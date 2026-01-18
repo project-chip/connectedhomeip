@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <algorithm>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
 #include <platform/ESP32/ESP32Config.h>
@@ -30,6 +29,22 @@ using namespace chip::DeviceLayer::Internal;
 namespace {
 static constexpr uint32_t kDACPrivateKeySize = 32;
 static constexpr uint32_t kDACPublicKeySize  = 65;
+
+// Helper function to remove dashes from a string in-place
+// Returns the new length after removing dashes
+inline size_t RemoveDashesInPlace(char * str, size_t length)
+{
+    size_t writePos = 0;
+    for (size_t readPos = 0; readPos < length; readPos++)
+    {
+        if (str[readPos] != '-')
+        {
+            str[writePos++] = str[readPos];
+        }
+    }
+    str[writePos] = '\0';
+    return writePos;
+}
 } // namespace
 
 CHIP_ERROR ESP32FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
@@ -241,16 +256,20 @@ CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8
     char dateStr[kMaxManufacturingDateLength + 1];
     size_t dateLen;
     err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
-    std::string mfgDateStr(dateStr);
     SuccessOrExit(err);
     VerifyOrExit(dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
-    mfgDateStr.erase(std::remove(mfgDateStr.begin(), mfgDateStr.end(), '-'), mfgDateStr.end());
-    VerifyOrExit(mfgDateStr.size() >= kMaxDateLength && mfgDateStr.size() <= kMaxManufacturingDateLength,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    year  = static_cast<uint16_t>(std::stoi(mfgDateStr.substr(0, 4)));
-    month = static_cast<uint8_t>(std::stoi(mfgDateStr.substr(4, 2)));
-    day   = static_cast<uint8_t>(std::stoi(mfgDateStr.substr(6, 2)));
+    dateLen = RemoveDashesInPlace(dateStr, dateLen);
+
+    VerifyOrExit(dateLen >= kMaxDateLength && dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    char yearStr[5]  = { dateStr[0], dateStr[1], dateStr[2], dateStr[3], '\0' };
+    char monthStr[3] = { dateStr[4], dateStr[5], '\0' };
+    char dayStr[3]   = { dateStr[6], dateStr[7], '\0' };
+
+    year  = static_cast<uint16_t>(atoi(yearStr));
+    month = static_cast<uint8_t>(atoi(monthStr));
+    day   = static_cast<uint8_t>(atoi(dayStr));
 
     VerifyOrExit(year >= 1000 && year <= 9999, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(month >= 1 && month <= 12, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -275,16 +294,16 @@ CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDateSuffix(MutableCharSpan 
     size_t dateLen;
     size_t vendorInfoLen;
     err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
-    std::string mfgDateStr(dateStr);
     SuccessOrExit(err);
     VerifyOrExit(dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
-    mfgDateStr.erase(std::remove(mfgDateStr.begin(), mfgDateStr.end(), '-'), mfgDateStr.end());
-    VerifyOrExit(mfgDateStr.size() >= kMaxDateLength && mfgDateStr.size() <= kMaxManufacturingDateLength,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-    vendorInfoLen = mfgDateStr.size() - kMaxDateLength;
+
+    dateLen = RemoveDashesInPlace(dateStr, dateLen);
+
+    VerifyOrExit(dateLen >= kMaxDateLength && dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    vendorInfoLen = dateLen - kMaxDateLength;
     VerifyOrExit(vendorInfoLen <= kMaxVendorInfoLength, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(vendorInfoSpan.size() >= vendorInfoLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(vendorInfoSpan.data(), mfgDateStr.substr(kMaxDateLength).c_str(), vendorInfoLen);
+    memcpy(vendorInfoSpan.data(), dateStr + kMaxDateLength, vendorInfoLen);
     vendorInfoSpan.reduce_size(vendorInfoLen);
 
 exit:
