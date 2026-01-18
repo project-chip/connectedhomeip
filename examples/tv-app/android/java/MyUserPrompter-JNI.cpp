@@ -156,12 +156,16 @@ void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t 
         jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
         VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
 
+        jstring jpairingInstruction = env->NewStringUTF(pairingInstruction);
+        VerifyOrExit(jpairingInstruction != nullptr, ChipLogError(Zcl, "Could not create pairingInstruction jstring");
+                     err = CHIP_ERROR_INTERNAL);
+
         ChipLogError(Zcl, "JNIMyUserPrompter::PromptForCommissionPasscode length=%d", static_cast<uint16_t>(passcodeLength));
 
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId),
                             static_cast<jint>(productId), static_cast<jint>(passcodeLength), jcommissioneeName,
-                            static_cast<jint>(pairingHint), pairingInstruction);
+                            static_cast<jint>(pairingHint), jpairingInstruction);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in PromptForCommissionPincode");
