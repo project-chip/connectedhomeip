@@ -95,6 +95,7 @@ private:
 
     std::optional<CommandHandler::Handle> mActiveCommandHandle;
     std::optional<JCMCommissionee> mActiveCommissionee;
+    std::optional<FabricIndex> mVerifiedFabricIndex;
 };
 
 JointFabricAdministratorGlobalInstance gJointFabricAdministratorGlobalInstance;
@@ -219,8 +220,9 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
 
     std::optional<Status> globalStatus = std::nullopt;
     ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
+    const FabricIndex accessingFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
-    auto onComplete = [this, cachedPath](const CHIP_ERROR & err) {
+    auto onComplete = [this, cachedPath, accessingFabricIndex](const CHIP_ERROR & err) {
         if (mActiveCommandHandle.has_value())
         {
             auto * commandHandler = mActiveCommandHandle.value().Get();
@@ -228,6 +230,7 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
             {
                 ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
                 commandHandler->AddStatus(cachedPath, Status::Success);
+                mVerifiedFabricIndex = accessingFabricIndex;
             }
             else
             {
@@ -274,6 +277,7 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an ICACCSRRequest command");
 
     auto nonDefaultStatus           = Status::Success;
+    Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
     auto & failSafeContext          = Server::GetInstance().GetFailSafeContext();
     auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
 
@@ -288,9 +292,10 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     VerifyOrExit(failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
 
-    /* TODO spec.: If the <<ref_FabricTableVendorIdVerificationProcedure, FabricFabric Table Vendor ID Verification Procedure>>
-     * has not been executed against the initiator of this command, the command SHALL fail
-     * with a <<ref_JFVidNotVerified, JfVidNotVerified>> status code SHALL be sent back to the initiator.*/
+    // VID must be verified (check that the fabric index matches the one whose VID was most recently verified)
+    VerifyOrExit(mVerifiedFabricIndex.has_value() &&
+                     mVerifiedFabricIndex.value() == ctx.mCommandHandler.GetAccessingFabricIndex(),
+                 status.Emplace(StatusCodeEnum::kVIDNotVerified));
 
     VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
@@ -301,7 +306,11 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 
 exit:
-    if (nonDefaultStatus != Status::Success)
+    if (status.HasValue())
+    {
+        TEMPORARY_RETURN_IGNORED ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath, to_underlying(status.Value()));
+    }
+    else if (nonDefaultStatus != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
     }
