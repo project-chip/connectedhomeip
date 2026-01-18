@@ -27,6 +27,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+class PushAvStreamTransportServerLogic;
+
 /// Integration of Push AV Stream Transport logic within the matter data model
 ///
 /// Translates between matter calls and Push AV Stream Transport logic
@@ -44,6 +46,7 @@ public:
      *
      * @note The caller must ensure the delegate lives throughout the instance's lifetime
      */
+    PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
         DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mLogic(aEndpointId, aFeatures)
     {}
