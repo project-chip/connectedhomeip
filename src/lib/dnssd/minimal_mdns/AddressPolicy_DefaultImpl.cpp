@@ -18,79 +18,9 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <algorithm>
-#include <cctype>
-#include <cstdlib>
-#include <sstream>
-#include <string>
-#include <vector>
-
 namespace mdns {
 namespace Minimal {
 namespace {
-
-// Filter class to check if interface is allowed based on CHIP_MDNS_INTERFACE env var
-class InterfaceNameFilter
-{
-public:
-    static InterfaceNameFilter & Instance()
-    {
-        static InterfaceNameFilter sInstance;
-        return sInstance;
-    }
-
-    bool IsAllowed(const char * name) const
-    {
-        if (!mEnabled)
-        {
-            return true;
-        }
-        bool allowed = std::find(mNames.begin(), mNames.end(), name) != mNames.end();
-        ChipLogProgress(Discovery, "InterfaceNameFilter: interface '%s' allowed=%d", name, allowed ? 1 : 0);
-        return allowed;
-    }
-
-private:
-    InterfaceNameFilter()
-    {
-        const char * env = std::getenv("CHIP_MDNS_INTERFACE");
-        if ((env == nullptr) || (env[0] == '\0'))
-        {
-            ChipLogProgress(Discovery, "InterfaceNameFilter: CHIP_MDNS_INTERFACE not set, allowing all interfaces");
-            return;
-        }
-        mEnabled = true;
-        ChipLogProgress(Discovery, "InterfaceNameFilter: CHIP_MDNS_INTERFACE='%s'", env);
-        std::stringstream ss(env);
-        std::string token;
-        while (std::getline(ss, token, ','))
-        {
-            auto trimmed = Trim(token);
-            if (!trimmed.empty())
-            {
-                mNames.push_back(trimmed);
-            }
-        }
-    }
-
-    static std::string Trim(const std::string & input)
-    {
-        size_t start = 0;
-        while ((start < input.size()) && std::isspace(static_cast<unsigned char>(input[start])))
-        {
-            ++start;
-        }
-        size_t end = input.size();
-        while ((end > start) && std::isspace(static_cast<unsigned char>(input[end - 1])))
-        {
-            --end;
-        }
-        return input.substr(start, end - start);
-    }
-
-    bool mEnabled = false;
-    std::vector<std::string> mNames;
-};
 
 /// Checks if the current interface is powered on
 /// and not local loopback.
@@ -108,6 +38,13 @@ bool IsCurrentInterfaceUsable(T & iterator)
         return false;
     }
 
+    // Check if interface is allowed by the configured filter (set by applications)
+    if (!GetInterfaceFilter().IsInterfaceAllowed(name))
+    {
+        ChipLogProgress(Discovery, "InterfaceFilter: ignoring interface '%s'", name);
+        return false;
+    }
+
     // TODO: need a better way to ignore local loopback interfaces/addresses
     // We do not want to listen on local loopback even though they are up and
     // support multicast
@@ -121,13 +58,6 @@ bool IsCurrentInterfaceUsable(T & iterator)
         /// local loopback interface is not usable by MDNS
         return false;
     }
-
-    // Check if interface is in the allowed list (if CHIP_MDNS_INTERFACE is set)
-    if (!InterfaceNameFilter::Instance().IsAllowed(name))
-    {
-        return false;
-    }
-
     return true;
 }
 
