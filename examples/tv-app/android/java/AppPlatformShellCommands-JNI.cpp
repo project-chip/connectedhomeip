@@ -396,7 +396,8 @@ JNI_METHOD(jstring, OnExecuteCommand)(JNIEnv * env, jobject, jobjectArray string
     }
 
     jstring result = nullptr;
-    CHIP_ERROR err = JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(buf, strlen(buf)), reinterpret_cast<jobject&>(result));
+    CHIP_ERROR err =
+        JniReferences::GetInstance().CharToStringUTF(chip::CharSpan(buf, strlen(buf)), reinterpret_cast<jobject &>(result));
     if (err != CHIP_NO_ERROR)
     {
         return nullptr;
