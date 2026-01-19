@@ -374,9 +374,9 @@ class Terminable(Protocol):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
-    '--commissioning',
-    type=click.Choice(['ble-wifi', 'wifi-paf'], case_sensitive=False),
-    default=None,
+    '--commissioning-method',
+    type=click.Choice(['on-network', 'ble-wifi', 'wifi-paf'], case_sensitive=False),
+    default='on-network',
     help='Commissioning method to use. "ble-wifi" uses Bluetooth and WiFi mock servers. "wifi-paf" uses WiFi-PAF (NAN/USD) mock. Both options are Linux-only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
@@ -387,7 +387,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
             energy_management_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
             chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, commissioning: str | None) -> None:
+            expected_failures: int, commissioning_method: str | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -457,11 +457,12 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning parameter
-    ble_wifi = commissioning == 'ble-wifi'
-    wifi_paf = commissioning == 'wifi-paf'
+    ble_wifi = commissioning_method == 'ble-wifi'
+    wifi_paf = commissioning_method == 'wifi-paf'
+    on_network = commissioning_method == 'on-network'
 
-    if commissioning and sys.platform != "linux":
-        raise click.BadOptionUsage("commissioning", f"Option --commissioning={commissioning} is available on Linux platform only")
+    if on_network != 'on-network' and sys.platform != "linux":
+        raise click.BadOptionUsage("commissioning_method", f"Option --commissioning_method={commissioning_method} is available on Linux platform only")
 
     ble_controller_app = None
     ble_controller_tool = None
@@ -479,7 +480,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            app_name = 'wlx-app' if (ble_wifi or wifi_paf) else 'eth-app'
+            app_name = 'eth-app' if on_network else 'wlx-app'
             tool_name = 'wlx-tool' if wifi_paf else 'eth-tool'
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
