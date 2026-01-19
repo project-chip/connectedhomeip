@@ -214,7 +214,7 @@ CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)
     //   - causes the OnOff attribute to be set to FALSE
     // the server SHALL set the OnTime attribute to 0
     //
-    // Note that here we only update things is mOnTime is not already 0
+    // Note that here we only update things if mOnTime is not already 0
     if (!on && (mOnTime != 0))
     {
         mOnTime = 0;
