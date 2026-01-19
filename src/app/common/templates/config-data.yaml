@@ -53,7 +53,6 @@ CommandHandlerInterfaceOnlyClusters:
     - TLS Certificate Management
     - TLS Client Management
     - Thread Border Router Management
-    - Thread Network Diagnostics
     - Thread Network Directory
     - Water Heater Management
     - Water Heater Mode
