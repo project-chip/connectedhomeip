@@ -11,11 +11,21 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
+#include <string>
+#include <uriparser/Uri.h>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+// Internal namespace for helper functions
+namespace Internal {
+
+std::string extractTextRange(const UriTextRangeA & range);
+std::string extractPath(const UriPathSegmentA * pathHead);
+
+} // namespace Internal
 
 class PushAvStreamTransportServerLogic
 {

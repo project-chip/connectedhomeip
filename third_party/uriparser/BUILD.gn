@@ -16,38 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 
-# Configurable parameters for uriparser features
-declare_args() {
-  uriparser_enable_wprintf = false
-  uriparser_enable_reallocarray = false
-}
-
-# Generate UriConfig.h from template
-# Convert boolean to string for script arguments
-_wprintf_value = "0"
-if (uriparser_enable_wprintf) {
-  _wprintf_value = "1"
-}
-
-_reallocarray_value = "0"
-if (uriparser_enable_reallocarray) {
-  _reallocarray_value = "1"
-}
-
-action("gen_uri_config") {
-  script = "${chip_root}/third_party/uriparser/gen_uri_config.py"
-  inputs = [ "${chip_root}/third_party/uriparser/repo/src/UriConfig.h.in" ]
-  outputs = [ "${target_gen_dir}/UriConfig.h" ]
-
-  args = [
-    rebase_path("${chip_root}/third_party/uriparser/repo/src/UriConfig.h.in",
-                root_build_dir),
-    rebase_path("${target_gen_dir}/UriConfig.h", root_build_dir),
-    "1.0.0",
-    _wprintf_value,
-    _reallocarray_value,
-  ]
-}
+# Static UriConfig.h with both features disabled (HAVE_WPRINTF and HAVE_REALLOCARRAY)
 
 # Static library for uriparser
 static_library("uriparser") {
@@ -104,13 +73,11 @@ static_library("uriparser") {
     "${chip_root}/third_party/uriparser/repo/src/UriVersion.c",
   ]
 
-  deps = [ ":gen_uri_config" ]
-
   # Public include directory for uriparser headers
   public_configs = [ ":uriparser_include" ]
 
-  # Include directory for generated UriConfig.h
-  include_dirs = [ "${target_gen_dir}" ]
+  # Include directory for static UriConfig.h
+  include_dirs = [ "${chip_root}/third_party/uriparser" ]
 
   # Compile definitions
   defines = [

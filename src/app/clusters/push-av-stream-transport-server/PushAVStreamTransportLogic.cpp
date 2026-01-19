@@ -48,6 +48,38 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace Internal {
+
+std::string extractTextRange(const UriTextRangeA & range)
+{
+    if (range.first == nullptr || range.afterLast == nullptr || range.first >= range.afterLast)
+    {
+        return "";
+    }
+    return std::string(range.first, range.afterLast);
+}
+
+std::string extractPath(const UriPathSegmentA * pathHead)
+{
+    std::string path;
+    const UriPathSegmentA * segment = pathHead;
+
+    while (segment != nullptr)
+    {
+        path += "/";
+
+        if (segment->text.first != nullptr && segment->text.afterLast != nullptr)
+        {
+            path += std::string(segment->text.first, segment->text.afterLast);
+        }
+        segment = segment->next;
+    }
+
+    return path;
+}
+
+} // namespace Internal
+
 PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<Feature> aFeatures) :
     mEndpointId(aEndpoint), mFeatures(aFeatures),
     mSupportedFormats{ PushAvStreamTransport::SupportedFormatStruct{ PushAvStreamTransport::ContainerFormatEnum::kCmaf,
@@ -228,34 +260,6 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
     }
 }
 
-std::string extractTextRange(const UriTextRangeA & range)
-{
-    if (range.first == nullptr || range.afterLast == nullptr || range.first >= range.afterLast)
-    {
-        return "";
-    }
-    return std::string(range.first, range.afterLast);
-}
-
-std::string extractPath(const UriPathSegmentA * pathHead)
-{
-    std::string path;
-    const UriPathSegmentA * segment = pathHead;
-
-    while (segment != nullptr)
-    {
-        path += "/";
-
-        if (segment->text.first != nullptr && segment->text.afterLast != nullptr)
-        {
-            path += std::string(segment->text.first, segment->text.afterLast);
-        }
-        segment = segment->next;
-    }
-
-    return path;
-}
-
 bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
 {
     UriUriA uri;
@@ -270,11 +274,11 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     }
 
     // Extract components
-    std::string scheme   = extractTextRange(uri.scheme);
-    std::string host     = extractTextRange(uri.hostText);
-    std::string path     = extractPath(uri.pathHead);
-    std::string query    = extractTextRange(uri.query);
-    std::string fragment = extractTextRange(uri.fragment);
+    std::string scheme   = Internal::extractTextRange(uri.scheme);
+    std::string host     = Internal::extractTextRange(uri.hostText);
+    std::string path     = Internal::extractPath(uri.pathHead);
+    std::string query    = Internal::extractTextRange(uri.query);
+    std::string fragment = Internal::extractTextRange(uri.fragment);
 
     // Free URI structure
     uriFreeUriMembersA(&uri);
