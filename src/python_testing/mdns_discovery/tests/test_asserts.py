@@ -24,8 +24,8 @@ from mdns_discovery.utils.asserts import (assert_is_border_router_type, assert_i
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
                                           assert_valid_jf_key, assert_valid_long_discriminator_subtype,
                                           assert_valid_operational_instance_name, assert_valid_ph_key,
-                                          assert_valid_ph_pi_relationship, assert_valid_pi_key,
-                                          assert_valid_product_id, assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
+                                          assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_product_id,
+                                          assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
                                           assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
                                           assert_valid_vendor_id, assert_valid_vendor_subtype, assert_valid_vp_key)
 from mobly import signals

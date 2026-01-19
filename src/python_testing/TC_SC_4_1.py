@@ -66,10 +66,10 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
                                           assert_valid_long_discriminator_subtype, assert_valid_ph_key,
-                                          assert_valid_ph_pi_relationship, assert_valid_pi_key,
-                                          assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
-                                          assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
-                                          assert_valid_vendor_subtype, assert_valid_vp_key)
+                                          assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_ri_key,
+                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
+                                          assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
+                                          assert_valid_vp_key)
 from mobly import asserts
 
 import matter.clusters as Clusters
