@@ -38,7 +38,8 @@ constexpr const uint8_t kOTModule[]  = "[ot]";
 
 static constexpr size_t kTimeStampStringSize = sizeof("[0000:00:00.000]"); // includes null terminator
 static constexpr size_t kMaxCategoryStrLen =
-    std::max({ sizeof(kLogError), sizeof(kLogWarn), sizeof(kLogInfo), sizeof(kLogDetail), sizeof(kLogLwip), sizeof(kLogSilabs), sizeof(kLogNone), sizeof(kOTModule) });
+    std::max({ sizeof(kLogError), sizeof(kLogWarn), sizeof(kLogInfo), sizeof(kLogDetail), sizeof(kLogLwip), sizeof(kLogSilabs),
+               sizeof(kLogNone), sizeof(kOTModule) });
 
 enum LogCategory : uint8_t
 {
