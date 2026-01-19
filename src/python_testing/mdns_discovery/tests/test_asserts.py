@@ -1187,10 +1187,6 @@ class TestAssertValidPhPiRelationship(unittest.TestCase):
         # 16 = 0b10000
         assert_valid_ph_pi_relationship({'PH': '16', 'PI': 'some instruction'})
 
-    def test_valid_pi_with_correct_ph(self):
-        # PI is present, PH has bit 4 set
-        assert_valid_ph_pi_relationship({'PH': '16', 'PI': 'some instruction'})
-
     def test_invalid_ph_mandatory_pi_bit_set_no_pi(self):
         # PH bit 4 is set, but PI is missing
         msg = fail_msg(assert_valid_ph_pi_relationship, {'PH': '16'})
