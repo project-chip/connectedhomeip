@@ -382,20 +382,20 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 
     caseSessionManagerConfig = {
-         .sessionInitParams =  {
-             .sessionManager    = &mSessions,
-             .sessionResumptionStorage = mSessionResumptionStorage,
-             .certificateValidityPolicy = &mCertificateValidityPolicy,
-             .exchangeMgr       = &mExchangeMgr,
-             .fabricTable       = &mFabrics,
-             .groupDataProvider = mGroupsProvider,
-             // Don't provide an MRP local config, so each CASE initiation will use
-             // the then-current value.
-             .mrpLocalConfig = NullOptional,
-         },
-         .clientPool            = &mCASEClientPool,
-         .sessionSetupPool      = &mSessionSetupPool,
-     };
+        .sessionInitParams =  {
+            .sessionManager    = &mSessions,
+            .sessionResumptionStorage = mSessionResumptionStorage,
+            .certificateValidityPolicy = &mCertificateValidityPolicy,
+            .exchangeMgr       = &mExchangeMgr,
+            .fabricTable       = &mFabrics,
+            .groupDataProvider = mGroupsProvider,
+            // Don't provide an MRP local config, so each CASE initiation will use
+            // the then-current value.
+            .mrpLocalConfig = NullOptional,
+        },
+        .clientPool            = &mCASEClientPool,
+        .sessionSetupPool      = &mSessionSetupPool,
+    };
 
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
