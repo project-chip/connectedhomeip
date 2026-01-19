@@ -438,6 +438,45 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
     return false;
 }
 
+bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollLength,
+                                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId)
+{
+    // If the video stream ID is missing or null, error log and return false
+    if (!videoStreamId.HasValue())
+    {
+        ChipLogError(Camera, "MaxPreRollLength validation requested with no provided stream") return false;
+    }
+    else
+    {
+        if (videoStreamId.Value().IsNull())
+        {
+            ChipLogError(Camera, "MaxPreRollLength validation requested against a Null stream") return false;
+        }
+    }
+
+    auto & videoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+
+    if (videoStreams.empty())
+    {
+        return false;
+    }
+
+    for (const VideoStreamStruct & stream : videoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId.Value().Value())
+        {
+            // Max pre roll length must be less than key frame interval
+            if (maxPreRollLength < stream.keyFrameInterval)
+            {
+                return true;
+            }
+            break;
+        }
+    }
+
+    return false;
+}
+
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStream(StreamUsageEnum streamUsage,
                                                                                     uint16_t & videoStreamId)
 {

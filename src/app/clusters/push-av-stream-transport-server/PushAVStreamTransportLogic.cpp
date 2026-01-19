@@ -867,6 +867,20 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
+    // Validate MaxPreRollLength constraint
+    if (transportOptionsPtr->videoStreamID.HasValue())
+    {
+        uint16_t maxPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
+        if (maxPreRollLength == 0 || !mDelegate->ValidateSegmentDuration(maxPreRollLength, transportOptionsPtr->videoStreamID))
+        {
+            auto maxPreRolllLengthStatus = to_underlying(StatusCodeEnum::kInvalidPreRollLength);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed", 
+                            mEndpointId, maxPreRollLength);
+            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, maxPreRolllLengthStatus);
+            return std::nullopt;
+        }
+    }
+
     uint16_t connectionID = GenerateConnectionID();
 
     if (connectionID == kMaxConnectionId)
