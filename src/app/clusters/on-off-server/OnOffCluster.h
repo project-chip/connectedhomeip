@@ -86,6 +86,11 @@ protected:
     TimerDelegate & mTimerDelegate;
 
 private:
+    /// Separate timer context specific for scenes transition: this class is quite self-contained
+    /// so keeping it separate so that subclasses of the OnOff cluster can have their own
+    /// timer context derivation without getting into multiple-inheritance.
+    ///
+    /// This comes at the cost of an extra pointer (the self-referencing mCluster).
     class SceneTransitionTimer : public TimerContext
     {
     public:
