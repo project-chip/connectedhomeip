@@ -74,3 +74,9 @@ tests:
       attribute: "CurrentChannel"
       response:
           value: { MajorNumber: majornumber, MinorNumber: minornumber }
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

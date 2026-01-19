@@ -32,13 +32,17 @@ public:
 class NamedPipeCommands
 {
 public:
-    CHIP_ERROR Start(std::string & path, NamedPipeCommandDelegate * delegate);
+    CHIP_ERROR Start(const std::string & path, NamedPipeCommandDelegate * delegate);
+    CHIP_ERROR Start(const std::string & path, const std::string & path_out, NamedPipeCommandDelegate * delegate);
     CHIP_ERROR Stop();
+    void WriteToOutPipe(const std::string & json);
+    const std::string & OutPath() const { return mChipEventFifoPathOut; }
 
 private:
     bool mStarted = false;
     pthread_t mChipEventCommandListener;
     std::string mChipEventFifoPath;
+    std::string mChipEventFifoPathOut;
     NamedPipeCommandDelegate * mDelegate = nullptr;
 
     static void * EventCommandListenerTask(void * arg);

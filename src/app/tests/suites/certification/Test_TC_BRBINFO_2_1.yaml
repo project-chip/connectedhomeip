@@ -638,3 +638,9 @@ tests:
       attribute: "ConfigurationVersion"
       response:
           value: ConfigurationVersionValue
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: bridge
+      app: bridge
