@@ -185,6 +185,8 @@ int main(int argc, char * argv[])
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    // Enable automatic port retry for casting apps to handle port conflicts
+    initParams.portRetryCount = 9;
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
     if (argc > 1)

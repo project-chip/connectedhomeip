@@ -74,7 +74,7 @@
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 20
 
 // Change port to make it easy to run against tv-casting-app
-#define CHIP_PORT 5640
+// #define CHIP_PORT 5640
 
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
