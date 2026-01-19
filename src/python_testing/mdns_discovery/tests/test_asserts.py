@@ -23,7 +23,8 @@ from mdns_discovery.utils.asserts import (assert_is_border_router_type, assert_i
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
                                           assert_valid_jf_key, assert_valid_long_discriminator_subtype,
-                                          assert_valid_operational_instance_name, assert_valid_ph_key, assert_valid_pi_key,
+                                          assert_valid_operational_instance_name, assert_valid_ph_key,
+                                          assert_valid_ph_pi_relationship, assert_valid_pi_key,
                                           assert_valid_product_id, assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
                                           assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
                                           assert_valid_vendor_id, assert_valid_vendor_subtype, assert_valid_vp_key)
@@ -1173,6 +1174,42 @@ class TestAssertValidPiKey(unittest.TestCase):
         msg = fail_msg(assert_valid_pi_key, bad)
         self.assertIn(self.UTF8_MSG, msg)
         self.assertNotIn(self.LEN_MSG, msg)
+
+
+class TestAssertValidPhPiRelationship(unittest.TestCase):
+    def test_valid_ph_no_pi_needed(self):
+        # PH has no mandatory PI bits set (e.g., bit 0, 1, 2, 3)
+        # 7 = 0b0111
+        assert_valid_ph_pi_relationship({'PH': '7'})
+
+    def test_valid_ph_with_mandatory_pi_bits(self):
+        # PH bit 4 is set, PI is present
+        # 16 = 0b10000
+        assert_valid_ph_pi_relationship({'PH': '16', 'PI': 'some instruction'})
+
+    def test_valid_pi_with_correct_ph(self):
+        # PI is present, PH has bit 4 set
+        assert_valid_ph_pi_relationship({'PH': '16', 'PI': 'some instruction'})
+
+    def test_invalid_ph_mandatory_pi_bit_set_no_pi(self):
+        # PH bit 4 is set, but PI is missing
+        msg = fail_msg(assert_valid_ph_pi_relationship, {'PH': '16'})
+        self.assertIn("'PI' key must be present", msg)
+
+    def test_invalid_pi_no_ph(self):
+        # PI is present, but PH is missing
+        msg = fail_msg(assert_valid_ph_pi_relationship, {'PI': 'some instruction'})
+        self.assertIn("'PH' key must be present", msg)
+
+    def test_invalid_pi_with_ph_missing_related_bits(self):
+        # PI is present, PH is present but has none of bits 4, 8-12, 15-22 set
+        # 7 = 0b0111
+        msg = fail_msg(assert_valid_ph_pi_relationship, {'PH': '7', 'PI': 'some instruction'})
+        self.assertIn("'PH' key must have at least one of bits", msg)
+
+    def test_empty_txt(self):
+        # No PH or PI, should pass
+        assert_valid_ph_pi_relationship({})
 
 
 class TestAssertValidProductId(unittest.TestCase):

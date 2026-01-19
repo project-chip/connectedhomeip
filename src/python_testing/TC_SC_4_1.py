@@ -65,7 +65,8 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
-                                          assert_valid_long_discriminator_subtype, assert_valid_ph_key, assert_valid_pi_key,
+                                          assert_valid_long_discriminator_subtype, assert_valid_ph_key,
+                                          assert_valid_ph_pi_relationship, assert_valid_pi_key,
                                           assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
                                           assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
                                           assert_valid_vendor_subtype, assert_valid_vp_key)
@@ -618,13 +619,6 @@ class TC_SC_4_1(MatterBaseTest):
             # text, omitting any leading zeros, and value different than '0'
             assert_valid_ph_key(ph_key)
 
-            # Verify that if any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set, then the PI key is present
-            ph_val = int(ph_key)
-            mandatory_pi_bits = [4, 8, 10, 12, 15, 17, 19, 20, 21, 22]
-            if any((ph_val & (1 << bit)) for bit in mandatory_pi_bits):
-                asserts.assert_in(
-                    'PI', txt_record.txt, "'PI' key must be present if any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set in 'PH' key.")
-
         # *** PI KEY ***
         # If the PI key is present
         if 'PI' in txt_record.txt:
@@ -636,13 +630,8 @@ class TC_SC_4_1(MatterBaseTest):
             # with a maximum length of 128 bytes
             assert_valid_pi_key(pi_key)
 
-            # Verify that the PH key is present and has at least one of the bits 4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, or 22 set
-            asserts.assert_in('PH', txt_record.txt, "'PH' key must be present if 'PI' key is present.")
-            ph_key = txt_record.txt['PH']
-            ph_val = int(ph_key)
-            pi_related_bits = [4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22]
-            asserts.assert_true(any((ph_val & (1 << bit)) for bit in pi_related_bits),
-                                "'PH' key must have at least one of bits 4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, or 22 set if 'PI' key is present.")
+        # Verify the relationship between PH and PI keys
+        assert_valid_ph_pi_relationship(txt_record.txt)
 
     def verify_t_key(self, txt_record) -> None:
         # If 'supports_tcp' is False and T key is not present, nothing to check
