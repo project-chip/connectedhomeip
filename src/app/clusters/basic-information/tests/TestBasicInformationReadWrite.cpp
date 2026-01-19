@@ -172,22 +172,19 @@ private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
 };
 
-MockConfigurationManager gMockConfigurationManager;
-MockDeviceInstanceInfoProvider gMockDeviceInstanceInfoProvider;
+class MockDelegate : public BasicInformationCluster::Delegate
+{
+public:
+    DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() override { return &mDeviceInfoProvider; }
+    DeviceLayer::ConfigurationManager & GetConfigurationManager() override { return mMockConfigurationManager; }
+    DeviceLayer::PlatformManager & GetPlatformManager() override { return chip::DeviceLayer::PlatformMgr(); }
+
+    MockConfigurationManager mMockConfigurationManager;
+    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
+};
 struct TestBasicInformationReadWrite : public ::testing::Test
 {
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-
-        // Back up any existing DeviceInstanceInfoProvider and install the mock provider. This is required on platforms that build
-        // all unit tests into a single binary(e.g. Nordic), where global DeviceLayer state persists across test suites.
-        // DeviceInstanceInfoProvider has no universal default and cannot be reliably reset via Init/Shutdown, so without this
-        // backup/restore the mock would leak into subsequent tests.
-        sDeviceInstanceInfoProviderBackup = DeviceLayer::TestOnlyTryGetDeviceInstanceInfoProvider();
-        DeviceLayer::SetDeviceInstanceInfoProvider(&gMockDeviceInstanceInfoProvider);
-        DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
 
     static void TearDownTestSuite()
     {
@@ -203,15 +200,13 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
     chip::Testing::TestServerClusterContext testContext;
-    static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup;
+    MockDelegate mDelegate;
 };
-
-DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDeviceInstanceInfoProviderBackup = nullptr;
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -266,7 +261,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 
     BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
     optionalAttributeSet.Set<Attributes::ManufacturingDate::Id>();
-    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
     chip::Testing::ClusterTester tester(cluster);
 
     // VendorName
@@ -340,10 +335,10 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     {
         char buf[32];
         CharSpan val(buf);
-        gMockDeviceInstanceInfoProvider.SetManufacturingDateSuffix("ABCDEFGH");
+        mDelegate.mDeviceInfoProvider.SetManufacturingDateSuffix("ABCDEFGH");
         ASSERT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
         EXPECT_TRUE(val.data_equal("20230615ABCDEFGH"_span));
-        gMockDeviceInstanceInfoProvider.SetManufacturingDateSuffix(nullptr);
+        mDelegate.mDeviceInfoProvider.SetManufacturingDateSuffix(nullptr);
     }
 
     // UniqueID (Mandatory in Rev 4+, so if it fails, cluster rev must be < 4)
@@ -392,7 +387,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -414,7 +409,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -448,7 +443,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 
     BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
     optionalAttributeSet.Set<Attributes::LocalConfigDisabled::Id>();
-    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
