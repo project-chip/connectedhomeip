@@ -447,7 +447,6 @@ TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 0);
 
-
     // Step 5: Turn off, set OnTime and OffWaitTime to non-zero values
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(false), CHIP_NO_ERROR);
     testAccess.SetOnTime(100);
