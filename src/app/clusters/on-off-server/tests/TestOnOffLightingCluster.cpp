@@ -427,6 +427,7 @@ TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
     testAccess.SetOffWaitTime(200);
 
     // Step 2: Call SetOnOffWithTimeReset(false) to turn off and clear OnTime.
+    // Spec requires mOnTime to be set to 0
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(false), CHIP_NO_ERROR);
     uint16_t onTime = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
@@ -435,14 +436,28 @@ TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 200);
 
-    // Step 3: Set OnTime and OffWaitTime to non-zero values again
-    testAccess.SetOnTime(100);
+    // Step 3: Set OnTime to 0 and OffWaitTime to non-zero values
+    testAccess.SetOnTime(0);
     testAccess.SetOffWaitTime(200);
 
     // Step 4: Call SetOnOffWithTimeReset(true) to turn on and clear OffWaitTime.
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(true), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 0);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
+    EXPECT_EQ(onTime, 0);
+
+
+    // Step 5: Turn off, set OnTime and OffWaitTime to non-zero values
+    EXPECT_EQ(mCluster.SetOnOffWithTimeReset(false), CHIP_NO_ERROR);
+    testAccess.SetOnTime(100);
+    testAccess.SetOffWaitTime(200);
+
+    // Step 6: Call SetOnOffWithTimeReset(true) to turn on and clear OffWaitTime.
+    // Spec requires mOffTime to NOT be set to 0 becaues mOnTime is not 0
+    EXPECT_EQ(mCluster.SetOnOffWithTimeReset(true), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
+    EXPECT_EQ(offWaitTime, 200);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
     EXPECT_EQ(onTime, 100);
 }
