@@ -28,6 +28,24 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
+namespace {
+
+class RootNodeBasicInfoDelegate : public BasicInformationCluster::Delegate
+{
+public:
+    DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() override
+    {
+        return DeviceLayer::GetDeviceInstanceInfoProvider();
+    }
+
+    DeviceLayer::ConfigurationManager & GetConfigurationManager() override { return DeviceLayer::ConfigurationMgr(); }
+
+    DeviceLayer::PlatformManager & GetPlatformManager() override { return DeviceLayer::PlatformMgr(); }
+};
+
+static RootNodeBasicInfoDelegate gBasicInfoDelegate;
+
+} // namespace
 namespace chip {
 namespace app {
 
@@ -47,20 +65,20 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
             .Set<BasicInformation::Attributes::Reachable::Id>();
 
-    mBasicInformationCluster.Create(optionalAttributeSet);
+    mBasicInformationCluster.Create(optionalAttributeSet, &gBasicInfoDelegate);
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
 
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
