@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <cassert>
 #include <cstring>
 #include <pw_unit_test/framework.h>
 #include <string>
@@ -53,96 +54,72 @@ class TestValidateUrlDelegate : public PushAvStreamTransportDelegate
 public:
     Status AllocatePushTransport(const TransportOptionsStruct &, const uint16_t, FabricIndex) override { return Status::Success; }
     Status DeallocatePushTransport(const uint16_t) override { return Status::Success; }
-    Status ModifyPushTransport(const uint16_t, const TransportOptionsStruct &) override { return Status::Success; }
-    Status SetTransportStatus(const uint16_t, TransportStatusEnum) override { return Status::Success; }
-    Status ManuallyTriggerTransport(const uint16_t) override { return Status::Success; }
-    Status FindTransport(const uint16_t, TransportConfigurationStruct &) override { return Status::Success; }
-    Status SelectVideoStream(StreamUsageEnum, uint16_t &) override { return Status::Success; }
-    Status SetVideoStream(const uint16_t) override { return Status::Success; }
-    Status SelectAudioStream(StreamUsageEnum, uint16_t &) override { return Status::Success; }
-    Status SetAudioStream(const uint16_t) override { return Status::Success; }
-    bool ValidateMotionZoneListSize(const DataModel::List<const Structs::TransportZoneOptionsStruct::Type> &) override
+    Status ModifyPushTransport(const uint16_t, const TransportOptionsStorage) override { return Status::Success; }
+    Status SetTransportStatus(const std::vector<uint16_t>, TransportStatusEnum) override { return Status::Success; }
+    Status ManuallyTriggerTransport(const uint16_t, TriggerActivationReasonEnum,
+                                    const Optional<Structs::TransportMotionTriggerTimeControlStruct::Type> &) override
     {
-        return true;
+        return Status::Success;
     }
-    void SetTLSCerts(const Tls::CertificateTable::BufferedClientCert &, const Tls::CertificateTable::BufferedRootCert &) override {}
-    bool ValidateSegmentDuration(const uint32_t, const uint16_t) override { return true; }
+    bool ValidateStreamUsage(StreamUsageEnum) override { return true; }
+    bool ValidateSegmentDuration(uint16_t, const Optional<DataModel::Nullable<uint16_t>> &) override { return true; }
+    Status ValidateBandwidthLimit(StreamUsageEnum, const Optional<DataModel::Nullable<uint16_t>> &,
+                                  const Optional<DataModel::Nullable<uint16_t>> &) override
+    {
+        return Status::Success;
+    }
+    Status SelectVideoStream(StreamUsageEnum, uint16_t &) override { return Status::Success; }
+    Status SelectAudioStream(StreamUsageEnum, uint16_t &) override { return Status::Success; }
+    Status SetVideoStream(uint16_t) override { return Status::Success; }
+    Status SetAudioStream(uint16_t) override { return Status::Success; }
+    Status ValidateZoneId(uint16_t) override { return Status::Success; }
+    bool ValidateMotionZoneListSize(size_t) override { return true; }
+    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t) override
+    {
+        return PushAvStreamTransportStatusEnum::kIdle;
+    }
+    void OnAttributeChanged(AttributeId) override {}
+    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR PersistentAttributesLoadedCallback() override { return CHIP_NO_ERROR; }
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert &, Tls::CertificateTable::BufferedRootCert &) override {}
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override
+    {
+        isActive = false;
+        return CHIP_NO_ERROR;
+    }
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer *) override {}
 };
 
 class TestValidateUrlTlsDelegate : public TlsClientManagementDelegate
 {
 public:
-    CHIP_ERROR FindProvisionedEndpointByID(EndpointId, FabricIndex, uint16_t, int) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR FindProvisionedEndpointByFQDN(const CharSpan &, FabricIndex, uint16_t &, int &) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifier(uint32_t, FabricIndex, uint16_t &, int &) override
+    CHIP_ERROR Init(PersistentStorageDelegate &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ForEachEndpoint(EndpointId, FabricIndex, LoadedEndpointCallback) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId, FabricIndex, uint16_t, LoadedEndpointCallback) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByVendorId(uint16_t, FabricIndex, uint16_t &, int &) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR FindProvisionedEndpointByProductId(uint16_t, FabricIndex, uint16_t &, int &) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR FindProvisionedEndpointByServerName(const CharSpan &, FabricIndex, uint16_t &, int &) override
+    ClusterStatusCode ProvisionEndpoint(EndpointId, FabricIndex,
+                                        const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType &,
+                                        uint16_t &) override
     {
-        return CHIP_NO_ERROR;
+        return ClusterStatusCode(Status::Success);
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndVendorId(uint32_t, uint16_t, FabricIndex, uint16_t &, int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndProductId(uint32_t, uint16_t, FabricIndex, uint16_t &,
-                                                                         int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierVendorIdAndProductId(uint32_t, uint16_t, uint16_t, FabricIndex,
-                                                                                 uint16_t &, int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerNameAndVendorId(const CharSpan &, uint16_t, FabricIndex, uint16_t &, int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerNameAndProductId(const CharSpan &, uint16_t, FabricIndex, uint16_t &, int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerNameVendorIdAndProductId(const CharSpan &, uint16_t, uint16_t, FabricIndex,
-                                                                       uint16_t &, int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameAndVendorId(uint32_t, const CharSpan &, uint16_t, FabricIndex,
-                                                                                  uint16_t &, int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameAndProductId(uint32_t, const CharSpan &, uint16_t,
-                                                                                   FabricIndex, uint16_t &, int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameVendorIdAndProductId(uint32_t, const CharSpan &, uint16_t,
-                                                                                           uint16_t, FabricIndex, uint16_t &,
-                                                                                           int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndServerName(uint32_t, const CharSpan &, FabricIndex, uint16_t &,
-                                                                          int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameVendorIdAndProductId(uint32_t, const CharSpan &, uint16_t,
-                                                                                           uint16_t, FabricIndex, uint16_t &,
-                                                                                           int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndServerName(uint32_t, const CharSpan &, FabricIndex, uint16_t &,
-                                                                          int &) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    Status RemoveProvisionedEndpointByID(EndpointId, FabricIndex, uint16_t) override { return Status::Success; }
+    void RemoveFabric(FabricIndex) override {}
+    CHIP_ERROR MutateEndpointReferenceCount(EndpointId, FabricIndex, uint16_t, int8_t) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR RootCertCanBeRemoved(EndpointId, FabricIndex, Tls::TLSCAID) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ClientCertCanBeRemoved(EndpointId, FabricIndex, Tls::TLSCCDID) override { return CHIP_NO_ERROR; }
 };
 
 class TestValidateUrl : public ::testing::Test
@@ -162,6 +139,8 @@ public:
 
         // Set URL
         transportOptions.url = Span(urlInput.data(), urlInput.size());
+        transportOptions.videoStreamID.SetValue(1);
+        transportOptions.audioStreamID.SetValue(2);
 
         // Set container options
         CMAFContainerOptionsStruct cmafOptions;
@@ -171,12 +150,11 @@ public:
         transportOptions.containerOptions.CMAFContainerOptions.SetValue(cmafOptions);
 
         // Set trigger options
-        TransportTriggerOptionsDecodableStruct triggerOptions;
-        triggerOptions.triggerType = TransportTriggerTypeEnum::kCommand;
-        triggerOptions.maxPreRollLen.SetValue(1000);
-        transportOptions.triggerOptions.SetValue(triggerOptions);
-
-        // Clear expiry time to avoid timer-related issues in tests
+        transportOptions.triggerOptions.triggerType = TransportTriggerTypeEnum::kCommand;
+        transportOptions.triggerOptions.maxPreRollLen.SetValue(1000);
+        transportOptions.streamUsage   = StreamUsageEnum::kAnalysis;
+        transportOptions.TLSEndpointID = 1;
+        transportOptions.ingestMethod  = IngestMethodsEnum::kCMAFIngest;
         transportOptions.expiryTime.ClearValue();
 
         return transportOptions;
