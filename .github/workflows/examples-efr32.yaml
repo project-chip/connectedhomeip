@@ -31,8 +31,9 @@ env:
 
 jobs:
   efr32:
-    #TODO: Re-enable these tests once the Silabs version of the DeviceInstanceInfoProvider is updated
+    # TODO: Re-enable these tests once the Silabs version of the DeviceInstanceInfoProvider is updated
     # to support the latest changes with reporting device capability minima. 
+    # See [Issue #42709](https://github.com/project-chip/connectedhomeip/issues/42709)
     name: EFR32
     if: false
 
