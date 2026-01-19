@@ -159,17 +159,17 @@ not_automated:
     - name: TC_GCAST_common.py
       reason: Shared code for TC_GCAST, not a standalone test.
     - name: TC_GCAST_2_1.py
-      reason: Test case is provisional. CI is not supported.
+      reason: Cluster not finalized. Will re-enable before 1.6TE2. CI is not supported.
     - name: TC_GCAST_2_3.py
-      reason: Test case is provisional. CI is not supported.
+      reason: Cluster not finalized. Will re-enable before 1.6TE2. CI is not supported.
     - name: TC_GCAST_2_4.py
-      reason: Test case is provisional. CI is not supported.
+      reason: Cluster not finalized. Will re-enable before 1.6TE2. CI is not supported.
     - name: TC_GCAST_2_5.py
-      reason: Test case is provisional. CI is not supported.
+      reason: Cluster not finalized. Will re-enable before 1.6TE2. CI is not supported.
     - name: TC_GCAST_2_6.py
-      reason: Test case is provisional. CI is not supported.
+      reason: Cluster not finalized. Will re-enable before 1.6TE2. CI is not supported.
     - name: TC_GCAST_2_7.py
-      reason: Test case is provisional. CI is not supported.
+      reason: Cluster not finalized. Will re-enable before 1.6TE2. CI is not supported.
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
 # to consider improving. May not be exhaustive

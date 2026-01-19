@@ -73,8 +73,6 @@ class TC_GCAST_2_4(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_4(self):
-        if self.matter_test_config.endpoint is None:
-            self.matter_test_config.endpoint = 0
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
         # membership_attribute = Clusters.Objects.Groupcast.Attributes.Membership ?
