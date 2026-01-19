@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include "CodegenIntegration.h"
+
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>

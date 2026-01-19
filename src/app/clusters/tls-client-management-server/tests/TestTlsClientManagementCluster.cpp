@@ -295,7 +295,11 @@ struct TestTlsClientManagementCluster : public ::testing::Test
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+    void TearDown() override
+    {
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        app::SetSafeAttributePersistenceProvider(nullptr);
+    }
 
     MockTlsClientManagementDelegate mMockDelegate;
     MockCertificateTable mMockCertTable;
