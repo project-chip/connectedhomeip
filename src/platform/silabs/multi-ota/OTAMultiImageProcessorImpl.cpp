@@ -56,7 +56,7 @@ void OTAMultiImageProcessorImpl::Clear()
     mParams.totalFileBytes  = 0;
     mParams.downloadedBytes = 0;
     mCurrentProcessor       = nullptr;
-    TEMPORARY_RETURN_IGNORED ReleaseBlock();
+    VerifyOrReturn(ReleaseBlock() == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Release block failed while Clearing"));
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::PrepareDownload()
@@ -114,7 +114,8 @@ void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mAccumulator.Init(sizeof(OTATlvHeader));
-    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    VerifyOrReturn(imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR) == CHIP_NO_ERROR,
+                   ChipLogError(SoftwareUpdate, "OnPreparedForDownload failed"));
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ProcessHeader(ByteSpan & block)
@@ -270,7 +271,7 @@ void OTAMultiImageProcessorImpl::AbortAllProcessors()
     {
         if (pair.second->WasSelected())
         {
-            TEMPORARY_RETURN_IGNORED pair.second->Clear();
+            VerifyOrReturn(pair.second->Clear() == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Clear processor failed"));
             pair.second->SetWasSelected(false);
         }
     }
@@ -351,7 +352,7 @@ void OTAMultiImageProcessorImpl::HandleFinalize(intptr_t context)
 
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
 
-    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+    VerifyOrReturn(imageProcessor->ReleaseBlock() == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Release block failed"));
 
     if (error != CHIP_NO_ERROR)
     {
@@ -408,7 +409,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     for (auto const & pair : imageProcessor->mProcessorMap)
     {
-        TEMPORARY_RETURN_IGNORED pair.second->Clear();
+        VerifyOrReturn(pair.second->Clear() == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "Clear processor failed"));
         pair.second->SetWasSelected(false);
     }
 
@@ -419,7 +420,8 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     osDelay(500); // sl-temp: delay for uart print before reboot
 #endif
     // Write that we are rebooting after a software update and reboot the device
-    TEMPORARY_RETURN_IGNORED SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true);
+    VerifyOrReturn(SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true) == CHIP_NO_ERROR,
+                   ChipLogError(SoftwareUpdate, "WriteConfigValue failed"));
 #ifdef SLI_SI91X_MCU_INTERFACE // 917 SoC reboot
     chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
 #else // EFR reboot
@@ -444,7 +446,8 @@ void OTAMultiImageProcessorImpl::FetchNextData(uint32_t context)
     SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)
         {
-            TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
+            VerifyOrReturn(imageProcessor->mDownloader->FetchNextData() == CHIP_NO_ERROR,
+                           ChipLogError(SoftwareUpdate, "FetchNextData failed"));
         }
     });
 }
