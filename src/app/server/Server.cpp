@@ -148,8 +148,8 @@ bool SafePortIncrement(uint16_t basePort, uint16_t increment, uint16_t & outPort
  * @return CHIP_ERROR indicating success or failure of the initialization
  */
 CHIP_ERROR InitTransportWithPortRetry(uint16_t basePort, uint16_t maxRetries, const char * componentName,
-                                      std::function<CHIP_ERROR(uint16_t)> initFunction,
-                                      std::function<void()> closeFunction, uint16_t & outBoundPort)
+                                      std::function<CHIP_ERROR(uint16_t)> initFunction, std::function<void()> closeFunction,
+                                      uint16_t & outBoundPort)
 {
     uint16_t portToTry     = basePort;
     uint16_t attemptNumber = 0;
@@ -346,7 +346,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = InitTransportWithPortRetry(
         mOperationalServicePort, initParams.portRetryCount, "transport",
         [&](uint16_t port) -> CHIP_ERROR {
-            // Update TCP listen params if enabled
+    // Update TCP listen params if enabled
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
             tcpListenParams.SetListenPort(port);
 #endif
@@ -622,8 +622,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         [&](uint16_t port) -> CHIP_ERROR {
             // Attempt to initialize UDC transport with the selected port
             return mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                              .SetAddressType(Inet::IPAddressType::kIPv6)
-                                              .SetListenPort(port)
+                                                           .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                           .SetListenPort(port)
 #if INET_CONFIG_ENABLE_IPV4
                                               ,
                                           Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
