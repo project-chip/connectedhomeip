@@ -725,6 +725,8 @@ class Globals:
                         ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=7, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -735,6 +737,8 @@ class Globals:
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
             metadataEnabled: 'bool' = False
+            videoStreams: 'typing.Optional[typing.List[uint]]' = None
+            audioStreams: 'typing.Optional[typing.List[uint]]' = None
             fabricIndex: 'uint' = 0
 
 
@@ -20646,17 +20650,15 @@ class Groupcast(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keySetID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="hasAuxiliaryACL", Tag=3, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="expiringKeyID", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             groupID: 'uint' = 0
             endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
-            keyID: 'uint' = 0
+            keySetID: 'uint' = 0
             hasAuxiliaryACL: 'bool' = False
-            expiringKeyID: 'typing.Optional[uint]' = None
             fabricIndex: 'uint' = 0
 
     class Commands:
@@ -20673,18 +20675,18 @@ class Groupcast(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keySetID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=4, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=5, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=4, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="replaceEndpoints", Tag=5, Type=typing.Optional[bool]),
                     ])
 
             groupID: uint = 0
             endpoints: typing.List[uint] = field(default_factory=lambda: [])
-            keyID: uint = 0
+            keySetID: uint = 0
             key: typing.Optional[bytes] = None
-            gracePeriod: typing.Optional[uint] = None
             useAuxiliaryACL: typing.Optional[bool] = None
+            replaceEndpoints: typing.Optional[bool] = None
 
         @dataclass
         class LeaveGroup(ClusterCommand):
@@ -20716,13 +20718,11 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.Optional[typing.List[uint]]),
-                        ClusterObjectFieldDescriptor(Label="listTooLarge", Tag=2, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
                     ])
 
             groupID: uint = 0
-            endpoints: typing.Optional[typing.List[uint]] = None
-            listTooLarge: typing.Optional[bool] = None
+            endpoints: typing.List[uint] = field(default_factory=lambda: [])
 
         @dataclass
         class UpdateGroupKey(ClusterCommand):
@@ -20736,36 +20736,18 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keySetID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             groupID: uint = 0
-            keyID: uint = 0
+            keySetID: uint = 0
             key: typing.Optional[bytes] = None
-            gracePeriod: typing.Optional[uint] = None
-
-        @dataclass
-        class ExpireGracePeriod(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000065
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                    ])
-
-            groupID: uint = 0
 
         @dataclass
         class ConfigureAuxiliaryACL(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000065
-            command_id: typing.ClassVar[int] = 0x00000005
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -47969,11 +47951,12 @@ class CameraAvStreamManagement(Cluster):
 
         class ImageCodecEnum(MatterIntEnum):
             kJpeg = 0x00
+            kHeic = 0x01
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 1
+            kUnknownEnumValue = 2
 
         class TriStateAutoEnum(MatterIntEnum):
             kOff = 0x00
@@ -49751,6 +49734,8 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=5, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=6, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=7, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=8, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=9, Type=typing.Optional[typing.List[uint]]),
                     ])
 
             streamUsage: Globals.Enums.StreamUsageEnum = 0
@@ -49761,6 +49746,8 @@ class WebRTCTransportProvider(Cluster):
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
             SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
+            videoStreams: typing.Optional[typing.List[uint]] = None
+            audioStreams: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class SolicitOfferResponse(ClusterCommand):
@@ -49805,6 +49792,8 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=7, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="metadataEnabled", Tag=8, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="SFrameConfig", Tag=9, Type=typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct]),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=10, Type=typing.Optional[typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=11, Type=typing.Optional[typing.List[uint]]),
                     ])
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
@@ -49817,6 +49806,8 @@ class WebRTCTransportProvider(Cluster):
             ICETransportPolicy: typing.Optional[str] = None
             metadataEnabled: typing.Optional[bool] = None
             SFrameConfig: typing.Optional[WebRTCTransportProvider.Structs.SFrameStruct] = None
+            videoStreams: typing.Optional[typing.List[uint]] = None
+            audioStreams: typing.Optional[typing.List[uint]] = None
 
         @dataclass
         class ProvideOfferResponse(ClusterCommand):
@@ -50251,6 +50242,8 @@ class PushAvStreamTransport(Cluster):
             kInvalidOptions = 0x09
             kInvalidStreamUsage = 0x0A
             kInvalidTime = 0x0B
+            kInvalidPreRollLength = 0x0C
+            kDuplicateStreamValues = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -50280,11 +50273,12 @@ class PushAvStreamTransport(Cluster):
             kUserInitiated = 0x00
             kAutomation = 0x01
             kEmergency = 0x02
+            kDoorbellPressed = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
+            kUnknownEnumValue = 4
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -50321,6 +50315,32 @@ class PushAvStreamTransport(Cluster):
 
             zone: 'typing.Union[Nullable, uint]' = NullValue
             sensitivity: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AudioStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="audioStreamName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=1, Type=uint),
+                    ])
+
+            audioStreamName: 'str' = ""
+            audioStreamID: 'uint' = 0
+
+        @dataclass
+        class VideoStreamStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="videoStreamName", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=uint),
+                    ])
+
+            videoStreamName: 'str' = ""
+            videoStreamID: 'uint' = 0
 
         @dataclass
         class TransportTriggerOptionsStruct(ClusterObject):
@@ -50394,6 +50414,8 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="ingestMethod", Tag=6, Type=PushAvStreamTransport.Enums.IngestMethodsEnum),
                         ClusterObjectFieldDescriptor(Label="containerOptions", Tag=7, Type=PushAvStreamTransport.Structs.ContainerOptionsStruct),
                         ClusterObjectFieldDescriptor(Label="expiryTime", Tag=8, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="videoStreams", Tag=9, Type=typing.Optional[typing.List[PushAvStreamTransport.Structs.VideoStreamStruct]]),
+                        ClusterObjectFieldDescriptor(Label="audioStreams", Tag=10, Type=typing.Optional[typing.List[PushAvStreamTransport.Structs.AudioStreamStruct]]),
                     ])
 
             streamUsage: 'Globals.Enums.StreamUsageEnum' = 0
@@ -50405,6 +50427,8 @@ class PushAvStreamTransport(Cluster):
             ingestMethod: 'PushAvStreamTransport.Enums.IngestMethodsEnum' = 0
             containerOptions: 'PushAvStreamTransport.Structs.ContainerOptionsStruct' = field(default_factory=lambda: PushAvStreamTransport.Structs.ContainerOptionsStruct())
             expiryTime: 'typing.Optional[uint]' = None
+            videoStreams: 'typing.Optional[typing.List[PushAvStreamTransport.Structs.VideoStreamStruct]]' = None
+            audioStreams: 'typing.Optional[typing.List[PushAvStreamTransport.Structs.AudioStreamStruct]]' = None
 
         @dataclass
         class TransportConfigurationStruct(ClusterObject):
@@ -50706,11 +50730,15 @@ class PushAvStreamTransport(Cluster):
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="triggerType", Tag=1, Type=PushAvStreamTransport.Enums.TransportTriggerTypeEnum),
                         ClusterObjectFieldDescriptor(Label="activationReason", Tag=2, Type=typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum]),
+                        ClusterObjectFieldDescriptor(Label="containerType", Tag=3, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
+                        ClusterObjectFieldDescriptor(Label="CMAFSessionNumber", Tag=4, Type=typing.Optional[uint]),
                     ])
 
             connectionID: uint = 0
             triggerType: PushAvStreamTransport.Enums.TransportTriggerTypeEnum = 0
             activationReason: typing.Optional[PushAvStreamTransport.Enums.TriggerActivationReasonEnum] = None
+            containerType: PushAvStreamTransport.Enums.ContainerFormatEnum = 0
+            CMAFSessionNumber: typing.Optional[uint] = None
 
         @dataclass
         class PushTransportEnd(ClusterEvent):
@@ -50727,9 +50755,13 @@ class PushAvStreamTransport(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="connectionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="containerType", Tag=1, Type=PushAvStreamTransport.Enums.ContainerFormatEnum),
+                        ClusterObjectFieldDescriptor(Label="CMAFSessionNumber", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             connectionID: uint = 0
+            containerType: PushAvStreamTransport.Enums.ContainerFormatEnum = 0
+            CMAFSessionNumber: typing.Optional[uint] = None
 
 
 @dataclass

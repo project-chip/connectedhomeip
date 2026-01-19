@@ -202,8 +202,14 @@ public:
      *  This only compares the error code. Under the CHIP_CONFIG_ERROR_SOURCE configuration, errors compare equal
      *  if they have the same error code, even if they have different source locations.
      */
-    __attribute__((always_inline)) inline bool operator==(const ChipError & other) const { return mError == other.mError; }
-    __attribute__((always_inline)) inline bool operator!=(const ChipError & other) const { return mError != other.mError; }
+    constexpr __attribute__((always_inline)) inline bool operator==(const ChipError & other) const
+    {
+        return mError == other.mError;
+    }
+    constexpr __attribute__((always_inline)) inline bool operator!=(const ChipError & other) const
+    {
+        return mError != other.mError;
+    }
 
     /**
      * Return an integer code for the error.
@@ -957,7 +963,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR                   CHIP_CORE_ERROR(0x33)
 
-// AVAILABLE: 0x34
+/**
+ *  @def CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME
+ *
+ *  @brief
+ *    The DNSSD service name is not a supported/recognized type.
+ *
+ */
+#define CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME               CHIP_CORE_ERROR(0x34)
+
 // AVAILABLE: 0x35
 // AVAILABLE: 0x36
 // AVAILABLE: 0x37
