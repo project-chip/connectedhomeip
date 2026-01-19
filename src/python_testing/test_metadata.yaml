@@ -156,6 +156,8 @@ not_automated:
       reason: Helper methods for Push AV Integration TCs
     - name: TC_TLS_Utils.py
       reason: Helper methods for TC tests dependent on TLS clusters
+    - name: TC_GCAST_common.py
+      reason: Shared code for TC_GCAST, not a standalone test.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

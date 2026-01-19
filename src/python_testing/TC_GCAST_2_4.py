@@ -42,7 +42,9 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from src.python_testing.TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 logger = logging.getLogger(__name__)
@@ -75,6 +77,7 @@ class TC_GCAST_2_4(MatterBaseTest):
             self.matter_test_config.endpoint = 0
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
+        # membership_attribute = Clusters.Objects.Groupcast.Attributes.Membership ?
 
         self.step("1a")
         ln_enabled, sd_enabled = await get_feature_map(self)
