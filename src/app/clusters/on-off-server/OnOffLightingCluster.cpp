@@ -283,7 +283,7 @@ void OnOffLightingCluster::UpdateTimer()
         {
             return (mOnTime > 0) && (mOnTime != 0xFFFF);
         }
-        // not on, check on conditions
+        // not on, check off conditions
         return (mOffWaitTime > 0) && (mOffWaitTime != 0xFFFF);
     }();
 
