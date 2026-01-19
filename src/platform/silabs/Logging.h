@@ -90,7 +90,7 @@ inline uint8_t GetCategoryStringSize(LogCategory category)
     case kLog_Silabs:
         return sizeof(kLogSilabs) - 1;
     case kLog_OT:
-        return sizeof(kOTModule) - 1;    
+        return sizeof(kOTModule) - 1;
     default:
         return sizeof(kLogNone) - 1;
     }
