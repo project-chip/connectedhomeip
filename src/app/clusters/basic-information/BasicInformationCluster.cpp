@@ -296,12 +296,10 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
 {
     using namespace BasicInformation::Attributes;
 
-    DeviceInstanceInfoProvider * deviceInfoProvider;
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProviderImpl(&deviceInfoProvider));
-
-    // TODO: The configuration manager should be injected into the basic information cluster instead of
-    // directly fetching a reference to the singleton object. Issue #42602
-    auto & configManager = ConfigurationMgr();
+    // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
+    //       costs some flash (even though code would be more readable that way...)
+    auto * deviceInfoProvider = mDelegate->GetDeviceInstanceInfoProvider();
+    auto & configManager      = mDelegate->GetConfigurationManager();
 
     switch (request.path.mAttributeId)
     {
@@ -396,7 +394,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         CharSpan location;
         ReturnErrorOnFailure(decoder.Decode(location));
         VerifyOrReturnError(location.size() == kExpectedFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
-        return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
+        return mDelegate->GetConfigurationManager().StoreCountryCode(location.data(), location.size());
     }
     case NodeLabel::Id: {
         CharSpan label;
@@ -405,7 +403,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         return persistence.StoreString(request.path, mNodeLabel);
     }
     case LocalConfigDisabled::Id: {
-        auto deviceInfoProvider  = GetDeviceInstanceInfoProvider();
+        auto deviceInfoProvider  = mDelegate->GetDeviceInstanceInfoProvider();
         bool localConfigDisabled = false;
         ReturnErrorOnFailure(deviceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
         auto decodeStatus = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, localConfigDisabled);
@@ -445,9 +443,9 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (PlatformMgr().GetDelegate() == nullptr)
+    if (mDelegate->GetPlatformManager().GetDelegate() == nullptr)
     {
-        PlatformMgr().SetDelegate(this);
+        mDelegate->GetPlatformManager().SetDelegate(this);
     }
 
     AttributePersistence persistence(context.attributeStorage);
@@ -460,16 +458,16 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     bool localConfigDisabled = false;
     (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
                                                    localConfigDisabled, false);
-    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->SetLocalConfigDisabled(localConfigDisabled));
+    ReturnErrorOnFailure(mDelegate->GetDeviceInstanceInfoProvider()->SetLocalConfigDisabled(localConfigDisabled));
 
     return CHIP_NO_ERROR;
 }
 
 void BasicInformationCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    if (PlatformMgr().GetDelegate() == this)
+    if (mDelegate->GetPlatformManager().GetDelegate() == this)
     {
-        PlatformMgr().SetDelegate(nullptr);
+        mDelegate->GetPlatformManager().SetDelegate(nullptr);
     }
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -501,22 +499,6 @@ void BasicInformationCluster::OnShutDown()
     DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
     eventsGenerator.GenerateEvent(event, kRootEndpointId);
     eventsGenerator.ScheduleUrgentEventDeliverySync();
-}
-
-CHIP_ERROR
-BasicInformationCluster::GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider)
-{
-    if (mDeviceInfoProvider == nullptr)
-    {
-        // NOTE: this should NEVER be nullptr
-        *outDeviceInfoProvider = GetDeviceInstanceInfoProvider();
-        VerifyOrReturnError(*outDeviceInfoProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    else
-    {
-        *outDeviceInfoProvider = mDeviceInfoProvider;
-    }
-    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::Clusters
