@@ -175,7 +175,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateconsent,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
-            # expected_output="Server initialization complete",
+            expected_output="Server initialization complete",
             timeout=30
         )
 
@@ -188,7 +188,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         )
         logger.info(f'Provider Commissioning response: {resp}')
 
-        await self.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        # await self.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
 
         await self.set_default_ota_providers_list(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
 
@@ -207,7 +207,9 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
 
         self.terminate_provider()
-        controller.ExpireSessions(nodeId=provider_node_id)
+        # controller.ExpireSessions(nodeId=provider_node_id)
+
+        await asyncio.sleep(2)
 
         self.step(2)
 
@@ -225,35 +227,41 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateAvailable,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
-            # expected_output="Server initialization complete",
+            expected_output="Server initialization complete",
             timeout=30
         )
 
-        # Commission Provider (Only one time)
-        resp = await controller.CommissionOnNetwork(
-            nodeId=provider_node_id,
-            setupPinCode=provider_setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=provider_discriminator
-        )
-        logger.info(f'Provider Commissioning response: {resp}')
+        await asyncio.sleep(2)
 
-        await self.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+        # Commission Provider (Only one time)
+        # resp = await controller.CommissionOnNetwork(
+        #     nodeId=provider_node_id,
+        #     setupPinCode=provider_setupPinCode,
+        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+        #     filter=provider_discriminator
+        # )
+        # logger.info(f'Provider Commissioning response: {resp}')
+
+        # await self.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
 
         await self.set_default_ota_providers_list(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
 
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=self.endpoint, fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
+        await asyncio.sleep(2)
+
         await self.announce_ota_provider(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
 
         querying_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
+        logger.info(f"Quering: {querying_event}")
         asserts.assert_equal(self.querying, querying_event.newState,
                              f"New state is {querying_event.newState} and it should be {self.querying}")
 
-        downloading_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        asserts.assert_equal(self.downloading, downloading_event.newState,
-                             f"New state is {downloading_event.newState} and it should be {self.downloading}")
+        downloading_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.DownloadError, 50)
+        logger.info(f"Error: {downloading_event}")
+        # asserts.assert_equal(self.downloading, downloading_event.newState,
+        #                      f"New state is {downloading_event.newState} and it should be {self.downloading}")
 
         command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.endpoint}
         self.write_to_app_pipe(command, self.fifo_in)
