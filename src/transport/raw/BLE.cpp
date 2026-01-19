@@ -59,19 +59,16 @@ void BLEBase::ClearState()
     mState = State::kNotReady;
 }
 
+void BLEBase::Close()
+{
+    ClearState();
+}
+
 CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 {
     BleLayer * bleLayer = param.GetBleLayer();
 
-    // Allow re-initialization (no-op) if already initialized.
-    // This supports port retry scenarios where other transports need to reinitialize
-    // but BLE doesn't use ports and doesn't need re-initialization.
-    if (mState != State::kNotReady)
-    {
-        ChipLogDetail(Inet, "BLEBase::Init - already initialized, skipping re-init");
-        return CHIP_NO_ERROR;
-    }
-
+    VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(bleLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mBleLayer = bleLayer;
