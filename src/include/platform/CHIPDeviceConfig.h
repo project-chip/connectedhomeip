@@ -1699,8 +1699,8 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 
 /**
  * CHIP_CONFIG_MDNS_FALLBACK_TIMEOUT_SECONDS
- * 
- * @brief The timeout for when to use the IP/port from on-network commissioning (PASE) if there is no 
+ *
+ * @brief The timeout for when to use the IP/port from on-network commissioning (PASE) if there is no
  * mDNS response when CHIP_CONFIG_ENABLE_MDNS_FALLBACK is enabled
  */
 #ifndef CHIP_CONFIG_MDNS_FALLBACK_TIMEOUT_SECONDS
