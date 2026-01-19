@@ -23,7 +23,8 @@ import logging
 from mobly import asserts, signals
 
 import matter.testing.nfc
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -65,11 +66,6 @@ class TC_DD_1_5(MatterBaseTest):
     @async_test_body
     async def test_TC_DD_1_5(self):
 
-        asserts.assert_true(self.matter_test_config.qr_code_content,
-                            "This test needs to be run with the qr setup code.")
-        qr_code_content = self.matter_test_config.qr_code_content[0]
-        log.info(f"qr_code_content: {qr_code_content}")
-
         reader = matter.testing.nfc.NFCReader()
 
         ###########
@@ -102,12 +98,41 @@ class TC_DD_1_5(MatterBaseTest):
 
         ###########
         self.step("3")
-        asserts.assert_equal(
-            qr_code_content,
-            nfc_tag_content,
-            f"Error! QR Code and NFC Tag onboarding data differ! "
-            f"qr_code_content='{qr_code_content}', nfc_tag_content='{nfc_tag_content}'"
-        )
+
+        if self.check_pics("MCORE.DD.NTL"):
+            log.info("MCORE.DD.NTL is set")
+        else:
+            log.info("MCORE.DD.NTL is not set")
+
+        if self.check_pics("MCORE.DD.QR"):
+            log.info("MCORE.DD.QR is set")
+        else:
+            log.info("MCORE.DD.QR is not set")
+
+
+        # The current test can be executed on:
+        # - devices supporting NTL.
+        # - devices with NFC onboarding data (not necessarily supporting NTL).
+        if self.check_pics("MCORE.DD.NTL"):
+            # Device supporting NTL: QRCode is mandatory
+            asserts.assert_true(self.check_pics("MCORE.DD.QR"),
+                                "NTL devices SHALL have a QRCode")
+
+            asserts.assert_true(self.matter_test_config.qr_code_content,
+                                "This test needs to be run with qr_code param")
+            qr_code_content = self.matter_test_config.qr_code_content[0]
+            log.info(f"qr_code_content: {qr_code_content}")
+
+            asserts.assert_equal(
+                qr_code_content,
+                nfc_tag_content,
+                f"Error! QR Code and NFC Tag onboarding data differ! "
+                f"qr_code_content='{qr_code_content}', nfc_tag_content='{nfc_tag_content}'"
+            )
+
+        else:
+            log.info("Device not supporting NTL: QRCode is optional")
+
 
         ###########
         self.step("4")
