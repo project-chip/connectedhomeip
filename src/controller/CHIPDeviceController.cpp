@@ -978,8 +978,10 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 {
     MATTER_TRACE_SCOPE("Commission", "DeviceCommissioner");
 
+#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
     // Reset fallback from any previous commissioning session
     mCommissioningFallbackResult.ClearValue();
+#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
 
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     if (device == nullptr || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
@@ -3759,6 +3761,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
+#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
         Transport::Type type = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
         // cache address if we are connected over TCP or UDP
         if (type == Transport::Type::kTcp || type == Transport::Type::kUdp)
@@ -3771,6 +3774,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
             mCommissioningFallbackResult.SetValue(result);
         }
+#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
         CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
@@ -3779,13 +3783,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
         MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
-                                                               &mOnDeviceConnectionFailureCallback,
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(
+            scopedPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                                               /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback,
+            /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                                               TransportPayloadCapability::kMRPPayload, 
-                                                               mCommissioningFallbackResult);
+            TransportPayloadCapability::kMRPPayload, mCommissioningFallbackResult);
     }
     break;
     case CommissioningStage::kPrimaryOperationalNetworkFailed: {
