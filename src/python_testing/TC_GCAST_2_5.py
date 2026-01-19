@@ -45,8 +45,8 @@ from matter.testing.event_attribute_reporting import AttributeSubscriptionHandle
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from src.python_testing.TC_GCAST_common import (generate_membership_empty_matcher, generate_membership_entry_matcher,
-                                                get_feature_map, valid_endpoints_list)
+from TC_GCAST_common import (generate_membership_empty_matcher, generate_membership_entry_matcher,
+                             get_feature_map, valid_endpoints_list)
 
 logger = logging.getLogger(__name__)
 
