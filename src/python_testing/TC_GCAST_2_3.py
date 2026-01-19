@@ -39,14 +39,14 @@ import logging
 import secrets
 
 from mobly import asserts
+from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 logger = logging.getLogger(__name__)
 
