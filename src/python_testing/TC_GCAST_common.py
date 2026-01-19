@@ -35,7 +35,7 @@ def is_groupcast_supporting_cluster(cluster_id: int) -> bool:
         Clusters.OnOff.id,
         Clusters.LevelControl.id,
         Clusters.ColorControl.id,
-        Clusters.SceneManagement.id
+        Clusters.ScenesManagement.id
     }
     return cluster_id in GROUPCAST_SUPPORTING_CLUSTERS
 
