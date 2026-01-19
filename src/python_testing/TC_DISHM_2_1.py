@@ -49,8 +49,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_asserts import is_valid_int_value
-from matter.testing.matter_testing import MatterBaseTest, TestStep, matchers
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -112,16 +112,24 @@ class TC_DISHM_2_1(MatterBaseTest):
         current_mode_attribute = cluster.Attributes.CurrentMode
         endpoint = self.get_endpoint()
 
-        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
-                            "PIXIT.DISHM.MODE_CHANGE_OK must be included on the command line in "
-                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_OK:<mode id>")
-        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
-                            "PIXIT.DISHM.MODE_CHANGE_FAIL must be included on the command line in "
-                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_FAIL:<mode id>")
+        can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
+        can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
+        failure_and_manual = can_test_mode_failure and can_manually_control
 
-        self.mode_fail = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
-        self.mode_ok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
+        if can_manually_control:
+            asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
+                                "PIXIT.DISHM.MODE_CHANGE_OK must be included ...")
+            self.mode_ok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
+
+        if failure_and_manual:
+            asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
+                                "PIXIT.DISHM.MODE_CHANGE_FAIL must be included ...")
+            self.mode_fail = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
+
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+
+        logger.info(f"Mode OK: {self.mode_ok}")
+        logger.info(f"Mode Fail: {self.mode_fail}")
 
         # Commissioning, already done
         self.step(1)
@@ -133,10 +141,6 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         logger.info(f"SupportedModes: {supported_modes_dut}")
         logger.info(f"Modes: {modes}")
-
-        can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
-        can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
-        failure_and_manual = can_test_mode_failure and can_manually_control
 
         # Check if the list of supported modes is at least 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
@@ -216,14 +220,15 @@ class TC_DISHM_2_1(MatterBaseTest):
 
        # TH reads from the DUT the CurrentMode attribute
         self.step(8)
-        old_current_mode_dut_2 = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
+        if self.pics_guard(failure_and_manual):
+            old_current_mode_dut_2 = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
-        # CurrentMode attribute value is an integer value
-        is_valid_int_value(old_current_mode_dut_2)
+            # CurrentMode attribute value is an integer value
+            is_valid_int_value(old_current_mode_dut_2)
 
-        # old_current_mode_dut_2 is equal to old_current_mode_dut
-        asserts.assert_equal(old_current_mode_dut_2, old_current_mode_dut,
-                             f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
+            # old_current_mode_dut_2 is equal to old_current_mode_dut
+            asserts.assert_equal(old_current_mode_dut_2, old_current_mode_dut,
+                                 f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
 
         # Manually put the device in a state from which it will SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK
         self.step(9)
@@ -236,47 +241,52 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(10)
-        old_current_mode_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
+        if self.pics_guard(can_manually_control):
+            old_current_mode_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
-        # CurrentMode attribute value is an integer value
-        is_valid_int_value(old_current_mode_dut)
+            # CurrentMode attribute value is an integer value
+            is_valid_int_value(old_current_mode_dut)
 
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_OK
         self.step(11)
-        cmd = cluster.Commands.ChangeToMode(newMode=self.mode_ok)
-        change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        if self.pics_guard(can_manually_control):
+            cmd = cluster.Commands.ChangeToMode(newMode=self.mode_ok)
+            change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
-        # DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response
-        asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
-                            "Unexpected return type for ChangeToMode")
-        asserts.assert_equal(change_to_mode_response.status, CommonCodes.SUCCESS.value,
-                             f"Status is {change_to_mode_response.status} and it should be SUCCESS 0x00")
+            # DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response
+            asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
+                                "Unexpected return type for ChangeToMode")
+            asserts.assert_equal(change_to_mode_response.status, CommonCodes.SUCCESS.value,
+                                 f"Status is {change_to_mode_response.status} and it should be SUCCESS 0x00")
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(12)
-        current_mode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
+        if self.pics_guard(can_manually_control):
+            current_mode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
-        # CurrentMode attribute value is an integer value and it is the same as step 11
-        is_valid_int_value(current_mode)
-        asserts.assert_equal(current_mode, self.mode_ok,
-                             f"CurrentMode: {current_mode} doesn't match the argument of the successful ChangeToMode command: {self.mode_ok}")
+            # CurrentMode attribute value is an integer value and it is the same as step 11
+            is_valid_int_value(current_mode)
+            asserts.assert_equal(current_mode, self.mode_ok,
+                                 f"CurrentMode: {current_mode} doesn't match the argument of the successful ChangeToMode command: {self.mode_ok}")
 
         # TH sends a ChangeToMode command to the DUT with NewMode set to invalid_mode_th
         self.step(13)
-        cmd = cluster.Commands.ChangeToMode(newMode=invalid_mode_th)
-        change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        if self.pics_guard(can_manually_control):
+            cmd = cluster.Commands.ChangeToMode(newMode=invalid_mode_th)
+            change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
-        # DUT responds contains a ChangeToModeResponse command with a UnsupportedMode(0x01) status response
-        asserts.assert_equal(change_to_mode_response.status, CommonCodes.UNSUPPORTED_MODE.value,
-                             f"Attempt to change to invalid mode {invalid_mode_th} didn't fail as expected")
+            # DUT responds contains a ChangeToModeResponse command with a UnsupportedMode(0x01) status response
+            asserts.assert_equal(change_to_mode_response.status, CommonCodes.UNSUPPORTED_MODE.value,
+                                 f"Attempt to change to invalid mode {invalid_mode_th} didn't fail as expected")
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(14)
-        current_mode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
+        if self.pics_guard(can_manually_control):
+            current_mode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
-        # CurrentMode attribute value is an integer value and same as step 12
-        asserts.assert_equal(current_mode, self.mode_ok,
-                             f"CurrentMode: {current_mode} doesn't match the argument of the successful ChangeToMode command: {self.mode_ok}")
+            # CurrentMode attribute value is an integer value and same as step 12
+            asserts.assert_equal(current_mode, self.mode_ok,
+                                 f"CurrentMode: {current_mode} doesn't match the argument of the successful ChangeToMode command: {self.mode_ok}")
 
 
 if __name__ == "__main__":
