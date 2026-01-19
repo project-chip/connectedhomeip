@@ -90,6 +90,7 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
 
+    // ThreadDiagnosticsDelegate implementation
     void OnConnectionStatusChanged(ThreadNetworkDiagnostics::ConnectionStatusEnum newConnectionStatus) override;
     void OnNetworkFaultChanged(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current) override;
