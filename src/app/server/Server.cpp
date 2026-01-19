@@ -113,6 +113,104 @@ bool IsAddressInUseError(CHIP_ERROR err)
     return (err == CHIP_ERROR_POSIX(EADDRINUSE));
 }
 
+/**
+ * Helper function to safely increment a port number with overflow protection
+ *
+ * @param basePort The base port number
+ * @param increment The amount to increment
+ * @param[out] outPort The resulting port number
+ * @return true if the increment was successful, false if overflow would occur
+ */
+bool SafePortIncrement(uint16_t basePort, uint16_t increment, uint16_t & outPort)
+{
+    // Check for overflow: if basePort + increment > UINT16_MAX
+    if (increment > (UINT16_MAX - basePort))
+    {
+        return false;
+    }
+    outPort = static_cast<uint16_t>(basePort + increment);
+    return true;
+}
+
+/**
+ * Helper function to initialize a transport with automatic port selection and retry logic
+ *
+ * This function attempts to initialize a transport on a specific port, and if the port is already
+ * in use, it will retry with incrementing port numbers up to the specified retry count.
+ *
+ * @param basePort The initial port to try
+ * @param maxRetries Maximum number of retry attempts
+ * @param componentName Name of the component being initialized (for logging)
+ * @param initFunction Function to call to initialize the transport with a given port
+ *                     Returns CHIP_ERROR indicating success or failure
+ * @param closeFunction Function to call to close/cleanup the transport on retry
+ * @param[out] outBoundPort The actual port that was successfully bound
+ * @return CHIP_ERROR indicating success or failure of the initialization
+ */
+CHIP_ERROR InitTransportWithPortRetry(uint16_t basePort, uint16_t maxRetries, const char * componentName,
+                                      std::function<CHIP_ERROR(uint16_t)> initFunction,
+                                      std::function<void()> closeFunction, uint16_t & outBoundPort)
+{
+    uint16_t portToTry     = basePort;
+    uint16_t attemptNumber = 0;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+
+    for (;;)
+    {
+        // Try next sequential port if retrying
+        if (attemptNumber > 0)
+        {
+            if (!SafePortIncrement(basePort, attemptNumber, portToTry))
+            {
+                ChipLogError(AppServer, "%s: Port increment would overflow (base: %u, increment: %u)", componentName, basePort,
+                             attemptNumber);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            ChipLogProgress(AppServer, "Retrying %s initialization with port %u (attempt %u/%u)", componentName, portToTry,
+                            attemptNumber + 1, maxRetries + 1);
+        }
+
+        // Attempt to initialize transport with the selected port
+        err = initFunction(portToTry);
+
+        // Check if initialization succeeded
+        if (err == CHIP_NO_ERROR)
+        {
+            // Success! Update the output port to the actually bound port
+            outBoundPort = portToTry;
+            if (attemptNumber > 0)
+            {
+                ChipLogProgress(AppServer, "Successfully bound %s to port %u after %u attempt(s)", componentName, outBoundPort,
+                                attemptNumber + 1);
+            }
+            break;
+        }
+
+        // Check if we should retry
+        if (IsAddressInUseError(err) && attemptNumber < maxRetries)
+        {
+            closeFunction();
+            ChipLogProgress(AppServer, "%s port %u already in use (error: %" CHIP_ERROR_FORMAT "), will retry with different port",
+                            componentName, portToTry, err.Format());
+            attemptNumber++;
+            continue;
+        }
+
+        // No retry possible or different error - break out
+        if (IsAddressInUseError(err))
+        {
+            ChipLogError(AppServer,
+                         "Failed to bind %s to port %u: Address already in use. "
+                         "Consider setting portRetryCount > 0 to enable automatic port selection.",
+                         componentName, portToTry);
+        }
+        break;
+    }
+
+    return err;
+}
+
 } // anonymous namespace
 
 Server Server::sServer;
@@ -244,37 +342,26 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // The logic below expects that the IPv6 transport is at index 0. Keep that logic in sync with
     // this code.
     //
-    // Implement automatic port selection with retry logic if enabled
-    {
-        uint16_t portToTry     = mOperationalServicePort;
-        uint16_t attemptNumber = 0;
-
-        for (;;)
-        {
-            // Try next sequential port if retrying
-            if (attemptNumber > 0)
-            {
-                portToTry = static_cast<uint16_t>(mOperationalServicePort + attemptNumber);
-                ChipLogProgress(AppServer, "Retrying transport initialization with port %u (attempt %u/%u)", portToTry,
-                                attemptNumber + 1, initParams.portRetryCount + 1);
-            }
-
+    // Use helper function for automatic port selection with retry logic and overflow protection
+    err = InitTransportWithPortRetry(
+        mOperationalServicePort, initParams.portRetryCount, "transport",
+        [&](uint16_t port) -> CHIP_ERROR {
             // Update TCP listen params if enabled
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-            tcpListenParams.SetListenPort(portToTry);
+            tcpListenParams.SetListenPort(port);
 #endif
 
             // Attempt to initialize transports with the selected port
-            err = mTransports.Init(
+            return mTransports.Init(
                 UdpListenParameters(DeviceLayer::UDPEndPointManager())
                     .SetAddressType(IPAddressType::kIPv6)
-                    .SetListenPort(portToTry)
+                    .SetListenPort(port)
                     .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
                     ,
                 // The logic below expects that the IPv4 transport, if enabled, is at
                 // index 1. Keep that logic in sync with this code.
-                UdpListenParameters(DeviceLayer::UDPEndPointManager()).SetAddressType(IPAddressType::kIPv4).SetListenPort(portToTry)
+                UdpListenParameters(DeviceLayer::UDPEndPointManager()).SetAddressType(IPAddressType::kIPv4).SetListenPort(port)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                     ,
@@ -285,7 +372,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                 tcpListenParams
 #if INET_CONFIG_ENABLE_IPV4
                 ,
-                TcpListenParameters(DeviceLayer::TCPEndPointManager()).SetAddressType(IPAddressType::kIPv4).SetListenPort(portToTry)
+                TcpListenParameters(DeviceLayer::TCPEndPointManager()).SetAddressType(IPAddressType::kIPv4).SetListenPort(port)
 #endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
@@ -298,43 +385,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                 NfcListenParameters(nullptr)
 #endif
             );
-
-            // Check if initialization succeeded
-            if (err == CHIP_NO_ERROR)
-            {
-                // Success! Update the operational service port to the actually bound port
-                mOperationalServicePort = portToTry;
-                if (attemptNumber > 0)
-                {
-                    ChipLogProgress(AppServer, "Successfully bound to port %u after %u attempt(s)", mOperationalServicePort,
-                                    attemptNumber + 1);
-                }
-                break;
-            }
-
-            // Check if we should retry
-            if (IsAddressInUseError(err) && attemptNumber < initParams.portRetryCount)
-            {
-                ChipLogProgress(AppServer, "Port %u already in use (error: %" CHIP_ERROR_FORMAT "), will retry with different port",
-                                portToTry, err.Format());
-                // Close transports from the failed attempt before retrying
-                // BLE transport now handles re-initialization gracefully as a no-op
-                mTransports.Close();
-                attemptNumber++;
-                continue;
-            }
-
-            // No retry possible or different error - break out
-            if (IsAddressInUseError(err))
-            {
-                ChipLogError(AppServer,
-                             "Failed to bind to port %u: Address already in use. "
-                             "Consider setting portRetryCount > 0 to enable automatic port selection.",
-                             portToTry);
-            }
-            break;
-        }
-    }
+        },
+        [&]() {
+            // Close transports from the failed attempt before retrying
+            // BLE transport now handles re-initialization gracefully as a no-op
+            mTransports.Close();
+        },
+        mOperationalServicePort);
 
     SuccessOrExit(err);
     err = mListener.Init(this);
@@ -558,72 +615,25 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
-    // Initialize UDC transport with automatic port selection retry logic if enabled
-    {
-        mUdcTransportMgr          = Platform::New<UdcTransportMgr>();
-        uint16_t udcPortToTry     = mCdcListenPort;
-        uint16_t udcAttemptNumber = 0;
-        CHIP_ERROR udcErr         = CHIP_NO_ERROR;
-
-        for (;;)
-        {
-            // Try next sequential port if retrying
-            if (udcAttemptNumber > 0)
-            {
-                udcPortToTry = static_cast<uint16_t>(mCdcListenPort + udcAttemptNumber);
-                ChipLogProgress(AppServer, "Retrying UDC transport initialization with port %u (attempt %u/%u)", udcPortToTry,
-                                udcAttemptNumber + 1, initParams.portRetryCount + 1);
-            }
-
+    // Use helper function for UDC transport initialization with automatic port selection and overflow protection
+    mUdcTransportMgr = Platform::New<UdcTransportMgr>();
+    err              = InitTransportWithPortRetry(
+        mCdcListenPort, initParams.portRetryCount, "UDC transport",
+        [&](uint16_t port) -> CHIP_ERROR {
             // Attempt to initialize UDC transport with the selected port
-            udcErr = mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                                .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                .SetListenPort(static_cast<uint16_t>(udcPortToTry))
+            return mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                              .SetAddressType(Inet::IPAddressType::kIPv6)
+                                              .SetListenPort(port)
 #if INET_CONFIG_ENABLE_IPV4
-                                                ,
-                                            Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                                .SetAddressType(Inet::IPAddressType::kIPv4)
-                                                .SetListenPort(static_cast<uint16_t>(udcPortToTry))
+                                              ,
+                                          Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                              .SetAddressType(Inet::IPAddressType::kIPv4)
+                                              .SetListenPort(port)
 #endif // INET_CONFIG_ENABLE_IPV4
             );
-
-            // Check if initialization succeeded
-            if (udcErr == CHIP_NO_ERROR)
-            {
-                // Success! Update mCdcListenPort to the actually bound port
-                mCdcListenPort = udcPortToTry;
-                if (udcAttemptNumber > 0)
-                {
-                    ChipLogProgress(AppServer, "Successfully bound UDC transport to port %u after %u attempt(s)", mCdcListenPort,
-                                    udcAttemptNumber + 1);
-                }
-                break;
-            }
-
-            // Check if we should retry
-            if (IsAddressInUseError(udcErr) && udcAttemptNumber < initParams.portRetryCount)
-            {
-                mUdcTransportMgr->Close();
-                ChipLogProgress(AppServer,
-                                "UDC port %u already in use (error: %" CHIP_ERROR_FORMAT "), will retry with different port",
-                                udcPortToTry, udcErr.Format());
-                udcAttemptNumber++;
-                continue;
-            }
-
-            // No retry possible or different error - break out
-            if (IsAddressInUseError(udcErr))
-            {
-                ChipLogError(AppServer,
-                             "Failed to bind UDC transport to port %u: Address already in use. "
-                             "Consider setting portRetryCount > 0 to enable automatic port selection.",
-                             udcPortToTry);
-            }
-            break;
-        }
-
-        ReturnErrorOnFailure(udcErr);
-    }
+        },
+        [&]() { mUdcTransportMgr->Close(); }, mCdcListenPort);
+    SuccessOrExit(err);
 
     gUDCClient = Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
     mUdcTransportMgr->SetSessionManager(gUDCClient);
