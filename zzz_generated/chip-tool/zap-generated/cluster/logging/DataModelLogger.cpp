@@ -2834,10 +2834,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("KeyID", indent + 1, value.keyID);
+        CHIP_ERROR err = LogValue("KeySetID", indent + 1, value.keySetID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'KeyID'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'KeySetID'");
             return err;
         }
     }
@@ -2846,14 +2846,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HasAuxiliaryACL'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExpiringKeyID", indent + 1, value.expiringKeyID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExpiringKeyID'");
             return err;
         }
     }
@@ -12228,7 +12220,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
     ReturnErrorOnFailure(DataModelLogger::LogValue("endpoints", indent + 1, value.endpoints));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("listTooLarge", indent + 1, value.listTooLarge));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }

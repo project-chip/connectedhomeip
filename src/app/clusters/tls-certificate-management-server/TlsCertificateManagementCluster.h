@@ -19,11 +19,11 @@
 #pragma once
 
 #include "CertificateTable.h"
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
+#include <clusters/TlsCertificateManagement/Metadata.h>
 #include <clusters/TlsCertificateManagement/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -34,14 +34,11 @@ namespace Clusters {
 
 class TlsCertificateManagementDelegate;
 
-class TlsCertificateManagementCluster : private AttributeAccessInterface,
-                                        private CommandHandlerInterface,
-                                        private FabricTable::Delegate
+class TlsCertificateManagementCluster : public DefaultServerCluster, private FabricTable::Delegate
 {
 public:
     /**
-     * Creates a TlsCertificateManagement server instance. The Init() function needs to be called for this instance to be registered
-     * and called by the interaction model at the appropriate times.
+     * Creates a TlsCertificateManagement server instance.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
      * @param dependencyChecker A reference to a CertificateDependencyChecker which checks for transitive dependencies
@@ -54,18 +51,6 @@ public:
                                     Tls::CertificateDependencyChecker & dependencyChecker, Tls::CertificateTable & certificateTable,
                                     uint8_t maxRootCertificates, uint8_t maxClientCertificates);
     ~TlsCertificateManagementCluster();
-
-    /**
-     * Initializes the TLS Certificate Management server instance.
-     * @return Returns an error  if the CommandHandler or AttributeHandler registration fails.
-     */
-    CHIP_ERROR Init();
-
-    /**
-     * Shuts down the TLS Certificate Management server instance.
-     * @return Returns an error if the destruction fails.
-     */
-    CHIP_ERROR Finish();
 
     // Attribute Getters
 
@@ -82,9 +67,26 @@ public:
     /**
      * @return The endpoint ID.
      */
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
 
     Tls::CertificateTable & GetCertificateTable() { return mCertificateTable; }
+
+    /**
+     * @brief ServerClusterInterface methods.
+     */
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType) override;
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
     TlsCertificateManagementDelegate & mDelegate;
@@ -95,36 +97,35 @@ private:
     uint8_t mMaxRootCertificates;
     uint8_t mMaxClientCertificates;
 
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
-    {
-        ChipLogError(NotSpecified, "DataModel::ReadAttributeRequest overload should be called");
-        chipAbort();
-    }
+    // Command Handlers
+    std::optional<DataModel::ActionReturnStatus>
+    HandleProvisionRootCertificate(CommandHandler & commandHandler,
+                                   const TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleFindRootCertificate(CommandHandler & commandHandler,
+                              const TlsCertificateManagement::Commands::FindRootCertificate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleLookupRootCertificate(CommandHandler & commandHandler,
+                                const TlsCertificateManagement::Commands::LookupRootCertificate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleRemoveRootCertificate(CommandHandler & commandHandler,
+                                const TlsCertificateManagement::Commands::RemoveRootCertificate::DecodableType & req);
 
-    CHIP_ERROR Read(const DataModel::ReadAttributeRequest & aRequest, AttributeValueEncoder & aEncoder) override;
-
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-    void HandleProvisionRootCertificate(HandlerContext & ctx,
-                                        const TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType & req);
-    void HandleFindRootCertificate(HandlerContext & ctx,
-                                   const TlsCertificateManagement::Commands::FindRootCertificate::DecodableType & req);
-    void HandleLookupRootCertificate(HandlerContext & ctx,
-                                     const TlsCertificateManagement::Commands::LookupRootCertificate::DecodableType & req);
-    void HandleRemoveRootCertificate(HandlerContext & ctx,
-                                     const TlsCertificateManagement::Commands::RemoveRootCertificate::DecodableType & req);
-
-    void HandleGenerateClientCsr(HandlerContext & ctx, const TlsCertificateManagement::Commands::ClientCSR::DecodableType & req);
-    void
-    HandleProvisionClientCertificate(HandlerContext & ctx,
+    std::optional<DataModel::ActionReturnStatus>
+    HandleGenerateClientCsr(CommandHandler & commandHandler,
+                            const TlsCertificateManagement::Commands::ClientCSR::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleProvisionClientCertificate(CommandHandler & commandHandler,
                                      const TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType & req);
-    void HandleFindClientCertificate(HandlerContext & ctx,
-                                     const TlsCertificateManagement::Commands::FindClientCertificate::DecodableType & req);
-    void HandleLookupClientCertificate(HandlerContext & ctx,
-                                       const TlsCertificateManagement::Commands::LookupClientCertificate::DecodableType & req);
-    void HandleRemoveClientCertificate(HandlerContext & ctx,
-                                       const TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleFindClientCertificate(CommandHandler & commandHandler,
+                                const TlsCertificateManagement::Commands::FindClientCertificate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleLookupClientCertificate(CommandHandler & commandHandler,
+                                  const TlsCertificateManagement::Commands::LookupClientCertificate::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleRemoveClientCertificate(CommandHandler & commandHandler,
+                                  const TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & req);
 
     // Encodes all provisioned root certificates
     CHIP_ERROR EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,

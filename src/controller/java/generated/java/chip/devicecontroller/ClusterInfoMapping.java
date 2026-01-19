@@ -8034,7 +8034,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer groupID, Optional<ArrayList<Integer>> endpoints, Optional<Boolean> listTooLarge) {
+    public void onSuccess(Integer groupID, ArrayList<Integer> endpoints) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo groupIDResponseValue = new CommandResponseInfo("groupID", "Integer");
@@ -8042,8 +8042,6 @@ public class ClusterInfoMapping {
       // endpoints: endpoint_no
       // Conversion from this type to Java is not properly implemented yet
 
-      CommandResponseInfo listTooLargeResponseValue = new CommandResponseInfo("listTooLarge", "Optional<Boolean>");
-      responseValues.put(listTooLargeResponseValue, listTooLarge);
       callback.onSuccess(responseValues);
     }
 
@@ -26576,17 +26574,17 @@ public class ClusterInfoMapping {
     CommandParameterInfo groupcastjoinGroupendpointsCommandParameterInfo = new CommandParameterInfo("endpoints", ArrayList.class, ArrayList.class);
     groupcastjoinGroupCommandParams.put("endpoints",groupcastjoinGroupendpointsCommandParameterInfo);
 
-    CommandParameterInfo groupcastjoinGroupkeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
-    groupcastjoinGroupCommandParams.put("keyID",groupcastjoinGroupkeyIDCommandParameterInfo);
+    CommandParameterInfo groupcastjoinGroupkeySetIDCommandParameterInfo = new CommandParameterInfo("keySetID", Integer.class, Integer.class);
+    groupcastjoinGroupCommandParams.put("keySetID",groupcastjoinGroupkeySetIDCommandParameterInfo);
 
     CommandParameterInfo groupcastjoinGroupkeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
     groupcastjoinGroupCommandParams.put("key",groupcastjoinGroupkeyCommandParameterInfo);
 
-    CommandParameterInfo groupcastjoinGroupgracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
-    groupcastjoinGroupCommandParams.put("gracePeriod",groupcastjoinGroupgracePeriodCommandParameterInfo);
-
     CommandParameterInfo groupcastjoinGroupuseAuxiliaryACLCommandParameterInfo = new CommandParameterInfo("useAuxiliaryACL", Optional.class, Boolean.class);
     groupcastjoinGroupCommandParams.put("useAuxiliaryACL",groupcastjoinGroupuseAuxiliaryACLCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupreplaceEndpointsCommandParameterInfo = new CommandParameterInfo("replaceEndpoints", Optional.class, Boolean.class);
+    groupcastjoinGroupCommandParams.put("replaceEndpoints",groupcastjoinGroupreplaceEndpointsCommandParameterInfo);
     InteractionInfo groupcastjoinGroupInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.GroupcastCluster) cluster)
@@ -26595,14 +26593,14 @@ public class ClusterInfoMapping {
         commandArguments.get("groupID")
         , (ArrayList<Integer>)
         commandArguments.get("endpoints")
-        , (Long)
-        commandArguments.get("keyID")
+        , (Integer)
+        commandArguments.get("keySetID")
         , (Optional<byte[]>)
         commandArguments.get("key")
-        , (Optional<Long>)
-        commandArguments.get("gracePeriod")
         , (Optional<Boolean>)
         commandArguments.get("useAuxiliaryACL")
+        , (Optional<Boolean>)
+        commandArguments.get("replaceEndpoints")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -26639,49 +26637,27 @@ public class ClusterInfoMapping {
     CommandParameterInfo groupcastupdateGroupKeygroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
     groupcastupdateGroupKeyCommandParams.put("groupID",groupcastupdateGroupKeygroupIDCommandParameterInfo);
 
-    CommandParameterInfo groupcastupdateGroupKeykeyIDCommandParameterInfo = new CommandParameterInfo("keyID", Long.class, Long.class);
-    groupcastupdateGroupKeyCommandParams.put("keyID",groupcastupdateGroupKeykeyIDCommandParameterInfo);
+    CommandParameterInfo groupcastupdateGroupKeykeySetIDCommandParameterInfo = new CommandParameterInfo("keySetID", Integer.class, Integer.class);
+    groupcastupdateGroupKeyCommandParams.put("keySetID",groupcastupdateGroupKeykeySetIDCommandParameterInfo);
 
     CommandParameterInfo groupcastupdateGroupKeykeyCommandParameterInfo = new CommandParameterInfo("key", Optional.class, byte[].class);
     groupcastupdateGroupKeyCommandParams.put("key",groupcastupdateGroupKeykeyCommandParameterInfo);
-
-    CommandParameterInfo groupcastupdateGroupKeygracePeriodCommandParameterInfo = new CommandParameterInfo("gracePeriod", Optional.class, Long.class);
-    groupcastupdateGroupKeyCommandParams.put("gracePeriod",groupcastupdateGroupKeygracePeriodCommandParameterInfo);
     InteractionInfo groupcastupdateGroupKeyInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.GroupcastCluster) cluster)
         .updateGroupKey((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("groupID")
-        , (Long)
-        commandArguments.get("keyID")
+        , (Integer)
+        commandArguments.get("keySetID")
         , (Optional<byte[]>)
         commandArguments.get("key")
-        , (Optional<Long>)
-        commandArguments.get("gracePeriod")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
         groupcastupdateGroupKeyCommandParams
     );
     groupcastClusterInteractionInfoMap.put("updateGroupKey", groupcastupdateGroupKeyInteractionInfo);
-
-    Map<String, CommandParameterInfo> groupcastexpireGracePeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo groupcastexpireGracePeriodgroupIDCommandParameterInfo = new CommandParameterInfo("groupID", Integer.class, Integer.class);
-    groupcastexpireGracePeriodCommandParams.put("groupID",groupcastexpireGracePeriodgroupIDCommandParameterInfo);
-    InteractionInfo groupcastexpireGracePeriodInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.GroupcastCluster) cluster)
-        .expireGracePeriod((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("groupID")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        groupcastexpireGracePeriodCommandParams
-    );
-    groupcastClusterInteractionInfoMap.put("expireGracePeriod", groupcastexpireGracePeriodInteractionInfo);
 
     Map<String, CommandParameterInfo> groupcastconfigureAuxiliaryACLCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

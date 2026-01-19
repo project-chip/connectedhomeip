@@ -18,6 +18,7 @@ TARGET_SOURCES(
         PRIVATE
         "${CLUSTER_DIR}/CertificateTableImpl.cpp"
         "${CLUSTER_DIR}/CertificateTableImpl.h"
+        "${CLUSTER_DIR}/CodegenIntegration.cpp"
         "${CLUSTER_DIR}/TlsCertificateManagementCluster.cpp"
         "${CLUSTER_DIR}/TlsCertificateManagementCluster.h"
 )
