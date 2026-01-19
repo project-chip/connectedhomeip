@@ -37,7 +37,7 @@ static const uint16_t kTimeoutInSeconds = 3;
 
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    [self startCommissionedAppWithName:@"all-clusters"
+    [self startCommissionedAppWithName:@"camera"
                              arguments:@[]
                             controller:controller
                                 nodeID:@(kDeviceId1)];

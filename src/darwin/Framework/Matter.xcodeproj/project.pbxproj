@@ -2544,7 +2544,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nif [[ -n $CHIP_NO_TEST_FIXTURE_APPS ]]; then\n    echo \"Skipping because CHIP_NO_TEST_FIXTURE_APPS is set\"\n    exit 0\nfi\n\ncd \"$CHIP_ROOT\"\nscripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app\nscripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app non_spec_compliant_ota_action_delay_floor=0\n";
+			shellScript = "set -e\n\nif [[ -n $CHIP_NO_TEST_FIXTURE_APPS ]]; then\n    echo \"Skipping because CHIP_NO_TEST_FIXTURE_APPS is set\"\n    exit 0\nfi\n\ncd \"$CHIP_ROOT\"\nscripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/all-clusters-app\nscripts/examples/gn_build_example.sh examples/camera-app/linux out/debug/camera-app\nscripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app non_spec_compliant_ota_action_delay_floor=0\n";
 		};
 		9B7838562CFE3AE600FB04C4 /* Acquire git revision info */ = {
 			isa = PBXShellScriptBuildPhase;
