@@ -369,9 +369,7 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
 #define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID                                                                            \
-    {                                                                                                                              \
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff                             \
-    }
+    { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }
 #endif
 
 /**
@@ -1718,3 +1716,21 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #ifndef CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT
 #define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
 #endif // CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT
+
+/**
+ * CHIP_CONFIG_ENABLE_MDNS_FALLBACK enables use of the IP/port from on-network commissioning (PASE)
+ * if there is no mDNS response within CHIP_CONFIG_MDNS_FALLBACK_TIMEOUT_SECONDS.
+ */
+#ifndef CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#define CHIP_CONFIG_ENABLE_MDNS_FALLBACK 0
+#endif // CHIP_DEVICE_ENABLE_DNS_FALLBACK
+
+/**
+ * CHIP_CONFIG_MDNS_FALLBACK_TIMEOUT_SECONDS
+ *
+ * @brief The timeout for when to use the IP/port from on-network commissioning (PASE) if there is no
+ * mDNS response when CHIP_CONFIG_ENABLE_MDNS_FALLBACK is enabled
+ */
+#ifndef CHIP_CONFIG_MDNS_FALLBACK_TIMEOUT_SECONDS
+#define CHIP_CONFIG_MDNS_FALLBACK_TIMEOUT_SECONDS 5
+#endif // CHIP_DEVICE_MDNS_FALLBACK_TIMEOUT_SECONDS

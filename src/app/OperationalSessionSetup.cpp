@@ -579,6 +579,10 @@ OperationalSessionSetup::~OperationalSessionSetup()
     CancelSessionSetupReattempt();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
+#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+    CancelFallbackTimer();
+#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+
     DequeueConnectionCallbacks(CHIP_ERROR_CANCELLED, ReleaseBehavior::DoNotRelease);
 }
 
@@ -623,7 +627,22 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
 
     NodeLookupRequest request(peerId);
 
-    return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+    CHIP_ERROR err = Resolver::Instance().LookupNode(request, mAddressLookupHandle);
+
+#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+    // Start fallback timer if we have a fallback result configured
+    if (err == CHIP_NO_ERROR)
+    {
+        CHIP_ERROR fallbackErr = StartFallbackTimer();
+        if (fallbackErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to start fallback timer: %" CHIP_ERROR_FORMAT, fallbackErr.Format());
+            // Continue anyway - fallback timer is optional
+        }
+    }
+#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+
+    return err;
 }
 
 void OperationalSessionSetup::PerformAddressUpdate()
@@ -654,6 +673,11 @@ void OperationalSessionSetup::PerformAddressUpdate()
 
 void OperationalSessionSetup::OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result)
 {
+#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+    // mDNS resolution succeeded, cancel the fallback timer
+    CancelFallbackTimer();
+#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+
     UpdateDeviceData(result);
 }
 
@@ -898,5 +922,91 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Cloc
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+void OperationalSessionSetup::SetFallbackResolveResult(const AddressResolve::ResolveResult & result)
+{
+    ChipLogProgress(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: Setting fallback resolve result",
+                    mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
+    mFallbackResolveResult.SetValue(result);
+}
+
+CHIP_ERROR OperationalSessionSetup::StartFallbackTimer()
+{
+    if (!mFallbackResolveResult.HasValue())
+    {
+        // No fallback configured, nothing to do
+        return CHIP_NO_ERROR;
+    }
+
+    auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
+    VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    auto * systemLayer = sessionManager->SystemLayer();
+    VerifyOrReturnError(systemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: Starting fallback timer (%u seconds)",
+                    mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()),
+                    static_cast<unsigned>(std::chrono::duration_cast<System::Clock::Seconds16>(mFallbackTimeout).count()));
+
+    return systemLayer->StartTimer(mFallbackTimeout, OnFallbackTimeout, this);
+}
+
+void OperationalSessionSetup::CancelFallbackTimer()
+{
+    if (!mFallbackResolveResult.HasValue())
+    {
+        // No fallback configured, nothing to cancel
+        return;
+    }
+
+    auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
+    VerifyOrReturn(sessionManager != nullptr);
+
+    auto * systemLayer = sessionManager->SystemLayer();
+    VerifyOrReturn(systemLayer != nullptr);
+
+    ChipLogDetail(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: Cancelling fallback timer",
+                  mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
+
+    systemLayer->CancelTimer(OnFallbackTimeout, this);
+}
+
+void OperationalSessionSetup::OnFallbackTimeout(System::Layer * systemLayer, void * appState)
+{
+    auto * self = static_cast<OperationalSessionSetup *>(appState);
+
+    ChipLogProgress(Discovery,
+                    "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: mDNS resolution timed out, using fallback address",
+                    self->mPeerId.GetFabricIndex(), ChipLogValueX64(self->mPeerId.GetNodeId()));
+
+    // Cancel the ongoing mDNS lookup
+    if (self->mAddressLookupHandle.IsActive())
+    {
+        CHIP_ERROR err = Resolver::Instance().CancelLookup(self->mAddressLookupHandle, Resolver::FailureCallback::Skip);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to cancel mDNS lookup: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
+    // Mark that we're using the fallback
+    self->mUsingFallback = true;
+
+    // Use the fallback result
+    if (self->mFallbackResolveResult.HasValue())
+    {
+        self->UpdateDeviceData(self->mFallbackResolveResult.Value());
+        // Do not touch `self` instance anymore; it might have been destroyed in UpdateDeviceData.
+    }
+    else
+    {
+        // This should not happen, but handle it gracefully
+        ChipLogError(Discovery, "Fallback timer fired but no fallback result available");
+        self->DequeueConnectionCallbacks(CHIP_ERROR_INTERNAL);
+        // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
 
 } // namespace chip
