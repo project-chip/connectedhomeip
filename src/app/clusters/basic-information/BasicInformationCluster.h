@@ -22,6 +22,7 @@
 #include <clusters/BasicInformation/AttributeIds.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
@@ -37,6 +38,15 @@ namespace Clusters {
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
+    class Delegate
+    {
+    public:
+        virtual ~Delegate()                                                               = default;
+        virtual DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() = 0;
+        virtual DeviceLayer::ConfigurationManager & GetConfigurationManager()             = 0;
+        virtual DeviceLayer::PlatformManager & GetPlatformManager()                       = 0;
+    };
+
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
         BasicInformation::Attributes::ManufacturingDate::Id,       //
         BasicInformation::Attributes::PartNumber::Id,              //
@@ -52,10 +62,9 @@ public:
         BasicInformation::Attributes::UniqueID::Id //
         >;
 
-    BasicInformationCluster(OptionalAttributesSet optionalAttributeSet,
-                            DeviceLayer::DeviceInstanceInfoProvider * deviceInfoProvider = nullptr) :
-        DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }),
-        mEnabledOptionalAttributes(optionalAttributeSet), mDeviceInfoProvider(deviceInfoProvider)
+    BasicInformationCluster(OptionalAttributesSet optionalAttributeSet, Delegate * delegate) :
+        DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }), mEnabledOptionalAttributes(optionalAttributeSet),
+        mDelegate(delegate)
     {
         mEnabledOptionalAttributes
             .Set<BasicInformation::Attributes::UniqueID::Id>(); // Unless told otherwise, unique id is mandatory
@@ -79,12 +88,11 @@ public:
 private:
     // write without notification
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
-    CHIP_ERROR GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider);
 
     OptionalAttributesSet mEnabledOptionalAttributes;
 
     Storage::String<32> mNodeLabel;
-    DeviceLayer::DeviceInstanceInfoProvider * mDeviceInfoProvider = nullptr;
+    Delegate * mDelegate;
 };
 
 } // namespace Clusters

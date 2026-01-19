@@ -127,14 +127,24 @@ public:
 
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
 };
+class MockDelegate : public BasicInformationCluster::Delegate
+{
+public:
+    DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() override { return &mDeviceInfoProvider; }
+    // You can stub these or mock them if needed for specific tests
+    DeviceLayer::ConfigurationManager & GetConfigurationManager() override { return chip::DeviceLayer::ConfigurationMgr(); }
+    DeviceLayer::PlatformManager & GetPlatformManager() override { return chip::DeviceLayer::PlatformMgr(); }
 
+private:
+    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
+};
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestBasicInformationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
+    MockDelegate mDelegate;
 };
 
 TEST_F(TestBasicInformationCluster, TestAttributes)
@@ -143,7 +153,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // check without optional attributes
     {
         const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, &mDeviceInfoProvider);
+        BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(
             cluster,
@@ -161,7 +171,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // Check that disabling unique id works
     {
         const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, &mDeviceInfoProvider);
+        BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
 
         // UniqueID is EXPLICITLY NOT SET
         cluster.OptionalAttributes() = BasicInformationCluster::OptionalAttributesSet();
@@ -199,7 +209,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                                                                                         .Set<ProductAppearance::Id>()
                                                                                         .Set<UniqueID::Id>();
 
-        BasicInformationCluster cluster(optionalAttributeSet, &mDeviceInfoProvider);
+        BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
 
