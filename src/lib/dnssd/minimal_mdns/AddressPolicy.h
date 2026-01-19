@@ -84,8 +84,7 @@ public:
 
 CHIP_ERROR ConfigureInterfaceFilter(chip::Span<const chip::CharSpan> allowedInterfaces);
 CHIP_ERROR ConfigureInterfaceFilterFromCommaSeparatedList(const char * commaSeparatedNames);
-CHIP_ERROR ConfigureInterfaceFilterFromEnvironmentVariable(
-    const char * envVarName = kMinimalMdnsInterfaceEnvVar);
+CHIP_ERROR ConfigureInterfaceFilterFromEnvironmentVariable(const char * envVarName = kMinimalMdnsInterfaceEnvVar);
 
 } // namespace Minimal
 } // namespace mdns

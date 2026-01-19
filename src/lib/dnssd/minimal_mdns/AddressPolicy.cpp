@@ -28,8 +28,8 @@ namespace mdns {
 namespace Minimal {
 
 namespace {
-AddressPolicy * gAddressPolicy        = nullptr;
-InterfaceFilter * gInterfaceFilter    = nullptr;
+AddressPolicy * gAddressPolicy     = nullptr;
+InterfaceFilter * gInterfaceFilter = nullptr;
 InterfaceNameListFilter gDefaultFilter;
 } // namespace
 
@@ -111,7 +111,7 @@ CHIP_ERROR InterfaceNameListFilter::SetAllowedInterfaces(chip::Span<const chip::
     {
         const auto & span = allowed[i];
         memcpy(writePtr, span.data(), span.size());
-        writePtr[span.size()] = '\0';
+        writePtr[span.size()]   = '\0';
         mAcceptedNames.Get()[i] = writePtr;
         writePtr += span.size() + 1;
     }
@@ -232,7 +232,7 @@ CHIP_ERROR InterfaceNameListFilter::SetAllowedInterfacesFromCommaSeparatedList(c
         trimmedLen   = tokenLen;
 
         memcpy(writePtr, trimmedStart, trimmedLen);
-        writePtr[trimmedLen] = '\0';
+        writePtr[trimmedLen]                 = '\0';
         mAcceptedNames.Get()[segmentIndex++] = writePtr;
         writePtr += trimmedLen + 1;
     };
