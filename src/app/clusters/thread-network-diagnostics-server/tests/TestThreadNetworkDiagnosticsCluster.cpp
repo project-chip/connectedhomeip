@@ -95,8 +95,15 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kMLECounts };
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features,
-                                                                 ThreadNetworkDiagnosticsCluster::StartupConfiguration{});
+        ThreadNetworkDiagnosticsCluster::StartupConfiguration config{ .detachedRoleCount                 = true,
+                                                                      .childRoleCount                    = true,
+                                                                      .routerRoleCount                   = true,
+                                                                      .leaderRoleCount                   = true,
+                                                                      .attachAttemptCount                = true,
+                                                                      .partitionIdChangeCount            = true,
+                                                                      .betterPartitionAttachAttemptCount = true,
+                                                                      .parentChangeCount                 = true };
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, config);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -125,8 +132,41 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kMACCounts };
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features,
-                                                                 ThreadNetworkDiagnosticsCluster::StartupConfiguration{});
+        ThreadNetworkDiagnosticsCluster::StartupConfiguration config{ .txTotalCount                  = true,
+                                                                      .txUnicastCount                = true,
+                                                                      .txBroadcastCount              = true,
+                                                                      .txAckRequestedCount           = true,
+                                                                      .txAckedCount                  = true,
+                                                                      .txNoAckRequestedCount         = true,
+                                                                      .txDataCount                   = true,
+                                                                      .txDataPollCount               = true,
+                                                                      .txBeaconCount                 = true,
+                                                                      .txBeaconRequestCount          = true,
+                                                                      .txOtherCount                  = true,
+                                                                      .txRetryCount                  = true,
+                                                                      .txDirectMaxRetryExpiryCount   = true,
+                                                                      .txIndirectMaxRetryExpiryCount = true,
+                                                                      .txErrCcaCount                 = true,
+                                                                      .txErrAbortCount               = true,
+                                                                      .txErrBusyChannelCount         = true,
+                                                                      .rxTotalCount                  = true,
+                                                                      .rxUnicastCount                = true,
+                                                                      .rxBroadcastCount              = true,
+                                                                      .rxDataCount                   = true,
+                                                                      .rxDataPollCount               = true,
+                                                                      .rxBeaconCount                 = true,
+                                                                      .rxBeaconRequestCount          = true,
+                                                                      .rxOtherCount                  = true,
+                                                                      .rxAddressFilteredCount        = true,
+                                                                      .rxDestAddrFilteredCount       = true,
+                                                                      .rxDuplicatedCount             = true,
+                                                                      .rxErrNoFrameCount             = true,
+                                                                      .rxErrUnknownNeighborCount     = true,
+                                                                      .rxErrInvalidSrcAddrCount      = true,
+                                                                      .rxErrSecCount                 = true,
+                                                                      .rxErrFcsCount                 = true,
+                                                                      .rxErrOtherCount               = true };
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, config);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -363,8 +403,15 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kMLECounts };
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features,
-                                                                 ThreadNetworkDiagnosticsCluster::StartupConfiguration{});
+        ThreadNetworkDiagnosticsCluster::StartupConfiguration config{ .detachedRoleCount                 = true,
+                                                                      .childRoleCount                    = true,
+                                                                      .routerRoleCount                   = true,
+                                                                      .leaderRoleCount                   = true,
+                                                                      .attachAttemptCount                = true,
+                                                                      .partitionIdChangeCount            = true,
+                                                                      .betterPartitionAttachAttemptCount = true,
+                                                                      .parentChangeCount                 = true };
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, config);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(threadNetworkDiagnostics);
@@ -461,8 +508,41 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kMACCounts };
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features,
-                                                                 ThreadNetworkDiagnosticsCluster::StartupConfiguration{});
+        ThreadNetworkDiagnosticsCluster::StartupConfiguration config{ .txTotalCount                  = true,
+                                                                      .txUnicastCount                = true,
+                                                                      .txBroadcastCount              = true,
+                                                                      .txAckRequestedCount           = true,
+                                                                      .txAckedCount                  = true,
+                                                                      .txNoAckRequestedCount         = true,
+                                                                      .txDataCount                   = true,
+                                                                      .txDataPollCount               = true,
+                                                                      .txBeaconCount                 = true,
+                                                                      .txBeaconRequestCount          = true,
+                                                                      .txOtherCount                  = true,
+                                                                      .txRetryCount                  = true,
+                                                                      .txDirectMaxRetryExpiryCount   = true,
+                                                                      .txIndirectMaxRetryExpiryCount = true,
+                                                                      .txErrCcaCount                 = true,
+                                                                      .txErrAbortCount               = true,
+                                                                      .txErrBusyChannelCount         = true,
+                                                                      .rxTotalCount                  = true,
+                                                                      .rxUnicastCount                = true,
+                                                                      .rxBroadcastCount              = true,
+                                                                      .rxDataCount                   = true,
+                                                                      .rxDataPollCount               = true,
+                                                                      .rxBeaconCount                 = true,
+                                                                      .rxBeaconRequestCount          = true,
+                                                                      .rxOtherCount                  = true,
+                                                                      .rxAddressFilteredCount        = true,
+                                                                      .rxDestAddrFilteredCount       = true,
+                                                                      .rxDuplicatedCount             = true,
+                                                                      .rxErrNoFrameCount             = true,
+                                                                      .rxErrUnknownNeighborCount     = true,
+                                                                      .rxErrInvalidSrcAddrCount      = true,
+                                                                      .rxErrSecCount                 = true,
+                                                                      .rxErrFcsCount                 = true,
+                                                                      .rxErrOtherCount               = true };
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, config);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(threadNetworkDiagnostics);

@@ -46,14 +46,65 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
     {
         const BitFlags<Feature> featureMap(rawFeatureMap);
+        ThreadNetworkDiagnosticsCluster::StartupConfiguration config;
 
-        bool activeTs  = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id);
-        bool pendingTs = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id);
-        bool delay     = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, Delay::Id);
+        config.activeTs           = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ActiveTimestamp::Id);
+        config.pendingTs          = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PendingTimestamp::Id);
+        config.delay              = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, Delay::Id);
+        config.detachedRoleCount  = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, DetachedRoleCount::Id);
+        config.childRoleCount     = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ChildRoleCount::Id);
+        config.routerRoleCount    = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RouterRoleCount::Id);
+        config.leaderRoleCount    = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, LeaderRoleCount::Id);
+        config.attachAttemptCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, AttachAttemptCount::Id);
+        config.partitionIdChangeCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, PartitionIdChangeCount::Id);
+        config.betterPartitionAttachAttemptCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, BetterPartitionAttachAttemptCount::Id);
+        config.parentChangeCount   = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, ParentChangeCount::Id);
+        config.txTotalCount        = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxTotalCount::Id);
+        config.txUnicastCount      = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxUnicastCount::Id);
+        config.txBroadcastCount    = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxBroadcastCount::Id);
+        config.txAckRequestedCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxAckRequestedCount::Id);
+        config.txAckedCount        = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxAckedCount::Id);
+        config.txNoAckRequestedCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxNoAckRequestedCount::Id);
+        config.txDataCount          = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxDataCount::Id);
+        config.txDataPollCount      = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxDataPollCount::Id);
+        config.txBeaconCount        = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxBeaconCount::Id);
+        config.txBeaconRequestCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxBeaconRequestCount::Id);
+        config.txOtherCount         = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxOtherCount::Id);
+        config.txRetryCount         = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxRetryCount::Id);
+        config.txDirectMaxRetryExpiryCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxDirectMaxRetryExpiryCount::Id);
+        config.txIndirectMaxRetryExpiryCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxIndirectMaxRetryExpiryCount::Id);
+        config.txErrCcaCount   = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxErrCcaCount::Id);
+        config.txErrAbortCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxErrAbortCount::Id);
+        config.txErrBusyChannelCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, TxErrBusyChannelCount::Id);
+        config.rxTotalCount         = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxTotalCount::Id);
+        config.rxUnicastCount       = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxUnicastCount::Id);
+        config.rxBroadcastCount     = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxBroadcastCount::Id);
+        config.rxDataCount          = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxDataCount::Id);
+        config.rxDataPollCount      = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxDataPollCount::Id);
+        config.rxBeaconCount        = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxBeaconCount::Id);
+        config.rxBeaconRequestCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxBeaconRequestCount::Id);
+        config.rxOtherCount         = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxOtherCount::Id);
+        config.rxAddressFilteredCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxAddressFilteredCount::Id);
+        config.rxDestAddrFilteredCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxDestAddrFilteredCount::Id);
+        config.rxDuplicatedCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxDuplicatedCount::Id);
+        config.rxErrNoFrameCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxErrNoFrameCount::Id);
+        config.rxErrUnknownNeighborCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxErrUnknownNeighborCount::Id);
+        config.rxErrInvalidSrcAddrCount =
+            emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxErrInvalidSrcAddrCount::Id);
+        config.rxErrSecCount   = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxErrSecCount::Id);
+        config.rxErrFcsCount   = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxErrFcsCount::Id);
+        config.rxErrOtherCount = emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, RxErrOtherCount::Id);
 
-        gServers[clusterInstanceIndex].Create(
-            endpointId, featureMap,
-            ThreadNetworkDiagnosticsCluster::StartupConfiguration{ .activeTs = activeTs, .pendingTs = pendingTs, .delay = delay });
+        gServers[clusterInstanceIndex].Create(endpointId, featureMap, config);
         return gServers[clusterInstanceIndex].Registration();
     }
 

@@ -29,6 +29,48 @@ public:
         bool activeTs{};
         bool pendingTs{};
         bool delay{};
+        bool detachedRoleCount{};
+        bool childRoleCount{};
+        bool routerRoleCount{};
+        bool leaderRoleCount{};
+        bool attachAttemptCount{};
+        bool partitionIdChangeCount{};
+        bool betterPartitionAttachAttemptCount{};
+        bool parentChangeCount{};
+        bool txTotalCount{};
+        bool txUnicastCount{};
+        bool txBroadcastCount{};
+        bool txAckRequestedCount{};
+        bool txAckedCount{};
+        bool txNoAckRequestedCount{};
+        bool txDataCount{};
+        bool txDataPollCount{};
+        bool txBeaconCount{};
+        bool txBeaconRequestCount{};
+        bool txOtherCount{};
+        bool txRetryCount{};
+        bool txDirectMaxRetryExpiryCount{};
+        bool txIndirectMaxRetryExpiryCount{};
+        bool txErrCcaCount{};
+        bool txErrAbortCount{};
+        bool txErrBusyChannelCount{};
+        bool rxTotalCount{};
+        bool rxUnicastCount{};
+        bool rxBroadcastCount{};
+        bool rxDataCount{};
+        bool rxDataPollCount{};
+        bool rxBeaconCount{};
+        bool rxBeaconRequestCount{};
+        bool rxOtherCount{};
+        bool rxAddressFilteredCount{};
+        bool rxDestAddrFilteredCount{};
+        bool rxDuplicatedCount{};
+        bool rxErrNoFrameCount{};
+        bool rxErrUnknownNeighborCount{};
+        bool rxErrInvalidSrcAddrCount{};
+        bool rxErrSecCount{};
+        bool rxErrFcsCount{};
+        bool rxErrOtherCount{};
     };
 
     ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<ThreadNetworkDiagnostics::Feature> features,
@@ -55,9 +97,7 @@ public:
 private:
     const BitFlags<ThreadNetworkDiagnostics::Feature> mFeatures;
 
-    bool mActiveTs{};
-    bool mPendingTs{};
-    bool mDelay{};
+    StartupConfiguration mConfig;
 };
 
 } // namespace chip::app::Clusters
