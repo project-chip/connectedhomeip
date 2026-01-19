@@ -23,6 +23,7 @@
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -55,16 +56,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -73,12 +73,13 @@ public:
 #endif
         };
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
-                       static_cast<DeviceLoadStatusProvider *>(interactionModel),
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), &DeviceLayer::GetDiagnosticDataProvider(),
                        Server::GetInstance().GetTestEventTriggerDelegate(), Server::GetInstance().GetNodeStartupTimestamp(),
                        functionsConfig);
 #else
         gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
-                       static_cast<DeviceLoadStatusProvider *>(interactionModel), Server::GetInstance().GetNodeStartupTimestamp());
+                       static_cast<DeviceLoadStatusProvider *>(interactionModel), &DeviceLayer::GetDiagnosticDataProvider(),
+                       Server::GetInstance().GetNodeStartupTimestamp());
         gServer.Cluster().SetTestEventTriggerDelegate(Server::GetInstance().GetTestEventTriggerDelegate());
 #endif
         return gServer.Registration();
