@@ -105,7 +105,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to configure recorder settings for Connection: [%u], error: %s",
-                     connectionID, chip::ErrorStr(err));
+                     connectionID, ErrorStr(err));
         return Status::Failure;
     }
     mTransportMap[connectionID] = std::move(transport);
@@ -218,7 +218,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to modify Connection :[%u], error: %s", connectionID,
-                     chip::ErrorStr(err));
+                     ErrorStr(err));
         return Status::Failure;
     }
 
