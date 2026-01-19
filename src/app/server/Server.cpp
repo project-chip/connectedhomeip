@@ -114,7 +114,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     ChipLogProgress(AppServer, "Server initializing...");
     assertChipStackLockedByCurrentThread();
 
-    mNodeStartupTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
+    mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
@@ -310,10 +310,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             { &sCritEventBuffer[0], sizeof(sCritEventBuffer), app::PriorityLevel::Critical }
         };
 
-        err = app::EventManagement::GetInstance().Init(
-            &mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0], &logStorageResources[0], &sGlobalEventIdCounter,
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(mNodeStartupTimestamp),
-            &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+        err = app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
+                                                       &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
 
         SuccessOrExit(err);
     }
