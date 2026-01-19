@@ -210,6 +210,11 @@ CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)
 {
     ReturnErrorOnFailure(SetOnOff(on));
 
+    // Spec: On receipt of a level control cluster command that:
+    //   - causes the OnOff attribute to be set to FALSE
+    // the server SHALL set the OnTime attribute to 0
+    //
+    // Note that here we only update things is mOnTime is not already 0
     if (!on && (mOnTime != 0))
     {
         mOnTime = 0;
@@ -217,7 +222,13 @@ CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)
         NotifyAttributeChanged(Attributes::OnTime::Id);
     }
 
-    if (on && (mOffWaitTime != 0))
+    // Spec: On receipt of a level control cluster command that:
+    //   - causes the OnOff attribute to be set to TRUE
+    //   - if the value of the OnTime attribute is equal to 0
+    // the server SHALL set the OffWaitTime attribute to 0
+    //
+    // Note that here we only update things is mOffWaitTime is not already 0
+    if (on && (mOnTime == 0) && (mOffWaitTime != 0))
     {
         mOffWaitTime = 0;
         UpdateTimer();
