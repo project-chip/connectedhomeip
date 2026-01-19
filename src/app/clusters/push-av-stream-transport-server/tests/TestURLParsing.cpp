@@ -65,9 +65,7 @@ public:
     {
         return true;
     }
-    void SetTLSCerts(const Tls::CertificateTable::BufferedClientCert &, const Tls::CertificateTable::BufferedRootCert &) override
-    {
-    }
+    void SetTLSCerts(const Tls::CertificateTable::BufferedClientCert &, const Tls::CertificateTable::BufferedRootCert &) override {}
     bool ValidateSegmentDuration(const uint32_t, const uint16_t) override { return true; }
 };
 
@@ -90,16 +88,13 @@ public:
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndProductId(uint32_t, uint16_t, FabricIndex, uint16_t &, int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndProductId(uint32_t, uint16_t, FabricIndex, uint16_t &,
+                                                                         int &) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierVendorIdAndProductId(uint32_t,
-                                                                                   uint16_t,
-                                                                                   uint16_t,
-                                                                                   FabricIndex,
-                                                                                   uint16_t &,
-                                                                                   int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierVendorIdAndProductId(uint32_t, uint16_t, uint16_t, FabricIndex,
+                                                                                 uint16_t &, int &) override
     {
         return CHIP_NO_ERROR;
     }
@@ -111,66 +106,40 @@ public:
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerNameVendorIdAndProductId(const CharSpan &,
-                                                                        uint16_t,
-                                                                        uint16_t,
-                                                                        FabricIndex,
-                                                                        uint16_t &,
-                                                                        int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerNameVendorIdAndProductId(const CharSpan &, uint16_t, uint16_t, FabricIndex,
+                                                                       uint16_t &, int &) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameAndVendorId(uint32_t,
-                                                                                    const CharSpan &,
-                                                                                    uint16_t,
-                                                                                    FabricIndex,
-                                                                                    uint16_t &,
-                                                                                    int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameAndVendorId(uint32_t, const CharSpan &, uint16_t, FabricIndex,
+                                                                                  uint16_t &, int &) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameAndProductId(uint32_t,
-                                                                                     const CharSpan &,
-                                                                                     uint16_t,
-                                                                                     FabricIndex,
-                                                                                     uint16_t &,
-                                                                                     int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameAndProductId(uint32_t, const CharSpan &, uint16_t,
+                                                                                   FabricIndex, uint16_t &, int &) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameVendorIdAndProductId(uint32_t,
-                                                                                            const CharSpan &,
-                                                                                            uint16_t,
-                                                                                            uint16_t,
-                                                                                            FabricIndex,
-                                                                                            uint16_t &,
-                                                                                            int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameVendorIdAndProductId(uint32_t, const CharSpan &, uint16_t,
+                                                                                           uint16_t, FabricIndex, uint16_t &,
+                                                                                           int &) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndServerName(uint32_t,
-                                                                           const CharSpan &,
-                                                                           FabricIndex,
-                                                                           uint16_t &,
-                                                                           int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndServerName(uint32_t, const CharSpan &, FabricIndex, uint16_t &,
+                                                                          int &) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameVendorIdAndProductId(uint32_t,
-                                                                                            const CharSpan &,
-                                                                                            uint16_t,
-                                                                                            uint16_t,
-                                                                                            FabricIndex,
-                                                                                            uint16_t &,
-                                                                                            int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierServerNameVendorIdAndProductId(uint32_t, const CharSpan &, uint16_t,
+                                                                                           uint16_t, FabricIndex, uint16_t &,
+                                                                                           int &) override
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndServerName(uint32_t,
-                                                                           const CharSpan &,
-                                                                           FabricIndex,
-                                                                           uint16_t &,
-                                                                           int &) override
+    CHIP_ERROR FindProvisionedEndpointByServerTypeIdentifierAndServerName(uint32_t, const CharSpan &, FabricIndex, uint16_t &,
+                                                                          int &) override
     {
         return CHIP_NO_ERROR;
     }
@@ -196,8 +165,8 @@ public:
 
         // Set container options
         CMAFContainerOptionsStruct cmafOptions;
-        cmafOptions.segmentDuration = 4000;
-        cmafOptions.trackName       = Span(trackName.data(), trackName.size());
+        cmafOptions.segmentDuration                     = 4000;
+        cmafOptions.trackName                           = Span(trackName.data(), trackName.size());
         transportOptions.containerOptions.containerType = ContainerFormatEnum::kCmaf;
         transportOptions.containerOptions.CMAFContainerOptions.SetValue(cmafOptions);
 
