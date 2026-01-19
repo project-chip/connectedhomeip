@@ -232,66 +232,6 @@ class TestTarget:
     arguments: list[str] = field(default_factory=list)
 
 
-def _standard_ci_target(app_placeholder: str):
-    """Returns a command tailored for a standard CI execution.
-
-    Generally this is just the given command without any arguments.
-    """
-    return TestTarget(name=app_placeholder, command=app_placeholder, arguments=[])
-
-
-class StandardTargets:
-    """Defines some commonly used run targets (app placeholders)"""
-    ALL_CLUSTERS = _standard_ci_target('all-clusters')
-    TV = _standard_ci_target('tv')
-    LOCK = _standard_ci_target('lock')
-    OTA = _standard_ci_target('ota-requestor')
-    BRIDGE = _standard_ci_target('bridge')
-    LIT_ICD = _standard_ci_target('lit-icd')
-    FABRIC_SYNC = _standard_ci_target('fabric-sync')
-    MWO = _standard_ci_target('microwave-oven')
-    RVC = _standard_ci_target('rvc')
-    NETWORK_MANAGER = _standard_ci_target('network-manager')
-    ENERGY_GATEWAY = _standard_ci_target('energy-gateway')
-    ENERGY_MANAGEMENT = _standard_ci_target('energy-management')
-    CLOSURE = _standard_ci_target('closure')
-
-    @classmethod
-    def for_test_name(cls, name) -> TestTarget:
-        if (name.startswith("TV_") or name.startswith("Test_TC_MC_") or
-            name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or
-            name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or
-            name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or
-            name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or
-            name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or
-                name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
-            return StandardTargets.TV
-        if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
-            return StandardTargets.LOCK
-        if name.startswith("TestFabricSync"):
-            return StandardTargets.FABRIC_SYNC
-        if name.startswith("OTA_"):
-            return StandardTargets.OTA
-        if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
-            return StandardTargets.BRIDGE
-        if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
-            return StandardTargets.LIT_ICD
-        if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
-            return StandardTargets.MWO
-        if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
-            return StandardTargets.RVC
-        if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
-            return StandardTargets.NETWORK_MANAGER
-        if name.startswith("Test_TC_MTRID_"):
-            return StandardTargets.ENERGY_GATEWAY
-        if (name.startswith("Test_TC_DEM_") or name.startswith("Test_TC_DEMM_") or
-                name.startswith("Test_TC_EEVSE_") or name.startswith("Test_TC_EEVSEM_")):
-            return StandardTargets.ENERGY_MANAGEMENT
-        if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
-            return StandardTargets.CLOSURE
-        return StandardTargets.ALL_CLUSTERS
-
-
 @dataclass
 class KnownSubprocessEntry:
     kind: SubprocessKind

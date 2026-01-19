@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
@@ -73,6 +74,27 @@ private:
     // ===== Members for internal use
 
     static void UpdateOperationalHours(System::Layer * systemLayer, void * appState);
+
+    // ===== Platform error formatting support
+
+    /**
+     * Register a text error formatter for Silabs platform errors.
+     */
+    static void RegisterSilabsPlatformErrorFormatter();
+
+    /**
+     * Given a CHIP error value that represents a Silabs platform error, returns a
+     * human-readable NULL-terminated C string describing the error.
+     *
+     * @param[in] buf                   Buffer into which the error string will be placed.
+     * @param[in] bufSize               Size of the supplied buffer in bytes.
+     * @param[in] err                   The error to be described.
+     *
+     * @return true                     If a description string was written into the supplied buffer.
+     * @return false                    If the supplied error was not a Silabs platform error.
+     *
+     */
+    static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
