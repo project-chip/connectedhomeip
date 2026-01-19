@@ -1019,14 +1019,14 @@ class TestAssertValidOperationalInstanceName(unittest.TestCase):
 class TestAssertValidPhKey(unittest.TestCase):
     INT_MSG = "Must be a decimal integer without leading zeroes"
     GT0_MSG = "Value must be greater than 0"
-    BIT_MSG = "Only bits 0-19 may be set (value must fit in 20 bits)"
+    BIT_MSG = "Only bits 0-22 may be set"
 
     # Valid values
     VALID_VALUES = [
         "1",          # minimum allowed
         "33",         # typical example
-        "1048575",    # max 20-bit value (2^20 - 1)
-        "524288",     # power of two within 20 bits
+        "8388607",    # all 22-bits enabled (1<<23 - 1)
+        "524288",     # power of two within 23 bits
         "999999",     # large but still valid under mask
     ]
 
@@ -1052,8 +1052,8 @@ class TestAssertValidPhKey(unittest.TestCase):
         self.assertIn(self.GT0_MSG, msg)
 
     def test_invalid_due_to_out_of_range(self):
-        # Exceeds 20-bit mask
-        msg = fail_msg(assert_valid_ph_key, str((1 << 20)))
+        # Only bits 1 through 22 are defined.
+        msg = fail_msg(assert_valid_ph_key, str((1 << 23)))
         self.assertIn(self.BIT_MSG, msg)
 
     def test_invalid_due_to_empty_string(self):
@@ -1069,8 +1069,8 @@ class TestAssertValidPhKey(unittest.TestCase):
         self.assertNotIn(self.BIT_MSG, msg)
 
     def test_invalid_due_to_leading_zero_and_out_of_range(self):
-        # Leading zero present and numeric value beyond 20-bit mask → INT + BIT
-        msg = fail_msg(assert_valid_ph_key, "01048576")  # 1_048_576 == 1 << 20
+        # Leading zero present and numeric value beyond range
+        msg = fail_msg(assert_valid_ph_key, "08388608")  # 8,388,608 == 1 << 23
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.BIT_MSG, msg)
         self.assertNotIn(self.GT0_MSG, msg)
@@ -1091,8 +1091,8 @@ class TestAssertValidPhKey(unittest.TestCase):
         self.assertNotIn(self.BIT_MSG, msg)
 
     def test_invalid_due_to_leading_zero_and_out_of_range_variant(self):
-        # Leading zero plus value beyond 20-bit mask -> INT + BIT, no GT0
-        msg = fail_msg(assert_valid_ph_key, "0001048577")  # 1_048_577 > (1<<20) - 1
+        # Leading zero plus value beyond 22-bit mask -> INT + BIT, no GT0
+        msg = fail_msg(assert_valid_ph_key, "0008388608")  # 1_048_577 > (1<<20) - 1
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.BIT_MSG, msg)
         self.assertNotIn(self.GT0_MSG, msg)
