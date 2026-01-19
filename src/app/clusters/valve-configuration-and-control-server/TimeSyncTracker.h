@@ -31,7 +31,7 @@ namespace chip::app::Clusters::ValveConfigurationAndControl {
 class TimeSyncTracker
 {
 public:
-    virtual ~TimeSyncTracker()    = default;
+    virtual ~TimeSyncTracker() = default;
 
     /// Checks whether UTC time is currently synchronized and valid.
     ///
