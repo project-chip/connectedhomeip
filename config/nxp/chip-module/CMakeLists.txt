@@ -43,7 +43,14 @@ if (NOT CHIP_ROOT)
 endif()
 get_filename_component(GN_ROOT_TARGET ${CHIP_ROOT}/config/nxp/chip-gn REALPATH)
 
-include(${CHIP_ROOT}/config/nxp/cmake/common.cmake)
+include(${CHIP_ROOT}/config/nxp/chip-module/generate_factory_data.cmake)
+
+get_filename_component(COMMON_CMAKE_SOURCE_DIR ${CHIP_ROOT}/config/common/cmake REALPATH)
+
+# Get common Cmake sources
+include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
+include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
+include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_kconfig_defaults.cmake)
 
 # Prepare compiler flags
 if (CHIP_CFLAGS)
@@ -104,10 +111,6 @@ matter_common_gn_args(
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
-
-if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
-    matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
-endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
