@@ -157,7 +157,7 @@ struct ServerInitParams
     uint16_t userDirectedCommissioningPort = CHIP_UDC_PORT;
     // Interface on which to run daemon
     Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();
-    
+
     // Number of sequential port retries if binding fails with "address in use"
     // When > 0, if binding to operationalServicePort (or userDirectedCommissioningPort) fails,
     // the system will automatically try portRetryCount additional sequential ports.
