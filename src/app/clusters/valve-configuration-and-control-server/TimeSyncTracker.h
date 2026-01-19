@@ -19,18 +19,27 @@
 
 namespace chip::app::Clusters::ValveConfigurationAndControl {
 
-/// Defines an interface to get the current status and availability
-/// of the TimeSynchronization cluster and UTC time.
+/// Interface for tracking TimeSynchronization cluster status and UTC time availability.
 ///
-/// This is needed for the Feature TimeSync of the ValveConfigurationAndControl
-/// cluster. According to spec this Feature shall only be enabled if the
-/// TimeSynchronization cluster is available.
-/// For the AutoCloseTime, the TimeSynchronization cluster should also have a
-/// valid UTC time.
+/// Required when the ValveConfigurationAndControl cluster enables the TimeSync feature.
+/// Per specification, the TimeSync feature shall only be enabled when the
+/// TimeSynchronization cluster is present on the device.
+///
+/// The AutoCloseTime attribute requires valid UTC time from TimeSynchronization.
+///
+/// Note: This interface is not needed if TimeSync feature is not supported.
 class TimeSyncTracker
 {
 public:
     virtual ~TimeSyncTracker()    = default;
+
+    /// Checks whether UTC time is currently synchronized and valid.
+    ///
+    /// When TimeSync feature is enabled, implementations must verify that the
+    /// TimeSynchronization cluster has successfully synchronized time before
+    /// allowing setting time-based attributes like AutoCloseTime.
+    ///
+    /// @return true if UTC time is synchronized and valid, false otherwise
     virtual bool IsValidUTCTime() = 0;
 };
 
