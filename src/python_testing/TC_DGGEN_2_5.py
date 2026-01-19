@@ -43,8 +43,8 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 cluster = Clusters.Objects.GeneralDiagnostics
@@ -203,11 +203,13 @@ class TC_DGGEN_2_5(MatterBaseTest):
         self.step(9)
         logger.info("Removing TH2 fabric from DUT")
 
+        th1FabricIndex = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=endpoint, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
+
         response = await self.th1.SendCommand(
             nodeId=self.dut_node_id,
             endpoint=endpoint,
             payload=Clusters.OperationalCredentials.Commands.RemoveFabric(
-                fabricIndex=fabricId2
+                fabricIndex=th1FabricIndex
             )
         )
 
