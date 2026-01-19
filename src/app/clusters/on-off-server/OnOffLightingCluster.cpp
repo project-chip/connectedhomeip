@@ -227,7 +227,7 @@ CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)
     //   - if the value of the OnTime attribute is equal to 0
     // the server SHALL set the OffWaitTime attribute to 0
     //
-    // Note that here we only update things is mOffWaitTime is not already 0
+    // Note that here we only update things is mOffWaitTime if not already 0
     if (on && (mOnTime == 0) && (mOffWaitTime != 0))
     {
         mOffWaitTime = 0;
