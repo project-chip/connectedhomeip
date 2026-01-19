@@ -457,9 +457,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning_method parameter
-    ble_wifi = commissioning_method == 'ble-wifi'
+    wifi_required = commissioning_method in ['ble-wifi']
 
-    if commissioning_method and sys.platform != "linux":
+    if wifi_required and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
@@ -481,12 +481,12 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not ble_wifi,
+                setup_app_link_up=not wifi_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if ble_wifi else 'eth-app'))
+                app_link_name='wlx-app' if wifi_required else 'eth-app'))
 
-            if ble_wifi:
+            if commissioning_method == 'ble-wifi':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
                 to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
