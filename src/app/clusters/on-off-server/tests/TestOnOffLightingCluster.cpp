@@ -453,7 +453,7 @@ TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
     testAccess.SetOffWaitTime(200);
 
     // Step 6: Call SetOnOffWithTimeReset(true) to turn on and clear OffWaitTime.
-    // Spec requires mOffTime to NOT be set to 0 becaues mOnTime is not 0
+    // Spec requires mOffTime to NOT be set to 0 because mOnTime is not 0
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(true), CHIP_NO_ERROR);
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
     EXPECT_EQ(offWaitTime, 200);
