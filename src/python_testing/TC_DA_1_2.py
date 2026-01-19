@@ -196,7 +196,7 @@ class TC_DA_1_2(BasicCompositionTests):
                          "PAA from PAI authority_key_id extension matches one found in authorized_paa_list"),
                 TestStep(9, ("Verify that the certification_declaration CMS enveloped can be verified with Certification Declaration public key.\n"
                              "For official CDs the signer must be one of the well-known CSA CD signing keys.\n"
-                             "For provisional CDs, the signer must be one of the well-known CSA CD signing keys unless the override_provisional_cd_check_warning flag is set to acknowledge the use of a provisional CD that cannot be used in production devices."
+                             "For provisional CDs, the signer must be one of the well-known CSA CD signing keys unless the `override_provisional_cd_check_warning` flag is set to acknowledge the use of a provisional CD that cannot be used in production devices."
                              "For test and development CDs, the signer certificates may be one of the development certificates or can be provided by the tester."
                              ),
                          "Signature verification passes"),
