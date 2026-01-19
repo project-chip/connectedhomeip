@@ -293,8 +293,7 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
                  nonDefaultStatus = Status::FailsafeRequired);
 
     // VID must be verified (check that the fabric index matches the one whose VID was most recently verified)
-    VerifyOrExit(mVerifiedFabricIndex.has_value() &&
-                     mVerifiedFabricIndex.value() == ctx.mCommandHandler.GetAccessingFabricIndex(),
+    VerifyOrExit(mVerifiedFabricIndex.has_value() && mVerifiedFabricIndex.value() == ctx.mCommandHandler.GetAccessingFabricIndex(),
                  status.Emplace(StatusCodeEnum::kVIDNotVerified));
 
     VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
