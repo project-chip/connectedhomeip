@@ -186,7 +186,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(6)
-        if self.pics_guard(can_manually_control):
+        if self.pics_guard(failure_and_manual):
             old_current_mode_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
             # CurrentMode attribute value is an integer value
