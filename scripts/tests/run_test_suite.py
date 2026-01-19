@@ -457,11 +457,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning parameter
-    ble_wifi = commissioning_method == 'ble-wifi'
-    wifi_paf = commissioning_method == 'wifi-paf'
-    on_network = commissioning_method == 'on-network'
+    wifi_required = commissioning_method in ['ble-wifi', 'wifi-paf']
 
-    if on_network != 'on-network' and sys.platform != "linux":
+    if wifi_required and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning_method", f"Option --commissioning_method={commissioning_method} is available on Linux platform only")
 
     ble_controller_app = None
@@ -480,37 +478,38 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            app_name = 'eth-app' if on_network else 'wlx-app'
-            tool_name = 'wlx-tool' if wifi_paf else 'eth-tool'
+            app_name = 'wlx-app' if wifi_required else 'eth-app'
+            tool_name = 'wlx-tool' if commissioning_method == 'wifi-paf' else 'eth-tool'
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi or WiFi-PAF commissioning.
-                setup_app_link_up=not (ble_wifi or wifi_paf),
+                setup_app_link_up=not wifi_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
                 app_link_name=app_name,
                 tool_link_name=tool_name))
-            if ble_wifi:
-                interfaces_params = [
-                    {"name": app_name}
-                ]
+
+            if wifi_required:
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
+
+                interfaces_params = []
+
+                if commissioning_method == 'ble-wifi':
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    interfaces_params = [
+                        {"name": app_name}
+                    ]
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+
+                if commissioning_method == 'wifi-paf':
+                    # Single mock with two interfaces (like real wpa_supplicant)
+                    interfaces_params = [
+                        {"name": app_name},
+                        {"name": tool_name}
+                    ]
+
                 to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, interfaces_params))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-            if wifi_paf:
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-
-                # Single mock with two interfaces (like real wpa_supplicant)
-                interfaces_params = [
-                    {"name": app_name},
-                    {"name": tool_name}
-                ]
-                wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns,
-                                                        interfaces_params)
-
-                to_terminate.append(wifi)
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -542,7 +541,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
-                        wifi_paf=wifi_paf
+                        wifi_paf=commissioning_method == 'wifi-paf'
                     )
                     if not dry_run:
                         test_end = time.monotonic()
