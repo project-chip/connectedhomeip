@@ -566,8 +566,8 @@ void uartMainLoop(void * args)
 {
     UartTxStruct_t workBuffer;
     uint8_t timeStampString[SilabsCoreLogs::kTimeStampStringSize];
-    uint8_t logWorkBuffer[1 + SilabsCoreLogs::kTimeStampStringSize + SilabsCoreLogs::kMaxCategoryStrLen + UART_TX_MAX_BUF_LEN +
-                          3]; // Header + Timestamp + Category + Data + \r\n + Footer
+    uint8_t logWorkBuffer[kHeaderSize + SilabsCoreLogs::kTimeStampStringSize + SilabsCoreLogs::kMaxCategoryStrLen + UART_TX_MAX_BUF_LEN +
+                          kEndOfLineSize + kFooterSize]; // Header + Timestamp + Category + Data + \r\n + Footer
 
     while (1)
     {

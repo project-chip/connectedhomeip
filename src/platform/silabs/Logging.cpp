@@ -124,7 +124,7 @@ size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
     uint8_t minutes = totalSeconds % 60;
     uint32_t hours  = totalSeconds / 60;
 
-    return snprintf(buffer, maxSize, "[%02lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    return snprintf(buffer, maxSize, "[%04lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
 }
 
 void HandleLog(const char * module, LogCategory category, const char * aFormat, va_list v)

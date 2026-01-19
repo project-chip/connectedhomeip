@@ -36,9 +36,9 @@ constexpr const uint8_t kLogSilabs[] = "[silabs]";
 constexpr const uint8_t kLogNone[]   = "-";
 constexpr const uint8_t kOTModule[]  = "[ot]";
 
-static constexpr size_t kTimeStampStringSize = sizeof("[00:00:00.000]"); // includes null terminator
+static constexpr size_t kTimeStampStringSize = sizeof("[0000:00:00.000]"); // includes null terminator
 static constexpr size_t kMaxCategoryStrLen =
-    std::max({ sizeof(kLogError), sizeof(kLogWarn), sizeof(kLogInfo), sizeof(kLogDetail), sizeof(kLogLwip), sizeof(kLogSilabs) });
+    std::max({ sizeof(kLogError), sizeof(kLogWarn), sizeof(kLogInfo), sizeof(kLogDetail), sizeof(kLogLwip), sizeof(kLogSilabs), sizeof(kLogNone), sizeof(kOTModule) });
 
 enum LogCategory : uint8_t
 {
@@ -49,26 +49,29 @@ enum LogCategory : uint8_t
     kLog_Lwip     = 4,
     kLog_Silabs   = 5,
     kLog_None     = 6,
+    kLog_OT       = 7,
 };
 
-inline uint8_t * GetCategoryString(LogCategory category)
+inline const uint8_t * GetCategoryString(LogCategory category)
 {
     switch (category)
     {
     case kLog_Error:
-        return const_cast<uint8_t *>(kLogError);
+        return (kLogError);
     case kLog_Progress:
-        return const_cast<uint8_t *>(kLogInfo);
+        return (kLogInfo);
     case kLog_Detail:
-        return const_cast<uint8_t *>(kLogDetail);
+        return (kLogDetail);
     case kLog_Warning:
-        return const_cast<uint8_t *>(kLogWarn);
+        return (kLogWarn);
     case kLog_Lwip:
-        return const_cast<uint8_t *>(kLogLwip);
+        return (kLogLwip);
     case kLog_Silabs:
-        return const_cast<uint8_t *>(kLogSilabs);
+        return (kLogSilabs);
+    case kLog_OT:
+        return (kOTModule);
     default:
-        return const_cast<uint8_t *>(kLogNone);
+        return (kLogNone);
     }
 }
 
@@ -86,6 +89,8 @@ inline uint8_t GetCategoryStringSize(LogCategory category)
         return sizeof(kLogLwip) - 1;
     case kLog_Silabs:
         return sizeof(kLogSilabs) - 1;
+    case kLog_OT:
+        return sizeof(kOTModule) - 1;    
     default:
         return sizeof(kLogNone) - 1;
     }

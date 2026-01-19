@@ -22,6 +22,9 @@
 
 constexpr uint8_t kLogHeader = 0x01; // ASCII Start of Heading
 constexpr uint8_t kLogFooter = 0x04; // ASCII End of Transmission
+constexpr uint8_t kHeaderSize = 1;
+constexpr uint8_t kFooterSize = 1;
+constexpr uint8_t kEndOfLineSize = 2; // \r\n
 
 #ifdef __cplusplus
 extern "C" {
