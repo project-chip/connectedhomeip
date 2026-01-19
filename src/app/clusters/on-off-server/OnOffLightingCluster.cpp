@@ -266,11 +266,20 @@ void OnOffLightingCluster::UpdateTimer()
     mTimerDelegate.CancelTimer(this);
 
     bool on = GetOnOff();
-    if ((on && mOnTime > 0) || (!on && mOffWaitTime > 0))
-    {
-        // 100ms = 1/10th second
-        LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(100)));
-    }
+
+    const bool needTimer = [&]() {
+        if (on)
+        {
+            return (mOnTime > 0) && (mOnTime != 0xFFFF);
+        }
+        // not on, check on conditions
+        return (mOffWaitTime > 0) && (mOffWaitTime != 0xFFFF);
+    }();
+
+    VerifyOrReturn(needTimer);
+
+    // 100ms = 1/10th second
+    LogErrorOnFailure(mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(100)));
 }
 
 DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
@@ -394,6 +403,9 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
 {
     Commands::OnWithTimedOff::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    VerifyOrReturnError(commandData.onTime <= 0xFFFE, Status::ConstraintError);
+    VerifyOrReturnError(commandData.offWaitTime <= 0xFFFE, Status::ConstraintError);
 
     if (commandData.onOffControl.Has(OnOffControlBitmap::kAcceptOnlyWhenOn) && !GetOnOff())
     {
