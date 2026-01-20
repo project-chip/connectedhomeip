@@ -319,6 +319,11 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
     bool wasOff = !GetOnOff();
     ReturnErrorOnFailure(SetOnOff(true));
 
+    // Spec requirement:
+    //   This attribute SHALL be set to TRUE after the reception of a command which
+    //   causes the OnOff attribute to be set to TRUE;
+    mGlobalSceneControl = true;
+
     if (wasOff && mScenesIntegrationDelegate != nullptr)
     {
         LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
@@ -443,6 +448,11 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
         // This command turns the device ON.
         LogErrorOnFailure(SetOnOff(true));
     }
+
+    // Spec requirement:
+    //   This attribute SHALL be set to TRUE after the reception of a command which
+    //   causes the OnOff attribute to be set to TRUE;
+    mGlobalSceneControl = true;
 
     UpdateTimer();
     return Status::Success;

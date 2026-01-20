@@ -487,11 +487,20 @@ TEST_F(TestOnOffLightingCluster, TestOffWithEffect_GlobalSceneControlFalse)
     mMockScenesIntegrationDelegate.storeCalls.clear();
     mMockEffectDelegate.mCalled = false;
 
-    // Step 4: Turn On again.
+    // Step 4: Turn On again. This sets GlobalSceneControl to true.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
     EXPECT_TRUE(mMockDelegate.mOnOff);
 
-    // Step 5: Call OffWithEffect again. Since GlobalSceneControl is false,
+    // Step 5: Set GlobalSceneControl to false by invoking OffWithEffect.
+    EXPECT_TRUE(mClusterTester.Invoke(offCommand1).IsSuccess());
+    EXPECT_EQ(mMockScenesIntegrationDelegate.storeCalls.size(), 1u);
+
+
+    // start clear
+    mMockScenesIntegrationDelegate.storeCalls.clear();
+    mMockEffectDelegate.mCalled = false;
+
+    // Step 6: Call OffWithEffect again. Since GlobalSceneControl is false,
     // no effect should be triggered and no scene operations should occur.
     Commands::OffWithEffect::Type offCommand2;
     offCommand2.effectIdentifier = EffectIdentifierEnum::kDelayedAllOff;
