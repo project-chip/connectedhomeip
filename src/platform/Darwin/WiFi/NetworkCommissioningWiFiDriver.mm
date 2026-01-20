@@ -75,7 +75,8 @@ private:
         destination.security = GetWiFiSecurity(source);
         destination.channel = static_cast<uint16_t>(source.wlanChannel.channelNumber);
         destination.wiFiBand = GetWiFiBand(source.wlanChannel);
-        destination.rssi = static_cast<int8_t>(source.rssiValue);
+        destination.signal.type = NetworkCommissioning::WirelessSignalType::kdBm;
+        destination.signal.strength = static_cast<int8_t>(source.rssiValue);
 
         NSData * ssidData = source.ssidData;
         destination.ssidLen = static_cast<uint8_t>(std::min(ssidData.length, DeviceLayer::Internal::kMaxWiFiSSIDLength));
