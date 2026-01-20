@@ -729,7 +729,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info("Verified SpecificationVersion unchanged verification successful")
 
         # Step 66: MaxPathsPerInvoke
-        
+
         self.step(66)
         mpi = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
         log.info(f"Read MaxPathsPerInvoke: {mpi}")
