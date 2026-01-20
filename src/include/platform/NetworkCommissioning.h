@@ -95,6 +95,28 @@ struct Network
 static_assert(sizeof(Network::networkID) <= std::numeric_limits<decltype(Network::networkIDLen)>::max(),
               "Max length of networkID ssid exceeds the limit of networkIDLen field");
 
+/**
+ *  Wireless signal strength assessment or measurement type.
+ */
+enum class WirelessSignalType
+{
+    /**
+     *  No signal strength information available.
+     */
+    kNone,
+
+    /**
+     *  Signal strength is quantitative, in dBm.
+     */
+    kdBm,
+
+    /**
+     *  Signal strength is qualitative, increasing from 0 (none/worst)
+     *  to 100 (best).
+     */
+    kQualitative
+};
+
 struct WiFiScanResponse
 {
 public:
