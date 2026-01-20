@@ -979,7 +979,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
     EXPECT_EQ(result.response->audioStreamID, 1);
 
@@ -1070,7 +1070,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
     ASSERT_TRUE(allocResult.status.has_value());
-    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
     uint16_t streamId = allocResult.response->audioStreamID;
     EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 1u);
@@ -1080,7 +1080,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
     deallocRequest.audioStreamID = streamId;
     auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
     ASSERT_TRUE(deallocResult.status.has_value());
-    EXPECT_TRUE(deallocResult.status->IsSuccess());
+    EXPECT_TRUE(deallocResult.IsSuccess());
     EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 0u);
 
     // Attempt to deallocate again, should fail
@@ -1118,7 +1118,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamAllocateCommand)
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
     EXPECT_EQ(result.response->videoStreamID, 1);
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
@@ -1194,7 +1194,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
     ASSERT_TRUE(allocResult.status.has_value());
-    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
     uint16_t streamId = allocResult.response->videoStreamID;
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
@@ -1204,7 +1204,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
     deallocRequest.videoStreamID = streamId;
     auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
     ASSERT_TRUE(deallocResult.status.has_value());
-    EXPECT_TRUE(deallocResult.status->IsSuccess());
+    EXPECT_TRUE(deallocResult.IsSuccess());
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 0u);
 
     // Attempt to deallocate again, should fail
@@ -1242,7 +1242,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
     ASSERT_TRUE(allocResult.status.has_value());
-    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
     uint16_t streamId = allocResult.response->videoStreamID;
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
@@ -1254,7 +1254,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
 
     auto modifyResult = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
     ASSERT_TRUE(modifyResult.status.has_value());
-    EXPECT_TRUE(modifyResult.status->IsSuccess());
+    EXPECT_TRUE(modifyResult.IsSuccess());
 
     // Verify the changes
     Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
@@ -1272,7 +1272,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
     modifyRequest.OSDEnabled       = chip::Optional<bool>::Missing();
     modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
     ASSERT_TRUE(modifyResult.status.has_value());
-    EXPECT_TRUE(modifyResult.status->IsSuccess());
+    EXPECT_TRUE(modifyResult.IsSuccess());
 
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
     it = allocatedVideoStreams.begin();
@@ -1309,7 +1309,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamAllocateCommand)
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
     EXPECT_EQ(result.response->snapshotStreamID, 1);
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
@@ -1374,7 +1374,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocateCommand)
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
     ASSERT_TRUE(allocResult.status.has_value());
-    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
     uint16_t streamId = allocResult.response->snapshotStreamID;
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
@@ -1384,7 +1384,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocateCommand)
     deallocRequest.snapshotStreamID = streamId;
     auto deallocResult              = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
     ASSERT_TRUE(deallocResult.status.has_value());
-    EXPECT_TRUE(deallocResult.status->IsSuccess());
+    EXPECT_TRUE(deallocResult.IsSuccess());
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 0u);
 
     // Attempt to deallocate again, should fail
@@ -1418,7 +1418,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
     ASSERT_TRUE(allocResult.status.has_value());
-    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
     uint16_t streamId = allocResult.response->snapshotStreamID;
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
@@ -1430,7 +1430,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
 
     auto modifyResult = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
     ASSERT_TRUE(modifyResult.status.has_value());
-    EXPECT_TRUE(modifyResult.status->IsSuccess());
+    EXPECT_TRUE(modifyResult.IsSuccess());
 
     // Verify the changes
     Attributes::AllocatedSnapshotStreams::TypeInfo::DecodableType allocatedSnapshotStreams;
@@ -1448,7 +1448,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
     modifyRequest.OSDEnabled       = chip::Optional<bool>::Missing();
     modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
     ASSERT_TRUE(modifyResult.status.has_value());
-    EXPECT_TRUE(modifyResult.status->IsSuccess());
+    EXPECT_TRUE(modifyResult.IsSuccess());
 
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedSnapshotStreams::Id, allocatedSnapshotStreams), CHIP_NO_ERROR);
     it = allocatedSnapshotStreams.begin();
@@ -1483,7 +1483,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
     request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
     auto result              = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
 
     Attributes::StreamUsagePriorities::TypeInfo::DecodableType readPriorities;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StreamUsagePriorities::Id, readPriorities), CHIP_NO_ERROR);
@@ -1541,7 +1541,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
 
         auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
         ASSERT_TRUE(allocResult.status.has_value());
-        ASSERT_TRUE(allocResult.status->IsSuccess());
+        ASSERT_TRUE(allocResult.IsSuccess());
         EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
     }
 
@@ -1559,7 +1559,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
         deallocRequest.videoStreamID = 1;
         auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
         ASSERT_TRUE(deallocResult.status.has_value());
-        EXPECT_TRUE(deallocResult.status->IsSuccess());
+        EXPECT_TRUE(deallocResult.IsSuccess());
         EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 0u);
 
         mVideoStreams.clear();
@@ -1586,7 +1586,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand)
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
     ASSERT_TRUE(allocResult.status.has_value());
-    ASSERT_TRUE(allocResult.status->IsSuccess());
+    ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
     uint16_t streamId = allocResult.response->snapshotStreamID;
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
@@ -1601,7 +1601,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand)
 
     auto result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
 
     EXPECT_EQ(result.response->imageCodec, ImageCodecEnum::kJpeg);
