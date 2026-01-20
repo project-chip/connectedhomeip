@@ -47,7 +47,7 @@ using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
 static constexpr chip::EndpointId kTestEndpointId = 1;
-static constexpr uint8_t testMaxPresets = 5;
+static constexpr uint8_t testMaxPresets           = 5;
 
 // Minimal mock delegate for testing
 class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
@@ -103,9 +103,8 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
 
     TestCameraAvSettingsUserLevelManagementCluster() :
         mServer(kTestEndpointId,
-                chip::BitFlags<Feature>(
-                    Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                    Feature::kMechanicalZoom, Feature::kMechanicalPresets),
+                chip::BitFlags<Feature>(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                                        Feature::kMechanicalZoom, Feature::kMechanicalPresets),
                 testMaxPresets),
         mClusterTester(mServer)
     {}
