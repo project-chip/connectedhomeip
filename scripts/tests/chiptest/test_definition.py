@@ -469,7 +469,8 @@ class TestDefinition:
                  pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
                  test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
                  ble_controller_app: int | None = None,
-                 ble_controller_tool: int | None = None):
+                 ble_controller_tool: int | None = None,
+                 wifi_paf: bool = False):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
