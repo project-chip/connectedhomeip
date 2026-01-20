@@ -5255,6 +5255,20 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             }
             value.activationReason = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            value.containerType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.CMAFSessionNumber.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.CMAFSessionNumber.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.cmafSessionNumber = memberValue;
+        } while (0);
 
         return value;
     }
@@ -5272,6 +5286,20 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             memberValue = [NSNumber numberWithUnsignedShort:cppValue.connectionID];
             value.connectionID = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            value.containerType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.CMAFSessionNumber.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.CMAFSessionNumber.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.cmafSessionNumber = memberValue;
+        } while (0);
 
         return value;
     }
@@ -5288,6 +5316,23 @@ static id _Nullable DecodeEventPayloadForChimeCluster(EventId aEventId, TLV::TLV
 {
     using namespace Clusters::Chime;
     switch (aEventId) {
+    case Events::ChimeStartedPlaying::Id: {
+        Events::ChimeStartedPlaying::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRChimeClusterChimeStartedPlayingEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.chimeID];
+            value.chimeID = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known Chime event.
         break;
