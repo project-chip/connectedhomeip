@@ -6256,8 +6256,7 @@ private:
 | * JoinGroup                                                         |   0x00 |
 | * LeaveGroup                                                        |   0x01 |
 | * UpdateGroupKey                                                    |   0x03 |
-| * ExpireGracePeriod                                                 |   0x04 |
-| * ConfigureAuxiliaryACL                                             |   0x05 |
+| * ConfigureAuxiliaryACL                                             |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Membership                                                        | 0x0000 |
@@ -6282,10 +6281,10 @@ public:
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("Endpoints", &mComplex_Endpoints);
-        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("KeySetID", 0, UINT16_MAX, &mRequest.keySetID);
         AddArgument("Key", &mRequest.key);
-        AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         AddArgument("UseAuxiliaryACL", 0, 1, &mRequest.useAuxiliaryACL);
+        AddArgument("ReplaceEndpoints", 0, 1, &mRequest.replaceEndpoints);
         ClusterCommand::AddArguments();
     }
 
@@ -6364,9 +6363,8 @@ public:
     GroupcastUpdateGroupKey(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("update-group-key", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
-        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("KeySetID", 0, UINT16_MAX, &mRequest.keySetID);
         AddArgument("Key", &mRequest.key);
-        AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         ClusterCommand::AddArguments();
     }
 
@@ -6393,44 +6391,6 @@ public:
 
 private:
     chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Type mRequest;
-};
-
-/*
- * Command ExpireGracePeriod
- */
-class GroupcastExpireGracePeriod : public ClusterCommand
-{
-public:
-    GroupcastExpireGracePeriod(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("expire-grace-period", credsIssuerConfig)
-    {
-        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Type mRequest;
 };
 
 /*
@@ -15412,7 +15372,8 @@ class WebRTCTransportProviderSolicitOffer : public ClusterCommand
 public:
     WebRTCTransportProviderSolicitOffer(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
-        mComplex_SFrameConfig(&mRequest.SFrameConfig)
+        mComplex_SFrameConfig(&mRequest.SFrameConfig), mComplex_VideoStreams(&mRequest.videoStreams),
+        mComplex_AudioStreams(&mRequest.audioStreams)
     {
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
@@ -15422,6 +15383,8 @@ public:
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
         AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
+        AddArgument("VideoStreams", &mComplex_VideoStreams, "", Argument::kOptional);
+        AddArgument("AudioStreams", &mComplex_AudioStreams, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -15453,6 +15416,8 @@ private:
         mComplex_ICEServers;
     TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
         mComplex_SFrameConfig;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_VideoStreams;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_AudioStreams;
 };
 
 /*
@@ -15463,7 +15428,8 @@ class WebRTCTransportProviderProvideOffer : public ClusterCommand
 public:
     WebRTCTransportProviderProvideOffer(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
-        mComplex_SFrameConfig(&mRequest.SFrameConfig)
+        mComplex_SFrameConfig(&mRequest.SFrameConfig), mComplex_VideoStreams(&mRequest.videoStreams),
+        mComplex_AudioStreams(&mRequest.audioStreams)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
@@ -15475,6 +15441,8 @@ public:
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
         AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
+        AddArgument("VideoStreams", &mComplex_VideoStreams, "", Argument::kOptional);
+        AddArgument("AudioStreams", &mComplex_AudioStreams, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -15506,6 +15474,8 @@ private:
         mComplex_ICEServers;
     TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
         mComplex_SFrameConfig;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_VideoStreams;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_AudioStreams;
 };
 
 /*
@@ -24209,7 +24179,6 @@ void registerClusterGroupcast(Commands & commands, CredentialIssuerCommands * cr
         make_unique<GroupcastJoinGroup>(credsIssuerConfig),             //
         make_unique<GroupcastLeaveGroup>(credsIssuerConfig),            //
         make_unique<GroupcastUpdateGroupKey>(credsIssuerConfig),        //
-        make_unique<GroupcastExpireGracePeriod>(credsIssuerConfig),     //
         make_unique<GroupcastConfigureAuxiliaryACL>(credsIssuerConfig), //
         //
         // Attributes

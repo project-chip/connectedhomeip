@@ -102,7 +102,7 @@ void MatterOccupancySensingClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterOccupancySensingClusterShutdownCallback(EndpointId endpointId)
+void MatterOccupancySensingClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -113,7 +113,7 @@ void MatterOccupancySensingClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kOccupancySensingFixedClusterCount,
             .maxClusterInstanceCount   = kOccupancySensingMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 namespace chip::app::Clusters::OccupancySensing {

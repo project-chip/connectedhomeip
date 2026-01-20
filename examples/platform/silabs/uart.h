@@ -29,6 +29,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength);
 int16_t uartLogWrite(const char * log, uint16_t length);
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead);
 void uartFlushTxQueue(void);
+void uartForceTransmit(const uint8_t * data, uint16_t length);
 
 void uartMainLoop(void * args);
 

@@ -9465,6 +9465,33 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                                            value_activationReason);
             }
 
+            jobject value_containerType;
+            std::string value_containerTypeClassName     = "java/lang/Integer";
+            std::string value_containerTypeCtorSignature = "(I)V";
+            jint jnivalue_containerType                  = static_cast<jint>(cppValue.containerType);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_containerTypeClassName.c_str(), value_containerTypeCtorSignature.c_str(), jnivalue_containerType,
+                value_containerType);
+
+            jobject value_CMAFSessionNumber;
+            if (!cppValue.CMAFSessionNumber.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_CMAFSessionNumber);
+            }
+            else
+            {
+                jobject value_CMAFSessionNumberInsideOptional;
+                std::string value_CMAFSessionNumberInsideOptionalClassName     = "java/lang/Long";
+                std::string value_CMAFSessionNumberInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_CMAFSessionNumberInsideOptional = static_cast<jlong>(cppValue.CMAFSessionNumber.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_CMAFSessionNumberInsideOptionalClassName.c_str(),
+                    value_CMAFSessionNumberInsideOptionalCtorSignature.c_str(), jnivalue_CMAFSessionNumberInsideOptional,
+                    value_CMAFSessionNumberInsideOptional);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_CMAFSessionNumberInsideOptional,
+                                                                                           value_CMAFSessionNumber);
+            }
+
             jclass pushTransportBeginStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PushAvStreamTransportClusterPushTransportBeginEvent",
@@ -9476,9 +9503,10 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID pushTransportBeginStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, pushTransportBeginStructClass, "<init>",
-                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V",
-                                                                &pushTransportBeginStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, pushTransportBeginStructClass, "<init>",
+                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;)V",
+                &pushTransportBeginStructCtor);
             if (err != CHIP_NO_ERROR || pushTransportBeginStructCtor == nullptr)
             {
                 ChipLogError(Zcl,
@@ -9487,7 +9515,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(pushTransportBeginStructClass, pushTransportBeginStructCtor, value_connectionID,
-                                           value_triggerType, value_activationReason);
+                                           value_triggerType, value_activationReason, value_containerType, value_CMAFSessionNumber);
 
             return value;
         }
@@ -9506,6 +9534,33 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_connectionIDClassName.c_str(), value_connectionIDCtorSignature.c_str(), jnivalue_connectionID,
                 value_connectionID);
 
+            jobject value_containerType;
+            std::string value_containerTypeClassName     = "java/lang/Integer";
+            std::string value_containerTypeCtorSignature = "(I)V";
+            jint jnivalue_containerType                  = static_cast<jint>(cppValue.containerType);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_containerTypeClassName.c_str(), value_containerTypeCtorSignature.c_str(), jnivalue_containerType,
+                value_containerType);
+
+            jobject value_CMAFSessionNumber;
+            if (!cppValue.CMAFSessionNumber.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_CMAFSessionNumber);
+            }
+            else
+            {
+                jobject value_CMAFSessionNumberInsideOptional;
+                std::string value_CMAFSessionNumberInsideOptionalClassName     = "java/lang/Long";
+                std::string value_CMAFSessionNumberInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_CMAFSessionNumberInsideOptional = static_cast<jlong>(cppValue.CMAFSessionNumber.Value());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_CMAFSessionNumberInsideOptionalClassName.c_str(),
+                    value_CMAFSessionNumberInsideOptionalCtorSignature.c_str(), jnivalue_CMAFSessionNumberInsideOptional,
+                    value_CMAFSessionNumberInsideOptional);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_CMAFSessionNumberInsideOptional,
+                                                                                           value_CMAFSessionNumber);
+            }
+
             jclass pushTransportEndStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PushAvStreamTransportClusterPushTransportEndEvent",
@@ -9518,14 +9573,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jmethodID pushTransportEndStructCtor;
             err = chip::JniReferences::GetInstance().FindMethod(env, pushTransportEndStructClass, "<init>",
-                                                                "(Ljava/lang/Integer;)V", &pushTransportEndStructCtor);
+                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V",
+                                                                &pushTransportEndStructCtor);
             if (err != CHIP_NO_ERROR || pushTransportEndStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$PushAvStreamTransportClusterPushTransportEndEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(pushTransportEndStructClass, pushTransportEndStructCtor, value_connectionID);
+            jobject value = env->NewObject(pushTransportEndStructClass, pushTransportEndStructCtor, value_connectionID,
+                                           value_containerType, value_CMAFSessionNumber);
 
             return value;
         }

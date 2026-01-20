@@ -50,13 +50,9 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kEndpoints), endpoints);
     if (includeSensitive)
     {
-        encoder.Encode(to_underlying(Fields::kKeyID), keyID);
+        encoder.Encode(to_underlying(Fields::kKeySetID), keySetID);
     }
     encoder.Encode(to_underlying(Fields::kHasAuxiliaryACL), hasAuxiliaryACL);
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kExpiringKeyID), expiringKeyID);
-    }
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -83,17 +79,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endpoints);
         }
-        else if (__context_tag == to_underlying(Fields::kKeyID))
+        else if (__context_tag == to_underlying(Fields::kKeySetID))
         {
-            err = DataModel::Decode(reader, keyID);
+            err = DataModel::Decode(reader, keySetID);
         }
         else if (__context_tag == to_underlying(Fields::kHasAuxiliaryACL))
         {
             err = DataModel::Decode(reader, hasAuxiliaryACL);
-        }
-        else if (__context_tag == to_underlying(Fields::kExpiringKeyID))
-        {
-            err = DataModel::Decode(reader, expiringKeyID);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {

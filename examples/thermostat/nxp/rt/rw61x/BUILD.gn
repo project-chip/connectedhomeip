@@ -154,7 +154,6 @@ rt_executable("thermostat") {
   ]
 
   if (chip_enable_ble) {
-    defines += [ "APP_BT_DEVICE_NAME=\"NXP-ThermostatApp\"" ]
     include_dirs += [ "${common_example_dir}/app_ble/include" ]
     if (ble_adv_data_custom) {
       # to customize BLE advertising data

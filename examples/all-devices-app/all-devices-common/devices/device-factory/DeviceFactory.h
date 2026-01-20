@@ -19,6 +19,7 @@
 
 #include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
+#include <devices/chime/impl/LoggingChimeDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
@@ -64,6 +65,16 @@ public:
         return nullptr;
     }
 
+    std::vector<std::string> SupportedDeviceTypes() const
+    {
+        std::vector<std::string> result;
+        for (auto & item : mRegistry)
+        {
+            result.push_back(item.first);
+        }
+        return result;
+    }
+
 private:
     std::map<std::string, DeviceCreator> mRegistry;
     DefaultTimerDelegate timer;
@@ -79,6 +90,7 @@ private:
                 &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
+        mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };
     }
 };
 

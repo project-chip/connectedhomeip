@@ -17,11 +17,15 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
+#include <app/clusters/tls-client-management-server/CodegenIntegration.h>
 #include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
+#include <app/util/af-types.h>
 #include <clusters/TlsClientManagement/Commands.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <tls-client-management-instance.h>
 
@@ -388,7 +392,10 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
 {
     VerifyOrReturn(mStorage != nullptr);
 
-    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(fabric), Zcl, "Failure clearing TLS endpoints for fabric");
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr, ChipLogError(Zcl, "No data model provider on fabric removal."));
+
+    ReturnAndLogOnFailure(mProvisioned.RemoveFabric(*provider, fabric), Zcl, "Failure clearing TLS endpoints for fabric");
 
     UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
     VerifyOrReturn(globalData);
@@ -421,16 +428,17 @@ CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(Endp
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
-static TlsClientManagementCluster gTlsClientManagementClusterInstance = TlsClientManagementCluster(
-    EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisionedEndpoints);
 
-void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
+namespace chip {
+namespace app {
+namespace Clusters {
+
+void InitializeTlsClientManagement()
 {
-    TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Init();
+    MatterTlsClientManagementSetDelegate(TlsClientManagementCommandDelegate::GetInstance());
+    MatterTlsClientManagementSetCertificateTable(gCertificateTableInstance);
 }
 
-void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
-{
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterInstance.Finish();
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

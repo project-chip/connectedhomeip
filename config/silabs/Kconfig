@@ -41,16 +41,6 @@ config CHIP_OTA_IMAGE_BUILD
 	depends on SIGN_IMAGES
 	select DFU_MULTI_IMAGE_PACKAGE_BUILD
 
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
-
-config CHIP_DEBUG_SYMBOLS
-	bool "Generate debug symbols"
-	default y
-	help
-	  Enables building the application with debug symbols.
-
 config CHIP_LOG_VERIFY_OR_DIE
 	bool "Log source code location on VerifyOrDie failure"
 	default y
@@ -204,13 +194,6 @@ config CHIP_OPENTHREAD_JOINER_ENABLED
 	  If disabled, it allows to optimize memory usage even if Thread Joiner
 	  support is enabled.
 
-config CHIP_ENABLE_READ_CLIENT
-	bool "Enable Read Client in the Interaction Model"
-	help
-	  Enable support for Read Client in the Interaction Model.
-	  This config can be disabled for device types that do not require Read Client functionality.
-	  Disabling this config can save flash and RAM space.
-
 config CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
 	bool "Operational keys migration feature"
 	depends on CHIP_CRYPTO_IMPL_PSA
@@ -273,11 +256,8 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 	help
 	  Enables the BDX protocol for diagnostics log transfer purposes.
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-	bool "Enable Silicon Labs Wi-Fi support"
-	default y if BOARD_SIWX917_RB4338A
-	default y if BOARD_SIWX917_RB4342A
 	select WIFI
 	imply NET_STATISTICS
 	imply NET_PKT_TXTIME
