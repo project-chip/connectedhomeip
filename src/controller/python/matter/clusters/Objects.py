@@ -20650,17 +20650,15 @@ class Groupcast(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keySetID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="hasAuxiliaryACL", Tag=3, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="expiringKeyID", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             groupID: 'uint' = 0
             endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
-            keyID: 'uint' = 0
+            keySetID: 'uint' = 0
             hasAuxiliaryACL: 'bool' = False
-            expiringKeyID: 'typing.Optional[uint]' = None
             fabricIndex: 'uint' = 0
 
     class Commands:
@@ -20677,18 +20675,18 @@ class Groupcast(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keySetID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=4, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=5, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=4, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="replaceEndpoints", Tag=5, Type=typing.Optional[bool]),
                     ])
 
             groupID: uint = 0
             endpoints: typing.List[uint] = field(default_factory=lambda: [])
-            keyID: uint = 0
+            keySetID: uint = 0
             key: typing.Optional[bytes] = None
-            gracePeriod: typing.Optional[uint] = None
             useAuxiliaryACL: typing.Optional[bool] = None
+            replaceEndpoints: typing.Optional[bool] = None
 
         @dataclass
         class LeaveGroup(ClusterCommand):
@@ -20720,13 +20718,11 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.Optional[typing.List[uint]]),
-                        ClusterObjectFieldDescriptor(Label="listTooLarge", Tag=2, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
                     ])
 
             groupID: uint = 0
-            endpoints: typing.Optional[typing.List[uint]] = None
-            listTooLarge: typing.Optional[bool] = None
+            endpoints: typing.List[uint] = field(default_factory=lambda: [])
 
         @dataclass
         class UpdateGroupKey(ClusterCommand):
@@ -20740,36 +20736,18 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="keyID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="keySetID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="key", Tag=2, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="gracePeriod", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             groupID: uint = 0
-            keyID: uint = 0
+            keySetID: uint = 0
             key: typing.Optional[bytes] = None
-            gracePeriod: typing.Optional[uint] = None
-
-        @dataclass
-        class ExpireGracePeriod(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000065
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                    ])
-
-            groupID: uint = 0
 
         @dataclass
         class ConfigureAuxiliaryACL(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000065
-            command_id: typing.ClassVar[int] = 0x00000005
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -50839,7 +50817,10 @@ class Chime(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="chimeID", Tag=0, Type=typing.Optional[uint]),
                     ])
+
+            chimeID: typing.Optional[uint] = None
 
     class Attributes:
         @dataclass
@@ -50969,6 +50950,26 @@ class Chime(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class ChimeStartedPlaying(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000556
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="chimeID", Tag=0, Type=uint),
+                    ])
+
+            chimeID: uint = 0
 
 
 @dataclass
