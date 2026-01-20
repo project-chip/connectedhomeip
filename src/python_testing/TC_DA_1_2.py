@@ -52,6 +52,7 @@
 import logging
 import random
 import re
+from enum import IntEnum
 from pathlib import Path
 from typing import Tuple
 
@@ -214,6 +215,11 @@ class TC_DA_1_2(BasicCompositionTests):
 
     @async_test_body
     async def test_TC_DA_1_2(self):
+        class CertificationType(IntEnum):
+            kTest = 0
+            kProvisional = 1
+            kOfficial = 2
+
         # NOTE: this parameter is not used for production CDs or provisional CDs without the override flag.
         cd_cert_dir = self.user_params.get("cd_cert_dir")
         if cd_cert_dir is None:
@@ -376,8 +382,9 @@ class TC_DA_1_2(BasicCompositionTests):
         asserts.assert_in(version_number, range(0, 65535), "Version number out of range")
         self.step("6.9")
         if post_cert_test:
-            asserts.assert_in(certification_type, [1, 2], "Certification declaration is not marked as production or provisional.")
-            if certification_type == 1:
+            asserts.assert_in(certification_type, [CertificationType.kProvisional, CertificationType.kOfficial],
+                              "Certification declaration is not marked as production or provisional.")
+            if certification_type == CertificationType.kProvisional:
                 # This is a provisional CD, which is technically allowed, but unexpected in the interop lab. Create a warning,
                 # but delay reporting until the end of the test.
                 msg = """
@@ -391,7 +398,8 @@ class TC_DA_1_2(BasicCompositionTests):
         # Provisional CDs must be signed by a CSA CD signing key (unless there is an override).
         # Production CDs must always be signed by a CSA CD signing key.
         # The signature check is handled in step 9.
-        asserts.assert_in(certification_type, [0, 1, 2], "Certification type is out of range")
+        asserts.assert_in(certification_type, [CertificationType.kTest, CertificationType.kProvisional,
+                          CertificationType.kOfficial], "Certification type is out of range")
 
         self.step("7.0")
         dac_vid, dac_pid, pai_vid, pai_pid = parse_ids_from_certs(parsed_dac, parsed_pai)
@@ -458,12 +466,12 @@ class TC_DA_1_2(BasicCompositionTests):
         # If the CD is a test CD, or a provisional key with the specified override, it can be signed by the supplied CD signers.
         # if the CD is a provisional CD with no override, or a full production CD, it MUST be signed by the official CD signers.
         prod_certs = load_certs(CredentialSource.kProduction)
-        if certification_type == 0 or (override_provisional_cd_check_warning and certification_type == 1):
+        if certification_type == CertificationType.kTest or (override_provisional_cd_check_warning and certification_type == CertificationType.kProvisional):
             certs = load_certs(cd_cert_dir)
         else:
             certs = prod_certs
 
-        if certification_type == 1 and subject_key_identifier not in prod_certs:
+        if certification_type == CertificationType.kProvisional and subject_key_identifier not in prod_certs:
             msg = """WARNING: This device is using a CD that is marked as provisional, but which is not signed by the official CSA
                      CD signing key.
 
