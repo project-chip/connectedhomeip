@@ -140,11 +140,6 @@ public:
         mTestEventTriggerDelegate = testEventTriggerDelegate;
     }
 
-    void SetNodeStartupTimestamp(System::Clock::Microseconds64 nodeStartupTimestamp)
-    {
-        mNodeStartupTimestamp = nodeStartupTimestamp;
-    }
-
 protected:
     OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);

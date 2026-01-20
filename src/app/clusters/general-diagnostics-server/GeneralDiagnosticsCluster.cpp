@@ -223,10 +223,13 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 
     // Calling OnDeviceReboot here to maintain the event generation of the old implemenation of the
     // server init callback. We consider startup to be a boot event here.
-    GeneralDiagnostics::BootReasonEnum bootReason;
-    if (mDiagnosticDataProvider->GetBootReason(bootReason) == CHIP_NO_ERROR)
+    if (mDiagnosticDataProvider != nullptr)
     {
-        OnDeviceReboot(bootReason);
+        GeneralDiagnostics::BootReasonEnum bootReason;
+        if (mDiagnosticDataProvider->GetBootReason(bootReason) == CHIP_NO_ERROR)
+        {
+            OnDeviceReboot(bootReason);
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -442,7 +445,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
-    if (mDiagnosticDataProvider->GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    if (mDiagnosticDataProvider != nullptr && mDiagnosticDataProvider->GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
