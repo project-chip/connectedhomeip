@@ -113,8 +113,8 @@ private:
     //   - HandleOnWithTimedOff (see spec diagram)
     //   - TimerFired (decreases times)
     //   - SetOnOffFromCommand (needs to transition to on/off correctly)
-    uint16_t mOnTime         = 0;
-    uint16_t mOffWaitTime    = 0;
+    uint16_t mOnTime      = 0;
+    uint16_t mOffWaitTime = 0;
 
     // controlling cluster startup - these values are only used at startup however
     // user may modify mStartUpOnOff attribute as it is writable.

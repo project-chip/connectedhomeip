@@ -501,10 +501,13 @@ CHIP_ERROR OnOffLightingCluster::SetOnOffFromCommand(bool on)
     // if no change, do not attempt any transition
     VerifyOrReturnValue(GetOnOff() != on, CHIP_NO_ERROR);
 
-    if (on) {
+    if (on)
+    {
         // device turned on. we stop waiting for on again
         SetOffWaitTime(0);
-    } else {
+    }
+    else
+    {
         // device turned off. Stop waiting to turn off after a timer
         SetOnTime(0);
     }
