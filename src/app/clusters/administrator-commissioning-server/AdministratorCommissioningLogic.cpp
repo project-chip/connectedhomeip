@@ -33,6 +33,10 @@ namespace Clusters {
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
+    // Runtime check to ensure the FailSafeContext provided during init
+    // matches the one the WindowManager is actually using.
+    VerifyOrDie(&mContext.failSafeContext == &mContext.commissioningWindowManager.GetFailSafeContext());
+
     MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
     auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
@@ -78,6 +82,8 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioning
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
+    VerifyOrDie(&mContext.failSafeContext == &mContext.commissioningWindowManager.GetFailSafeContext());
+
     MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
 
