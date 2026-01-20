@@ -408,11 +408,6 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 
 void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpointId)
 {
-    if (endpointId != GetEnergyDeviceEndpointId())
-    {
-        return;
-    }
-
     VerifyOrDie(!gEEMAttrAccess);
 
     gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
