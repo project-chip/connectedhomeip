@@ -74,15 +74,11 @@ constexpr uint8_t kTagPositionRight  = 1;
 
 // Set unique TagList for endpoints 1 and 2 (both have Window Covering device type)
 const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint1TagList[] = {
-    { .namespaceID = kNamespacePosition,
-      .tag         = kTagPositionLeft,
-      .label       = chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Position.Left"_span)) },
+    { .namespaceID = kNamespacePosition, .tag = kTagPositionLeft },
 };
 
 const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint2TagList[] = {
-    { .namespaceID = kNamespacePosition,
-      .tag         = kTagPositionRight,
-      .label       = chip::MakeOptional(chip::app::DataModel::Nullable<chip::CharSpan>("Position.Right"_span)) },
+    { .namespaceID = kNamespacePosition, .tag = kTagPositionRight },
 };
 } // namespace
 
