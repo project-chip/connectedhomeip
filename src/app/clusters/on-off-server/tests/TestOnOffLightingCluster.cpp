@@ -1013,4 +1013,41 @@ TEST_F(TestOnOffLightingCluster, TestOffToTimedOn)
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
 }
 
+TEST_F(TestOnOffLightingCluster, TestOnToTimedOn)
+{
+    // Step 1: Ensure device is ON.
+    EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
+    EXPECT_TRUE(mMockDelegate.mOnOff);
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
+
+    // Step 2: Invoke OnWithTimedOff command.
+    Commands::OnWithTimedOff::Type command;
+    command.onTime      = 50;
+    command.offWaitTime = 30;
+
+    EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
+
+    // Step 3: Verify the state remains ON.
+    EXPECT_TRUE(mMockDelegate.mOnOff);
+    bool onOffState = false;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOffState), CHIP_NO_ERROR);
+    EXPECT_TRUE(onOffState);
+
+    // Step 4: Verify OnTime and OffWaitTime attributes. (attributes and getters as well)
+    uint16_t onTime = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
+    EXPECT_EQ(onTime, 50);
+
+    uint16_t offWaitTime = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
+    EXPECT_EQ(offWaitTime, 30);
+
+    // via getters
+    EXPECT_EQ(mCluster.GetOnTime(), 50);
+    EXPECT_EQ(mCluster.GetOffWaitTime(), 30);
+
+    // Step 5: Verify that the timer is active.
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
+}
+
 } // namespace
