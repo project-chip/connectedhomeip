@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-constants.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-logic.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <string>

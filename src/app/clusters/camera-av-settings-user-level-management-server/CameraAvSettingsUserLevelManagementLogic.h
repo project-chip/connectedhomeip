@@ -22,7 +22,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-constants.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>

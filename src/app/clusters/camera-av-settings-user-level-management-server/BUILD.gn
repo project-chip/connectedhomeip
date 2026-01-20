@@ -18,8 +18,8 @@ source_set("camera-av-settings-user-level-management-server") {
   sources = [
     "CameraAvSettingsUserLevelManagementCluster.cpp",
     "CameraAvSettingsUserLevelManagementCluster.h",
-    "camera-av-settings-user-level-management-logic.cpp",
-    "camera-av-settings-user-level-management-logic.h",
+    "CameraAvSettingsUserLevelManagementLogic.cpp",
+    "CameraAvSettingsUserLevelManagementLogic.h",
   ]
 
   deps = [

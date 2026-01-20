@@ -94,9 +94,6 @@ DataModel::ActionReturnStatus
 CameraAvSettingsUserLevelManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                           AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(request.path.mClusterId == CameraAvSettingsUserLevelManagement::Id);
-    ChipLogProgress(Zcl, "CameraAvSettingsUserLevelManagement: ReadAttribute");
-
     switch (request.path.mAttributeId)
     {
     case Attributes::FeatureMap::Id:
