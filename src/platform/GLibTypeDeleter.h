@@ -61,6 +61,11 @@ struct GErrorDeleter
     void operator()(GError * object) { g_error_free(object); }
 };
 
+struct GHashTableDeleter
+{
+    void operator()(GHashTable * hash) { g_hash_table_destroy(hash); }
+};
+
 struct GIOChannelDeleter
 {
     void operator()(GIOChannel * object) { g_io_channel_unref(object); }
@@ -137,6 +142,12 @@ template <>
 struct GAutoPtrDeleter<GError>
 {
     using deleter = GErrorDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GHashTable>
+{
+    using deleter = GHashTableDeleter;
 };
 
 template <>
