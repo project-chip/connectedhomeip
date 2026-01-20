@@ -157,6 +157,12 @@ struct GAutoPtrDeleter<GIOChannel>
 };
 
 template <>
+struct GAutoPtrDeleter<GObject>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<GSource>
 {
     using deleter = GSourceDeleter;
