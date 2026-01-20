@@ -33,6 +33,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
+namespace {
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -44,9 +46,8 @@ using namespace chip::Testing;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
-namespace {
-
 static constexpr chip::EndpointId kTestEndpointId = 1;
+static constexpr uint8_t testMaxPresets = 5;
 
 // Minimal mock delegate for testing
 class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
@@ -99,20 +100,39 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    TestCameraAvSettingsUserLevelManagementCluster() :
+        mServer(kTestEndpointId,
+                chip::BitFlags<Feature>(
+                    Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
+                    Feature::kMechanicalZoom, Feature::kMechanicalPresets),
+                testMaxPresets),
+        mClusterTester(mServer)
+    {}
+
+    void SetUp() override
+    {
+        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
+        SetAttributePersistenceProvider(&mPersistenceProvider);
+        mServer.SetDelegate(&mMockDelegate);
+        EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    }
+
+    void TearDown() override 
+    { 
+        SetAttributePersistenceProvider(nullptr); 
+        mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    MockCameraAvSettingsUserLevelManagementDelegate mMockDelegate;
+    CameraAvSettingsUserLevelManagementCluster mServer;
+    ClusterTester mClusterTester;
+    DefaultAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestAttributes)
 {
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    ASSERT_TRUE(IsAttributesListEqualTo(server,
+    ASSERT_TRUE(IsAttributesListEqualTo(mServer,
                                         {
                                             Attributes::MPTZPosition::kMetadataEntry,
                                             Attributes::MaxPresets::kMetadataEntry,
@@ -129,16 +149,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestAttributes)
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestCommands)
 {
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(server,
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(mServer,
                                               {
                                                   Commands::MPTZSetPosition::kMetadataEntry,
                                                   Commands::MPTZRelativeMove::kMetadataEntry,
@@ -152,59 +163,37 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestCommands)
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClusterTesterTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     uint8_t maxPresets = 0;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MaxPresets::Id, maxPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MaxPresets::Id, maxPresets), CHIP_NO_ERROR);
     ASSERT_EQ(testMaxPresets, maxPresets);
 
     uint8_t zoomMax = 0;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::ZoomMax::Id, zoomMax), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::ZoomMax::Id, zoomMax), CHIP_NO_ERROR);
     ASSERT_LE(zoomMax, kZoomMaxMaxValue);
     ASSERT_GE(zoomMax, kZoomMaxMinValue);
 
     int16_t tiltMin = 0;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::TiltMin::Id, tiltMin), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TiltMin::Id, tiltMin), CHIP_NO_ERROR);
     ASSERT_LE(tiltMin, kTiltMinMaxValue);
     ASSERT_GE(tiltMin, kTiltMinMinValue);
 
     int16_t tiltMax = 0;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::TiltMax::Id, tiltMax), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::TiltMax::Id, tiltMax), CHIP_NO_ERROR);
     ASSERT_LE(tiltMax, kTiltMaxMaxValue);
     ASSERT_GE(tiltMax, kTiltMaxMinValue);
 
     int16_t panMin = 0;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::PanMin::Id, panMin), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::PanMin::Id, panMin), CHIP_NO_ERROR);
     ASSERT_LE(panMin, kPanMinMaxValue);
     ASSERT_GE(panMin, kPanMinMinValue);
 
     int16_t panMax = 0;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::PanMax::Id, panMax), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::PanMax::Id, panMax), CHIP_NO_ERROR);
     ASSERT_LE(panMax, kPanMaxMaxValue);
     ASSERT_GE(panMax, kPanMaxMinValue);
 
     Structs::MPTZStruct::DecodableType mptzPosition;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
     ASSERT_LE(mptzPosition.pan.Value(), panMax);
     ASSERT_GE(mptzPosition.pan.Value(), panMin);
     ASSERT_LE(mptzPosition.tilt.Value(), tiltMax);
@@ -214,47 +203,25 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReadAllAttributesWithClus
 
     // No commands have been invoked, we should be Idle
     PhysicalMovementEnum movementState;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 
     // On startup there should be no presets and no streams set
     Attributes::MPTZPresets::TypeInfo::DecodableType mptzPresets;
     size_t presetsSize;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(0));
 
     Attributes::DPTZStreams::TypeInfo::DecodableType dptzStreams;
     size_t streamsSize;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&streamsSize);
     ASSERT_EQ(streamsSize, static_cast<size_t>(0));
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCommandTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZSetPosition::Id };
@@ -269,7 +236,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
     commandData.tilt.Emplace(testTilt);
     commandData.zoom.Emplace(testZoom);
 
-    auto response = server.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPath, commandData);
+    auto response = mServer.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus. We're explicitly checking as clang complains on use
     // of Optional without checking if a form ASSERT_TRUE(response.has_value()) is used.
@@ -285,48 +252,26 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSetPositionCom
 
     // Server should think the device is moving until the app callsback, verify that the MovementState is correct
     PhysicalMovementEnum movementState;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);
 
     // Fake the delegate callback
-    server.GetLogic().OnPhysicalMovementComplete(Status::Success);
+    mServer.GetLogic().OnPhysicalMovementComplete(Status::Success);
 
     // Verify that the values in the attribute are the values set by the command
     Structs::MPTZStruct::DecodableType mptzPosition;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
     ASSERT_EQ(mptzPosition.pan.Value(), testPan);
     ASSERT_EQ(mptzPosition.tilt.Value(), testTilt);
     ASSERT_EQ(mptzPosition.zoom.Value(), testZoom);
 
     // Verify that the MovementState has returned to Idle
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCommandTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZRelativeMove::Id };
@@ -334,7 +279,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
 
     // Get the current values of MPTZ, these should be the server defaults (0,0,1)
     Structs::MPTZStruct::DecodableType startingMptzPosition;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, startingMptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, startingMptzPosition), CHIP_NO_ERROR);
 
     // Set relative values of pan, tilt, zoom to be the +10
     int16_t relativePan  = 10;
@@ -345,7 +290,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     commandData.tiltDelta.Emplace(relativeTilt);
     commandData.zoomDelta.Emplace(relativeZoom);
 
-    auto response = server.GetLogic().HandleMPTZRelativeMove(commandHandler, kCommandPath, commandData);
+    auto response = mServer.GetLogic().HandleMPTZRelativeMove(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
     if (response.has_value())
@@ -359,48 +304,26 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
 
     // Server should think the device is moving until the app callsback, verify that the MovementState is correct
     PhysicalMovementEnum movementState;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);
 
     // Fake the delegate callback
-    server.GetLogic().OnPhysicalMovementComplete(Status::Success);
+    mServer.GetLogic().OnPhysicalMovementComplete(Status::Success);
 
     // Verify that the values in the attribute are the values set by the command
     Structs::MPTZStruct::DecodableType movedMptzPosition;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, movedMptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, movedMptzPosition), CHIP_NO_ERROR);
     ASSERT_EQ(movedMptzPosition.pan.Value(), startingMptzPosition.pan.Value() + relativePan);
     ASSERT_EQ(movedMptzPosition.tilt.Value(), startingMptzPosition.tilt.Value() + relativeTilt);
     ASSERT_EQ(movedMptzPosition.zoom.Value(), startingMptzPosition.zoom.Value() + relativeZoom);
 
     // Verify that the MovementState has returned to Idle
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetCommandTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZSavePreset::Id };
@@ -409,13 +332,13 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     // Presets attribute should be empty
     Attributes::MPTZPresets::TypeInfo::DecodableType mptzPresets;
     size_t presetsSize;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(0));
 
     // Get the current values of MPTZ, these should be the server defaults (0,0,1)
     Structs::MPTZStruct::DecodableType currentMptzPosition;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, currentMptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, currentMptzPosition), CHIP_NO_ERROR);
 
     // Save the current values as a preset
     chip::CharSpan presetName("DefaultPreset"_span);
@@ -423,7 +346,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
 
     commandData.name = presetName;
     commandData.presetID.Emplace(presetIDAsInt);
-    auto response = server.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPath, commandData);
+    auto response = mServer.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
     if (response.has_value())
@@ -436,7 +359,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     }
 
     // Verify that there is a single saved preset. The values match those of the current MPTZ Position
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(1));
 
@@ -448,33 +371,11 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     }
 
     // As we provided a Preset ID of 2, the next Preset to use should still be 1
-    ASSERT_EQ(server.GetLogic().mCurrentPresetID, 1);
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 1);
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCommandTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPathMove{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZMoveToPreset::Id };
@@ -487,7 +388,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     // Presets attribute should be empty
     Attributes::MPTZPresets::TypeInfo::DecodableType mptzPresets;
     size_t presetsSize;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(0));
 
@@ -495,7 +396,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     uint8_t presetIDAsInt = 2;
 
     moveToPresetCommandData.presetID = presetIDAsInt;
-    auto moveResponse = server.GetLogic().HandleMPTZMoveToPreset(commandHandler, kCommandPathMove, moveToPresetCommandData);
+    auto moveResponse = mServer.GetLogic().HandleMPTZMoveToPreset(commandHandler, kCommandPathMove, moveToPresetCommandData);
 
     // The response should contain an ActionReturnStatus
     if (moveResponse.has_value())
@@ -511,7 +412,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     chip::CharSpan presetName("DefaultPreset"_span);
     savePresetCommandData.name = presetName;
     savePresetCommandData.presetID.Emplace(presetIDAsInt);
-    auto saveResponse = server.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPathMPTZSave, savePresetCommandData);
+    auto saveResponse = mServer.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPathMPTZSave, savePresetCommandData);
 
     // The response should contain an ActionReturnStatus
     if (saveResponse.has_value())
@@ -524,7 +425,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     }
 
     // Save the stored preset settings; we know there is only one entry
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
 
     int16_t presetPan;
     int16_t presetTilt;
@@ -547,7 +448,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     mptzSetCommandData.tilt.Emplace(testTilt);
     mptzSetCommandData.zoom.Emplace(testZoom);
 
-    auto setResponse = server.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPathMPTZSet, mptzSetCommandData);
+    auto setResponse = mServer.GetLogic().HandleMPTZSetPosition(commandHandler, kCommandPathMPTZSet, mptzSetCommandData);
 
     // The response should contain an ActionReturnStatus
     if (setResponse.has_value())
@@ -560,17 +461,17 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
     }
 
     // Fake the delegate callback
-    server.GetLogic().OnPhysicalMovementComplete(Status::Success);
+    mServer.GetLogic().OnPhysicalMovementComplete(Status::Success);
 
     // Verify that the values in the attribute are the values set by the command
     Structs::MPTZStruct::DecodableType mptzPosition;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
     ASSERT_EQ(mptzPosition.pan.Value(), testPan);
     ASSERT_EQ(mptzPosition.tilt.Value(), testTilt);
     ASSERT_EQ(mptzPosition.zoom.Value(), testZoom);
 
     // Move to the preset
-    moveResponse = server.GetLogic().HandleMPTZMoveToPreset(commandHandler, kCommandPathMove, moveToPresetCommandData);
+    moveResponse = mServer.GetLogic().HandleMPTZMoveToPreset(commandHandler, kCommandPathMove, moveToPresetCommandData);
 
     // The response should contain an ActionReturnStatus
     if (moveResponse.has_value())
@@ -584,18 +485,18 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
 
     // Ensure we're "moving"
     PhysicalMovementEnum movementState;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kMoving);
 
     // Fake the callback
-    server.GetLogic().OnPhysicalMovementComplete(Status::Success);
+    mServer.GetLogic().OnPhysicalMovementComplete(Status::Success);
 
     // Ensure we've reverted to idle
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MovementState::Id, movementState), CHIP_NO_ERROR);
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 
     // Ensure the values in MPTZPosition are those of the Preset
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
     ASSERT_EQ(mptzPosition.pan.Value(), presetPan);
     ASSERT_EQ(mptzPosition.tilt.Value(), presetTilt);
     ASSERT_EQ(mptzPosition.zoom.Value(), presetZoom);
@@ -603,28 +504,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCo
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCommandTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPathRemove{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZRemovePreset::Id };
@@ -635,7 +514,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     // Presets attribute should be empty
     Attributes::MPTZPresets::TypeInfo::DecodableType mptzPresets;
     size_t presetsSize;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(0));
 
@@ -643,7 +522,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     uint8_t presetIDAsInt = 2;
 
     removePresetCommandData.presetID = presetIDAsInt;
-    auto removeResponse = server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
+    auto removeResponse = mServer.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
 
     // The response should contain an ActionReturnStatus
     if (removeResponse.has_value())
@@ -659,7 +538,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     chip::CharSpan presetName("DefaultPreset"_span);
     savePresetCommandData.name = presetName;
     savePresetCommandData.presetID.Emplace(presetIDAsInt);
-    auto saveResponse = server.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPathMPTZSave, savePresetCommandData);
+    auto saveResponse = mServer.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPathMPTZSave, savePresetCommandData);
 
     // The response should contain an ActionReturnStatus
     if (saveResponse.has_value())
@@ -672,13 +551,13 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     }
 
     // Verify that there is a single saved preset. The values match those of the current MPTZ Position
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(1));
 
     // Try to remove again, verify success
     removePresetCommandData.presetID = presetIDAsInt;
-    removeResponse = server.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
+    removeResponse = mServer.GetLogic().HandleMPTZRemovePreset(commandHandler, kCommandPathRemove, removePresetCommandData);
 
     // The response should contain an ActionReturnStatus
     if (removeResponse.has_value())
@@ -691,35 +570,13 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     }
 
     // Verify that there are no saved presets. The values match those of the current MPTZ Position
-    ASSERT_EQ(tester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(0));
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCommandTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::DPTZSetViewport::Id };
@@ -728,7 +585,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     // DPTZStreams attribute starts empty
     Attributes::DPTZStreams::TypeInfo::DecodableType dptzStreams;
     size_t streamsSize;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED dptzStreams.ComputeSize(&streamsSize);
     ASSERT_EQ(streamsSize, static_cast<size_t>(0));
 
@@ -737,7 +594,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     Globals::Structs::ViewportStruct::Type viewPort = { 0, 0, 1920, 1080 };
     commandData.videoStreamID                       = videoStreamID;
     commandData.viewport                            = viewPort;
-    auto response = server.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData);
+    auto response = mServer.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
     if (response.has_value())
@@ -750,10 +607,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     }
 
     // Allocate a video stream
-    server.GetLogic().AddMoveCapableVideoStream(videoStreamID, viewPort);
+    mServer.GetLogic().AddMoveCapableVideoStream(videoStreamID, viewPort);
 
     // Verify that DPTZStreams is now populated correctly
-    ASSERT_EQ(tester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED dptzStreams.ComputeSize(&streamsSize);
     ASSERT_EQ(streamsSize, static_cast<size_t>(1));
 
@@ -771,7 +628,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     Globals::Structs::ViewportStruct::Type newViewPort = { 0, 0, 1280, 720 };
     commandData.viewport                               = newViewPort;
 
-    response = server.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData);
+    response = mServer.GetLogic().HandleDPTZSetViewport(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
     if (response.has_value())
@@ -784,7 +641,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
     }
 
     // Verify this new viewport is in DPTZStreams
-    ASSERT_EQ(tester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
 
     it = dptzStreams.begin();
     while (it.Next())
@@ -799,28 +656,6 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCom
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCommandTest)
 {
-    TestServerClusterContext context;
-
-    // Setup persistent storage
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultAttributePersistenceProvider provider;
-    ASSERT_EQ(provider.Init(&storageDelegate), CHIP_NO_ERROR);
-    SetAttributePersistenceProvider(&provider);
-
-    MockCameraAvSettingsUserLevelManagementDelegate mockDelegate;
-    BitFlags<Feature, uint32_t> testFeatures(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
-                                             Feature::kMechanicalZoom, Feature::kMechanicalPresets);
-
-    const uint8_t testMaxPresets = 5;
-
-    CameraAvSettingsUserLevelManagementCluster server(kTestEndpointId, testFeatures, testMaxPresets);
-    server.SetDelegate(&mockDelegate);
-
-    EXPECT_EQ(server.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Create ClusterTester for simplified attribute reading
-    ClusterTester tester(server);
-
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
     ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::DPTZRelativeMove::Id };
@@ -829,7 +664,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     // DPTZStreams attribute starts empty
     Attributes::DPTZStreams::TypeInfo::DecodableType dptzStreams;
     size_t streamsSize;
-    ASSERT_EQ(tester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED dptzStreams.ComputeSize(&streamsSize);
     ASSERT_EQ(streamsSize, static_cast<size_t>(0));
 
@@ -845,7 +680,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     commandData.deltaY.Emplace(deltaY);
     commandData.zoomDelta.Emplace(zoomDelta);
 
-    auto response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
+    auto response = mServer.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
     if (response.has_value())
@@ -859,10 +694,10 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
 
     // Allocate a video stream
     Globals::Structs::ViewportStruct::Type viewPort = { 0, 0, 1920, 1080 };
-    server.GetLogic().AddMoveCapableVideoStream(videoStreamID, viewPort);
+    mServer.GetLogic().AddMoveCapableVideoStream(videoStreamID, viewPort);
 
     // Try to move the viewport
-    response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
+    response = mServer.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
 
     // The response should contain an ActionReturnStatus
     if (response.has_value())
@@ -879,7 +714,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
 
     // Try to move the viewport with an out of range zoomDelta
     commandData.zoomDelta.Emplace(zoomDeltaFail);
-    response = server.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
+    response = mServer.GetLogic().HandleDPTZRelativeMove(commandHandler, kCommandPath, commandData);
 
     if (response.has_value())
     {

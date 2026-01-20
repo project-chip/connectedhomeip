@@ -22,12 +22,22 @@ source_set("camera-av-settings-user-level-management-server") {
     "camera-av-settings-user-level-management-logic.h",
   ]
 
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_deps = [ ":camera-av-settings-user-level-management-cluster" ]
+}
+
+source_set("camera-av-settings-user-level-management-cluster") {
   public_deps = [
-    "${chip_root}/src/app/",
+    "${chip_root}/src/app:constants",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/persistence:singleton",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/lib/core:types",
     "${chip_root}/zzz_generated/app-common/clusters/CameraAvSettingsUserLevelManagement",
   ]
-  public_configs = [ "${chip_root}/src:includes" ]
 }
