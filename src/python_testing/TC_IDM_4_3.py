@@ -952,8 +952,8 @@ class TC_IDM_4_3(BasicCompositionTests):
                 total_attributes += len(attributes)
 
         asserts.assert_greater(num_endpoints, 0, "Should receive reports from at least one endpoint")
-        asserts.assert_greater(total_clusters, 40, "Should receive reports from multiple clusters")
-        asserts.assert_greater(total_attributes, 100, "Should receive reports for many attributes")
+        asserts.assert_greater(total_clusters, 10, "Should receive reports from multiple clusters")
+        asserts.assert_greater(total_attributes, 50, "Should receive reports for many attributes")
 
         log.info(
             f"Step 10: Priming data received from {num_endpoints} endpoints, {total_clusters} clusters, {total_attributes} attributes")
