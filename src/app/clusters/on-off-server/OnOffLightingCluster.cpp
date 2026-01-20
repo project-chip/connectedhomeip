@@ -273,7 +273,7 @@ void OnOffLightingCluster::TimerFired()
         // If timer is not yet 0, update the timer and keep going. Otherwise move to off state.
         VerifyOrReturn(mOnTime == 0, UpdateTimer());
 
-        // transition TIMED_ON to OFF - clear off wiat time and turn off
+        // transition TIMED_ON to OFF - clear off wait time and turn off
         SetOffWaitTime(0);
         LogErrorOnFailure(SetOnOff(false));
     }
