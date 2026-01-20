@@ -771,5 +771,6 @@ class TC_BINFO_2_1(MatterBaseTest):
         asserts.assert_equal(val, config_version, "ConfigurationVersion changed after failed write")
         log.info("Verified ConfigurationVersion unchanged verification successful")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
