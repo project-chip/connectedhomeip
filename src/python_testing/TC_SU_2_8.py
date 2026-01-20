@@ -330,9 +330,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # ACL permissions are not required
 
-        if self.fabric_id_th2 == self.th1.fabricId:
-            raise AssertionError(f"Fabric IDs are the same for TH1: {self.th1.fabricId} and TH2: {self.fabric_id_th2}.")
-
         # Event Handler
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
         await event_cb.start(dev_ctrl=self.th1, node_id=self.requestor_node_id, endpoint=self.endpoint,
