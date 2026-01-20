@@ -77,29 +77,6 @@ void CommissioningProxyCommandHandler::HandleCommand(intptr_t context)
         }
 
         ChipLogProgress(NotSpecified, "Endpoint %u: %s", endpoint, name.c_str());
-#if 0
-        if (name == "LightOn")
-        {
-            self->OnLightOnHandler(endpoint);
-        }
-        else if (name == "LightOff")
-        {
-            self->OnLightOffHandler(endpoint);
-        }
-        else if (name == "LightToggle")
-        {
-            self->OnLightToggleHandler(endpoint);
-        }
-        else if (name == "LightIdentify")
-        {
-            uint16_t identifyTime = static_cast<uint16_t>(self->mJsonValue["IdentifyTime"].asUInt());
-            self->OnIdentifyHandler(endpoint, identifyTime);
-        }
-        else if (name == "LightIdentify-effect")
-        {
-            self->OnIdentifyEffectHandler(endpoint, self->mJsonValue["IdentifyEffect"].asString());
-        }
-#endif
     }
     else if (name == "SoftwareFault")
     {

@@ -52,6 +52,12 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <wifipaf/WiFiPAFEndPoint.h>
 #include <wifipaf/WiFiPAFLayer.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#include <app/CommandHandler.h>
+#include <set>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
 #endif
 #endif
 
@@ -90,6 +96,33 @@ struct GAutoPtrDeleter<WpaSupplicant1Network>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 namespace DeviceLayer {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+struct NanPeerInfo
+{
+    uint8_t mac[6]{};
+    uint16_t vid = 0;
+    uint16_t pid = 0;
+    uint16_t discriminator = 0;
+    uint8_t  opcode = 0;
+    uint16_t srvProtoType = 0;
+
+    std::vector<uint8_t> storage;   // extendedData storage
+    app::DataModel::Nullable<ByteSpan> extendedData;
+
+    std::vector<uint8_t> ssi;
+
+    // Used in the std::set<NanPeerInfo> to determine uniqueness
+    bool operator<(const NanPeerInfo & o) const
+    {
+        if ((memcmp(mac, o.mac, 6) == 0) && (discriminator == o.discriminator))
+        {
+            return false;
+        }
+        return true;
+    }
+};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
@@ -166,6 +199,23 @@ public:
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+public:
+    void ScanNanReceive(GVariant * obj);
+    void ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason);
+    void ScanDiscoveryResult(GVariant * discov_info);
+    CHIP_ERROR _WiFiPAFScan(chip::app::CommandHandler::Handle handle,
+                            const chip::app::ConcreteCommandPath & path);
+private:
+    std::set<NanPeerInfo> mNanScanPeers;
+    uint32_t mNanScanSubscribeId       = 0;
+
+    // ProxyScanResponse is not sent back immediately, store state
+    std::optional<chip::app::CommandHandler::Handle> mPendingProxyScanHandle;
+    chip::app::ConcreteCommandPath mPendingProxyScanPath;
+    void FinishWiFiPAFScanAndRespond(void);
+#endif
 
 private:
     bool _IsWiFiInterfaceEnabled() CHIP_REQUIRES(mWpaSupplicantMutex);

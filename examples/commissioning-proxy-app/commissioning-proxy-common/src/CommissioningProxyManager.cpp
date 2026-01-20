@@ -40,7 +40,6 @@
 // specified
 #define UHUBCTL_ARGUMENT_ENV_NAME "MORSE_MICRO_MATTER_UHUBCTL_COMMAND"
 
-
 CommissioningProxyManager CommissioningProxyManager::sCommissioningProxy;
 
 CHIP_ERROR CommissioningProxyManager::Init()
@@ -106,7 +105,7 @@ bool CommissioningProxyManager::InitiateAction(Action_t aAction)
             mActionInitiated_CB(aAction);
         }
 
-        //SetMainLight(new_state == kState_CPConnected);
+        //new_state == kState_CPConnected;
 
         if (mActionCompleted_CB)
         {
@@ -116,69 +115,3 @@ bool CommissioningProxyManager::InitiateAction(Action_t aAction)
 
     return action_initiated;
 }
-
-#if 0
-void CommissioningProxyManager::SetMainLight(bool aOn)
-{
-    // Set the main light to the default color if on or the 'off' color if off
-    SetMainLight(aOn ? LIGHT_DEFAULT_ON_COLOR_MAIN : LIGHT_OFF_COLOR);
-}
-
-void CommissioningProxyManager::RestoreMainLight(void)
-{
-    // Synchronize the physical representation of the main light to the logical
-    // representation
-    SetMainLight(mMainCommissioningProxyState == kState_CPConnected ? mMainLightColor : LIGHT_OFF_COLOR);
-}
-
-void CommissioningProxyManager::SetMainLight(uint32_t color)
-{
-    // Set the physical main light to the requested state.
-    // The default legacy behaviour may have been overridden through
-    // environment variables
-
-    mMainCommissioningProxyState = (color == LIGHT_OFF_COLOR) ? kState_CPDisconnected : kState_CPConnected
-    mMainLightColor = (color == LIGHT_OFF_COLOR) ? mMainLightColor : color;
-}
-
-void CommissioningProxyManager::SetStatusLight(bool aOn)
-{
-    // Set the secondary visual indicator to the default color if on or the 'off' color if off
-    SetStatusLight(aOn ? LIGHT_DEFAULT_ON_COLOR_STATUS : LIGHT_OFF_COLOR);
-}
-
-void CommissioningProxyManager::SetStatusLight(uint32_t color)
-{
-    mStatusLightState = (color == LIGHT_OFF_COLOR) ? kState_CPDisconnected : kState_CPConnected
-    mStatusLightColor = (color == LIGHT_OFF_COLOR) ? mStatusLightColor : color;
-}
-
-void CommissioningProxyManager::SetIdentifyLight(bool aOn)
-{
-    // Set the Identify indicator to the default color if on or the 'off' color if off
-    SetIdentifyLight(aOn ? LIGHT_DEFAULT_ON_COLOR_IDENTIFY : LIGHT_OFF_COLOR);
-}
-
-void CommissioningProxyManager::SetIdentifyLight(uint32_t color)
-{
-    // Set the physical Identify indicator to the requested state.
-    // At present this directly uses the secondary visual indicator.
-    mIdentifyLightState = (color == LIGHT_OFF_COLOR) ? kState_CPDisconnected : kState_CPConnected
-    mIdentifyLightColor = (color == LIGHT_OFF_COLOR) ? mIdentifyLightColor : color;
-
-    SetStatusLight(color);
-}
-
-void CommissioningProxyManager::ToggleIdentifyLight(void)
-{
-    ToggleIdentifyLight(mIdentifyLightColor);
-}
-
-void CommissioningProxyManager::ToggleIdentifyLight(uint32_t color)
-{
-    // Toggle the physical Identify indicator to provide an easy flash
-    // mechanism
-    mIdentifyLightState = (mIdentifyLightState == kState_CPConnected) ? kState_CPDisconnected : kState_CPConnected
-    SetIdentifyLight(mIdentifyLightState == kState_CPConnected ? color : LIGHT_OFF_COLOR);
-}
-#endif

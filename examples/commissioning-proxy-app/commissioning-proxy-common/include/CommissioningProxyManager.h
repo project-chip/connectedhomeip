@@ -58,20 +58,6 @@ public:
     // SetCPState() is used to set the state of the CP
     void SetCPState(uint8_t level);
     
-#if 0
-    // RestoreMainLight() is used if we are not sure what state the physical
-    // main light is in, for example, after the Identify function may have used it
-    void RestoreMainLight(void);
-    // SetIdentifyLight() is for use by the Identify function, generally to
-    // ensure the indication is turned off at the end of an Identify sequence.
-    void SetIdentifyLight(bool aOn);
-
-    // ToggleIdentifyLight() is for use by the Identify function to flash the
-    // indication.
-    void ToggleIdentifyLight(void);
-    void ToggleIdentifyLight(uint32_t color);
-#endif
-
 private:
     friend CommissioningProxyManager & CommissioningProxyMgr(void);
 
@@ -93,25 +79,8 @@ private:
 
     CommissioningProxyCallback_fn mActionInitiated_CB;
     CommissioningProxyCallback_fn mActionCompleted_CB;
-#if 0
-    // SetMainLight() has a legacy bool interface and a later color interface
-    // to support simple color selection when available externally
-    void SetMainLight(bool aOn);
-    void SetMainLight(uint32_t color);
-    void ToggleMainLight(void);
 
-    // SetStatusLight() has a legacy bool interface and a later color interface
-    // to support simple color selection when available externally
-    void SetStatusLight(bool aOn);
-    void SetStatusLight(uint32_t color);
-    void ToggleStatusLight(void);
-
-    // SetIdentifyLight() has a color interface to support simple color
-    // selection when available externally
-    void SetIdentifyLight(uint32_t color);
-#endif
-    // There is a single static instance of the CommissioningProxyManager since the
-    // physical light hardware is static as well
+    // There is a single static instance of the CommissioningProxyManager
     static CommissioningProxyManager sCommissioningProxy;
 };
 

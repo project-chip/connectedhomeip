@@ -137,20 +137,24 @@ bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::DecodableType & commandData)
 {
-#if 0
     using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
     std::vector<ScanResultT> results;
     // ScanResultT r{};
 
     // Start PAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
+    CHIP_ERROR err = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissioning Proxy PAF Scan Request Failed");
+        return false;
+    }
 
-     // TODO: parse these from commandData
+    // TODO: parse these from commandData
     //chip::Optional<uint16_t> srvProtoType;  // set if you want to filter
     //uint32_t windowMs = 1500;
 
     std::vector<chip::DeviceLayer::NanPeerInfo> peers;
-    //CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl().ScanNanPublishers(
+    //err = chip::DeviceLayer::ConnectivityMgrImpl().ScanNanPublishers(
     //    serviceName, srvProtoType, windowMs, peers);
 
     ChipLogProgress(NotSpecified, "=== %s() Transport:0x%x WiFiBands:0x%x", __func__,
@@ -160,14 +164,14 @@ bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
     // Create a Handle and move it into ConnectivityManagerImpl
     // This keeps the ProxyScanRequest open, so the scan can complete before the ProxyScanResponse is sent
     CommandHandler::Handle handle(commandObj);
-    CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), commandPath);
+    err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), commandPath);
     if (err != CHIP_NO_ERROR) {
         commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Failure);
         return true;
     }
 
     ChipLogProgress(Controller, "===SHM %s() Before", __func__);
-    // Ensure Response Timeout is greater than the ScanMaxTimeSeconds
+    // Ensure Response Timeout is greater than the ScanMaxTime
     if (auto * ec = commandObj->GetExchangeContext())
     {
         ec->SetResponseTimeout(chip::System::Clock::Seconds16(140));
@@ -210,7 +214,6 @@ bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
 
 //    commandObj->AddClusterSpecificFailure(commandPath,
   //                                        to_underlying(Clusters::CommissioningProxy::ProxyErrorEnum::kProxyBusy));
-#endif
 #endif
     return true;
 }
