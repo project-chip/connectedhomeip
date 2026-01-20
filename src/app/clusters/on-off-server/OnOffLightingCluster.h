@@ -33,9 +33,11 @@ class OnOffLightingClusterTestAccess;
 /// - OnTime / OffWaitTime
 /// - StartUpOnOff
 /// - Timed commands
-class OnOffLightingCluster : public OnOffCluster, public TimerContext {
+class OnOffLightingCluster : public OnOffCluster, public TimerContext
+{
 public:
-    enum class StartupType {
+    enum class StartupType
+    {
         kRegular,
 
         // post OTA startup: on/off value must be preserved (i.e. ignore startup on off):
@@ -47,11 +49,12 @@ public:
         kOTA,
     };
 
-    struct Context {
+    struct Context
+    {
         TimerDelegate & timerDelegate;
         OnOffEffectDelegate & effectDelegate;
         chip::scenes::ScenesIntegrationDelegate * scenesIntegrationDelegate = nullptr;
-        BitMask<OnOff::Feature> featureMap = OnOff::Feature::kLighting;
+        BitMask<OnOff::Feature> featureMap                                  = OnOff::Feature::kLighting;
 
         StartupType startupType = StartupType::kRegular;
     };
@@ -65,16 +68,16 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-        AttributeValueEncoder & encoder) override;
+                                                AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-        AttributeValueDecoder & decoder) override;
+                                                 AttributeValueDecoder & decoder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-        chip::TLV::TLVReader & input_arguments,
-        CommandHandler * handler) override;
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
 
     /// Sets the OnOff value with special behavior for integration with other clusters.
     ///
@@ -95,8 +98,8 @@ private:
 
     // Lighting Attributes
     bool mGlobalSceneControl = true;
-    uint16_t mOnTime = 0;
-    uint16_t mOffWaitTime = 0;
+    uint16_t mOnTime         = 0;
+    uint16_t mOffWaitTime    = 0;
     DataModel::Nullable<OnOff::StartUpOnOffEnum> mStartUpOnOff;
     StartupType mStartupType;
 
@@ -107,7 +110,7 @@ private:
 
     // Command Handlers
     DataModel::ActionReturnStatus HandleOffWithEffect(const DataModel::InvokeRequest & request,
-        chip::TLV::TLVReader & input_arguments);
+                                                      chip::TLV::TLVReader & input_arguments);
     DataModel::ActionReturnStatus HandleOnWithRecallGlobalScene(const DataModel::InvokeRequest & request);
     DataModel::ActionReturnStatus HandleOnWithTimedOff(chip::TLV::TLVReader & input_arguments);
 
@@ -117,12 +120,10 @@ private:
     DataModel::ActionReturnStatus HandleToggle();
 };
 
-class OnOffLightingClusterTestAccess {
+class OnOffLightingClusterTestAccess
+{
 public:
-    OnOffLightingClusterTestAccess(OnOffLightingCluster & cluster)
-        : mCluster(cluster)
-    {
-    }
+    OnOffLightingClusterTestAccess(OnOffLightingCluster & cluster) : mCluster(cluster) {}
 
     void SetOnTime(uint16_t onTime) { mCluster.mOnTime = onTime; }
 
