@@ -969,4 +969,23 @@ TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_NullDelegate)
     EXPECT_TRUE(globalSceneControl);
 }
 
+TEST_F(TestOnOffLightingCluster, TestToggleCommand)
+{
+    // Step 1: Ensure device is OFF.
+    EXPECT_FALSE(mMockDelegate.mOnOff);
+
+    // Step 2: Invoke Toggle command. Device should turn ON.
+    EXPECT_TRUE(mClusterTester.Invoke(Commands::Toggle::Type()).IsSuccess());
+    EXPECT_TRUE(mMockDelegate.mOnOff);
+    bool onOffState = false;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOffState), CHIP_NO_ERROR);
+    EXPECT_TRUE(onOffState);
+
+    // Step 3: Invoke Toggle command again. Device should turn OFF.
+    EXPECT_TRUE(mClusterTester.Invoke(Commands::Toggle::Type()).IsSuccess());
+    EXPECT_FALSE(mMockDelegate.mOnOff);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOffState), CHIP_NO_ERROR);
+    EXPECT_FALSE(onOffState);
+}
+
 } // namespace
