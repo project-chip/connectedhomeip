@@ -60,10 +60,10 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(featureMap),
-                       AdministratorCommissioningCluster::Context{
-                           .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-                           .fabricTable                = Server::GetInstance().GetFabricTable(),
-                           .failSafeContext = Server::GetInstance().GetCommissioningWindowManager().GetFailSafeContext() });
+                       AdministratorCommissioningCluster::Context{ .commissioningWindowManager =
+                                                                       Server::GetInstance().GetCommissioningWindowManager(),
+                                                                   .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                                   .failSafeContext = Server::GetInstance().GetFailSafeContext() });
         return gServer.Registration();
     }
 
