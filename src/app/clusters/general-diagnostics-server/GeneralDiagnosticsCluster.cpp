@@ -221,7 +221,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Calling OnDeviceReboot here to maintain the event generation of the old implemenation of the
+    // Calling OnDeviceReboot here to maintain the event generation of the old implementation of the
     // server init callback. We consider startup to be a boot event here.
     VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
