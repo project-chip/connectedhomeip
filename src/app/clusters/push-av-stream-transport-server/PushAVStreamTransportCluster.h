@@ -59,7 +59,7 @@ public:
         }
     }
 
-    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
+    void SetTLSClientManagementDelegate(TLSClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
 
     void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
     {

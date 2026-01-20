@@ -33,9 +33,9 @@ namespace app {
 namespace Clusters {
 static constexpr uint16_t kSpecMaxHostname = 253;
 
-class TlsClientManagementDelegate;
+class TLSClientManagementDelegate;
 
-class TlsClientManagementCluster : public DefaultServerCluster, private chip::FabricTable::Delegate
+class TLSClientManagementCluster : public DefaultServerCluster, private chip::FabricTable::Delegate
 {
 public:
     /**
@@ -46,9 +46,9 @@ public:
      * @param maxProvisioned The maximum number of endpoints which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TlsClientManagementCluster(EndpointId endpointId, TlsClientManagementDelegate & delegate,
+    TLSClientManagementCluster(EndpointId endpointId, TLSClientManagementDelegate & delegate,
                                Tls::CertificateTable & certificateTable, uint8_t maxProvisioned);
-    ~TlsClientManagementCluster();
+    ~TLSClientManagementCluster();
 
     // Attribute Getters
 
@@ -75,7 +75,7 @@ public:
                                                                CommandHandler * handler) override;
 
 private:
-    TlsClientManagementDelegate & mDelegate;
+    TLSClientManagementDelegate & mDelegate;
     Tls::CertificateTable & mCertificateTable;
 
     // Attribute local storage
@@ -102,15 +102,15 @@ private:
 /** @brief
  *  Defines methods for implementing application-specific logic for the TLSClientManagement Cluster.
  */
-class TlsClientManagementDelegate : public Tls::CertificateDependencyChecker
+class TLSClientManagementDelegate : public Tls::CertificateDependencyChecker
 {
 public:
     using EndpointStructType     = TlsClientManagement::Structs::TLSEndpointStruct::DecodableType;
     using LoadedEndpointCallback = std::function<CHIP_ERROR(EndpointStructType & endpoint)>;
 
-    TlsClientManagementDelegate() = default;
+    TLSClientManagementDelegate() = default;
 
-    virtual ~TlsClientManagementDelegate() = default;
+    virtual ~TLSClientManagementDelegate() = default;
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate & storage) = 0;
 
@@ -183,16 +183,16 @@ public:
                                                     int8_t delta) = 0;
 
 protected:
-    friend class TlsClientManagementCluster;
+    friend class TLSClientManagementCluster;
 
-    TlsClientManagementCluster * mTlsClientManagementCluster = nullptr;
+    TLSClientManagementCluster * mTLSClientManagementCluster = nullptr;
 
     // sets the TlsClientManagement Cluster pointer
-    void SetTlsClientManagementCluster(TlsClientManagementCluster * tlsClientManagementServer)
+    void SetTLSClientManagementCluster(TLSClientManagementCluster * tlsClientManagementServer)
     {
-        mTlsClientManagementCluster = tlsClientManagementServer;
+        mTLSClientManagementCluster = tlsClientManagementServer;
     }
-    TlsClientManagementCluster * GetTlsClientManagementCluster() const { return mTlsClientManagementCluster; }
+    TLSClientManagementCluster * GetTLSClientManagementCluster() const { return mTLSClientManagementCluster; }
 };
 
 } // namespace Clusters

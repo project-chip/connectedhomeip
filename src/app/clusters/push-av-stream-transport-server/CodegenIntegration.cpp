@@ -121,7 +121,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     }
 }
 
-void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDelegate * delegate)
+void SetTLSClientManagementDelegate(EndpointId endpointId, TLSClientManagementDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting TLS Client Management delegate on endpoint %u", endpointId);
     if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)

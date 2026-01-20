@@ -26,7 +26,7 @@
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/testing/MockCommandHandler.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -335,7 +335,7 @@ private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
 };
 
-class TestTlsClientManagementDelegate : public TlsClientManagementDelegate
+class TestTLSClientManagementDelegate : public TLSClientManagementDelegate
 {
 
 public:
@@ -617,7 +617,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
-    TestTlsClientManagementDelegate tlsClientManagementDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -1004,7 +1004,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
-    TestTlsClientManagementDelegate tlsClientManagementDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -1339,7 +1339,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
     TestPushAVStreamTransportDelegateImpl mockDelegate;
-    TestTlsClientManagementDelegate tlsClientManagementDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
 
     MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
