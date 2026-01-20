@@ -256,13 +256,14 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
 TEST_F(TestOnOffLightingCluster, Startup_OTA)
 {
     // Test that StartupType::kOTA bypasses StartUpOnOff logic.
+
     mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
     WriteAttributeToStorage(Attributes::OnOff::Id, false); // Start OFF
     WriteAttributeToStorage(Attributes::StartUpOnOff::Id, to_underlying(StartUpOnOffEnum::kOn)); // Should turn ON
-    mCluster.RemoveDelegate(&mMockDelegate);
-    mMockDelegate.Reset();
+
+    MockOnOffDelegate localMockDelegate;
 
     // Reconstruct the cluster with StartupType::kOTA
     OnOffLightingCluster otaCluster(kTestEndpointId,
@@ -273,18 +274,50 @@ TEST_F(TestOnOffLightingCluster, Startup_OTA)
                                         .startupType               = OnOffLightingCluster::StartupType::kOTA,
                                     });
     ClusterTester otaTester(otaCluster);
-    otaCluster.AddDelegate(&mMockDelegate);
+    otaCluster.AddDelegate(&localMockDelegate);
 
     ASSERT_EQ(otaCluster.Startup(otaTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // OnOff should remain FALSE, as StartUpOnOff is ignored during OTA startup
     EXPECT_FALSE(otaCluster.GetOnOff());
-    EXPECT_TRUE(mMockDelegate.mStartupCalled);
-    EXPECT_FALSE(mMockDelegate.mCalled);
-    EXPECT_FALSE(mMockDelegate.mOnOff);
+    EXPECT_TRUE(localMockDelegate.mStartupCalled);
+    EXPECT_FALSE(localMockDelegate.mCalled);
+    EXPECT_FALSE(localMockDelegate.mOnOff);
+}
 
-    otaCluster.RemoveDelegate(&mMockDelegate);
-    otaCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+TEST_F(TestOnOffLightingCluster, Startup_TogglePersists)
+{
+    // Test that the OnOff value change due to StartUpOnOff::kToggle is persisted.
+    const bool initialOnOff = false;
+
+    // Initial state: OFF, StartUpOnOff = kToggle
+    mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
+    WriteAttributeToStorage(Attributes::OnOff::Id, initialOnOff);
+    WriteAttributeToStorage(Attributes::StartUpOnOff::Id, to_underlying(StartUpOnOffEnum::kToggle));
+
+    // First startup: Toggles to ON
+    mMockDelegate.Reset();
+    ASSERT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(mCluster.GetOnOff());
+    EXPECT_TRUE(mMockDelegate.mStartupCalled);
+
+    // Check that the OnOff attribute in storage is now TRUE
+    bool onOffState = false;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOffState), CHIP_NO_ERROR);
+    EXPECT_TRUE(onOffState);
+
+    // ensure we do not toggle again (i.e. keep on)
+    EXPECT_EQ(mCluster.SetStartupOnOff({}), CHIP_NO_ERROR);
+
+    // Shutdown and Startup again
+    mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    mMockDelegate.Reset();
+    ASSERT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // OnOff should now be TRUE, as the toggled state (ON) should have been loaded from storage.
+    EXPECT_TRUE(mCluster.GetOnOff());
+    EXPECT_TRUE(mMockDelegate.mStartupCalled);
 }
 
 TEST_F(TestOnOffLightingCluster, TestLightingAttributes)
