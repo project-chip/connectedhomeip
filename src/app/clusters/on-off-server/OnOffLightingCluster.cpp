@@ -322,12 +322,15 @@ void OnOffLightingCluster::UpdateTimer()
     bool on = GetOnOff();
 
     const bool needTimer = [&]() {
+        // Timer is needed if we did not reach 0 AND if value is not 0xFFFF (according to the spec):
+        //    "... attribute is decremented every 1/10th second, unless its value equals 0xFFFF"
         if (on)
         {
-            return (mOnTime > 0) && (mOnTime != 0xFFFF);
+            return (mOnTime != 0) && (mOnTime != 0xFFFF);
         }
+
         // not on, check off conditions
-        return (mOffWaitTime > 0) && (mOffWaitTime != 0xFFFF);
+        return (mOffWaitTime != 0) && (mOffWaitTime != 0xFFFF);
     }();
 
     VerifyOrReturn(needTimer);
