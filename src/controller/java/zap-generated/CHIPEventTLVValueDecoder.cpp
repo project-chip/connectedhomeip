@@ -9454,6 +9454,42 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::Chime;
         switch (aPath.mEventId)
         {
+        case Events::ChimeStartedPlaying::Id: {
+            Events::ChimeStartedPlaying::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_chimeID;
+            std::string value_chimeIDClassName     = "java/lang/Integer";
+            std::string value_chimeIDCtorSignature = "(I)V";
+            jint jnivalue_chimeID                  = static_cast<jint>(cppValue.chimeID);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_chimeIDClassName.c_str(), value_chimeIDCtorSignature.c_str(), jnivalue_chimeID, value_chimeID);
+
+            jclass chimeStartedPlayingStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ChimeClusterChimeStartedPlayingEvent", chimeStartedPlayingStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ChimeClusterChimeStartedPlayingEvent");
+                return nullptr;
+            }
+
+            jmethodID chimeStartedPlayingStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, chimeStartedPlayingStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;)V", &chimeStartedPlayingStructCtor);
+            if (err != CHIP_NO_ERROR || chimeStartedPlayingStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ChimeClusterChimeStartedPlayingEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(chimeStartedPlayingStructClass, chimeStartedPlayingStructCtor, value_chimeID);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
