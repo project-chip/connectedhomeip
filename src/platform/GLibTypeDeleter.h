@@ -91,6 +91,11 @@ struct GBytesDeleter
     void operator()(GBytes * object) { g_bytes_unref(object); }
 };
 
+struct GStrvDeleter
+{
+    void operator()(gchar ** object) { g_strfreev(object); }
+};
+
 template <typename T>
 struct GAutoPtrDeleter
 {
@@ -142,6 +147,12 @@ template <>
 struct GAutoPtrDeleter<GError>
 {
     using deleter = GErrorDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<gchar *>
+{
+    using deleter = GStrvDeleter;
 };
 
 template <>
