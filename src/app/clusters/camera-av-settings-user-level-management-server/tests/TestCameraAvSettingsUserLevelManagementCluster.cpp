@@ -118,9 +118,9 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override 
-    { 
-        SetAttributePersistenceProvider(nullptr); 
+    void TearDown() override
+    {
+        SetAttributePersistenceProvider(nullptr);
         mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
