@@ -28,6 +28,7 @@
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/PlatformManager.h>
 #include <soil-measurement-stub.h>
 
@@ -50,6 +51,9 @@ using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
 namespace {
+
+// Maximum value for TotalOperationalHours per specification (0xFFFFFFFE)
+constexpr uint32_t kMaxTotalOperationalHours = 0xFFFFFFFE;
 
 std::unique_ptr<ButtonEventsSimulator> sButtonSimulatorInstance{ nullptr };
 
@@ -575,6 +579,34 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "UserIntentCommissioningStart")
     {
         TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
+    else if (name == "SetTotalOperationalHours")
+    {
+        bool hasHours = HasNumericField(self->mJsonValue, "Hours");
+        if (!hasHours)
+        {
+            ChipLogError(NotSpecified, "The SetTotalOperationalHours command requires the Hours key.");
+            return;
+        }
+
+        uint32_t hours = static_cast<uint32_t>(self->mJsonValue["Hours"].asUInt());
+        // Validate the value is within valid range (max value is 0xFFFFFFFE per specification)
+        if (hours > kMaxTotalOperationalHours)
+        {
+            ChipLogError(NotSpecified, "TotalOperationalHours value %u is out of valid range (0 to %u)", hours,
+                         kMaxTotalOperationalHours);
+            return;
+        }
+
+        CHIP_ERROR err = DeviceLayer::ConfigurationMgr().StoreTotalOperationalHours(hours);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store TotalOperationalHours: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Successfully set TotalOperationalHours to %u hours", hours);
+        }
     }
     else
     {
