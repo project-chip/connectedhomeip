@@ -23,50 +23,25 @@ CommandHandlerInterfaceOnlyClusters:
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
-    - Access Control
     - Actions
-    - Activated Carbon Filter Monitoring
-    - Administrator Commissioning
-    - Basic Information
-    - Boolean State
-    - Boolean State Configuration
     - Camera AV Settings User Level Management
-    - Camera AV Stream Management
-    - Chime
     - Closure Control
     - Closure Dimension
     - Commissioner Control
     - Commodity Price
     - Commodity Tariff
-    - Descriptor
-    - Device Energy Management
     - Device Energy Management Mode
-    - Diagnostic Logs
     - Dishwasher Mode
     - Electrical Energy Measurement
-    - Electrical Power Measurement
     - Energy EVSE
     - Energy EVSE Mode
-    - Ethernet Network Diagnostics
-    - Fixed Label
-    - General Commissioning
-    - General Diagnostics
-    - Group Key Management
-    - Groupcast
-    - HEPA Filter Monitoring
-    - ICD Management
-    - Identify
     - Joint Fabric Administrator
     - Laundry Washer Mode
     - Microwave Oven Control
     - Network Commissioning
-    - OTA Software Update Provider
-    - Operational Credentials
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
-    - Power Topology
-    - Push AV Stream Transport
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
@@ -74,19 +49,15 @@ CommandHandlerInterfaceOnlyClusters:
     - Sample MEI
     - Scenes Management
     - Service Area
-    - Software Diagnostics
     - Soil Measurement
     - TLS Certificate Management
     - TLS Client Management
     - Thread Border Router Management
     - Thread Network Directory
-    - Time Synchronization
-    - User Label
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
     - WebRTC Transport Requestor
-    - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
     - Zone Management
     # keep-sorted end
@@ -102,7 +73,6 @@ ClustersWithInitFunctions:
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Scenes Management
     - Thermostat
     # keep-sorted end
 
@@ -124,7 +94,6 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Scenes Management
     - Thermostat
     # keep-sorted end
 
@@ -153,6 +122,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Camera AV Stream Management
     - Chime
     - Descriptor
     - Device Energy Management
@@ -173,9 +143,13 @@ CodeDrivenClusters:
     - Operational Credentials
     - Power Topology
     - Push AV Stream Transport
+    - Scenes Management
     - Software Diagnostics
+    - TLS Certificate Management
+    - TLS Client Management
     - Time Format Localization
     - Time Synchronization
+    - Unit Localization
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end

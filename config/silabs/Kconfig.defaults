@@ -6,6 +6,10 @@ config BT_HOST_CRYPTO
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default -1
 
+config CHIP_WIFI
+	default y if BOARD_SIWX917_RB4338A
+	default y if BOARD_SIWX917_RB4342A
+
 # ==============================================================================
 # Logging configuration
 # ==============================================================================

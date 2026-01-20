@@ -20,6 +20,10 @@
 
 if CHIP
 
+# See config/common/cmake/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	default "NXP Semiconductors"
+
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	default 1
 
@@ -45,6 +49,12 @@ config CHIP_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
 config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
 	default 800 if NET_L2_OPENTHREAD
 	default 2000
+
+config CHIP_INET_ENABLE_TCP_ENDPOINT
+	default n
+
+config CHIP_ENABLE_READ_CLIENT
+	default y
 
 if CHIP_FACTORY_DATA
 
@@ -408,9 +418,6 @@ endif
 config MBEDTLS
 	default y
 
-config MBEDTLS_CFG_FILE
-	default "config-tls-generic.h"
-
 config MBEDTLS_PSA_KEY_SLOT_COUNT
     default 64
 
@@ -441,7 +448,7 @@ config MBEDTLS_CIPHER_AES_ENABLED
 config MBEDTLS_CIPHER_CCM_ENABLED
 	default y
 
-config MBEDTLS_CTR_DRBG_ENABLED
+config MBEDTLS_CTR_DRBG_C
 	default y
 
 config MBEDTLS_CIPHER_MODE_CBC_ENABLED
@@ -453,8 +460,10 @@ config MBEDTLS_ECP_C
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
 	default y
 
-config CHIP_CRYPTO_PSA
-	default y
+choice CHIP_CRYPTO
+    default CHIP_CRYPTO_PSA
+
+endchoice
 
 if CHIP_CRYPTO_PSA
 
@@ -526,5 +535,10 @@ config FLASH_SHELL
 	default n
 
 endif # SHELL
+
+choice POSIX_AEP_CHOICE
+	prompt "POSIX Subprofile"
+	default POSIX_AEP_CHOICE_NONE
+endchoice
 
 endif

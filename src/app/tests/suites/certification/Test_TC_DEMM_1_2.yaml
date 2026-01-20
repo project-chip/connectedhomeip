@@ -109,3 +109,9 @@ tests:
           [1705923927.418327][23602:23604] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009F Attribute 0x0000_0001 DataVersion: 2217281174
           [1705923927.418389][23602:23604] CHIP:TOO:   CurrentMode: 0
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: energy-management
+      app: energy-management

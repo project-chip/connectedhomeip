@@ -28,7 +28,7 @@ void DefaultMediaController::SetCameraDevice(Camera::CameraDevice * device)
     {
         size_t bufferSize = mCameraDevice->GetPreRollBufferSize();
         mPreRollBuffer.SetMaxTotalBytes(bufferSize * 1000);
-        ChipLogProgress(Camera, "PreRollBuffer size set to %ld bytes from CameraDevice.", bufferSize);
+        ChipLogProgress(Camera, "PreRollBuffer size set to %zu bytes from CameraDevice.", bufferSize);
     }
     else
     {
