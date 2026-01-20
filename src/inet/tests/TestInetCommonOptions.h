@@ -94,4 +94,4 @@ public:
 };
 
 extern FaultInjectionOptions gFaultInjectionOptions;
-#endif  // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
+#endif // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
