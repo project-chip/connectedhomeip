@@ -316,7 +316,34 @@ TEST_F(TestOnOffLightingCluster, Startup_TogglePersists)
 
     // OnOff should now be TRUE, as the toggled state (ON) should have been loaded from storage.
     EXPECT_TRUE(mCluster.GetOnOff());
+\
     EXPECT_TRUE(mMockDelegate.mStartupCalled);
+}
+
+TEST_F(TestOnOffLightingCluster, TestSetters)
+{
+    // Test SetOnTime
+    mCluster.SetOnTime(100);
+    uint16_t onTime = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
+    EXPECT_EQ(onTime, 100);
+
+    // Test SetOffWaitTime
+    mCluster.SetOffWaitTime(200);
+    uint16_t offWaitTime = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
+    EXPECT_EQ(offWaitTime, 200);
+
+    // Test SetStartupOnOff
+    DataModel::Nullable<StartUpOnOffEnum> startUpOnOff;
+    EXPECT_EQ(mCluster.SetStartupOnOff(StartUpOnOffEnum::kOn), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
+    EXPECT_FALSE(startUpOnOff.IsNull());
+    EXPECT_EQ(startUpOnOff.Value(), StartUpOnOffEnum::kOn);
+
+    EXPECT_EQ(mCluster.SetStartupOnOff({}), CHIP_NO_ERROR);
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
+    EXPECT_TRUE(startUpOnOff.IsNull());
 }
 
 TEST_F(TestOnOffLightingCluster, TestLightingAttributes)
