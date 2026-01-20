@@ -127,3 +127,6 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
+
+# Post-build steps
+include(${CHIP_ROOT}/config/nxp/app/zephyr-post-build.cmake)
