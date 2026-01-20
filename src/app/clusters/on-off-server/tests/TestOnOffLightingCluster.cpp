@@ -164,7 +164,8 @@ struct TestOnOffLightingCluster : public ::testing::Test
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override {
+    void TearDown() override
+    {
         mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
     }
@@ -248,8 +249,6 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
         EXPECT_TRUE(mMockDelegate.mStartupCalled);
         EXPECT_FALSE(mMockDelegate.mCalled);
         EXPECT_EQ(mMockDelegate.mOnOff, testCase.expectedStartState);
-
-
     }
 }
 
@@ -260,7 +259,7 @@ TEST_F(TestOnOffLightingCluster, Startup_OTA)
     mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
-    WriteAttributeToStorage(Attributes::OnOff::Id, false); // Start OFF
+    WriteAttributeToStorage(Attributes::OnOff::Id, false);                                       // Start OFF
     WriteAttributeToStorage(Attributes::StartUpOnOff::Id, to_underlying(StartUpOnOffEnum::kOn)); // Should turn ON
 
     MockOnOffDelegate localMockDelegate;
