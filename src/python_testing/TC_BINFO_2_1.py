@@ -147,7 +147,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         # Step 1: Commissioning
         self.step(1)
         log.info("Commissioning successful")
-        
+
         # Step 2: Read DataModelRevision
         self.step(2)
         val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.DataModelRevision, endpoint=self.endpoint)
@@ -195,7 +195,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         vendor_id = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.VendorID, endpoint=self.endpoint)
         log.info(f"Read VendorID: {vendor_id}")
         asserts.assert_greater_equal(vendor_id, 1, "VendorID can't be less than 1")
-        asserts.assert_less_equal(vendor_id, 65521, "VendorID can't be greater than 65521") 
+        asserts.assert_less_equal(vendor_id, 65521, "VendorID can't be greater than 65521")
 
         # Step 9: Write VendorID
         self.step(9)
@@ -278,7 +278,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         location = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.Location, endpoint=self.endpoint)
         log.info(f"Read Location: {location}")
         asserts.assert_equal(len(location), 2, "Location should be a 2-character Country Code")
-        # Note: YAML Step 1 traces show "XX" being used during commissioning. 
+        # Note: YAML Step 1 traces show "XX" being used during commissioning.
         # Ideally we would match this with the value sent during commissioning.
 
         # Step 20b: Write Location (Should SUCCEED)
@@ -391,7 +391,7 @@ class TC_BINFO_2_1(MatterBaseTest):
             datetime.datetime.strptime(mfg_date[:8], "%Y%m%d")
         except ValueError:
             asserts.fail(f"First 8 characters of ManufacturingDate '{mfg_date}' do not match the ISO 8601 format: YYYYMMDD")
-        
+
 
         # Step 34: Write ManufacturingDate
         self.step(34)
@@ -434,7 +434,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info(f"Read ProductURL: {prod_url}")
         assert_is_string(prod_url, "ProductURL should be a string")
         assert_string_length(prod_url, max_length=256, description="ProductURL max length is 256")
-        
+
         # Verify RFC 3986 syntax and web page link if not empty
         if prod_url:
             try:
@@ -537,7 +537,7 @@ class TC_BINFO_2_1(MatterBaseTest):
             log.info(f"Attempting to write Reachable to {val_to_write} (expect failure)")
             await self.verify_unsupported_write(attributes.Reachable, val_to_write, self.endpoint)
             log.info("Verified UNSUPPORTED_WRITE for Reachable")
-            
+
             # Step 52b: Verify Reachable unchanged
             self.step("52b")
             reachable_after = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.Reachable, endpoint=self.endpoint)
@@ -547,7 +547,7 @@ class TC_BINFO_2_1(MatterBaseTest):
             log.info("Step 51 & 52: Skipping Reachable (BINFO.S.A0011) - Optional/PICS disabled")
             self.step("52a")
             self.step("52b")
-            
+
         # Step 53: UniqueID
         self.step(53)
         if self.check_pics("BINFO.S.A0012"):
@@ -579,32 +579,32 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info("Reading and Validating CapabilityMinima")
         caps = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.CapabilityMinima, endpoint=self.endpoint)
         log.info(f"Read CapabilityMinima: {caps}")
-        
+
         # CaseSessionsPerFabric: min 3
         asserts.assert_true(hasattr(caps, "caseSessionsPerFabric"), "caseSessionsPerFabric is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking CaseSessionsPerFabric: {caps.caseSessionsPerFabric} >= 3")
         asserts.assert_greater_equal(caps.caseSessionsPerFabric, 3, "CaseSessionsPerFabric >= 3")
-        
+
         # SubscriptionsPerFabric: min 3
         asserts.assert_true(hasattr(caps, "subscriptionsPerFabric"), "subscriptionsPerFabric is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SubscriptionsPerFabric: {caps.subscriptionsPerFabric} >= 3")
         asserts.assert_greater_equal(caps.subscriptionsPerFabric, 3, "SubscriptionsPerFabric >= 3")
-        
+
         # SimultaneousInvocationsSupported: min 1 (New field)
         asserts.assert_true(hasattr(caps, "simultaneousInvocationsSupported"), "simultaneousInvocationsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SimultaneousInvocationsSupported: {caps.simultaneousInvocationsSupported} >= 1")
         asserts.assert_greater_equal(caps.simultaneousInvocationsSupported, 1, "SimultaneousInvocationsSupported >= 1")
-        
+
         # SimultaneousWritesSupported: min 1 (New field)
         asserts.assert_true(hasattr(caps, "simultaneousWritesSupported"), "simultaneousWritesSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SimultaneousWritesSupported: {caps.simultaneousWritesSupported} >= 1")
         asserts.assert_greater_equal(caps.simultaneousWritesSupported, 1, "SimultaneousWritesSupported >= 1")
-        
+
         # ReadPathsSupported: min 9 (New field)
         asserts.assert_true(hasattr(caps, "readPathsSupported"), "readPathsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking ReadPathsSupported: {caps.readPathsSupported} >= 9")
         asserts.assert_greater_equal(caps.readPathsSupported, 9, "ReadPathsSupported >= 9")
-        
+
         # SubscribePathsSupported: min 3 (New field)
         asserts.assert_true(hasattr(caps, "subscribePathsSupported"), "subscribePathsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SubscribePathsSupported: {caps.subscribePathsSupported} >= 3")
@@ -656,7 +656,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         self.step(63)
         spec_ver = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.SpecificationVersion, endpoint=self.endpoint)
         log.info(f"Read SpecificationVersion: {spec_ver}")
-        
+
         # Verify valid values
         allowed_versions = [0x01040000, 0x01040100, 0x01040200, 0x01050000]
         if spec_ver not in allowed_versions:
@@ -665,7 +665,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         # Verify lower 8 bits are zero
         if spec_ver & 0xFF != 0:
              asserts.fail(f"SpecificationVersion {spec_ver:#010x} must have lower 8 bits set to zero")
-        
+
 
         # Step 64
         self.step(64)
