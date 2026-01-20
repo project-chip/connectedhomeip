@@ -318,22 +318,22 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
-                     --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -344,13 +344,13 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
-                     --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
             - name: Run BLE-WiFi commissioning test
@@ -366,11 +366,11 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
-                     --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --ble-wifi \
                   "
 
@@ -391,18 +391,18 @@ jobs:
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
@@ -415,21 +415,21 @@ jobs:
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Uploading core files
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -437,7 +437,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -455,7 +455,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@v5
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -563,23 +563,23 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
-                     --chip-tool ./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-                     --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --lit-icd-app ./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-                     --network-manager-app ./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --app-path ota-requestor:./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --app-path tv:./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --app-path bridge:./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+                     --app-path lit-icd:./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --app-path microwave-oven:./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --app-path rvc:./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+                     --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --app-path energy-management:./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -592,17 +592,17 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
-                     --chip-tool ./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -610,13 +610,13 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -634,7 +634,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@v5
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -888,7 +888,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@v5
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -1097,7 +1097,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-python-repl
@@ -1105,20 +1105,20 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading traces on failure
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: trace-data-python-repl
                   path: out/trace_data/
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-python-repl

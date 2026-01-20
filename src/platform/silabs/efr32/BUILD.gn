@@ -48,6 +48,7 @@ static_library("efr32") {
     "${silabs_platform_dir}/CHIPDevicePlatformEvent.h",
     "${silabs_platform_dir}/CHIPMem-Platform.cpp",
     "${silabs_platform_dir}/CHIPPlatformConfig.h",
+    "${silabs_platform_dir}/ChipDie.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.h",
     "${silabs_platform_dir}/ConnectivityManagerImpl.h",
