@@ -63,7 +63,6 @@ public:
     OnOffLightingCluster(EndpointId endpointId, const Context & context);
     ~OnOffLightingCluster() override;
 
-
     uint16_t GetOnTime() const { return mOnTime; }
     void SetOnTime(uint16_t value);
 

@@ -493,7 +493,6 @@ TEST_F(TestOnOffLightingCluster, TestOffWithEffect_GlobalSceneControlFalse)
     EXPECT_TRUE(mClusterTester.Invoke(offCommand1).IsSuccess());
     EXPECT_EQ(mMockScenesIntegrationDelegate.storeCalls.size(), 1u);
 
-
     // start clear
     mMockScenesIntegrationDelegate.storeCalls.clear();
     mMockEffectDelegate.mCalled = false;
