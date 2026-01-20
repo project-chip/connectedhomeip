@@ -89,12 +89,12 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     mOperationalCredentialsCluster.Create(
         endpointId,
-        OperationalCredentialsCluster::Context{
-            .fabricTable                = Server::GetInstance().GetFabricTable(),
-            .failSafeContext            = Server::GetInstance().GetCommissioningWindowManager().GetFailSafeContext(),
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
-            .dnssdServer                = app::DnssdServer::Instance(),
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager() });
+        OperationalCredentialsCluster::Context{ .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+                                                .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+                                                .dnssdServer     = app::DnssdServer::Instance(),
+                                                .commissioningWindowManager =
+                                                    Server::GetInstance().GetCommissioningWindowManager() });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
