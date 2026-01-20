@@ -69,7 +69,10 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
         endpointId, BitFlags<AdministratorCommissioning::Feature>{},
         AdministratorCommissioningCluster::Context{ .commissioningWindowManager =
                                                         Server::GetInstance().GetCommissioningWindowManager(),
-                                                    .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                    .fabricTable = Server::GetInstance().GetFabricTable(),
+                                                    // Note: We pull FailSafeContext directly from Server instead of via
+                                                    // CommissioningWindowManager because the WindowManager's internal
+                                                    // Server pointer is not yet initialized at this stage of registration.
                                                     .failSafeContext = Server::GetInstance().GetFailSafeContext() });
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
