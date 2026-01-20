@@ -7175,6 +7175,52 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
     return output.toString();
   }
 }
+public static class ChimeClusterChimeStartedPlayingEvent {
+  public Integer chimeID;
+  private static final long CHIME_ID_ID = 0L;
+
+  public ChimeClusterChimeStartedPlayingEvent(
+    Integer chimeID
+  ) {
+    this.chimeID = chimeID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CHIME_ID_ID, new UIntType(chimeID)));
+
+    return new StructType(values);
+  }
+
+  public static ChimeClusterChimeStartedPlayingEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer chimeID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CHIME_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          chimeID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ChimeClusterChimeStartedPlayingEvent(
+      chimeID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChimeClusterChimeStartedPlayingEvent {\n");
+    output.append("\tchimeID: ");
+    output.append(chimeID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class CommissionerControlClusterCommissioningRequestResultEvent {
   public Long requestID;
   public Long clientNodeID;
