@@ -96,7 +96,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
     @async_test_body
     async def setup_test(self):
-
         # Variables for TH1-OTA Provider
         self.p1_node = 10
         self.p1_node_invalid = 13
@@ -107,11 +106,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         self.p2_disc = 1111
 
         self.p_pass = 20202021
-
-        # States
-        self.idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
-        self.querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
-        self.downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
 
         self.app_path = self.user_params.get('provider_app_path', None)
         self.image = self.user_params.get('ota_image')
@@ -179,6 +173,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
     @async_test_body
     async def test_TC_SU_2_8(self):
+        requestorCluster = Clusters.Objects.OtaSoftwareUpdateRequestor
+        providerCluster = Clusters.Objects.OtaSoftwareUpdateProvider
 
         # Commissioning step
         self.step(0)
@@ -248,13 +244,13 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # Check ProtocolsSupported protocols_supported
         ps = response_data['Payload']['ProtocolsSupported']
-        asserts.assert_true(Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous in ps,
-                            f"kBDXSynchronous: {Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kBDXSynchronous} is not part of ProtocolsSupporter: {ps}")
+        asserts.assert_true(providerCluster.Enums.DownloadProtocolEnum.kBDXSynchronous in ps,
+                            f"kBDXSynchronous: {providerCluster.Enums.DownloadProtocolEnum.kBDXSynchronous} is not part of ProtocolsSupporter: {ps}")
 
         # Check MCORE.OTA.HTTPS
         if self.check_pics("MCORE.OTA.HTTPS"):
-            asserts.assert_true(Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kHttps in ps,
-                                f"kHttps: {Clusters.OtaSoftwareUpdateProvider.Enums.DownloadProtocolEnum.kHttps} is not part of ProtocolsSupporter: {ps}")
+            asserts.assert_true(providerCluster.Enums.DownloadProtocolEnum.kHttps in ps,
+                                f"kHttps: {providerCluster.Enums.DownloadProtocolEnum.kHttps} is not part of ProtocolsSupporter: {ps}")
 
         # Check RequestorCanConsent
         expected_rcc = 0
@@ -331,7 +327,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # ACL permissions are not required
 
         # Event Handler
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        event_cb = EventSubscriptionHandler(expected_cluster=requestorCluster)
         await event_cb.start(dev_ctrl=self.th1, node_id=self.requestor_node_id, endpoint=self.endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
@@ -342,27 +338,24 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await self.announce_ota_provider(controller=self.th1, provider_node_id=self.p1_node_invalid, requestor_node_id=self.requestor_node_id, vendor_id=self.vendor_id, endpoint=self.endpoint)
 
         # Expect events idle to querying, downloadError and then back to idle
-        querying_event = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        asserts.assert_equal(self.querying, querying_event.newState,
-                             f"New state is {querying_event.newState} and it should be {self.querying}")
+        querying_event = event_cb.wait_for_event_report(requestorCluster.Events.StateTransition, 50)
+        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kQuerying, querying_event.newState,
+                             f"New state is {querying_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kQuerying}")
 
-        download_error = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.DownloadError, 50)
+        download_error = event_cb.wait_for_event_report(requestorCluster.Events.DownloadError, 50)
 
         logger.info(f"Download Error: {download_error}")
 
-        idle_event = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        asserts.assert_equal(self.idle, idle_event.newState,
-                             f"New state is {idle_event.newState} and it should be {self.idle}")
+        idle_event = event_cb.wait_for_event_report(requestorCluster.Events.StateTransition, 50)
+        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kIdle, idle_event.newState,
+                             f"New state is {idle_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kIdle}")
 
         event_cb.reset()
         event_cb.cancel()
         await asyncio.sleep(2)
 
         # Subscribe to events
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        event_cb = EventSubscriptionHandler(expected_cluster=requestorCluster)
         await event_cb.start(dev_ctrl=th2, node_id=self.requestor_node_id, endpoint=self.endpoint,
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
@@ -375,17 +368,15 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Announce after subscription
         await self.announce_ota_provider(controller=th2, provider_node_id=self.p2_node, requestor_node_id=self.requestor_node_id, vendor_id=self.vendor_id, endpoint=self.endpoint)
 
-        event_idle_to_querying = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
+        event_idle_to_querying = event_cb.wait_for_event_report(requestorCluster.Events.StateTransition, 50)
 
         self.verify_state_transition_event(event_report=event_idle_to_querying,
-                                           expected_previous_state=self.idle, expected_new_state=self.querying)
+                                           expected_previous_state=requestorCluster.Enums.UpdateStateEnum.kIdle, expected_new_state=requestorCluster.Enums.UpdateStateEnum.kQuerying)
 
-        event_querying_to_downloading = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
+        event_querying_to_downloading = event_cb.wait_for_event_report(requestorCluster.Events.StateTransition, 50)
 
         self.verify_state_transition_event(event_report=event_querying_to_downloading,
-                                           expected_previous_state=self.querying, expected_new_state=self.downloading, expected_target_version=self.target_version)
+                                           expected_previous_state=requestorCluster.Enums.UpdateStateEnum.kQuerying, expected_new_state=requestorCluster.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.target_version)
 
         event_cb.reset()
         event_cb.cancel()
