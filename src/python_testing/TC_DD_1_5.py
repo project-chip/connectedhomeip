@@ -109,7 +109,6 @@ class TC_DD_1_5(MatterBaseTest):
         else:
             log.info("MCORE.DD.QR is not set")
 
-
         # The current test can be executed on:
         # - devices supporting NTL.
         # - devices with NFC onboarding data (not necessarily supporting NTL).
@@ -132,7 +131,6 @@ class TC_DD_1_5(MatterBaseTest):
 
         else:
             log.info("Device not supporting NTL: QRCode is optional")
-
 
         ###########
         self.step("4")
