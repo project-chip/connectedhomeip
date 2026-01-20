@@ -716,14 +716,16 @@ class TestConformanceSupport(MatterBaseTest):
 
         conformance_assessment_data = EMPTY_CLUSTER_GLOBAL_ATTRIBUTES
 
-        xml = create_xml(1)
+        xml = create_xml(2)
         et = ElementTree.fromstring(xml)
         xml_callable = parse_callable_from_xml(et, self.params)
-        asserts.assert_equal(str(xml_callable), 'Rev >= v1')
+        asserts.assert_equal(str(xml_callable), 'Rev >= v2')
 
         conformance_assessment_data.cluster_revision = 1
-        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.NOT_APPLICABLE)
         conformance_assessment_data.cluster_revision = 2
+        asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
+        conformance_assessment_data.cluster_revision = 3
         asserts.assert_equal(xml_callable(conformance_assessment_data).decision, ConformanceDecision.MANDATORY)
 
         xml = create_xml(5)
@@ -745,8 +747,8 @@ class TestConformanceSupport(MatterBaseTest):
         too_many_terms = ('<mandatoryConform>'
                           '<greaterOrEqualTerm>'
                           '<revision value="current"/>'
-                          '<revision value="1"/>'
-                          '<revision value="1"/>'
+                          '<revision value="2"/>'
+                          '<revision value="2"/>'
                           '</greaterOrEqualTerm>'
                           '</mandatoryConform>')
         et = ElementTree.fromstring(too_many_terms)
@@ -764,7 +766,7 @@ class TestConformanceSupport(MatterBaseTest):
 
         too_few_terms_value = ('<mandatoryConform>'
                                '<greaterOrEqualTerm>'
-                               '<revision value="1"/>'
+                               '<revision value="2"/>'
                                '</greaterOrEqualTerm>'
                                '</mandatoryConform>')
         et = ElementTree.fromstring(too_few_terms_value)
