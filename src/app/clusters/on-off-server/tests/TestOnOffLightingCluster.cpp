@@ -366,6 +366,39 @@ TEST_F(TestOnOffLightingCluster, TestLightingAttributes)
     EXPECT_TRUE(startUpOnOff.IsNull());
 }
 
+TEST_F(TestOnOffLightingCluster, TestDefaultStartUpOnOffFromContext)
+{
+    // Shutdown the existing cluster
+    mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
+
+    // Reconstruct the cluster with a default StartUpOnOff value
+    OnOffLightingCluster cluster(kTestEndpointId,
+                                 {
+                                     .timerDelegate             = mMockTimerDelegate,
+                                     .effectDelegate            = mMockEffectDelegate,
+                                     .scenesIntegrationDelegate = &mMockScenesIntegrationDelegate,
+                                     .defaults                  = { .startupOnOff = StartUpOnOffEnum::kOn },
+                                 });
+    ClusterTester tester(cluster);
+    MockOnOffDelegate localMockDelegate;
+    cluster.AddDelegate(&localMockDelegate);
+
+    // Startup the cluster
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Check that the StartUpOnOff attribute is set to the default value
+    DataModel::Nullable<StartUpOnOffEnum> startUpOnOff;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::StartUpOnOff::Id, startUpOnOff), CHIP_NO_ERROR);
+    EXPECT_FALSE(startUpOnOff.IsNull());
+    EXPECT_EQ(startUpOnOff.Value(), StartUpOnOffEnum::kOn);
+
+    // Check that the OnOff attribute is set to true due to the default StartUpOnOff value
+    EXPECT_TRUE(cluster.GetOnOff());
+    EXPECT_TRUE(localMockDelegate.mStartupCalled);
+    EXPECT_TRUE(localMockDelegate.mOnOff);
+}
+
 TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff)
 {
     // Step 1: Turn On with Timed Off (OnTime = 10, OffWaitTime = 20)

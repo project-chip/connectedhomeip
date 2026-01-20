@@ -45,7 +45,7 @@ OnOffLightingCluster::OnOffLightingCluster(EndpointId endpointId, const Context 
                  },
                  { Feature::kLighting, Feature::kDeadFrontBehavior }),
     mEffectDelegate(context.effectDelegate), mScenesIntegrationDelegate(context.scenesIntegrationDelegate),
-    mStartupType(context.startupType)
+    mStartUpOnOff(context.defaults.startupOnOff), mStartupType(context.startupType)
 {}
 
 OnOffLightingCluster::~OnOffLightingCluster()
