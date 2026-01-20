@@ -59,7 +59,8 @@ public:
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
         mFeatureFlags(featureFlags), mDeviceLoadStatusProvider(deviceLoadStatusProvider),
-        mDiagnosticDataProvider(diagnosticDataProvider), mNodeStartupTimestamp(nodeStartupTimestamp)
+        mDiagnosticDataProvider(diagnosticDataProvider), mTestEventTriggerDelegate(nullptr),
+        mNodeStartupTimestamp(nodeStartupTimestamp)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
