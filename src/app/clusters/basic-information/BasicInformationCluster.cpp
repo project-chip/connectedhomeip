@@ -134,6 +134,13 @@ inline CHIP_ERROR ReadProductID(DeviceInstanceInfoProvider * deviceInfoProvider,
     return aEncoder.Encode(productId);
 }
 
+inline CHIP_ERROR ReadLocalConfigDisabled(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
+{
+    bool localConfigDisabled = false;
+    ReturnErrorOnFailure(deviceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
+    return aEncoder.Encode(localConfigDisabled);
+}
+
 inline CHIP_ERROR ReadHardwareVersion(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     uint16_t hardwareVersion = 0;
@@ -206,15 +213,24 @@ inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager
     return EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
 }
 
-inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceInstanceInfoProvider * deviceInfoProvider)
 {
     BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
 
     // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
     constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
+    auto capabilityMinimasFromDeviceInfo = deviceInfoProvider->GetSupportedCapabilityMinimaValues();
+
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
     capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
+    capabilityMinima.simultaneousInvocationsSupported =
+        chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.simultaneousInvocationsSupported);
+    capabilityMinima.simultaneousWritesSupported =
+        chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.simultaneousWritesSupported);
+    capabilityMinima.readPathsSupported = chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.readPathsSupported);
+    capabilityMinima.subscribePathsSupported =
+        chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.subscribePathsSupported);
 
     return aEncoder.Encode(capabilityMinima);
 }
@@ -271,26 +287,21 @@ inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoP
     return aEncoder.Encode(productAppearance);
 }
 
-BasicInformationCluster gInstance;
-
 } // namespace
 
 namespace chip::app::Clusters {
-
-BasicInformationCluster & BasicInformationCluster::Instance()
-{
-    return gInstance;
-}
 
 DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
     using namespace BasicInformation::Attributes;
 
-    // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
-    //       costs some flash (even though code would be more readable that way...)
-    auto * deviceInfoProvider = GetDeviceInstanceInfoProvider();
-    auto & configManager      = ConfigurationMgr();
+    DeviceInstanceInfoProvider * deviceInfoProvider;
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProviderImpl(&deviceInfoProvider));
+
+    // TODO: The configuration manager should be injected into the basic information cluster instead of
+    // directly fetching a reference to the singleton object. Issue #42602
+    auto & configManager = ConfigurationMgr();
 
     switch (request.path.mAttributeId)
     {
@@ -307,7 +318,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case NodeLabel::Id:
         return encoder.Encode(mNodeLabel.Content());
     case LocalConfigDisabled::Id:
-        return encoder.Encode(mLocalConfigDisabled);
+        return ReadLocalConfigDisabled(deviceInfoProvider, encoder);
     case DataModelRevision::Id:
         return encoder.Encode(Revision::kDataModelRevision);
     case Location::Id:
@@ -348,7 +359,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case UniqueID::Id:
         return ReadUniqueID(configManager, encoder);
     case CapabilityMinima::Id:
-        return ReadCapabilityMinima(encoder);
+        return ReadCapabilityMinima(encoder, deviceInfoProvider);
     case ProductAppearance::Id:
         return ReadProductAppearance(deviceInfoProvider, encoder);
     case SpecificationVersion::Id:
@@ -393,8 +404,14 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         VerifyOrReturnError(mNodeLabel.SetContent(label), Protocols::InteractionModel::Status::ConstraintError);
         return persistence.StoreString(request.path, mNodeLabel);
     }
-    case LocalConfigDisabled::Id:
-        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
+    case LocalConfigDisabled::Id: {
+        auto deviceInfoProvider  = GetDeviceInstanceInfoProvider();
+        bool localConfigDisabled = false;
+        ReturnErrorOnFailure(deviceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
+        auto decodeStatus = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, localConfigDisabled);
+        ReturnErrorOnFailure(deviceInfoProvider->SetLocalConfigDisabled(localConfigDisabled));
+        return decodeStatus;
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
@@ -439,8 +456,11 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     // Specialization because some platforms `#define` true/false as 1/0 and we get;
     // error: no matching function for call to
     //   'chip::app::AttributePersistence::LoadNativeEndianValue(<brace-enclosed initializer list>, bool&, int)'
+
+    bool localConfigDisabled = false;
     (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
-                                                   mLocalConfigDisabled, false);
+                                                   localConfigDisabled, false);
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->SetLocalConfigDisabled(localConfigDisabled));
 
     return CHIP_NO_ERROR;
 }
@@ -481,6 +501,22 @@ void BasicInformationCluster::OnShutDown()
     DataModel::EventsGenerator & eventsGenerator = mContext->interactionContext.eventsGenerator;
     eventsGenerator.GenerateEvent(event, kRootEndpointId);
     eventsGenerator.ScheduleUrgentEventDeliverySync();
+}
+
+CHIP_ERROR
+BasicInformationCluster::GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider)
+{
+    if (mDeviceInfoProvider == nullptr)
+    {
+        // NOTE: this should NEVER be nullptr
+        *outDeviceInfoProvider = GetDeviceInstanceInfoProvider();
+        VerifyOrReturnError(*outDeviceInfoProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        *outDeviceInfoProvider = mDeviceInfoProvider;
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::Clusters

@@ -115,3 +115,6 @@ if(CONFIG_CHIP_LIB_SHELL)
                    ${CHIP_ROOT}/examples/shell/shell_common/cmd_server.cpp
     )
 endif()
+
+# Post-build steps
+include(${CHIP_ROOT}/config/nxp/app/zephyr-post-build.cmake)

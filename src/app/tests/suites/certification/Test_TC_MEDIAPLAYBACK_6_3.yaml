@@ -144,3 +144,9 @@ tests:
                 value: "Please enter 'y' if media has not moved"
               - name: "expectedValue"
                 value: "y"
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

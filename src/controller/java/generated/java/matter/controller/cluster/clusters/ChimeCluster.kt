@@ -40,6 +40,7 @@ import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
 import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
@@ -85,11 +86,14 @@ class ChimeCluster(private val controller: MatterController, private val endpoin
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun playChimeSound(timedInvokeTimeout: Duration? = null) {
+  suspend fun playChimeSound(chimeID: UByte?, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_CHIME_ID_REQ: Int = 0
+    chimeID?.let { tlvWriter.put(ContextSpecificTag(TAG_CHIME_ID_REQ), chimeID) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

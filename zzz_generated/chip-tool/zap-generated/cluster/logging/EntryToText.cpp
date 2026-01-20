@@ -5683,8 +5683,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LeaveGroup";
         case chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return "UpdateGroupKey";
-        case chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
-            return "ExpireGracePeriod";
         case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return "ConfigureAuxiliaryACL";
         default:
