@@ -56,8 +56,6 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
         DEPENDS ${ZEPHYR_OUTPUT_DIR}/zephyr_full.bin
     )
 
-    add_dependencies(merge_mcuboot build_mcuboot)
-
     if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         chip_ota_image(chip-ota-image
             INPUT_FILES ${ZEPHYR_OUTPUT_DIR}/${ZEPHYR_OUTPUT_NAME}.bin
