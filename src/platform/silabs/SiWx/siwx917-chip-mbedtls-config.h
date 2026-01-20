@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+// includes exclusive config options
+// common options and non-exclusive config options
+// are defined in the sli_mbedtls_config_autogen.h file
+// see sli_mbedtls_config_autogen.h for more details
+
 #pragma once
 
 #define MBEDTLS_PLATFORM_C
