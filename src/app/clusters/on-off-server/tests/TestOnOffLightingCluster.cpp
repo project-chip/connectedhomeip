@@ -316,7 +316,7 @@ TEST_F(TestOnOffLightingCluster, Startup_TogglePersists)
 
     // OnOff should now be TRUE, as the toggled state (ON) should have been loaded from storage.
     EXPECT_TRUE(mCluster.GetOnOff());
-\
+
     EXPECT_TRUE(mMockDelegate.mStartupCalled);
 }
 
