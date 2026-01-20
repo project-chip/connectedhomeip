@@ -113,10 +113,10 @@ class TC_BINFO_2_1(MatterBaseTest):
             TestStep(53, "TH reads UniqueID from the DUT"),
             TestStep(54, "TH writes UniqueID", "Write fails with UNSUPPORTED_WRITE"),
             TestStep(55, "TH reads UniqueID from the DUT"),
-            TestStep(56, "TH reads CapabilityMinima from the DUT and checks fields"),
+            TestStep(56, "TH reads CapabilityMinima from the DUT and checks caseSessionsPerFabric, subscriptionsPerFabric, simultaneousInvocationsSupported, simultaneousWritesSupported, readPathsSupported, and subscribePathsSupported"),
             TestStep(57, "TH writes CapabilityMinima (CaseSessionsPerFabric)", "Write fails with UNSUPPORTED_WRITE"),
             TestStep(58, "TH writes CapabilityMinima (SimultaneousInvocationsSupported)", "Write fails with UNSUPPORTED_WRITE"),
-            TestStep(59, "TH reads CapabilityMinima from the DUT"),
+            TestStep(59, "TH reads CapabilityMinima and verifies it matches the original value"),
             TestStep(60, "TH reads ProductAppearance from the DUT"),
             TestStep(61, "TH writes ProductAppearance", "Write fails with UNSUPPORTED_WRITE"),
             TestStep(62, "TH reads ProductAppearance from the DUT"),
@@ -198,7 +198,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         vendor_id = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.VendorID, endpoint=self.endpoint)
         log.info(f"Read VendorID: {vendor_id}")
         asserts.assert_greater_equal(vendor_id, 1, "VendorID can't be less than 1")
-        asserts.assert_less_equal(vendor_id, 65524, "VendorID can't be greater than 65524")
+        asserts.assert_less_equal(vendor_id, 65521, "VendorID can't be greater than 65521")
 
         # Step 9: Write VendorID
         self.step(9)
@@ -328,7 +328,7 @@ class TC_BINFO_2_1(MatterBaseTest):
 
         # Step 25
         self.step(25)
-        val_to_write = attributes.HardwareVersionString("newhard")
+        val_to_write = attributes.HardwareVersionString("newhardwareversion")
         log.info(f"Attempting to write HardwareVersionString to {val_to_write} (expect failure)")
         await self.verify_unsupported_write(attributes.HardwareVersionString, val_to_write, self.endpoint)
         log.info("Verified UNSUPPORTED_WRITE for HardwareVersionString")
@@ -383,150 +383,186 @@ class TC_BINFO_2_1(MatterBaseTest):
         asserts.assert_equal(val, sw_ver_str, "SoftwareVersionString changed after failed write")
         log.info("Verified SoftwareVersionString unchanged verification successful")
 
-        # Step 33: ManufacturingDate
-        self.step(33)
-        mfg_date = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ManufacturingDate, endpoint=self.endpoint)
-        log.info(f"Read ManufacturingDate: {mfg_date}")
-        assert_is_string(mfg_date, "ManufacturingDate")
-        assert_string_length(mfg_date, min_length=8, description="ManufacturingDate")
-        assert_string_length(mfg_date, max_length=16, description="ManufacturingDate")
-        try:
-            datetime.datetime.strptime(mfg_date[:8], "%Y%m%d")
-        except ValueError:
-            asserts.fail(f"First 8 characters of ManufacturingDate '{mfg_date}' do not match the ISO 8601 format: YYYYMMDD")
-
-        # Step 34: Write ManufacturingDate
-        self.step(34)
-        val_to_write = attributes.ManufacturingDate("20210814789452IN")
-        log.info(f"Attempting to write ManufacturingDate to {val_to_write} (expect failure)")
-        await self.verify_unsupported_write(attributes.ManufacturingDate, val_to_write, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for ManufacturingDate")
-
-        # Step 35: Verify ManufacturingDate unchanged
-        self.step(35)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ManufacturingDate, endpoint=self.endpoint)
-        log.info(f"Read ManufacturingDate again: {val}")
-        asserts.assert_equal(val, mfg_date, "ManufacturingDate changed after failed write")
-        log.info("Verified ManufacturingDate unchanged verification successful")
-
-        # Step 36: PartNumber
-        self.step(36)
-        part_num = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.PartNumber, endpoint=self.endpoint)
-        log.info(f"Read PartNumber: {part_num}")
-        assert_is_string(part_num, "PartNumber")
-        assert_string_length(part_num, max_length=32, description="PartNumber")
-
-        # Step 37: Write PartNumber
-        self.step(37)
-        val_to_write = attributes.PartNumber("newpart")
-        log.info(f"Attempting to write PartNumber to {val_to_write} (expect failure)")
-        await self.verify_unsupported_write(attributes.PartNumber, val_to_write, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for PartNumber")
-
-        # Step 38: Verify PartNumber unchanged
-        self.step(38)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.PartNumber, endpoint=self.endpoint)
-        log.info(f"Read PartNumber again: {val}")
-        asserts.assert_equal(val, part_num, "PartNumber changed after failed write")
-        log.info("Verified PartNumber unchanged verification successful")
-
-        # Step 39: ProductURL
-        self.step(39)
-        prod_url = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductURL, endpoint=self.endpoint)
-        log.info(f"Read ProductURL: {prod_url}")
-        assert_is_string(prod_url, "ProductURL should be a string")
-        assert_string_length(prod_url, max_length=256, description="ProductURL max length is 256")
-
-        # Verify RFC 3986 syntax and web page link if not empty
-        if prod_url:
+        # Step 33: ManufacturingDate is optional
+        if self.check_pics("BINFO.S.A000b"):
+            self.step(33)
+            mfg_date = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ManufacturingDate, endpoint=self.endpoint)
+            log.info(f"Read ManufacturingDate: {mfg_date}")
+            assert_is_string(mfg_date, "ManufacturingDate")
+            assert_string_length(mfg_date, min_length=8, description="ManufacturingDate")
+            assert_string_length(mfg_date, max_length=16, description="ManufacturingDate")
             try:
-                result = urlparse(prod_url)
-                if not all([result.scheme, result.netloc]):
-                    asserts.fail(f"ProductURL '{prod_url}' is not a valid URL according to RFC 3986 (missing scheme or netloc)")
-                if result.scheme not in ['http', 'https']:
-                    asserts.fail(f"ProductURL '{prod_url}' should point to a web page (http/https)")
+                datetime.datetime.strptime(mfg_date[:8], "%Y%m%d")
             except ValueError:
-                asserts.fail(f"ProductURL '{prod_url}' could not be parsed as a URL")
+                asserts.fail(f"First 8 characters of ManufacturingDate '{mfg_date}' do not match the ISO 8601 format: YYYYMMDD")
 
-        # Step 40: Write ProductURL
-        self.step(40)
-        val_to_write = attributes.ProductURL("https://www.example.com")
-        log.info(f"Attempting to write ProductURL to {val_to_write} (expect failure)")
-        await self.verify_unsupported_write(attributes.ProductURL, val_to_write, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for ProductURL")
+            # Step 34: Write ManufacturingDate
+            self.step(34)
+            val_to_write = attributes.ManufacturingDate("20210814789452IN")
+            log.info(f"Attempting to write ManufacturingDate to {val_to_write} (expect failure)")
+            await self.verify_unsupported_write(attributes.ManufacturingDate, val_to_write, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for ManufacturingDate")
 
-        # Step 41
-        self.step(41)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductURL, endpoint=self.endpoint)
-        log.info(f"Read ProductURL again: {val}")
-        asserts.assert_equal(val, prod_url, "ProductURL changed after failed write")
-        log.info("Verified ProductURL unchanged verification successful")
+            # Step 35: Verify ManufacturingDate unchanged
+            self.step(35)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ManufacturingDate, endpoint=self.endpoint)
+            log.info(f"Read ManufacturingDate again: {val}")
+            asserts.assert_equal(val, mfg_date, "ManufacturingDate changed after failed write")
+            log.info("Verified ManufacturingDate unchanged verification successful")
+        else:
+            log.info("ManufacturingDate is not supported and is optional; skipping steps 33-35")
+            self.step(33)
+            self.step(34)
+            self.step(35)
 
-        # Step 42: ProductLabel
-        self.step(42)
-        prod_label = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductLabel, endpoint=self.endpoint)
-        log.info(f"Read ProductLabel: {prod_label}")
-        assert_is_string(prod_label, "ProductLabel")
-        assert_string_length(prod_label, max_length=64, description="ProductLabel")
-        # Verify that the ProductLabel does not contain the VendorName
-        if vendor_name in prod_label:
-            asserts.fail(f"ProductLabel '{prod_label}' must not contain VendorName '{vendor_name}'")
+        # Step 36: PartNumber is optional
+        if self.check_pics("BINFO.S.A000c"):
+            self.step(36)
+            part_num = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.PartNumber, endpoint=self.endpoint)
+            log.info(f"Read PartNumber: {part_num}")
+            assert_is_string(part_num, "PartNumber")
+            assert_string_length(part_num, max_length=32, description="PartNumber")
 
-        # Step 43: Write ProductLabel
-        self.step(43)
-        val_to_write = attributes.ProductLabel("newproductlabel")
-        log.info(f"Attempting to write ProductLabel to {val_to_write} (expect failure)")
-        await self.verify_unsupported_write(attributes.ProductLabel, val_to_write, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for ProductLabel")
+            # Step 37: Write PartNumber
+            self.step(37)
+            val_to_write = attributes.PartNumber("newpart")
+            log.info(f"Attempting to write PartNumber to {val_to_write} (expect failure)")
+            await self.verify_unsupported_write(attributes.PartNumber, val_to_write, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for PartNumber")
 
-        # Step 44
-        self.step(44)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductLabel, endpoint=self.endpoint)
-        log.info(f"Read ProductLabel again: {val}")
-        asserts.assert_equal(val, prod_label, "ProductLabel changed after failed write")
-        log.info("Verified ProductLabel unchanged verification successful")
+            # Step 38: Verify PartNumber unchanged
+            self.step(38)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.PartNumber, endpoint=self.endpoint)
+            log.info(f"Read PartNumber again: {val}")
+            asserts.assert_equal(val, part_num, "PartNumber changed after failed write")
+            log.info("Verified PartNumber unchanged verification successful")
+        else:
+            log.info("PartNumber is not supported and is optional; skipping steps 36-38")
+            self.step(36)
+            self.step(37)
+            self.step(38)
 
-        # Step 45: SerialNumber
-        self.step(45)
-        serial_num = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.SerialNumber, endpoint=self.endpoint)
-        log.info(f"Read SerialNumber: {serial_num}")
-        assert_is_string(serial_num, "SerialNumber")
-        assert_string_length(serial_num, max_length=32, description="SerialNumber")
+        # Step 39: ProductURL is optional
+        if self.check_pics("BINFO.S.A000d"):
+            self.step(39)
+            prod_url = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductURL, endpoint=self.endpoint)
+            log.info(f"Read ProductURL: {prod_url}")
+            assert_is_string(prod_url, "ProductURL should be a string")
+            assert_string_length(prod_url, max_length=256, description="ProductURL max length is 256")
 
-        # Step 46: Write SerialNumber
-        self.step(46)
-        val_to_write = attributes.SerialNumber("newser")
-        log.info(f"Attempting to write SerialNumber to {val_to_write} (expect failure)")
-        await self.verify_unsupported_write(attributes.SerialNumber, val_to_write, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for SerialNumber")
+            # Verify RFC 3986 syntax and web page link if not empty
+            if prod_url:
+                try:
+                    result = urlparse(prod_url)
+                    if not all([result.scheme, result.netloc]):
+                        asserts.fail(f"ProductURL '{prod_url}' is not a valid URL according to RFC 3986 (missing scheme or netloc)")
+                    if result.scheme not in ['http', 'https']:
+                        asserts.fail(f"ProductURL '{prod_url}' should point to a web page (http/https)")
+                except ValueError:
+                    asserts.fail(f"ProductURL '{prod_url}' could not be parsed as a URL")
 
-        # Step 47: Verify SerialNumber unchanged
-        self.step(47)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.SerialNumber, endpoint=self.endpoint)
-        log.info(f"Read SerialNumber again: {val}")
-        asserts.assert_equal(val, serial_num, "SerialNumber changed after failed write")
-        log.info("Verified SerialNumber unchanged verification successful")
+            # Step 40: Write ProductURL
+            self.step(40)
+            val_to_write = attributes.ProductURL("https://www.example.com")
+            log.info(f"Attempting to write ProductURL to {val_to_write} (expect failure)")
+            await self.verify_unsupported_write(attributes.ProductURL, val_to_write, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for ProductURL")
 
-        # Step 48: LocalConfigDisabled
-        self.step(48)
-        log.info("Reading LocalConfigDisabled")
-        local_config_disabled = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.LocalConfigDisabled, endpoint=self.endpoint)
-        log.info(f"Read LocalConfigDisabled: {local_config_disabled}")
-        assert_valid_bool(local_config_disabled, "LocalConfigDisabled")
+            # Step 41
+            self.step(41)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductURL, endpoint=self.endpoint)
+            log.info(f"Read ProductURL again: {val}")
+            asserts.assert_equal(val, prod_url, "ProductURL changed after failed write")
+            log.info("Verified ProductURL unchanged verification successful")
+        else:
+            log.info("ProductURL is not supported and is optional; skipping steps 39-41")
+            self.step(39)
+            self.step(40)
+            self.step(41)
 
-        # Step 49: Write LocalConfigDisabled (Should SUCCEED)
-        self.step(49)
-        log.info("Attempting to write LocalConfigDisabled to True")
-        await self.write_single_attribute(attributes.LocalConfigDisabled(True), endpoint_id=self.endpoint)
+        # Step 42: ProductLabel is optional
+        if self.check_pics("BINFO.S.A000e"):
+            self.step(42)
+            prod_label = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductLabel, endpoint=self.endpoint)
+            log.info(f"Read ProductLabel: {prod_label}")
+            assert_is_string(prod_label, "ProductLabel")
+            assert_string_length(prod_label, max_length=64, description="ProductLabel")
+            # Verify that the ProductLabel does not contain the VendorName
+            if vendor_name in prod_label:
+                asserts.fail(f"ProductLabel '{prod_label}' must not contain VendorName '{vendor_name}'")
 
-        # Step 50: Verify LocalConfigDisabled
-        self.step(50)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.LocalConfigDisabled, endpoint=self.endpoint)
-        log.info(f"Read LocalConfigDisabled: {val}")
-        asserts.assert_equal(val, True, "LocalConfigDisabled should be True")
-        log.info("Verified LocalConfigDisabled update successful")
+            # Step 43: Write ProductLabel
+            self.step(43)
+            val_to_write = attributes.ProductLabel("newproductlabel")
+            log.info(f"Attempting to write ProductLabel to {val_to_write} (expect failure)")
+            await self.verify_unsupported_write(attributes.ProductLabel, val_to_write, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for ProductLabel")
 
-        # Step 51: Reachable
+            # Step 44
+            self.step(44)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductLabel, endpoint=self.endpoint)
+            log.info(f"Read ProductLabel again: {val}")
+            asserts.assert_equal(val, prod_label, "ProductLabel changed after failed write")
+            log.info("Verified ProductLabel unchanged verification successful")
+        else:
+            log.info("ProductLabel is not supported and is optional; skipping steps 42-44")
+            self.step(42)
+            self.step(43)
+            self.step(44)
+
+        # Step 45: SerialNumber is optional
+        if self.check_pics("BINFO.S.A000f"):
+            self.step(45)
+            serial_num = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.SerialNumber, endpoint=self.endpoint)
+            log.info(f"Read SerialNumber: {serial_num}")
+            assert_is_string(serial_num, "SerialNumber")
+            assert_string_length(serial_num, max_length=32, description="SerialNumber")
+
+            # Step 46: Write SerialNumber
+            self.step(46)
+            val_to_write = attributes.SerialNumber("newserialnumber")
+            log.info(f"Attempting to write SerialNumber to {val_to_write} (expect failure)")
+            await self.verify_unsupported_write(attributes.SerialNumber, val_to_write, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for SerialNumber")
+
+            # Step 47: Verify SerialNumber unchanged
+            self.step(47)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.SerialNumber, endpoint=self.endpoint)
+            log.info(f"Read SerialNumber again: {val}")
+            asserts.assert_equal(val, serial_num, "SerialNumber changed after failed write")
+            log.info("Verified SerialNumber unchanged verification successful")
+        else:
+            log.info("SerialNumber is not supported and is optional; skipping steps 45-47")
+            self.step(45)
+            self.step(46)
+            self.step(47)
+
+        # Step 48: LocalConfigDisabled is optional
+        if self.check_pics("BINFO.S.A0010"):
+            self.step(48)
+            log.info("Reading LocalConfigDisabled")
+            local_config_disabled = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.LocalConfigDisabled, endpoint=self.endpoint)
+            log.info(f"Read LocalConfigDisabled: {local_config_disabled}")
+            assert_valid_bool(local_config_disabled, "LocalConfigDisabled")
+
+            # Step 49: Write LocalConfigDisabled (Should SUCCEED)
+            self.step(49)
+            log.info("Attempting to write LocalConfigDisabled to True")
+            await self.write_single_attribute(attributes.LocalConfigDisabled(True), endpoint_id=self.endpoint)
+
+            # Step 50: Verify LocalConfigDisabled
+            self.step(50)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.LocalConfigDisabled, endpoint=self.endpoint)
+            log.info(f"Read LocalConfigDisabled: {val}")
+            asserts.assert_equal(val, True, "LocalConfigDisabled should be True")
+            log.info("Verified LocalConfigDisabled update successful")
+        else:
+            log.info("LocalConfigDisabled is not supported and is optional; skipping steps 48-50")
+            self.step(48)
+            self.step(49)
+            self.step(50)
+
+        # Step 51: Reachable is optional
         if self.check_pics("BINFO.S.A0011"):
             self.step(51)
             reachable = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.Reachable, endpoint=self.endpoint)
@@ -546,38 +582,31 @@ class TC_BINFO_2_1(MatterBaseTest):
             asserts.assert_equal(reachable, reachable_after, "Reachable should remain unchanged")
             log.info("Verified Reachable unchanged verification successful")
         else:
-            log.info("Skipping steps 51 & 52")
+            log.info("Reachable is not supported and is optional; skipping steps 51-52")
             self.step(51)
             self.step("52a")
             self.step("52b")
 
         # Step 53: UniqueID
+        self.step(53)
+        uid = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.UniqueID, endpoint=self.endpoint)
+        log.info(f"Read UniqueID: {uid}")
+        assert_is_string(uid, "UniqueID")
+        assert_string_length(uid, max_length=32, description="UniqueID")
 
-        if self.check_pics("BINFO.S.A0012"):
-            self.step(53)
-            uid = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.UniqueID, endpoint=self.endpoint)
-            log.info(f"Read UniqueID: {uid}")
-            assert_is_string(uid, "UniqueID")
-            assert_string_length(uid, max_length=32, description="UniqueID")
+        # Step 54: Write UniqueID
+        self.step(54)
+        val_to_write = attributes.UniqueID("newid")
+        log.info(f"Attempting to write UniqueID to {val_to_write} (expect failure)")
+        await self.verify_unsupported_write(attributes.UniqueID, val_to_write, self.endpoint)
+        log.info("Verified UNSUPPORTED_WRITE for UniqueID")
 
-            # Step 54: Write UniqueID
-            self.step(54)
-            val_to_write = attributes.UniqueID("newid")
-            log.info(f"Attempting to write UniqueID to {val_to_write} (expect failure)")
-            await self.verify_unsupported_write(attributes.UniqueID, val_to_write, self.endpoint)
-            log.info("Verified UNSUPPORTED_WRITE for UniqueID")
-
-            # Step 55: Verify UniqueID unchanged
-            self.step(55)
-            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.UniqueID, endpoint=self.endpoint)
-            log.info(f"Read UniqueID again: {val}")
-            asserts.assert_equal(val, uid, "UniqueID changed after failed write")
-            log.info("Verified UniqueID unchanged verification successful")
-        else:
-            log.info("Skipping steps 53-55")
-            self.step(53)
-            self.step(54)
-            self.step(55)
+        # Step 55: Verify UniqueID unchanged
+        self.step(55)
+        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.UniqueID, endpoint=self.endpoint)
+        log.info(f"Read UniqueID again: {val}")
+        asserts.assert_equal(val, uid, "UniqueID changed after failed write")
+        log.info("Verified UniqueID unchanged verification successful")
 
         # Step 56: CapabilityMinima - CRITICAL VALIDATION STEP
         self.step(56)
@@ -585,40 +614,40 @@ class TC_BINFO_2_1(MatterBaseTest):
         caps = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.CapabilityMinima, endpoint=self.endpoint)
         log.info(f"Read CapabilityMinima: {caps}")
 
-        # CaseSessionsPerFabric: min 3
+        # caseSessionsPerFabric: min 3
         asserts.assert_true(hasattr(caps, "caseSessionsPerFabric"),
                             "caseSessionsPerFabric is not an attribute in CapabilityMinimaStruct")
-        log.info(f"Checking CaseSessionsPerFabric: {caps.caseSessionsPerFabric} >= 3")
-        asserts.assert_greater_equal(caps.caseSessionsPerFabric, 3, "CaseSessionsPerFabric >= 3")
+        log.info(f"Checking caseSessionsPerFabric: {caps.caseSessionsPerFabric} >= 3")
+        asserts.assert_greater_equal(caps.caseSessionsPerFabric, 3, "caseSessionsPerFabric >= 3")
 
-        # SubscriptionsPerFabric: min 3
+        # subscriptionsPerFabric: min 3
         asserts.assert_true(hasattr(caps, "subscriptionsPerFabric"),
                             "subscriptionsPerFabric is not an attribute in CapabilityMinimaStruct")
-        log.info(f"Checking SubscriptionsPerFabric: {caps.subscriptionsPerFabric} >= 3")
-        asserts.assert_greater_equal(caps.subscriptionsPerFabric, 3, "SubscriptionsPerFabric >= 3")
+        log.info(f"Checking subscriptionsPerFabric: {caps.subscriptionsPerFabric} >= 3")
+        asserts.assert_greater_equal(caps.subscriptionsPerFabric, 3, "subscriptionsPerFabric >= 3")
 
-        # SimultaneousInvocationsSupported: min 1 (New field)
+        # simultaneousInvocationsSupported: min 1 (New field)
         asserts.assert_true(hasattr(caps, "simultaneousInvocationsSupported"),
                             "simultaneousInvocationsSupported is not an attribute in CapabilityMinimaStruct")
-        log.info(f"Checking SimultaneousInvocationsSupported: {caps.simultaneousInvocationsSupported} >= 1")
-        asserts.assert_greater_equal(caps.simultaneousInvocationsSupported, 1, "SimultaneousInvocationsSupported >= 1")
+        log.info(f"Checking simultaneousInvocationsSupported: {caps.simultaneousInvocationsSupported} >= 1")
+        asserts.assert_greater_equal(caps.simultaneousInvocationsSupported, 1, "simultaneousInvocationsSupported >= 1")
 
-        # SimultaneousWritesSupported: min 1 (New field)
+        # simultaneousWritesSupported: min 1 (New field)
         asserts.assert_true(hasattr(caps, "simultaneousWritesSupported"),
                             "simultaneousWritesSupported is not an attribute in CapabilityMinimaStruct")
-        log.info(f"Checking SimultaneousWritesSupported: {caps.simultaneousWritesSupported} >= 1")
-        asserts.assert_greater_equal(caps.simultaneousWritesSupported, 1, "SimultaneousWritesSupported >= 1")
+        log.info(f"Checking simultaneousWritesSupported: {caps.simultaneousWritesSupported} >= 1")
+        asserts.assert_greater_equal(caps.simultaneousWritesSupported, 1, "simultaneousWritesSupported >= 1")
 
-        # ReadPathsSupported: min 9 (New field)
+        # readPathsSupported: min 9 (New field)
         asserts.assert_true(hasattr(caps, "readPathsSupported"), "readPathsSupported is not an attribute in CapabilityMinimaStruct")
-        log.info(f"Checking ReadPathsSupported: {caps.readPathsSupported} >= 9")
-        asserts.assert_greater_equal(caps.readPathsSupported, 9, "ReadPathsSupported >= 9")
+        log.info(f"Checking readPathsSupported: {caps.readPathsSupported} >= 9")
+        asserts.assert_greater_equal(caps.readPathsSupported, 9, "readPathsSupported >= 9")
 
-        # SubscribePathsSupported: min 3 (New field)
+        # subscribePathsSupported: min 3 (New field)
         asserts.assert_true(hasattr(caps, "subscribePathsSupported"),
                             "subscribePathsSupported is not an attribute in CapabilityMinimaStruct")
-        log.info(f"Checking SubscribePathsSupported: {caps.subscribePathsSupported} >= 3")
-        asserts.assert_greater_equal(caps.subscribePathsSupported, 3, "SubscribePathsSupported >= 3")
+        log.info(f"Checking subscribePathsSupported: {caps.subscribePathsSupported} >= 3")
+        asserts.assert_greater_equal(caps.subscribePathsSupported, 3, "subscribePathsSupported >= 3")
 
         # Step 57: Write CapabilityMinima (Existing fields)
         self.step(57)
@@ -665,7 +694,7 @@ class TC_BINFO_2_1(MatterBaseTest):
             asserts.assert_equal(val, pa, "ProductAppearance changed after failed write")
             log.info("Verified ProductAppearance unchanged verification successful")
         else:
-            log.info("ProductAppearance is not an optional attribute, skipping steps 60, 61 and 62")
+            log.info("ProductAppearance is an optional attribute but not supported; skipping steps 60, 61 and 62")
             self.step(60)
             self.step(61)
             self.step(62)
@@ -699,60 +728,48 @@ class TC_BINFO_2_1(MatterBaseTest):
         asserts.assert_equal(val, spec_ver, "SpecificationVersion changed after failed write")
         log.info("Verified SpecificationVersion unchanged verification successful")
 
-        # Step 66: MaxPathsPerInvoke is an optional attribute
-        if self.check_pics("BINFO.S.A0010"):
-            self.step(66)
-            mpi = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
-            log.info(f"Read MaxPathsPerInvoke: {mpi}")
-            asserts.assert_greater_equal(mpi, 1, "MaxPathsPerInvoke min 1")
-            asserts.assert_less_equal(mpi, 65535, "MaxPathsPerInvoke max 65535")
+        # Step 66: MaxPathsPerInvoke
+        
+        self.step(66)
+        mpi = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
+        log.info(f"Read MaxPathsPerInvoke: {mpi}")
+        asserts.assert_greater_equal(mpi, 1, "MaxPathsPerInvoke min 1")
+        asserts.assert_less_equal(mpi, 65535, "MaxPathsPerInvoke max 65535")
 
-            # Step 67
-            self.step(67)
-            val_to_write = attributes.MaxPathsPerInvoke(12345)
-            log.info(f"Attempting to write MaxPathsPerInvoke to {val_to_write} (expect failure)")
-            await self.verify_unsupported_write(attributes.MaxPathsPerInvoke, val_to_write, self.endpoint)
-            log.info("Verified UNSUPPORTED_WRITE for MaxPathsPerInvoke")
+        # Step 67
+        self.step(67)
+        val_to_write = attributes.MaxPathsPerInvoke(12345)
+        log.info(f"Attempting to write MaxPathsPerInvoke to {val_to_write} (expect failure)")
+        await self.verify_unsupported_write(attributes.MaxPathsPerInvoke, val_to_write, self.endpoint)
+        log.info("Verified UNSUPPORTED_WRITE for MaxPathsPerInvoke")
 
-            # Step 68
-            self.step(68)
-            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
-            log.info(f"Read MaxPathsPerInvoke again: {val}")
-            asserts.assert_equal(val, mpi, "MaxPathsPerInvoke changed after failed write")
-            log.info("Verified MaxPathsPerInvoke unchanged verification successful")
-        else:
-            log.info("MaxPathsPerInvoke not supported, skipping steps 67-68")
-            self.step(66)
-            self.step(67)
-            self.step(68)
+        # Step 68
+        self.step(68)
+        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
+        log.info(f"Read MaxPathsPerInvoke again: {val}")
+        asserts.assert_equal(val, mpi, "MaxPathsPerInvoke changed after failed write")
+        log.info("Verified MaxPathsPerInvoke unchanged verification successful")
 
-        # Step 69: ConfigurationVersion is an optional attribute
-        if self.check_pics("BINFO.S.A000e"):
-            self.step(69)
-            config_version = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
-            log.info(f"Read ConfigurationVersion: {config_version}")
-            assert_valid_uint32(config_version, "ConfigurationVersion")
-            asserts.assert_greater_equal(config_version, 1, "ConfigurationVersion min 1")
+        # Step 69: ConfigurationVersion
+        self.step(69)
+        config_version = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
+        log.info(f"Read ConfigurationVersion: {config_version}")
+        assert_valid_uint32(config_version, "ConfigurationVersion")
+        asserts.assert_greater_equal(config_version, 1, "ConfigurationVersion min 1")
 
-            # Step 70
-            self.step(70)
-            val_to_write = attributes.ConfigurationVersion(4388)
-            log.info(f"Attempting to write ConfigurationVersion to {val_to_write} (expect failure)")
-            await self.verify_unsupported_write(attributes.ConfigurationVersion, val_to_write, self.endpoint)
-            log.info("Verified UNSUPPORTED_WRITE for ConfigurationVersion")
+        # Step 70
+        self.step(70)
+        val_to_write = attributes.ConfigurationVersion(4388)
+        log.info(f"Attempting to write ConfigurationVersion to {val_to_write} (expect failure)")
+        await self.verify_unsupported_write(attributes.ConfigurationVersion, val_to_write, self.endpoint)
+        log.info("Verified UNSUPPORTED_WRITE for ConfigurationVersion")
 
-            # Step 71
-            self.step(71)
-            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
-            log.info(f"Read ConfigurationVersion again: {val}")
-            asserts.assert_equal(val, config_version, "ConfigurationVersion changed after failed write")
-            log.info("Verified ConfigurationVersion unchanged verification successful")
-        else:
-            log.info("ConfigurationVersion not supported, skipping steps 69-71")
-            self.step(69)
-            self.step(70)
-            self.step(71)
-
+        # Step 71
+        self.step(71)
+        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
+        log.info(f"Read ConfigurationVersion again: {val}")
+        asserts.assert_equal(val, config_version, "ConfigurationVersion changed after failed write")
+        log.info("Verified ConfigurationVersion unchanged verification successful")
 
 if __name__ == "__main__":
     default_matter_test_main()
