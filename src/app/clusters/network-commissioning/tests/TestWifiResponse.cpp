@@ -89,34 +89,28 @@ TEST_F(TestWifiResponseEncoding, TestErrorEncode)
 
 TEST_F(TestWifiResponseEncoding, TestSuccessEncode)
 {
-    TestResponseIterator<3> fakeResponses{ WiFiScanResponse{
-                                               .security = BitFlags<WiFiSecurityBitmap>(WiFiSecurityBitmap::kWpa2Personal),
-                                               .ssid     = { 'f', 'o', 'o', 0 },
-                                               .ssidLen  = 3,
-                                               .bssid    = { '1', '2', '3', '4', 0 },
-                                               .channel  = 123,
-                                               .wiFiBand = WiFiBandEnum::k5g,
-                                               .rssi     = 10,
-                                           },
-                                           WiFiScanResponse{
-                                               .security = BitFlags<WiFiSecurityBitmap>(WiFiSecurityBitmap::kWpa2Personal),
-                                               .ssid     = { 'b', 'a', 'r', 0 },
-                                               .ssidLen  = 3,
-                                               .bssid    = { 'x', 'y', 'z', 0 },
-                                               .channel  = 321,
-                                               .wiFiBand = WiFiBandEnum::k2g4,
-                                               .rssi     = 20,
-                                           },
-                                           WiFiScanResponse{
-                                               .security = BitFlags<WiFiSecurityBitmap>(WiFiSecurityBitmap::kWpa2Personal),
-                                               .ssid     = { 'b', 'a', 0 },
-                                               .ssidLen  = 2,
-                                               .bssid    = { 'z', 'z', 'z', 0 },
-                                               .channel  = 100,
-                                               .wiFiBand = WiFiBandEnum::k2g4,
-                                               .rssi     = 15,
-                                           }
-
+    TestResponseIterator<3> fakeResponses{
+        WiFiScanResponse{ .security = BitFlags<WiFiSecurityBitmap>(WiFiSecurityBitmap::kWpa2Personal),
+                          .ssid     = { 'f', 'o', 'o', 0 },
+                          .ssidLen  = 3,
+                          .bssid    = { '1', '2', '3', '4', 0 },
+                          .channel  = 123,
+                          .wiFiBand = WiFiBandEnum::k5g,
+                          .signal   = { .type = WirelessSignalType::kdBm, .strength = 10 } },
+        WiFiScanResponse{ .security = BitFlags<WiFiSecurityBitmap>(WiFiSecurityBitmap::kWpa2Personal),
+                          .ssid     = { 'b', 'a', 'r', 0 },
+                          .ssidLen  = 3,
+                          .bssid    = { 'x', 'y', 'z', 0 },
+                          .channel  = 321,
+                          .wiFiBand = WiFiBandEnum::k2g4,
+                          .signal   = { .type = WirelessSignalType::kdBm, .strength = 20 } },
+        WiFiScanResponse{ .security = BitFlags<WiFiSecurityBitmap>(WiFiSecurityBitmap::kWpa2Personal),
+                          .ssid     = { 'b', 'a', 0 },
+                          .ssidLen  = 2,
+                          .bssid    = { 'z', 'z', 'z', 0 },
+                          .channel  = 100,
+                          .wiFiBand = WiFiBandEnum::k2g4,
+                          .signal   = { .type = WirelessSignalType::kdBm, .strength = 15 } }
     };
     WifiScanResponseToTLV encoder(NetworkCommissioningStatusEnum::kSuccess, ""_span, &fakeResponses);
 
