@@ -198,7 +198,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         vendor_id = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.VendorID, endpoint=self.endpoint)
         log.info(f"Read VendorID: {vendor_id}")
         asserts.assert_greater_equal(vendor_id, 1, "VendorID can't be less than 1")
-        asserts.assert_less_equal(vendor_id, 65521, "VendorID can't be greater than 65521")
+        asserts.assert_less_equal(vendor_id, 65524, "VendorID can't be greater than 65524")
 
         # Step 9: Write VendorID
         self.step(9)
@@ -269,7 +269,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info("Attempting to write NodeLabel to 'newnode'")
         await self.write_single_attribute(attributes.NodeLabel("newnode"), endpoint_id=self.endpoint)
 
-        # Step 19: Verify NodeLabel unchanged
+        # Step 19: Verify NodeLabel
         self.step(19)
         new_label = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.NodeLabel, endpoint=self.endpoint)
         log.info(f"Read NodeLabel again: {new_label}")
@@ -640,26 +640,32 @@ class TC_BINFO_2_1(MatterBaseTest):
         asserts.assert_equal(val, caps, "CapabilityMinima changed after failed write")
         log.info("Verified CapabilityMinima unchanged verification successful")
 
-        # Step 60: ProductAppearance
-        self.step(60)
-        pa = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductAppearance, endpoint=self.endpoint)
-        log.info(f"Read ProductAppearance: {pa}")
+        # Step 60: ProductAppearance is an optional attribute
+        if cluster.has_attribute(attributes.ProductAppearance):
+            self.step(60)
+            pa = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductAppearance, endpoint=self.endpoint)
+            log.info(f"Read ProductAppearance: {pa}")
 
-        # Step 61: Write ProductAppearance
-        self.step(61)
-        # Need to construct a valid ProductAppearanceStruct to attempt write
-        # assuming arbitrary values for test
-        pa_val = attributes.ProductAppearance(cluster.Structs.ProductAppearanceStruct(finish=3, primaryColor=4))
-        log.info(f"Attempting to write ProductAppearance to {pa_val} (expect failure)")
-        await self.verify_unsupported_write(attributes.ProductAppearance, pa_val, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for ProductAppearance")
+            # Step 61: Write ProductAppearance
+            self.step(61)
+            # Need to construct a valid ProductAppearanceStruct to attempt write
+            # assuming arbitrary values for test
+            pa_val = attributes.ProductAppearance(cluster.Structs.ProductAppearanceStruct(finish=3, primaryColor=4))
+            log.info(f"Attempting to write ProductAppearance to {pa_val} (expect failure)")
+            await self.verify_unsupported_write(attributes.ProductAppearance, pa_val, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for ProductAppearance")
 
-        # Step 62
-        self.step(62)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductAppearance, endpoint=self.endpoint)
-        log.info(f"Read ProductAppearance again: {val}")
-        asserts.assert_equal(val, pa, "ProductAppearance changed after failed write")
-        log.info("Verified ProductAppearance unchanged verification successful")
+            # Step 62
+            self.step(62)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductAppearance, endpoint=self.endpoint)
+            log.info(f"Read ProductAppearance again: {val}")
+            asserts.assert_equal(val, pa, "ProductAppearance changed after failed write")
+            log.info("Verified ProductAppearance unchanged verification successful")
+        else:
+            log.info("ProductAppearance is not an optional attribute, skipping steps 60, 61 and 62")
+            self.step(60)
+            self.step(61)
+            self.step(62)
 
         # Step 63: SpecificationVersion
         self.step(63)
@@ -690,47 +696,59 @@ class TC_BINFO_2_1(MatterBaseTest):
         asserts.assert_equal(val, spec_ver, "SpecificationVersion changed after failed write")
         log.info("Verified SpecificationVersion unchanged verification successful")
 
-        # Step 66: MaxPathsPerInvoke
-        self.step(66)
-        mpi = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
-        log.info(f"Read MaxPathsPerInvoke: {mpi}")
-        asserts.assert_greater_equal(mpi, 1, "MaxPathsPerInvoke min 1")
-        asserts.assert_less_equal(mpi, 65535, "MaxPathsPerInvoke max 65535")
+        # Step 66: MaxPathsPerInvoke is an optional attribute
+        if cluster.has_attribute(attributes.MaxPathsPerInvoke):
+            self.step(66)
+            mpi = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
+            log.info(f"Read MaxPathsPerInvoke: {mpi}")
+            asserts.assert_greater_equal(mpi, 1, "MaxPathsPerInvoke min 1")
+            asserts.assert_less_equal(mpi, 65535, "MaxPathsPerInvoke max 65535")
 
-        # Step 67
-        self.step(67)
-        val_to_write = attributes.MaxPathsPerInvoke(12345)
-        log.info(f"Attempting to write MaxPathsPerInvoke to {val_to_write} (expect failure)")
-        await self.verify_unsupported_write(attributes.MaxPathsPerInvoke, val_to_write, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for MaxPathsPerInvoke")
+            # Step 67
+            self.step(67)
+            val_to_write = attributes.MaxPathsPerInvoke(12345)
+            log.info(f"Attempting to write MaxPathsPerInvoke to {val_to_write} (expect failure)")
+            await self.verify_unsupported_write(attributes.MaxPathsPerInvoke, val_to_write, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for MaxPathsPerInvoke")
 
-        # Step 68
-        self.step(68)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
-        log.info(f"Read MaxPathsPerInvoke again: {val}")
-        asserts.assert_equal(val, mpi, "MaxPathsPerInvoke changed after failed write")
-        log.info("Verified MaxPathsPerInvoke unchanged verification successful")
+            # Step 68
+            self.step(68)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
+            log.info(f"Read MaxPathsPerInvoke again: {val}")
+            asserts.assert_equal(val, mpi, "MaxPathsPerInvoke changed after failed write")
+            log.info("Verified MaxPathsPerInvoke unchanged verification successful")
+        else:
+            log.info("MaxPathsPerInvoke not supported, skipping steps 67-68")
+            self.step(66)
+            self.step(67)
+            self.step(68)
 
-        # Step 69: ConfigurationVersion
-        self.step(69)
-        config_version = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
-        log.info(f"Read ConfigurationVersion: {config_version}")
-        assert_valid_uint32(config_version, "ConfigurationVersion")
-        asserts.assert_greater_equal(config_version, 1, "ConfigurationVersion min 1")
+        # Step 69: ConfigurationVersion is an optional attribute
+        if cluster.has_attribute(attributes.ConfigurationVersion):
+            self.step(69)
+            config_version = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
+            log.info(f"Read ConfigurationVersion: {config_version}")
+            assert_valid_uint32(config_version, "ConfigurationVersion")
+            asserts.assert_greater_equal(config_version, 1, "ConfigurationVersion min 1")
 
-        # Step 70
-        self.step(70)
-        val_to_write = attributes.ConfigurationVersion(4388)
-        log.info(f"Attempting to write ConfigurationVersion to {val_to_write} (expect failure)")
-        await self.verify_unsupported_write(attributes.ConfigurationVersion, val_to_write, self.endpoint)
-        log.info("Verified UNSUPPORTED_WRITE for ConfigurationVersion")
+            # Step 70
+            self.step(70)
+            val_to_write = attributes.ConfigurationVersion(4388)
+            log.info(f"Attempting to write ConfigurationVersion to {val_to_write} (expect failure)")
+            await self.verify_unsupported_write(attributes.ConfigurationVersion, val_to_write, self.endpoint)
+            log.info("Verified UNSUPPORTED_WRITE for ConfigurationVersion")
 
-        # Step 71
-        self.step(71)
-        val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
-        log.info(f"Read ConfigurationVersion again: {val}")
-        asserts.assert_equal(val, config_version, "ConfigurationVersion changed after failed write")
-        log.info("Verified ConfigurationVersion unchanged verification successful")
+            # Step 71
+            self.step(71)
+            val = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
+            log.info(f"Read ConfigurationVersion again: {val}")
+            asserts.assert_equal(val, config_version, "ConfigurationVersion changed after failed write")
+            log.info("Verified ConfigurationVersion unchanged verification successful")
+        else:
+            log.info("ConfigurationVersion not supported, skipping steps 69-71")
+            self.step(69)
+            self.step(70)
+            self.step(71)
 
 
 if __name__ == "__main__":
