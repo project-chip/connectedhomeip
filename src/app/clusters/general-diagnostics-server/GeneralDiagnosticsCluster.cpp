@@ -223,13 +223,12 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 
     // Calling OnDeviceReboot here to maintain the event generation of the old implemenation of the
     // server init callback. We consider startup to be a boot event here.
-    if (mDiagnosticDataProvider != nullptr)
+    VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    GeneralDiagnostics::BootReasonEnum bootReason;
+    if (mDiagnosticDataProvider->GetBootReason(bootReason) == CHIP_NO_ERROR)
     {
-        GeneralDiagnostics::BootReasonEnum bootReason;
-        if (mDiagnosticDataProvider->GetBootReason(bootReason) == CHIP_NO_ERROR)
-        {
-            OnDeviceReboot(bootReason);
-        }
+        OnDeviceReboot(bootReason);
     }
     return CHIP_NO_ERROR;
 }

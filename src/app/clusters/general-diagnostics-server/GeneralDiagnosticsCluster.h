@@ -24,6 +24,7 @@
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
 #include <system/SystemClock.h>
@@ -105,25 +106,34 @@ public:
     void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
-    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const { return mDiagnosticDataProvider->GetRebootCount(rebootCount); }
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
+    {
+        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        return mDiagnosticDataProvider->GetRebootCount(rebootCount);
+    }
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
     {
+        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mDiagnosticDataProvider->GetTotalOperationalHours(totalOperationalHours);
     }
     CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const
     {
+        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mDiagnosticDataProvider->GetBootReason(bootReason);
     }
     CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
     {
+        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mDiagnosticDataProvider->GetActiveHardwareFaults(hardwareFaults);
     }
     CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
     {
+        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mDiagnosticDataProvider->GetActiveRadioFaults(radioFaults);
     }
     CHIP_ERROR GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
     {
+        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return mDiagnosticDataProvider->GetActiveNetworkFaults(networkFaults);
     }
 
