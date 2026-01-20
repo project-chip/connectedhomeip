@@ -44,7 +44,9 @@ using namespace chip::Inet;
 // Global Variables
 
 NetworkOptions gNetworkOptions;
+#if defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
 FaultInjectionOptions gFaultInjectionOptions;
+#endif  // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
 
 NetworkOptions::NetworkOptions()
 {
