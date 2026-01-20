@@ -347,6 +347,7 @@ static_library("support") {
   public_deps = [
     ":attributes",
     ":chip_version_header",
+    ":fixedbuffer",
     ":logging_constants",
     ":memory",
     ":safeint",
