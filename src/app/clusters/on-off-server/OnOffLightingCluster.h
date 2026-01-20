@@ -99,8 +99,25 @@ private:
 
     // Lighting Attributes
     bool mGlobalSceneControl = true;
+
+    // On/Off times represent deltayed on/off timeouts in 1/10th second resolution.
+    // They are updated by the unerlying timer context (see TimerFired) according to the spec.
+    //
+    // The cluster may be in the following states:
+    //   - ON        - On (no timers)
+    //   - OFF       - Off (no timers)
+    //   - TIMED_ON  - On with a timer set (mOnTime decrements and will turn off on 0)
+    //   - TIMED_OFF - Off with a timer set (mOffWaitTiem decrements and will turn on on 0)
+    //
+    // Values are affected by the following:
+    //   - HandleOnWithTimedOff (see spec diagram)
+    //   - TimerFired (decreases times)
+    //   - SetOnOffFromCommand (needs to transition to on/off correctly)
     uint16_t mOnTime         = 0;
     uint16_t mOffWaitTime    = 0;
+
+    // controlling cluster startup - these values are only used at startup however
+    // user may modify mStartUpOnOff attribute as it is writable.
     DataModel::Nullable<OnOff::StartUpOnOffEnum> mStartUpOnOff;
     StartupType mStartupType;
 
@@ -119,6 +136,11 @@ private:
     DataModel::ActionReturnStatus HandleOn();
     DataModel::ActionReturnStatus HandleOff();
     DataModel::ActionReturnStatus HandleToggle();
+
+    // Handles transitions for timed on/off. This is to be used by commands EXCEPT
+    // HandleOnWithTimedOff to represent the spec `Any command which causes the attribute to be set
+    // to TRUE/FALSE` like on/off/toggle/OnWithRecallGlobalScene/OffWithEffect
+    CHIP_ERROR SetOnOffFromCommand(bool on);
 };
 
 } // namespace chip::app::Clusters

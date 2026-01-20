@@ -261,34 +261,28 @@ CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)
 
 void OnOffLightingCluster::TimerFired()
 {
-    bool on      = GetOnOff();
-    bool changed = false;
-
-    if (on && mOnTime > 0)
+    if (GetOnOff())
     {
+        // we are on, see if we have to decrease the timer
+        VerifyOrReturn(mOnTime > 0);
+
+        // TIMED_ON state: we decrement OnTime  to see if we need to turn off
         mOnTime--;
-        changed = true;
-        if (mOnTime == 0)
-        {
-            mOffWaitTime = 0;
-            // Best effort update logic
-            // Since SetOnOff triggers storage writes etc, we just use it.
-            LogErrorOnFailure(SetOnOff(false));
-            NotifyAttributeChanged(Attributes::OffWaitTime::Id);
-            on = false; // Updated state
-        }
         NotifyAttributeChanged(Attributes::OnTime::Id);
-    }
-    else if (!on && mOffWaitTime > 0)
-    {
-        mOffWaitTime--;
-        changed = true;
-        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
-    }
 
-    // Schedule next tick if needed
-    if (changed)
+        // If timer is not yet 0, update the timer and keep going. Otherwise move to off state.
+        VerifyOrReturn(mOnTime == 0, UpdateTimer());
+
+        // transition TIMED_ON to OFF - clear off wiat time and turn off
+        SetOffWaitTime(0);
+        LogErrorOnFailure(SetOnOff(false));
+    }
+    else
     {
+        VerifyOrReturn(mOffWaitTime > 0);
+
+        mOffWaitTime--;
+        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
         UpdateTimer();
     }
 }
@@ -317,7 +311,7 @@ void OnOffLightingCluster::UpdateTimer()
 DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
 {
     bool wasOn = GetOnOff();
-    ReturnErrorOnFailure(SetOnOff(false));
+    ReturnErrorOnFailure(SetOnOffFromCommand(false));
 
     if (wasOn && mScenesIntegrationDelegate != nullptr)
     {
@@ -333,7 +327,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
 DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
 {
     bool wasOff = !GetOnOff();
-    ReturnErrorOnFailure(SetOnOff(true));
+    ReturnErrorOnFailure(SetOnOffFromCommand(true));
 
     // Spec requirement:
     //   This attribute SHALL be set to TRUE after the reception of a command which
@@ -387,7 +381,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOffWithEffect(const Da
         mGlobalSceneControl = false;
         NotifyAttributeChanged(Attributes::GlobalSceneControl::Id);
 
-        ReturnErrorOnFailure(SetOnOff(false));
+        ReturnErrorOnFailure(SetOnOffFromCommand(false));
 
         mOnTime = 0;
         NotifyAttributeChanged(Attributes::OnTime::Id);
@@ -415,12 +409,12 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithRecallGlobalScen
             //     scene... If the scene cannot be recalled... it SHALL set the OnOff attribute to TRUE
             // Log and proceed to turning on.
             ChipLogError(Zcl, "Failed to recall global scene: %" CHIP_ERROR_FORMAT, err.Format());
-            ReturnErrorOnFailure(SetOnOff(true));
+            ReturnErrorOnFailure(SetOnOffFromCommand(true));
         }
     }
     else
     {
-        ReturnErrorOnFailure(SetOnOff(true));
+        ReturnErrorOnFailure(SetOnOffFromCommand(true));
     }
 
     mGlobalSceneControl = true;
@@ -449,29 +443,73 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
         return Status::Success; // Discard
     }
 
-    if (mOffWaitTime > 0 && !GetOnOff())
+    // we have to turn the device on EXCEPT if we already in a TIMED_OFF state
+    if (mOffWaitTime == 0 && !GetOnOff())
     {
-        mOffWaitTime = std::min(mOffWaitTime, commandData.offWaitTime);
-        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+        // NOTE: this sets directly the ONOFF without the "from command" because the state
+        //       transitions are handled by OnWithTimedOff command directly
+        LogErrorOnFailure(SetOnOff(true));
+
+        // Spec requirement:
+        //   This attribute SHALL be set to TRUE after the reception of a command which
+        //   causes the OnOff attribute to be set to TRUE;
+        mGlobalSceneControl = true;
+    }
+
+    // state transition logic between ON/OFF/TIMED_ON/TIMED_OFF
+    if (GetOnOff())
+    {
+        // we are in a form of ON state. Determinie which.
+        if (mOnTime > 0)
+        {
+            // TIMED_ON state, stay here
+            SetOnTime(std::max(mOnTime, static_cast<uint16_t>(commandData.onTime)));
+        }
+        else
+        {
+            // ON -> TIMED_ON transition
+            SetOnTime(commandData.onTime);
+        }
+
+        // in both cases, OffWaitTime stays to the user input value
+        SetOffWaitTime(commandData.offWaitTime);
     }
     else
     {
-        mOnTime      = std::max(mOnTime, static_cast<uint16_t>(commandData.onTime));
-        mOffWaitTime = commandData.offWaitTime;
-        NotifyAttributeChanged(Attributes::OnTime::Id);
-        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
-
-        // This command turns the device ON.
-        LogErrorOnFailure(SetOnOff(true));
+        // We are in an off state, determine which.
+        if (mOffWaitTime > 0)
+        {
+            // TIMED_OFF already, we IGNORE the OnTime (according to spec diagram)
+            SetOffWaitTime(std::min(mOffWaitTime, commandData.offWaitTime));
+        }
+        else
+        {
+            // OFF -> TIMED_ON transition, keep user values
+            SetOnTime(commandData.onTime);
+            SetOffWaitTime(commandData.offWaitTime);
+        }
     }
 
-    // Spec requirement:
-    //   This attribute SHALL be set to TRUE after the reception of a command which
-    //   causes the OnOff attribute to be set to TRUE;
-    mGlobalSceneControl = true;
-
+    // since times changed, make sure we update states as needed
     UpdateTimer();
+
     return Status::Success;
+}
+
+CHIP_ERROR OnOffLightingCluster::SetOnOffFromCommand(bool on)
+{
+    // if no change, do not attempt any transition
+    VerifyOrReturnValue(GetOnOff() != on, CHIP_NO_ERROR);
+
+    if (on) {
+        // device turned on. we stop waiting for on again
+        SetOffWaitTime(0);
+    } else {
+        // device turned off. Stop waiting to turn off after a timer
+        SetOnTime(0);
+    }
+
+    return SetOnOff(on);
 }
 
 } // namespace chip::app::Clusters

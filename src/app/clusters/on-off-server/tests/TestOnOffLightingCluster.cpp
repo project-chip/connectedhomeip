@@ -264,7 +264,6 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff)
 {
     // Step 1: Turn On with Timed Off (OnTime = 10, OffWaitTime = 20)
     Commands::OnWithTimedOff::Type command;
-    command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0); // Unconditional
     command.onTime      = 10;
     command.offWaitTime = 20;
 
