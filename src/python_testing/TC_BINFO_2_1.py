@@ -552,7 +552,7 @@ class TC_BINFO_2_1(MatterBaseTest):
             self.step("52b")
 
         # Step 53: UniqueID
-        
+
         if self.check_pics("BINFO.S.A0012"):
             self.step(53)
             uid = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.UniqueID, endpoint=self.endpoint)
