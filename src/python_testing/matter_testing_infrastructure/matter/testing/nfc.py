@@ -19,8 +19,8 @@ import asyncio
 import logging
 import threading
 
-import ndef         # From 'ndeflib' library
-import smartcard    # From 'pyscard' library
+import ndef  # From 'ndeflib' library
+import smartcard  # From 'pyscard' library
 import smartcard.CardMonitoring
 from mobly import asserts
 
