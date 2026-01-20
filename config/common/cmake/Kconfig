@@ -60,6 +60,14 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_OPTIMIZE_DEBUG_LEVEL
+	string "Debug optimization level"
+	depends on DEBUG
+	default "0"
+	help
+	  Set the optimization level to use when building with debug symbols.
+	  This value is used with the -O compiler flag (e.g., -Og, -O0, -O1, -O2, -O3, -Os, -Oz).
+
 config CHIP_STRIP_SYMBOLS
 	bool "Strip symbols"
 	help
@@ -452,6 +460,18 @@ config CHIP_THREAD_NETWORK_ENDPOINT_ID
 	help
 	  Specify the endpoint ID of the Thread network.
 
+config CHIP_OPENTHREAD_FTD
+	bool "Enable OpenThread Full Thread Device (FTD) support"
+	default y
+	help
+	  Configure the platform as an OpenThread Full Thread Device (FTD).
+
+config CHIP_USE_OT_ENDPOINT
+	bool "Use OpenThread TCP/UDP stack directly"
+	help
+	  Use the OpenThread TCP/UDP stack directly instead of another networking stack like LwIP.
+	  This is useful for platforms that do not have LwIP but do have OpenThread.
+
 endif # NET_L2_OPENTHREAD
 
 config CHIP_ENABLE_ICD_SUPPORT
@@ -647,6 +667,13 @@ config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
 	help
 	  Sets the local idle retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
 
+config CHIP_ENABLE_READ_CLIENT
+	bool "Enable Read Client in the Interaction Model"
+	help
+	  Enable support for Read Client in the Interaction Model.
+	  This config can be disabled for device types that do not require Read Client functionality.
+	  Disabling this config can save flash and RAM space.
+
 # Build system options
 
 config CHIP_WITH_LWIP
@@ -694,5 +721,11 @@ config CHIP_CUSTOM_BLE_ADV_DATA
     depends on BT
 	help
 	  Customization of BLE advertising data at the application layer
+
+config CHIP_INET_ENABLE_TCP_ENDPOINT
+	bool "Enable TCP endpoint in Inet layer"
+	default y if CHIP_BUILD_TESTS
+	help
+	  Enable TCP endpoint support in the Matter Inet layer.
 
 endif # CHIP

@@ -5868,30 +5868,26 @@ public static class ScenesManagementClusterSceneInfoStruct {
 public static class GroupcastClusterMembershipStruct {
   public Integer groupID;
   public ArrayList<Integer> endpoints;
-  public Long keyID;
+  public Integer keySetID;
   public Boolean hasAuxiliaryACL;
-  public Optional<Long> expiringKeyID;
   public Integer fabricIndex;
   private static final long GROUP_ID_ID = 0L;
   private static final long ENDPOINTS_ID = 1L;
-  private static final long KEY_ID_ID = 2L;
+  private static final long KEY_SET_ID_ID = 2L;
   private static final long HAS_AUXILIARY_ACL_ID = 3L;
-  private static final long EXPIRING_KEY_ID_ID = 4L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public GroupcastClusterMembershipStruct(
     Integer groupID,
     ArrayList<Integer> endpoints,
-    Long keyID,
+    Integer keySetID,
     Boolean hasAuxiliaryACL,
-    Optional<Long> expiringKeyID,
     Integer fabricIndex
   ) {
     this.groupID = groupID;
     this.endpoints = endpoints;
-    this.keyID = keyID;
+    this.keySetID = keySetID;
     this.hasAuxiliaryACL = hasAuxiliaryACL;
-    this.expiringKeyID = expiringKeyID;
     this.fabricIndex = fabricIndex;
   }
 
@@ -5899,9 +5895,8 @@ public static class GroupcastClusterMembershipStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(GROUP_ID_ID, new UIntType(groupID)));
     values.add(new StructElement(ENDPOINTS_ID, ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints))));
-    values.add(new StructElement(KEY_ID_ID, new UIntType(keyID)));
+    values.add(new StructElement(KEY_SET_ID_ID, new UIntType(keySetID)));
     values.add(new StructElement(HAS_AUXILIARY_ACL_ID, new BooleanType(hasAuxiliaryACL)));
-    values.add(new StructElement(EXPIRING_KEY_ID_ID, expiringKeyID.<BaseTLVType>map((nonOptionalexpiringKeyID) -> new UIntType(nonOptionalexpiringKeyID)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -5913,9 +5908,8 @@ public static class GroupcastClusterMembershipStruct {
     }
     Integer groupID = null;
     ArrayList<Integer> endpoints = null;
-    Long keyID = null;
+    Integer keySetID = null;
     Boolean hasAuxiliaryACL = null;
-    Optional<Long> expiringKeyID = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_ID_ID) {
@@ -5928,20 +5922,15 @@ public static class GroupcastClusterMembershipStruct {
           ArrayType castingValue = element.value(ArrayType.class);
           endpoints = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
         }
-      } else if (element.contextTagNum() == KEY_ID_ID) {
+      } else if (element.contextTagNum() == KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          keyID = castingValue.value(Long.class);
+          keySetID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == HAS_AUXILIARY_ACL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
           hasAuxiliaryACL = castingValue.value(Boolean.class);
-        }
-      } else if (element.contextTagNum() == EXPIRING_KEY_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          expiringKeyID = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5953,9 +5942,8 @@ public static class GroupcastClusterMembershipStruct {
     return new GroupcastClusterMembershipStruct(
       groupID,
       endpoints,
-      keyID,
+      keySetID,
       hasAuxiliaryACL,
-      expiringKeyID,
       fabricIndex
     );
   }
@@ -5970,14 +5958,11 @@ public static class GroupcastClusterMembershipStruct {
     output.append("\tendpoints: ");
     output.append(endpoints);
     output.append("\n");
-    output.append("\tkeyID: ");
-    output.append(keyID);
+    output.append("\tkeySetID: ");
+    output.append(keySetID);
     output.append("\n");
     output.append("\thasAuxiliaryACL: ");
     output.append(hasAuxiliaryACL);
-    output.append("\n");
-    output.append("\texpiringKeyID: ");
-    output.append(expiringKeyID);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
