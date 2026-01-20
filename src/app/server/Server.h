@@ -495,6 +495,12 @@ public:
         return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
     }
 
+    /**
+     * Returns the monotonic timestamp captured when the Server was initialized.
+     *
+     * TimeSinceInit() is computed as the difference between the current monotonic
+     * time and this startup timestamp.
+     */
     System::Clock::Microseconds64 GetNodeStartupTimestamp() const { return mInitTimestamp; }
 
     static Server & GetInstance() { return sServer; }
