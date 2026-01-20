@@ -46,6 +46,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+
 class TC_BINFO_2_1(MatterBaseTest):
     def pics_TC_BINFO_2_1(self) -> list[str]:
         return ["BINFO.S"]
@@ -392,7 +393,6 @@ class TC_BINFO_2_1(MatterBaseTest):
         except ValueError:
             asserts.fail(f"First 8 characters of ManufacturingDate '{mfg_date}' do not match the ISO 8601 format: YYYYMMDD")
 
-
         # Step 34: Write ManufacturingDate
         self.step(34)
         val_to_write = attributes.ManufacturingDate("20210814789452IN")
@@ -440,11 +440,11 @@ class TC_BINFO_2_1(MatterBaseTest):
             try:
                 result = urlparse(prod_url)
                 if not all([result.scheme, result.netloc]):
-                     asserts.fail(f"ProductURL '{prod_url}' is not a valid URL according to RFC 3986 (missing scheme or netloc)")
+                    asserts.fail(f"ProductURL '{prod_url}' is not a valid URL according to RFC 3986 (missing scheme or netloc)")
                 if result.scheme not in ['http', 'https']:
-                     asserts.fail(f"ProductURL '{prod_url}' should point to a web page (http/https)")
+                    asserts.fail(f"ProductURL '{prod_url}' should point to a web page (http/https)")
             except ValueError:
-                 asserts.fail(f"ProductURL '{prod_url}' could not be parsed as a URL")
+                asserts.fail(f"ProductURL '{prod_url}' could not be parsed as a URL")
 
         # Step 40: Write ProductURL
         self.step(40)
@@ -468,7 +468,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         assert_string_length(prod_label, max_length=64, description="ProductLabel")
         # Verify that the ProductLabel does not contain the VendorName
         if vendor_name in prod_label:
-             asserts.fail(f"ProductLabel '{prod_label}' must not contain VendorName '{vendor_name}'")
+            asserts.fail(f"ProductLabel '{prod_label}' must not contain VendorName '{vendor_name}'")
 
         # Step 43: Write ProductLabel
         self.step(43)
@@ -581,22 +581,26 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info(f"Read CapabilityMinima: {caps}")
 
         # CaseSessionsPerFabric: min 3
-        asserts.assert_true(hasattr(caps, "caseSessionsPerFabric"), "caseSessionsPerFabric is not an attribute in CapabilityMinimaStruct")
+        asserts.assert_true(hasattr(caps, "caseSessionsPerFabric"),
+                            "caseSessionsPerFabric is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking CaseSessionsPerFabric: {caps.caseSessionsPerFabric} >= 3")
         asserts.assert_greater_equal(caps.caseSessionsPerFabric, 3, "CaseSessionsPerFabric >= 3")
 
         # SubscriptionsPerFabric: min 3
-        asserts.assert_true(hasattr(caps, "subscriptionsPerFabric"), "subscriptionsPerFabric is not an attribute in CapabilityMinimaStruct")
+        asserts.assert_true(hasattr(caps, "subscriptionsPerFabric"),
+                            "subscriptionsPerFabric is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SubscriptionsPerFabric: {caps.subscriptionsPerFabric} >= 3")
         asserts.assert_greater_equal(caps.subscriptionsPerFabric, 3, "SubscriptionsPerFabric >= 3")
 
         # SimultaneousInvocationsSupported: min 1 (New field)
-        asserts.assert_true(hasattr(caps, "simultaneousInvocationsSupported"), "simultaneousInvocationsSupported is not an attribute in CapabilityMinimaStruct")
+        asserts.assert_true(hasattr(caps, "simultaneousInvocationsSupported"),
+                            "simultaneousInvocationsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SimultaneousInvocationsSupported: {caps.simultaneousInvocationsSupported} >= 1")
         asserts.assert_greater_equal(caps.simultaneousInvocationsSupported, 1, "SimultaneousInvocationsSupported >= 1")
 
         # SimultaneousWritesSupported: min 1 (New field)
-        asserts.assert_true(hasattr(caps, "simultaneousWritesSupported"), "simultaneousWritesSupported is not an attribute in CapabilityMinimaStruct")
+        asserts.assert_true(hasattr(caps, "simultaneousWritesSupported"),
+                            "simultaneousWritesSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SimultaneousWritesSupported: {caps.simultaneousWritesSupported} >= 1")
         asserts.assert_greater_equal(caps.simultaneousWritesSupported, 1, "SimultaneousWritesSupported >= 1")
 
@@ -606,20 +610,23 @@ class TC_BINFO_2_1(MatterBaseTest):
         asserts.assert_greater_equal(caps.readPathsSupported, 9, "ReadPathsSupported >= 9")
 
         # SubscribePathsSupported: min 3 (New field)
-        asserts.assert_true(hasattr(caps, "subscribePathsSupported"), "subscribePathsSupported is not an attribute in CapabilityMinimaStruct")
+        asserts.assert_true(hasattr(caps, "subscribePathsSupported"),
+                            "subscribePathsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking SubscribePathsSupported: {caps.subscribePathsSupported} >= 3")
         asserts.assert_greater_equal(caps.subscribePathsSupported, 3, "SubscribePathsSupported >= 3")
 
         # Step 57: Write CapabilityMinima (Existing fields)
         self.step(57)
-        test_val = attributes.CapabilityMinima(cluster.Structs.CapabilityMinimaStruct(caseSessionsPerFabric=4, subscriptionsPerFabric=4))
+        test_val = attributes.CapabilityMinima(cluster.Structs.CapabilityMinimaStruct(
+            caseSessionsPerFabric=4, subscriptionsPerFabric=4))
         log.info(f"Attempting to write CapabilityMinima to {test_val} (expect failure)")
         await self.verify_unsupported_write(attributes.CapabilityMinima, test_val, self.endpoint)
         log.info("Verified UNSUPPORTED_WRITE for CapabilityMinima")
 
         # Step 58: Write CapabilityMinima (New fields)
         self.step(58)
-        test_val_new = attributes.CapabilityMinima(cluster.Structs.CapabilityMinimaStruct(caseSessionsPerFabric=3, subscriptionsPerFabric=3, simultaneousInvocationsSupported=1, simultaneousWritesSupported=1))
+        test_val_new = attributes.CapabilityMinima(cluster.Structs.CapabilityMinimaStruct(
+            caseSessionsPerFabric=3, subscriptionsPerFabric=3, simultaneousInvocationsSupported=1, simultaneousWritesSupported=1))
         log.info(f"Attempting to write CapabilityMinima to {test_val_new} (expect failure)")
         await self.verify_unsupported_write(attributes.CapabilityMinima, test_val_new, self.endpoint)
         log.info("Verified UNSUPPORTED_WRITE for CapabilityMinima")
@@ -660,12 +667,12 @@ class TC_BINFO_2_1(MatterBaseTest):
         # Verify valid values
         allowed_versions = [0x01040000, 0x01040100, 0x01040200, 0x01050000]
         if spec_ver not in allowed_versions:
-             asserts.fail(f"SpecificationVersion {spec_ver:#010x} is not one of the allowed values: {[hex(v) for v in allowed_versions]}")
+            asserts.fail(
+                f"SpecificationVersion {spec_ver:#010x} is not one of the allowed values: {[hex(v) for v in allowed_versions]}")
 
         # Verify lower 8 bits are zero
         if spec_ver & 0xFF != 0:
-             asserts.fail(f"SpecificationVersion {spec_ver:#010x} must have lower 8 bits set to zero")
-
+            asserts.fail(f"SpecificationVersion {spec_ver:#010x} must have lower 8 bits set to zero")
 
         # Step 64
         self.step(64)
