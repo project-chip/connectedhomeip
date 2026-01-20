@@ -80,6 +80,11 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_Internal.h"
         },
         {
+            "path": "MTRBaseClusters_Private.zapt",
+            "name": "Objc ZCL asynchronous API Private Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_Private.h"
+        },
+        {
             "path": "MTRBaseClusters.zapt",
             "name": "Objc ZCL asynchronous API Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h"
@@ -93,6 +98,11 @@
             "path": "MTRClusters_Internal.zapt",
             "name": "Objc ZCL synchronous API Internal Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_Internal.h"
+        },
+        {
+            "path": "MTRClusters_Private.zapt",
+            "name": "Objc ZCL synchronous API Private Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_Private.h"
         },
         {
             "path": "MTRClusters.zapt",
@@ -128,6 +138,11 @@
             "path": "MTRCommandPayloads_Internal.zapt",
             "name": "Internal methods for objc reflections of MTR command payloads header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloads_Internal.h"
+        },
+        {
+            "path": "MTRCommandPayloads_Private.zapt",
+            "name": "Private methods for objc reflections of MTR command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloads_Private.h"
         },
         {
             "path": "MTRAttributeTLVValueDecoder-src.zapt",
