@@ -221,20 +221,15 @@ class App:
         return True
 
 
-class TestTarget(StrEnum):
-    ALL_CLUSTERS = 'all-clusters'
-    TV = 'tv'
-    LOCK = 'lock'
-    OTA = 'ota-requestor'
-    BRIDGE = 'bridge'
-    LIT_ICD = 'lit-icd'
-    FABRIC_SYNC = 'fabric-sync'
-    MWO = 'microwave-oven'
-    RVC = 'rvc'
-    NETWORK_MANAGER = 'network-manager'
-    ENERGY_GATEWAY = 'energy-gateway'
-    ENERGY_MANAGEMENT = 'energy-management'
-    CLOSURE = 'closure'
+@dataclass
+class TestTarget:
+    name: str
+
+    # command to execute. MUST be a placeholder like tv or lock
+    command: str
+
+    # arguments to pass in to the command to execute
+    arguments: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -436,7 +431,7 @@ class TestRunTime(Enum):
 class TestDefinition:
     name: str
     run_name: str
-    target: TestTarget
+    targets: list[TestTarget]
     tags: set[TestTag] = field(default_factory=set)
 
     @property
@@ -463,25 +458,39 @@ class TestDefinition:
             wifi_paf: bool = False):
         """
         Executes the given test case using the provided runner for execution.
+        Will iterate and execute every target.
         """
+        for target in self.targets:
+            log.info('Executing %s::%s', self.name, target.name)
+            self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
+                          test_runtime, ble_controller_app, ble_controller_tool)
+
+    def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
+                 pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
+                 test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
+                 ble_controller_app: int | None = None,
+                 ble_controller_tool: int | None = None):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
 
         loggedCapturedLogs = False
         try:
-            if self.target.value not in subproc_info_repo:
+            if target.command not in subproc_info_repo:
                 log.warning("Path to default target '%s' for test '%s' is not known, test will likely fail",
-                            self.target.value, self.name)
+                            target.command, self.name)
             if not dry_run:
                 for key, subproc in subproc_info_repo.items():
                     # Do not add tools to the register
                     if subproc.kind == SubprocessKind.TOOL:
                         continue
 
-                    # For the app indicated by self.target, give it the 'default' key to add to the register
-                    if key == self.target.value:
+                    # For the app indicated by target, give it the 'default' key to add to the register
+                    if key == target.command:
                         key = 'default'
+                        for arg in target.arguments:
+                            subproc = subproc.with_args(arg)
+
                     if ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(ble_controller_app), "--wifi")
                     elif wifi_paf:
@@ -548,7 +557,7 @@ class TestDefinition:
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 
-                if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                if target.command == 'lit-icd' and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                     pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
                 test_cmd = subproc_info_repo['chip-tool-with-python'].with_args('tests', self.run_name, '--PICS', str(pics_file))

@@ -450,7 +450,7 @@ jobs:
                      --app-path energy-management:./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Uploading core files
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -458,7 +458,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -476,7 +476,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@v5
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -623,7 +623,7 @@ jobs:
                   "
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -631,13 +631,13 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -655,7 +655,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@v5
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -909,7 +909,7 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - name: Save ccache
               if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v4
+              uses: actions/cache/save@v5
               with:
                   path: .ccache
                   key: ${{ env.CCACHE_KEY }}
@@ -1118,7 +1118,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-python-repl
@@ -1126,20 +1126,20 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading traces on failure
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: trace-data-python-repl
                   path: out/trace_data/
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-python-repl
