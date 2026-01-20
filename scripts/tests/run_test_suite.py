@@ -460,7 +460,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     wifi_required = commissioning_method in ['ble-wifi', 'wifi-paf']
 
     if wifi_required and sys.platform != "linux":
-        raise click.BadOptionUsage("commissioning_method", f"Option --commissioning_method={commissioning_method} is available on Linux platform only")
+        raise click.BadOptionUsage("commissioning_method",
+                                   f"Option --commissioning_method={commissioning_method} is available on Linux platform only")
 
     ble_controller_app = None
     ble_controller_tool = None
