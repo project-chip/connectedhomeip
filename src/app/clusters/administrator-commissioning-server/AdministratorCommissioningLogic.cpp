@@ -33,9 +33,6 @@ namespace Clusters {
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
-    // Runtime check to ensure the FailSafeContext provided during init
-    // matches the one the WindowManager is actually using.
-    VerifyOrDie(&mContext.failSafeContext == &mContext.commissioningWindowManager.GetFailSafeContext());
 
     MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -82,8 +79,6 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioning
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
-    VerifyOrDie(&mContext.failSafeContext == &mContext.commissioningWindowManager.GetFailSafeContext());
-
     MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
 
@@ -113,15 +108,11 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received RevokeCommissioning command");
 
-    auto & commissionMgr = mClusterContext.commissioningWindowManager;
+    auto & commissionMgr = mContext.commissioningWindowManager;
 
     commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
 
     if (!commissionMgr.IsCommissioningWindowOpen())
-        mClusterContext.failSafeContext.ForceFailSafeTimerExpiry();
-    mContext.failSafeContext.ForceFailSafeTimerExpiry();
-
-    if (!mContext.commissioningWindowManager.IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
         return ClusterStatusCode::ClusterSpecificFailure(StatusCode::kWindowNotOpen);

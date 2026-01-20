@@ -34,8 +34,7 @@ public:
 
     constexpr AdministratorCommissioningCluster(EndpointId endpointId,
                                                 BitFlags<AdministratorCommissioning::Feature> _unused_features, Context context) :
-        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id)),
-        mLogic(context)
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id)), mLogic(context)
     {}
 
     // Server cluster implementation
@@ -58,8 +57,7 @@ public:
     AdministratorCommissioningWithBasicCommissioningWindowCluster(EndpointId endpointId,
                                                                   BitFlags<AdministratorCommissioning::Feature> features,
                                                                   Context context) :
-        AdministratorCommissioningCluster(endpointId, features, context),
-        mFeatures(features)
+        AdministratorCommissioningCluster(endpointId, features, context), mFeatures(features)
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
