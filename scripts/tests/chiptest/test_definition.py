@@ -463,7 +463,7 @@ class TestDefinition:
         for target in self.targets:
             log.info('Executing %s::%s', self.name, target.name)
             self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
-                          test_runtime, ble_controller_app, ble_controller_tool)
+                          test_runtime, ble_controller_app, ble_controller_tool, wifi_paf)
 
     def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
                  pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,

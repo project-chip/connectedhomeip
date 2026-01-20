@@ -502,6 +502,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                     ]
                     ble_controller_app = 0   # Bind app to the first BLE controller
                     ble_controller_tool = 1  # Bind tool to the second BLE controller
+                    
 
                 if commissioning_method == 'wifi-paf':
                     # Single mock with two interfaces (like real wpa_supplicant)
@@ -509,8 +510,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         {"name": app_name},
                         {"name": tool_name}
                     ]
-
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, interfaces_params))
+                    to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, interfaces_params))
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
