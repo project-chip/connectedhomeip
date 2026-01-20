@@ -163,6 +163,7 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization
+    - TLS Client Management
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end
