@@ -495,6 +495,10 @@
 #include <clusters/TemperatureMeasurement/Commands.ipp>
 #include <clusters/TemperatureMeasurement/Events.ipp>
 #include <clusters/TemperatureMeasurement/Structs.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Attributes.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Commands.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Events.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Structs.ipp>
 #include <clusters/Thermostat/Attributes.ipp>
 #include <clusters/Thermostat/Commands.ipp>
 #include <clusters/Thermostat/Events.ipp>

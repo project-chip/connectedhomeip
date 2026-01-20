@@ -106,8 +106,6 @@
 #include <clusters/EthernetNetworkDiagnostics/MetadataProvider.h>
 #include <clusters/FanControl/Ids.h>
 #include <clusters/FanControl/MetadataProvider.h>
-#include <clusters/FaultInjection/Ids.h>
-#include <clusters/FaultInjection/MetadataProvider.h>
 #include <clusters/FixedLabel/Ids.h>
 #include <clusters/FixedLabel/MetadataProvider.h>
 #include <clusters/FlowMeasurement/Ids.h>
@@ -270,8 +268,6 @@
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/MetadataProvider.h>
 #include <clusters/UnitLocalization/Ids.h>
 #include <clusters/UnitLocalization/MetadataProvider.h>
-#include <clusters/UnitTesting/Ids.h>
-#include <clusters/UnitTesting/MetadataProvider.h>
 #include <clusters/UserLabel/Ids.h>
 #include <clusters/UserLabel/MetadataProvider.h>
 #include <clusters/ValveConfigurationAndControl/Ids.h>
@@ -553,11 +549,6 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == FanControl::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, FanControl::Id>::EntryFor(command);
-    }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == FaultInjection::Id) || ...))
-    {
-        if (id == FaultInjection::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, FaultInjection::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == FixedLabel::Id) || ...))
     {
@@ -969,11 +960,6 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == UnitLocalization::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, UnitLocalization::Id>::EntryFor(command);
-    }
-    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == UnitTesting::Id) || ...))
-    {
-        if (id == UnitTesting::Id)
-            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, UnitTesting::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == UserLabel::Id) || ...))
     {
