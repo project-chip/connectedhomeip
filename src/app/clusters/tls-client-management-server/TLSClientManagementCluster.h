@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/ConcreteAttributePath.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTable.h>
+#include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TlsClientManagement/Commands.h>
+#include <clusters/TlsClientManagement/Metadata.h>
 #include <clusters/TlsClientManagement/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -33,65 +33,64 @@ namespace app {
 namespace Clusters {
 static constexpr uint16_t kSpecMaxHostname = 253;
 
-class TlsClientManagementDelegate;
+class TLSClientManagementDelegate;
 
-class TlsClientManagementCluster : private AttributeAccessInterface,
-                                   private CommandHandlerInterface,
-                                   private chip::FabricTable::Delegate
+class TLSClientManagementCluster : public DefaultServerCluster, private chip::FabricTable::Delegate
 {
 public:
     /**
-     * Creates a TLSClientManagement server instance. The Init() function needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
+     * Creates a TLSClientManagement server instance.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
-     * @param certificateTable A reference to the certificate table for looking up certiciates
+     * @param certificateTable A reference to the certificate table for looking up certificates
      * @param maxProvisioned The maximum number of endpoints which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TlsClientManagementCluster(EndpointId endpointId, TlsClientManagementDelegate & delegate,
+    TLSClientManagementCluster(EndpointId endpointId, TLSClientManagementDelegate & delegate,
                                Tls::CertificateTable & certificateTable, uint8_t maxProvisioned);
-    ~TlsClientManagementCluster();
-
-    /**
-     * Initialise the TLS Client Management server instance.
-     * @return Returns an error  if the CommandHandler or AttributeHandler registration fails.
-     */
-    CHIP_ERROR Init();
-
-    /**
-     * Shuts down the TLS Client Management server instance.
-     * @return Returns an error if the destruction fails.
-     */
-    CHIP_ERROR Finish();
+    ~TLSClientManagementCluster();
 
     // Attribute Getters
 
-    /**
-     * @return The MaxProvisioned attribute.
-     */
     uint8_t GetMaxProvisioned() const;
 
+    EndpointId GetEndpointId() const { return mPath.mEndpointId; }
+
     /**
-     * @return The endpoint ID.
+     * @brief ServerClusterInterface methods.
      */
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
 
 private:
-    TlsClientManagementDelegate & mDelegate;
+    TLSClientManagementDelegate & mDelegate;
     Tls::CertificateTable & mCertificateTable;
 
     // Attribute local storage
     uint8_t mMaxProvisioned;
 
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    // Command handlers
+    std::optional<DataModel::ActionReturnStatus>
+    HandleProvisionEndpoint(CommandHandler & commandHandler,
+                            const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & req);
 
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-    void HandleProvisionEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & req);
-    void HandleFindEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::FindEndpoint::DecodableType & req);
-    void HandleRemoveEndpoint(HandlerContext & ctx, const TlsClientManagement::Commands::RemoveEndpoint::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleFindEndpoint(CommandHandler & commandHandler, const TlsClientManagement::Commands::FindEndpoint::DecodableType & req);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleRemoveEndpoint(CommandHandler & commandHandler, const TlsClientManagement::Commands::RemoveEndpoint::DecodableType & req);
 
     // Encodes all provisioned endpoints
     CHIP_ERROR EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
@@ -103,15 +102,15 @@ private:
 /** @brief
  *  Defines methods for implementing application-specific logic for the TLSClientManagement Cluster.
  */
-class TlsClientManagementDelegate : public Tls::CertificateDependencyChecker
+class TLSClientManagementDelegate : public Tls::CertificateDependencyChecker
 {
 public:
     using EndpointStructType     = TlsClientManagement::Structs::TLSEndpointStruct::DecodableType;
     using LoadedEndpointCallback = std::function<CHIP_ERROR(EndpointStructType & endpoint)>;
 
-    TlsClientManagementDelegate() = default;
+    TLSClientManagementDelegate() = default;
 
-    virtual ~TlsClientManagementDelegate() = default;
+    virtual ~TLSClientManagementDelegate() = default;
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate & storage) = 0;
 
@@ -184,16 +183,16 @@ public:
                                                     int8_t delta) = 0;
 
 protected:
-    friend class TlsClientManagementCluster;
+    friend class TLSClientManagementCluster;
 
-    TlsClientManagementCluster * mTlsClientManagementCluster = nullptr;
+    TLSClientManagementCluster * mTLSClientManagementCluster = nullptr;
 
     // sets the TlsClientManagement Cluster pointer
-    void SetTlsClientManagementCluster(TlsClientManagementCluster * tlsClientManagementServer)
+    void SetTLSClientManagementCluster(TLSClientManagementCluster * tlsClientManagementServer)
     {
-        mTlsClientManagementCluster = tlsClientManagementServer;
+        mTLSClientManagementCluster = tlsClientManagementServer;
     }
-    TlsClientManagementCluster * GetTlsClientManagementCluster() const { return mTlsClientManagementCluster; }
+    TLSClientManagementCluster * GetTLSClientManagementCluster() const { return mTLSClientManagementCluster; }
 };
 
 } // namespace Clusters
