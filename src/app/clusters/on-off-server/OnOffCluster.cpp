@@ -49,19 +49,18 @@ OnOffValidator & GlobalOnOffValidator()
 
 } // namespace
 
-OnOffCluster::OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<Feature> featureMap) :
-    OnOffCluster(endpointId, timerDelegate, featureMap, { Feature::kDeadFrontBehavior, Feature::kOffOnly })
+OnOffCluster::OnOffCluster(EndpointId endpointId, const Context & context) :
+    OnOffCluster(endpointId, context, { Feature::kDeadFrontBehavior, Feature::kOffOnly })
 {}
 
-OnOffCluster::OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<Feature> featureMap,
-                           BitMask<Feature> supportedFeatures) :
-    DefaultServerCluster({ endpointId, Clusters::OnOff::Id }),
-    DefaultSceneHandlerImpl(GlobalOnOffValidator()), mFeatureMap(featureMap), mTimerDelegate(timerDelegate), mSceneTimer(*this)
+OnOffCluster::OnOffCluster(EndpointId endpointId, const Context & context, BitMask<Feature> supportedFeatures) :
+    DefaultServerCluster({ endpointId, Clusters::OnOff::Id }), DefaultSceneHandlerImpl(GlobalOnOffValidator()),
+    mFeatureMap(context.featureMap), mOnOff(context.defaults.onOff), mTimerDelegate(context.timerDelegate), mSceneTimer(*this)
 {
-    VerifyOrDie(supportedFeatures.HasAll(featureMap));
+    VerifyOrDie(supportedFeatures.HasAll(context.featureMap));
 
     // Feature validity check: offonly does not support any of the other features.
-    VerifyOrDie(!featureMap.Has(Feature::kOffOnly) || featureMap.HasOnly(Feature::kOffOnly));
+    VerifyOrDie(!context.featureMap.Has(Feature::kOffOnly) || context.featureMap.HasOnly(Feature::kOffOnly));
 }
 
 OnOffCluster::~OnOffCluster()

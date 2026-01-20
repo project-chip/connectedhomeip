@@ -34,7 +34,20 @@ namespace chip::app::Clusters {
 class OnOffCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl
 {
 public:
-    OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<OnOff::Feature> featureMap = {});
+    // Represents defauls for NVS values if no persistent storage set
+    struct Defaults
+    {
+        bool onOff;
+    };
+
+    struct Context
+    {
+        TimerDelegate & timerDelegate;
+        BitMask<OnOff::Feature> featureMap = {};
+        Defaults defaults                  = {};
+    };
+
+    OnOffCluster(EndpointId endpointId, const Context & context);
     ~OnOffCluster() override;
 
     void AddDelegate(OnOffDelegate * delegate) { mDelegates.PushBack(delegate); }
@@ -78,14 +91,13 @@ protected:
     /// Validates that requested 'featureMap' does not exceed implementation capabilities.
     ///
     /// This will VerifyOrDie that featureMap is a subset of supportedFeatures.
-    OnOffCluster(EndpointId endpointId, TimerDelegate & timerDelegate, BitMask<OnOff::Feature> featureMap,
-                 BitMask<OnOff::Feature> supportedFeatures);
+    OnOffCluster(EndpointId endpointId, const Context & context, BitMask<OnOff::Feature> supportedFeatures);
 
     IntrusiveList<OnOffDelegate, IntrusiveMode::AutoUnlink> mDelegates;
     BitMask<OnOff::Feature> mFeatureMap;
 
     // Attribute local storage
-    bool mOnOff = false;
+    bool mOnOff;
 
     // Timer support
     TimerDelegate & mTimerDelegate;

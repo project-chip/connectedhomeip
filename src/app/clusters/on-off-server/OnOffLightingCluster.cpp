@@ -34,7 +34,16 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip::app::Clusters {
 
 OnOffLightingCluster::OnOffLightingCluster(EndpointId endpointId, const Context & context) :
-    OnOffCluster(endpointId, context.timerDelegate, context.featureMap, { Feature::kLighting, Feature::kDeadFrontBehavior }),
+    OnOffCluster(endpointId,
+                 {
+                     .timerDelegate = context.timerDelegate,
+                     .featureMap    = context.featureMap,
+                     .defaults =
+                         OnOffCluster::Defaults{
+                             .onOff = context.defaults.onOff,
+                         },
+                 },
+                 { Feature::kLighting, Feature::kDeadFrontBehavior }),
     mEffectDelegate(context.effectDelegate), mScenesIntegrationDelegate(context.scenesIntegrationDelegate),
     mStartupType(context.startupType)
 {}
@@ -55,11 +64,11 @@ CHIP_ERROR OnOffLightingCluster::Startup(ServerClusterContext & context)
     AttributePersistence attributePersistence(context.attributeStorage);
 
     attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
-                                               mOnOff, false);
+                                               mOnOff, mOnOff);
 
     // Load StartUpOnOff. Defaults to NULL (default value for nullable) if not found in storage.
     attributePersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::StartUpOnOff::Id), mStartUpOnOff, {});
+        ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::StartUpOnOff::Id), mStartUpOnOff, mStartUpOnOff);
 
     if (mStartupType != StartupType::kOTA)
     {
@@ -225,6 +234,25 @@ void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
     mOffWaitTime = value;
     UpdateTimer();
     NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+}
+
+CHIP_ERROR OnOffLightingCluster::SetStartupOnOff(DataModel::Nullable<OnOff::StartUpOnOffEnum> value)
+{
+    VerifyOrReturnError(mStartUpOnOff != value, CHIP_NO_ERROR);
+    mStartUpOnOff = value;
+    NotifyAttributeChanged(Attributes::StartUpOnOff::Id);
+
+    if (mContext != nullptr)
+    {
+        NumericAttributeTraits<OnOff::StartUpOnOffEnum>::StorageType storageValue;
+        DataModel::NullableToStorage(mStartUpOnOff, storageValue);
+
+        ReturnErrorOnFailure(
+            mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OnOff::Id, Attributes::StartUpOnOff::Id },
+                                                  { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)

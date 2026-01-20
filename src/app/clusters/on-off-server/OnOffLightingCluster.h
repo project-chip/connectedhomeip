@@ -50,14 +50,21 @@ public:
         kOTA,
     };
 
+    // Represents defauls for NVS values if no persistent storage set
+    struct Defaults
+    {
+        bool onOff{};
+        DataModel::Nullable<OnOff::StartUpOnOffEnum> startupOnOff{};
+    };
+
     struct Context
     {
         TimerDelegate & timerDelegate;
         OnOffEffectDelegate & effectDelegate;
         chip::scenes::ScenesIntegrationDelegate * scenesIntegrationDelegate = nullptr;
         BitMask<OnOff::Feature> featureMap                                  = OnOff::Feature::kLighting;
-
-        StartupType startupType = StartupType::kRegular;
+        StartupType startupType                                             = StartupType::kRegular;
+        Defaults defaults{};
     };
 
     OnOffLightingCluster(EndpointId endpointId, const Context & context);
@@ -68,6 +75,9 @@ public:
 
     uint16_t GetOffWaitTime() const { return mOffWaitTime; }
     void SetOffWaitTime(uint16_t value);
+
+    DataModel::Nullable<OnOff::StartUpOnOffEnum> GetStartupOnOff() const { return mStartUpOnOff; }
+    CHIP_ERROR SetStartupOnOff(DataModel::Nullable<OnOff::StartUpOnOffEnum> value);
 
     // ServerClusterInterface implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
