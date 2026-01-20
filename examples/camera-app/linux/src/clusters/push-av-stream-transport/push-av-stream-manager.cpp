@@ -439,7 +439,7 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
 }
 
 bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollLength,
-                                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId)
+                                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId)
 {
     // If the video stream ID is missing or null, error log and return false
     if (!videoStreamId.HasValue())

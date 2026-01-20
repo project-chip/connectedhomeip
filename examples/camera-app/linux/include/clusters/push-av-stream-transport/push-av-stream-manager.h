@@ -100,7 +100,8 @@ public:
 
     bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
-    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength,
+                                  const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,

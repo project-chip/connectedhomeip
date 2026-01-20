@@ -874,8 +874,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         if (maxPreRollLength == 0 || !mDelegate->ValidateSegmentDuration(maxPreRollLength, transportOptionsPtr->videoStreamID))
         {
             auto maxPreRolllLengthStatus = to_underlying(StatusCodeEnum::kInvalidPreRollLength);
-            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed",
-                            mEndpointId, maxPreRollLength);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed", mEndpointId,
+                         maxPreRollLength);
             TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, maxPreRolllLengthStatus);
             return std::nullopt;
         }
