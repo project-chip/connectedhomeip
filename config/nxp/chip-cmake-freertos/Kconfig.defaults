@@ -56,6 +56,12 @@ config CHIP_TASK_STACK_SIZE
 config CHIP_TASK_PRIORITY
 	default 2
 
+config CHIP_USE_OT_ENDPOINT
+	default y if !CHIP_WITH_LWIP
+
+config CHIP_ENABLE_READ_CLIENT
+	default y
+
 config CHIP_DEVICE_HARDWARE_VERSION
 	default 1
 
@@ -138,6 +144,9 @@ endif # CHIP_FACTORY_DATA
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	default y
+
+config CHIP_OPTIMIZE_DEBUG_LEVEL
+	default "g" if CHIP_NXP_PLATFORM_MCXW71
 
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY
