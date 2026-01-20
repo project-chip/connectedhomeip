@@ -173,7 +173,6 @@ struct TestOnOffLightingCluster : public ::testing::Test
     template <typename T>
     void WriteAttributeToStorage(AttributeId id, const T & value)
     {
-
         EXPECT_EQ(mClusterTester.GetServerClusterContext().attributeStorage.WriteValue(
                       ConcreteAttributePath(kTestEndpointId, OnOff::Id, id), { (const uint8_t *) &value, sizeof(value) }),
                   CHIP_NO_ERROR);
@@ -183,14 +182,12 @@ struct TestOnOffLightingCluster : public ::testing::Test
     TimerDelegateMock mMockTimerDelegate;
     MockOnOffEffectDelegate mMockEffectDelegate;
     MockScenesIntegrationDelegate mMockScenesIntegrationDelegate;
-
     OnOffLightingCluster mCluster{ kTestEndpointId,
                                    {
                                        .timerDelegate             = mMockTimerDelegate,
                                        .effectDelegate            = mMockEffectDelegate,
                                        .scenesIntegrationDelegate = &mMockScenesIntegrationDelegate,
                                    } };
-
     ClusterTester mClusterTester{ mCluster };
 };
 
