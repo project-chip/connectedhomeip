@@ -47,6 +47,8 @@ public:
     CHIP_ERROR SetOnOff(bool on);
     bool GetOnOff() const { return mOnOff; }
 
+    BitMask<OnOff::Feature> GetFeatureMap() const { return mFeatureMap; }
+
     // Find out if a timer is active for a scene transition.
     bool IsSceneTransitionPending() { return mTimerDelegate.IsTimerActive(&mSceneTimer); }
 
