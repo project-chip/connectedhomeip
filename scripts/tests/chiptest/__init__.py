@@ -24,7 +24,7 @@ from typing import Iterator, Set
 import yaml
 
 from . import runner
-from .test_definition import StandardTargets, TestDefinition, TestTag, TestTarget
+from .test_definition import TestDefinition, TestTag, TestTarget
 
 log = logging.getLogger(__name__)
 
@@ -293,7 +293,7 @@ def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
 
     # default to a 'standard app name' if nothing set in the yaml file
     if not targets:
-        targets.append(StandardTargets.for_test_name(yaml_path.name))
+        targets.append(TestTarget(name='all-clusters', command='all-clusters'))
 
     return targets
 
