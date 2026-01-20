@@ -302,7 +302,10 @@ public:
     }
 
     /**
-     * Test whether if @a value can be losslessly encapsulated in a CHIP_ERROR.
+     * Test whether if @a value type can be losslessly encapsulated in a CHIP_ERROR.
+     *
+     * @note
+     * This function does not check the actual value, only the type T.
      */
     template <typename T>
     static constexpr bool CanEncapsulate(Range range, T value)
