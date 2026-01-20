@@ -139,14 +139,13 @@ struct WirelessSignal
 
 struct WiFiScanResponse
 {
-public:
     chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
     uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
     uint8_t ssidLen;
     uint8_t bssid[6];
     uint16_t channel;
     app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
-    int8_t rssi;
+    WirelessSignal signal;
 };
 
 static_assert(sizeof(WiFiScanResponse::ssid) <= std::numeric_limits<decltype(WiFiScanResponse::ssidLen)>::max(),
