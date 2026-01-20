@@ -488,7 +488,6 @@ TEST_F(TestOnOffLightingCluster, TestTimerCancellation)
 {
     // Step 1: Invoke OnWithTimedOff with OnTime=10 and OffWaitTime=0
     Commands::OnWithTimedOff::Type command;
-    command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command.onTime      = 10;
     command.offWaitTime = 0;
 
@@ -507,7 +506,6 @@ TEST_F(TestOnOffLightingCluster, TestOffWaitTime)
 {
     // Step 1: Invoke OnWithTimedOff with OnTime=10 and OffWaitTime=5
     Commands::OnWithTimedOff::Type command;
-    command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command.onTime      = 10;
     command.offWaitTime = 5;
 
@@ -718,7 +716,7 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_AcceptOnlyWhenOn)
     // Step 2: Call OnWithTimedOff with AcceptOnlyWhenOn = true.
     // The command should be discarded as the device is OFF.
     Commands::OnWithTimedOff::Type command;
-    command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 1);
+    command.onOffControl.Set(OnOffControlBitmap::kAcceptOnlyWhenOn);
     command.onTime      = 10;
     command.offWaitTime = 20;
 
@@ -743,7 +741,6 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_DelayedOffGuard)
     // Step 3: Call OnWithTimedOff. Since the device is OFF and OffWaitTime > 0,
     // the command should only potentially reduce OffWaitTime.
     Commands::OnWithTimedOff::Type command;
-    command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0); // Unconditional
     command.onTime      = 10;
     command.offWaitTime = 20;
 
@@ -861,7 +858,6 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_OnTimeActive)
 {
     // Step 1: Turn On with Timed Off (OnTime = 10, OffWaitTime = 0).
     Commands::OnWithTimedOff::Type command1;
-    command1.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command1.onTime      = 10;
     command1.offWaitTime = 0;
     EXPECT_TRUE(mClusterTester.Invoke(command1).IsSuccess());
@@ -870,7 +866,6 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_OnTimeActive)
     // Step 2: Call OnWithTimedOff again with a smaller OnTime (5).
     // OnTime should remain 10 because the new value is not greater.
     Commands::OnWithTimedOff::Type command2;
-    command2.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command2.onTime      = 5;
     command2.offWaitTime = 0;
     EXPECT_TRUE(mClusterTester.Invoke(command2).IsSuccess());
@@ -883,7 +878,6 @@ TEST_F(TestOnOffLightingCluster, TestOnWithTimedOff_OnTimeActive)
     // Step 3: Call OnWithTimedOff again with a larger OnTime (15).
     // OnTime should update to 15.
     Commands::OnWithTimedOff::Type command3;
-    command3.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command3.onTime      = 15;
     command3.offWaitTime = 0;
     EXPECT_TRUE(mClusterTester.Invoke(command3).IsSuccess());
@@ -915,7 +909,6 @@ TEST_F(TestOnOffLightingCluster, TestWriteOffWaitTimeWhenOnTimeActive)
 {
     // Step 1: Turn ON with OnTime to start the OnTime timer.
     Commands::OnWithTimedOff::Type command1;
-    command1.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command1.onTime      = 10;
     command1.offWaitTime = 0;
     EXPECT_TRUE(mClusterTester.Invoke(command1).IsSuccess());
@@ -996,7 +989,6 @@ TEST_F(TestOnOffLightingCluster, TestOffToTimedOn)
 
     // Step 2: Invoke OnWithTimedOff command.
     Commands::OnWithTimedOff::Type command;
-    command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
     command.onTime      = 50;
     command.offWaitTime = 30;
 
@@ -1022,3 +1014,4 @@ TEST_F(TestOnOffLightingCluster, TestOffToTimedOn)
 }
 
 } // namespace
+

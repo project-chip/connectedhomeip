@@ -474,6 +474,8 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
         return Status::Success; // Discard
     }
 
+    const bool wasOn = GetOnOff();
+
     // we have to turn the device on EXCEPT if we already in a TIMED_OFF state
     if (mOffWaitTime == 0 && !GetOnOff())
     {
@@ -488,7 +490,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
     }
 
     // state transition logic between ON/OFF/TIMED_ON/TIMED_OFF
-    if (GetOnOff())
+    if (wasOn)
     {
         // we are in a form of ON state. Determine which.
         if (mOnTime > 0)
