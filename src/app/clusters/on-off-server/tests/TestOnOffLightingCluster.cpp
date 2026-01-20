@@ -1014,4 +1014,3 @@ TEST_F(TestOnOffLightingCluster, TestOffToTimedOn)
 }
 
 } // namespace
-
