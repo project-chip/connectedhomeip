@@ -197,8 +197,8 @@ flowchart TD
 ```
 
 In order to run tests with mocked BLE and Wi-Fi connectivity and Linux network
-namespaces use the `--commissioning-method ble-wifi` option to the `run` command of the
-`scripts/tests/run_test_suite.py` script:
+namespaces use the `--commissioning-method ble-wifi` option to the `run` command
+of the `scripts/tests/run_test_suite.py` script:
 
 ```shell
 # Run the TestOperationalState test case with ble-wifi commissioning
