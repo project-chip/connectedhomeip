@@ -52,15 +52,15 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
 
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -68,10 +68,10 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     mAdministratorCommissioningCluster.Create(
         endpointId, BitFlags<AdministratorCommissioning::Feature>{},
-        AdministratorCommissioningCluster::Context{
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-            .fabricTable                = Server::GetInstance().GetFabricTable(),
-            .failSafeContext            = Server::GetInstance().GetCommissioningWindowManager().GetFailSafeContext() });
+        AdministratorCommissioningCluster::Context{ .commissioningWindowManager =
+                                                        Server::GetInstance().GetCommissioningWindowManager(),
+                                                    .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                    .failSafeContext = Server::GetInstance().GetFailSafeContext() });
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
