@@ -39612,6 +39612,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _chimeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -39622,6 +39624,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRChimeClusterPlayChimeSoundParams alloc] init];
 
+    other.chimeID = self.chimeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -39630,7 +39633,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; >", NSStringFromClass([self class]), _chimeID];
     return descriptionString;
 }
 
@@ -39642,6 +39645,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     chip::app::Clusters::Chime::Commands::PlayChimeSound::Type encodableStruct;
     ListFreer listFreer;
+    {
+        if (self.chimeID != nil) {
+            auto & definedValue_0 = encodableStruct.chimeID.Emplace();
+            definedValue_0 = self.chimeID.unsignedCharValue;
+        }
+    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
