@@ -74,7 +74,7 @@ struct TestOnOffCluster : public ::testing::Test
     MockOnOffDelegate mMockDelegate;
     TimerDelegateMock mMockTimerDelegate;
 
-    OnOffCluster mCluster{ kTestEndpointId, mMockTimerDelegate };
+    OnOffCluster mCluster{ kTestEndpointId, { .timerDelegate = mMockTimerDelegate } };
 
     ClusterTester mClusterTester{ mCluster };
 };
@@ -158,7 +158,7 @@ TEST_F(TestOnOffCluster, TestNoPersistence)
     // Step 1: Initial startup, set to ON
     {
         TestServerClusterContext context;
-        OnOffCluster cluster(kTestEndpointId, mockTimerDelegate);
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate });
         cluster.AddDelegate(&mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster); // Uses its own context
@@ -172,14 +172,79 @@ TEST_F(TestOnOffCluster, TestNoPersistence)
     // Step 2: Restart, verify state is NOT persisted (should be default OFF)
     {
         TestServerClusterContext context;
-        OnOffCluster cluster(kTestEndpointId, mockTimerDelegate);
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate });
         cluster.AddDelegate(&mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster); // Uses its own context
 
         bool onOff = true; // Initialize to true to ensure it's changed
         EXPECT_EQ(tester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
+
         EXPECT_FALSE(onOff);
+    }
+}
+
+TEST_F(TestOnOffCluster, TestPersistence)
+
+{
+    MockOnOffDelegate mockDelegate;
+    TimerDelegateMock mockTimerDelegate;
+    TestServerClusterContext context;
+
+    // Step 1: Initial startup, set to ON and check persistence
+    {
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate });
+        cluster.AddDelegate(&mockDelegate);
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        chip::Testing::ClusterTester tester(cluster);
+
+        EXPECT_TRUE(tester.Invoke<Commands::On::Type>(Commands::On::Type()).IsSuccess());
+        bool onOff = false;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
+        EXPECT_TRUE(onOff);
+
+        // Check that the value is persisted in storage
+        uint8_t persistedValue = 0;
+        MutableByteSpan span(&persistedValue, sizeof(persistedValue));
+        EXPECT_EQ(context.Get().attributeStorage.ReadValue(
+                      ConcreteAttributePath(kTestEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id), span),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(persistedValue != 0);
+    }
+
+    // Step 2: Restart, verify state IS persisted
+    {
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate });
+        cluster.AddDelegate(&mockDelegate);
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        chip::Testing::ClusterTester tester(cluster);
+
+        bool onOff = false; // Initialize to false to ensure it's changed
+        EXPECT_EQ(tester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
+        EXPECT_TRUE(onOff);
+    }
+}
+
+TEST_F(TestOnOffCluster, TestDefaultValue)
+{
+    MockOnOffDelegate mockDelegate;
+    TimerDelegateMock mockTimerDelegate;
+    TestServerClusterContext context;
+
+    // Test with default false
+    {
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate, .defaults = { .onOff = false } });
+        cluster.AddDelegate(&mockDelegate);
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        EXPECT_FALSE(cluster.GetOnOff());
+    }
+
+    // Test with default true
+    {
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate, .defaults = { .onOff = true } });
+        cluster.AddDelegate(&mockDelegate);
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        EXPECT_TRUE(cluster.GetOnOff());
     }
 }
 
@@ -198,7 +263,8 @@ struct TestOffOnlyOnOffCluster : public ::testing::Test
 
     MockOnOffDelegate mMockDelegate;
     TimerDelegateMock mMockTimerDelegate;
-    OnOffCluster mCluster{ kTestEndpointId, mMockTimerDelegate, BitMask<Feature>(Feature::kOffOnly) };
+    OnOffCluster mCluster{ kTestEndpointId,
+                           { .timerDelegate = mMockTimerDelegate, .featureMap = BitMask<Feature>(Feature::kOffOnly) } };
     ClusterTester mClusterTester{ mCluster };
 };
 
