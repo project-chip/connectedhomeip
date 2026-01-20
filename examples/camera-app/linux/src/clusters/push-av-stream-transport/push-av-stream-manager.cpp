@@ -465,8 +465,8 @@ bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollL
     {
         if (stream.videoStreamID == videoStreamId.Value().Value())
         {
-            // Max pre roll length must be less than key frame interval
-            if (maxPreRollLength < stream.keyFrameInterval)
+            // Max pre-roll length must be greater than or equal to key frame interval of the stream. Otherwise, it's invalid.
+            if (maxPreRollLength >= stream.keyFrameInterval)
             {
                 return true;
             }

@@ -153,7 +153,7 @@ public:
      *
      * @param maxPreRollLength Max Pre Roll length to validate
      * @param videoStreamId The video stream ID to be validated against
-     * @return true if the Max Pre Roll length is less than KeyFrameInterval for the provided videoStreamId, false otherwise
+     * @return true if the Max pre-roll length must be greater than or equal to key frame interval for the provided videoStreamId, false otherwise
      */
     virtual bool ValidateMaxPreRollLength(uint16_t maxPreRollLength,
                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
