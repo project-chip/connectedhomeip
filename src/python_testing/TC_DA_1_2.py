@@ -147,7 +147,7 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> Tuple[
 # --string-arg cd_cert_dir:'your_directory_name'
 # ex. --string-arg cd_cert_dir:'credentials/development/cd-certs'
 # default is the internal development CD signer certificates
-# This directory is only used for test CDs or provisional CDs when the override_provisional_cd_check flag is used.
+# This directory is only used for test CDs or provisional CDs when the override_provisional_cd_check_warning flag is used.
 # For production and provisional CDs with no flag, the internal production CD signer certificates are used
 
 
@@ -227,7 +227,7 @@ class TC_DA_1_2(BasicCompositionTests):
             setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
             await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
 
-        override_provisional_cd_check = self.user_params.get("override_provisional_cd_check_warning", False)
+        override_provisional_cd_check_warning = self.user_params.get("override_provisional_cd_check_warning", False)
 
         problem_location = CommandPathLocation(endpoint_id=0, cluster_id=Clusters.OperationalCredentials.id,
                                                command_id=Clusters.OperationalCredentials.Commands.AttestationRequest.command_id)
@@ -437,30 +437,33 @@ class TC_DA_1_2(BasicCompositionTests):
             self.mark_current_step_skipped()
 
         self.step(9)
+        signature_cd = bytes(signer_info['signature'])
+
+        def load_certs(cd_signers):
+            certs = {}
+            for filename in get_cd_certs(cd_signers).iterdir():
+                if not filename.name.endswith('.der'):
+                    continue
+                with filename.open("rb") as f:
+                    log.info(f'Parsing CD signing certificate file: {filename}')
+                    try:
+                        cert = x509.load_der_x509_certificate(f.read())
+                    except ValueError:
+                        log.info(f'File {filename} is not a valid certificate, skipping')
+                        continue
+                    pub = cert.public_key()
+                    ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
+                    certs[ski] = pub
+            return certs
         # If the CD is a test CD, or a provisional key with the specified override, it can be signed by the supplied CD signers.
         # if the CD is a provisional CD with no override, or a full production CD, it MUST be signed by the official CD signers.
-        if certification_type == 0 or (override_provisional_cd_check and certification_type == 1):
-            cd_signers = cd_cert_dir
+        prod_certs = load_certs(CredentialSource.kProduction)
+        if certification_type == 0 or (override_provisional_cd_check_warning and certification_type == 1):
+            certs = load_certs(cd_cert_dir)
         else:
-            cd_signers = CredentialSource.kProduction
+            certs = prod_certs
 
-        signature_cd = bytes(signer_info['signature'])
-        certs = {}
-        for filename in get_cd_certs(cd_signers).iterdir():
-            if not filename.name.endswith('.der'):
-                continue
-            with filename.open("rb") as f:
-                log.info(f'Parsing CD signing certificate file: {filename}')
-                try:
-                    cert = x509.load_der_x509_certificate(f.read())
-                except ValueError:
-                    log.info(f'File {filename} is not a valid certificate, skipping')
-                    continue
-                pub = cert.public_key()
-                ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
-                certs[ski] = pub
-
-        if certification_type == 1 and not override_provisional_cd_check and subject_key_identifier not in certs:
+        if certification_type == 1 and subject_key_identifier not in prod_certs:
             msg = """WARNING: This device is using a CD that is marked as provisional, but which is not signed by the official CSA
                      CD signing key.
 
@@ -472,10 +475,17 @@ class TC_DA_1_2(BasicCompositionTests):
                      During this transition period, non-CSA signed provisional CDs are still being accepted for certification
                      testing. Note that such CDs are NOT suitable for use on production devices.
 
+                     """
+            if override_provisional_cd_check_warning:
+                msg += "Press enter to acknowledge that this provisional CD cannot be used in a production device."
+                self.wait_for_user_input(msg)
+            else:
+                msg += """
                      To continue using a non-CSA signed provisional CD for certification testing, please set the
-                     override_provisional_cd_check_warning flag (`--bool-arg override_provisional_cd_check_warning:true') and re-run this test.
+                     override_provisional_cd_check_warning flag (`--bool-arg override_provisional_cd_check_warning:true')
+                     and re-run this test.
                    """
-            self.record_error(test_name=self.current_test_info.name, location=problem_location, problem=msg)
+                self.record_error(test_name=self.current_test_info.name, location=problem_location, problem=msg)
 
         asserts.assert_true(subject_key_identifier in certs, "Subject key identifier not found in CD certs")
         try:

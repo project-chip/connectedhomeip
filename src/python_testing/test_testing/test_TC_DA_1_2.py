@@ -16,6 +16,7 @@
 #    limitations under the License.
 #
 
+import io
 import json
 import os
 import subprocess
@@ -35,6 +36,7 @@ def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = Fa
 
     app = os.path.join(
         CHIP_ROOT, 'objdir-clone/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app')
+    app = os.path.join(CHIP_ROOT, 'out', 'linux-x64-all-clusters-no-ble', 'chip-all-clusters-app')
 
     # Certs in the commissioner_dut directory use 0x8000 as the PID
     app_args = '--discriminator 1234 --KVS kvs1 --product-id ' + \
@@ -117,8 +119,13 @@ def main():
     ret = run_single_test(path, pid)
     passes.append((f'{str(p)} (no flag)', ret, False))
 
+    # This should pass, but there is a manual step to acknowledge the provisional CD with the wrong signer
+    mock_input = io.StringIO("\n")
+    original_stdin = sys.stdin
+    sys.stdin = mock_input
     ret = run_single_test(path, pid, additional_script_args='--bool-arg override_provisional_cd_check_warning:true')
     passes.append((f'{str(p)} (flag=true)', ret, True))
+    sys.stdin = original_stdin
 
     ret = run_single_test(path, pid, additional_script_args='--bool-arg override_provisional_cd_check_warning:false')
     passes.append((f'{str(p)} (flag=false)', ret, False))
