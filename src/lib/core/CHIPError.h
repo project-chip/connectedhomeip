@@ -88,13 +88,17 @@ public:
      */
     enum class Range : uint8_t
     {
-        kSDK              = 0x0,  ///< CHIP SDK errors.
-        kOS               = 0x1,  ///< Encapsulated OS errors, other than POSIX errno.
-        kPOSIX            = 0x2,  ///< Encapsulated POSIX errno values.
-        kLwIP             = 0x3,  ///< Encapsulated LwIP errors.
-        kOpenThread       = 0x4,  ///< Encapsulated OpenThread errors.
-        kPlatform         = 0x5,  ///< Platform-defined encapsulation.
-        kPlatformExtended = 0x80, ///< Platform-defined encapsulation with 31-bit value.
+        kSDK        = 0x0, ///< CHIP SDK errors.
+        kOS         = 0x1, ///< Encapsulated OS errors, other than POSIX errno.
+        kPOSIX      = 0x2, ///< Encapsulated POSIX errno values.
+        kLwIP       = 0x3, ///< Encapsulated LwIP errors.
+        kOpenThread = 0x4, ///< Encapsulated OpenThread errors.
+        kPlatform   = 0x5, ///< Platform-defined encapsulation.
+        // Platform-defined encapsulation with 31-bit value. This is a special range which maximizes
+        // the number of bits available for the encapsulated value. Such approach should minimize the
+        // risk of value truncation when encapsulating platform-specific error codes. Since we do not
+        // control platform-specific error codes we should not make assumptions about their size.
+        kPlatformExtended = 0x80,
         kLastRange        = kPlatform,
     };
 
@@ -267,7 +271,9 @@ public:
     constexpr bool IsRange(Range range) const
     {
         if (range == Range::kPlatformExtended)
+        {
             return mError & (1u << kPlatformBit);
+        }
         return range == static_cast<Range>(GetField(kRangeStartBit, kRangeLength, mError));
     }
 
@@ -277,7 +283,9 @@ public:
     constexpr Range GetRange() const
     {
         if (mError & (1u << kPlatformBit))
+        {
             return Range::kPlatformExtended;
+        }
         return static_cast<Range>(GetField(kRangeStartBit, kRangeLength, mError));
     }
 
@@ -287,7 +295,9 @@ public:
     constexpr ValueType GetValue() const
     {
         if (mError & (1u << kPlatformBit))
+        {
             return GetField<ValueType>(kPlatformValueStart, kPlatformValueLength, mError);
+        }
         return GetField<ValueType>(kValueStartBit, kValueLength, mError);
     }
 
@@ -298,7 +308,9 @@ public:
     static constexpr bool CanEncapsulate(Range range, T value)
     {
         if (range == Range::kPlatformExtended)
+        {
             return std::numeric_limits<T>::min() >= kPlatformValueMin && std::numeric_limits<T>::max() <= kPlatformValueMax;
+        }
         return std::numeric_limits<T>::min() >= kValueMin && std::numeric_limits<T>::max() <= kValueMax;
     }
 
@@ -426,11 +438,13 @@ private:
         return MakeInteger(Range::kSDK, MakeField(kSdkPartStartBit, to_underlying(part)) | MakeField(kSdkCodeStartBit, code));
     }
 
+    // Clear all bits outside the value field.
+    //
+    // This function does not mask the value for the kPlatformExtended range because in
+    // case of kPlatformExtended the entire lower 31 bits are used for the value and the
+    // highest bit is set anyway to indicate this special range.
     static constexpr StorageType MaskValue(Range range, ValueType value)
     {
-        // Mask value for every range except kPlatformExtended range. The kPlatformExtended
-        // range is special, because we are using only the highest bit to determine whether
-        // the range is kPlatformExtended and the rest is used to store the value itself.
         // No masking is needed for kPlatformExtended because MakeInteger will set the MSB.
         return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStartBit, kValueLength))
                                                    : static_cast<StorageType>(value);
