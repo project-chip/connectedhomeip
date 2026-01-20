@@ -459,7 +459,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
     // state transition logic between ON/OFF/TIMED_ON/TIMED_OFF
     if (GetOnOff())
     {
-        // we are in a form of ON state. Determinie which.
+        // we are in a form of ON state. Determine which.
         if (mOnTime > 0)
         {
             // TIMED_ON state, stay here
