@@ -988,4 +988,37 @@ TEST_F(TestOnOffLightingCluster, TestToggleCommand)
     EXPECT_FALSE(onOffState);
 }
 
+TEST_F(TestOnOffLightingCluster, TestOffToTimedOn)
+{
+    // Step 1: Ensure device is OFF.
+    EXPECT_FALSE(mMockDelegate.mOnOff);
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
+
+    // Step 2: Invoke OnWithTimedOff command.
+    Commands::OnWithTimedOff::Type command;
+    command.onOffControl.SetField(OnOffControlBitmap::kAcceptOnlyWhenOn, 0);
+    command.onTime      = 50;
+    command.offWaitTime = 30;
+
+    EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
+
+    // Step 3: Verify the state transition to ON.
+    EXPECT_TRUE(mMockDelegate.mOnOff);
+    bool onOffState = false;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnOff::Id, onOffState), CHIP_NO_ERROR);
+    EXPECT_TRUE(onOffState);
+
+    // Step 4: Verify OnTime and OffWaitTime attributes.
+    uint16_t onTime = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OnTime::Id, onTime), CHIP_NO_ERROR);
+    EXPECT_EQ(onTime, 50);
+
+    uint16_t offWaitTime = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::OffWaitTime::Id, offWaitTime), CHIP_NO_ERROR);
+    EXPECT_EQ(offWaitTime, 30);
+
+    // Step 5: Verify that the timer is active.
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
+}
+
 } // namespace
