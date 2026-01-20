@@ -22,7 +22,9 @@ from .Types import Nullable, NullValue
 __all__ = [
     "Globals",
 {{#zcl_clusters}}
+{{~#unless (is_str_equal (if apiMaturity apiMaturity "") "internal")}}
     "{{asUpperCamelCase name}}",
+{{/unless~}}
 {{/zcl_clusters}}
 ]
 
@@ -55,6 +57,7 @@ class Globals:
 {{/zcl_structs}}
 
 {{#zcl_clusters}}
+{{~#unless (is_str_equal (if apiMaturity apiMaturity "") "internal")}}
 
 @dataclass
 class {{asUpperCamelCase name}}(Cluster):
@@ -210,4 +213,5 @@ class {{asUpperCamelCase name}}(Cluster):
             {{/zcl_event_fields}}
 
 {{/zcl_events}}
+{{~/unless}}
 {{/zcl_clusters}}

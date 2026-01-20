@@ -12307,3 +12307,15 @@ cluster SampleMei = 4294048800 {
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
 
+/** Test cluster for validating manufacturer-specific cluster handling without controller-side implementation */
+internal cluster TestHiddenManufacturerSpecific = 4294048801 {
+  revision 1; // NOTE: Default/not specifically set
+
+  readonly attribute boolean testAttribute = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
