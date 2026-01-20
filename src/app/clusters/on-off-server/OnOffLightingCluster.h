@@ -50,7 +50,7 @@ public:
         kOTA,
     };
 
-    // Represents defauls for NVS values if no persistent storage set
+    // Represents defaults for NVS values if no persistent storage set
     struct Defaults
     {
         bool onOff{};
