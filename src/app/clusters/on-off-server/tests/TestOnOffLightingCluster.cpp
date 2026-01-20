@@ -180,7 +180,12 @@ struct TestOnOffLightingCluster : public ::testing::Test
     MockOnOffEffectDelegate mMockEffectDelegate;
     MockScenesIntegrationDelegate mMockScenesIntegrationDelegate;
 
-    OnOffLightingCluster mCluster{ kTestEndpointId, mMockTimerDelegate, mMockEffectDelegate, &mMockScenesIntegrationDelegate };
+    OnOffLightingCluster mCluster{ kTestEndpointId,
+                                   {
+                                       .timerDelegate             = mMockTimerDelegate,
+                                       .effectDelegate            = mMockEffectDelegate,
+                                       .scenesIntegrationDelegate = &mMockScenesIntegrationDelegate,
+                                   } };
 
     ClusterTester mClusterTester{ mCluster };
 };
@@ -538,7 +543,10 @@ TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_RecallFails)
     // Step 2: Re-setup the cluster with the FailingRecallScenesIntegrationDelegate.
     FailingRecallScenesIntegrationDelegate failingDelegate;
     MockOnOffDelegate localMockDelegate;
-    OnOffLightingCluster cluster(kTestEndpointId, mMockTimerDelegate, mMockEffectDelegate, &failingDelegate);
+    OnOffLightingCluster cluster(kTestEndpointId,
+                                 { .timerDelegate             = mMockTimerDelegate,
+                                   .effectDelegate            = mMockEffectDelegate,
+                                   .scenesIntegrationDelegate = &failingDelegate });
     ClusterTester tester(cluster);
     cluster.AddDelegate(&localMockDelegate);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -797,7 +805,11 @@ TEST_F(TestOnOffLightingCluster, TestOnWithRecallGlobalScene_NullDelegate)
 
     // Step 2: Re-setup the cluster with a null scenes delegate.
     MockOnOffDelegate localMockDelegate;
-    OnOffLightingCluster cluster(kTestEndpointId, mMockTimerDelegate, mMockEffectDelegate, nullptr);
+    OnOffLightingCluster cluster(kTestEndpointId,
+                                 {
+                                     .timerDelegate  = mMockTimerDelegate,
+                                     .effectDelegate = mMockEffectDelegate,
+                                 });
     ClusterTester tester(cluster);
     cluster.AddDelegate(&localMockDelegate);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

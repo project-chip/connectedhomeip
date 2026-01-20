@@ -17,8 +17,12 @@
 #include <app/clusters/on-off-server/OnOffLightingCluster.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/OnOff/AttributeIds.h>
+#include <clusters/OnOff/ClusterId.h>
+#include <clusters/OnOff/Enums.h>
 #include <clusters/OnOff/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -29,12 +33,10 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
 
-OnOffLightingCluster::OnOffLightingCluster(EndpointId endpointId, TimerDelegate & timerDelegate,
-                                           OnOffEffectDelegate & effectDelegate,
-                                           chip::scenes::ScenesIntegrationDelegate * scenesIntegrationDelegate,
-                                           BitMask<Feature> featureMap) :
-    OnOffCluster(endpointId, timerDelegate, featureMap, { Feature::kLighting, Feature::kDeadFrontBehavior }),
-    mEffectDelegate(effectDelegate), mScenesIntegrationDelegate(scenesIntegrationDelegate)
+OnOffLightingCluster::OnOffLightingCluster(EndpointId endpointId, const Context & context) :
+    OnOffCluster(endpointId, context.timerDelegate, context.featureMap, { Feature::kLighting, Feature::kDeadFrontBehavior }),
+    mEffectDelegate(context.effectDelegate), mScenesIntegrationDelegate(context.scenesIntegrationDelegate),
+    mStartupType(context.startupType)
 {}
 
 OnOffLightingCluster::~OnOffLightingCluster()
@@ -59,33 +61,36 @@ CHIP_ERROR OnOffLightingCluster::Startup(ServerClusterContext & context)
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::StartUpOnOff::Id), mStartUpOnOff, {});
 
-    // Apply StartUpOnOff behavior
-    if (!mStartUpOnOff.IsNull())
+    if (mStartupType != StartupType::kOTA)
     {
-        bool targetState = GetOnOff();
-        switch (mStartUpOnOff.Value())
+        // Apply StartUpOnOff behavior
+        if (!mStartUpOnOff.IsNull())
         {
-        case StartUpOnOffEnum::kOff:
-            targetState = false;
-            break;
-        case StartUpOnOffEnum::kOn:
-            targetState = true;
-            break;
-        case StartUpOnOffEnum::kToggle:
-            targetState = !targetState;
-            break;
-        default:
-            // Invalid value, keep previous
-            break;
-        }
-        if (mOnOff != targetState)
-        {
-            // If startup value modified the state, make sure we also persist it.
-            // In practice this means "toggle" will flip it on every reboot.
-            mOnOff = targetState;
-            LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-                ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
-                ByteSpan(reinterpret_cast<const uint8_t *>(&mOnOff), sizeof(mOnOff))));
+            bool targetState = GetOnOff();
+            switch (mStartUpOnOff.Value())
+            {
+            case StartUpOnOffEnum::kOff:
+                targetState = false;
+                break;
+            case StartUpOnOffEnum::kOn:
+                targetState = true;
+                break;
+            case StartUpOnOffEnum::kToggle:
+                targetState = !targetState;
+                break;
+            default:
+                // Invalid value, keep previous
+                break;
+            }
+            if (mOnOff != targetState)
+            {
+                // If startup value modified the state, make sure we also persist it.
+                // In practice this means "toggle" will flip it on every reboot.
+                mOnOff = targetState;
+                LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+                    ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
+                    ByteSpan(reinterpret_cast<const uint8_t *>(&mOnOff), sizeof(mOnOff))));
+            }
         }
     }
 
