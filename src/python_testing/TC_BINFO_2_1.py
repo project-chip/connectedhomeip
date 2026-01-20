@@ -527,8 +527,8 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info("Verified LocalConfigDisabled update successful")
 
         # Step 51: Reachable
-        self.step(51)
         if self.check_pics("BINFO.S.A0011"):
+            self.step(51)
             reachable = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.Reachable, endpoint=self.endpoint)
             log.info(f"Read Reachable: {reachable}")
             assert_valid_bool(reachable, "Reachable")
@@ -546,13 +546,15 @@ class TC_BINFO_2_1(MatterBaseTest):
             asserts.assert_equal(reachable, reachable_after, "Reachable should remain unchanged")
             log.info("Verified Reachable unchanged verification successful")
         else:
-            log.info("Step 51 & 52: Skipping Reachable (BINFO.S.A0011) - Optional/PICS disabled")
+            log.info("Skipping steps 51 & 52")
+            self.step(51)
             self.step("52a")
             self.step("52b")
 
         # Step 53: UniqueID
-        self.step(53)
+        
         if self.check_pics("BINFO.S.A0012"):
+            self.step(53)
             uid = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.UniqueID, endpoint=self.endpoint)
             log.info(f"Read UniqueID: {uid}")
             assert_is_string(uid, "UniqueID")
@@ -572,7 +574,8 @@ class TC_BINFO_2_1(MatterBaseTest):
             asserts.assert_equal(val, uid, "UniqueID changed after failed write")
             log.info("Verified UniqueID unchanged verification successful")
         else:
-            log.info("Step 53-55: Skipping UniqueID (BINFO.S.A0012) - Optional/PICS disabled")
+            log.info("Skipping steps 53-55")
+            self.step(53)
             self.step(54)
             self.step(55)
 
@@ -641,7 +644,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info("Verified CapabilityMinima unchanged verification successful")
 
         # Step 60: ProductAppearance is an optional attribute
-        if cluster.has_attribute(attributes.ProductAppearance):
+        if self.check_pics("BINFO.S.A0014"):
             self.step(60)
             pa = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ProductAppearance, endpoint=self.endpoint)
             log.info(f"Read ProductAppearance: {pa}")
@@ -697,7 +700,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info("Verified SpecificationVersion unchanged verification successful")
 
         # Step 66: MaxPathsPerInvoke is an optional attribute
-        if cluster.has_attribute(attributes.MaxPathsPerInvoke):
+        if self.check_pics("BINFO.S.A0010"):
             self.step(66)
             mpi = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.MaxPathsPerInvoke, endpoint=self.endpoint)
             log.info(f"Read MaxPathsPerInvoke: {mpi}")
@@ -724,7 +727,7 @@ class TC_BINFO_2_1(MatterBaseTest):
             self.step(68)
 
         # Step 69: ConfigurationVersion is an optional attribute
-        if cluster.has_attribute(attributes.ConfigurationVersion):
+        if self.check_pics("BINFO.S.A000e"):
             self.step(69)
             config_version = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.ConfigurationVersion, endpoint=self.endpoint)
             log.info(f"Read ConfigurationVersion: {config_version}")
