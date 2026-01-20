@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/storage/FabricTableImpl.ipp> // nogncheck
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/TLV.h>
@@ -23,6 +24,135 @@
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
 #include <stdlib.h>
+
+using Serializer = chip::app::Storage::DefaultSerializer<chip::Groupcast::DataId, chip::Groupcast::Data>;
+
+namespace chip {
+namespace app {
+namespace Storage {
+
+struct Tags
+{
+    static constexpr TLV::Tag GroupId() { return TLV::ContextTag(1); }
+    static constexpr TLV::Tag KeyId() { return TLV::ContextTag(2); }
+    static constexpr TLV::Tag EndpointCount() { return TLV::ContextTag(10); }
+    static constexpr TLV::Tag EndpointList() { return TLV::ContextTag(12); }
+    static constexpr TLV::Tag EndpointEntry() { return TLV::ContextTag(13); }
+};
+
+template <>
+StorageKeyName Serializer::EndpointEntryCountKey(EndpointId endpoint_id)
+{
+    return DefaultStorageKeyAllocator::GroupcastEntryCountKey();
+}
+
+template <>
+StorageKeyName Serializer::FabricEntryKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+{
+    return DefaultStorageKeyAllocator::GroupcastFabricEntryKey(fabric, idx);
+}
+
+template <>
+StorageKeyName Serializer::FabricEntryDataKey(FabricIndex fabric, EndpointId endpoint)
+{
+    return DefaultStorageKeyAllocator::GroupcastFabricEntryDataKey(fabric);
+}
+
+template <>
+constexpr size_t Serializer::kEntryMaxBytes()
+{
+    return TLV::EstimateStructOverhead(sizeof(GroupId) + sizeof(KeysetId) + sizeof(uint16_t),
+                                       Groupcast::kMaxEndpointsPerGroup * TLV::EstimateStructOverhead(sizeof(EndpointId)));
+}
+
+template <>
+constexpr uint16_t Serializer::kMaxPerFabric()
+{
+    return Groupcast::kMaxGroupsPerFabric;
+}
+
+template <>
+constexpr uint16_t Serializer::kMaxPerEndpoint()
+{
+    return Groupcast::kMaxEndpointsPerGroup;
+}
+
+template <>
+CHIP_ERROR Serializer::SerializeId(TLV::TLVWriter & writer, const Groupcast::DataId & id)
+{
+    ReturnErrorOnFailure(writer.Put(Tags::GroupId(), id.mGroupId));
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Serializer::DeserializeId(TLV::TLVReader & reader, Groupcast::DataId & id)
+{
+    // Scene ID
+    ReturnErrorOnFailure(reader.Next(Tags::GroupId()));
+    ReturnErrorOnFailure(reader.Get(id.mGroupId));
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Serializer::SerializeData(TLV::TLVWriter & writer, const Groupcast::Data & data)
+{
+    ReturnErrorOnFailure(writer.Put(Tags::GroupId(), static_cast<uint16_t>(data.groupID)));
+    ReturnErrorOnFailure(writer.Put(Tags::KeyId(), static_cast<uint32_t>(data.keySetID)));
+    ReturnErrorOnFailure(writer.Put(Tags::EndpointCount(), static_cast<uint16_t>(data.endpointCount)));
+    // Endpoints
+    {
+        TLV::TLVType array, item;
+        ReturnErrorOnFailure(writer.StartContainer(Tags::EndpointList(), TLV::kTLVType_Array, array));
+        for (size_t i = 0; i < data.endpointCount; ++i)
+        {
+            ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, item));
+            // Endpoint
+            ReturnErrorOnFailure(writer.Put(Tags::EndpointEntry(), data.endpoints[i]));
+            ReturnErrorOnFailure(writer.EndContainer(item));
+        }
+        ReturnErrorOnFailure(writer.EndContainer(array));
+    }
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR Serializer::DeserializeData(TLV::TLVReader & reader, Groupcast::Data & data)
+{
+    // Group Id
+    ReturnErrorOnFailure(reader.Next(Tags::GroupId()));
+    ReturnErrorOnFailure(reader.Get(data.groupID));
+    // Key Id
+    ReturnErrorOnFailure(reader.Next(Tags::KeyId()));
+    ReturnErrorOnFailure(reader.Get(data.keySetID));
+    // Endpoint Count
+    ReturnErrorOnFailure(reader.Next(Tags::EndpointCount()));
+    ReturnErrorOnFailure(reader.Get(data.endpointCount));
+    // Endpoints
+    ReturnErrorOnFailure(reader.Next(Tags::EndpointList()));
+    VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_INTERNAL);
+    {
+        TLV::TLVType array, item;
+        ReturnErrorOnFailure(reader.EnterContainer(array));
+        for (size_t i = 0; i < data.endpointCount; ++i)
+        {
+            ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
+            VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+            ReturnErrorOnFailure(reader.EnterContainer(item));
+            // Endpoint
+            ReturnErrorOnFailure(reader.Next(Tags::EndpointEntry()));
+            ReturnErrorOnFailure(reader.Get(data.endpoints[i]));
+            ReturnErrorOnFailure(reader.ExitContainer(item));
+        }
+        ReturnErrorOnFailure(reader.ExitContainer(array));
+    }
+    return CHIP_NO_ERROR;
+}
+
+template class chip::app::Storage::FabricTableImpl<chip::Groupcast::DataId, chip::Groupcast::Data>;
+
+} // namespace Storage
+} // namespace app
+} // namespace chip
 
 namespace chip {
 namespace Credentials {
@@ -838,6 +968,7 @@ void GroupDataProviderImpl::SetStorageDelegate(PersistentStorageDelegate * stora
 {
     VerifyOrDie(storage != nullptr);
     mStorage = storage;
+    TEMPORARY_RETURN_IGNORED mList.Init(*storage);
 }
 
 //
@@ -1954,6 +2085,150 @@ void GroupDataProviderImpl::GroupSessionIteratorImpl::Release()
 {
     mGroupKeyContext.ReleaseKeys();
     mProvider.mGroupSessionsIterator.ReleaseObject(this);
+}
+
+CHIP_ERROR GroupDataProviderImpl::Initialize(PersistentStorageDelegate * storage, chip::Crypto::SessionKeystore * keystore)
+{
+    VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(keystore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mStorage         = storage;
+    mSessionKeystore = keystore;
+    return mList.Init(*storage);
+}
+
+bool GroupDataProviderImpl::IsInitialized()
+{
+    return (nullptr != mStorage) && (nullptr != mSessionKeystore);
+}
+
+uint8_t GroupDataProviderImpl::GetMaxMembershipCount()
+{
+    return Groupcast::kMaxMembershipCount;
+}
+
+CHIP_ERROR GroupDataProviderImpl::SetGroup(chip::FabricIndex fabric_index, Groupcast::Data & group)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> buffer;
+    Groupcast::DataId id(group.groupID);
+    return mList.SetTableEntry(fabric_index, id, group, buffer);
+}
+
+CHIP_ERROR GroupDataProviderImpl::GetGroup(FabricIndex fabric_index, Groupcast::Data & group)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> buffer;
+    Groupcast::DataId id(group.groupID);
+    return mList.GetTableEntry(fabric_index, id, group, buffer);
+}
+
+CHIP_ERROR GroupDataProviderImpl::RemoveGroup(FabricIndex fabric_index, GroupId group_id)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    Groupcast::DataId id(group_id);
+    return mList.RemoveTableEntry(fabric_index, id);
+}
+
+CHIP_ERROR GroupDataProviderImpl::SetEndpoints(FabricIndex fabric_index, Groupcast::Data & group)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(group.endpointCount <= Groupcast::kMaxEndpointsPerGroup, CHIP_ERROR_INVALID_ARGUMENT);
+
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> buffer;
+    Groupcast::DataId id(group.groupID);
+    Groupcast::Data entry;
+
+    ReturnErrorOnFailure(mList.GetTableEntry(fabric_index, id, entry, buffer));
+    entry.endpointCount = group.endpointCount;
+    for (size_t i = 0; i < entry.endpointCount; ++i)
+    {
+        entry.endpoints[i] = group.endpoints[i];
+    }
+    return mList.SetTableEntry(fabric_index, id, entry, buffer);
+}
+
+CHIP_ERROR GroupDataProviderImpl::IterateGroups(FabricIndex fabric, IteratorCallback iterateFn)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    PersistenceBuffer<Serializer::kEntryMaxBytes()> buffer;
+    return mList.IterateEntries(fabric, buffer, [&](auto & iter) {
+        app::Storage::Data::TableEntryDataConvertingIterator<Groupcast::DataId, Groupcast::Data> innerIter(iter);
+        return iterateFn(innerIter);
+    });
+}
+
+chip::Crypto::SymmetricKeyContext * GroupDataProviderImpl::CreateKeyContext(FabricIndex fabric_index, GroupId groupId)
+{
+    VerifyOrReturnError(IsInitialized(), nullptr);
+    Groupcast::Data group(groupId);
+    VerifyOrReturnError(CHIP_NO_ERROR == GetGroup(fabric_index, group), nullptr);
+    // return mLegacyGroups->GetKeysetContext(fabric_index, group.keySetID);
+
+    FabricData fabric(fabric_index);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), nullptr);
+
+    KeySetData keyset;
+    VerifyOrReturnError(keyset.Find(mStorage, fabric, group.keySetID), nullptr);
+    Crypto::GroupOperationalCredentials * creds = keyset.GetCurrentGroupCredentials();
+    if (nullptr != creds)
+    {
+        return mGroupKeyContexPool.CreateObject(*this, creds->encryption_key, creds->hash, creds->privacy_key);
+    }
+    return nullptr;
+}
+
+CHIP_ERROR GroupDataProviderImpl::FindGroupSession(FabricIndex fabric_index, uint16_t hash, GroupSession & session)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    KeysetId keyset_id = 0;
+    auto policy        = GroupDataProvider::SecurityPolicy::kUnknownEnumValue;
+    session.Clear();
+
+    // Find context
+
+    FabricData fabric(fabric_index);
+    ReturnErrorOnFailure(fabric.Load(mStorage));
+
+    Crypto::SymmetricKeyContext * context = nullptr;
+    keyset_id                             = fabric.first_keyset;
+    while (keyset_id)
+    {
+        KeySetData keyset(fabric_index, keyset_id);
+        ReturnErrorOnFailure(keyset.Load(mStorage));
+        Crypto::GroupOperationalCredentials * creds = keyset.GetCurrentGroupCredentials();
+        if ((nullptr != creds && (creds->hash == hash)))
+        {
+            context = mGroupKeyContexPool.CreateObject(*this, creds->encryption_key, creds->hash, creds->privacy_key);
+            policy  = keyset.policy;
+            break;
+        }
+        keyset_id = keyset.next;
+    }
+    VerifyOrReturnError(nullptr != context, CHIP_ERROR_NOT_FOUND);
+
+    // Find group with matching keySetID
+
+    Groupcast::Data group;
+    auto result = IterateGroups(fabric_index, [&](auto & iter) -> CHIP_ERROR {
+        while (iter.Next(group))
+        {
+            if (keyset_id == group.keySetID)
+            {
+                session.fabric_index    = fabric_index;
+                session.group_id        = group.groupID;
+                session.security_policy = policy;
+                session.keyContext      = context;
+                return CHIP_NO_ERROR;
+            }
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+    if (context && (CHIP_NO_ERROR != result))
+    {
+        context->Release();
+    }
+    return result;
 }
 
 namespace {

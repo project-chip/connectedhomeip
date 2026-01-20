@@ -37,6 +37,7 @@ namespace Clusters {
 class GroupcastLogic
 {
 public:
+    GroupcastLogic() {}
     GroupcastLogic(BitFlags<Groupcast::Feature> features) : mFeatures(features) {}
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 

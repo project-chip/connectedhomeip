@@ -193,6 +193,19 @@ public:
     GroupSessionIterator * IterateGroupSessions(uint16_t) override { return nullptr; }
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex, GroupId) override { return nullptr; }
 
+    uint8_t GetMaxMembershipCount() override { return 0; }
+    CHIP_ERROR SetGroup(chip::FabricIndex fabric_index, chip::Groupcast::Data & group) override { return CHIP_ERROR_NOT_FOUND; }
+    CHIP_ERROR GetGroup(FabricIndex fabric_index, chip::Groupcast::Data & group) override { return CHIP_ERROR_NOT_FOUND; }
+    CHIP_ERROR RemoveGroup(FabricIndex fabric_index, GroupId group_id) override { return CHIP_ERROR_NOT_FOUND; }
+    CHIP_ERROR SetEndpoints(FabricIndex fabric_index, chip::Groupcast::Data & group) override { return CHIP_ERROR_NOT_FOUND; }
+    CHIP_ERROR IterateGroups(FabricIndex fabric, IteratorCallback iterateFn) override { return CHIP_ERROR_NOT_FOUND; }
+
+    chip::Crypto::SymmetricKeyContext * CreateKeyContext(FabricIndex fabric, GroupId groupId) override { return nullptr; }
+    CHIP_ERROR FindGroupSession(FabricIndex fabric_index, uint16_t hash, GroupSession & session) override
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
     bool mHasEndpoint = true;
 };
 

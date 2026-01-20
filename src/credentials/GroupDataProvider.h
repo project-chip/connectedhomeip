@@ -27,7 +27,70 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 
+#include <app/storage/FabricTableImpl.h> // nogncheck
+#include <app/storage/TableEntry.h>      // nogncheck
+#include <functional>
+
 namespace chip {
+namespace Groupcast {
+
+constexpr size_t kMaxMembershipCount   = CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT;
+constexpr size_t kMaxGroupsPerFabric   = kMaxMembershipCount;
+constexpr size_t kMaxEndpointsPerGroup = 20; // Groupcast 7.1.2 (Endpoints Field)
+
+struct DataId
+{
+    // Identifies group within the scope of the given fabric
+    GroupId mGroupId = kUndefinedGroupId;
+
+    DataId(GroupId groupId = kUndefinedGroupId) : mGroupId(groupId) {}
+
+    void Clear() { mGroupId = kUndefinedGroupId; }
+
+    bool IsValid() { return (mGroupId != kUndefinedGroupId); }
+
+    bool operator==(const DataId & other) const { return (mGroupId == other.mGroupId); }
+};
+
+struct Data
+{
+    Data() = default;
+    Data(GroupId gid) : groupID(gid) {}
+    Data(GroupId gid, KeysetId kid) : groupID(gid), keySetID(kid) {}
+
+    Data & operator=(const Data & t)
+    {
+        this->groupID       = t.groupID;
+        this->endpointCount = t.endpointCount;
+        memcpy(this->endpoints, t.endpoints, this->endpointCount * sizeof(EndpointId));
+        return *this;
+    }
+
+    void Clear()
+    {
+        groupID       = kUndefinedGroupId;
+        keySetID      = 0;
+        endpointCount = 0;
+        memset(endpoints, 0, sizeof(endpoints));
+    }
+
+    GroupId groupID        = kUndefinedGroupId;
+    KeysetId keySetID      = 0;
+    uint16_t endpointCount = 0;
+    EndpointId endpoints[kMaxEndpointsPerGroup];
+};
+
+class List : public app::Storage::FabricTableImpl<DataId, Data>
+{
+public:
+    using Super = app::Storage::FabricTableImpl<DataId, Data>;
+    using Entry = app::Storage::Data::TableEntryRef<DataId, Data>;
+
+    List() : Super(kMaxGroupsPerFabric, kMaxEndpointsPerGroup) { SetEndpoint(kRootEndpointId); }
+    ~List() { Finish(); };
+};
+
+} // namespace Groupcast
 namespace Credentials {
 
 class GroupDataProvider
@@ -114,6 +177,13 @@ public:
         FabricIndex fabric_index;
         SecurityPolicy security_policy;
         Crypto::SymmetricKeyContext * keyContext = nullptr;
+
+        void Clear()
+        {
+            group_id     = kUndefinedGroupId;
+            fabric_index = kUndefinedFabricIndex;
+            keyContext   = nullptr;
+        }
     };
 
     // An EpochKey is a single key usable to determine an operational group key
@@ -315,6 +385,23 @@ public:
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
+
+    //
+    // Groupcast
+    //
+
+    using KeyContext       = chip::Crypto::SymmetricKeyContext;
+    using IteratorCallback = std::function<CHIP_ERROR(CommonIterator<Groupcast::Data> & iterator)>;
+
+    virtual uint8_t GetMaxMembershipCount()                                              = 0;
+    virtual CHIP_ERROR SetGroup(chip::FabricIndex fabric_index, Groupcast::Data & group) = 0;
+    virtual CHIP_ERROR GetGroup(FabricIndex fabric_index, Groupcast::Data & group)       = 0;
+    virtual CHIP_ERROR RemoveGroup(FabricIndex fabric_index, GroupId group_id)           = 0;
+    virtual CHIP_ERROR SetEndpoints(FabricIndex fabric_index, Groupcast::Data & group)   = 0;
+    virtual CHIP_ERROR IterateGroups(FabricIndex fabric, IteratorCallback iterateFn)     = 0;
+
+    virtual chip::Crypto::SymmetricKeyContext * CreateKeyContext(FabricIndex fabric, GroupId groupId)    = 0;
+    virtual CHIP_ERROR FindGroupSession(FabricIndex fabric_index, uint16_t hash, GroupSession & session) = 0;
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)

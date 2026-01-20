@@ -97,6 +97,21 @@ public:
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) override;
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
+    //
+    // Groupcast
+    //
+    CHIP_ERROR Initialize(PersistentStorageDelegate * storage, chip::Crypto::SessionKeystore * keystore);
+    bool IsInitialized();
+    uint8_t GetMaxMembershipCount() override;
+    CHIP_ERROR SetGroup(chip::FabricIndex fabric_index, Groupcast::Data & group) override;
+    CHIP_ERROR GetGroup(FabricIndex fabric_index, Groupcast::Data & group) override;
+    CHIP_ERROR RemoveGroup(FabricIndex fabric_index, GroupId group_id) override;
+    CHIP_ERROR SetEndpoints(FabricIndex fabric_index, Groupcast::Data & group) override;
+    CHIP_ERROR IterateGroups(FabricIndex fabric, IteratorCallback iterateFn) override;
+
+    chip::Crypto::SymmetricKeyContext * CreateKeyContext(FabricIndex fabric, GroupId groupId) override;
+    CHIP_ERROR FindGroupSession(FabricIndex fabric_index, uint16_t hash, GroupSession & session) override;
+
 protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator
     {
@@ -243,9 +258,9 @@ protected:
         bool mFirstMap           = true;
         GroupKeyContext mGroupKeyContext;
     };
-    bool IsInitialized() { return (mStorage != nullptr); }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
+    Groupcast::List mList;
     PersistentStorageDelegate * mStorage       = nullptr;
     Crypto::SessionKeystore * mSessionKeystore = nullptr;
     ObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
