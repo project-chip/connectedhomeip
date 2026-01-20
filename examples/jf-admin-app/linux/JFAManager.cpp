@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/server/Server.h>
 
 #include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -103,6 +104,73 @@ void JFAManager::HandleCommissioningCompleteEvent()
                     kJointFabricAdminEndpointId, fabricIndex);
 
                 jfFabricIndex = fabricIndex;
+
+                // Set AnchorRootCA
+                uint8_t mAnchorRootCABuffer[Credentials::kMaxDERCertLength];
+                MutableByteSpan rootCertSpan(mAnchorRootCABuffer);
+                if (mServer->GetFabricTable().FetchRootCert(fabricIndex, rootCertSpan) == CHIP_NO_ERROR)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorRootCA(rootCertSpan) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorRootCA (%u bytes)", static_cast<unsigned>(rootCertSpan.size()));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorRootCA");
+                    }
+                }
+
+                // obtain nodeid and use it to set anchornodeid
+                NodeId nodeId = fb.GetNodeId();
+                if (nodeId != kUndefinedNodeId)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorNodeId(nodeId) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorNodeId to 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorNodeId to 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+                    }
+                }
+
+                VendorId vendorId = fb.GetVendorId();
+                if (vendorId != VendorId::NotSpecified)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorVendorId(vendorId) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorVendorId to %d", vendorId);
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorVendorId to %d", vendorId);
+                    }
+                }
+
+                if (vendorId != VendorId::NotSpecified && nodeId != kUndefinedNodeId)
+                {
+                    char friendlyNameBuffer[32];
+                    int written = snprintf(friendlyNameBuffer, sizeof(friendlyNameBuffer), "jfa-0x%04X-0x" ChipLogFormatX64,
+                                           to_underlying(vendorId), ChipLogValueX64(nodeId));
+                    CharSpan friendlyName = CharSpan(friendlyNameBuffer, static_cast<size_t>(written));
+
+                    if (Server::GetInstance().GetJointFabricDatastore().SetFriendlyName(friendlyName) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set FriendlyName to %.*s", static_cast<int>(friendlyName.size()),
+                                        friendlyName.data());
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set FriendlyName to %.*s", static_cast<int>(friendlyName.size()),
+                                     friendlyName.data());
+                    }
+                }
+
+                Server::GetInstance().GetJointFabricDatastore().SetStatus(
+                    Clusters::JointFabricDatastore::DatastoreStateEnum::kPending,
+                    static_cast<uint32_t>(System::SystemClock().GetMonotonicTimestamp().count()), 0);
+
+                ChipLogProgress(JointFabric, "Joint Fabric Administrator commissioned on fabric index %d", fabricIndex);
             }
         }
     }
