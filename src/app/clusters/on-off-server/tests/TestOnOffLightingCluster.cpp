@@ -164,7 +164,10 @@ struct TestOnOffLightingCluster : public ::testing::Test
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override {}
+    void TearDown() override {
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
+    }
 
     template <typename T>
     void WriteAttributeToStorage(AttributeId id, const T & value)
@@ -189,6 +192,13 @@ struct TestOnOffLightingCluster : public ::testing::Test
 
     ClusterTester mClusterTester{ mCluster };
 };
+
+TEST_F(TestOnOffLightingCluster, TestFeatureMap)
+{
+    uint32_t featureMap = 0;
+    EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_TRUE(BitMask<Feature>(featureMap).Has(Feature::kLighting));
+}
 
 TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
 {
@@ -238,10 +248,47 @@ TEST_F(TestOnOffLightingCluster, Startup_OnOffValue)
         EXPECT_TRUE(mMockDelegate.mStartupCalled);
         EXPECT_FALSE(mMockDelegate.mCalled);
         EXPECT_EQ(mMockDelegate.mOnOff, testCase.expectedStartState);
+
+
     }
 }
 
+TEST_F(TestOnOffLightingCluster, Startup_OTA)
+{
+    // Test that StartupType::kOTA bypasses StartUpOnOff logic.
+    mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    mClusterTester.GetTestContext().StorageDelegate().ClearStorage();
+    WriteAttributeToStorage(Attributes::OnOff::Id, false); // Start OFF
+    WriteAttributeToStorage(Attributes::StartUpOnOff::Id, to_underlying(StartUpOnOffEnum::kOn)); // Should turn ON
+    mCluster.RemoveDelegate(&mMockDelegate);
+    mMockDelegate.Reset();
+
+    // Reconstruct the cluster with StartupType::kOTA
+    OnOffLightingCluster otaCluster(kTestEndpointId,
+                                    {
+                                        .timerDelegate             = mMockTimerDelegate,
+                                        .effectDelegate            = mMockEffectDelegate,
+                                        .scenesIntegrationDelegate = &mMockScenesIntegrationDelegate,
+                                        .startupType               = OnOffLightingCluster::StartupType::kOTA,
+                                    });
+    ClusterTester otaTester(otaCluster);
+    otaCluster.AddDelegate(&mMockDelegate);
+
+    ASSERT_EQ(otaCluster.Startup(otaTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // OnOff should remain FALSE, as StartUpOnOff is ignored during OTA startup
+    EXPECT_FALSE(otaCluster.GetOnOff());
+    EXPECT_TRUE(mMockDelegate.mStartupCalled);
+    EXPECT_FALSE(mMockDelegate.mCalled);
+    EXPECT_FALSE(mMockDelegate.mOnOff);
+
+    otaCluster.RemoveDelegate(&mMockDelegate);
+    otaCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestOnOffLightingCluster, TestLightingAttributes)
+
 {
     bool globalSceneControl = false;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::GlobalSceneControl::Id, globalSceneControl), CHIP_NO_ERROR);
