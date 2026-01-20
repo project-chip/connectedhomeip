@@ -197,7 +197,7 @@ flowchart TD
 ```
 
 In order to run tests with mocked BLE and Wi-Fi connectivity and Linux network
-namespaces use the `--ble-wifi` option to the `run` command of the
+namespaces use the `--commissioning-method ble-wifi` option to the `run` command of the
 `scripts/tests/run_test_suite.py` script:
 
 ```shell
@@ -208,5 +208,20 @@ scripts/tests/run_test_suite.py --runner chip_tool_python \
     run \
     --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
     --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
-    --ble-wifi
+    --commissioning-method ble-wifi
+```
+
+In order to run tests with mocked Nan and Wi-Fi connectivity and Linux network
+namespaces use the `--commissioning-method wifi-paf` option to the `run` command of the
+`scripts/tests/run_test_suite.py` script:
+
+```shell
+# Run the TestOperationalState test case with ble-wifi commissioning
+scripts/tests/run_test_suite.py --runner chip_tool_python \
+    --target TestOperationalState \
+    --log-level=debug \
+    run \
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
+    --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
+    --commissioning-method wifi-paf
 ```
