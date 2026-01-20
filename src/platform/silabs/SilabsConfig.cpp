@@ -25,9 +25,9 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/PlatformError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 #include <platform/silabs/CHIPDevicePlatformConfig.h>
-#include <platform/PlatformError.h>
 
 #include <nvm3.h>
 #include <nvm3_default.h>
