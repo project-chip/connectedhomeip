@@ -20,6 +20,7 @@
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/clusters/on-off-server/OnOffEffectDelegate.h>
 #include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
+#include <cstdint>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters {
@@ -60,21 +61,24 @@ public:
     };
 
     OnOffLightingCluster(EndpointId endpointId, const Context & context);
-
     ~OnOffLightingCluster() override;
 
+
+    uint16_t GetOnTime() const { return mOnTime; }
+    void SetOnTime(uint16_t value);
+
+    uint16_t GetOffWaitTime() const { return mOffWaitTime; }
+    void SetOffWaitTime(uint16_t value);
+
+    // ServerClusterInterface implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
-
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
@@ -91,8 +95,6 @@ public:
     void TimerFired() override;
 
 private:
-    friend class OnOffLightingClusterTestAccess;
-
     OnOffEffectDelegate & mEffectDelegate;
     chip::scenes::ScenesIntegrationDelegate * mScenesIntegrationDelegate;
 
@@ -118,19 +120,6 @@ private:
     DataModel::ActionReturnStatus HandleOn();
     DataModel::ActionReturnStatus HandleOff();
     DataModel::ActionReturnStatus HandleToggle();
-};
-
-class OnOffLightingClusterTestAccess
-{
-public:
-    OnOffLightingClusterTestAccess(OnOffLightingCluster & cluster) : mCluster(cluster) {}
-
-    void SetOnTime(uint16_t onTime) { mCluster.mOnTime = onTime; }
-
-    void SetOffWaitTime(uint16_t offWaitTime) { mCluster.mOffWaitTime = offWaitTime; }
-
-private:
-    OnOffLightingCluster & mCluster;
 };
 
 } // namespace chip::app::Clusters

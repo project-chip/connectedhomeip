@@ -211,6 +211,22 @@ std::optional<DataModel::ActionReturnStatus> OnOffLightingCluster::InvokeCommand
     }
 }
 
+void OnOffLightingCluster::SetOnTime(uint16_t value)
+{
+    VerifyOrReturn(mOnTime != value);
+    mOnTime = value;
+    UpdateTimer();
+    NotifyAttributeChanged(Attributes::OnTime::Id);
+}
+
+void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
+{
+    VerifyOrReturn(mOffWaitTime != value);
+    mOffWaitTime = value;
+    UpdateTimer();
+    NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+}
+
 CHIP_ERROR OnOffLightingCluster::SetOnOffWithTimeReset(bool on)
 {
     ReturnErrorOnFailure(SetOnOff(on));

@@ -425,11 +425,9 @@ TEST_F(TestOnOffLightingCluster, TestGlobalSceneControl)
 
 TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
 {
-    OnOffLightingClusterTestAccess testAccess(mCluster);
-
     // Step 1: Set OnTime and OffWaitTime to non-zero values
-    testAccess.SetOnTime(100);
-    testAccess.SetOffWaitTime(200);
+    mCluster.SetOnTime(100);
+    mCluster.SetOffWaitTime(200);
 
     // Step 2: Call SetOnOffWithTimeReset(false) to turn off and clear OnTime.
     // Spec requires mOnTime to be set to 0
@@ -442,8 +440,8 @@ TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
     EXPECT_EQ(offWaitTime, 200);
 
     // Step 3: Set OnTime to 0 and OffWaitTime to non-zero values
-    testAccess.SetOnTime(0);
-    testAccess.SetOffWaitTime(200);
+    mCluster.SetOnTime(0);
+    mCluster.SetOffWaitTime(200);
 
     // Step 4: Call SetOnOffWithTimeReset(true) to turn on and clear OffWaitTime.
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(true), CHIP_NO_ERROR);
@@ -454,8 +452,8 @@ TEST_F(TestOnOffLightingCluster, TestSetOnOffWithTimeReset)
 
     // Step 5: Turn off, set OnTime and OffWaitTime to non-zero values
     EXPECT_EQ(mCluster.SetOnOffWithTimeReset(false), CHIP_NO_ERROR);
-    testAccess.SetOnTime(100);
-    testAccess.SetOffWaitTime(200);
+    mCluster.SetOnTime(100);
+    mCluster.SetOffWaitTime(200);
 
     // Step 6: Call SetOnOffWithTimeReset(true) to turn on and clear OffWaitTime.
     // Spec requires mOffTime to NOT be set to 0 because mOnTime is not 0
@@ -765,8 +763,7 @@ TEST_F(TestOnOffLightingCluster, TestWriteOnTimeWhenOffWaitActive)
 {
     // Step 1: Turn ON, set OffWaitTime, then turn OFF to start the OffWaitTime timer.
     EXPECT_TRUE(mClusterTester.Invoke(Commands::On::Type()).IsSuccess());
-    OnOffLightingClusterTestAccess testAccess(mCluster);
-    testAccess.SetOffWaitTime(10);
+    mCluster.SetOffWaitTime(10);
     EXPECT_TRUE(mClusterTester.Invoke(Commands::Off::Type()).IsSuccess());
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
     EXPECT_FALSE(mMockDelegate.mOnOff);
