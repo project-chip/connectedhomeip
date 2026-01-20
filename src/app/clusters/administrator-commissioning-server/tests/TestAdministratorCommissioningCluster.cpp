@@ -143,7 +143,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpi
     ASSERT_SUCCESS(failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60)));
     ASSERT_TRUE(failSafeContext.IsFailSafeArmed());
 
-    AdministratorCommissioningLogic logic;
+    AdministratorCommissioningLogic logic(CreateContext());
     AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
 
     // RevokeCommissioning attempts to expire the fail-safe (when it is held by a PASE session) regardless of the commissioning
