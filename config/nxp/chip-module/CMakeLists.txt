@@ -28,9 +28,7 @@
 if (CONFIG_CHIP)
 
 include(ExternalProject)
-include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
-include(generate_factory_data.cmake)
 
 # ==============================================================================
 # Prepare CHIP configuration based on the project Kconfig configuration
@@ -167,56 +165,6 @@ if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
         -Wl,--wrap=_realloc_r
         -Wl,--wrap=_free_r
     )
-endif()
-
-# ==============================================================================
-# Define 'chip-ota-image' target for building CHIP OTA image
-# ==============================================================================
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    if(CONFIG_MCUBOOT_SIGNATURE_KEY_FILE STREQUAL "")
-        set(ZEPHYR_OUTPUT_NAME "zephyr")
-    else()
-        set(ZEPHYR_OUTPUT_NAME "zephyr.signed")
-    endif()
-
-    set(GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/nxp/app/bootloader.conf")
-
-    add_custom_target(build_mcuboot ALL
-        COMMAND
-        west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE}
-            -DEXTRA_DTC_OVERLAY_FILE="${DTC_OVERLAY_FILE};${EXTRA_DTC_OVERLAY_FILE}"
-        COMMAND
-        cp ${PROJECT_BINARY_DIR}/../modules/connectedhomeip/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
-    )
-    add_dependencies(build_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
-    set(BLOCK_SIZE "1024")
-    dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
-    dt_reg_size(mcuboot_size PATH ${dts_partition_path})
-    math(EXPR boot_blocks "${mcuboot_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
-
-    add_custom_target(merge_mcuboot ALL
-        COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin of=${PROJECT_BINARY_DIR}/zephyr_full.bin
-        COMMAND
-        dd if=${PROJECT_BINARY_DIR}/${ZEPHYR_OUTPUT_NAME}.bin of=${PROJECT_BINARY_DIR}/zephyr_full.bin bs=${BLOCK_SIZE} seek=${boot_blocks}
-    )
-    add_dependencies(merge_mcuboot build_mcuboot)
-
-    if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-        chip_ota_image(chip-ota-image
-            INPUT_FILES ${PROJECT_BINARY_DIR}/${ZEPHYR_OUTPUT_NAME}.bin
-            OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
-        )
-    endif()
-endif()
-
-# ==============================================================================
-# Define 'factory_data' target for generating a factory data partition
-# ==============================================================================
-
-if (CONFIG_CHIP_FACTORY_DATA_BUILD)
-    nxp_generate_factory_data()
 endif()
 
 endif() # CONFIG_CHIP
