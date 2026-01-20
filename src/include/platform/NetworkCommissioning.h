@@ -117,6 +117,26 @@ enum class WirelessSignalType
     kQualitative
 };
 
+/**
+ *  Wireless signal type and strength assessment.
+ */
+struct WirelessSignal
+{
+    /**
+     *  Wireless signal strength assessment or measurement type.
+     *
+     *  This determines how to interpret @a strength.
+     */
+    WirelessSignalType type;
+
+    /**
+     *  Wireless signal strength assessment or measurement.
+     *
+     *  This is interpretted based on @a type.
+     */
+    int8_t strength;
+};
+
 struct WiFiScanResponse
 {
 public:
