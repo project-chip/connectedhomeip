@@ -215,7 +215,10 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, nocSpan));
     ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(nocSpan, &nodeId, &fabricId));
 
-    auto * fabricTable            = params.systemState->Fabrics();
+    auto * systemState = params.systemState ? params.systemState : mSystemState;
+    VerifyOrReturnError(systemState != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto * fabricTable            = systemState->Fabrics();
     const FabricInfo * fabricInfo = nullptr;
 
     //
