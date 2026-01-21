@@ -101,8 +101,12 @@ Ubuntu 22.04 ships with Python 3.10 by default, but Matter SDK requires Python
 
 ```shell
 sudo apt-get install python3.11 python3.11-dev python3.11-venv
+# Register python3.10 so that it can be switched back if needed
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+# Register python3.11 with higher priority (will be automatically selected)
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2
+# Verify that python3 points to python3.11
+python3 --version
 ```
 
 #### NFC builds
