@@ -268,10 +268,19 @@ class Command:
 
 
 @dataclass
+class Revision:
+    number: int
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
+
+
+@dataclass
 class Cluster:
     name: str
     code: int
-    revision: int = 1
+    revision: Revision = field(default_factory=lambda: Revision(number=1))
     enums: List[Enum] = field(default_factory=list)
     bitmaps: List[Bitmap] = field(default_factory=list)
     events: List[Event] = field(default_factory=list)
