@@ -128,15 +128,23 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     uint16_t videoStreamID = -1;
     uint16_t audioStreamID = -1;
 
-    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
+    // This is to support videoStreams, audioStreams passed in the structure for 1.5.1 spec
+    // TODO: Update below changes after application uses transportOptions.videoStreams, transportOptions.audioStreams for
+    // MediaController registration and Bandwidth calculation
+    Optional<Nullable<uint16_t>> firstVideoStream;
+    Optional<Nullable<uint16_t>> firstAudioStream;
+
+    if (transportOptions.videoStreams.HasValue())
     {
-        videoStreamID = transportOptions.videoStreamID.Value().Value();
+        firstVideoStream.SetValue(transportOptions.videoStreams.Value().front().videoStreamID);
+        videoStreamID = firstVideoStream.Value().Value();
+    }
+    if (transportOptions.audioStreams.HasValue())
+    {
+        firstAudioStream.SetValue(transportOptions.audioStreams.Value().front().audioStreamID);
+        audioStreamID = firstAudioStream.Value().Value();
     }
 
-    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
-    {
-        audioStreamID = transportOptions.audioStreamID.Value().Value();
-    }
     ChipLogProgress(
         Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
         connectionID, videoStreamID, audioStreamID);
@@ -144,7 +152,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
     uint32_t newTransportBandwidthbps = 0;
-    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
+    GetBandwidthForStreams(firstVideoStream, firstAudioStream, newTransportBandwidthbps);
 
     mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthbps(newTransportBandwidthbps);
     mTotalUsedBandwidthbps += newTransportBandwidthbps;

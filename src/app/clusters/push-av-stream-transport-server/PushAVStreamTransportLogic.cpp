@@ -923,7 +923,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
                 audioStreamsCount++;
                 audioStreamNames.insert(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size()));
-                ;
                 audioStreamIDs.insert(audioStream.audioStreamID);
             }
 
