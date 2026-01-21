@@ -121,6 +121,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Chime::Id:
         MatterChimeClusterInitCallback(endpoint);
         break;
+    case app::Clusters::TlsCertificateManagement::Id:
+        MatterTlsCertificateManagementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterInitCallback(endpoint);
         break;
@@ -223,6 +226,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::Chime::Id:
         MatterChimeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::TlsCertificateManagement::Id:
+        MatterTlsCertificateManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterShutdownCallback(endpoint, shutdownType);
