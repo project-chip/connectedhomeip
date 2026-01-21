@@ -35,11 +35,11 @@ namespace {
 
 CertificateTableImpl gDefaultCertificateTable;
 
-TlsCertificateManagementDelegate * gDelegate      = nullptr;
+TLSCertificateManagementDelegate * gDelegate      = nullptr;
 CertificateDependencyChecker * gDependencyChecker = nullptr;
 CertificateTableImpl * gCertificateTable          = &gDefaultCertificateTable;
 
-LazyRegisteredServerCluster<TlsCertificateManagementCluster> gClusterInstance;
+LazyRegisteredServerCluster<TLSCertificateManagementCluster> gClusterInstance;
 
 } // anonymous namespace
 
@@ -47,7 +47,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-void MatterTlsCertificateManagementSetDelegate(TlsCertificateManagementDelegate & delegate)
+void MatterTlsCertificateManagementSetDelegate(TLSCertificateManagementDelegate & delegate)
 {
     gDelegate = &delegate;
 }
