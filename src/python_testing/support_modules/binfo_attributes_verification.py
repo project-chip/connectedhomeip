@@ -22,7 +22,9 @@ import validators
 from mobly import asserts
 
 from matter.clusters.ClusterObjects import Cluster
+from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.spec_parsing import dm_from_spec_version
 
 
 class BasicInformationAttributesVerificationBase(MatterBaseTest):
@@ -271,15 +273,10 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(22)
         if hasattr(cluster.Attributes, 'SpecificationVersion') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
             ret22 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SpecificationVersion)
-            major = (ret22 >> 24) & 0xFF
-            minor = (ret22 >> 16) & 0xFF
-            dot = (ret22 >> 8) & 0xFF
-            reserved = ret22 & 0xFF
-            asserts.assert_equal(reserved, 0, "SpecificationVersion lower 8 bits (reserved) should be zero")
-            # For Matter 1.5, expect Major=1, Minor=5, Dot=0
-            asserts.assert_equal(major, 1, f"SpecificationVersion Major should be 1, got {major}")
-            asserts.assert_equal(minor, 5, f"SpecificationVersion Minor should be 5 for Matter 1.5, got {minor}")
-            asserts.assert_equal(dot, 0, f"SpecificationVersion Dot should be 0, got {dot}")
+            try:
+                dm_from_spec_version(ret22)
+            except ConformanceException:
+                asserts.fail(f'Unknown SpecificationVersion {ret22:08X}')
         elif not hasattr(cluster.Attributes, 'SpecificationVersion'):
             self.mark_current_step_skipped()
 
