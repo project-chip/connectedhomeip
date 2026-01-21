@@ -150,7 +150,7 @@ TEST_F(TestOnOffCluster, TestCommands)
     EXPECT_FALSE(onOff);
 }
 
-TEST_F(TestOnOffCluster, TestNoPersistence)
+TEST_F(TestOnOffCluster, TestNoPersistenceUseDefaultsOnStartup)
 {
     MockOnOffDelegate mockDelegate;
     TimerDelegateMock mockTimerDelegate;
