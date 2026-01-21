@@ -27,11 +27,10 @@ steps:
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-      # TODO: Revert the below change once trigger is verified.
           - >-
               pip install esp-idf-kconfig==2.5.0 &&
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
-              ./examples/chef/chef.py --build_all --build_include "linux_x86-rootnode_dimmablelight"
+              ./examples/chef/chef.py --build_all --build_exclude "noip|icd"
       id: CompileAll
       waitFor:
           - Bootstrap
