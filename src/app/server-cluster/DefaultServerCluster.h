@@ -116,14 +116,14 @@ protected:
     void NotifyAttributeChanged(AttributeId attributeId);
 
     /// Apply the very common pattern of:
-    ///   - if a member variable value needs changing, update and NotifyAttributeChanged
+    ///   - if a variable value needs changing, update and NotifyAttributeChanged
     ///
     /// Returns true if the value has been updated to a new value.
     template <typename T>
-    bool SetAttributeValue(T & member, const T & value, AttributeId attributeId)
+    bool SetAttributeValue(T & dest, const T & value, AttributeId attributeId)
     {
-        VerifyOrReturnValue(member != value, false);
-        member = value;
+        VerifyOrReturnValue(dest != value, false);
+        dest = value;
         NotifyAttributeChanged(attributeId);
         return true;
     }
