@@ -2,7 +2,126 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MTRClusterConstants.h"
+#import "MTRDevice_Internal.h"
+#import "MTRCluster_Internal.h"
 #import "MTRClusters_Private.h"
+#import "MTRStructsObjc.h"
+#import "MTRCommandPayloadsObjc.h"
+#import "MTRLogging_Internal.h"
+#import "MTRDefines_Internal.h"
 
-// Nothing here for now, but leaving this file in place in case we need to add
-// something.
+#include <app-common/zap-generated/cluster-objects.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#include <type_traits>
+
+using chip::Callback::Callback;
+using chip::Callback::Cancelable;
+using namespace chip::app::Clusters;
+using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+@implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
+
+{{#zcl_commands}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandImpl"}}
+{{#if (isSupported cluster command=command)}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#*inline "paramsType"}}MTR{{cluster}}Cluster{{command}}Params{{/inline}}
+- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+{
+    if (params == nil) {
+        params = [[{{> paramsType}} alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        {{#if hasSpecificResponse}}
+        completion(response, error);
+        {{else}}
+        completion(error);
+        {{/if}}
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    {{#if mustUseTimedInvoke}}
+    if (timedInvokeTimeoutMs == nil) {
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+{{#if hasSpecificResponse}}
+                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
+{{else}}
+                                     responseClass:nil
+{{/if}}
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+{{/if}}
+{{/inline}}
+{{#if (is_str_equal source 'client')}}
+{{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server}}
+{{#if (and
+        (or clusterRef
+            (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true)))
+        (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)))}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
+- (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
+}
+
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
+{{#*inline "callbackName"}}DefaultSuccess{{/inline}}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+  [self write{{>attribute}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber *timedWriteTimeout = params.timedWriteTimeout;
+    {{#if mustUseTimedWrite}}
+    if (!timedWriteTimeout) {
+        timedWriteTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+{{/if}}
+
+{{/if}}
+{{/zcl_attributes_server}}
+
+@end
+{{/if}}
+{{/if}}
+
+{{/zcl_clusters}}
+
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
