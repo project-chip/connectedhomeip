@@ -104,10 +104,10 @@ private:
     // Encodes all Installed Chime Sounds
     CHIP_ERROR EncodeSupportedChimeSounds(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
-    DataModel::ActionReturnStatus HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath, 
+    DataModel::ActionReturnStatus HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath,
                                                        const Chime::Commands::PlayChimeSound::DecodableType & commandData);
 
-    void GenerateChimeStartedPlayingEvent(const uint8_t chimeID); 
+    void GenerateChimeStartedPlayingEvent(const uint8_t chimeID);
 };
 
 /** @brief

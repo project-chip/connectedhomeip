@@ -271,18 +271,18 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
     }
 }
 
-DataModel::ActionReturnStatus  ChimeCluster::HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath, 
+DataModel::ActionReturnStatus  ChimeCluster::HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath,
                                                                    const Commands::PlayChimeSound::DecodableType & commandData)
 {
     // Immediately return if we're not enabled
     //
-    if (!mEnabled) 
+    if (!mEnabled)
     {
         return Status::Success;
     }
 
     // If we have a provided Chime ID, ensure it is valid
-    // 
+    //
     uint8_t chimeIDToUse = mSelectedChime;
     if (commandData.chimeID.HasValue())
     {
