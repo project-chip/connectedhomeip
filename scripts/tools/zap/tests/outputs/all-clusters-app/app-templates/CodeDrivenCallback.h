@@ -52,6 +52,10 @@ void MatterTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpointId
 
 void MatterTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterGeneralCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -140,3 +144,11 @@ void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId, 
 void MatterChimeClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterChimeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterTlsCertificateManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTlsCertificateManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
