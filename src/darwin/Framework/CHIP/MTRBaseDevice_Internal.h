@@ -35,11 +35,11 @@
 
 @class MTRDeviceController;
 
-// An AttestationResponse command needs to have an attestationChallenge
-// to make sense of the results.  Encode that with a profile-specific tag under
-// the Apple vendor id.  Let's select profile 0xFFFF just because, and use 0xFF
-// for the actual tag number, so that if someone accidentally casts it to a
-// uint8 (aka context tag) that will not collide with anything interesting.
+// An AttestationResponse or SignVIDVerificationResponse command needs to have an
+// attestationChallenge to make sense of the results.  Encode that with a profile-specific tag under
+// the Apple vendor id.  Let's select profile 0xFFFF just because, and use 0xFF for the actual tag
+// number, so that if someone accidentally casts it to a uint8 (aka context tag) that will not
+// collide with anything interesting.
 inline constexpr chip::TLV::Tag kAttestationChallengeTag = chip::TLV::ProfileTag(chip::VendorId::Apple, 0xFFFF, 0xFF);
 
 // We have no way to extract the tag value as a single thing, so just do it

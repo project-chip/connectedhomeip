@@ -1482,10 +1482,12 @@ exit:
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
             NSData * attestationChallenge;
             if ([clusterID isEqualToNumber:@(MTRClusterIDTypeOperationalCredentialsID)] &&
-                [commandID isEqualToNumber:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)] && session->IsSecureSession()) {
-                // An AttestationResponse command needs to have an attestationChallenge
-                // to make sense of the results.  If we are doing an
-                // AttestationRequest, store the challenge now.
+                ([commandID isEqualToNumber:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)] ||
+                 [commandID isEqualToNumber:@(MTRCommandIDTypeClusterOperationalCredentialsCommandSignVIDVerificationRequestID)]) &&
+                session->IsSecureSession()) {
+                // An AttestationResponse Or SignVIDVerificationResponse command needs to have an
+                // attestationChallenge to make sense of the results.  If we are doing a
+                // corresponding request, store the challenge now.
                 attestationChallenge = AsData(session->AsSecureSession()->GetCryptoContext().GetAttestationChallenge());
             }
             // NSObjectCommandCallback guarantees that there will be exactly one call to either the success callback or the failure
