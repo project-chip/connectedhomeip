@@ -2025,8 +2025,8 @@ uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     return kMaxNumSubscriptionsPerFabric;
 #else
-    return static_cast<uint16_t>(
-        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(kMaxNumSubscriptionsPerFabric)));
+    return static_cast<uint16_t>(std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(),
+                                          static_cast<size_t>(kMaxNumSubscriptionsPerFabric)));
 #endif
 }
 

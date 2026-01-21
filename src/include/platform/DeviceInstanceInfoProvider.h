@@ -277,12 +277,17 @@ public:
      */
     virtual DeviceInfoCapabilityMinimas GetSupportedCapabilityMinimaValues()
     {
-        static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER >= 1 && CHIP_IM_MAX_NUM_COMMAND_HANDLER <= 10000, "CHIP_IM_MAX_NUM_COMMAND_HANDLER must be greater than or equal to 1 and less than or equal to 10000");
-        static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER >= 1 && CHIP_IM_MAX_NUM_WRITE_HANDLER <= 10000, "CHIP_IM_MAX_NUM_WRITE_HANDLER must be greater than or equal to 1 and less than or equal to 10000");
-        static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS >= 9 && CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= 10000,
-                      "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must be greater than or equal to 9 and less than or equal to 10000");
-        static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS >= 3 && CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= 10000,
-                      "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must be greater than or equal to 3 and less than or equal to 10000");
+        static_assert(CHIP_IM_MAX_NUM_COMMAND_HANDLER >= 1 && CHIP_IM_MAX_NUM_COMMAND_HANDLER <= 10000,
+                      "CHIP_IM_MAX_NUM_COMMAND_HANDLER must be greater than or equal to 1 and less than or equal to 10000");
+        static_assert(CHIP_IM_MAX_NUM_WRITE_HANDLER >= 1 && CHIP_IM_MAX_NUM_WRITE_HANDLER <= 10000,
+                      "CHIP_IM_MAX_NUM_WRITE_HANDLER must be greater than or equal to 1 and less than or equal to 10000");
+        static_assert(
+            CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS >= 9 && CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS <= 10000,
+            "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS must be greater than or equal to 9 and less than or equal to 10000");
+        static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS >= 3 &&
+                          CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS <= 10000,
+                      "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS must be greater than or equal to 3 and less than or "
+                      "equal to 10000");
 
         return DeviceInfoCapabilityMinimas{ .simultaneousInvocationsSupported = CHIP_IM_MAX_NUM_COMMAND_HANDLER,
                                             .simultaneousWritesSupported      = CHIP_IM_MAX_NUM_WRITE_HANDLER,
