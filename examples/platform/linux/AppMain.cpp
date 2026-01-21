@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdint>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -340,7 +341,8 @@ void StopMainEventLoop()
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
-        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
 }
 
