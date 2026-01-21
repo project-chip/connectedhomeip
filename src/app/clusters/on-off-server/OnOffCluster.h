@@ -50,6 +50,10 @@ public:
     OnOffCluster(EndpointId endpointId, const Context & context);
     ~OnOffCluster() override;
 
+    // Cluster supports multiple on/off delegates: we expect application to need
+    // to be notified of on/off operations however so do various cluster integration as
+    // specification dictates interaction between On/Off and various other clusters like
+    // Level Control.
     void AddDelegate(OnOffDelegate * delegate) { mDelegates.PushBack(delegate); }
     void RemoveDelegate(OnOffDelegate * delegate) { mDelegates.Remove(delegate); }
 
