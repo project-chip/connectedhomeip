@@ -41,6 +41,8 @@ static constexpr size_t kMaxCENCKeyIDLength = 16u;
 static constexpr size_t kMaxTrackNameLength = 16u;
 static constexpr size_t kMinSegmentDuration = 500u;
 static constexpr size_t kMaxSegmentDuration = 65500u;
+static constexpr size_t kMinStreamNameLength = 1u;
+static constexpr size_t kMaxStreamNameLength = 16u;
 
 enum class PushAvStreamTransportStatusEnum : uint8_t
 {

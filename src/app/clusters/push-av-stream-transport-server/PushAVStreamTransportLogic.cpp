@@ -362,19 +362,31 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid streamUsage ", mEndpointId));
 
-    // Validate stream usage
-    VerifyOrReturnValue(transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
-                        ChipLogError(Zcl, "Transport Options verification[ep=%d]: Invalid streamUsage", mEndpointId));
+    // Check for video stream name length constraints
+    if (transportOptions.videoStreams.HasValue())
+    {
+        for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
+        {
+            auto streamName = iter.GetValue().videoStreamName;
+            VerifyOrReturnValue(streamName.size() >= kMinStreamNameLength && streamName.size() <= kMaxStreamNameLength,
+                                Status::ConstraintError,
+                                ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Video Stream Name "
+                                             "Constraint Error", mEndpointId));
+        }
+    }
 
-    // Check mutual exclusivity and presence of stream fields
-    bool hasNewStreamFields = transportOptions.videoStreams.HasValue() || transportOptions.audioStreams.HasValue();
-    bool hasOldStreamFields = transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue();
-
-    VerifyOrReturnValue(!(hasNewStreamFields && hasOldStreamFields), Status::InvalidCommand,
-                        ChipLogError(Zcl, "Transport Options[ep=%d]: Both new and old stream fields present", mEndpointId));
-
-    VerifyOrReturnValue(hasNewStreamFields || hasOldStreamFields, Status::InvalidCommand,
-                        ChipLogError(Zcl, "Transport Options[ep=%d]: Missing stream fields", mEndpointId));
+    // Check for audio stream name length constraints
+    if (transportOptions.audioStreams.HasValue())
+    {
+        for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
+        {
+            auto streamName = iter.GetValue().audioStreamName;
+            VerifyOrReturnValue(streamName.size() >= kMinStreamNameLength && streamName.size() <= kMaxStreamNameLength,
+                                Status::ConstraintError,
+                                ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Audio Stream Name "
+                                             "Constraint Error", mEndpointId));
+        }
+    }
 
     VerifyOrReturnValue(transportOptions.TLSEndpointID <= kMaxEndpointId, Status::ConstraintError,
                         ChipLogError(Zcl,
@@ -826,12 +838,12 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     }
 
     // Validate Bandwidth Requirement
-    Status globalStatus = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
+    Status retStatus = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
                                                             transportOptions.audioStreamID);
-    if (globalStatus != Status::Success)
+    if (retStatus != Status::Success)
     {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted", mEndpointId);
-        handler.AddStatus(commandPath, globalStatus);
+        handler.AddStatus(commandPath, retStatus);
         return std::nullopt;
     }
 
@@ -844,10 +856,17 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // Validate new multistream fields
+    // Check mutual exclusivity and presence of stream fields
     bool hasNewStreamFields = transportOptions.videoStreams.HasValue() || transportOptions.audioStreams.HasValue();
     bool hasOldStreamFields = transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue();
 
+    VerifyOrReturnValue(!(hasNewStreamFields && hasOldStreamFields), Status::InvalidCommand,
+                        ChipLogError(Zcl, "Transport Options[ep=%d]: Both new and old stream fields are present", mEndpointId));
+
+    VerifyOrReturnValue(hasNewStreamFields || hasOldStreamFields, Status::InvalidCommand,
+                        ChipLogError(Zcl, "Transport Options[ep=%d]: Missing stream fields", mEndpointId));
+
+    // Validate new multistream fields
     if (hasNewStreamFields)
     {
         // Check at least one stream type is present
@@ -1092,9 +1111,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
     FabricIndex accessingFabricIndex = handler.GetAccessingFabricIndex();
 
-    globalStatus = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
+    retStatus = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
 
-    if (globalStatus == Status::Success)
+    if (retStatus == Status::Success)
     {
         // add connection to CurrentConnections
         TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
@@ -1117,7 +1136,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     }
     else
     {
-        handler.AddStatus(commandPath, globalStatus);
+        handler.AddStatus(commandPath, retStatus);
     }
 
     return std::nullopt;
