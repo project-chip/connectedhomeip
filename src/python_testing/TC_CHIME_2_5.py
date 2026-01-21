@@ -114,7 +114,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
                 log.info("CHIME 2_5: No response received for no chime sound played user prompt")
 
         self.step(4)
-        await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, True)  
+        await self.write_chime_attribute_expect_success(endpoint, attributes.Enabled, True)
 
         myChimeSounds = await self.read_chime_attribute_expect_success(endpoint, attributes.InstalledChimeSounds)
         mySelectedChime = await self.read_chime_attribute_expect_success(endpoint, attributes.SelectedChime)

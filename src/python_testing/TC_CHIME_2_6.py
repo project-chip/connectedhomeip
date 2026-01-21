@@ -74,7 +74,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             TestStep(2, "Establish a subscription to the ChimeStartedPlaying event"),
             TestStep(3, "Set the enabled attribute to True"),
             TestStep(4, "Read and save the value of the SelectedChime attribute in mySelectedChime"),
-            TestStep(5, "Send the PlayChimeSound command"), 
+            TestStep(5, "Send the PlayChimeSound command"),
             TestStep(6, "Verify reception of the ChimeStartedPlaying event"),
             TestStep(7, "Verify that the value of the ChimeID in the event is the same as the value of mySelectedChime"),
         ]
