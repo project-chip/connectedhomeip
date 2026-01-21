@@ -467,6 +467,14 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables dynamic switching from SIT to LIT operating modes.
 
+        config ICD_SHORT_IDLE_MODE_DURATION_SEC
+            int "ICD Short Idle Mode Duration(s)"
+            depends on ENABLE_ICD_LIT
+            default 60
+            help
+                Shorter idle mode interval for LIT capable devices operating in SIT mode. This allows devices
+                to report more frequently and maintain a more reliable availability status with their
+                subscribers.
 
         config ENABLE_ICD_CIP
             bool "Enable Check-in protocol"
@@ -474,6 +482,13 @@ menu "CHIP Device Layer"
             default y
             help
                 Enables or Disables ICD Check-in protocol
+
+        config ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+            bool "Enable Check-in on report timeout"
+            depends on ENABLE_ICD_CIP
+            default y
+            help
+                Enables or disables sending Check-in message on report timeout
 
         config ICD_CLIENTS_SUPPORTED_PER_FABRIC
             int "ICD Clients Number Supported Per Fabric"
