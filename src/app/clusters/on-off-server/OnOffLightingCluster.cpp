@@ -66,7 +66,7 @@ CHIP_ERROR OnOffLightingCluster::Startup(ServerClusterContext & context)
     attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
                                                mOnOff, mOnOff);
 
-    // Load StartUpOnOff. Defaults to NULL (default value for nullable) if not found in storage.
+    // Load StartUpOnOff. Defaults to "unchanged" (i.e. constructor default) if missing from storage.
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::StartUpOnOff::Id), mStartUpOnOff, mStartUpOnOff);
 
