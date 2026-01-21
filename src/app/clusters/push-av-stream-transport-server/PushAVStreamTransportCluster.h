@@ -61,9 +61,9 @@ public:
 
     void SetTLSClientManagementDelegate(TLSClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
 
-    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
+    void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
     {
-        mLogic.SetTlsCertificateManagementDelegate(delegate);
+        mLogic.SetTLSCertificateManagementDelegate(delegate);
     }
 
     /**
