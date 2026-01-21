@@ -2,8 +2,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRClusters.h"
-#import "MTRDevice.h"
+#import "MTRBaseClusters_Private.h"
 
 // Nothing here for now, but leaving this file in place in case we need to add
 // something.

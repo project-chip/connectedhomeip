@@ -1,7 +1,7 @@
 {{> header excludeZapComment=true}}
 
-#import <Matter/MTRDefines.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRDefines.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 
