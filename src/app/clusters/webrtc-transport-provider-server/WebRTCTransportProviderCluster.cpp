@@ -27,6 +27,7 @@
 
 #include <iterator>
 #include <memory>
+#include <set>
 
 using namespace chip;
 using namespace chip::app;
@@ -499,13 +500,6 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
         return Status::ConstraintError;
     }
 
-    // At least one of Video Stream ID and Audio Stream ID has to be present
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
-    {
-        ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
-        return Status::InvalidCommand;
-    }
-
     if (req.SFrameConfig.HasValue())
     {
         if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
@@ -552,56 +546,129 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
         return Status::DynamicConstraintError;
     }
 
-    // Validate VideoStreamID against AllocatedVideoStreams.
-    // If present and null then a stream has to have been allocated.
-    // If present and not null, then the stream ID has to exist
-    if (req.videoStreamID.HasValue())
+    // If the VideoStreams or AudioStreams fields are present, and the VideoStreamID or AudioStreamID
+    // fields are present, fail the command with INVALID_COMMAND
+    if ((req.videoStreams.HasValue() || req.audioStreams.HasValue()) &&
+        (req.videoStreamID.HasValue() || req.audioStreamID.HasValue()))
     {
-        if (req.videoStreamID.Value().IsNull())
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot have both VideoStreams/AudioStreams and VideoStreamID/AudioStreamID");
+        return Status::InvalidCommand;
+    }
+
+    // When deprecated VideoStreamID/AudioStreamID fields are not used (Rev>=2 clients),
+    // at least one of VideoStreams or AudioStreams must be present
+    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+    {
+        if (!req.videoStreams.HasValue() && !req.audioStreams.HasValue())
         {
-            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
-            if (!mDelegate.HasAllocatedVideoStreams())
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: video requested when there are no AllocatedVideoStreams");
-                return Status::InvalidInState;
-            }
-        }
-        else
-        {
-            // Delegate should validate against AllocatedVideoStreams
-            if (mDelegate.ValidateVideoStreamID(req.videoStreamID.Value().Value()) != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: VideoStreamID %u does not match AllocatedVideoStreams",
-                             req.videoStreamID.Value().Value());
-                return Status::DynamicConstraintError;
-            }
+            ChipLogError(Zcl, "HandleSolicitOffer: At least one of VideoStreams or AudioStreams must be present");
+            return Status::InvalidCommand;
         }
     }
 
-    // Validate AudioStreamID against AllocatedAudioStreams if present
-    // If present and null then a stream has to have been allocated.
-    // If present and not null, then the stream ID has to exist
+    // Normalize inputs to vectors
+    Optional<std::vector<uint16_t>> videoStreams;
+    Optional<std::vector<uint16_t>> audioStreams;
+
+    // Deprecated field handling per spec:
+    if (req.videoStreamID.HasValue())
+    {
+        // - If present and null: automatic stream assignment (empty vector triggers auto-select)
+        // - If present and non-null: add the specific stream ID to the list
+        std::vector<uint16_t> streams;
+        if (!req.videoStreamID.Value().IsNull())
+        {
+            streams.push_back(req.videoStreamID.Value().Value());
+        }
+
+        // Empty vector implies auto-select
+        videoStreams.SetValue(std::move(streams));
+    }
+
     if (req.audioStreamID.HasValue())
     {
-        if (req.audioStreamID.Value().IsNull())
+        // - If present and null: automatic stream assignment (empty vector triggers auto-select)
+        // - If present and non-null: add the specific stream ID to the list
+        std::vector<uint16_t> streams;
+        if (!req.audioStreamID.Value().IsNull())
         {
-            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
-            if (!mDelegate.HasAllocatedAudioStreams())
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedAudioStreams");
-                return Status::InvalidInState;
-            }
+            streams.push_back(req.audioStreamID.Value().Value());
         }
-        else
+
+        // Empty vector implies auto-select
+        audioStreams.SetValue(std::move(streams));
+    }
+
+    // Validate VideoStreams array if present
+    if (req.videoStreams.HasValue())
+    {
+        std::vector<uint16_t> streams;
+        auto iter = req.videoStreams.Value().begin();
+        while (iter.Next())
         {
-            // Delegate should validate against AllocatedVideoStreams
-            if (mDelegate.ValidateAudioStreamID(req.audioStreamID.Value().Value()) != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleSolicitOffer: AudioStreamID %u does not match AllocatedAudioStreams",
-                             req.audioStreamID.Value().Value());
-                return Status::DynamicConstraintError;
-            }
+            streams.push_back(iter.GetValue());
         }
+
+        // Check if AllocatedVideoStreams is empty
+        if (!mDelegate.HasAllocatedVideoStreams())
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: AllocatedVideoStreams is empty");
+            return Status::InvalidInState;
+        }
+
+        // Check for duplicate entries in VideoStreams
+        std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
+        if (uniqueStreams.size() != streams.size())
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: Duplicate entries in VideoStreams");
+            return Status::AlreadyExists;
+        }
+
+        // Validate each entry exists in AllocatedVideoStreams
+        if (mDelegate.ValidateVideoStreams(streams) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: VideoStreams entry not found in AllocatedVideoStreams");
+            return Status::DynamicConstraintError;
+        }
+
+        videoStreams.SetValue(std::move(streams));
+    }
+
+    // Validate AudioStreams array if present
+    if (req.audioStreams.HasValue())
+    {
+        std::vector<uint16_t> streams;
+        auto iter = req.audioStreams.Value().begin();
+        while (iter.Next())
+        {
+            streams.push_back(iter.GetValue());
+        }
+
+        const auto & streams = audioStreams.Value();
+
+        // Check if AllocatedAudioStreams is empty
+        if (!mDelegate.HasAllocatedAudioStreams())
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: AllocatedAudioStreams is empty");
+            return Status::InvalidInState;
+        }
+
+        // Check for duplicate entries in AudioStreams
+        std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
+        if (uniqueStreams.size() != streams.size())
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: Duplicate entries in AudioStreams");
+            return Status::AlreadyExists;
+        }
+
+        // Validate each entry exists in AllocatedAudioStreams
+        if (mDelegate.ValidateAudioStreams(streams) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleSolicitOffer: AudioStreams entry not found in AllocatedAudioStreams");
+            return Status::DynamicConstraintError;
+        }
+
+        audioStreams.SetValue(std::move(streams));
     }
 
     if (req.SFrameConfig.HasValue())
@@ -624,8 +691,8 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     }
 
     // Check resource management and stream priorities. If the IDs are null the delegate will populate with
-    // a stream that matches the stream usage
-    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+    // a stream that matches the stream usage. Supports both deprecated single-stream fields and new arrays.
+    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID, videoStreams, audioStreams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
@@ -646,6 +713,8 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     args.streamUsage           = req.streamUsage;
     args.videoStreamId         = videoStreamID;
     args.audioStreamId         = audioStreamID;
+    args.videoStreams          = videoStreams;
+    args.audioStreams          = audioStreams;
     args.peerNodeId            = GetNodeIdFromCtx(commandHandler);
     args.fabricIndex           = commandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
@@ -681,7 +750,8 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     // The delegate implementation SHALL:
     // - Populate a new WebRTCSessionStruct with the requested values.
     // - If in standby mode, set deferredOffer to true (and perform steps to exit standby within 30 seconds).
-    // - If not in standby mode, ensure that VideoStreamID and AudioStreamID are valid (or allocate/select new streams if null).
+    // - If not in standby mode, ensure that VideoStreamID and AudioStreamID or videoStreams and audioStreams are valid (or
+    // allocate/select new streams if null).
     // - Internally increment the ReferenceCount on any used video/audio streams.
     // - If resources cannot be allocated, invoke End with Reason OutOfResources.
     WebRTCSessionStruct outSession;
@@ -750,13 +820,6 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     {
         ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
         return Status::ConstraintError;
-    }
-
-    // At least one of Video Stream ID and Audio Stream ID must be present
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
-    {
-        ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
-        return Status::InvalidCommand;
     }
 
     if (req.SFrameConfig.HasValue())
@@ -830,54 +893,129 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             return Status::DynamicConstraintError;
         }
 
-        // If VideoStreamID is present and is not null and does not match a value in AllocatedVideoStreams:
-        // Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
-        if (videoStreamID.HasValue() && !videoStreamID.Value().IsNull())
+        // If the VideoStreams or AudioStreams fields are present, and the VideoStreamID or AudioStreamID
+        // fields are present, fail the command with INVALID_COMMAND
+        if ((req.videoStreams.HasValue() || req.audioStreams.HasValue()) &&
+            (req.videoStreamID.HasValue() || req.audioStreamID.HasValue()))
         {
-            if (mDelegate.ValidateVideoStreamID(videoStreamID.Value().Value()) != CHIP_NO_ERROR)
+            ChipLogError(Zcl, "HandleSolicitOffer: Cannot have both VideoStreams/AudioStreams and VideoStreamID/AudioStreamID");
+            return Status::InvalidCommand;
+        }
+
+        // When deprecated VideoStreamID/AudioStreamID fields are not used (Rev>=2 clients),
+        // at least one of VideoStreams or AudioStreams must be present
+        if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
+        {
+            if (!req.videoStreams.HasValue() && !req.audioStreams.HasValue())
             {
-                ChipLogError(Zcl, "HandleProvideOffer: VideoStreamID %u does not match AllocatedVideoStreams",
-                             videoStreamID.Value().Value());
-                return Status::DynamicConstraintError;
+                ChipLogError(Zcl, "HandleSolicitOffer: At least one of VideoStreams or AudioStreams must be present");
+                return Status::InvalidCommand;
             }
         }
 
-        // If VideoStreamID is present and is null:
-        // If AllocatedVideoStreams is empty: Fail the command with the status code INVALID_IN_STATE
-        // Automatically select an existing video stream per the Resource Management and Stream Priorities.
-        if (videoStreamID.HasValue() && videoStreamID.Value().IsNull())
+        // Normalize inputs to vectors
+        Optional<std::vector<uint16_t>> videoStreams;
+        Optional<std::vector<uint16_t>> audioStreams;
+
+        // Deprecated field handling per spec:
+        if (req.videoStreamID.HasValue())
         {
+            // - If present and null: automatic stream assignment (empty vector triggers auto-select)
+            // - If present and non-null: add the specific stream ID to the list
+            std::vector<uint16_t> streams;
+            if (!req.videoStreamID.Value().IsNull())
+            {
+                streams.push_back(req.videoStreamID.Value().Value());
+            }
+
+            // Empty vector implies auto-select
+            videoStreams.SetValue(std::move(streams));
+        }
+
+        if (req.audioStreamID.HasValue())
+        {
+            // - If present and null: automatic stream assignment (empty vector triggers auto-select)
+            // - If present and non-null: add the specific stream ID to the list
+            std::vector<uint16_t> streams;
+            if (!req.audioStreamID.Value().IsNull())
+            {
+                streams.push_back(req.audioStreamID.Value().Value());
+            }
+
+            // Empty vector implies auto-select
+            audioStreams.SetValue(std::move(streams));
+        }
+
+        // Validate VideoStreams array if present
+        if (req.videoStreams.HasValue())
+        {
+            std::vector<uint16_t> streams;
+            auto iter = req.videoStreams.Value().begin();
+            while (iter.Next())
+            {
+                streams.push_back(iter.GetValue());
+            }
+
+            // Check if AllocatedVideoStreams is empty
             if (!mDelegate.HasAllocatedVideoStreams())
             {
-                ChipLogError(Zcl, "HandleProvideOffer: AllocatedVideoStreams is empty");
+                ChipLogError(Zcl, "HandleSolicitOffer: AllocatedVideoStreams is empty");
                 return Status::InvalidInState;
             }
-            // Automatic selection will be handled by the delegate in HandleProvideOffer.
-        }
 
-        // If AudioStreamID is present and is not null and does not match a value in AllocatedAudioStreams:
-        // Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
-        if (audioStreamID.HasValue() && !audioStreamID.Value().IsNull())
-        {
-            if (mDelegate.ValidateAudioStreamID(audioStreamID.Value().Value()) != CHIP_NO_ERROR)
+            // Check for duplicate entries in VideoStreams
+            std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
+            if (uniqueStreams.size() != streams.size())
             {
-                ChipLogError(Zcl, "HandleProvideOffer: AudioStreamID %u does not match AllocatedAudioStreams",
-                             audioStreamID.Value().Value());
+                ChipLogError(Zcl, "HandleSolicitOffer: Duplicate entries in VideoStreams");
+                return Status::AlreadyExists;
+            }
+
+            // Validate each entry exists in AllocatedVideoStreams
+            if (mDelegate.ValidateVideoStreams(streams) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: VideoStreams entry not found in AllocatedVideoStreams");
                 return Status::DynamicConstraintError;
             }
+
+            videoStreams.SetValue(std::move(streams));
         }
 
-        // If AudioStreamID is present and is null:
-        // If AllocatedAudioStreams is empty: Fail the command with the status code INVALID_IN_STATE
-        // Automatically select an existing audio stream per the Resource Management and Stream Priorities.
-        if (audioStreamID.HasValue() && audioStreamID.Value().IsNull())
+        // Validate AudioStreams array if present
+        if (req.audioStreams.HasValue())
         {
+            std::vector<uint16_t> streams;
+            auto iter = req.audioStreams.Value().begin();
+            while (iter.Next())
+            {
+                streams.push_back(iter.GetValue());
+            }
+
+            const auto & streams = audioStreams.Value();
+
+            // Check if AllocatedAudioStreams is empty
             if (!mDelegate.HasAllocatedAudioStreams())
             {
-                ChipLogError(Zcl, "HandleProvideOffer: AllocatedAudioStreams is empty");
+                ChipLogError(Zcl, "HandleSolicitOffer: AllocatedAudioStreams is empty");
                 return Status::InvalidInState;
             }
-            // Automatic selection will be handled by the delegate in HandleProvideOffer.
+
+            // Check for duplicate entries in AudioStreams
+            std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
+            if (uniqueStreams.size() != streams.size())
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: Duplicate entries in AudioStreams");
+                return Status::AlreadyExists;
+            }
+
+            // Validate each entry exists in AllocatedAudioStreams
+            if (mDelegate.ValidateAudioStreams(streams) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "HandleSolicitOffer: AudioStreams entry not found in AllocatedAudioStreams");
+                return Status::DynamicConstraintError;
+            }
+
+            audioStreams.SetValue(std::move(streams));
         }
 
         // If not able to meet the Resource Management and Stream Priorities conditions or unable to provide another WebRTC session:

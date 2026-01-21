@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -36,9 +37,9 @@ public:
     virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
-    virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
+    virtual CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) = 0;
 
-    virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
+    virtual CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) = 0;
 
     virtual CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) = 0;
 
@@ -69,13 +70,15 @@ public:
      * @brief Called by transports when they start using the corresponding audio and video streams.
      *
      */
-    virtual CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamId, uint16_t videoStreamId) = 0;
+    virtual CHIP_ERROR OnTransportAcquireAudioVideoStreams(const std::vector<uint16_t> & audioStreams,
+                                                           const std::vector<uint16_t> & videoStreams) = 0;
 
     /**
      * @brief Called by transports when they release the corresponding audio and video streams.
      *
      */
-    virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamId, uint16_t videoStreamId) = 0;
+    virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(const std::vector<uint16_t> & audioStreams,
+                                                           const std::vector<uint16_t> & videoStreams) = 0;
 };
 
 } // namespace CameraAvStreamManagement

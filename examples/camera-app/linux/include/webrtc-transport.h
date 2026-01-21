@@ -54,8 +54,8 @@ public:
     struct RequestArgs
     {
         uint16_t sessionId;
-        uint16_t videoStreamId;
-        uint16_t audioStreamId;
+        std::vector<uint16_t> videoStreams;
+        std::vector<uint16_t> audioStreams;
         chip::NodeId peerNodeId;
         chip::FabricIndex fabricIndex;
         chip::EndpointId originatingEndpointId;
