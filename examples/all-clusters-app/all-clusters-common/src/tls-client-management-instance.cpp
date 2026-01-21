@@ -19,9 +19,12 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-client-management-server/CodegenIntegration.h>
+#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
+#include <app/util/af-types.h>
 #include <clusters/TlsClientManagement/Commands.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <tls-client-management-instance.h>
 
@@ -291,7 +294,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 
     if (provisionReq.endpointID.IsNull())
     {
-        VerifyOrReturnError(numInFabric < mTlsClientManagementServer->GetMaxProvisioned(),
+        VerifyOrReturnError(numInFabric < mTlsClientManagementCluster->GetMaxProvisioned(),
                             ClusterStatusCode(Status::ResourceExhausted));
         EndpointSerializer::Clear(endpoint.mEndpoint);
         auto & endpointStruct = endpoint.mEndpoint;
@@ -423,16 +426,17 @@ CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(Endp
 
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance;
-static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(
-    EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisionedEndpoints);
 
-void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
+namespace chip {
+namespace app {
+namespace Clusters {
+
+void InitializeTlsClientManagement()
 {
-    TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterServerInstance.Init();
+    MatterTlsClientManagementSetDelegate(TlsClientManagementCommandDelegate::GetInstance());
+    MatterTlsClientManagementSetCertificateTable(gCertificateTableInstance);
 }
 
-void emberAfTlsClientManagementClusterShutdownCallback(EndpointId matterEndpoint)
-{
-    TEMPORARY_RETURN_IGNORED gTlsClientManagementClusterServerInstance.Finish();
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

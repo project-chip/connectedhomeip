@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.h>
-#include <app/util/config.h>
 #include <vector>
 
 namespace chip {
@@ -103,6 +102,12 @@ public:
 
     static inline TlsClientManagementCommandDelegate & GetInstance() { return instance; }
 };
+
+/**
+ * Initialize the TLS Client Management cluster with application-specific delegate and certificate table.
+ * MUST be called before server initialization (e.g. in ApplicationInit()).
+ */
+void InitializeTlsClientManagement();
 
 } // namespace Clusters
 } // namespace app
