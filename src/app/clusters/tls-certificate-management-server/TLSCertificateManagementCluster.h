@@ -32,9 +32,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class TlsCertificateManagementDelegate;
+class TLSCertificateManagementDelegate;
 
-class TlsCertificateManagementCluster : public DefaultServerCluster, private FabricTable::Delegate
+class TLSCertificateManagementCluster : public DefaultServerCluster, private FabricTable::Delegate
 {
 public:
     /**
@@ -47,10 +47,10 @@ public:
      * @param maxClientCertificates The maximum number of client certificates which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TlsCertificateManagementCluster(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
+    TLSCertificateManagementCluster(EndpointId endpointId, TLSCertificateManagementDelegate & delegate,
                                     Tls::CertificateDependencyChecker & dependencyChecker, Tls::CertificateTable & certificateTable,
                                     uint8_t maxRootCertificates, uint8_t maxClientCertificates);
-    ~TlsCertificateManagementCluster();
+    ~TLSCertificateManagementCluster();
 
     // Attribute Getters
 
@@ -89,7 +89,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
-    TlsCertificateManagementDelegate & mDelegate;
+    TLSCertificateManagementDelegate & mDelegate;
     Tls::CertificateDependencyChecker & mDependencyChecker;
     Tls::CertificateTable & mCertificateTable;
 
@@ -140,7 +140,7 @@ private:
 /** @brief
  *  Defines methods for implementing application-specific logic for the TlsCertificateManagement Cluster.
  */
-class TlsCertificateManagementDelegate
+class TLSCertificateManagementDelegate
 {
 public:
     using RootCertStructType             = TlsCertificateManagement::Structs::TLSCertStruct::Type;
@@ -150,9 +150,9 @@ public:
     using ClientCsrType                  = TlsCertificateManagement::Commands::ClientCSR::DecodableType;
     using ClientCsrResponseType          = TlsCertificateManagement::Commands::ClientCSRResponse::Type;
 
-    TlsCertificateManagementDelegate() = default;
+    TLSCertificateManagementDelegate() = default;
 
-    virtual ~TlsCertificateManagementDelegate() = default;
+    virtual ~TLSCertificateManagementDelegate() = default;
 
     using RootCertificateListCallback     = std::function<CHIP_ERROR(DataModel::List<const RootCertStructType> & certs)>;
     using ClientCertificateListCallback   = std::function<CHIP_ERROR(DataModel::List<const ClientCertStructType> & certs)>;
@@ -338,19 +338,19 @@ public:
     virtual Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric,
                                                                  Tls::TLSCCDID id) = 0;
 
-    Tls::CertificateTable & GetCertificateTable() { return mTlsCertificateManagementCluster->GetCertificateTable(); }
+    Tls::CertificateTable & GetCertificateTable() { return mTLSCertificateManagementCluster->GetCertificateTable(); }
 
 protected:
-    friend class TlsCertificateManagementCluster;
+    friend class TLSCertificateManagementCluster;
 
-    TlsCertificateManagementCluster * mTlsCertificateManagementCluster = nullptr;
+    TLSCertificateManagementCluster * mTLSCertificateManagementCluster = nullptr;
 
     // sets the TlsCertificateManagement Cluster pointer
-    void SetTlsCertificateManagementCluster(TlsCertificateManagementCluster * tlsCertificateManagementServer)
+    void SetTLSCertificateManagementCluster(TLSCertificateManagementCluster * tlsCertificateManagementServer)
     {
-        mTlsCertificateManagementCluster = tlsCertificateManagementServer;
+        mTLSCertificateManagementCluster = tlsCertificateManagementServer;
     }
-    TlsCertificateManagementCluster * GetTlsCertificateManagementCluster() const { return mTlsCertificateManagementCluster; }
+    TLSCertificateManagementCluster * GetTLSCertificateManagementCluster() const { return mTLSCertificateManagementCluster; }
 };
 
 } // namespace Clusters
