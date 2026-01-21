@@ -16,9 +16,12 @@
  */
 
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <clusters/AdministratorCommissioning/Enums.h>
+#include <clusters/AdministratorCommissioning/Metadata.h>
 #include <crypto/RandUtils.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/dnssd/Advertiser.h>
@@ -41,8 +44,10 @@
 #include <messaging/tests/MessagingContext.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::Crypto;
 using namespace chip::Messaging;
+using namespace chip::Protocols;
 using namespace System::Clock::Literals;
 
 using chip::CommissioningWindowAdvertisement;
@@ -527,26 +532,6 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
-// BEGIN-IF-CHANGE-ALSO-CHANGE(src/app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.cpp)
-void RevokeCommissioningCommandEquivalent()
-{
-    ChipLogProgress(Zcl, "Received RevokeCommissioning command");
-
-    auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-
-    commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
-
-    if (!commissionMgr.IsCommissioningWindowOpen())
-    {
-        ChipLogError(Zcl, "Commissioning window is currently not open");
-        return;
-    }
-
-    commissionMgr.CloseCommissioningWindow();
-    ChipLogProgress(Zcl, "Commissioning window is now closed");
-}
-// END-IF-CHANGE-ALSO-CHANGE(src/app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.cpp)
-
 TEST_F(TestCommissioningWindowManager, RevokeCommissioningClearsPASESession)
 {
     TemporarySessionManager sessionManager(*this);
@@ -584,8 +569,10 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningClearsPASESession)
     EXPECT_TRUE(commissionMgr.GetPASESession().HasValue());
     EXPECT_TRUE(commissionMgr.GetPASESession().Value()->AsSecureSession()->IsPASESession());
 
-    // This is the equivalent of AdministratorCommissioningLogic::RevokeCommissioning() in the AdministratorCommissioning Cluster
-    RevokeCommissioningCommandEquivalent();
+    Clusters::AdministratorCommissioningLogic logic;
+    Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
+
+    ASSERT_EQ(logic.RevokeCommissioning(unused), Protocols::InteractionModel::Status::Success);
 
     // We need to service events here to allow the Async Events to be processed and make sure that the CommissioningWindowManager
     // successfully shutdown the PASESession
@@ -661,7 +648,14 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTime
     // Ensuring Fail-Safe is still armed
     EXPECT_TRUE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
 
-    RevokeCommissioningCommandEquivalent();
+    Clusters::AdministratorCommissioningLogic logic;
+    Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
+
+    // RevokeCommissioning is invoked after the commissioning window has timed out and therefore returns StatusCode::kWindowNotOpen.
+    // However, it still explicitly forces fail-safe timer expiry regardless of the commissioning window state.
+    ASSERT_EQ(logic.RevokeCommissioning(unused),
+              InteractionModel::ClusterStatusCode::ClusterSpecificFailure(
+                  Clusters::AdministratorCommissioning::StatusCode::kWindowNotOpen));
 
     // We need to service events here to allow the Async Events to be processed and make sure that the CommissioningWindowManager
     // successfully shutdown the PASESession

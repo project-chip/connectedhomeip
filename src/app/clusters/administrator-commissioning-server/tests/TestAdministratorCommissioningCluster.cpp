@@ -121,13 +121,13 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
 TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpireFailSafeIfNotHeldByPASE)
 {
 
-    AdministratorCommissioningLogic logic;
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
     // Arming the fail-safe outside of the commissioning context
     ASSERT_SUCCESS(failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60)));
     ASSERT_TRUE(failSafeContext.IsFailSafeArmed());
 
+    AdministratorCommissioningLogic logic;
     AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
 
     // RevokeCommissioning attempts to expire the fail-safe (when it is held by a PASE session) regardless of the commissioning

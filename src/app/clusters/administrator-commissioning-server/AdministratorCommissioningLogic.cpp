@@ -101,7 +101,6 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissi
     return Status::Success;
 }
 
-// BEGIN-IF-CHANGE-ALSO-CHANGE(src/app/tests/TestCommissioningWindowManager.cpp)
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioning(
     const AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData)
 {
@@ -122,7 +121,6 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     ChipLogProgress(Zcl, "Commissioning window is now closed");
     return Status::Success;
 }
-// END-IF-CHANGE-ALSO-CHANGE(src/app/tests/TestCommissioningWindowManager.cpp)
 
 } // namespace Clusters
 } // namespace app
