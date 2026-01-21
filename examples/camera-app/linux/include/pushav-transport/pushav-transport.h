@@ -55,6 +55,7 @@ class PushAVTransport : public Transport
 public:
     PushAVTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
                     const uint16_t connectionID, AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
+
     ~PushAVTransport() override;
 
     // Send video data for a given stream ID
@@ -90,10 +91,11 @@ public:
         return (mTransportStatus == chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum::kInactive);
     } // 0:Active 1:Inactive
 
-    void ConfigureRecorderSettings(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
-                                   AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
+    CHIP_ERROR
+    ConfigureRecorderSettings(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
+                              AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
 
-    void ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage & transportOptions);
+    CHIP_ERROR ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage & transportOptions);
 
     bool HandleTriggerDetected();
 

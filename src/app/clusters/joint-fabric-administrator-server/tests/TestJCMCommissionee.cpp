@@ -481,6 +481,8 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestStoreEndpointIdSuccess)
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     FakeCommandHandler commandHandler;
     CommandHandler::Handle handle(&commandHandler);
+    Messaging::ExchangeContext * exchangeCtx1 = NewExchangeToBob(nullptr, false);
+    commandHandler.SetExchangeContext(exchangeCtx1);
 
     constexpr EndpointId kExpectedEndpointId{ 55 };
     Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kInvalidEndpointId);
