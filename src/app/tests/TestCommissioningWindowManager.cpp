@@ -530,6 +530,8 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
 // BEGIN-IF-CHANGE-ALSO-CHANGE(src/app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.cpp)
 void RevokeCommissioningCommandEquivalent()
 {
+    ChipLogProgress(Zcl, "Received RevokeCommissioning command");
+
     auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
     commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
@@ -665,6 +667,7 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTime
     // successfully shutdown the PASESession
     ServiceEvents();
 
+    EXPECT_FALSE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
     // This asserts that the CommissioningWindowManager has cleared the PASESession
     EXPECT_FALSE(commissionMgr.GetPASESession().HasValue());

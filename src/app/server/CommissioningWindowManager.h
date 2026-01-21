@@ -133,7 +133,8 @@ public:
     Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
 
     /**
-     * Expire the fail-safe if it is commissioning-related and comes from a PASE Session.
+     * Expire the fail-safe if there is an active PASE session, since this indicates
+     * an active commissioning context and it is therefore safe to expire the fail-safe.
      */
     void ExpireFailSafeIfHeldByOpenPASESession();
 
