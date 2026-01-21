@@ -99,6 +99,8 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
             "callback has not been set, yet IdentificationDeclarationOptions.mCommissionerPasscode is set to true");
         SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
+    ChipLogProgress(AppServer,
+                    "CastingPlayer::VerifyOrEstablishConnection() cachedCastingPlayers.size=%zu", cachedCastingPlayers.size());
 
     // If *this* CastingPlayer was previously connected to, its nodeId, fabricIndex and other attributes should be present
     // in the CastingStore cache. If that is the case, AND, the cached data contains the endpoint desired by the client, if any,
