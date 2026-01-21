@@ -954,10 +954,10 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             {
                 auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
                     mDelegate->SelectVideoStream(transportOptions.streamUsage, finalVideoStreamID));
-
                 if (!delegateStatus.IsSuccess())
                 {
-                    handler.AddStatus(commandPath, delegateStatus);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedVideoStreamsAttribute is empty", mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidInState);
                     return std::nullopt;
                 }
 
@@ -1002,19 +1002,16 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             
             if (transportOptions.audioStreamID.Value().IsNull())
             {
-                uint16_t audioStreamID;
-
                 auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                    mDelegate->SelectAudioStream(transportOptions.streamUsage, audioStreamID));
-
+                    mDelegate->SelectAudioStream(transportOptions.streamUsage, finalAudioStreamID));
                 if (!delegateStatus.IsSuccess())
                 {
-                    handler.AddStatus(commandPath, delegateStatus);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedAudioStreamsAttribute is empty", mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidInState);
                     return std::nullopt;
                 }
 
-                transportOptionsPtr->audioStreamID.SetValue(audioStreamID);
-                finalAudioStreamID = audioStreamID;
+                transportOptionsPtr->audioStreamID.SetValue(finalAudioStreamID);
             }
             else
             {
