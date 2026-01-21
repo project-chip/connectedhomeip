@@ -2020,7 +2020,7 @@ endpoint 1 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint default = 0;
+    ram      attribute temperatureSetpoint default = 4900;
     ram      attribute minTemperature default = 4900;
     ram      attribute maxTemperature default = 8200;
     ram      attribute step default = 100;
@@ -2082,5 +2082,3 @@ endpoint 1 {
     handle command Resume;
   }
 }
-
-
