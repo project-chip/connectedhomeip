@@ -154,33 +154,34 @@ TEST_F(TestOnOffCluster, TestNoPersistence)
 {
     MockOnOffDelegate mockDelegate;
     TimerDelegateMock mockTimerDelegate;
+    TestServerClusterContext context;
 
     // Step 1: Initial startup, set to ON
     {
-        TestServerClusterContext context;
-        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate });
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate, .defaults = { .onOff = true } });
         cluster.AddDelegate(&mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster); // Uses its own context
 
-        EXPECT_TRUE(tester.Invoke<Commands::On::Type>(Commands::On::Type()).IsSuccess());
         bool onOff = false;
         EXPECT_EQ(tester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
         EXPECT_TRUE(onOff);
+        EXPECT_TRUE(cluster.GetOnOff());
     }
 
-    // Step 2: Restart, verify state is NOT persisted (should be default OFF)
+    // Step 2:
+    //   - Restart, verify state is NOT persisted (should be default OFF)
+    //   - We reuse the same context so persistence is the same. Only defaults apply.
     {
-        TestServerClusterContext context;
-        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate });
+        OnOffCluster cluster(kTestEndpointId, { .timerDelegate = mockTimerDelegate, .defaults = { .onOff = false } });
         cluster.AddDelegate(&mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster); // Uses its own context
 
         bool onOff = true; // Initialize to true to ensure it's changed
         EXPECT_EQ(tester.ReadAttribute(Attributes::OnOff::Id, onOff), CHIP_NO_ERROR);
-
         EXPECT_FALSE(onOff);
+        EXPECT_FALSE(cluster.GetOnOff());
     }
 }
 
