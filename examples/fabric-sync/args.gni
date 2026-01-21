@@ -38,3 +38,6 @@ matter_log_json_payload_decode_full = true
 
 # Thread devices do not support WakeOnLan because their mac address is >48bit
 chip_enable_openthread = false
+
+# For Commissioning and User Directed Commissioning in CommissionerDiscoveryController
+chip_device_config_enable_commissioner_discovery = true

@@ -216,6 +216,7 @@ source_set("commissioner-main") {
   }
 
   public_deps = [
+    "${chip_root}/src/controller:commissioner-discovery-controller",
     "${chip_root}/src/controller:controller",
     "${chip_root}/src/lib",
   ]

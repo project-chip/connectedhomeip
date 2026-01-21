@@ -47,7 +47,9 @@
 #include <controller/CommissionerDiscoveryController.h>
 using namespace ::chip::Controller;
 extern DeviceCommissioner * GetDeviceCommissioner();
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 extern CommissionerDiscoveryController * GetCommissionerDiscoveryController();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 using namespace chip;

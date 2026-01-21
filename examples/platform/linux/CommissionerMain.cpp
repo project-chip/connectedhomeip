@@ -115,7 +115,9 @@ class MyCommissionerCallback : public CommissionerCallback
 AutoCommissioner gAutoCommissioner;
 
 DeviceCommissioner gCommissioner;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 CommissionerDiscoveryController gCommissionerDiscoveryController;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
@@ -219,8 +221,10 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     ReturnLogErrorOnFailure(
         chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricIndex, defaultIpk, compressedFabricIdSpan));
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     // advertise operational since we are an admin
     ReturnLogErrorOnFailure(app::DnssdServer::Instance().AdvertiseOperational());
@@ -247,11 +251,11 @@ class PairingCommand : public Controller::DevicePairingDelegate
 {
 public:
     PairingCommand()
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
         :
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     {}
 
     /////////// DevicePairingDelegate Interface /////////
@@ -266,14 +270,14 @@ public:
     void OnFabricCheck(NodeId matchingNodeId) override;
 
 private:
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                     const chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 };
 
 PairingCommand gPairingCommand;
@@ -288,13 +292,13 @@ void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
         break;
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(AppServer, "Secure Pairing Failed");
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
         CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
         if (cdc != nullptr)
         {
             cdc->CommissioningFailed(CHIP_ERROR_CONNECTION_ABORTED);
         }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
         break;
     }
 }
@@ -327,26 +331,26 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
         ChipLogProgress(AppServer, "Device commissioning completed with success - getting OperationalDeviceProxy");
 
         TEMPORARY_RETURN_IGNORED gCommissioner.GetConnectedDevice(
             gAutoCommissioner.GetCommissioningParameters().GetRemoteNodeId().ValueOr(nodeId), &mOnDeviceConnectedCallback,
             &mOnDeviceConnectionFailureCallback);
-#else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
         ChipLogProgress(AppServer, "Device commissioning completed with success");
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     }
     else
     {
         ChipLogProgress(AppServer, "Device commissioning Failure: %s", ErrorStr(err));
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
         CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
         if (cdc != nullptr)
         {
             cdc->CommissioningFailed(err);
         }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     }
 }
 
@@ -401,7 +405,7 @@ void PairingCommand::OnFabricCheck(NodeId matchingNodeId)
     }
 }
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 void PairingCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
                                          const SessionHandle & sessionHandle)
@@ -428,7 +432,7 @@ void PairingCommand::OnDeviceConnectionFailureFn(void * context, const ScopedNod
     }
 }
 
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport::PeerAddress address)
 {
@@ -462,10 +466,12 @@ DeviceCommissioner * GetDeviceCommissioner()
     return &gCommissioner;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 CommissionerDiscoveryController * GetCommissionerDiscoveryController()
 {
     return &gCommissionerDiscoveryController;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 Crypto::SessionKeystore * GetSessionKeystore()
 {
