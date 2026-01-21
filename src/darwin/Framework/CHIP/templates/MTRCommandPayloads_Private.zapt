@@ -1,0 +1,13 @@
+{{> header excludeZapComment=true}}
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+// Nothing here for now, but leaving this file in place in case we need to add
+// something.
+
+NS_ASSUME_NONNULL_END
