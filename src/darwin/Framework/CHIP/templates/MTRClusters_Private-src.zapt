@@ -29,6 +29,9 @@ using chip::System::Clock::Seconds16;
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+// Cluster {{asUpperCamelCase name preserveAcronyms=true}} is already publicly available in MTRClusters.mm
+// No private-specific cluster implementation needed.
+{{else}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 {{#zcl_commands}}

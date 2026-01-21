@@ -49,6 +49,9 @@ public:
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+// Cluster {{asUpperCamelCase name preserveAcronyms=true}} is already publicly available in MTRBaseClusters.mm
+// No private-specific cluster implementation needed.
+{{else}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 {{#zcl_commands}}

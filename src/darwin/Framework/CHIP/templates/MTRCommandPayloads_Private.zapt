@@ -11,6 +11,9 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#zcl_commands}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
+// Command {{asUpperCamelCase parent.name preserveAcronyms=true}}::{{asUpperCamelCase name preserveAcronyms=true}} is already publicly available
+// No private-specific command payload methods needed.
+{{else}}
 
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params (PrivateMethods)
 
@@ -26,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 
 @end
-
 
 
 {{/if}}

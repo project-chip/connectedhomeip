@@ -10,6 +10,9 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+// Cluster {{asUpperCamelCase name preserveAcronyms=true}} is already publicly available in MTRClusters.h
+// No private-specific cluster class needed.
+{{else}}
 
 /**
  * Cluster {{name}}
