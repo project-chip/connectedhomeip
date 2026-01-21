@@ -106,7 +106,7 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     const AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
-    ChipLogProgress(Zcl, "Received command to close commissioning window");
+    ChipLogProgress(Zcl, "Received RevokeCommissioning command");
 
     auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
