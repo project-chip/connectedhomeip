@@ -79,7 +79,7 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
     default 10240
 
 config MPSL_WORK_STACK_SIZE
-    default 2048 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
+    default 2048 if SOC_SERIES_NRF54L # nRF54L requires more memory due to crypto backend
 
 # We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
 config COMMON_LIBC_MALLOC_ARENA_SIZE
@@ -189,7 +189,7 @@ config BT_RX_STACK_SIZE
 
 # Increase maximum data length of PDU supported in the Controller
 config BT_CTLR_DATA_LENGTH_MAX
-    default 251 if SOC_SERIES_NRF52X
+    default 251 if SOC_SERIES_NRF52
 
 config BT_CTLR_ECDH
     default n
@@ -229,11 +229,11 @@ config CHIP_OTA_REQUESTOR
     default y
 
 config BOOT_IMAGE_ACCESS_HOOKS
-    default y if SOC_SERIES_NRF53X
+    default y if SOC_SERIES_NRF53
 
 config UPDATEABLE_IMAGE_NUMBER
     default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
-    default 2 if SOC_SERIES_NRF53X
+    default 2 if SOC_SERIES_NRF53
 
 config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
     default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
@@ -271,8 +271,8 @@ config OPENTHREAD_THREAD_STACK_SIZE
 
 config OPENTHREAD_DEFAULT_TX_POWER
     default 20 if MPSL_FEM
-    default 3 if SOC_SERIES_NRF53X
-    default 8 if SOC_SERIES_NRF52X || SOC_SERIES_NRF54LX
+    default 3 if SOC_SERIES_NRF53
+    default 8 if SOC_SERIES_NRF52 || SOC_SERIES_NRF54L
 
 endif # OPENTHREAD
 
@@ -355,7 +355,7 @@ choice OPENTHREAD_SECURITY
 endchoice
 
 choice RNG_GENERATOR_CHOICE
-    default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53X
+    default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53
 endchoice
 
 config MBEDTLS_ENABLE_HEAP
@@ -379,16 +379,16 @@ config CHIP_CRYPTO_PSA
 if CHIP_CRYPTO_PSA
 
 config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
-    default y if SOC_SERIES_NRF54LX
+    default y if SOC_SERIES_NRF54L
 
 config PSA_CRYPTO_DRIVER_OBERON
-    default y if (SOC_SERIES_NRF52X || SOC_SERIES_NRF53X)
+    default y if (SOC_SERIES_NRF52 || SOC_SERIES_NRF53)
 
 config PSA_CRYPTO_DRIVER_CC3XX
     default n
 
 config PSA_CRYPTO_DRIVER_CRACEN
-    default y if SOC_SERIES_NRF54LX
+    default y if SOC_SERIES_NRF54L
 
 config PSA_WANT_ALG_SHA_224
     default n

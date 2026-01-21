@@ -184,7 +184,7 @@ config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
 config CHIP_FACTORY_DATA_WRITE_PROTECT
 	bool "Factory Data write protection"
 	select FPROTECT
-	depends on CHIP_FACTORY_DATA && !SOC_SERIES_NRF54LX
+	depends on CHIP_FACTORY_DATA && !SOC_SERIES_NRF54L
 	default y
 	help
 	  Enables the write protection of the Factory Data partition in the flash memory.

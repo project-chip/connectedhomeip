@@ -227,7 +227,7 @@ if (CONFIG_CHIP_PW_RPC)
 endif()
 
 # Inform users that they use not-optimized settings backend for the nRF54LX series.
-if(CONFIG_SOC_SERIES_NRF54LX AND CONFIG_SETTINGS_NVS)
+if(CONFIG_SOC_SERIES_NRF54L AND CONFIG_SETTINGS_NVS)
     message(WARNING "
     The nRF54L series is not optimized for the NVS settings backend due to RRAM specifications.
     Consider using the CONFIG_SETTINGS_ZMS Kconfig option, which is recommended for this type of non-volatile memory.")
