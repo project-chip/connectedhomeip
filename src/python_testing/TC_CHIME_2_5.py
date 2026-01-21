@@ -145,5 +145,6 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             self.skip_step(5)
             self.skip_step(6)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
