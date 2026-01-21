@@ -144,8 +144,6 @@ public:
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mTestEventTriggerDelegate; }
 
-    System::Clock::Microseconds64 GetNodeStartupTimestamp() const { return mNodeStartupTimestamp; }
-
     void SetTestEventTriggerDelegate(TestEventTriggerDelegate * testEventTriggerDelegate)
     {
         mTestEventTriggerDelegate = testEventTriggerDelegate;

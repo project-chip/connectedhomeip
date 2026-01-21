@@ -41,9 +41,9 @@ namespace {
 
 // Determine if the configurable version of the general diagnostics cluster with additonal command options is needed
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gDiagnosticsServer;
 #else
-LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gDiagnosticsServer;
 #endif
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -56,16 +56,15 @@ public:
         InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-        const GeneralDiagnosticsFunctionsConfig functionsConfig
-        {
-            /*
-            Only consider real time if time sync cluster is actually enabled. If it's not
-            enabled, this avoids likelihood of frequently reporting unusable unsynched time.
-            */
+        const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        /*
+        Only consider real time if time sync cluster is actually enabled. If it's not
+        enabled, this avoids likelihood of frequently reporting unusable unsynched time.
+        */
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime       = false,
+            .enablePosixTime = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
             .enablePayloadSnapshot = true,
@@ -73,23 +72,23 @@ public:
             .enablePayloadSnapshot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
+        gDiagnosticsServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
                        &DeviceLayer::GetDiagnosticDataProvider(), Server::GetInstance().GetTestEventTriggerDelegate(),
                        Server::GetInstance().GetNodeStartupTimestamp(), functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
+        gDiagnosticsServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), interactionModel,
                        &DeviceLayer::GetDiagnosticDataProvider(), Server::GetInstance().GetNodeStartupTimestamp());
-        gServer.Cluster().SetTestEventTriggerDelegate(Server::GetInstance().GetTestEventTriggerDelegate());
+        gDiagnosticsServer.Cluster().SetTestEventTriggerDelegate(Server::GetInstance().GetTestEventTriggerDelegate());
 #endif
-        return gServer.Registration();
+        return gDiagnosticsServer.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
-        return &gServer.Cluster();
+        VerifyOrReturnValue(gDiagnosticsServer.IsConstructed(), nullptr);
+        return &gDiagnosticsServer.Cluster();
     }
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gDiagnosticsServer.Destroy(); }
 };
 
 } // namespace
@@ -133,36 +132,36 @@ void MatterGeneralDiagnosticsPluginServerShutdownCallback() {}
 namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnDeviceReboot(bootReason);
+        gDiagnosticsServer.Cluster().OnDeviceReboot(bootReason);
     }
 }
 
 void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
                                       const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnHardwareFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnHardwareFaultsDetect(previous, current);
     }
 }
 
 void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
                                    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnRadioFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnRadioFaultsDetect(previous, current);
     }
 }
 
 void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnNetworkFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnNetworkFaultsDetect(previous, current);
     }
 }
 } // namespace chip::app::Clusters::GeneralDiagnostics
