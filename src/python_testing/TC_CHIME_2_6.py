@@ -63,7 +63,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
+class TC_CHIME_2_6(MatterBaseTest, CHIMETestBase):
 
     def desc_TC_CHIME_2_6(self) -> str:
         return "[TC-CHIME-2.6] Verify the generation of the ChimeStartedPlaying Event"

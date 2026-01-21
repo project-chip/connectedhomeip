@@ -62,7 +62,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
+class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
 
     def desc_TC_CHIME_2_5(self) -> str:
         return "[TC-CHIME-2.5] Verify functionality of the PlayChimeSound command-Release 1.5.1 or later"
