@@ -43,8 +43,13 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(GroupKeyManagementCluster::Context{ .fabricTable       = Server::GetInstance().GetFabricTable(),
-                                                           .groupDataProvider = *Credentials::GetGroupDataProvider() });
+        Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+        VerifyOrDie(groupDataProvider != nullptr); // we require app main to set this before cluster startup
+
+        gServer.Create(GroupKeyManagementCluster::Context{
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .groupDataProvider = *groupDataProvider,
+        });
         return gServer.Registration();
     }
 

@@ -72,8 +72,24 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
-    auto & fabricTable = Server::GetInstance().GetFabricTable();
-    static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver, fabricTable);
+    static Credentials::GroupDataProviderImpl groupDataProvider;
+
+    static WifiRootNodeDevice rootNodeDevice(
+        {
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+            .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
+            .platformManager = DeviceLayer::PlatformMgr(), .groupDataProvider = groupDataProvider,
+            .sessionManager = Server::GetInstance().GetSecureSessionManager(), .dnssdServer = DnssdServer::Instance(),
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        },
+        {
+            .wifiDriver = sWiFiDriver,
+        });
     static std::unique_ptr<DeviceInterface> constructedDevice;
 
     TEMPORARY_RETURN_IGNORED rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);

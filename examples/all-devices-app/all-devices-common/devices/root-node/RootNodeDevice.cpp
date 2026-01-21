@@ -19,7 +19,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
-#include <credentials/GroupDataProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -53,14 +52,14 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
         GeneralCommissioningCluster::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+            .commissioningWindowManager = mContext.commissioningWindowManager, //
+                .configurationManager   = mContext.configurationManager,       //
+                .deviceControlServer    = mContext.deviceControlServer,        //
+                .fabricTable            = mContext.fabricTable,                //
+                .failsafeContext        = mContext.failsafeContext,            //
+                .platformManager        = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -74,7 +73,9 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
     mGroupKeyManagementCluster.Create(GroupKeyManagementCluster::Context{
-        .fabricTable = mFabricTable, .groupDataProvider = *Credentials::GetGroupDataProvider() });
+        .fabricTable       = mContext.fabricTable,
+        .groupDataProvider = mContext.groupDataProvider,
+    });
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet{});
@@ -83,14 +84,14 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mAccessControlCluster.Create();
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
-    mOperationalCredentialsCluster.Create(
-        endpointId,
-        OperationalCredentialsCluster::Context{ .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                .dnssdServer     = app::DnssdServer::Instance(),
-                                                .commissioningWindowManager =
-                                                    Server::GetInstance().GetCommissioningWindowManager() });
+    mOperationalCredentialsCluster.Create(endpointId,
+                                          OperationalCredentialsCluster::Context{
+                                              .fabricTable                = mContext.fabricTable,
+                                              .failSafeContext            = mContext.failsafeContext,
+                                              .sessionManager             = mContext.sessionManager,
+                                              .dnssdServer                = mContext.dnssdServer,
+                                              .commissioningWindowManager = mContext.commissioningWindowManager,
+                                          });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
@@ -150,7 +151,7 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));
 
-    mNetworkCommissioningCluster.Create(endpointId, mWifiDriver, mGeneralCommissioningCluster.Cluster());
+    mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver, mGeneralCommissioningCluster.Cluster());
     ReturnErrorOnFailure(mNetworkCommissioningCluster.Cluster().Init());
     ReturnErrorOnFailure(provider.AddCluster(mNetworkCommissioningCluster.Registration()));
 
