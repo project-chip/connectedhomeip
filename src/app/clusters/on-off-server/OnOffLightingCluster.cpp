@@ -222,25 +222,19 @@ std::optional<DataModel::ActionReturnStatus> OnOffLightingCluster::InvokeCommand
 
 void OnOffLightingCluster::SetOnTime(uint16_t value)
 {
-    VerifyOrReturn(mOnTime != value);
-    mOnTime = value;
+    VerifyOrReturn(SetAttributeValue(mOnTime, value, Attributes::OnTime::Id));
     UpdateTimer();
-    NotifyAttributeChanged(Attributes::OnTime::Id);
 }
 
 void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
 {
-    VerifyOrReturn(mOffWaitTime != value);
-    mOffWaitTime = value;
+    VerifyOrReturn(SetAttributeValue(mOffWaitTime, value, Attributes::OffWaitTime::Id));
     UpdateTimer();
-    NotifyAttributeChanged(Attributes::OffWaitTime::Id);
 }
 
 CHIP_ERROR OnOffLightingCluster::SetStartupOnOff(DataModel::Nullable<OnOff::StartUpOnOffEnum> value)
 {
-    VerifyOrReturnError(mStartUpOnOff != value, CHIP_NO_ERROR);
-    mStartUpOnOff = value;
-    NotifyAttributeChanged(Attributes::StartUpOnOff::Id);
+    VerifyOrReturnValue(SetAttributeValue(mStartUpOnOff, value, Attributes::StartUpOnOff::Id), CHIP_NO_ERROR);
 
     if (mContext != nullptr)
     {
@@ -349,8 +343,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOff()
         LogErrorOnFailure(mScenesIntegrationDelegate->MakeSceneInvalidForAllFabrics());
     }
 
-    mOnTime = 0;
-    NotifyAttributeChanged(Attributes::OnTime::Id);
+    SetAttributeValue<uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
     UpdateTimer();
     return Status::Success;
 }
@@ -363,11 +356,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
     // Spec requirement:
     //   This attribute SHALL be set to TRUE after the reception of a command which
     //   causes the OnOff attribute to be set to TRUE;
-    if (!mGlobalSceneControl)
-    {
-        mGlobalSceneControl = true;
-        NotifyAttributeChanged(Attributes::GlobalSceneControl::Id);
-    }
+    SetAttributeValue(mGlobalSceneControl, true, Attributes::GlobalSceneControl::Id);
 
     if (wasOff && mScenesIntegrationDelegate != nullptr)
     {
@@ -376,8 +365,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
 
     if (mOnTime == 0)
     {
-        mOffWaitTime = 0;
-        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+        SetAttributeValue<uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
     }
     UpdateTimer();
     return Status::Success;
@@ -413,13 +401,12 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOffWithEffect(const Da
 
         VerifyOrReturnValue(status.IsSuccess(), status);
 
-        mGlobalSceneControl = false;
-        NotifyAttributeChanged(Attributes::GlobalSceneControl::Id);
+        SetAttributeValue(mGlobalSceneControl, false, Attributes::GlobalSceneControl::Id);
 
         ReturnErrorOnFailure(SetOnOffFromCommand(false));
 
-        mOnTime = 0;
-        NotifyAttributeChanged(Attributes::OnTime::Id);
+        SetAttributeValue<uint16_t>(mOnTime, 0, Attributes::OnTime::Id);
+
         UpdateTimer();
         return Status::Success;
     }
@@ -452,13 +439,11 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithRecallGlobalScen
         ReturnErrorOnFailure(SetOnOffFromCommand(true));
     }
 
-    mGlobalSceneControl = true;
-    NotifyAttributeChanged(Attributes::GlobalSceneControl::Id);
+    SetAttributeValue(mGlobalSceneControl, true, Attributes::GlobalSceneControl::Id);
 
     if (mOnTime == 0)
     {
-        mOffWaitTime = 0;
-        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+        SetAttributeValue<uint16_t>(mOffWaitTime, 0, Attributes::OffWaitTime::Id);
     }
     UpdateTimer();
 
@@ -490,11 +475,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
         // Spec requirement:
         //   This attribute SHALL be set to TRUE after the reception of a command which
         //   causes the OnOff attribute to be set to TRUE;
-        if (!mGlobalSceneControl)
-        {
-            mGlobalSceneControl = true;
-            NotifyAttributeChanged(Attributes::GlobalSceneControl::Id);
-        }
+        SetAttributeValue(mGlobalSceneControl, true, Attributes::GlobalSceneControl::Id);
     }
 
     // state transition logic between ON/OFF/TIMED_ON/TIMED_OFF
