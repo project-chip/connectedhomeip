@@ -5337,6 +5337,70 @@ static BOOL AttributeIsSpecifiedInSoilMeasurementCluster(AttributeId aAttributeI
     }
     }
 }
+static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientContextSensing;
+    switch (aAttributeId) {
+    case Attributes::HumanActivityDetected::Id: {
+        return YES;
+    }
+    case Attributes::ObjectIdentified::Id: {
+        return YES;
+    }
+    case Attributes::AudioContextDetected::Id: {
+        return YES;
+    }
+    case Attributes::AmbientContextType::Id: {
+        return YES;
+    }
+    case Attributes::AmbientContextTypeSupported::Id: {
+        return YES;
+    }
+    case Attributes::SimultaneousDetectionLimit::Id: {
+        return YES;
+    }
+    case Attributes::CountThresholdReached::Id: {
+        return YES;
+    }
+    case Attributes::CountThreshold::Id: {
+        return YES;
+    }
+    case Attributes::ObjectCount::Id: {
+        return YES;
+    }
+    case Attributes::HoldTime::Id: {
+        return YES;
+    }
+    case Attributes::HoldTimeLimits::Id: {
+        return YES;
+    }
+    case Attributes::PredictedActivity::Id: {
+        return YES;
+    }
+    case Attributes::PrivacyModeEnabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AmbientContextSensing attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -7316,6 +7380,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::SoilMeasurement::Id: {
         return AttributeIsSpecifiedInSoilMeasurementCluster(aAttributeId);
+    }
+    case Clusters::AmbientContextSensing::Id: {
+        return AttributeIsSpecifiedInAmbientContextSensingCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);

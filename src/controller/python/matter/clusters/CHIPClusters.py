@@ -5516,10 +5516,10 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "endpoints": "int",
-                    "keyID": "int",
+                    "keySetID": "int",
                     "key": "bytes",
-                    "gracePeriod": "int",
                     "useAuxiliaryACL": "bool",
+                    "replaceEndpoints": "bool",
                 },
             },
             0x00000001: {
@@ -5535,20 +5535,12 @@ class ChipClusters:
                 "commandName": "UpdateGroupKey",
                 "args": {
                     "groupID": "int",
-                    "keyID": "int",
+                    "keySetID": "int",
                     "key": "bytes",
-                    "gracePeriod": "int",
                 },
             },
             0x00000004: {
                 "commandId": 0x00000004,
-                "commandName": "ExpireGracePeriod",
-                "args": {
-                    "groupID": "int",
-                },
-            },
-            0x00000005: {
-                "commandId": 0x00000005,
                 "commandName": "ConfigureAuxiliaryACL",
                 "args": {
                     "groupID": "int",
@@ -11426,6 +11418,125 @@ class ChipClusters:
             },
         },
     }
+    _AMBIENT_CONTEXT_SENSING_CLUSTER_INFO = {
+        "clusterName": "AmbientContextSensing",
+        "clusterId": 0x00000431,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "HumanActivityDetected",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ObjectIdentified",
+                "attributeId": 0x00000001,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "AudioContextDetected",
+                "attributeId": 0x00000002,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "AmbientContextType",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "AmbientContextTypeSupported",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "SimultaneousDetectionLimit",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000006: {
+                "attributeName": "CountThresholdReached",
+                "attributeId": 0x00000006,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "CountThreshold",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000008: {
+                "attributeName": "ObjectCount",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "HoldTime",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000A: {
+                "attributeName": "HoldTimeLimits",
+                "attributeId": 0x0000000A,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "PredictedActivity",
+                "attributeId": 0x0000000B,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "PrivacyModeEnabled",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO = {
         "clusterName": "WiFiNetworkManagement",
         "clusterId": 0x00000451,
@@ -13542,6 +13653,8 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
                     "SFrameConfig": "SFrameStruct",
+                    "videoStreams": "int",
+                    "audioStreams": "int",
                 },
             },
             0x00000002: {
@@ -13558,6 +13671,8 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
                     "SFrameConfig": "SFrameStruct",
+                    "videoStreams": "int",
+                    "audioStreams": "int",
                 },
             },
             0x00000004: {
@@ -13807,6 +13922,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PlayChimeSound",
                 "args": {
+                    "chimeID": "int",
                 },
             },
         },
@@ -15961,6 +16077,7 @@ class ChipClusters:
         0x0000042E: _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x0000042F: _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000430: _SOIL_MEASUREMENT_CLUSTER_INFO,
+        0x00000431: _AMBIENT_CONTEXT_SENSING_CLUSTER_INFO,
         0x00000451: _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         0x00000452: _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         0x00000453: _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,
@@ -16106,6 +16223,7 @@ class ChipClusters:
         "TotalVolatileOrganicCompoundsConcentrationMeasurement": _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "RadonConcentrationMeasurement": _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "SoilMeasurement": _SOIL_MEASUREMENT_CLUSTER_INFO,
+        "AmbientContextSensing": _AMBIENT_CONTEXT_SENSING_CLUSTER_INFO,
         "WiFiNetworkManagement": _WI_FI_NETWORK_MANAGEMENT_CLUSTER_INFO,
         "ThreadBorderRouterManagement": _THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER_INFO,
         "ThreadNetworkDirectory": _THREAD_NETWORK_DIRECTORY_CLUSTER_INFO,

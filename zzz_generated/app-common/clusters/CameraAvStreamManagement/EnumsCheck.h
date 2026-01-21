@@ -43,6 +43,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CameraAvStreamManagemen
     switch (val)
     {
     case EnumType::kJpeg:
+    case EnumType::kHeic:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

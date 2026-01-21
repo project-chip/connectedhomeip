@@ -45,8 +45,9 @@
 from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 
 import matter.clusters as Clusters
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityMetering
 
@@ -190,7 +191,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
 
         self.step("14")
         # TH removes the subscription to MeteredQuantity attribute.
-        await subscription_handler.cancel()
+        subscription_handler.cancel()
 
 
 if __name__ == "__main__":

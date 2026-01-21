@@ -171,7 +171,7 @@ config BT_GATT_CACHING
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
-    default 896 if BT_W91
+    default 1024 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
     default 664 if BT_B9X || BT_TLX
@@ -252,6 +252,13 @@ config RISCV_MTVEC_VECTORED_MODE
 config CHIP_OTA_REQUESTOR
     default y
 
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
+
 config MCUBOOT_SIGNATURE_KEY_FILE
     default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     depends on BOOTLOADER_MCUBOOT
@@ -328,12 +335,16 @@ config IEEE802154_TLX_OPTIMIZATION
     help
       Improve RF performance in IEEE 802.15.4 communication on TLX SoCs.
 
+config IEEE802154_TLX_ACTIVE_STAGE_OPTIMIZATION
+    bool "Active Stage Optimization"
+    default n if BOARD_TL3218X_RETENTION
+
 config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 440 if PM
-    default 608
+    default 496 if PM && ZEPHYR_VERSION_3_3
+    default 640
 
 config OPENTHREAD_SLAAC
     default y
@@ -382,9 +393,8 @@ config NET_MAX_CONTEXTS
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-    bool "Enable Telink Wi-Fi support"
     default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     select WIFI_W91
     select WIFI
@@ -516,10 +526,6 @@ config MBEDTLS_PSA_STATIC_KEY_SLOTS
 
 config MBEDTLS_PSA_CRYPTO_C
     bool "MBEDTLS_PSA_CRYPTO_C"
-    default n
-
-config CHIP_CRYPTO_PSA
-    bool "CHIP_CRYPTO_PSA"
     default n
 
 endif # !ZEPHYR_VERSION_3_3

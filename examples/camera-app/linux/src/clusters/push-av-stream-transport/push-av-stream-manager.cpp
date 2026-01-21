@@ -98,9 +98,17 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mTransportOptionsMap[connectionID] = transportOptions;
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
-    mTransportMap[connectionID] =
-        std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
 
+    auto transport = std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
+
+    CHIP_ERROR err = transport->ConfigureRecorderSettings(transportOptions, mAudioStreamParams, mVideoStreamParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to configure recorder settings for Connection: [%u], error: %s",
+                     connectionID, ErrorStr(err));
+        return Status::Failure;
+    }
+    mTransportMap[connectionID] = std::move(transport);
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
     mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
     mTransportMap[connectionID]->SetFabricIndex(accessingFabricIndex);
@@ -206,6 +214,14 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         return Status::NotFound;
     }
 
+    CHIP_ERROR err = mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to modify Connection :[%u], error: %s", connectionID,
+                     ErrorStr(err));
+        return Status::Failure;
+    }
+
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
@@ -220,7 +236,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
                   connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     mTransportOptionsMap[connectionID] = transportOptions;
-    mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
+
     ChipLogProgress(Camera, "PushAvStreamTransportManager, success to modify Connection :[%u]", connectionID);
 
     return Status::Success;
@@ -602,7 +618,7 @@ void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {
-            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10);
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10, true);
         }
     }
 }
@@ -635,7 +651,7 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
         }
         else
         {
-            ChipLogProgress(Camera, "Intermediate certificates fetched and stored. Size: %ld", mBufferIntermediateCerts.size());
+            ChipLogProgress(Camera, "Intermediate certificates fetched and stored. Size: %zu", mBufferIntermediateCerts.size());
         }
     }
     else
@@ -646,7 +662,7 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     const ByteSpan rawKeySpan = clientCertEntry.mCertWithKey.key.Span();
     if (rawKeySpan.size() != Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length)
     {
-        ChipLogError(Camera, "Raw key pair has incorrect size: %ld (expected %ld)", rawKeySpan.size(),
+        ChipLogError(Camera, "Raw key pair has incorrect size: %zu (expected %zu)", rawKeySpan.size(),
                      static_cast<size_t>(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length));
         return;
     }

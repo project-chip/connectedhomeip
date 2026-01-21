@@ -12,6 +12,7 @@
         "account-login-cluster.xml",
         "administrator-commissioning-cluster.xml",
         "air-quality-cluster.xml",
+        "ambient-context-sensing-cluster.xml",
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",
@@ -179,6 +180,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
+        "Ambient Context Sensing": ["HoldTimeLimits"],
         "Basic Information": [
             "FeatureMap",
             "ClusterRevision",
@@ -396,6 +398,7 @@
             "FeatureMap",
             "ClusterRevision"
         ],
+        "Scenes Management": ["ClusterRevision"],
         "Software Diagnostics": [
             "ClusterRevision",
             "CurrentHeapFree",
@@ -838,7 +841,7 @@
             "ClusterRevision",
             "FeatureMap"
         ],
-        "Unit Localization": ["TemperatureUnit"],
+        "Unit Localization": ["ClusterRevision", "TemperatureUnit"],
         "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",

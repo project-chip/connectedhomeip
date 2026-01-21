@@ -39,9 +39,8 @@ public:
 class PowerTopologyInstance : public Instance
 {
 public:
-    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, Feature aFeature,
-                          OptionalAttributes aOptionalAttributes) :
-        PowerTopology::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttributes)
+    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, Feature aFeature) :
+        PowerTopology::Instance(aEndpointId, aDelegate, aFeature)
     {
         mDelegate = &aDelegate;
     }
