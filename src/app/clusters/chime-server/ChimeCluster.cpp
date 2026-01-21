@@ -22,9 +22,9 @@
 
 #include "ChimeCluster.h"
 
+#include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/EventLogging.h>
 #include <clusters/Chime/Attributes.h>
 #include <clusters/Chime/Commands.h>
 #include <clusters/Chime/Events.h>
@@ -271,8 +271,8 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
     }
 }
 
-DataModel::ActionReturnStatus  ChimeCluster::HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath,
-                                                                   const Commands::PlayChimeSound::DecodableType & commandData)
+DataModel::ActionReturnStatus ChimeCluster::HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath,
+                                                                 const Commands::PlayChimeSound::DecodableType & commandData)
 {
     // Immediately return if we're not enabled
     //
