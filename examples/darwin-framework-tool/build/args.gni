@@ -34,7 +34,7 @@ declare_args() {
   generate_compilation_database = false
 
   # Use Network.framework instead of POSIX sockets
-  use_network_framework = false
+  use_network_framework = true
 }
 
 sdk = "macosx"
