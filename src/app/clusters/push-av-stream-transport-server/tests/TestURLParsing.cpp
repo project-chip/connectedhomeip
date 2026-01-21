@@ -25,7 +25,7 @@
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -100,7 +100,7 @@ public:
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer *) override {}
 };
 
-class TestValidateUrlTlsDelegate : public TlsClientManagementDelegate
+class TestValidateUrlTLSDelegate : public TLSClientManagementDelegate
 {
 public:
     CHIP_ERROR Init(PersistentStorageDelegate &) override { return CHIP_NO_ERROR; }
@@ -164,7 +164,7 @@ public:
     {
         PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
         TestValidateUrlDelegate mockDelegate;
-        TestValidateUrlTlsDelegate tlsClientManagementDelegate;
+        TestValidateUrlTLSDelegate tlsClientManagementDelegate;
 
         Testing::MockCommandHandler commandHandler;
         commandHandler.SetFabricIndex(1);

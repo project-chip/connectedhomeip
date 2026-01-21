@@ -275,11 +275,9 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     }
 
     // Extract components
-    std::string scheme   = Internal::extractTextRange(uri.scheme);
-    std::string host     = Internal::extractTextRange(uri.hostText);
-    std::string path     = Internal::extractPath(uri.pathHead);
-    std::string query    = Internal::extractTextRange(uri.query);
-    std::string fragment = Internal::extractTextRange(uri.fragment);
+    std::string scheme = Internal::extractTextRange(uri.scheme);
+    std::string host   = Internal::extractTextRange(uri.hostText);
+    std::string path   = Internal::extractPath(uri.pathHead);
 
     // Free URI structure
     uriFreeUriMembersA(&uri);
