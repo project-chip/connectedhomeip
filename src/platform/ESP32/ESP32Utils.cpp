@@ -35,8 +35,41 @@
 #include "esp_wifi.h"
 #include "nvs.h"
 
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include "esp_heap_caps.h"
+#include <lib/support/CHIPMemString.h>
+#include <string.h>
+#include <system/SystemTimer.h>
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
+
+using namespace chip::DeviceLayer;
+using namespace chip::Tracing;
+
+// Heap Diagnostics (internal)
+constexpr MetricKey kMetricHeapInternalFree         = "internal_free";
+constexpr MetricKey kMetricHeapInternalMinFree      = "internal_min_free";
+constexpr MetricKey kMetricHeapInternalLargestBlock = "internal_largest_free";
+
+// Heap Diagnostics (external)
+constexpr MetricKey kMetricHeapExternalFree         = "external_free";
+constexpr MetricKey kMetricHeapExternalMinFree      = "external_min_free";
+constexpr MetricKey kMetricHeapExternalLargestBlock = "external_largest_block";
+
+constexpr MetricKey kMetricHeapSystemMemory         = "system_memory";
+constexpr MetricKey kMetricTaskCPUUsage             = "task_cpu";
+constexpr MetricKey kMetricTaskPriority             = "task_priority";
+constexpr MetricKey kMetricTaskStackUsage           = "task_stack";
+constexpr MetricKey kMetricHeapTotalAllocatedBlocks = "total_allocated_blocks";
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
+
+#ifndef CONFIG_HEAP_LOG_INTERVAL
+#define CONFIG_HEAP_LOG_INTERVAL 86400000
+#endif // CONFIG_HEAP_LOG_INTERVAL
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ESP32Utils::IsStationEnabled(bool & staEnabled)
 {
@@ -301,6 +334,150 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
+void LogHeapDataCallback(chip::System::Layer * systemLayer, void * appState)
+{
+    multi_heap_info_t info;
+    heap_caps_get_info(&info, MALLOC_CAP_INTERNAL);
+    MATTER_LOG_METRIC(kMetricHeapInternalFree, static_cast<int32_t>(info.total_free_bytes));
+    MATTER_LOG_METRIC(kMetricHeapInternalMinFree, static_cast<int32_t>(info.minimum_free_bytes));
+    MATTER_LOG_METRIC(kMetricHeapInternalLargestBlock, static_cast<int32_t>(info.largest_free_block));
+
+    int32_t memoryPercentage =
+        (info.total_allocated_bytes > 0) ? static_cast<int32_t>((info.total_allocated_bytes * 100) / info.total_free_bytes) : 0;
+    MATTER_LOG_METRIC(kMetricHeapSystemMemory, memoryPercentage);
+    int32_t blockPercentage = (info.total_blocks > 0) ? static_cast<int32_t>((info.allocated_blocks * 100) / info.total_blocks) : 0;
+    MATTER_LOG_METRIC(kMetricHeapTotalAllocatedBlocks, blockPercentage);
+
+#ifdef CONFIG_SPIRAM
+    // External RAM (if PSRAM is enabled)
+    uint32_t external_free               = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    uint32_t external_largest_free_block = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+    uint32_t external_min_free           = heap_caps_get_minimum_free_size(MALLOC_CAP_SPIRAM);
+
+    MATTER_LOG_METRIC(kMetricHeapExternalFree, static_cast<int32_t>(external_free));
+    MATTER_LOG_METRIC(kMetricHeapExternalMinFree, static_cast<int32_t>(external_min_free));
+    MATTER_LOG_METRIC(kMetricHeapExternalLargestBlock, static_cast<int32_t>(external_largest_free_block));
+    int32_t externalMemoryPercentage = (total_external > 0) ? static_cast<int32_t>((allocated_external * 100) / total_external) : 0;
+    MATTER_LOG_METRIC(kMetricHeapExternalMemory, externalMemoryPercentage);
+#endif // CONFIG_SPIRAM
+
+    if (appState != nullptr)
+    {
+        bool setTimer = *static_cast<bool *>(appState);
+        if (setTimer)
+        {
+            CHIP_ERROR err = SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL),
+                                                      LogHeapDataCallback, &setTimer);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to reschedule heap log timer");
+                MATTER_TRACE_INSTANT("Heap_Monitor", "RescheduleFailed");
+            }
+        }
+    }
+}
+
+void FailedAllocCallback(size_t size, uint32_t caps, const char * function_name)
+{
+    MATTER_TRACE_COUNTER("Failed_memory_allocations");
+    ChipLogError(DeviceLayer, "Memory allocation failed!");
+}
+
+// Function to initialize and start periodic heap logging
+void ESP32Utils::LogHeapInfo(bool setTimer)
+{
+    if (CONFIG_HEAP_LOG_INTERVAL <= 0)
+    {
+        setTimer = false;
+        return;
+    }
+
+    static bool timerState = setTimer;
+
+    if (!setTimer)
+    {
+        SystemLayer().CancelTimer(LogHeapDataCallback, &timerState);
+        MATTER_TRACE_INSTANT("Heap_Monitor", "Stopped");
+        return;
+    }
+
+    MATTER_TRACE_INSTANT("Heap_Monitor", "Started");
+    esp_err_t err = heap_caps_register_failed_alloc_callback(FailedAllocCallback);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to register callback. Error: 0x%08x", err);
+        MATTER_TRACE_INSTANT("Heap_Monitor", "RegisterFailed");
+    }
+
+    LogHeapDataCallback(&SystemLayer(), &timerState);
+    if (setTimer)
+    {
+        CHIP_ERROR error = SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CONFIG_HEAP_LOG_INTERVAL),
+                                                    LogHeapDataCallback, &timerState);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to schedule heap log timer. Error: %s", chip::ErrorStr(error));
+            MATTER_TRACE_INSTANT("Heap_Monitor", "ScheduleFailed");
+        }
+    }
+}
+
+const char * StateToString(eTaskState state)
+{
+    switch (state)
+    {
+    case eRunning:
+        return "Running";
+    case eReady:
+        return "Ready";
+    case eBlocked:
+        return "Blocked";
+    case eSuspended:
+        return "Suspended";
+    case eDeleted:
+        return "Deleted";
+    default:
+        return "Unknown";
+    }
+}
+
+CHIP_ERROR ESP32Utils::LogTaskSnapshotInfo()
+{
+#ifdef CONFIG_FREERTOS_USE_TRACE_FACILITY
+    uint32_t arraySize = uxTaskGetNumberOfTasks();
+
+    MATTER_TRACE_INSTANT("Task_Monitor", "TasksSnapshot");
+
+    chip::Platform::ScopedMemoryBuffer<TaskStatus_t> taskStatusArray;
+    VerifyOrReturnError(taskStatusArray.Calloc(arraySize), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t totalRunTime;
+    arraySize = uxTaskGetSystemState(taskStatusArray.Get(), arraySize, &totalRunTime);
+
+    if (totalRunTime == 0)
+    {
+        totalRunTime = 1;
+    }
+
+    for (uint32_t i = 0; i < arraySize; i++)
+    {
+        TaskStatus_t task = taskStatusArray[i];
+        MATTER_TRACE_INSTANT(task.pcTaskName, StateToString(task.eCurrentState));
+        MATTER_LOG_METRIC(kMetricTaskPriority, static_cast<int32_t>(task.uxCurrentPriority));
+        MATTER_LOG_METRIC(kMetricTaskStackUsage, static_cast<int32_t>(task.usStackHighWaterMark));
+#ifdef CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+        uint32_t percentage = (totalRunTime > 0) ? (task.ulRunTimeCounter * 100 / totalRunTime) : 0;
+
+        MATTER_LOG_METRIC(kMetricTaskCPUUsage, static_cast<int32_t>(percentage));
+#endif // CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS
+    }
+#endif // CONFIG_FREERTOS_USE_TRACE_FACILITY
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 struct netif * ESP32Utils::GetNetif(const char * ifKey)
 {
