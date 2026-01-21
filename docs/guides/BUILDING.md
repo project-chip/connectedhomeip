@@ -215,7 +215,7 @@ permanently, you need to make the following changes:
 
 1. Add the following content to the `wpa-supplicant` file:
 
-    ```ini
+    ```conf
     ctrl_interface=DIR=/run/wpa_supplicant
     update_config=1
     ```
