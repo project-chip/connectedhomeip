@@ -32,6 +32,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {{#zcl_commands}}
 {{#*inline "completeImpl"}}
 {{#if (isSupported cluster command=command isForCommandPayload=true)}}
+{{#unless (isInConfigList cluster "DarwinPrivateClusters")}}
 @implementation MTR{{cluster}}Cluster{{command}}Params
 - (instancetype)init
 {
@@ -200,6 +201,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {{/if}}
 
 @end
+{{/unless}}
 {{/if}}
 {{/inline}}
 {{#*inline "oldNameImpl"}}

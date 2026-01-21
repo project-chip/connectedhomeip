@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 /**
  * Cluster {{name}}
  *    {{description}}
@@ -89,6 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+{{/unless}}
 {{/if}}
 {{/zcl_clusters}}
 

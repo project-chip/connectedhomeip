@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 /**
  * Cluster {{name}}
  *
@@ -92,6 +93,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
                                    queue:(dispatch_queue_t)queue {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat (asUpperCamelCase name preserveAcronyms=true) " is deprecated and will be removed")}};
 
 @end
+{{/unless}}
 {{/if}}
 
 {{/zcl_clusters}}

@@ -48,10 +48,6 @@ public:
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
-{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
-// Cluster {{asUpperCamelCase name preserveAcronyms=true}} is already publicly available in MTRBaseClusters.mm
-// No private-specific cluster implementation needed.
-{{else}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 {{#zcl_commands}}
@@ -208,7 +204,6 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{/zcl_attributes_server}}
 
 @end
-{{/if}}
 {{/if}}
 
 {{/zcl_clusters}}

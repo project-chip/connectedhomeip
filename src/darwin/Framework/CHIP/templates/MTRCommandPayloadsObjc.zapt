@@ -9,6 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_commands}}
 {{#*inline "completeDecl"}}
 {{#if (isSupported cluster command=command isForCommandPayload=true)}}
+{{#unless (isInConfigList cluster "DarwinPrivateClusters")}}
 
 {{availability cluster command=command isForCommandPayload=true deprecationMessage=deprecationMessage}}
 @interface MTR{{cluster}}Cluster{{command}}Params : {{base}}
@@ -89,6 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
                                          error:(NSError * __autoreleasing *)error {{availability cluster command=command deprecationMessage="This command has been removed" minimalRelease="3C23F160-13CE-4397-BC65-122B61E4D691"}};
 {{/if}}
 @end
+{{/unless}}
 {{/if}}
 {{/inline}}
 {{#*inline "oldNameDecl"}}

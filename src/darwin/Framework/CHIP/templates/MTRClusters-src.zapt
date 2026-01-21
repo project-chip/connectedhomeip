@@ -28,6 +28,7 @@ using chip::System::Clock::Seconds16;
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#zcl_clusters}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 {{#zcl_commands}}
@@ -135,6 +136,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{/zcl_attributes_server}}
 
 @end
+{{/unless}}
 {{/if}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
 {{#if (isSupported (compatClusterNameRemapping name))}}
