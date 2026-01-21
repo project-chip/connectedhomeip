@@ -500,6 +500,11 @@ TEST_F(TestValidateUrl, MalformedUrl)
     EXPECT_TRUE(TestUrlValidation("https:/example.com/", false));
     EXPECT_TRUE(TestUrlValidation("https:example.com/", false));
     EXPECT_TRUE(TestUrlValidation("://example.com/", false));
+    EXPECT_TRUE(TestUrlValidation("https//example.com/", false));
+    EXPECT_TRUE(TestUrlValidation("https/example.com/", false));
+    EXPECT_TRUE(TestUrlValidation("https::://example.com/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example.com::443/", false));
+    EXPECT_TRUE(TestUrlValidation("https:///example.com/", false));
 }
 
 TEST_F(TestValidateUrl, ComplexValidPaths)
@@ -524,6 +529,84 @@ TEST_F(TestValidateUrl, PortNumbers)
     EXPECT_TRUE(TestUrlValidation("https://example.com:443/", true));
     EXPECT_TRUE(TestUrlValidation("https://example.com:8080/", true));
     EXPECT_TRUE(TestUrlValidation("https://example.com:8443/", true));
+}
+
+TEST_F(TestValidateUrl, InvalidIPv6Addresses)
+{
+    // Invalid IPv6 syntax - missing brackets
+    EXPECT_TRUE(TestUrlValidation("https://2001:0db8::1/", false));
+    EXPECT_TRUE(TestUrlValidation("https://::12/", false));
+
+    // Invalid IPv6 - multiple zippers (::)
+    EXPECT_TRUE(TestUrlValidation("https://[2001::db8::1]/", false));
+    EXPECT_TRUE(TestUrlValidation("https://[::1::2]/", false));
+
+    // Invalid IPv6 - triple colon
+    EXPECT_TRUE(TestUrlValidation("https://[:::/", false));
+    EXPECT_TRUE(TestUrlValidation("https://[2001:::1]/", false));
+
+    // Invalid IPv6 - too many segments
+    EXPECT_TRUE(TestUrlValidation("https://[1:2:3:4:5:6:7:8:9]/", false));
+    EXPECT_TRUE(TestUrlValidation("https://[::1:2:3:4:5:6:7:8]/", false));
+
+    // Invalid IPv6 - invalid characters
+    EXPECT_TRUE(TestUrlValidation("https://[g:0:0:0:0:0:0:1]/", false));
+    EXPECT_TRUE(TestUrlValidation("https://[2001:0db8:g:1]/", false));
+
+    // Invalid IPv6 - malformed IPv4 part
+    EXPECT_TRUE(TestUrlValidation("https://[::ffff:256.1.1.1]/", false));
+    EXPECT_TRUE(TestUrlValidation("https://[::ffff:1.2.3.256]/", false));
+    EXPECT_TRUE(TestUrlValidation("https://[::ffff:1.2.3]/", false)); // Missing octet
+
+    // Valid IPv6 addresses
+    EXPECT_TRUE(TestUrlValidation("https://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/", true));
+    EXPECT_TRUE(TestUrlValidation("https://[::1]/", true));
+    EXPECT_TRUE(TestUrlValidation("https://[2001:db8::1]/", true));
+    EXPECT_TRUE(TestUrlValidation("https://[::ffff:192.168.1.1]/", true)); // IPv4-mapped IPv6
+}
+
+TEST_F(TestValidateUrl, PercentEncodingEdgeCases)
+{
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path%20with%20spaces/", true));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path%2Fwith%2Fslashes/", true));
+
+    // Invalid percent encoding - incomplete
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path%/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path%2/", false));
+
+    // Invalid percent encoding - non-hex characters
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path%g2/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path%2g/", false));
+}
+
+TEST_F(TestValidateUrl, InvalidPort)
+{
+    EXPECT_TRUE(TestUrlValidation("https://example.com:port/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example.com:-1/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example.com:12abc/", false));
+}
+
+TEST_F(TestValidateUrl, VerifyPath)
+{
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path-with-dashes/", true));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path_with_underscores/", true));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path.with.dots/", true));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/123/", true));
+
+    EXPECT_TRUE(TestUrlValidation("https://user@pass@example.com/", false));
+
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path with spaces/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/path\nwith\nnewlines/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example.com//", true));
+    EXPECT_TRUE(TestUrlValidation("https://example.com///", true));
+    EXPECT_TRUE(TestUrlValidation("https://example.com/api%2Fv1%2Fendpoint/", true));
+}
+
+TEST_F(TestValidateUrl, HostnameEdgeCases)
+{
+    EXPECT_TRUE(TestUrlValidation("https://example .com/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example\n.com/", false));
+    EXPECT_TRUE(TestUrlValidation("https://example\t.com/", false));
 }
 
 } // namespace PushAvStreamTransport

@@ -270,6 +270,7 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     if (result != URI_SUCCESS)
     {
         // No need to call uriFreeUriMembersA on failure
+        ChipLogError(Zcl, "PushAVStreamTransport URL : %s is not RFC 3986 compliant", url.c_str());
         return false;
     }
 
@@ -296,8 +297,8 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     }
 
     bool pathEndsWithSlash = !path.empty() && path.back() == '/';
-    bool noQuery           = query.empty() && url.find('?') == std::string::npos;
-    bool noFragment        = fragment.empty() && url.find('#') == std::string::npos;
+    bool noQuery           = url.find('?') == std::string::npos;
+    bool noFragment        = url.find('#') == std::string::npos;
 
     return scheme == "https" && noFragment && noQuery && pathEndsWithSlash && !host.empty();
 }
