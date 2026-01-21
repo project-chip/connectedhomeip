@@ -132,6 +132,11 @@ public:
 
     Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
 
+    /**
+     * Expire the fail-safe if it is commissioning-related and comes from a PASE Session.
+     */
+    void ExpireFailSafeIfHeldByOpenPASESession();
+
 private:
     //////////// SessionDelegate Implementation ///////////////
     void OnSessionReleased() override;

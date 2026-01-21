@@ -602,6 +602,14 @@ void CommissioningWindowManager::ExpireFailSafeIfArmed()
     }
 }
 
+void CommissioningWindowManager::ExpireFailSafeIfHeldByOpenPASESession()
+{
+    if (GetPASESession().HasValue())
+    {
+        ExpireFailSafeIfArmed();
+    }
+}
+
 void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnum aNewStatus)
 {
     CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();

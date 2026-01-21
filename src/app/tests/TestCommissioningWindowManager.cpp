@@ -532,10 +532,7 @@ void RevokeCommissioningCommandEquivalent()
 {
     auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
-    if (commissionMgr.GetPASESession().HasValue())
-    {
-        Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
-    }
+    commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
 
     if (!commissionMgr.IsCommissioningWindowOpen())
     {
