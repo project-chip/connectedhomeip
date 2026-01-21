@@ -948,12 +948,12 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         if (transportOptions.videoStreamID.HasValue())
         {
+            uint16_t finalVideoStreamID;
+            
             if (transportOptions.videoStreamID.Value().IsNull())
             {
-                uint16_t videoStreamID;
-
                 auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                    mDelegate->SelectVideoStream(transportOptions.streamUsage, videoStreamID));
+                    mDelegate->SelectVideoStream(transportOptions.streamUsage, finalVideoStreamID));
 
                 if (!delegateStatus.IsSuccess())
                 {
@@ -961,7 +961,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                     return std::nullopt;
                 }
 
-                transportOptionsPtr->videoStreamID.SetValue(videoStreamID);
+                transportOptionsPtr->videoStreamID.SetValue(finalVideoStreamID);
             }
             else
             {
@@ -975,11 +975,31 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                     TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
                     return std::nullopt;
                 }
+                
+                finalVideoStreamID = transportOptions.videoStreamID.Value().Value();
             }
+            
+            // Add the provided or selected VideoStreamID as a new entry in the VideoStreams list
+            // using the VideoStreamName 'video' as per the constraint
+            if (!transportOptionsPtr->videoStreams.HasValue())
+            {
+                // Initialize videoStreams vector if not present
+                transportOptionsPtr->ClearVideoStreams();
+            }
+                        
+            // Create new video stream entry with name 'video' and the final videoStreamID
+            Structs::VideoStreamStruct::Type newVideoStream;
+            newVideoStream.videoStreamName = CharSpan::fromCharString("video");
+            newVideoStream.videoStreamID   = finalVideoStreamID;
+                        
+            // Add to storage and update the list
+            transportOptionsPtr->AddVideoStream(newVideoStream);
         }
 
         if (transportOptions.audioStreamID.HasValue())
         {
+            uint16_t finalAudioStreamID;
+            
             if (transportOptions.audioStreamID.Value().IsNull())
             {
                 uint16_t audioStreamID;
@@ -994,6 +1014,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 }
 
                 transportOptionsPtr->audioStreamID.SetValue(audioStreamID);
+                finalAudioStreamID = audioStreamID;
             }
             else
             {
@@ -1007,7 +1028,25 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                     TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
                     return std::nullopt;
                 }
+                
+                finalAudioStreamID = transportOptions.audioStreamID.Value().Value();
             }
+            
+            // Add the provided or selected AudioStreamID as a new entry in the AudioStreams list
+            // using the AudioStreamName 'audio' as per the constraint
+            if (!transportOptionsPtr->audioStreams.HasValue())
+            {
+                // Initialize audioStreams vector if not present
+                transportOptionsPtr->ClearAudioStreams();
+            }
+                        
+            // Create new audio stream entry with name 'audio' and the final audioStreamID
+            Structs::AudioStreamStruct::Type newAudioStream;
+            newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
+            newAudioStream.audioStreamID   = finalAudioStreamID;
+                        
+            // Add to storage and update the list
+            transportOptionsPtr->AddAudioStream(newAudioStream);
         }
     }
 
