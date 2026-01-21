@@ -154,8 +154,8 @@ if (is_si917_board) {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B310F1536IM48"
 
-  # TODO enable me once submodule is updated
-  # sl_enable_rgb_led = true
+  sl_enable_rgb_led = true
+
   # ThunderBoards don't have a LCD,
   show_qr_code = false
   disable_lcd = true
@@ -231,6 +231,7 @@ if (is_si917_board) {
   # ThunderBoards don't have a LCD,
   show_qr_code = false
   disable_lcd = true
+  sl_enable_rgb_led = true
 
   # Custom Board ----------
 } else if (silabs_board == "CUSTOM") {

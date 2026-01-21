@@ -28,6 +28,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/EnumsCheck.h>
 #include <clusters/AdministratorCommissioning/EnumsCheck.h>
 #include <clusters/AirQuality/EnumsCheck.h>
+#include <clusters/AmbientContextSensing/EnumsCheck.h>
 #include <clusters/ApplicationBasic/EnumsCheck.h>
 #include <clusters/ApplicationLauncher/EnumsCheck.h>
 #include <clusters/AudioOutput/EnumsCheck.h>

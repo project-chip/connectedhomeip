@@ -27,6 +27,8 @@ import memdf.util.sqlite
 from memdf import Config, ConfigDescription
 from memdf.util.github import Gh
 
+log = logging.getLogger(__name__)
+
 GITHUB_CONFIG: ConfigDescription = {
     Config.group_def('github'): {
         'title': 'github options',
@@ -81,17 +83,17 @@ def main(argv):
                 events = ['push']
             for a in gh.get_size_artifacts(label=config['github.label']):
                 if events and a.event not in events:
-                    logging.debug('Skipping %s artifact %d', a.event, a.id)
+                    log.debug("Skipping '%s' artifact %d", a.event, a.id)
                     continue
                 cur = db.execute('SELECT id FROM build WHERE artifact = ?',
                                  (a.id,))
                 if cur.fetchone():
-                    logging.debug('Skipping known artifact %d', a.id)
+                    log.debug("Skipping known artifact %d", a.id)
                     continue
                 blob = gh.download_artifact(a.id)
                 if blob:
-                    logging.info('Adding artifact %d %s %s %s %s',
-                                 a.id, a.commit[:12], a.pr, a.event, a.group)
+                    log.info("Adding artifact id=%d commit='%s' pr='%s' event='%s' group='%s'",
+                             a.id, a.commit[:12], a.pr, a.event, a.group)
                     db.add_sizes_from_zipfile(io.BytesIO(blob),
                                               {'artifact': a.id})
                     db.commit()

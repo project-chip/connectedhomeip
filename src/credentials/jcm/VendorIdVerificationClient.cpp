@@ -88,10 +88,9 @@ CHIP_ERROR VendorIdVerificationClient::Verify(
 
     // 10. Given the subject public key associated with the fabric being verified, validate that Crypto_Verify(noc_public_key,
     // vendor_id_verification_tbs, signature) succeeds, otherwise the procedure terminates as failed.
-    VerifyOrReturnError(responseData.signature.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
     Crypto::P256ECDSASignature signature;
-    memcpy(signature.Bytes(), responseData.signature.data(), signature.Capacity());
-    signature.SetLength(signature.Capacity());
+    ReturnValueOnFailure(signature.SetLength(responseData.signature.size()), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(signature.Bytes(), responseData.signature.data(), responseData.signature.size());
 
     ReturnLogErrorOnFailure(
         nocPublicKey.ECDSA_validate_msg_signature(vidVerificationTbsSpan.data(), vidVerificationTbsSpan.size(), signature));
@@ -132,7 +131,7 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
 
     // Generate a 32-octet random challenge
     uint8_t kClientChallenge[32];
-    Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
+    TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(kClientChallenge, sizeof(kClientChallenge));
     ByteSpan clientChallengeSpan{ kClientChallenge };
     chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type request;
 
@@ -146,7 +145,15 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
                                                                const decltype(request)::ResponseType & responseData) {
         ChipLogProgress(Controller, "Successfully received SignVIDVerificationResponse");
         ByteSpan clientChallenge{ kClientChallenge };
-        ByteSpan attestationChallenge = getSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+
+        auto session = getSession();
+        if (!session.HasValue())
+        {
+            ChipLogError(Controller, "Session is missing");
+            OnVendorIdVerificationComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+        ByteSpan attestationChallenge = session.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         CHIP_ERROR err                = Verify(info, clientChallenge, attestationChallenge, responseData);
         ChipLogProgress(Controller, "Vendor ID verification completed with result: %s", ErrorStr(err));
         OnVendorIdVerificationComplete(err);
@@ -157,8 +164,16 @@ CHIP_ERROR VendorIdVerificationClient::VerifyVendorId(Messaging::ExchangeManager
         OnVendorIdVerificationComplete(err);
     };
 
+    Optional<SessionHandle> session = getSession();
+    if (!session.HasValue())
+    {
+        ChipLogError(Controller, "Session is missing");
+        CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
+        OnVendorIdVerificationComplete(err);
+        return err;
+    }
     CHIP_ERROR err =
-        Controller::InvokeCommandRequest(exchangeMgr, getSession().Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
+        Controller::InvokeCommandRequest(exchangeMgr, session.Value(), kRootEndpointId, request, onSuccessCb, onFailureCb);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send SignVIDVerificationRequest: %s", ErrorStr(err));

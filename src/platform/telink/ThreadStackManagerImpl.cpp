@@ -99,7 +99,7 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     Thread::OperationalDataset current_dataset;
-    ThreadStackMgrImpl().GetThreadProvision(current_dataset);
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadProvision(current_dataset);
     if (dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && callback == nullptr)
         return CHIP_NO_ERROR;
 
@@ -132,7 +132,7 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::Thread
     {
         if (mpScanCallback != nullptr)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
                 mpScanCallback = nullptr;
             });

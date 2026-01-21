@@ -53,7 +53,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -654,7 +653,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    output.SetLength(bbuf.Needed());
+    TEMPORARY_RETURN_IGNORED output.SetLength(bbuf.Needed());
 
 exit:
     memset(privkey, 0, sizeof(privkey));
@@ -757,7 +756,7 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_raw_sig_span.size() == (kP256_FE_Length * 2), error = CHIP_ERROR_INTERNAL);
-    signature.SetLength(out_raw_sig_span.size());
+    TEMPORARY_RETURN_IGNORED signature.SetLength(out_raw_sig_span.size());
 
     // Verify the signature using the public key
     error = pubkey.ECDSA_validate_msg_signature(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(cri).CHIP_CRYPTO_PAL_PRIVATE_X509(p),

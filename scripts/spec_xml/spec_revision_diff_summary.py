@@ -22,13 +22,13 @@
 
 import click
 
-from matter.testing.conformance import ConformanceDecision
+from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceDecision
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 
 
 def get_changes(old, new):
-    added = [e.name for id, e in new.items() if id not in old.keys()]
-    removed = [e.name for id, e in old.items() if id not in new.keys()]
+    added = [e.name for id, e in new.items() if id not in old]
+    removed = [e.name for id, e in old.items() if id not in new]
     same_ids = set(new.keys()).intersection(set(old.keys()))
 
     return added, removed, same_ids
@@ -119,7 +119,7 @@ def diff_device_types(prior_revision: PrebuiltDataModelDirectory, new_revision: 
 
 
 def _get_provisional(items):
-    return [e.name for e in items if e.conformance(0, [], []).decision == ConformanceDecision.PROVISIONAL]
+    return [e.name for e in items if e.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL]
 
 
 def get_all_provisional_clusters(new_revision: PrebuiltDataModelDirectory):

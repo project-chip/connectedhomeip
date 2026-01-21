@@ -30,7 +30,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --bool-arg ignore_in_progress:True
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --tests test_TC_ACE_2_2
@@ -48,6 +47,19 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --bool-arg ci_only_linux_skip_ota_cluster_disallowed_for_certification:True
 #       --tests test_TC_ACE_2_3
+#   run4:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_ACE_2_4
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -57,20 +69,25 @@ from typing import Optional
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import ValueDecodeFailure
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.spec_parsing import XmlCluster
 from matter.tlv import uint
+
+log = logging.getLogger(__name__)
 
 
 class AccessTestType(Enum):
     READ = auto()
     WRITE = auto()
     INVOKE = auto()
+    SUBSCRIBE = auto()
 
 
 def step_number_with_privilege(step: int, substep: str, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:
@@ -110,7 +127,7 @@ def checkable_commands(cluster_id, cluster, xml_cluster) -> list[uint]:
     return [cmd_id for cmd_id in all_cmds if is_known_cluster_cmd(cmd_id)]
 
 
-class AccessChecker(MatterBaseTest, BasicCompositionTests):
+class AccessChecker(BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         # TODO: Make this into a proper default in the class so we're not overriding the command lines
@@ -128,10 +145,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self.TH2 = fabric_admin.NewController(nodeId=self.TH2_nodeid)
 
     # Both the tests in this suite are potentially long-running if there are a large number of attributes on the DUT
-    # and the network is slow. Set the default to 3 minutes to account for this.
+    # and the network is slow. TC_ACE_2_4 (subscription test) is especially long as it tests ALL attributes.
+    # Set the default to 10 minutes to account for comprehensive subscription testing.
     @property
     def default_timeout(self) -> int:
-        return 180
+        return 1500  # 25 minutes for comprehensive subscription testing
 
     @async_test_body
     async def setup_test(self):
@@ -166,11 +184,23 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     attrs[cluster_id] = set()
                 if cluster_id not in cmds:
                     cmds[cluster_id] = set()
-                # discard MEI attributes as we do not have access information for them.
-                attrs[cluster_id].update(
-                    {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
-                cmds[cluster_id].update(
-                    {id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)})
+
+                if GlobalAttributeIds.ATTRIBUTE_LIST_ID not in device_cluster_data:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster does not have the AttributeList attribute")
+                else:
+                    # discard MEI attributes as we do not have access information for them.
+                    attrs[cluster_id].update(
+                        {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
+
+                if GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID not in device_cluster_data:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster does not have the AcceptedCommandList attribute")
+                else:
+                    cmds[cluster_id].update(
+                        {id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)})
 
         # Remove MEI clusters - we don't have information available to check these.
         all_clusters = [id for id in all_clusters if is_standard_cluster_id(id)]
@@ -189,7 +219,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             xml_cluster = self.xml_clusters[cluster_id]
             for attribute_id in attrs[cluster_id]:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
-                if attribute_id not in xml_cluster.attributes.keys():
+                if attribute_id not in xml_cluster.attributes:
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster attribute not found in spec XML")
                     self.success = False
@@ -202,7 +232,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # Check that we have information for all the required commands
             for command_id in cmds[cluster_id]:
                 location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
-                if command_id not in xml_cluster.accepted_commands.keys():
+                if command_id not in xml_cluster.accepted_commands:
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster command not found in spec XML")
                     self.success = False
@@ -220,10 +250,10 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         """
         ota_exception = self.user_params.get('ci_only_linux_skip_ota_cluster_disallowed_for_certification', False)
         if cluster_id == Clusters.OtaSoftwareUpdateRequestor.id and ota_exception:
-            logging.warning('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
+            log.warning('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
             return
 
-        logging.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')
+        log.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
@@ -234,7 +264,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # no side effects. Commands are checked with admin privilege in their cluster tests. The error that
                 # may be let through here is if the spec requires operate and the implementation requires admin.
                 continue
-            logging.info(
+            log.info(
                 f'  Testing command {xml_cluster.accepted_commands[command_id].name} from cluster {xml_cluster.name} - at privilege {privilege}, requires {spec_requires}')
             try:
                 timed = None
@@ -247,15 +277,15 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 self.record_error(test_name=name, location=location,
                                   problem=f"Unexpected success sending command {command} with privilege {privilege}")
                 self.success = False
-                logging.info('      Received unexpected SUCCESS')
+                log.info('      Received unexpected SUCCESS')
             except InteractionModelError as e:
                 if e.status != Status.UnsupportedAccess:
                     self.record_error(test_name=name, location=location,
                                       problem=f'Unexpected error sending command {command} with privilege {privilege} - expected UNSUPPORTED_ACCESS, got {e.status}')
                     self.success = False
-                    logging.info(f'      Received unexpected error {e}')
+                    log.info(f'      Received unexpected error {e}')
                 else:
-                    logging.info('      Received expected error')
+                    log.info('      Received expected error')
 
     async def _run_read_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
         # TODO: This assumes all attributes are readable. Which they are currently. But we don't have a general way to mark otherwise.
@@ -273,6 +303,103 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 if ret is None:
                     self.success = False
 
+    async def _subscribe_single_attribute_check_success(self, endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name):
+        """Helper to subscribe to an attribute expecting success."""
+        try:
+            subscription = await self.TH2.ReadAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(endpoint_id, attribute)],
+                reportInterval=(0, 30),
+                keepSubscriptions=False,
+                fabricFiltered=False
+            )
+
+            if subscription.subscriptionId is None:
+                self.record_error(test_name=test_name,
+                                  location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                                 cluster_id=cluster_id, attribute_id=attribute_id),
+                                  problem=f"Subscription activation failed - expected success with privilege {privilege}")
+                self.success = False
+                return False
+
+            log.info(f"Successfully established subscription (ID: {subscription.subscriptionId}) with privilege {privilege}")
+            subscription.Shutdown()
+            return True
+
+        except ChipStackError as e:  # chipstack-ok
+            # Unexpected ChipStackError
+            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            self.record_error(test_name=test_name,
+                              location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                             cluster_id=cluster_id, attribute_id=attribute_id),
+                              problem=f"Unexpected ChipStackError during subscription: {e} (error code: 0x{e.err:08X})")
+            self.success = False
+            return False
+
+    async def _subscribe_single_attribute_expect_error(self, endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name):
+        """Helper to subscribe to an attribute expecting UnsupportedAccess error."""
+        try:
+            subscription = await self.TH2.ReadAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(endpoint_id, attribute)],
+                reportInterval=(0, 30),
+                keepSubscriptions=False,
+                fabricFiltered=False
+            )
+
+            # Subscription succeeded but should have failed
+            subscription.Shutdown()
+            self.record_error(test_name=test_name,
+                              location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                             cluster_id=cluster_id, attribute_id=attribute_id),
+                              problem=f"Subscription succeeded but should have failed with privilege {privilege}")
+            self.success = False
+            return False
+
+        except ChipStackError as e:  # chipstack-ok
+            if e.err == 0x00000580:  # INVALID_ACTION - some attributes don't support subscription
+                # This occurs for attributes that cannot be subscribed to when testing with insufficient privileges.
+                # The attributes are write-only or have special subscription restrictions.
+                # These are the current clusters where this is noticed:
+                # - AccessControl
+                # - NetworkCommissioning
+                # - CameraAvStreamManagement
+                # - OperationalCredentials
+                log.warning(
+                    f"INVALID_ACTION: {cluster_class.__name__}.{attribute.__name__} (Cluster=0x{cluster_id:04X}, Attribute=0x{attribute_id:04X}, Endpoint={endpoint_id}, Privilege={privilege.name})")
+                return None  # Indicates skip
+            # Unexpected ChipStackError
+            log.error(f"Unexpected ChipStackError subscribing to attribute {attribute}: {e}")
+            self.record_error(test_name=test_name,
+                              location=AttributePathLocation(endpoint_id=endpoint_id,
+                                                             cluster_id=cluster_id, attribute_id=attribute_id),
+                              problem=f"Unexpected ChipStackError during subscription: {e} (error code: 0x{e.err:08X})")
+            self.success = False
+            return False
+
+    async def _run_subscribe_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
+        """Tests subscription access control by verifying subscriptions can be established.
+
+        This follows the same pattern as _run_read_access_test_for_cluster_privilege,
+        but uses subscription parameters in the ReadAttribute call.
+        """
+        for attribute_id in checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
+            spec_requires = xml_cluster.attributes[attribute_id].read_access
+            attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
+            cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+            test_name = f'Subscribe access checker - {privilege}'
+
+            log.info(f"Subscribing to attribute {attribute} cluster {xml_cluster.name} privilege {privilege}")
+
+            if operation_allowed(spec_requires, privilege):
+                result = await self._subscribe_single_attribute_check_success(
+                    endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
+            else:
+                result = await self._subscribe_single_attribute_expect_error(
+                    endpoint_id, cluster_id, attribute_id, attribute, cluster_class, privilege, test_name)
+                if result is None:  # Skip this attribute (INVALID_ACTION)
+                    continue
+
     async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, wildcard_read):
         for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].write_access
@@ -282,9 +409,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
             test_name = f'Write access checker - {privilege}'
-            logging.info(f"Testing attribute {attribute} on endpoint {endpoint_id}")
+            log.info(f"Testing attribute {attribute} on endpoint {endpoint_id}")
             if attribute == Clusters.AccessControl.Attributes.Acl and privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister:
-                logging.info("Skipping ACL attribute check for admin privilege as this is known to be writeable and is being used for this test")
+                log.info("Skipping ACL attribute check for admin privilege as this is known to be writeable and is being used for this test")
                 continue
 
             # Because we read everything with admin, we should have this in the wildcard read
@@ -332,7 +459,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     async def run_access_test(self, test_type: AccessTestType):
         # Step precondition, 1 and 2 are handled in the class setup, but need to be marked for every test
-        ignore_in_progress = self.user_params.get("ignore_in_progress", False)
         self.step("precondition")
         self.step(1)
         self.step(2)
@@ -347,17 +473,14 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
         self.step(check_step)
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        in_progress_clusters = [Clusters.ColorControl.id]
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
-            logging.info(f"Testing for {privilege}")
+            log.info(f"Testing for {privilege}")
             self.step(step_number_with_privilege(check_step, 'a', privilege))
             await self._setup_acl(privilege=privilege)
             self.step(step_number_with_privilege(check_step, 'b', privilege))
             for endpoint_id, endpoint in self.endpoints_tlv.items():
                 for cluster_id, device_cluster_data in endpoint.items():
-                    if ignore_in_progress and cluster_id in in_progress_clusters:
-                        continue
                     if not is_standard_cluster_id(cluster_id) or cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                         # These cases have already been recorded by the _record_errors function
                         continue
@@ -368,6 +491,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                         await self._run_write_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege, wildcard_read)
                     elif test_type == AccessTestType.INVOKE:
                         await self._maybe_run_command_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege)
+                    elif test_type == AccessTestType.SUBSCRIBE:
+                        await self._run_subscribe_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege)
                     else:
                         self.fail_current_test("Unsupported test type")
         if not self.success:
@@ -443,6 +568,27 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TC_ACE_2_3(self):
         await self.run_access_test(AccessTestType.INVOKE)
+
+    def steps_TC_ACE_2_4(self):
+        steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
+                 TestStep(1, "TH_commissioner performs a wildcard read (done during test setup)"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
+                 TestStep(3, "Repeat steps 3a and 3b for each permission level")]
+        enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
+        for p in privilege_enum:
+            steps.append(TestStep(step_number_with_privilege(3, 'a', p),
+                         "TH_commissioner gives TH_second_commissioner the specified privilege"))
+            steps.append(TestStep(step_number_with_privilege(3, 'b', p),
+                         "TH_second_controller subscribes to all the attributes and verifies the subscription is established and priming report is received with appropriate permission errors"))
+        return steps
+
+    def desc_TC_ACE_2_4(self):
+        return "[TC-ACE-2.4] Attribute read subscription report - [DUT as Server]"
+
+    @async_test_body
+    async def test_TC_ACE_2_4(self):
+        await self.run_access_test(AccessTestType.SUBSCRIBE)
 
 
 if __name__ == "__main__":

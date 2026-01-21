@@ -142,7 +142,7 @@ void WifiInterface::NotifyWifiTaskInitialized(void)
     MutableByteSpan macSpan(evt.body.mac_addr, kWifiMacAddressLength);
 #endif // WF200_WIFI
 
-    GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
+    TEMPORARY_RETURN_IGNORED GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
@@ -166,13 +166,13 @@ void WifiInterface::ScheduleConnectionAttempt()
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         //  Remove High performance request before giving up due to a timer start error to save battery life
-        Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+        TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         return;
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+    TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     ChipLogProgress(DeviceLayer, "ScheduleConnectionAttempt : Next attempt after %d Seconds", retryInterval);

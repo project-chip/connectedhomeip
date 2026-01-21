@@ -26,14 +26,16 @@
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/odd-sized-integers.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
+#include <app/clusters/scenes-server/CodegenEndpointToIndex.h>
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
@@ -143,10 +145,9 @@ static constexpr size_t kModeSelectMaxEnpointCount =
 
 static void timerCallback(System::Layer *, void * callbackContext);
 static void sceneModeSelectCallback(EndpointId endpoint);
-using ModeSelectEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
-using ModeSelectTransitionTimeInterface =
-    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kModeSelectMaxEnpointCount,
-                                                             MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT>;
+using ModeSelectEndPointPair            = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
+using ModeSelectTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<scenes::CodegenEndpointToIndex<
+    ModeSelect::Id, MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT, kModeSelectMaxEnpointCount>>;
 
 class DefaultModeSelectSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -155,23 +156,9 @@ public:
     // As per spec, 1 attribute is scenable in the mode select cluster
     static constexpr uint8_t kScenableAttributeCount = 1;
 
-    DefaultModeSelectSceneHandler() = default;
-    ~DefaultModeSelectSceneHandler() override {}
+    DefaultModeSelectSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
 
-    // Default function for the mode select cluster, only puts the mode select cluster ID in the span if supported on the given
-    // endpoint
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        if (emberAfContainsServer(endpoint, ModeSelect::Id) && clusterBuffer.size() >= 1)
-        {
-            clusterBuffer[0] = ModeSelect::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
+    ~DefaultModeSelectSceneHandler() override = default;
 
     // Default function for mode select cluster, only checks if mode select is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
@@ -251,8 +238,7 @@ public:
     }
 
 private:
-    ModeSelectTransitionTimeInterface mTransitionTimeInterface =
-        ModeSelectTransitionTimeInterface(ModeSelect::Id, sceneModeSelectCallback);
+    ModeSelectTransitionTimeInterface mTransitionTimeInterface = ModeSelectTransitionTimeInterface(sceneModeSelectCallback);
 };
 static DefaultModeSelectSceneHandler sModeSelectSceneHandler;
 

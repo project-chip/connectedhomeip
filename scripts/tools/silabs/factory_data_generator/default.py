@@ -30,6 +30,8 @@ from one of the default classes.
 import base64
 import logging
 
+log = logging.getLogger(__name__)
+
 
 class InputArgument:
     '''Base class for any input argument that will be added to KLV.
@@ -61,17 +63,17 @@ class InputArgument:
         self.val = None
 
     def key(self):
-        logging.error("key() should be implemented in derived classes.")
+        log.error("key() should be implemented in derived classes.")
 
     def length(self):
-        logging.error("length() should be implemented in derived classes.")
+        log.error("length() should be implemented in derived classes.")
 
     def encode(self):
-        logging.error("encode() should be implemented in derived classes.")
+        log.error("encode() should be implemented in derived classes.")
 
     def output(self):
         out = (self.key(), self.length(), self.encode())
-        logging.info("'{}' length: {}".format(type(self).__name__, self.length()))
+        log.info("'%s' length: %d", type(self).__name__, self.length())
         return out
 
 

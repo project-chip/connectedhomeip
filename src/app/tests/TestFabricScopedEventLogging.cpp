@@ -55,7 +55,7 @@ static uint8_t gInfoEventBuffer[128];
 static uint8_t gCritEventBuffer[128];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-class TestFabricScopedEventLogging : public chip::Test::AppContext
+class TestFabricScopedEventLogging : public chip::Testing::AppContext
 {
 public:
     // Performs setup for each individual test in the test suite
