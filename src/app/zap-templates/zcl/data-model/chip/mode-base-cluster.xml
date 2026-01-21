@@ -31,7 +31,6 @@ Each of these enum values is also listed/copied in the derived clusters.
     <cluster code="0x0054"/> <!-- RVC Run Mode -->
     <cluster code="0x0055"/> <!-- RVC Clean Mode -->
     <cluster code="0x0059"/> <!-- Dishwasher Mode -->
-    <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
     <cluster code="0x009E"/> <!-- Water Heater Mode -->
@@ -47,7 +46,6 @@ Each of these enum values is also listed/copied in the derived clusters.
     <cluster code="0x0054"/> <!-- RVC Run Mode -->
     <cluster code="0x0055"/> <!-- RVC Clean Mode -->
     <cluster code="0x0059"/> <!-- Dishwasher Mode -->
-    <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->
     <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
     <cluster code="0x009E"/> <!-- Water Heater Mode -->

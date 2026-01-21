@@ -37,8 +37,62 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenMode {
 namespace Structs {
-namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
-namespace ModeOptionStruct = Clusters::detail::Structs::ModeOptionStruct;
+namespace ModeTagStruct {
+enum class Fields : uint8_t
+{
+    kMfgCode = 0,
+    kValue   = 1,
+};
+
+struct Type
+{
+public:
+    Optional<chip::VendorId> mfgCode;
+    uint16_t value = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ModeTagStruct
+namespace ModeOptionStruct {
+enum class Fields : uint8_t
+{
+    kLabel    = 0,
+    kMode     = 1,
+    kModeTags = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::List<const Structs::ModeTagStruct::Type> modeTags;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::DecodableList<Structs::ModeTagStruct::DecodableType> modeTags;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace ModeOptionStruct
 } // namespace Structs
 } // namespace MicrowaveOvenMode
 } // namespace Clusters
