@@ -11106,6 +11106,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRChimeClusterChimeStartedPlayingEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _chimeID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRChimeClusterChimeStartedPlayingEvent alloc] init];
+
+    other.chimeID = self.chimeID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; >", NSStringFromClass([self class]), _chimeID];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRCommodityTariffClusterPeakPeriodStruct
 - (instancetype)init
 {

@@ -6,8 +6,8 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
-#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
+    void SetTLSClientManagementDelegate(TLSClientManagementDelegate * delegate)
     {
         mTLSClientManagementDelegate = delegate;
         if (mTLSClientManagementDelegate == nullptr)
@@ -53,10 +53,10 @@ public:
         }
     }
 
-    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
+    void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
     {
-        mTlsCertificateManagementDelegate = delegate;
-        if (mTlsCertificateManagementDelegate == nullptr)
+        mTLSCertificateManagementDelegate = delegate;
+        if (mTLSCertificateManagementDelegate == nullptr)
         {
             ChipLogError(Zcl, "Push AV Stream Transport: Trying to set TLS Certificate Management delegate to null");
             return;
@@ -134,8 +134,8 @@ public:
 
 private:
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
-    TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
-    TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
+    TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
+    TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true

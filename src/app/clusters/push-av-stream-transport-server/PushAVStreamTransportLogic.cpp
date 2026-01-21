@@ -635,9 +635,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
                 Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
 
-                if (mTlsCertificateManagementDelegate != nullptr)
+                if (mTLSCertificateManagementDelegate != nullptr)
                 {
-                    auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+                    auto & table = mTLSCertificateManagementDelegate->GetCertificateTable();
                     ReturnErrorOnFailure(table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(),
                                                                          TLSEndpoint.ccdid.Value(), clientCertEntry));
                     ReturnErrorOnFailure(

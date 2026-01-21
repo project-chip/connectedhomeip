@@ -31289,10 +31289,15 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> chimeClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> chimeplayChimeSoundCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo chimeplayChimeSoundchimeIDCommandParameterInfo = new CommandParameterInfo("chimeID", Optional.class, Integer.class);
+    chimeplayChimeSoundCommandParams.put("chimeID",chimeplayChimeSoundchimeIDCommandParameterInfo);
     InteractionInfo chimeplayChimeSoundInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ChimeCluster) cluster)
         .playChimeSound((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("chimeID")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

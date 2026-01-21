@@ -19,6 +19,6 @@ TARGET_SOURCES(
         "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.cpp"
         "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.h"
         "${CLUSTER_DIR}/CodegenIntegration.cpp"
-        "${CLUSTER_DIR}/TlsClientManagementCluster.cpp"
-        "${CLUSTER_DIR}/TlsClientManagementCluster.h"
+        "${CLUSTER_DIR}/TLSClientManagementCluster.cpp"
+        "${CLUSTER_DIR}/TLSClientManagementCluster.h"
 )
