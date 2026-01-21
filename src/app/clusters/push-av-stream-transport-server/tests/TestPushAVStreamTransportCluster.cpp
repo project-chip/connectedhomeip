@@ -188,7 +188,7 @@ public:
         return true;
     }
 
-    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) override
     {
         return true;
     }

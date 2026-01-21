@@ -871,7 +871,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     if (transportOptionsPtr->videoStreamID.HasValue() && transportOptions.triggerOptions.maxPreRollLen.HasValue())
     {
         uint16_t maxPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
-        if (maxPreRollLength != 0 && !mDelegate->ValidateMaxPreRollLength(maxPreRollLength, transportOptionsPtr->videoStreamID))
+        if (maxPreRollLength != 0 &&
+            !mDelegate->ValidateMaxPreRollLength(maxPreRollLength, transportOptionsPtr->videoStreamID.Value()))
         {
             auto maxPreRollLengthStatus = to_underlying(StatusCodeEnum::kInvalidPreRollLength);
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed", mEndpointId,

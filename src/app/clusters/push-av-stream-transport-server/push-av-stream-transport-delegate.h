@@ -156,8 +156,7 @@ public:
      * @return true if the Max pre-roll length is greater than or equal to KeyFrameInterval for the provided videoStreamId, false
        otherwise
      */
-    virtual bool ValidateMaxPreRollLength(uint16_t maxPreRollLength,
-                                          const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
+    virtual bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
