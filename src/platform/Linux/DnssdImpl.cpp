@@ -743,7 +743,30 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
             }
             service.mType[kDnssdTypeMaxSize] = 0;
-            context->mServices.push_back(service);
+
+            // DEDUPLICATION: Skip adding this service if it already exists in mServices.
+            // Avahi delivers only one resolve callback per unique service instance, so creating multiple ResolveContexts for the
+            // same service would never receive separate callbacks and could lead to leaks.
+            ChipLogError(DeviceLayer, " Avahi browse: service %s found using browse, has transport type %s and IPAddressType = %s",
+                         name, protocol == AVAHI_PROTO_INET6 ? "IPv6" : "IPv4",
+                         context->mAddressType == Inet::IPAddressType::kIPv6 ? "IPv6" : "IPv4");
+            bool alreadyExists = false;
+            for (auto & existing : context->mServices)
+            {
+                if (strcmp(existing.mName, service.mName) == 0 && strcmp(existing.mType, service.mType) == 0 &&
+                    existing.mProtocol == service.mProtocol)
+                {
+                    alreadyExists = true;
+                    ChipLogDetail(DeviceLayer, "Avahi browse: service %s already exists it has been skipped", name);
+                    break;
+                }
+            }
+
+            if (!alreadyExists)
+            {
+                context->mServices.push_back(service);
+                ChipLogDetail(DeviceLayer, "Avahi browse: Added new service: %s", name);
+            }
             if (context->mReceivedAllCached)
             {
                 InvokeDelegateOrCleanUp(context, browser);

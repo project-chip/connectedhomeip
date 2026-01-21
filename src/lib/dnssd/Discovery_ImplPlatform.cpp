@@ -54,6 +54,8 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     result->ToDiscoveredCommissionNodeData(addresses, nodeData);
 
+    // TODO: when using "discover commmissionables" command: this is causing device entry data to be logged twice, once here and
+    // once in DiscoverCommissionablesCommandBase::OnDiscoveredDevice
     nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
 
