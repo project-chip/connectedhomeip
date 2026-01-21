@@ -532,7 +532,19 @@ endif # LOG
 # ==============================================================================
 
 config SHELL
-    default y
+    default y if CHIP_LIB_SHELL
+
+if CHIP_LIB_SHELL
+
+# Currently the CHIPArgParser uses the standard getopt() API. Building with Zephyr's
+# shim getopt (which uses Zephyr's sys_getopt) does not work for this. So let's disable
+# it, and use directly the C library standard getopt.
+choice POSIX_AEP_CHOICE
+	default POSIX_AEP_CHOICE_NONE
+
+endchoice 
+
+endif # CHIP_LIB_SHELL
 
 if SHELL
 
