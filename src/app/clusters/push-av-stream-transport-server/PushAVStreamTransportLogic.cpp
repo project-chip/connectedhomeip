@@ -873,29 +873,20 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     // Validate new multistream fields
     if (hasNewStreamFields)
     {
-        // Check at least one stream type is present
-        if (!(transportOptions.videoStreams.HasValue() || transportOptions.audioStreams.HasValue()))
-        {
-            auto status = to_underlying(StatusCodeEnum::kInvalidStream);
-            ChipLogError(Zcl, "Transport Options[ep=%d]: Both VideoStreams and AudioStreams empty", mEndpointId);
-            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-            return std::nullopt;
-        }
-
         std::set<std::string> videoStreamNames;
 
-        // Validate VideoStreams
+        // Validate videoStreams
+        uint16_t videoStreamsCount = 0;
         if (transportOptions.videoStreams.HasValue())
         {
             std::set<uint16_t> videoStreamIDs;
-            uint16_t videoStreamsCount = 0;
 
             for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
             {
                 auto & videoStream = iter.GetValue();
 
                 videoStreamsCount++;
-                videoStreamNames.insert(videoStream.videoStreamName.data());
+                videoStreamNames.insert(std::string(videoStream.videoStreamName.data(), videoStream.videoStreamName.size()));
                 videoStreamIDs.insert(videoStream.videoStreamID);
             }
 
@@ -918,12 +909,12 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             }
         }
 
-        // Validate AudioStreams
+        // Validate audioStreams
+        uint16_t audioStreamsCount = 0;
         if (transportOptions.audioStreams.HasValue())
         {
             std::set<std::string> audioStreamNames;
             std::set<uint16_t> audioStreamIDs;
-            uint16_t audioStreamsCount = 0;
 
             // Check against video stream names
             for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
@@ -931,7 +922,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 auto & audioStream = iter.GetValue();
 
                 audioStreamsCount++;
-                audioStreamNames.insert(audioStream.audioStreamName.data());
+                audioStreamNames.insert(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size()));
+                ;
                 audioStreamIDs.insert(audioStream.audioStreamID);
             }
 
@@ -948,7 +940,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             {
                 auto & audioStream = iter.GetValue();
                 // Check for duplicate with video streams
-                if (videoStreamNames.find(audioStream.audioStreamName.data()) != videoStreamNames.end())
+                if (videoStreamNames.find(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size())) !=
+                    videoStreamNames.end())
                 {
                     auto status = to_underlying(StatusCodeEnum::kInvalidStream);
                     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AudioStreamName conflicts with video stream",
@@ -962,6 +955,15 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 VerifyOrReturnValue(status.IsSuccess(), Status::InvalidCommand,
                                     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ID", mEndpointId));
             }
+        }
+
+        // Check if both videoStreams and audioStreams are empty
+        if (videoStreamsCount == 0 && audioStreamsCount == 0)
+        {
+            auto status = to_underlying(StatusCodeEnum::kInvalidStream);
+            ChipLogError(Zcl, "Transport Options[ep=%d]: Both VideoStreams and AudioStreams empty", mEndpointId);
+            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
         }
     }
 
@@ -1002,15 +1004,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 finalVideoStreamID = transportOptions.videoStreamID.Value().Value();
             }
 
-            // Add the provided or selected VideoStreamID as a new entry in the VideoStreams list
-            // using the VideoStreamName 'video' as per the constraint
-            if (!transportOptionsPtr->videoStreams.HasValue())
-            {
-                // Initialize videoStreams vector if not present
-                transportOptionsPtr->ClearVideoStreams();
-            }
-
-            // Create new video stream entry with name 'video' and the final videoStreamID
+            // Create new video stream entry with name 'video' and the provided or selected VideoStreamID i.e; finalVideoStreamID
             Structs::VideoStreamStruct::Type newVideoStream;
             newVideoStream.videoStreamName = CharSpan::fromCharString("video");
             newVideoStream.videoStreamID   = finalVideoStreamID;
@@ -1052,15 +1046,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 finalAudioStreamID = transportOptions.audioStreamID.Value().Value();
             }
 
-            // Add the provided or selected AudioStreamID as a new entry in the AudioStreams list
-            // using the AudioStreamName 'audio' as per the constraint
-            if (!transportOptionsPtr->audioStreams.HasValue())
-            {
-                // Initialize audioStreams vector if not present
-                transportOptionsPtr->ClearAudioStreams();
-            }
-
-            // Create new audio stream entry with name 'audio' and the final audioStreamID
+            // Create new audio stream entry with name 'audio' and the provided or selected AudioStreamID i.e; finalAudioStreamID
             Structs::AudioStreamStruct::Type newAudioStream;
             newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
             newAudioStream.audioStreamID   = finalAudioStreamID;
