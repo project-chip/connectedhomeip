@@ -131,20 +131,6 @@ config NET_L2_OPENTHREAD
 	help
 	  Enable OT support.
 
-config CHIP_OPENTHREAD_FTD
-	bool "App is an OpenThread FTD"
-	default y
-	depends on NET_L2_OPENTHREAD
-	help
-	  App is an OpenThread FTD
-
-config CHIP_USE_OT_ENDPOINT
-	bool "Use OpenThread TCP/UDP stack directly"
-	default y if !CHIP_WITH_LWIP
-	depends on NET_L2_OPENTHREAD
-	help
-	  Use OpenThread TCP/UDP stack directly
-
 config CHIP_DEVICE_USE_ZEPHYR_BLE
 	bool "Use Zephyr BLE implementation"
 	depends on BT

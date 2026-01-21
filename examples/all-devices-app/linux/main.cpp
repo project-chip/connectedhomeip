@@ -67,6 +67,8 @@ void StopSignalHandler(int /* signal */)
 chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
 {
     static chip::app::DefaultAttributePersistenceProvider attributePersistenceProvider;
+    SuccessOrDie(attributePersistenceProvider.Init(delegate));
+
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
