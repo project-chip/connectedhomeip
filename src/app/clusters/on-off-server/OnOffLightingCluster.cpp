@@ -363,7 +363,11 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOn()
     // Spec requirement:
     //   This attribute SHALL be set to TRUE after the reception of a command which
     //   causes the OnOff attribute to be set to TRUE;
-    mGlobalSceneControl = true;
+    if (!mGlobalSceneControl)
+    {
+        mGlobalSceneControl = true;
+        NotifyAttributeChanged(Attributes::GlobalSceneControl::Id);
+    }
 
     if (wasOff && mScenesIntegrationDelegate != nullptr)
     {
@@ -486,7 +490,11 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithTimedOff(chip::T
         // Spec requirement:
         //   This attribute SHALL be set to TRUE after the reception of a command which
         //   causes the OnOff attribute to be set to TRUE;
-        mGlobalSceneControl = true;
+        if (!mGlobalSceneControl)
+        {
+            mGlobalSceneControl = true;
+            NotifyAttributeChanged(Attributes::GlobalSceneControl::Id);
+        }
     }
 
     // state transition logic between ON/OFF/TIMED_ON/TIMED_OFF
