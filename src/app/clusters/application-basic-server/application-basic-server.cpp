@@ -188,6 +188,15 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
         return ReadApplicationVersionAttribute(aEncoder, delegate);
     case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id:
         return ReadAllowedVendorListAttribute(aEncoder, delegate);
+    case chip::app::Clusters::ApplicationBasic::Attributes::FeatureMap::Id: {
+            uint32_t featureMap = 0;
+            return aEncoder.Encode(featureMap);
+
+    }
+    case chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::Id: {
+            uint16_t clusterRevision = 0;
+            return aEncoder.Encode(clusterRevision);
+    }
     default: {
         break;
     }
