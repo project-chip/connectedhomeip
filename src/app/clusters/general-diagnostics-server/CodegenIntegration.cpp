@@ -39,7 +39,7 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
 
 namespace {
 
-// Determine if the configurable version of the general diagnostics cluster with additonal command options is needed
+// Determine if the configurable version of the general diagnostics cluster with additional command options is needed
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
 LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gDiagnosticsServer;
 #else
