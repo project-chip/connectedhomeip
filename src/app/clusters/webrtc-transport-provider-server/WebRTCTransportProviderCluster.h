@@ -408,6 +408,16 @@ private:
     CheckTurnsOrStunsRequiresUTCTime(const char * commandName,
                                      const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers);
 
+    // Templated helper to decode and dispatch commands
+    template <typename DecodableType, typename HandlerFunc>
+    __attribute__((always_inline)) std::optional<DataModel::ActionReturnStatus>
+    HandleCommand(TLV::TLVReader & input_arguments, FabricIndex fabricIndex, CommandHandler & handler, HandlerFunc handlerFunc)
+    {
+        DecodableType req;
+        ReturnErrorOnFailure(req.Decode(input_arguments, fabricIndex));
+        return (this->*handlerFunc)(handler, req);
+    }
+
     // Command Handlers
     std::optional<DataModel::ActionReturnStatus> HandleSolicitOffer(CommandHandler & commandHandler,
                                                                     const Commands::SolicitOffer::DecodableType & req);

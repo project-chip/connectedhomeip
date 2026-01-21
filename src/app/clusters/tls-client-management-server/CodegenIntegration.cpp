@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include "CodegenIntegration.h"
+
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
@@ -35,11 +35,11 @@ namespace {
 
 CertificateTableImpl gDefaultCertificateTable;
 
-TlsClientManagementDelegate * gDelegate           = nullptr;
+TLSClientManagementDelegate * gDelegate           = nullptr;
 CertificateTableImpl * gCertificateTable          = &gDefaultCertificateTable;
 constexpr uint8_t kDefaultMaxProvisionedEndpoints = CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS;
 
-LazyRegisteredServerCluster<TlsClientManagementCluster> gClusterInstance;
+LazyRegisteredServerCluster<TLSClientManagementCluster> gClusterInstance;
 
 } // anonymous namespace
 
@@ -47,7 +47,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate)
+void MatterTlsClientManagementSetDelegate(TLSClientManagementDelegate & delegate)
 {
     gDelegate = &delegate;
 }

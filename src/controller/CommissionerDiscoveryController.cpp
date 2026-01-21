@@ -495,7 +495,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                           client->GetPairingInst(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()),
                           client->GetInstanceName());
             mUserPrompter->PromptWithCommissionerPasscode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName(),
-                                                          passcode, client->GetPasscodeLength(), client->GetPairingHint(),
+                                                          passcode, passcodeInfo.displayLength, client->GetPairingHint(),
                                                           client->GetPairingInst());
             return;
         }
