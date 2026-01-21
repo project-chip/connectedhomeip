@@ -16060,6 +16060,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * ChimeStartedPlaying                                               | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -16070,6 +16071,7 @@ class ChimePlayChimeSound : public ClusterCommand
 public:
     ChimePlayChimeSound(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("play-chime-sound", credsIssuerConfig)
     {
+        AddArgument("ChimeID", 0, UINT8_MAX, &mRequest.chimeID);
         ClusterCommand::AddArguments();
     }
 
@@ -31235,8 +31237,10 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                //
+        make_unique<ReadEvent>(Id, "chime-started-playing", Events::ChimeStartedPlaying::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeEvent>(Id, "chime-started-playing", Events::ChimeStartedPlaying::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
