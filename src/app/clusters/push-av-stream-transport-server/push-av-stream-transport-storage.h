@@ -288,8 +288,8 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
         if (!mVideoStreamsStorage.empty())
         {
-            videoStreams.SetValue(DataModel::List<const Structs::VideoStreamStruct::Type>(
-                mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
         }
         else
         {
@@ -300,8 +300,8 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
         if (!mAudioStreamsStorage.empty())
         {
-            audioStreams.SetValue(DataModel::List<const Structs::AudioStreamStruct::Type>(
-                mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
         }
         else
         {
@@ -343,8 +343,8 @@ struct TransportOptionsStorage : public TransportOptionsStruct
                 auto & videoStream = iter.GetValue();
                 mVideoStreamsStorage.push_back(videoStream);
             }
-            videoStreams.SetValue(DataModel::List<const Structs::VideoStreamStruct::Type>(
-                mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
         }
         else
         {
@@ -362,8 +362,8 @@ struct TransportOptionsStorage : public TransportOptionsStruct
                 auto & audioStream = iter.GetValue();
                 mAudioStreamsStorage.push_back(audioStream);
             }
-            audioStreams.SetValue(DataModel::List<const Structs::AudioStreamStruct::Type>(
-                mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
         }
         else
         {
@@ -386,16 +386,16 @@ struct TransportOptionsStorage : public TransportOptionsStruct
     void AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
     {
         mVideoStreamsStorage.push_back(videoStream);
-        videoStreams.SetValue(DataModel::List<const Structs::VideoStreamStruct::Type>(
-            mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        videoStreams.SetValue(
+            DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
     }
 
     void UpdateVideoStreamsList()
     {
         if (!mVideoStreamsStorage.empty())
         {
-            videoStreams.SetValue(DataModel::List<const Structs::VideoStreamStruct::Type>(
-                mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
         }
         else
         {
@@ -413,16 +413,16 @@ struct TransportOptionsStorage : public TransportOptionsStruct
     void AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
     {
         mAudioStreamsStorage.push_back(audioStream);
-        audioStreams.SetValue(DataModel::List<const Structs::AudioStreamStruct::Type>(
-            mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        audioStreams.SetValue(
+            DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
     }
 
     void UpdateAudioStreamsList()
     {
         if (!mAudioStreamsStorage.empty())
         {
-            audioStreams.SetValue(DataModel::List<const Structs::AudioStreamStruct::Type>(
-                mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
         }
         else
         {

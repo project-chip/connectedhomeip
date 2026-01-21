@@ -370,8 +370,10 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
             auto streamName = iter.GetValue().videoStreamName;
             VerifyOrReturnValue(streamName.size() >= kMinStreamNameLength && streamName.size() <= kMaxStreamNameLength,
                                 Status::ConstraintError,
-                                ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Video Stream Name "
-                                             "Constraint Error", mEndpointId));
+                                ChipLogError(Zcl,
+                                             "Transport Options verification from command data[ep=%d]: Video Stream Name "
+                                             "Constraint Error",
+                                             mEndpointId));
         }
     }
 
@@ -383,8 +385,10 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
             auto streamName = iter.GetValue().audioStreamName;
             VerifyOrReturnValue(streamName.size() >= kMinStreamNameLength && streamName.size() <= kMaxStreamNameLength,
                                 Status::ConstraintError,
-                                ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Audio Stream Name "
-                                             "Constraint Error", mEndpointId));
+                                ChipLogError(Zcl,
+                                             "Transport Options verification from command data[ep=%d]: Audio Stream Name "
+                                             "Constraint Error",
+                                             mEndpointId));
         }
     }
 
@@ -839,7 +843,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
     // Validate Bandwidth Requirement
     Status retStatus = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
-                                                            transportOptions.audioStreamID);
+                                                         transportOptions.audioStreamID);
     if (retStatus != Status::Success)
     {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted", mEndpointId);
