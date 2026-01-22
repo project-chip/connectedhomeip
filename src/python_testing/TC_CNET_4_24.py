@@ -221,7 +221,7 @@ class TC_CNET_4_24(MatterBaseTest):
         return [
             TestStep(
                 0,
-                "TH commissions the DUT over BLE-Thread using correct credentials\n"
+                "Commission device if not already done\n"
                 "Then opens a new fail-safe window (300 seconds) for network reconfiguration testing\n",
             ),
             TestStep(
@@ -307,6 +307,10 @@ class TC_CNET_4_24(MatterBaseTest):
 
         # Save correct Thread operational dataset from test config (used by commissioning framework and for final connection)
         correct_thread_dataset = self.matter_test_config.thread_operational_dataset
+        asserts.assert_is_not_none(
+            correct_thread_dataset,
+            "Thread operational dataset must be provided via --thread-dataset-hex parameter for this test"
+        )
         logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
 
         # Create incorrect Thread operational datasets for testing
@@ -330,7 +334,7 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         logger.info(f" --- Incorrect Thread dataset 2 (modified Network Key only): {incorrect_thread_dataset_2.hex()}")
 
-        # Step 0: TH commissions the DUT over BLE-Thread using correct credentials
+        # Step 0: Commission device if not already done
         self.step(0)
 
         # For non-concurrent mode, ConnectNetwork returns kSuccess immediately, actual connection is async so
@@ -345,7 +349,7 @@ class TC_CNET_4_24(MatterBaseTest):
             logger.info(" --- Device commissioned successfully, now on Thread network")
         except Exception as e:
             logger.error(f" --- Commissioning failed: {e}")
-            raise asserts.AssertionError(f"Step 0 failed: Device commissioning did not complete successfully. Error: {e}")
+            asserts.fail(f"Step 0 failed: Device commissioning did not complete successfully. Error: {e}")
 
         # Open a new fail-safe window (300 seconds) for network reconfiguration testing
         await self.send_single_cmd(
@@ -377,18 +381,18 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         logger.info(" --- All networks successfully removed. Ready for manual Thread configuration tests.")
 
-        # Wait for the device to disconnect from Thread network after removing the network configuration
-        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for device to disconnect from Thread...")
+        # Wait for device to update LastNetworkingStatus and LastConnectErrorValue
+        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for device to update status...")
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Verify device is disconnected by checking LastNetworkingStatus and LastConnectErrorValue
+        # Verify LastNetworkingStatus and LastConnectErrorValue are cleared to NULL after network removal
         last_networking_status = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus,
         )
-        logger.info(f" --- LastNetworkingStatus after removal: {last_networking_status}")
+        logger.info(f" --- LastNetworkingStatus after network removal: {last_networking_status}")
 
         # Read current connectivity status
         last_connect_error = await self.read_single_attribute(
