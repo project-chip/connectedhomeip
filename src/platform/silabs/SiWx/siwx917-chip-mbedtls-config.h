@@ -80,8 +80,8 @@
 #endif // !(SL_MATTER_ENABLE_AWS)
 
 // Added for codesize optimizations
-#define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 #define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+#define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
 #define MBEDTLS_HAVE_ASM
 #define MBEDTLS_HKDF_C
