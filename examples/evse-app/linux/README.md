@@ -168,7 +168,7 @@ app you need to add `chip_enable_energy_evse_trigger=true` to the gn args.
 Once the application is built you also need to tell it at runtime what the
 chosen enable key is using the `--enable-key` command line option.
 
-          $ ./chip-evse-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
+          $ ./chip-evse-app --enable-key 000102030405060708090a0b0c0d0e0f
 
 ### Running the test cases:
 
@@ -177,7 +177,7 @@ From the top-level of the connectedhomeip repo type:
 Start the chip-evse-app:
 
 ```bash
-rm -f evse.bin; out/debug/chip-evse-app --enable-key 000102030405060708090a0b0c0d0e0f --KVS evse.bin --featureSet $featureSet --application evse
+rm -f evse.bin; out/debug/chip-evse-app --enable-key 000102030405060708090a0b0c0d0e0f --KVS evse.bin --featureSet $featureSet
 ```
 
 where the \$featureSet depends on the test being run:
@@ -245,7 +245,7 @@ the matter persistent data (e.g. fabric info).
 -   Step 1: Launch the example app
 
 ```bash
-    $ ./chip-evse-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
+    $ ./chip-evse-app --enable-key 000102030405060708090a0b0c0d0e0f
 ```
 
 -   Step 2: Launch matter-repl
