@@ -20,6 +20,7 @@
 #include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/data-model/Nullable.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/LevelControl/Attributes.h>
