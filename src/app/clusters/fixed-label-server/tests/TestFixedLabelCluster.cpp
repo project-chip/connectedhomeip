@@ -72,7 +72,7 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     void TearDown() override { fixedLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestFixedLabelCluster() : fixedLabel(kRootEndpointId, &mDeviceInfoProvider) {}
+    TestFixedLabelCluster() : fixedLabel(kRootEndpointId, mDeviceInfoProvider) {}
 
     TestServerClusterContext testContext;
     MockDeviceInfoProvider mDeviceInfoProvider;

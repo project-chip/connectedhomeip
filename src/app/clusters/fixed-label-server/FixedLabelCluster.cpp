@@ -27,8 +27,8 @@ namespace {
 class AutoReleaseIterator
 {
 public:
-    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider, EndpointId endpointId) :
-        mIterator(provider != nullptr ? provider->IterateFixedLabel(endpointId) : nullptr)
+    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider, EndpointId endpointId) :
+        mIterator(provider.IterateFixedLabel(endpointId))
     {}
     ~AutoReleaseIterator()
     {
@@ -46,7 +46,7 @@ private:
     DeviceLayer::DeviceInfoProvider::FixedLabelIterator * mIterator;
 };
 
-CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider * provider)
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider & provider)
 {
     AutoReleaseIterator it(provider, endpoint);
     VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
@@ -63,7 +63,7 @@ CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, D
 
 } // namespace
 
-FixedLabelCluster::FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider * deviceInfoProvider) :
+FixedLabelCluster::FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider & deviceInfoProvider) :
     DefaultServerCluster({ endpoint, FixedLabel::Id }), mDeviceInfoProvider(deviceInfoProvider)
 {}
 

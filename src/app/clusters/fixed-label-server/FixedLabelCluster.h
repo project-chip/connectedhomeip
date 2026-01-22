@@ -25,7 +25,7 @@ class FixedLabelCluster : public DefaultServerCluster
 {
 public:
     FixedLabelCluster(EndpointId endpoint);
-    FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider * deviceInfoProvider);
+    FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider & deviceInfoProvider);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -33,7 +33,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
-    DeviceLayer::DeviceInfoProvider * mDeviceInfoProvider;
+    DeviceLayer::DeviceInfoProvider & mDeviceInfoProvider;
 };
 
 } // namespace chip::app::Clusters
