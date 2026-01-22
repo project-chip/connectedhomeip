@@ -17,6 +17,8 @@
 #include <app/clusters/level-control/LevelControlCluster.h>
 
 #include <algorithm>
+#include <app/ConcreteAttributePath.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/LevelControl/Attributes.h>
 #include <clusters/LevelControl/Commands.h>
@@ -69,6 +71,21 @@ LevelControlCluster::~LevelControlCluster()
 CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    AttributePersistence attributePersistence(context.attributeStorage);
+
+    // Restore N attributes from storage
+    // If storage has value, it overrides Config default.
+    // If storage is empty, Config default remains.
+    if (mFeatureMap.Has(Feature::kLighting))
+    {
+        attributePersistence.LoadNativeEndianValue(
+            ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id), mStartUpCurrentLevel,
+            mStartUpCurrentLevel);
+    }
+
+    attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::OnLevel::Id),
+                                               mOnLevel, mOnLevel);
 
     if (mFeatureMap.Has(Feature::kLighting) && !mStartUpCurrentLevel.IsNull())
     {
@@ -507,6 +524,20 @@ DataModel::ActionReturnStatus LevelControlCluster::SetOnLevel(DataModel::Nullabl
 {
     if (mOnLevel == newOnLevel)
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+
+    // Store if changed (N attribute)
+    if (mContext)
+    {
+        NumericAttributeTraits<uint8_t>::StorageType storageValue;
+        DataModel::NullableToStorage(newOnLevel, storageValue);
+        if (mContext->attributeStorage.WriteValue(
+                ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::OnLevel::Id),
+                ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))) != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(Failure);
+        }
+    }
+
     mOnLevel = newOnLevel;
     mDelegate.OnOnLevelChanged(mOnLevel);
     return NotifyAttributeChangedIfSuccess(Attributes::OnLevel::Id, Protocols::InteractionModel::Status::Success);
@@ -544,6 +575,20 @@ DataModel::ActionReturnStatus LevelControlCluster::SetStartUpCurrentLevel(DataMo
 {
     if (mStartUpCurrentLevel == startupLevel)
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+
+    // Store if changed (N attribute)
+    if (mContext)
+    {
+        NumericAttributeTraits<uint8_t>::StorageType storageValue;
+        DataModel::NullableToStorage(startupLevel, storageValue);
+        if (mContext->attributeStorage.WriteValue(
+                ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id),
+                ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))) != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(Failure);
+        }
+    }
+
     mStartUpCurrentLevel = startupLevel;
     return NotifyAttributeChangedIfSuccess(Attributes::StartUpCurrentLevel::Id, Protocols::InteractionModel::Status::Success);
 }
