@@ -600,8 +600,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
             [&](auto & TLSEndpoint) -> CHIP_ERROR {
                 // Use heap allocation for large certificate buffers to reduce stack usage
-                auto rootCertBuffer   = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
-                auto clientCertBuffer = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
+                auto rootCertBuffer   = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
+                auto clientCertBuffer = std::make_unique<PersistenceBuffer<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
 
                 Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
                 Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);

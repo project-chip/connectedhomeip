@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
 
 namespace chip {
 namespace app {
@@ -74,6 +74,12 @@ public:
 
     static inline TlsCertificateManagementCommandDelegate & GetInstance() { return instance; }
 };
+
+/**
+ * Initialize the TLS Certificate Management cluster with application-specific delegate and certificate table.
+ * MUST be called before server initialization (e.g. in ApplicationInit()).
+ */
+void InitializeTlsCertificateManagement();
 
 } // namespace Clusters
 } // namespace app
