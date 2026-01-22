@@ -28,11 +28,19 @@
 #include <devices/device-factory/DeviceFactory.h>
 #include <devices/root-node/RootNodeDevice.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
 #include <system/SystemLayer.h>
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+#include <platform/Linux/NetworkCommissioningDriver.h>
+#elif CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <platform/Darwin/NetworkCommissioningDriver.h>
+#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
+#else
+#error "App can only be compiled on linux or darwin"
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -108,8 +116,6 @@ private:
     DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWifiDriver;
 #elif CHIP_DEVICE_LAYER_TARGET_DARWIN
     DeviceLayer::NetworkCommissioning::DarwinWiFiDriver mWifiDriver;
-#else
-    #error "App can only be compiled on linux or darwin"
 #endif
 
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
