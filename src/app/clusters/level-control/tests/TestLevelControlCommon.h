@@ -17,36 +17,24 @@
 #pragma once
 
 #include <app/clusters/level-control/LevelControlCluster.h>
-
 #include <app/clusters/level-control/LevelControlDelegate.h>
-
 #include <lib/support/TimerDelegateMock.h>
-
 #include <pw_unit_test/framework.h>
-
 #include <system/RAIIMockClock.h>
 
 using namespace chip;
-
 using namespace chip::app;
-
 using namespace chip::app::Clusters;
-
 using namespace chip::app::Clusters::LevelControl;
 
 constexpr EndpointId kTestEndpointId = 1;
 
 class MockLevelControlDelegate : public LevelControlDelegate
-
 {
-
 public:
     void OnOptionsChanged(BitMask<OptionsBitmap> options) override { mOptions = options; }
-
     void OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel) override { mOnLevel = onLevel; }
-
     void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate) override { mDefaultMoveRate = defaultMoveRate; }
-
     void OnLevelChanged(uint8_t level) override
     {
         mLevel              = level;
@@ -54,7 +42,6 @@ public:
     }
 
     // OnOff methods
-
     void SetOnOff(bool on) override
     {
         mSetOnOffCalled = true;
@@ -64,31 +51,22 @@ public:
     bool GetOnOff() override { return mOn; }
 
     BitMask<OptionsBitmap> mOptions;
-
     DataModel::Nullable<uint8_t> mOnLevel;
-
     DataModel::Nullable<uint8_t> mDefaultMoveRate;
 
     bool mLevelChangedCalled = false;
-
-    uint8_t mLevel = 0;
+    uint8_t mLevel           = 0;
 
     bool mSetOnOffCalled = false;
-
-    bool mOn = false;
+    bool mOn             = false;
 };
 
 struct LevelControlTestBase : public ::testing::Test
-
 {
-
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     chip::TimerDelegateMock mockTimer;
-
     chip::System::Clock::Internal::RAIIMockClock mockClock;
-
     MockLevelControlDelegate mockDelegate;
 };
