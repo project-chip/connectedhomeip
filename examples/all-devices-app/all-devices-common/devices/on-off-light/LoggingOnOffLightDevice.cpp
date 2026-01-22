@@ -116,6 +116,7 @@ void LoggingOnOffLightDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     if (mOnOffCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
+        mOnOffCluster.Cluster().RemoveDelegate(&mOnOffDelegate);
         mOnOffCluster.Destroy();
     }
 
