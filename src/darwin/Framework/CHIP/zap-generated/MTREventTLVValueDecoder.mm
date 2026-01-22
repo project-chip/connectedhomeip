@@ -4452,6 +4452,19 @@ static id _Nullable DecodeEventPayloadForThermostatUserInterfaceConfigurationClu
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForHumidistatCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Humidistat;
+    switch (aEventId) {
+    default: {
+        // Not a known Humidistat event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForColorControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ColorControl;
@@ -5936,6 +5949,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ThermostatUserInterfaceConfiguration::Id: {
         return DecodeEventPayloadForThermostatUserInterfaceConfigurationCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::Humidistat::Id: {
+        return DecodeEventPayloadForHumidistatCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ColorControl::Id: {
         return DecodeEventPayloadForColorControlCluster(aPath.mEventId, aReader, aError);
