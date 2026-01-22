@@ -171,6 +171,151 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
+{
+    Platform::ScopedMemoryBuffer<uint8_t> presets;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize*mMaxPresets);
+
+    presets.Alloc(maxBufferSize);
+    bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
+    TLV::TLVWriter writer;
+
+    writer.Init(bufferSpan);
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+    for (const auto & mptzPresets : mMptzPresetHelpers)
+    {
+        // Get the details to encode from the preset helper
+        //
+        MPTZPresetStruct::Type presetStruct;
+        std::string name      = mptzPresets.GetName();
+        uint8_t preset        = mptzPresets.GetPresetID();
+        presetStruct.presetID = preset;
+        presetStruct.name     = CharSpan(name.c_str(), name.size());
+        presetStruct.settings = mptzPresets.GetMptzPosition();
+        ReturnErrorOnFailure(presetStruct.Encode(writer, TLV::AnonymousTag()));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, bufferSpan));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
+{
+    Platform::ScopedMemoryBuffer<uint8_t> presets;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize*mMaxPresets);
+
+    presets.Alloc(maxBufferSize);
+    bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, bufferSpan);
+
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        mMptzPresetHelpers.clear();
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    mMptzPresetHelpers.clear();
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        MPTZPresetStruct::Type preset;
+        ReturnErrorOnFailure(DataModel::Decode(reader, preset));
+        MPTZPresetHelper aMptzPresetHelper;
+
+        aMptzPresetHelper.SetPresetID(preset.presetID);
+        aMptzPresetHelper.SetName(preset.name);
+        aMptzPresetHelper.SetMptzPosition(preset.settings);
+        mMptzPresetHelpers.push_back(aMptzPresetHelper);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    return reader.VerifyEndOfContainer();
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreDPTZStreams()
+{
+    uint8_t buffer[kMaxDPTZStreamsSerializedSize];
+    MutableByteSpan bufferSpan(buffer);
+    TLV::TLVWriter writer;
+
+    writer.Init(bufferSpan);
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+    for (const auto & dptzstream : mDptzStreams)
+    {
+        ReturnErrorOnFailure(dptzstream.Encode(writer, TLV::AnonymousTag()));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::DPTZStreams::Id);
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, bufferSpan));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadDPTZStreams()
+{
+    uint8_t buffer[kMaxDPTZStreamsSerializedSize];
+    MutableByteSpan bufferSpan(buffer);
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::DPTZStreams::Id);
+
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, bufferSpan);
+
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        mDptzStreams.clear();
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    mDptzStreams.clear();
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        DPTZStruct::Type stream;
+        ReturnErrorOnFailure(DataModel::Decode(reader, stream));
+    
+        mDptzStreams.push_back(stream);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    return reader.VerifyEndOfContainer();
+}
+
 /**
  * Attribute mutators. In all cases, given that these may not have been enabled depending on the Feature Flags that are set,
  * the associated Feature presence is checked. The attributes are updated, and marked dirty, only if there is a change in the
@@ -315,6 +460,8 @@ void CameraAvSettingsUserLevelMgmtServerLogic::AddMoveCapableVideoStream(uint16_
     dptzEntry.videoStreamID = aVideoStreamID;
     dptzEntry.viewport      = aViewport;
     mDptzStreams.push_back(dptzEntry);
+
+    LogErrorOnFailure(StoreDPTZStreams());
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
@@ -334,6 +481,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::UpdateMoveCapableVideoStream(uint
     }
 
     it->viewport = aViewport;
+    LogErrorOnFailure(StoreDPTZStreams());
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
@@ -344,6 +492,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::UpdateMoveCapableVideoStreams(Glo
         dptzStream.viewport = aViewport;
     }
 
+    LogErrorOnFailure(StoreDPTZStreams());
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
@@ -364,6 +513,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::RemoveMoveCapableVideoStream(uint
     }
 
     mDptzStreams.erase(it);
+    LogErrorOnFailure(StoreDPTZStreams());
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
@@ -470,14 +620,14 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     }
 
     // Load MPTZPresets
-    err = mDelegate->LoadMPTZPresets(mMptzPresetHelpers);
+    err = LoadMPTZPresets();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the MPTZPresets from the KVS.", mEndpointId);
     }
 
     // Load DPTZRelativeMove
-    err = mDelegate->LoadDPTZStreams(mDptzStreams);
+    err = LoadDPTZStreams();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the DPTZRelativeMove from the KVS.", mEndpointId);
@@ -882,6 +1032,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
         UpdatePresetID();
     }
 
+    LogErrorOnFailure(StoreMPTZPresets());
     MarkDirty(Attributes::MPTZPresets::Id);
 
     return Status::Success;
@@ -924,6 +1075,8 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     // Remove the identified item from the known set of presets
     //
     mMptzPresetHelpers.erase(it);
+
+    LogErrorOnFailure(StoreMPTZPresets());
     MarkDirty(Attributes::MPTZPresets::Id);
 
     return Status::Success;

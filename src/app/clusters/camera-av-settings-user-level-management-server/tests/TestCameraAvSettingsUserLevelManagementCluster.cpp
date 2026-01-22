@@ -91,9 +91,6 @@ public:
     }
 
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) { return CHIP_NO_ERROR; }
-    CHIP_ERROR LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams) { return CHIP_NO_ERROR; }
 };
 
 struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
