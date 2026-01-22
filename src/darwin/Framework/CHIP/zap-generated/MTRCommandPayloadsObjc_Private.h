@@ -15,11 +15,9 @@
  *    limitations under the License.
  */
 
-#import "MTRCommandPayloadsObjc_Private.h"
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRDefines.h>
-
-#include <app-common/zap-generated/cluster-objects.h>
+#import <Matter/MTRStructsObjc.h>
 
 NS_ASSUME_NONNULL_BEGIN
 // Nothing here for now, but leaving this file in place in case we need to add

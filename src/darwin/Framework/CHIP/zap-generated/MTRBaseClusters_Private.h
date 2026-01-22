@@ -15,10 +15,14 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import "MTRCommandPayloadsObjc_Private.h"
+#import <Matter/MTRCluster.h>
+#import <Matter/MTRClusterStateCacheContainer.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRDefines.h>
 
-#import "MTRBaseClusters.h"
-#import "MTRBaseDevice.h"
-
+NS_ASSUME_NONNULL_BEGIN
 // Nothing here for now, but leaving this file in place in case we need to add
 // something.
+
+NS_ASSUME_NONNULL_END

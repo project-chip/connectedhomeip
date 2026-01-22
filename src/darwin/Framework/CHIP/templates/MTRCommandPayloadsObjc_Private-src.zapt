@@ -18,6 +18,7 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
 
 static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error) __attribute__((unused));
 static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error) {

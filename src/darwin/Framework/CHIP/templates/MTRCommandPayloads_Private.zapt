@@ -7,6 +7,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
