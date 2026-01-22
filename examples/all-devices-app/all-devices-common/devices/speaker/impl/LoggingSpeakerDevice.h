@@ -17,7 +17,6 @@
 #pragma once
 
 #include <devices/speaker/SpeakerDevice.h>
-#include <platform/DefaultTimerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -48,9 +47,6 @@ public:
     // OnOffDelegate
     void OnOffStartup(bool on) override;
     void OnOnOffChanged(bool on) override;
-
-private:
-    DefaultTimerDelegate mTimerDelegate;
 };
 
 } // namespace app

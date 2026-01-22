@@ -16,24 +16,20 @@
  */
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip {
 namespace app {
 
-LoggingSpeakerDevice::LoggingSpeakerDevice() : SpeakerDevice(*this, *this, mTimerDelegate) {}
+namespace {
+DefaultTimerDelegate sTimerDelegate;
+} // namespace
 
-LoggingSpeakerDevice::~LoggingSpeakerDevice()
-{
-    // Ensure clusters are destroyed before mTimerDelegate (which is a member of this class)
-    if (mLevelControlCluster.IsConstructed())
-        mLevelControlCluster.Destroy();
-    if (mOnOffCluster.IsConstructed())
-        mOnOffCluster.Destroy();
-    if (mIdentifyCluster.IsConstructed())
-        mIdentifyCluster.Destroy();
-}
+LoggingSpeakerDevice::LoggingSpeakerDevice() : SpeakerDevice(*this, *this, sTimerDelegate) {}
+
+LoggingSpeakerDevice::~LoggingSpeakerDevice() {}
 
 // LevelControlDelegate
 
