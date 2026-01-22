@@ -452,6 +452,7 @@ bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollL
 
     if (videoStreams.empty())
     {
+        ChipLogError(Camera, "Attempt to validate max pre-roll length when no video streams are allocated.");
         return false;
     }
 
@@ -465,7 +466,7 @@ bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollL
                 return true;
             }
             ChipLogError(Camera,
-                         "Max pre-roll length validation falied for video stream id [%u], max pre-roll length [%u], key frame "
+                         "Max pre-roll length validation failed for video stream id [%u], max pre-roll length [%u], key frame "
                          "interval [%u] ",
                          stream.videoStreamID, maxPreRollLength, stream.keyFrameInterval);
             break;
