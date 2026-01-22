@@ -22,19 +22,17 @@
 #include <pw_unit_test/framework.h>
 #include <system/RAIIMockClock.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::LevelControl;
+constexpr chip::EndpointId kTestEndpointId = 1;
 
-constexpr EndpointId kTestEndpointId = 1;
-
-class MockLevelControlDelegate : public LevelControlDelegate
+class MockLevelControlDelegate : public chip::app::Clusters::LevelControlDelegate
 {
 public:
-    void OnOptionsChanged(BitMask<OptionsBitmap> options) override { mOptions = options; }
-    void OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel) override { mOnLevel = onLevel; }
-    void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate) override { mDefaultMoveRate = defaultMoveRate; }
+    void OnOptionsChanged(chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> options) override { mOptions = options; }
+    void OnOnLevelChanged(chip::app::DataModel::Nullable<uint8_t> onLevel) override { mOnLevel = onLevel; }
+    void OnDefaultMoveRateChanged(chip::app::DataModel::Nullable<uint8_t> defaultMoveRate) override
+    {
+        mDefaultMoveRate = defaultMoveRate;
+    }
     void OnLevelChanged(uint8_t level) override
     {
         mLevel              = level;
@@ -50,9 +48,9 @@ public:
 
     bool GetOnOff() override { return mOn; }
 
-    BitMask<OptionsBitmap> mOptions;
-    DataModel::Nullable<uint8_t> mOnLevel;
-    DataModel::Nullable<uint8_t> mDefaultMoveRate;
+    chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> mOptions;
+    chip::app::DataModel::Nullable<uint8_t> mOnLevel;
+    chip::app::DataModel::Nullable<uint8_t> mDefaultMoveRate;
 
     bool mLevelChangedCalled = false;
     uint8_t mLevel           = 0;
@@ -63,8 +61,8 @@ public:
 
 struct LevelControlTestBase : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     chip::TimerDelegateMock mockTimer;
     chip::System::Clock::Internal::RAIIMockClock mockClock;

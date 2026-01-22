@@ -20,6 +20,11 @@
 #include <clusters/LevelControl/Attributes.h>
 #include <clusters/LevelControl/Commands.h>
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::LevelControl;
+
 struct TestLevelControlScenes : public LevelControlTestBase
 {
 };
@@ -85,4 +90,64 @@ TEST_F(TestLevelControlScenes, TestApplyScene)
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 20u);
+}
+
+TEST_F(TestLevelControlScenes, TestApplySceneImmediate)
+{
+    // Set a default transition time of 10s (100ds) to verify it is IGNORED when ApplyScene(0) is called.
+    LevelControlCluster cluster{
+        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOffTransitionTime(100)
+    };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    cluster.SetCurrentLevel(0);
+
+    // Scene with level 50
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+    AttributeValuePair pairs[1];
+    pairs[0].attributeID = Attributes::CurrentLevel::Id;
+    pairs[0].valueUnsigned8.SetValue(50);
+    app::DataModel::List<AttributeValuePair> list(pairs);
+    EXPECT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    // Apply Scene with 0ms (Immediate)
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, LevelControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+
+    // Should be immediate -> No Timer
+    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 50u);
+}
+
+TEST_F(TestLevelControlScenes, TestApplySceneWhileOff)
+{
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff() };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    cluster.SetCurrentLevel(0);
+    mockDelegate.mOn = false; // OFF
+
+    // Scene with level 50
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+    using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
+    AttributeValuePair pairs[1];
+    pairs[0].attributeID = Attributes::CurrentLevel::Id;
+    pairs[0].valueUnsigned8.SetValue(50);
+    app::DataModel::List<AttributeValuePair> list(pairs);
+    EXPECT_EQ(cluster.EncodeAttributeValueList(list, serializedBytes), CHIP_NO_ERROR);
+
+    // Apply Scene with 0ms
+    // Should succeed and update level even though Off
+    EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, LevelControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 50u);
 }

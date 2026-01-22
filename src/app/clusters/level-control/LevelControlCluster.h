@@ -190,7 +190,7 @@ private:
     DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
 
     // Extended Attributes (Lighting/Transitions)
-    DataModel::Nullable<uint16_t> mRemainingTime;
+    uint16_t mRemainingTime = 0;
     DataModel::Nullable<uint16_t> mOnTransitionTime;
     DataModel::Nullable<uint16_t> mOffTransitionTime;
     uint16_t mOnOffTransitionTime = 0;

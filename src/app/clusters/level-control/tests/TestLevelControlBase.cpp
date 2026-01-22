@@ -22,6 +22,11 @@
 #include <clusters/LevelControl/Commands.h>
 #include <clusters/LevelControl/Metadata.h>
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::LevelControl;
+
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
@@ -103,7 +108,7 @@ TEST_F(TestLevelControlBase, TestReadMinMaxLevel)
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-        uint8_t minLevel;
+        uint8_t minLevel = 0;
         EXPECT_TRUE(tester.ReadAttribute(Attributes::MinLevel::Id, minLevel).IsSuccess());
         EXPECT_EQ(minLevel, 10u);
     }
