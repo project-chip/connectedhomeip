@@ -656,7 +656,7 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 		Specifies the maximum connection recovery jitter interval (in milliseconds).
 		Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
 		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
-		within range [-JITTER; +JITTER].
+		within a range of +/- the value of this option.
 
 # Platform additions and configuration
 
