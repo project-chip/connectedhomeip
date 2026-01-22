@@ -47,7 +47,7 @@ public:
      * @brief Retrieve the current OnOff state.
      * @return True if On, False if Off.
      */
-    virtual bool GetOnOff() const { return false; }
+    virtual bool GetOnOff() { return false; }
 };
 
 } // namespace chip::app::Clusters
