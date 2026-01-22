@@ -544,6 +544,7 @@ jobs:
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-all-devices-app-tsan-clang-test
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -571,6 +572,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/darwin-${{matrix.arch}}-all-devices-app-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
