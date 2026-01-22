@@ -126,6 +126,8 @@ static_library("Linux") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ConnectivityManagerImpl_NetworkManagementInterface.h",
+    "ConnectivityManagerImpl_WiFiPafInterface.h",
     "ConnectivityUtils.cpp",
     "ConnectivityUtils.h",
     "DeviceInstanceInfoProviderImpl.cpp",
