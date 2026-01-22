@@ -129,6 +129,14 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: modebase_cluster_check.py
       reason: Shared code for Modebase derived clusters, not a standalone test.
+    - name: TC_TBRM_2_5.py
+      reason:
+          For Node with Secondary Netwrok Interface support. Require Thread
+          interface
+    - name: TC_TBRM_2_6.py
+      reason:
+          For Node with Secondary Netwrok Interface support. Require Thread
+          interface
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
