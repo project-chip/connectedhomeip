@@ -24,6 +24,7 @@
 #include <clusters/Groupcast/CommandIds.h>
 #include <clusters/Groupcast/Commands.h>
 #include <clusters/Groupcast/Enums.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -37,10 +38,16 @@ namespace Clusters {
 class GroupcastLogic
 {
 public:
+    static constexpr uint16_t kMaxMembershipCount     = CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT;
+    static constexpr uint16_t kMaxMembershipEndpoints = 255;
+    static constexpr uint16_t kMaxCommandEndpoints    = 20;
+
+    GroupcastLogic() {}
     GroupcastLogic(BitFlags<Groupcast::Feature> features) : mFeatures(features) {}
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
-    CHIP_ERROR ReadMembership(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
+                              AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
@@ -51,9 +58,10 @@ public:
                                      const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
 private:
-    CHIP_ERROR RegisterAccessControl(FabricIndex fabric_index, GroupId group_id);
+    CHIP_ERROR SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key);
 
     const BitFlags<Groupcast::Feature> mFeatures;
+    EndpointId mEndpoints[kMaxMembershipEndpoints];
 };
 
 } // namespace Clusters

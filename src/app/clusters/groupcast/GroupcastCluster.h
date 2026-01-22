@@ -31,6 +31,7 @@ namespace Clusters {
 class GroupcastCluster : public DefaultServerCluster
 {
 public:
+    GroupcastCluster();
     GroupcastCluster(BitFlags<Groupcast::Feature> features);
     virtual ~GroupcastCluster() {}
 
