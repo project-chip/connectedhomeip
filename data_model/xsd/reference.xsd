@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:group name="ReferenceGroup">
+    <xs:choice>
+      <xs:element name="feature">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="command">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="field" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="required" />
+          <xs:attribute name="field" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="event">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="attribute">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="field" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="name" type="xs:string" use="required" />
+          <xs:attribute name="cluster" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="field">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="condition">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="typeDef">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="enum">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="optional" />
+          <xs:attribute name="value" type="xs:string" use="optional" />
+          <xs:attribute name="default" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="bitmap">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required" />
+          <xs:attribute name="value" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="struct">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required" />
+          <xs:attribute name="field" type="xs:string" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:group>
+</xs:schema>
