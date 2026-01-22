@@ -241,6 +241,7 @@ void InitServer(intptr_t context)
     }
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
     SuccessOrDie(gGroupDataProvider.Init());
 
     initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);

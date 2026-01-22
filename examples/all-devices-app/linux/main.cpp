@@ -118,6 +118,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    gGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
     SuccessOrDie(gGroupDataProvider.Init());
 
     static CodeDrivenDataModelDevices devices(*initParams.persistentStorageDelegate);
