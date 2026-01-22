@@ -208,16 +208,24 @@ private:
     bool mIncreasing            = false;
     CommandId mCurrentCommandId = kInvalidCommandId;
     DataModel::Nullable<uint8_t> mStoredLevel; // Stores the level before turning Off, to restore on On if OnLevel is null.
-    bool mIgnoreOnOffEffects   = false;
-    uint64_t mLastReportTimeMs = 0;
+
+    // Used to ignore/prevent reentrance of OnOffChanged callbacks when we are programmatically setting On/Off state
+    // during a Level Control command (like MoveToLevelWithOnOff).
+    bool mTemporarilyIgnoreOnOffCallbacks = false;
+    uint64_t mLastReportTimeMs            = 0; // Used for Quieter Reporting (Spec mandates at most 1 report per second).
 
     // Helpers
-    void UpdateOnOff(bool on);
+    void UpdateOnOff(bool on, bool temporarilyIgnoreOnOffCallbacks = false);
     // Checks "Options" attribute ExecuteIfOff bit and command-specific overrides to determine if command should run.
     bool ShouldExecuteIfOff(CommandId commandId, BitMask<LevelControl::OptionsBitmap> optionsMask,
                             BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
     // Helper to set CurrentLevel with specific reporting rules (e.g. forced at end of transition).
+    // Spec 6.2. CurrentLevel Attribute:
+    // "Changes to this attribute SHALL only be marked as reportable in the following cases:
+    //  At most once per second, or
+    //  At the end of the movement/transition, or
+    //  When it changes from null to any other value and vice versa."
     DataModel::ActionReturnStatus SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
     // Helper to update RemainingTime attribute with quiet reporting rules (delta check).
     void UpdateRemainingTime(uint32_t remainingTimeMs, bool isNewTransition);

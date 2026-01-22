@@ -29,9 +29,7 @@ namespace app {
  * interfaces and logs messages when speaker actions occur (Mute/Unmute, Volume Change).
  * It also handles the interaction between OnOff (Mute) and LevelControl (Volume) clusters.
  */
-class LoggingSpeakerDevice : public SpeakerDevice,
-                             public Clusters::LevelControlDelegate,
-                             public Clusters::OnOffDelegate
+class LoggingSpeakerDevice : public SpeakerDevice, public Clusters::LevelControlDelegate, public Clusters::OnOffDelegate
 {
 public:
     LoggingSpeakerDevice();
@@ -42,7 +40,7 @@ public:
     void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> value) override;
     void OnOptionsChanged(BitMask<Clusters::LevelControl::OptionsBitmap> value) override;
     void OnOnLevelChanged(DataModel::Nullable<uint8_t> value) override;
-    
+
     // LevelControl -> OnOff Interaction
     void SetOnOff(bool on) override;
     bool GetOnOff() const override;

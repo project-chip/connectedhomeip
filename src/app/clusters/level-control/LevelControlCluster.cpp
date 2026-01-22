@@ -317,9 +317,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelHandler(CommandId 
     // Handle "With On/Off" commands: Turn On if moving up.
     if ((commandId == Commands::MoveToLevelWithOnOff::Id) && mIncreasing)
     {
-        mIgnoreOnOffEffects = true;
-        UpdateOnOff(true);
-        mIgnoreOnOffEffects = false;
+        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
 
         // If turning on, ensure we start at least at MinLevel (Spec: "set CurrentLevel to MinLevel")
         if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
@@ -394,9 +392,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
 
     if ((commandId == Commands::MoveWithOnOff::Id) && mIncreasing)
     {
-        mIgnoreOnOffEffects = true;
-        UpdateOnOff(true);
-        mIgnoreOnOffEffects = false;
+        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
 
         if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
         {
@@ -476,9 +472,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StepHandler(CommandId command
 
     if ((commandId == Commands::StepWithOnOff::Id) && mIncreasing)
     {
-        mIgnoreOnOffEffects = true;
-        UpdateOnOff(true);
-        mIgnoreOnOffEffects = false;
+        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
 
         if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
         {
@@ -616,11 +610,17 @@ DataModel::ActionReturnStatus LevelControlCluster::SetOnOffTransitionTime(uint16
     return NotifyAttributeChangedIfSuccess(Attributes::OnOffTransitionTime::Id, Protocols::InteractionModel::Status::Success);
 }
 
-void LevelControlCluster::UpdateOnOff(bool on)
+void LevelControlCluster::UpdateOnOff(bool on, bool temporarilyIgnoreOnOffCallbacks)
 {
     if (mFeatureMap.Has(Feature::kOnOff))
     {
+        if (temporarilyIgnoreOnOffCallbacks)
+            mTemporarilyIgnoreOnOffCallbacks = true;
+
         mDelegate.SetOnOff(on);
+
+        if (temporarilyIgnoreOnOffCallbacks)
+            mTemporarilyIgnoreOnOffCallbacks = false;
     }
 }
 
@@ -829,7 +829,7 @@ void LevelControlCluster::OnOffChanged(bool isOn)
 {
     if (mCurrentLevel.IsNull())
         return;
-    if (mIgnoreOnOffEffects)
+    if (mTemporarilyIgnoreOnOffCallbacks)
         return;
 
     if (isOn)

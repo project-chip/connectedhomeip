@@ -24,8 +24,10 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-SpeakerDevice::SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clusters::OnOffDelegate & onOffDelegate, TimerDelegate & timerDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSpeaker, 1)), mLevelDelegate(levelDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(timerDelegate)
+SpeakerDevice::SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clusters::OnOffDelegate & onOffDelegate,
+                             TimerDelegate & timerDelegate) :
+    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSpeaker, 1)),
+    mLevelDelegate(levelDelegate), mOnOffDelegate(onOffDelegate), mTimerDelegate(timerDelegate)
 {}
 
 CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
@@ -38,16 +40,16 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
 
     // OnOff (Mute)
     OnOffCluster::Context onOffContext{ mTimerDelegate };
-    
+
     mOnOffCluster.Create(endpoint, onOffContext);
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate); // Register the delegate
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
     // Level Control (Volume)
     LevelControlCluster::Config lcConfig(endpoint, mTimerDelegate, mLevelDelegate);
-    lcConfig.WithOnOff(); 
+    lcConfig.WithOnOff();
     lcConfig.WithInitialCurrentLevel(0);
-    
+
     mLevelControlCluster.Create(lcConfig);
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));
 
