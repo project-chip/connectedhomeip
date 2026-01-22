@@ -36,8 +36,8 @@ from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_
                                         parse_callable_from_xml)
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
-                                            ProblemSeverity, UnknownProblemLocation)
+                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemLocation,
+                                            ProblemNotice, ProblemSeverity, UnknownProblemLocation)
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
@@ -177,6 +177,7 @@ class XmlCluster:
     bitmaps: dict[str, XmlDataType]
     pics: str
     is_provisional: bool
+    revision_desc: dict[str]
 
 
 class ClusterSide(Enum):
@@ -232,6 +233,7 @@ class XmlDeviceType:
     # Keeping these as strings for now because the exact definitions are being discussed in DMTT
     classification_class: str
     classification_scope: str
+    revision_desc: dict[int, str]
     superset_of_device_type_name: Optional[str] = None
     superset_of_device_type_id: int = 0
 
@@ -314,6 +316,22 @@ def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) ->
 XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, Optional[ElementTree.Element]]
 
 
+def parse_revision_history(top_level: ElementTree.Element, location: ProblemLocation) -> tuple[dict[uint, str], list[ProblemNotice]]:
+    revision_desc = {}
+    problems = []
+    history = top_level.find('revisionHistory')
+    if history:
+        for e in history.iter('revision'):
+            try:
+                rev = int(e.get('revision', 'error'), 0)
+                revision_desc[rev] = e.get('summary', '')
+            except ValueError:
+                problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                              severity=ProblemSeverity.WARNING,
+                                              problem='Revision in revision history is missing or is not an int'))
+    return revision_desc, problems
+
+
 class ClusterParser:
     # Cluster ID is optional to support base clusters that have no ID of their own.
     def __init__(self, cluster: ElementTree.Element, cluster_id: Optional[uint], name: str):
@@ -353,6 +371,10 @@ class ClusterParser:
         self.event_elements = self.get_all_event_elements()
         self.params = ConformanceParseParameters(feature_map=self.create_feature_map(), attribute_map=self.create_attribute_map(),
                                                  command_map=self.create_command_map())
+
+        location = ClusterPathLocation(
+            endpoint_id=0, cluster_id=self._cluster_id if self._cluster_id is not None else 0)
+        self._revision_desc, problems = parse_revision_history(cluster, location)
 
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
         element, problem = get_conformance(element, self._cluster_id)
@@ -833,7 +855,8 @@ class ClusterParser:
                           structs=self._parse_data_type(DataTypeEnum.kStruct),
                           enums=self._parse_data_type(DataTypeEnum.kEnum),
                           bitmaps=self._parse_data_type(DataTypeEnum.kBitmap),
-                          pics=self._pics if self._pics is not None else "", is_provisional=self._is_provisional)
+                          pics=self._pics if self._pics is not None else "", is_provisional=self._is_provisional,
+                          revision_desc=self._revision_desc)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
@@ -1153,12 +1176,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 else:
                     unknown_commands.append(cmd)
             provisional = c.is_provisional or base.is_provisional
+            revision_desc = c.revision_desc
 
             new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
                              feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, structs=structs,
-                             enums=enums, bitmaps=bitmaps, pics=c.pics, is_provisional=provisional)
+                             enums=enums, bitmaps=bitmaps, pics=c.pics, is_provisional=provisional, revision_desc=revision_desc)
             xml_clusters[id] = new
 
 
@@ -1328,6 +1352,8 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
             device_name = DEVICE_TYPE_NAME_FIXES[id]
 
         location = DeviceTypePathLocation(device_type_id=id)
+        revision_desc, rev_problems = parse_revision_history(d, location)
+        problems.extend(rev_problems)
 
         try:
             classification = next(d.iter('classification'))
@@ -1346,7 +1372,8 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
                 return device_types, problems
         device_types[id] = XmlDeviceType(name=device_name, revision=revision, server_clusters={}, client_clusters={},
-                                         classification_class=device_class, classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
+                                         classification_class=device_class, revision_desc=revision_desc,
+                                         classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
         try:
             main_endpoint_clusters = next(d.iter('clusters'))
             clusters = main_endpoint_clusters.findall('cluster')
