@@ -75,8 +75,10 @@ public:
     // Group-Key map
     //
 
+    CHIP_ERROR SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id) override;
     CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info) override;
     CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info) override;
+    CHIP_ERROR GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id) override;
     CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index) override;
     CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index) override;
     GroupKeyIterator * IterateGroupKeys(FabricIndex fabric_index) override;

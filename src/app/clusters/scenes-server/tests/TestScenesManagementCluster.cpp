@@ -179,7 +179,12 @@ public:
     CHIP_ERROR RemoveEndpoint(FabricIndex, EndpointId) override { return CHIP_NO_ERROR; }
     GroupInfoIterator * IterateGroupInfo(FabricIndex) override { return nullptr; }
     EndpointIterator * IterateEndpoints(FabricIndex, std::optional<GroupId>) override { return nullptr; }
+    CHIP_ERROR SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id) override { return CHIP_NO_ERROR; }
     CHIP_ERROR SetGroupKeyAt(FabricIndex, size_t, const GroupKey &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id) override
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
     CHIP_ERROR GetGroupKeyAt(FabricIndex, size_t, GroupKey &) override { return CHIP_ERROR_NOT_FOUND; }
     CHIP_ERROR RemoveGroupKeyAt(FabricIndex, size_t) override { return CHIP_NO_ERROR; }
     CHIP_ERROR RemoveGroupKeys(FabricIndex) override { return CHIP_NO_ERROR; }
