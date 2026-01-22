@@ -78,13 +78,9 @@ void LoggingSpeakerDevice::SetOnOff(bool on)
     LogErrorOnFailure(OnOffCluster().SetOnOff(on));
 }
 
-bool LoggingSpeakerDevice::GetOnOff() const
+bool LoggingSpeakerDevice::GetOnOff()
 {
-    // HACK: Const-cast because OnOffCluster() accessors might not be const-friendly or accessible from const context?
-    // SpeakerDevice::OnOffCluster() is not const.
-    // But GetOnOff is const.
-    // I can const_cast 'this'.
-    return const_cast<LoggingSpeakerDevice *>(this)->OnOffCluster().GetOnOff();
+    return OnOffCluster().GetOnOff();
 }
 
 // OnOffDelegate

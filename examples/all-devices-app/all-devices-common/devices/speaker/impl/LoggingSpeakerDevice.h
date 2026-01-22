@@ -43,7 +43,7 @@ public:
 
     // LevelControl -> OnOff Interaction
     void SetOnOff(bool on) override;
-    bool GetOnOff() const override;
+    bool GetOnOff() override;
 
     // OnOffDelegate
     void OnOffStartup(bool on) override;
