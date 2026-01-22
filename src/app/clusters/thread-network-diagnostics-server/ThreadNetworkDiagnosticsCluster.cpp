@@ -35,8 +35,7 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                                  const OptionalAttributes optionalAttributes) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mOptionalAttributes(optionalAttributes)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -174,6 +173,7 @@ constexpr AttributeFeature gAttributes[] = { { ActiveTimestamp::Id, std::nullopt
                                              { RxErrOtherCount::Id, Feature::kMACCounts },
                                              { OverrunCount::Id, Feature::kErrorCounts } };
 
+// The metadata entries in gAttributeEntries[] need to match the same order of AttributeId in gAttributes[]
 AttributeListBuilder::OptionalAttributeEntry gAttributeEntries[] = { { false, ActiveTimestamp::kMetadataEntry },
                                                                      { false, PendingTimestamp::kMetadataEntry },
                                                                      { false, Delay::kMetadataEntry },
@@ -234,12 +234,12 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
         if (gAttributes[i].id != OverrunCount::Id)
         {
             gAttributeEntries[i].enabled = mOptionalAttributes.test(gAttributes[i].id);
-            if (gAttributes[i].feature)
+            if (gAttributes[i].feature.has_value())
             {
                 gAttributeEntries[i].enabled = gAttributeEntries[i].enabled && mFeatures.Has(gAttributes[i].feature.value());
             }
         }
-        else if (gAttributes[i].feature)
+        else if (gAttributes[i].feature.has_value())
         {
             gAttributeEntries[i].enabled = mFeatures.Has(gAttributes[i].feature.value());
         }
