@@ -210,7 +210,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                     code = e.status
                 # Verify that the Time Synchronization command returns SUCCESS otherwise fail the test.
                 asserts.assert_equal(
-                    code, 0, "Test failed because Thermostat has no UTCTime set and not allowing UTCTime to be set. Thermostat suggestions feature needs UTCTime.")
+                    code, 0, "Test failed because Thermostat has no UTCTime set and failed to set UTCTime. Thermostat suggestions feature needs UTCTime.")
         else:
             log.info("Thermostat has UTC time set.")
             self.skip_step("4a")
