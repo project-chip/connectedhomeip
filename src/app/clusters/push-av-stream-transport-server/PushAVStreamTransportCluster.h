@@ -42,11 +42,10 @@ public:
      * and used by the interaction model.
      *
      * @param aEndpointId The endpoint on which this cluster exists (must match zap configuration)
-     * @param aFeatures   Bitflags indicating which features are supported by this instance
+     * @param aFeatures   BitFlags indicating which features are supported by this instance
      *
      * @note The caller must ensure the delegate lives throughout the instance's lifetime
      */
-    PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
         DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mLogic(aEndpointId, aFeatures)
     {}
