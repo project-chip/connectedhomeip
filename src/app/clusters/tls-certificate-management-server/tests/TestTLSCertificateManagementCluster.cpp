@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 #include <clusters/TlsCertificateManagement/Attributes.h>
 #include <clusters/TlsCertificateManagement/Metadata.h>
 #include <pw_unit_test/framework.h>
@@ -182,7 +182,7 @@ public:
     CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, TLSCCDID id) override { return CHIP_NO_ERROR; }
 };
 
-class MockTlsCertificateManagementDelegate : public TlsCertificateManagementDelegate
+class MockTLSCertificateManagementDelegate : public TLSCertificateManagementDelegate
 {
 public:
     struct MockRootCert
@@ -449,7 +449,7 @@ public:
     }
 };
 
-struct TestTlsCertificateManagementCluster : public ::testing::Test
+struct TestTLSCertificateManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
@@ -476,11 +476,11 @@ struct TestTlsCertificateManagementCluster : public ::testing::Test
         app::SetSafeAttributePersistenceProvider(nullptr);
     }
 
-    MockTlsCertificateManagementDelegate mMockDelegate;
+    MockTLSCertificateManagementDelegate mMockDelegate;
     MockCertificateTable mMockCertTable;
     MockCertificateDependencyChecker mMockDependencyChecker;
 
-    TlsCertificateManagementCluster mCluster{ kTestEndpointId, mMockDelegate,        mMockDependencyChecker,
+    TLSCertificateManagementCluster mCluster{ kTestEndpointId, mMockDelegate,        mMockDependencyChecker,
                                               mMockCertTable,  kMaxRootCertificates, kMaxClientCertificates };
 
     ClusterTester mClusterTester{ mCluster };
@@ -488,35 +488,35 @@ struct TestTlsCertificateManagementCluster : public ::testing::Test
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
-TEST_F(TestTlsCertificateManagementCluster, TestReadMaxRootCertificates)
+TEST_F(TestTLSCertificateManagementCluster, TestReadMaxRootCertificates)
 {
     uint8_t maxRootCertificates = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MaxRootCertificates::Id, maxRootCertificates), CHIP_NO_ERROR);
     EXPECT_EQ(maxRootCertificates, kMaxRootCertificates);
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestReadMaxClientCertificates)
+TEST_F(TestTLSCertificateManagementCluster, TestReadMaxClientCertificates)
 {
     uint8_t maxClientCertificates = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MaxClientCertificates::Id, maxClientCertificates), CHIP_NO_ERROR);
     EXPECT_EQ(maxClientCertificates, kMaxClientCertificates);
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestReadClusterRevision)
+TEST_F(TestTLSCertificateManagementCluster, TestReadClusterRevision)
 {
     uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, kRevision);
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestReadFeatureMap)
+TEST_F(TestTLSCertificateManagementCluster, TestReadFeatureMap)
 {
     uint32_t featureMap = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 0u);
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestReadProvisionedRootCertificatesEmpty)
+TEST_F(TestTLSCertificateManagementCluster, TestReadProvisionedRootCertificatesEmpty)
 {
     Attributes::ProvisionedRootCertificates::TypeInfo::DecodableType list;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ProvisionedRootCertificates::Id, list), CHIP_NO_ERROR);
@@ -525,7 +525,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestReadProvisionedRootCertificatesE
     EXPECT_FALSE(it.Next());
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestReadProvisionedClientCertificatesEmpty)
+TEST_F(TestTLSCertificateManagementCluster, TestReadProvisionedClientCertificatesEmpty)
 {
     Attributes::ProvisionedClientCertificates::TypeInfo::DecodableType list;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ProvisionedClientCertificates::Id, list), CHIP_NO_ERROR);
@@ -534,7 +534,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestReadProvisionedClientCertificate
     EXPECT_FALSE(it.Next());
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestProvisionRootCertificateSuccess)
+TEST_F(TestTLSCertificateManagementCluster, TestProvisionRootCertificateSuccess)
 {
     // Generate a valid test certificate
     uint8_t certBuffer[Credentials::kMaxDERCertLength];
@@ -575,7 +575,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestProvisionRootCertificateSuccess)
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestFindRootCertificateSuccess)
+TEST_F(TestTLSCertificateManagementCluster, TestFindRootCertificateSuccess)
 {
     // Generate a valid test certificate
     uint8_t certBuffer[Credentials::kMaxDERCertLength];
@@ -612,7 +612,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestFindRootCertificateSuccess)
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestFindRootCertificateNotFound)
+TEST_F(TestTLSCertificateManagementCluster, TestFindRootCertificateNotFound)
 {
     Commands::FindRootCertificate::Type request;
     request.caid = 999; // Non-existent certificate
@@ -625,7 +625,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestFindRootCertificateNotFound)
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestRemoveRootCertificateSuccess)
+TEST_F(TestTLSCertificateManagementCluster, TestRemoveRootCertificateSuccess)
 {
     // Generate a valid test certificate
     uint8_t certBuffer[Credentials::kMaxDERCertLength];
@@ -659,7 +659,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestRemoveRootCertificateSuccess)
     EXPECT_EQ(mMockDelegate.rootCerts.size(), 0u);
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestRemoveRootCertificateNotFound)
+TEST_F(TestTLSCertificateManagementCluster, TestRemoveRootCertificateNotFound)
 {
     Commands::RemoveRootCertificate::Type request;
     request.caid = 999; // Non-existent certificate
@@ -672,7 +672,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestRemoveRootCertificateNotFound)
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestGenerateClientCsrSuccess)
+TEST_F(TestTLSCertificateManagementCluster, TestGenerateClientCsrSuccess)
 {
     Commands::ClientCSR::Type request;
     uint8_t dummyNonce[32] = { 0x01, 0x02, 0x03 };
@@ -689,7 +689,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestGenerateClientCsrSuccess)
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestProvisionClientCertificateSuccess)
+TEST_F(TestTLSCertificateManagementCluster, TestProvisionClientCertificateSuccess)
 {
     // Step 1: Generate a CSR to create the key pair and get the ccdid
     Commands::ClientCSR::Type csrRequest;
@@ -727,7 +727,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestProvisionClientCertificateSucces
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestFindClientCertificateSuccess)
+TEST_F(TestTLSCertificateManagementCluster, TestFindClientCertificateSuccess)
 {
     // Step 1: Generate a CSR to create the key pair and get the ccdid
     Commands::ClientCSR::Type csrRequest;
@@ -773,7 +773,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestFindClientCertificateSuccess)
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestFindClientCertificateNotFound)
+TEST_F(TestTLSCertificateManagementCluster, TestFindClientCertificateNotFound)
 {
     Commands::FindClientCertificate::Type request;
     request.ccdid = 999; // Non-existent certificate
@@ -786,7 +786,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestFindClientCertificateNotFound)
     }
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestRemoveClientCertificateSuccess)
+TEST_F(TestTLSCertificateManagementCluster, TestRemoveClientCertificateSuccess)
 {
     // Step 1: Generate a CSR to create the key pair and get the ccdid
     Commands::ClientCSR::Type csrRequest;
@@ -829,7 +829,7 @@ TEST_F(TestTlsCertificateManagementCluster, TestRemoveClientCertificateSuccess)
     EXPECT_EQ(mMockDelegate.clientCerts.size(), 0u);
 }
 
-TEST_F(TestTlsCertificateManagementCluster, TestRemoveClientCertificateNotFound)
+TEST_F(TestTLSCertificateManagementCluster, TestRemoveClientCertificateNotFound)
 {
     Commands::RemoveClientCertificate::Type request;
     request.ccdid = 999; // Non-existent certificate
