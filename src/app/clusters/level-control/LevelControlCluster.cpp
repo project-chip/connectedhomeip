@@ -55,11 +55,10 @@ LevelControlCluster::LevelControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
     mOnLevel(DataModel::Nullable<uint8_t>()), mMinLevel(config.mMinLevel), mMaxLevel(config.mMaxLevel),
-    mDefaultMoveRate(config.mDefaultMoveRate), mStartUpCurrentLevel(config.mStartUpCurrentLevel),
-    mRemainingTime(DataModel::MakeNullable<uint16_t>(0)), mOnTransitionTime(config.mOnTransitionTime),
-    mOffTransitionTime(config.mOffTransitionTime), mOnOffTransitionTime(config.mOnOffTransitionTime),
-    mOptionalAttributes(config.mOptionalAttributes), mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate),
-    mTimerDelegate(config.mTimerDelegate)
+    mDefaultMoveRate(config.mDefaultMoveRate), mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(0),
+    mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
+    mOnOffTransitionTime(config.mOnOffTransitionTime), mOptionalAttributes(config.mOptionalAttributes),
+    mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate)
 {}
 
 LevelControlCluster::~LevelControlCluster()
@@ -377,11 +376,9 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
     // Now determine Target and Check Constraints (safe from clobbering)
     if (mIncreasing)
     {
-        mTargetLevel = mMaxLevel;
+        mTargetLevel = 254; // Default max
         if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id))
             mTargetLevel = mMaxLevel;
-        else
-            mTargetLevel = 254; // Default max
 
         // Check if already at target
         uint8_t currentLevel = mCurrentLevel.Value();
@@ -390,7 +387,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
     }
     else
     {
-        mTargetLevel = 0;
+        mTargetLevel = 0; // Default min
         if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id))
             mTargetLevel = mMinLevel;
 
@@ -451,7 +448,9 @@ DataModel::ActionReturnStatus LevelControlCluster::StepHandler(CommandId command
     if (mIncreasing)
     {
         uint16_t next = currentLevel + stepSize;
-        uint8_t max   = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : 254;
+        uint8_t max   = 254; // Default max
+        if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id))
+            max = mMaxLevel;
         if (next > max)
             next = max;
         mTargetLevel = static_cast<uint8_t>(next);
@@ -459,7 +458,9 @@ DataModel::ActionReturnStatus LevelControlCluster::StepHandler(CommandId command
     else
     {
         int16_t next = currentLevel - stepSize;
-        uint8_t min  = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
+        uint8_t min  = 0; // Default min
+        if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id))
+            min = mMinLevel;
         if (next < min)
             next = min;
         mTargetLevel = static_cast<uint8_t>(next);
@@ -667,12 +668,11 @@ CHIP_ERROR LevelControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
             {
                 uint8_t level = decodePair.valueUnsigned8.Value();
                 DataModel::Nullable<uint16_t> ds;
-                if (timeMs > 0)
-                    ds.SetNonNull(static_cast<uint16_t>(timeMs / 100));
+                ds.SetNonNull(static_cast<uint16_t>(timeMs / 100));
 
-                // Use default options for scene?
-                BitMask<OptionsBitmap> optionsMask;
-                BitMask<OptionsBitmap> optionsOverride;
+                // Force execution even if Off
+                BitMask<OptionsBitmap> optionsMask(OptionsBitmap::kExecuteIfOff);
+                BitMask<OptionsBitmap> optionsOverride(OptionsBitmap::kExecuteIfOff);
 
                 MoveToLevelHandler(Commands::MoveToLevel::Id, level, ds, optionsMask, optionsOverride);
             }
@@ -720,9 +720,9 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, bool isN
         // Convert ms to ds (rounding up)
         uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
 
-        if (mRemainingTime.IsNull() || mRemainingTime.Value() != remainingTimeDs)
+        if (mRemainingTime != remainingTimeDs)
         {
-            mRemainingTime.SetNonNull(remainingTimeDs);
+            mRemainingTime = remainingTimeDs;
             NotifyAttributeChanged(Attributes::RemainingTime::Id);
         }
     }
@@ -777,7 +777,7 @@ void LevelControlCluster::HandleTick()
         if (mCurrentCommandId == Commands::MoveToLevelWithOnOff::Id || mCurrentCommandId == Commands::MoveWithOnOff::Id ||
             mCurrentCommandId == Commands::StepWithOnOff::Id)
         {
-            if (currentLevel == mMinLevel || currentLevel == 0)
+            if (currentLevel == mMinLevel)
                 UpdateOnOff(false);
         }
         return;
@@ -802,8 +802,6 @@ void LevelControlCluster::OnOffChanged(bool isOn)
             target = mOnLevel.Value();
         else if (!mStoredLevel.IsNull())
             target = mStoredLevel.Value();
-        else
-            target = mCurrentLevel.Value();
 
         // 1. Set to MinLevel
         SetCurrentLevel(mMinLevel);

@@ -22,6 +22,11 @@
 #include <clusters/LevelControl/Commands.h>
 #include <clusters/LevelControl/Metadata.h>
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::LevelControl;
+
 using chip::Testing::IsAttributesListEqualTo;
 
 struct TestLevelControlLighting : public LevelControlTestBase
@@ -69,6 +74,19 @@ TEST_F(TestLevelControlLighting, TestLightingAttributesPresence)
                                           Attributes::OnLevel::kMetadataEntry, Attributes::MinLevel::kMetadataEntry,
                                           Attributes::MaxLevel::kMetadataEntry, Attributes::StartUpCurrentLevel::kMetadataEntry,
                                           Attributes::RemainingTime::kMetadataEntry }));
+}
+
+TEST_F(TestLevelControlLighting, TestRemainingTimeDefault)
+{
+    LevelControlCluster cluster{
+        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(DataModel::NullNullable)
+    };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    uint16_t remainingTime;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, remainingTime).IsSuccess());
+    EXPECT_EQ(remainingTime, 0u);
 }
 
 TEST_F(TestLevelControlLighting, TestRemainingTime)

@@ -22,6 +22,11 @@
 #include <clusters/LevelControl/Commands.h>
 #include <clusters/LevelControl/Metadata.h>
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::LevelControl;
+
 using chip::Testing::IsAttributesListEqualTo;
 
 struct TestLevelControlOnOff : public LevelControlTestBase
@@ -244,6 +249,27 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
 
     EXPECT_EQ(readLevel.Value(), 200u);
+}
+
+TEST_F(TestLevelControlOnOff, TestOnOffChangedDefaultLevel)
+{
+    // Test that if OnLevel is null and StoredLevel is unknown (null or 0?), it defaults to MaxLevel.
+    LevelControlCluster cluster{
+        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff().WithOnOffTransitionTime(0)
+    }; // Immediate
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Initial state: Level 0 (Min)
+    cluster.SetCurrentLevel(0);
+
+    // Turn ON. No OnLevel set. No StoredLevel (as we haven't turned off from a high level).
+    // Should default to MaxLevel (254).
+    cluster.OnOffChanged(true);
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 254u);
 }
 
 class ReentrantMockDelegate : public MockLevelControlDelegate
