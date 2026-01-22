@@ -546,7 +546,7 @@ jobs:
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-all-devices-app-tsan-clang-test
+                        --target darwin-${{matrix.arch}}-all-devices-app-tsan-clang-test \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
