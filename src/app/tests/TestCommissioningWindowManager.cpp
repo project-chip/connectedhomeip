@@ -625,7 +625,7 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTime
 
     auto commissioningTimeout = commissionMgr.MinCommissioningTimeout();
 
-    // Advance time to just before commissioning window times out
+    // Advance time to just before the commissioning window times out (300 ms remaining)
     clock.AdvanceMonotonic(commissioningTimeout - 300_ms);
     ServiceEvents();
 
@@ -641,12 +641,13 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTime
     EXPECT_TRUE(commissionMgr.GetPASESession().HasValue());
     EXPECT_TRUE(commissionMgr.GetPASESession().Value()->AsSecureSession()->IsPASESession());
 
-    // Advance time to just after commissioning window times out, but before fail-safe timer expiry
-    clock.AdvanceMonotonic(301_ms);
+    // Advance time to 1000 ms after the commissioning window times out, while still before fail-safe timer expiry
+    clock.AdvanceMonotonic(1300_ms);
     ServiceEvents();
 
-    // Ensuring Fail-Safe is still armed
-    EXPECT_TRUE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
+    // Ensuring that commissioning window did time out and that fail-safe did not expire yet
+    ASSERT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    ASSERT_TRUE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
 
     Clusters::AdministratorCommissioningLogic logic;
     Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
