@@ -48,6 +48,8 @@ DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 
 AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+Credentials::GroupDataProviderImpl gGroupDataProvider;
+
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
@@ -72,16 +74,22 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
-    static Credentials::GroupDataProviderImpl groupDataProvider;
+    // Initialize the global provider with the storage delegate
+    SuccessOrDie(gGroupDataProvider.Init(delegate));
+
+    Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     static WifiRootNodeDevice rootNodeDevice(
         {
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
             .configurationManager       = DeviceLayer::ConfigurationMgr(),
             .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-            .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
-            .platformManager = DeviceLayer::PlatformMgr(), .groupDataProvider = groupDataProvider,
-            .sessionManager = Server::GetInstance().GetSecureSessionManager(), .dnssdServer = DnssdServer::Instance(),
+            .fabricTable                = Server::GetInstance().GetFabricTable(),
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),
+            .platformManager            = DeviceLayer::PlatformMgr(),
+            .groupDataProvider          = groupDataProvider,
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+            .dnssdServer                = DnssdServer::Instance(),
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -107,6 +115,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
     initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    initParams.groupDataProvider             = &gGroupDataProvider;
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     initParams.interfaceId                   = Inet::InterfaceId::Null();
