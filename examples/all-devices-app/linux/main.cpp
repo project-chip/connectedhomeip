@@ -45,7 +45,7 @@ namespace {
 
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
-Credentials::GroupDataProviderImpl gGropupDataProvider;
+Credentials::GroupDataProviderImpl gGroupDataprovider;
 AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -89,7 +89,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .timerDelegate     = timerDelegate,
-        .groupDataProvider = gGropupDataProvider,
+        .groupDataProvider = gGroupDataprovider,
         .fabricTable       = Server::GetInstance().GetFabricTable(),
     });
 
@@ -100,7 +100,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     initParams.interfaceId                   = Inet::InterfaceId::Null();
-    initParams.groupDataProvider             = &gGropupDataProvider;
+    initParams.groupDataProvider             = &gGroupDataprovider;
 
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");

@@ -93,7 +93,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
-Credentials::GroupDataProviderImpl gGropupDataProvider;
+Credentials::GroupDataProviderImpl gGroupDataprovider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -243,7 +243,7 @@ void InitServer(intptr_t context)
     initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-    initParams.groupDataProvider             = &gGropupDataProvider;
+    initParams.groupDataProvider             = &gGroupDataprovider;
 
     if (initParams.dataModelProvider == nullptr)
     {
