@@ -19,6 +19,8 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 } // namespace
 
+GroupcastCluster::GroupcastCluster() : DefaultServerCluster({ kRootEndpointId, Groupcast::Id }) {}
+
 GroupcastCluster::GroupcastCluster(BitFlags<Groupcast::Feature> features) :
     DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mLogic(features)
 {}
@@ -33,7 +35,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::ClusterRevision::Id:
         return encoder.Encode(Groupcast::kRevision);
     case Groupcast::Attributes::Membership::Id:
-        return mLogic.ReadMembership(request.path.mEndpointId, encoder);
+        return mLogic.ReadMembership(request.subjectDescriptor, request.path.mEndpointId, encoder);
     case Groupcast::Attributes::MaxMembershipCount::Id:
         return mLogic.ReadMaxMembershipCount(request.path.mEndpointId, encoder);
     }

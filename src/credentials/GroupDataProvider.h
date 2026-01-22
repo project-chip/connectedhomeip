@@ -44,12 +44,15 @@ public:
         GroupId group_id = kUndefinedGroupId;
         // Lastest group name written for a given GroupId on any Endpoint via the Groups cluster
         char name[kGroupNameMax + 1] = { 0 };
+        bool use_aux_acl             = false;
+        uint16_t count               = 0;
 
         GroupInfo() { SetName(nullptr); }
         GroupInfo(const char * groupName) { SetName(groupName); }
         GroupInfo(const CharSpan & groupName) { SetName(groupName); }
         GroupInfo(GroupId id, const char * groupName) : group_id(id) { SetName(groupName); }
         GroupInfo(GroupId id, const CharSpan & groupName) : group_id(id) { SetName(groupName); }
+        GroupInfo(GroupId id, bool aux_acl) : group_id(id), use_aux_acl(aux_acl) { SetName(nullptr); }
         void SetName(const char * groupName)
         {
             if (nullptr == groupName)
@@ -259,10 +262,12 @@ public:
     // Group-Key map
     //
 
-    virtual CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
-    virtual CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
-    virtual CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index)                     = 0;
-    virtual CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index)                                    = 0;
+    virtual CHIP_ERROR SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id)   = 0;
+    virtual CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info)  = 0;
+    virtual CHIP_ERROR GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id) = 0;
+    virtual CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info)        = 0;
+    virtual CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index)                      = 0;
+    virtual CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index)                                     = 0;
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
