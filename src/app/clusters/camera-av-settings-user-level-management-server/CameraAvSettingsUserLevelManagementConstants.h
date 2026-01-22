@@ -52,14 +52,14 @@ constexpr size_t kMptzPositionStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
 
 // Max size for an MPTZPresetStruct
-constexpr size_t kMaxMPTZPresetStructSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Fields::kName), kMptzPositionStructMaxSerializedSize);
+constexpr size_t kMaxMPTZPresetStructSerializedSize = TLV::EstimateStructOverhead(
+    sizeof(uint8_t), sizeof(CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Fields::kName),
+    kMptzPositionStructMaxSerializedSize);
 
 // Max size for a TLV encoded array of DPTZStruct
 constexpr size_t kViewportStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
-constexpr size_t kMaxDPTZStructSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(uint16_t), kViewportStructMaxSerializedSize);
+constexpr size_t kMaxDPTZStructSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t), kViewportStructMaxSerializedSize);
 constexpr size_t kMaxDPTZStreamsSerializedSize =
     kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS * kMaxDPTZStructSerializedSize);
 

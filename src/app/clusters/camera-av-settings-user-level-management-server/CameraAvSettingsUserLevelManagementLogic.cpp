@@ -175,7 +175,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 {
     Platform::ScopedMemoryBuffer<uint8_t> presets;
     MutableByteSpan bufferSpan;
-    size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize*mMaxPresets);
+    size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize * mMaxPresets);
 
     presets.Alloc(maxBufferSize);
     bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
@@ -210,12 +210,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
 {
     Platform::ScopedMemoryBuffer<uint8_t> presets;
     MutableByteSpan bufferSpan;
-    size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize*mMaxPresets);
+    size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize * mMaxPresets);
 
     presets.Alloc(maxBufferSize);
     bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto path      = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
     CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, bufferSpan);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
