@@ -44,7 +44,6 @@ using namespace chip::ArgParser;
 namespace {
 
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
-DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 Credentials::GroupDataProviderImpl gGroupDataprovider;
 AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -60,27 +59,47 @@ void StopSignalHandler(int /* signal */)
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
-        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
+        SuccessOrDie(SystemLayer().ScheduleLambda([]() { SuccessOrDie(PlatformMgr().StopEventLoopTask()); }));
     }
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+class CodeDrivenDataModelDevices
 {
-    static chip::app::DefaultAttributePersistenceProvider attributePersistenceProvider;
-    SuccessOrDie(attributePersistenceProvider.Init(delegate));
+public:
+    CodeDrivenDataModelDevices(chip::PersistentStorageDelegate & storageDelegate) :
+        mStorageDelegate(storageDelegate), mDataModelProvider(storageDelegate, mAttributePersistence), mRootNode(&mWifiDriver)
 
-    static chip::app::CodeDrivenDataModelProvider dataModelProvider =
-        chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
+    {
+        mWifiDriver.Set5gSupport(true);
+    }
 
-    static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver);
-    static std::unique_ptr<DeviceInterface> constructedDevice;
+    CHIP_ERROR Init()
+    {
+        ReturnErrorOnFailure(mAttributePersistence.Init(&mStorageDelegate));
+        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-    TEMPORARY_RETURN_IGNORED rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
-    constructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-    TEMPORARY_RETURN_IGNORED constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId);
+        mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
+        ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
 
-    return &dataModelProvider;
-}
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown() {
+        mConstructedDevice->UnRegister(mDataModelProvider);
+        mRootNode.UnRegister(mDataModelProvider);
+    }
+
+    chip::app::CodeDrivenDataModelProvider &DataModelProvider() { return mDataModelProvider; }
+
+private:
+    chip::PersistentStorageDelegate & mStorageDelegate;
+    chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
+    DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWifiDriver;
+    chip::app::CodeDrivenDataModelProvider mDataModelProvider;
+
+    WifiRootNodeDevice mRootNode;
+    std::unique_ptr<DeviceInterface> mConstructedDevice;
+};
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
@@ -93,10 +112,14 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .fabricTable       = Server::GetInstance().GetFabricTable(),
     });
 
+
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
-    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    static CodeDrivenDataModelDevices devices(*initParams.persistentStorageDelegate);
+    SuccessOrDie(devices.Init());
+
+    initParams.dataModelProvider             = &devices.DataModelProvider();
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     initParams.interfaceId                   = Inet::InterfaceId::Null();
@@ -138,7 +161,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
-    sWiFiDriver.Set5gSupport(true);
 
     struct sigaction sa = {};
     sa.sa_handler       = StopSignalHandler;
@@ -160,6 +182,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
+    devices.Shutdown();
     Server::GetInstance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
     tracing_setup.StopTracing();
