@@ -84,12 +84,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void Shutdown() {
+    void Shutdown()
+    {
         mConstructedDevice->UnRegister(mDataModelProvider);
         mRootNode.UnRegister(mDataModelProvider);
     }
 
-    chip::app::CodeDrivenDataModelProvider &DataModelProvider() { return mDataModelProvider; }
+    chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
 
 private:
     chip::PersistentStorageDelegate & mStorageDelegate;
@@ -111,7 +112,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         .groupDataProvider = gGroupDataprovider,
         .fabricTable       = Server::GetInstance().GetFabricTable(),
     });
-
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
@@ -160,7 +160,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     PrintOnboardingCodes(payload);
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
-
 
     struct sigaction sa = {};
     sa.sa_handler       = StopSignalHandler;
