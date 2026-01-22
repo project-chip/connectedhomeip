@@ -63,6 +63,10 @@ public:
     }
     bool ValidateStreamUsage(StreamUsageEnum) override { return true; }
     bool ValidateSegmentDuration(uint16_t, const Optional<DataModel::Nullable<uint16_t>> &) override { return true; }
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) override
+    {
+        return true;
+    }
     Status ValidateBandwidthLimit(StreamUsageEnum, const Optional<DataModel::Nullable<uint16_t>> &,
                                   const Optional<DataModel::Nullable<uint16_t>> &) override
     {

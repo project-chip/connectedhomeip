@@ -149,6 +149,16 @@ public:
                                          const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
 
     /**
+     * @brief Validates the provided Max Pre Roll Length.
+     *
+     * @param maxPreRollLength Max Pre Roll length to validate
+     * @param videoStreamId The video stream ID to be validated against
+     * @return true if the Max pre-roll length is greater than or equal to KeyFrameInterval for the provided videoStreamId, false
+       otherwise
+     */
+    virtual bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) = 0;
+
+    /**
      * @brief Validates bandwidth requirements against camera's resource management.
      *
      * @param streamUsage The desired usage type for the stream (e.g. live view, recording)
@@ -307,6 +317,7 @@ public:
      */
     virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
 };
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
