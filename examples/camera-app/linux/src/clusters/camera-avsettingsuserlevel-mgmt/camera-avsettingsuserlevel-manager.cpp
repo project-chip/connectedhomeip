@@ -296,7 +296,7 @@ CHIP_ERROR CameraAVSettingsUserLevelManager::LoadMPTZPresets(std::vector<MPTZPre
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
+CHIP_ERROR CameraAVSettingsUserLevelManager::LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams)
 {
     dptzStreams.clear();
     return CHIP_NO_ERROR;
