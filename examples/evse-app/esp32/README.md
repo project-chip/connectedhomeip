@@ -1,8 +1,8 @@
 # Matter ESP32 EVSE Example
 
 This example demonstrates the Matter Electric Vehicle Supply Equipment example
-application along with several other energy management clusters
-on ESP platforms.
+application along with several other energy management clusters on ESP
+platforms.
 
 Please
 [setup ESP-IDF and CHIP Environment](../../../docs/platforms/esp32/setup_idf_chip.md)
@@ -38,10 +38,10 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/evse-app/esp32/main/in
 
 ### Build time configuration
 
--   Test Event Trigger support: By default the EVSE, Device Energy
-    Management (DEM), Energy Reporting test event triggers are enabled in the
-    build. To turn these off run `idf.py menuconfig` and search for the
-    following config entries:
+-   Test Event Trigger support: By default the EVSE, Device Energy Management
+    (DEM), Energy Reporting test event triggers are enabled in the build. To
+    turn these off run `idf.py menuconfig` and search for the following config
+    entries:
 
         ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
         ENABLE_ENERGY_EVSE_TRIGGER
