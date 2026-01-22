@@ -19,62 +19,22 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <bitset>
+
 namespace chip::app::Clusters {
+
+namespace ThreadNetworkDiagnostics {
+
+// The highest attribute ID is 62 (ActiveNetworkFaultsList), so a size of 64 is safe.
+using OptionalAttributes = std::bitset<64>;
+
+} // namespace ThreadNetworkDiagnostics
 
 class ThreadNetworkDiagnosticsCluster : public DefaultServerCluster, public DeviceLayer::ThreadDiagnosticsDelegate
 {
 public:
-    struct StartupConfiguration
-    {
-        bool activeTs{};
-        bool pendingTs{};
-        bool delay{};
-        bool detachedRoleCount{};
-        bool childRoleCount{};
-        bool routerRoleCount{};
-        bool leaderRoleCount{};
-        bool attachAttemptCount{};
-        bool partitionIdChangeCount{};
-        bool betterPartitionAttachAttemptCount{};
-        bool parentChangeCount{};
-        bool txTotalCount{};
-        bool txUnicastCount{};
-        bool txBroadcastCount{};
-        bool txAckRequestedCount{};
-        bool txAckedCount{};
-        bool txNoAckRequestedCount{};
-        bool txDataCount{};
-        bool txDataPollCount{};
-        bool txBeaconCount{};
-        bool txBeaconRequestCount{};
-        bool txOtherCount{};
-        bool txRetryCount{};
-        bool txDirectMaxRetryExpiryCount{};
-        bool txIndirectMaxRetryExpiryCount{};
-        bool txErrCcaCount{};
-        bool txErrAbortCount{};
-        bool txErrBusyChannelCount{};
-        bool rxTotalCount{};
-        bool rxUnicastCount{};
-        bool rxBroadcastCount{};
-        bool rxDataCount{};
-        bool rxDataPollCount{};
-        bool rxBeaconCount{};
-        bool rxBeaconRequestCount{};
-        bool rxOtherCount{};
-        bool rxAddressFilteredCount{};
-        bool rxDestAddrFilteredCount{};
-        bool rxDuplicatedCount{};
-        bool rxErrNoFrameCount{};
-        bool rxErrUnknownNeighborCount{};
-        bool rxErrInvalidSrcAddrCount{};
-        bool rxErrSecCount{};
-        bool rxErrFcsCount{};
-        bool rxErrOtherCount{};
-    };
-
     ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<ThreadNetworkDiagnostics::Feature> features,
-                                    const StartupConfiguration & config);
+                                    const ThreadNetworkDiagnostics::OptionalAttributes optionalAttributes);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -97,8 +57,7 @@ public:
 
 private:
     const BitFlags<ThreadNetworkDiagnostics::Feature> mFeatures;
-
-    StartupConfiguration mConfig;
+    const ThreadNetworkDiagnostics::OptionalAttributes mOptionalAttributes;
 };
 
 } // namespace chip::app::Clusters

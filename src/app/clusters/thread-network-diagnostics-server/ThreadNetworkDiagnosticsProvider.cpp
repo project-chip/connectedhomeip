@@ -33,10 +33,7 @@
 
 using namespace chip::DeviceLayer;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ThreadNetworkDiagnostics {
+namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
@@ -862,7 +859,4 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     return err;
 }
 
-} // namespace ThreadNetworkDiagnostics
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ThreadNetworkDiagnostics
