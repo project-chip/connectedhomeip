@@ -73,8 +73,8 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.credentials import CredentialSource, get_cd_certs
-from matter.testing.problem_notices import CommandPathLocation
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.problem_notices import CommandPathLocation
 from matter.tlv import TLVReader
 
 
