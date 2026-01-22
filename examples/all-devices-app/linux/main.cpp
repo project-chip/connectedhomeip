@@ -88,7 +88,11 @@ public:
 
     void Shutdown()
     {
-        mConstructedDevice->UnRegister(mDataModelProvider);
+        if (mConstructedDevice)
+        {
+            mConstructedDevice->UnRegister(mDataModelProvider);
+            mConstructedDevice.reset();
+        }
         mRootNode.UnRegister(mDataModelProvider);
     }
 
