@@ -35,8 +35,7 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                                  const OptionalAttributes optionalAttributes) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mOptionalAttributes(optionalAttributes)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -119,79 +118,133 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
     }
 }
 
+namespace {
+
+struct AttributeFeature
+{
+    AttributeId id;
+    std::optional<Feature> feature;
+};
+
+constexpr AttributeFeature gAttributes[] = { { ActiveTimestamp::Id, std::nullopt },
+                                             { PendingTimestamp::Id, std::nullopt },
+                                             { Delay::Id, std::nullopt },
+                                             { DetachedRoleCount::Id, Feature::kMLECounts },
+                                             { ChildRoleCount::Id, Feature::kMLECounts },
+                                             { RouterRoleCount::Id, Feature::kMLECounts },
+                                             { LeaderRoleCount::Id, Feature::kMLECounts },
+                                             { AttachAttemptCount::Id, Feature::kMLECounts },
+                                             { PartitionIdChangeCount::Id, Feature::kMLECounts },
+                                             { BetterPartitionAttachAttemptCount::Id, Feature::kMLECounts },
+                                             { ParentChangeCount::Id, Feature::kMLECounts },
+                                             { TxTotalCount::Id, Feature::kMACCounts },
+                                             { TxUnicastCount::Id, Feature::kMACCounts },
+                                             { TxBroadcastCount::Id, Feature::kMACCounts },
+                                             { TxAckRequestedCount::Id, Feature::kMACCounts },
+                                             { TxAckedCount::Id, Feature::kMACCounts },
+                                             { TxNoAckRequestedCount::Id, Feature::kMACCounts },
+                                             { TxDataCount::Id, Feature::kMACCounts },
+                                             { TxDataPollCount::Id, Feature::kMACCounts },
+                                             { TxBeaconCount::Id, Feature::kMACCounts },
+                                             { TxBeaconRequestCount::Id, Feature::kMACCounts },
+                                             { TxOtherCount::Id, Feature::kMACCounts },
+                                             { TxRetryCount::Id, Feature::kMACCounts },
+                                             { TxDirectMaxRetryExpiryCount::Id, Feature::kMACCounts },
+                                             { TxIndirectMaxRetryExpiryCount::Id, Feature::kMACCounts },
+                                             { TxErrCcaCount::Id, Feature::kMACCounts },
+                                             { TxErrAbortCount::Id, Feature::kMACCounts },
+                                             { TxErrBusyChannelCount::Id, Feature::kMACCounts },
+                                             { RxTotalCount::Id, Feature::kMACCounts },
+                                             { RxUnicastCount::Id, Feature::kMACCounts },
+                                             { RxBroadcastCount::Id, Feature::kMACCounts },
+                                             { RxDataCount::Id, Feature::kMACCounts },
+                                             { RxDataPollCount::Id, Feature::kMACCounts },
+                                             { RxBeaconCount::Id, Feature::kMACCounts },
+                                             { RxBeaconRequestCount::Id, Feature::kMACCounts },
+                                             { RxOtherCount::Id, Feature::kMACCounts },
+                                             { RxAddressFilteredCount::Id, Feature::kMACCounts },
+                                             { RxDestAddrFilteredCount::Id, Feature::kMACCounts },
+                                             { RxDuplicatedCount::Id, Feature::kMACCounts },
+                                             { RxErrNoFrameCount::Id, Feature::kMACCounts },
+                                             { RxErrUnknownNeighborCount::Id, Feature::kMACCounts },
+                                             { RxErrInvalidSrcAddrCount::Id, Feature::kMACCounts },
+                                             { RxErrSecCount::Id, Feature::kMACCounts },
+                                             { RxErrFcsCount::Id, Feature::kMACCounts },
+                                             { RxErrOtherCount::Id, Feature::kMACCounts },
+                                             { OverrunCount::Id, Feature::kErrorCounts } };
+
+AttributeListBuilder::OptionalAttributeEntry gAttributeEntries[] = { { false, ActiveTimestamp::kMetadataEntry },
+                                                                     { false, PendingTimestamp::kMetadataEntry },
+                                                                     { false, Delay::kMetadataEntry },
+                                                                     { false, DetachedRoleCount::kMetadataEntry },
+                                                                     { false, ChildRoleCount::kMetadataEntry },
+                                                                     { false, RouterRoleCount::kMetadataEntry },
+                                                                     { false, LeaderRoleCount::kMetadataEntry },
+                                                                     { false, AttachAttemptCount::kMetadataEntry },
+                                                                     { false, PartitionIdChangeCount::kMetadataEntry },
+                                                                     { false, BetterPartitionAttachAttemptCount::kMetadataEntry },
+                                                                     { false, ParentChangeCount::kMetadataEntry },
+                                                                     { false, TxTotalCount::kMetadataEntry },
+                                                                     { false, TxUnicastCount::kMetadataEntry },
+                                                                     { false, TxBroadcastCount::kMetadataEntry },
+                                                                     { false, TxAckRequestedCount::kMetadataEntry },
+                                                                     { false, TxAckedCount::kMetadataEntry },
+                                                                     { false, TxNoAckRequestedCount::kMetadataEntry },
+                                                                     { false, TxDataCount::kMetadataEntry },
+                                                                     { false, TxDataPollCount::kMetadataEntry },
+                                                                     { false, TxBeaconCount::kMetadataEntry },
+                                                                     { false, TxBeaconRequestCount::kMetadataEntry },
+                                                                     { false, TxOtherCount::kMetadataEntry },
+                                                                     { false, TxRetryCount::kMetadataEntry },
+                                                                     { false, TxDirectMaxRetryExpiryCount::kMetadataEntry },
+                                                                     { false, TxIndirectMaxRetryExpiryCount::kMetadataEntry },
+                                                                     { false, TxErrCcaCount::kMetadataEntry },
+                                                                     { false, TxErrAbortCount::kMetadataEntry },
+                                                                     { false, TxErrBusyChannelCount::kMetadataEntry },
+                                                                     { false, RxTotalCount::kMetadataEntry },
+                                                                     { false, RxUnicastCount::kMetadataEntry },
+                                                                     { false, RxBroadcastCount::kMetadataEntry },
+                                                                     { false, RxDataCount::kMetadataEntry },
+                                                                     { false, RxDataPollCount::kMetadataEntry },
+                                                                     { false, RxBeaconCount::kMetadataEntry },
+                                                                     { false, RxBeaconRequestCount::kMetadataEntry },
+                                                                     { false, RxOtherCount::kMetadataEntry },
+                                                                     { false, RxAddressFilteredCount::kMetadataEntry },
+                                                                     { false, RxDestAddrFilteredCount::kMetadataEntry },
+                                                                     { false, RxDuplicatedCount::kMetadataEntry },
+                                                                     { false, RxErrNoFrameCount::kMetadataEntry },
+                                                                     { false, RxErrUnknownNeighborCount::kMetadataEntry },
+                                                                     { false, RxErrInvalidSrcAddrCount::kMetadataEntry },
+                                                                     { false, RxErrSecCount::kMetadataEntry },
+                                                                     { false, RxErrFcsCount::kMetadataEntry },
+                                                                     { false, RxErrOtherCount::kMetadataEntry },
+                                                                     { false, OverrunCount::kMetadataEntry } };
+
+} // namespace
+
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath & path,
                                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder attributeListBuilder(builder);
 
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { mOptionalAttributes.test(DetachedRoleCount::Id) && mFeatures.Has(Feature::kMLECounts),
-          DetachedRoleCount::kMetadataEntry },
-        { mOptionalAttributes.test(ChildRoleCount::Id) && mFeatures.Has(Feature::kMLECounts), ChildRoleCount::kMetadataEntry },
-        { mOptionalAttributes.test(RouterRoleCount::Id) && mFeatures.Has(Feature::kMLECounts), RouterRoleCount::kMetadataEntry },
-        { mOptionalAttributes.test(LeaderRoleCount::Id) && mFeatures.Has(Feature::kMLECounts), LeaderRoleCount::kMetadataEntry },
-        { mOptionalAttributes.test(AttachAttemptCount::Id) && mFeatures.Has(Feature::kMLECounts),
-          AttachAttemptCount::kMetadataEntry },
-        { mOptionalAttributes.test(PartitionIdChangeCount::Id) && mFeatures.Has(Feature::kMLECounts),
-          PartitionIdChangeCount::kMetadataEntry },
-        { mOptionalAttributes.test(BetterPartitionAttachAttemptCount::Id) && mFeatures.Has(Feature::kMLECounts),
-          BetterPartitionAttachAttemptCount::kMetadataEntry },
-        { mOptionalAttributes.test(ParentChangeCount::Id) && mFeatures.Has(Feature::kMLECounts),
-          ParentChangeCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxTotalCount::Id) && mFeatures.Has(Feature::kMACCounts), TxTotalCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxUnicastCount::Id) && mFeatures.Has(Feature::kMACCounts), TxUnicastCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxBroadcastCount::Id) && mFeatures.Has(Feature::kMACCounts), TxBroadcastCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxAckRequestedCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          TxAckRequestedCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxAckedCount::Id) && mFeatures.Has(Feature::kMACCounts), TxAckedCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxNoAckRequestedCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          TxNoAckRequestedCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxDataCount::Id) && mFeatures.Has(Feature::kMACCounts), TxDataCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxDataPollCount::Id) && mFeatures.Has(Feature::kMACCounts), TxDataPollCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxBeaconCount::Id) && mFeatures.Has(Feature::kMACCounts), TxBeaconCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxBeaconRequestCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          TxBeaconRequestCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxOtherCount::Id) && mFeatures.Has(Feature::kMACCounts), TxOtherCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxRetryCount::Id) && mFeatures.Has(Feature::kMACCounts), TxRetryCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxDirectMaxRetryExpiryCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          TxDirectMaxRetryExpiryCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxIndirectMaxRetryExpiryCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          TxIndirectMaxRetryExpiryCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxErrCcaCount::Id) && mFeatures.Has(Feature::kMACCounts), TxErrCcaCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxErrAbortCount::Id) && mFeatures.Has(Feature::kMACCounts), TxErrAbortCount::kMetadataEntry },
-        { mOptionalAttributes.test(TxErrBusyChannelCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          TxErrBusyChannelCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxTotalCount::Id) && mFeatures.Has(Feature::kMACCounts), RxTotalCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxUnicastCount::Id) && mFeatures.Has(Feature::kMACCounts), RxUnicastCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxBroadcastCount::Id) && mFeatures.Has(Feature::kMACCounts), RxBroadcastCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxDataCount::Id) && mFeatures.Has(Feature::kMACCounts), RxDataCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxDataPollCount::Id) && mFeatures.Has(Feature::kMACCounts), RxDataPollCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxBeaconCount::Id) && mFeatures.Has(Feature::kMACCounts), RxBeaconCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxBeaconRequestCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          RxBeaconRequestCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxOtherCount::Id) && mFeatures.Has(Feature::kMACCounts), RxOtherCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxAddressFilteredCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          RxAddressFilteredCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxDestAddrFilteredCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          RxDestAddrFilteredCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxDuplicatedCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          RxDuplicatedCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxErrNoFrameCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          RxErrNoFrameCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxErrUnknownNeighborCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          RxErrUnknownNeighborCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxErrInvalidSrcAddrCount::Id) && mFeatures.Has(Feature::kMACCounts),
-          RxErrInvalidSrcAddrCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxErrSecCount::Id) && mFeatures.Has(Feature::kMACCounts), RxErrSecCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxErrFcsCount::Id) && mFeatures.Has(Feature::kMACCounts), RxErrFcsCount::kMetadataEntry },
-        { mOptionalAttributes.test(RxErrOtherCount::Id) && mFeatures.Has(Feature::kMACCounts), RxErrOtherCount::kMetadataEntry },
-        { mOptionalAttributes.test(ActiveTimestamp::Id), ActiveTimestamp::kMetadataEntry },
-        { mOptionalAttributes.test(PendingTimestamp::Id), PendingTimestamp::kMetadataEntry },
-        { mOptionalAttributes.test(Delay::Id), Delay::kMetadataEntry },
-        { mFeatures.Has(Feature::kErrorCounts), OverrunCount::kMetadataEntry }
-    };
+    constexpr size_t NUM_ATTRIBUTES = sizeof(gAttributes) / sizeof(AttributeFeature);
+    for (size_t i = 0; i < NUM_ATTRIBUTES; ++i)
+    {
+        if (gAttributes[i].id != OverrunCount::Id)
+        {
+            gAttributeEntries[i].enabled = mOptionalAttributes.test(gAttributes[i].id);
+            if (gAttributes[i].feature)
+            {
+                gAttributeEntries[i].enabled = gAttributeEntries[i].enabled && mFeatures.Has(gAttributes[i].feature.value());
+            }
+        }
+        else if (gAttributes[i].feature)
+        {
+            gAttributeEntries[i].enabled = mFeatures.Has(gAttributes[i].feature.value());
+        }
+    }
 
-    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
+    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(gAttributeEntries));
 }
 
 // Notified when the Node’s connection status to a Thread network has changed.
