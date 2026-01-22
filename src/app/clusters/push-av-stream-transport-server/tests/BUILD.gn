@@ -25,6 +25,7 @@ chip_test_suite("tests") {
     "TestPushAVStreamTransportCluster.cpp",
     "TestPushAVStreamTransportStorage.cpp",
     "TestURLParsing.cpp",
+    "TestPushAVStreamTransportLogic.cpp",
   ]
 
   sources = []
