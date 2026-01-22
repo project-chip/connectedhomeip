@@ -282,23 +282,46 @@ bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
     // Free URI structure
     uriFreeUriMembersA(&uri);
 
-    // Check if required components exist
-    if (scheme.empty() || host.empty())
-    {
-        return false;
-    }
-
     // Convert scheme to lowercase for case-insensitive comparison
     for (char & c : scheme)
     {
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
-    bool pathEndsWithSlash = !path.empty() && path.back() == '/';
-    bool noQuery           = url.find('?') == std::string::npos;
-    bool noFragment        = url.find('#') == std::string::npos;
+    if (scheme != "https")
+    {
+        ChipLogError(Camera, "URL does not have a https scheme");
+        return false;
+    }
 
-    return scheme == "https" && noFragment && noQuery && pathEndsWithSlash && !host.empty();
+    if (host.empty())
+    {
+        ChipLogError(Camera, "URL does not contain a valid host.");
+        return false;
+    }
+
+    bool pathEndsWithSlash = !path.empty() && path.back() == '/';
+    if (!pathEndsWithSlash)
+    {
+        ChipLogError(Camera, "URL does not end with '/'");
+        return false;
+    }
+
+    bool noQuery = url.find('?') == std::string::npos;
+    if (!noQuery)
+    {
+        ChipLogError(Camera, "URL contains query character '?'");
+        return false;
+    }
+
+    bool noFragment = url.find('#') == std::string::npos;
+    if (!noFragment)
+    {
+        ChipLogError(Camera, "URL contains fragment character '#'");
+        return false;
+    }
+
+    return true;
 }
 
 CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
