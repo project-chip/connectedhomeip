@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/group-key-mgmt-server/CodegenIntegration.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Server.h>
@@ -64,14 +63,6 @@ public:
 };
 
 } // namespace
-
-namespace chip::app::Clusters::GroupKeyManagement {
-GroupKeyManagementCluster * Instance()
-{
-    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
-    return &gServer.Cluster();
-}
-} // namespace chip::app::Clusters::GroupKeyManagement
 
 void MatterGroupKeyManagementClusterInitCallback(EndpointId endpointId)
 {
