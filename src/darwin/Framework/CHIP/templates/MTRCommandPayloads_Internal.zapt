@@ -2,7 +2,6 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
-#import "MTRCommandPayloadsObjc_Private.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 
