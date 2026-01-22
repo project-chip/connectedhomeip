@@ -622,7 +622,7 @@ class PushAvServer:
         return stream  # TODO Update TH to use sessions instead
 
     def list_streams(self):
-        return {"streams": self.streams.values()}
+        return {"streams": list(self.streams.values())}
 
     async def handle_upload(self, stream_id: int, file_path: str, ext: str, req: Request):
         """
