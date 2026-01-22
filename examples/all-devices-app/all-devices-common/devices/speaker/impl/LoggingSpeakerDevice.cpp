@@ -28,9 +28,13 @@ LoggingSpeakerDevice::LoggingSpeakerDevice(TimerDelegate & timerDelegate) : Spea
 LoggingSpeakerDevice::~LoggingSpeakerDevice()
 {
     // Ensure clusters are destroyed
-    if (mLevelControlCluster.IsConstructed()) mLevelControlCluster.Destroy();
-    if (mOnOffCluster.IsConstructed()) mOnOffCluster.Destroy();
-    if (mIdentifyCluster.IsConstructed()) mIdentifyCluster.Destroy();
+    if (mLevelControlCluster.IsConstructed())
+        mLevelControlCluster.Destroy();
+    if (mOnOffCluster.IsConstructed())
+        mOnOffCluster.Destroy();
+    if (mIdentifyCluster.IsConstructed())
+        mIdentifyCluster.Destroy();
+}
 }
 
 // LevelControlDelegate
@@ -82,7 +86,7 @@ bool LoggingSpeakerDevice::GetOnOff() const
     // SpeakerDevice::OnOffCluster() is not const.
     // But GetOnOff is const.
     // I can const_cast 'this'.
-    return const_cast<LoggingSpeakerDevice*>(this)->OnOffCluster().GetOnOff();
+    return const_cast<LoggingSpeakerDevice *>(this)->OnOffCluster().GetOnOff();
 }
 
 // OnOffDelegate

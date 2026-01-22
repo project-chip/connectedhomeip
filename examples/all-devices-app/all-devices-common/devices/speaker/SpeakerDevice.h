@@ -31,7 +31,8 @@ class SpeakerDevice : public SingleEndpointDevice
 {
 public:
     // Takes delegates for the clusters.
-    SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clusters::OnOffDelegate & onOffDelegate, TimerDelegate & timerDelegate);
+    SpeakerDevice(Clusters::LevelControlDelegate & levelDelegate, Clusters::OnOffDelegate & onOffDelegate,
+                  TimerDelegate & timerDelegate);
     ~SpeakerDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
