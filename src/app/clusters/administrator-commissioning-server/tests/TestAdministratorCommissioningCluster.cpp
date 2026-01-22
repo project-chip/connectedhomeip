@@ -139,5 +139,9 @@ TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpi
     // Ensure that the fail-safe is still armed
     // RevokeCommissioning should NOT expire the fail-safe since it is not held by a PASE session
     ASSERT_TRUE(failSafeContext.IsFailSafeArmed());
+
+    //Teardown of Test (important when compiling all unit tests into a single binary, such as for nrfconnect)
+    failSafeContext.DisarmFailSafe();
+
 }
 } // namespace
