@@ -91,6 +91,10 @@
         {
             "name": "clusters_command_impl",
             "path": "partials/clusters_command_impl.zapt"
+        },
+        {
+            "name": "placeholder_comment",
+            "path": "partials/placeholder_comment.zapt"
         }
     ],
     "templates": [

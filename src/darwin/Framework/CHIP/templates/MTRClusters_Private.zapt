@@ -7,6 +7,7 @@
 #import "MTRCommandPayloadsObjc_Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -67,7 +68,6 @@ NS_ASSUME_NONNULL_BEGIN
                                    queue:(dispatch_queue_t)queue;
 
 @end
-
 {{/if}}
 {{/zcl_clusters}}
 

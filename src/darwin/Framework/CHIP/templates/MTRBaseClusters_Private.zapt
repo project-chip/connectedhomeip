@@ -7,6 +7,7 @@
 #import "MTRCommandPayloadsObjc_Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -78,7 +79,6 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 @end
 {{/if}}
-
 {{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END

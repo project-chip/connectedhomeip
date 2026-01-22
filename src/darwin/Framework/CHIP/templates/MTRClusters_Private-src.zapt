@@ -1,4 +1,6 @@
 {{> clusters_src_header clustersHeader="MTRClusters_Private.h"}}
+{{> placeholder_comment}}
+
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
@@ -55,7 +57,6 @@
 
 @end
 {{/if}}
-
 {{/zcl_clusters}}
 
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
