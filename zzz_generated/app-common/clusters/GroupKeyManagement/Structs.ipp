@@ -145,9 +145,21 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GroupKeyMapStruct
 
 namespace GroupKeySetStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kGroupKeySetID), groupKeySetID);
     encoder.Encode(to_underlying(Fields::kGroupKeySecurityPolicy), groupKeySecurityPolicy);
     encoder.Encode(to_underlying(Fields::kEpochKey0), epochKey0);
@@ -156,6 +168,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kEpochStartTime1), epochStartTime1);
     encoder.Encode(to_underlying(Fields::kEpochKey2), epochKey2);
     encoder.Encode(to_underlying(Fields::kEpochStartTime2), epochStartTime2);
+    encoder.Encode(to_underlying(Fields::kGroupKeyMulticastPolicy), groupKeyMulticastPolicy);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -200,6 +218,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEpochStartTime2))
         {
             err = DataModel::Decode(reader, epochStartTime2);
+        }
+        else if (__context_tag == to_underlying(Fields::kGroupKeyMulticastPolicy))
+        {
+            err = DataModel::Decode(reader, groupKeyMulticastPolicy);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
         }
 
         ReturnErrorOnFailure(err);

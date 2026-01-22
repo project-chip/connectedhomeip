@@ -28,6 +28,18 @@ namespace app {
 namespace Clusters {
 namespace GroupKeyManagement {
 
+// Enum for GroupKeyMulticastPolicyEnum
+enum class GroupKeyMulticastPolicyEnum : uint8_t
+{
+    kPerGroupID = 0x00,
+    kAllNodes   = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for GroupKeySecurityPolicyEnum
 enum class GroupKeySecurityPolicyEnum : uint8_t
 {
