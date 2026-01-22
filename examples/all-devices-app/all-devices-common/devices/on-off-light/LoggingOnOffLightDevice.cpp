@@ -107,12 +107,6 @@ void LoggingOnOffLightDevice::UnRegister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
 
-    if (mIdentifyCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
-        mIdentifyCluster.Destroy();
-    }
-
     if (mOnOffCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mOnOffCluster.Cluster()));
@@ -124,6 +118,12 @@ void LoggingOnOffLightDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     {
         LogErrorOnFailure(provider.RemoveCluster(&mScenesManagementCluster.Cluster()));
         mScenesManagementCluster.Destroy();
+    }
+
+    if (mIdentifyCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
+        mIdentifyCluster.Destroy();
     }
 }
 
