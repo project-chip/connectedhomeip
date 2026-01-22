@@ -65,41 +65,41 @@ void StopSignalHandler(int /* signal */)
 
 class CodeDrivenDataModelDevices
 {
-    public:
-        CodeDrivenDataModelDevices(chip::PersistentStorageDelegate & storageDelegate) :
-            mStorageDelegate(storageDelegate), mDataModelProvider(storageDelegate, mAttributePersistence), mRootNode(&mWifiDriver)
+public:
+    CodeDrivenDataModelDevices(chip::PersistentStorageDelegate & storageDelegate) :
+        mStorageDelegate(storageDelegate), mDataModelProvider(storageDelegate, mAttributePersistence), mRootNode(&mWifiDriver)
 
     {
         mWifiDriver.Set5gSupport(true);
     }
 
-        CHIP_ERROR Init()
-        {
-            ReturnErrorOnFailure(mAttributePersistence.Init(&mStorageDelegate));
-            ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
+    CHIP_ERROR Init()
+    {
+        ReturnErrorOnFailure(mAttributePersistence.Init(&mStorageDelegate));
+        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-            mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-            ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
+        mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
+        ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
 
-            return CHIP_NO_ERROR;
-        }
+        return CHIP_NO_ERROR;
+    }
 
-        void Shutdown()
-        {
-            mConstructedDevice->UnRegister(mDataModelProvider);
-            mRootNode.UnRegister(mDataModelProvider);
-        }
+    void Shutdown()
+    {
+        mConstructedDevice->UnRegister(mDataModelProvider);
+        mRootNode.UnRegister(mDataModelProvider);
+    }
 
-        chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
+    chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
 
-    private:
-        chip::PersistentStorageDelegate & mStorageDelegate;
-        chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
-        DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWifiDriver;
-        chip::app::CodeDrivenDataModelProvider mDataModelProvider;
+private:
+    chip::PersistentStorageDelegate & mStorageDelegate;
+    chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
+    DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWifiDriver;
+    chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
-        WifiRootNodeDevice mRootNode;
-        std::unique_ptr<DeviceInterface> mConstructedDevice;
+    WifiRootNodeDevice mRootNode;
+    std::unique_ptr<DeviceInterface> mConstructedDevice;
 };
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
@@ -108,10 +108,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-            .timerDelegate     = timerDelegate,
-            .groupDataProvider = gGroupDataProvider,
-            .fabricTable       = Server::GetInstance().GetFabricTable(),
-            });
+        .timerDelegate     = timerDelegate,
+        .groupDataProvider = gGroupDataProvider,
+        .fabricTable       = Server::GetInstance().GetFabricTable(),
+    });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
