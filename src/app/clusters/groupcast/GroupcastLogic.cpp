@@ -30,12 +30,6 @@ CHIP_ERROR GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupc
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR GroupcastLogic::ExpireGracePeriod(FabricIndex fabric_index,
-                                             const Groupcast::Commands::ExpireGracePeriod::DecodableType & data)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
                                                  const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data)
 {

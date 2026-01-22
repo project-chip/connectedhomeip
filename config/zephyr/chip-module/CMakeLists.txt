@@ -42,6 +42,7 @@ if(CONFIG_CHIP)
     # Get common Cmake sources
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
     include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
+    include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_kconfig_defaults.cmake)
 
     # Prepare compiler flags
 
@@ -105,20 +106,6 @@ if(CONFIG_CHIP)
     matter_add_gn_arg_string("zephyr_ar" ${CMAKE_AR})
     matter_add_gn_arg_string("zephyr_cc" ${CMAKE_C_COMPILER})
     matter_add_gn_arg_string("zephyr_cxx" ${CMAKE_CXX_COMPILER})
-    matter_add_gn_arg_bool("chip_logging" CONFIG_LOG)
-    matter_add_gn_arg_bool("chip_error_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
-    matter_add_gn_arg_bool("chip_progress_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
-    matter_add_gn_arg_bool("chip_detail_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
-    matter_add_gn_arg_bool("chip_automation_logging" FALSE)
-    matter_add_gn_arg_bool("chip_enable_openthread" CONFIG_NET_L2_OPENTHREAD)
-    matter_add_gn_arg_bool("chip_openthread_ftd" CONFIG_OPENTHREAD_FTD)
-    matter_add_gn_arg_bool("chip_inet_config_enable_ipv4" CONFIG_CHIP_IPV4)
-    matter_add_gn_arg_bool("chip_enable_wifi" CONFIG_CHIP_WIFI)
-    matter_add_gn_arg_bool("chip_config_network_layer_ble" CONFIG_BT)
-matter_add_gn_arg_bool("chip_malloc_sys_heap" CONFIG_CHIP_MALLOC_SYS_HEAP)
-matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" FALSE)
-    matter_add_gn_arg_bool("chip_enable_read_client" CONFIG_CHIP_ENABLE_READ_CLIENT)
-    matter_add_gn_arg_bool("chip_enable_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
 
     if(BOARD STREQUAL "native_sim")
         matter_add_gn_arg_string("target_cpu" "x86")
@@ -146,17 +133,6 @@ matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" FALSE)
         matter_add_gn_arg_string("pw_log_BACKEND" ${PIGWEED_DIR}/pw_log_basic)
         matter_add_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
     endif()
-
-    if(NOT CONFIG_CHIP_DEBUG_SYMBOLS)
-        matter_add_gn_arg_string("symbol_level" "0")
-    endif()
-
-    if(CONFIG_CHIP_STRIP_SYMBOLS)
-        matter_add_gn_arg_bool("strip_symbols" true)
-    endif()
-
-    # Allows to set chip_stack_lock_tracking level
-    matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
 
     matter_generate_args_tmp_file()
 

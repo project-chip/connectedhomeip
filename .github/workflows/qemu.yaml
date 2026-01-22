@@ -67,7 +67,7 @@ jobs:
                     --verbose                             \
                     --file-image-list ./out/esp32-qemu-tests/test_images.txt
             - name: Uploading Logs
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ !env.ACT }}
               with:
                   name: qemu-esp32-logs

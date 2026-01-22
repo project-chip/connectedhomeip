@@ -57,3 +57,9 @@ tests:
           of the input list"
       PICS: MEDIAINPUT.S.C02.Rsp
       command: "HideInputStatus"
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

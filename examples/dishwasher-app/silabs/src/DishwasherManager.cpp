@@ -49,12 +49,12 @@ CHIP_ERROR DishwasherManager::Init()
     VerifyOrReturnLogError(dem != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
-    dem->SetESAState(ESAStateEnum::kOnline);
-    dem->SetESAType(ESATypeEnum::kDishwasher);
+    TEMPORARY_RETURN_IGNORED dem->SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED dem->SetESAType(ESATypeEnum::kDishwasher);
 
     // Set the abs min and max power
-    dem->SetAbsMinPower(1200000); // 1.2KW
-    dem->SetAbsMaxPower(7600000); // 7.6KW
+    TEMPORARY_RETURN_IGNORED dem->SetAbsMinPower(1200000); // 1.2KW
+    TEMPORARY_RETURN_IGNORED dem->SetAbsMaxPower(7600000); // 7.6KW
 
     return CHIP_NO_ERROR;
 }

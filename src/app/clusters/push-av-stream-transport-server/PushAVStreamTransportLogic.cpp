@@ -606,9 +606,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
                 Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
 
-                if (mTlsCertificateManagementDelegate != nullptr)
+                if (mTLSCertificateManagementDelegate != nullptr)
                 {
-                    auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+                    auto & table = mTLSCertificateManagementDelegate->GetCertificateTable();
                     ReturnErrorOnFailure(table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(),
                                                                          TLSEndpoint.ccdid.Value(), clientCertEntry));
                     ReturnErrorOnFailure(
@@ -864,6 +864,21 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
                 return std::nullopt;
             }
+        }
+    }
+
+    // Validate MaxPreRollLength constraint
+    if (transportOptionsPtr->videoStreamID.HasValue() && transportOptions.triggerOptions.maxPreRollLen.HasValue())
+    {
+        uint16_t maxPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
+        if (maxPreRollLength != 0 &&
+            !mDelegate->ValidateMaxPreRollLength(maxPreRollLength, transportOptionsPtr->videoStreamID.Value()))
+        {
+            auto maxPreRollLengthStatus = to_underlying(StatusCodeEnum::kInvalidPreRollLength);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed", mEndpointId,
+                         maxPreRollLength);
+            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, maxPreRollLengthStatus);
+            return std::nullopt;
         }
     }
 

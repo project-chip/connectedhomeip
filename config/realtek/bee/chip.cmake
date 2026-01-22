@@ -78,6 +78,14 @@ list(
     ${CHIP_ROOT}/third_party/nlio/repo/include
 )
 
+if (matter_enable_cg_secure_dac_vendor)
+    list(
+        APPEND CHIP_INC
+
+        ${CGCRYPTO_PATH}
+    )
+endif (matter_enable_cg_secure_dac_vendor)
+
 execute_process(
     COMMAND echo "mkdir CHIP output folder ..."
     COMMAND mkdir -p ${CHIP_OUTPUT}
