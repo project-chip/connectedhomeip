@@ -5293,59 +5293,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 namespace CameraAvSettingsUserLevelManagement {
 namespace Attributes {
 
-namespace MaxPresets {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace MaxPresets
-
-namespace ZoomMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace ZoomMax
-
-namespace TiltMin {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace TiltMin
-
-namespace TiltMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace TiltMax
-
-namespace PanMin {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace PanMin
-
-namespace PanMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int16_t * value); // int16s
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-} // namespace PanMax
-
-namespace MovementState {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum * value); // PhysicalMovementEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CameraAvSettingsUserLevelManagement::PhysicalMovementEnum value,
-                                        MarkAttributeDirty markDirty);
-} // namespace MovementState
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
