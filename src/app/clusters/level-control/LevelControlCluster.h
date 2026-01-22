@@ -220,6 +220,12 @@ private:
     bool ShouldExecuteIfOff(CommandId commandId, BitMask<LevelControl::OptionsBitmap> optionsMask,
                             BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
+    // Handles the "With On/Off" command logic: Turns device On if needed and resets level to MinLevel.
+    void HandleOnOffTask(CommandId commandId, bool isMoveUp);
+
+    // Setup and start the transition timer
+    void ScheduleTimer(uint32_t durationMs, uint32_t transitionTimeMs);
+
     // Helper to set CurrentLevel with specific reporting rules (e.g. forced at end of transition).
     // Spec 6.2. CurrentLevel Attribute:
     // "Changes to this attribute SHALL only be marked as reportable in the following cases:
