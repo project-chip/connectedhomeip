@@ -80,6 +80,7 @@ public:
         ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
         mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
+        VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
 
         return CHIP_NO_ERROR;
