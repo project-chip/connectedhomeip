@@ -71,6 +71,26 @@
         {
             "name": "command_id_shims",
             "path": "partials/command_id_shims.zapt"
+        },
+        {
+            "name": "base_clusters_src_header",
+            "path": "partials/base_clusters_src_header.zapt"
+        },
+        {
+            "name": "base_clusters_command_impl",
+            "path": "partials/base_clusters_command_impl.zapt"
+        },
+        {
+            "name": "base_clusters_attribute_impl",
+            "path": "partials/base_clusters_attribute_impl.zapt"
+        },
+        {
+            "name": "clusters_src_header",
+            "path": "partials/clusters_src_header.zapt"
+        },
+        {
+            "name": "clusters_command_impl",
+            "path": "partials/clusters_command_impl.zapt"
         }
     ],
     "templates": [
@@ -138,6 +158,11 @@
             "path": "MTRCommandPayloadsObjc.zapt",
             "name": "Objc reflections of MTR command payloads header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.h"
+        },
+        {
+            "path": "MTRCommandPayloadsObjc_Private.zapt",
+            "name": "Objc reflections of MTR command payloads Private header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc_Private.h"
         },
         {
             "path": "MTRCommandPayloadsObjc-src.zapt",

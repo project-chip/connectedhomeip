@@ -19,6 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error) __attribute__((unused));
 static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error) {
   NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
   MTR_LOG_ERROR("%s", errorStr.UTF8String);
@@ -31,7 +32,91 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#zcl_commands}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
 
+@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params
+- (instancetype)init
+{
+  if (self = [super init]) {
+{{#zcl_command_arguments}}
+
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+{{/zcl_command_arguments}}
+{{#if (or (isStrEqual source "client")
+          (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+    _timedInvokeTimeoutMs = nil;
+{{/if}}
+{{#if (isStrEqual source "client")}}
+    _serverSideProcessingTimeout = nil;
+{{/if}}
+  }
+  return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+  auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params alloc] init];
+
+  {{#zcl_command_arguments}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/zcl_command_arguments}}
+{{#if (or (isStrEqual source "client")
+          (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+  other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+{{/if}}
+{{#if (isStrEqual source "client")}}
+  other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+{{/if}}
+
+  return other;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_command_arguments}}{{asStructPropertyName label}}:%@; {{/zcl_command_arguments}}>", NSStringFromClass([self class]) {{#zcl_command_arguments}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_command_arguments}}];
+  return descriptionString;
+}
+
+{{#if (isStrEqual source "server")}}
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+  if (!(self = [super init])) {
+    return nil;
+  }
+
+  using DecodableType = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType;
+  chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                         clusterID:DecodableType::GetClusterId()
+                                                                         commandID:DecodableType::GetCommandId()
+                                                                             error:error];
+  if (buffer.IsNull()) {
+    return nil;
+  }
+
+  chip::TLV::TLVReader reader;
+  reader.Init(buffer->Start(), buffer->DataLength());
+
+  CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+  if (err == CHIP_NO_ERROR) {
+    DecodableType decodedStruct;
+    err = chip::app::DataModel::Decode(reader, decodedStruct);
+    if (err == CHIP_NO_ERROR) {
+      err = [self _setFieldsFromDecodableStruct:decodedStruct];
+      if (err == CHIP_NO_ERROR) {
+        return self;
+      }
+    }
+  }
+
+  LogAndConvertDecodingError(err, error);
+  return nil;
+}
+{{/if}}
+
+@end
+
+{{/if}}
 @implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params (PrivateMethods)
 
 {{#if (isStrEqual source "server")}}

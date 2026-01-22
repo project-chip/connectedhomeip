@@ -100,12 +100,14 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 {{#zcl_clusters}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (compatClusterNameRemapping name))}}
 {{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRBaseCluster" (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRBaseCluster{{compatClusterNameRemapping name}} : MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
 
 {{/if}}
+{{/unless}}
 {{/unless}}
 {{/zcl_clusters}}
 
@@ -174,6 +176,7 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
 {{#zcl_clusters}}
 {{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 @interface MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
@@ -235,6 +238,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 @end
 
+{{/unless}}
 {{/if}}
 {{/zcl_clusters}}
 

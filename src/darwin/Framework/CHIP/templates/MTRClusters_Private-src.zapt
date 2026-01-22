@@ -1,31 +1,4 @@
-{{> header excludeZapComment=true}}
-
-#import <Foundation/Foundation.h>
-
-#import "MTRClusterConstants.h"
-#import "MTRDevice_Internal.h"
-#import "MTRCluster_Internal.h"
-#import "MTRClusters_Private.h"
-#import "MTRStructsObjc.h"
-#import "MTRCommandPayloadsObjc.h"
-#import "MTRLogging_Internal.h"
-#import "MTRDefines_Internal.h"
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <platform/CHIPDeviceLayer.h>
-
-#include <type_traits>
-
-using chip::Callback::Callback;
-using chip::Callback::Cancelable;
-using namespace chip::app::Clusters;
-using chip::Messaging::ExchangeManager;
-using chip::SessionHandle;
-using chip::Optional;
-using chip::System::Clock::Timeout;
-using chip::System::Clock::Seconds16;
-
-// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+{{> clusters_src_header clustersHeader="MTRClusters_Private.h"}}
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
@@ -36,44 +9,7 @@ using chip::System::Clock::Seconds16;
 {{#if (isSupported cluster command=command)}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#*inline "paramsType"}}MTR{{cluster}}Cluster{{command}}Params{{/inline}}
-- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
-{
-    if (params == nil) {
-        params = [[{{> paramsType}} alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        {{#if hasSpecificResponse}}
-        completion(response, error);
-        {{else}}
-        completion(error);
-        {{/if}}
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-    {{#if mustUseTimedInvoke}}
-    if (timedInvokeTimeoutMs == nil) {
-      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
-    }
-    {{/if}}
-
-    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-{{#if hasSpecificResponse}}
-                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
-{{else}}
-                                     responseClass:nil
-{{/if}}
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
+{{> clusters_command_impl cluster=cluster}}
 {{/if}}
 {{/inline}}
 {{#if (is_str_equal source 'client')}}

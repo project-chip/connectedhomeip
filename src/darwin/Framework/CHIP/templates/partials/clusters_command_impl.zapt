@@ -1,0 +1,38 @@
+- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+{
+    if (params == nil) {
+        params = [[{{> paramsType}} alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        {{#if hasSpecificResponse}}
+        completion(response, error);
+        {{else}}
+        completion(error);
+        {{/if}}
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    {{#if mustUseTimedInvoke}}
+    if (timedInvokeTimeoutMs == nil) {
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+{{#if hasSpecificResponse}}
+                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
+{{else}}
+                                     responseClass:nil
+{{/if}}
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}

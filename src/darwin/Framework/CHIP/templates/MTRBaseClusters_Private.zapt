@@ -4,6 +4,7 @@
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import "MTRCommandPayloadsObjc_Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
