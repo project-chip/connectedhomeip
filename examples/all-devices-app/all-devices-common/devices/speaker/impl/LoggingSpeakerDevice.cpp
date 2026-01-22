@@ -35,7 +35,6 @@ LoggingSpeakerDevice::~LoggingSpeakerDevice()
     if (mIdentifyCluster.IsConstructed())
         mIdentifyCluster.Destroy();
 }
-}
 
 // LevelControlDelegate
 
