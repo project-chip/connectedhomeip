@@ -22,15 +22,17 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-LoggingSpeakerDevice::LoggingSpeakerDevice() : SpeakerDevice(*this, *this, mTimerDelegate)
-{}
+LoggingSpeakerDevice::LoggingSpeakerDevice() : SpeakerDevice(*this, *this, mTimerDelegate) {}
 
 LoggingSpeakerDevice::~LoggingSpeakerDevice()
 {
     // Ensure clusters are destroyed before mTimerDelegate (which is a member of this class)
-    if (mLevelControlCluster.IsConstructed()) mLevelControlCluster.Destroy();
-    if (mOnOffCluster.IsConstructed()) mOnOffCluster.Destroy();
-    if (mIdentifyCluster.IsConstructed()) mIdentifyCluster.Destroy();
+    if (mLevelControlCluster.IsConstructed())
+        mLevelControlCluster.Destroy();
+    if (mOnOffCluster.IsConstructed())
+        mOnOffCluster.Destroy();
+    if (mIdentifyCluster.IsConstructed())
+        mIdentifyCluster.Destroy();
 }
 
 // LevelControlDelegate
@@ -82,7 +84,7 @@ bool LoggingSpeakerDevice::GetOnOff() const
     // SpeakerDevice::OnOffCluster() is not const.
     // But GetOnOff is const.
     // I can const_cast 'this'.
-    return const_cast<LoggingSpeakerDevice*>(this)->OnOffCluster().GetOnOff();
+    return const_cast<LoggingSpeakerDevice *>(this)->OnOffCluster().GetOnOff();
 }
 
 // OnOffDelegate
