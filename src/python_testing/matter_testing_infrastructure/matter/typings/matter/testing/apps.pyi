@@ -6,6 +6,7 @@ from typing import Any, BinaryIO, List, Optional, Union
 
 from matter.testing.tasks import Subprocess
 
+
 @dataclass
 class OtaImagePath:
     path: str
@@ -53,5 +54,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def kill(self) -> None: ...
 
     def get_pid(self) -> int: ...
-
-    def read_from_logs(self, pattern: str, regex: bool = True, before: int = 4, after: int = 4) -> list[dict]: ...

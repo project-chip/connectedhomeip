@@ -5516,10 +5516,10 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "endpoints": "int",
-                    "keyID": "int",
+                    "keySetID": "int",
                     "key": "bytes",
-                    "gracePeriod": "int",
                     "useAuxiliaryACL": "bool",
+                    "replaceEndpoints": "bool",
                 },
             },
             0x00000001: {
@@ -5535,20 +5535,12 @@ class ChipClusters:
                 "commandName": "UpdateGroupKey",
                 "args": {
                     "groupID": "int",
-                    "keyID": "int",
+                    "keySetID": "int",
                     "key": "bytes",
-                    "gracePeriod": "int",
                 },
             },
             0x00000004: {
                 "commandId": 0x00000004,
-                "commandName": "ExpireGracePeriod",
-                "args": {
-                    "groupID": "int",
-                },
-            },
-            0x00000005: {
-                "commandId": 0x00000005,
                 "commandName": "ConfigureAuxiliaryACL",
                 "args": {
                     "groupID": "int",
@@ -13930,6 +13922,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PlayChimeSound",
                 "args": {
+                    "chimeID": "int",
                 },
             },
         },

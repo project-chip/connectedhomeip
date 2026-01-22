@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <clusters/TlsClientManagement/Attributes.h>
 #include <clusters/TlsClientManagement/Metadata.h>
 #include <pw_unit_test/framework.h>
@@ -143,7 +143,7 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
 };
 
-class MockTlsClientManagementDelegate : public TlsClientManagementDelegate
+class MockTLSClientManagementDelegate : public TLSClientManagementDelegate
 {
 public:
     struct MockEndpoint
@@ -277,7 +277,7 @@ public:
     }
 };
 
-struct TestTlsClientManagementCluster : public ::testing::Test
+struct TestTLSClientManagementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
@@ -295,19 +295,23 @@ struct TestTlsClientManagementCluster : public ::testing::Test
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+    void TearDown() override
+    {
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        app::SetSafeAttributePersistenceProvider(nullptr);
+    }
 
-    MockTlsClientManagementDelegate mMockDelegate;
+    MockTLSClientManagementDelegate mMockDelegate;
     MockCertificateTable mMockCertTable;
 
-    TlsClientManagementCluster mCluster{ kTestEndpointId, mMockDelegate, mMockCertTable, kMaxProvisioned };
+    TLSClientManagementCluster mCluster{ kTestEndpointId, mMockDelegate, mMockCertTable, kMaxProvisioned };
 
     ClusterTester mClusterTester{ mCluster };
 
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
-TEST_F(TestTlsClientManagementCluster, TestAttributesList)
+TEST_F(TestTLSClientManagementCluster, TestAttributesList)
 {
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> listBuilder;
     EXPECT_EQ(mCluster.Attributes(ConcreteClusterPath(kTestEndpointId, TlsClientManagement::Id), listBuilder), CHIP_NO_ERROR);
@@ -319,7 +323,7 @@ TEST_F(TestTlsClientManagementCluster, TestAttributesList)
     EXPECT_TRUE(EqualAttributeSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
 }
 
-TEST_F(TestTlsClientManagementCluster, TestAcceptedCommands)
+TEST_F(TestTLSClientManagementCluster, TestAcceptedCommands)
 {
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> listBuilder;
     EXPECT_EQ(mCluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, TlsClientManagement::Id), listBuilder), CHIP_NO_ERROR);
@@ -336,28 +340,28 @@ TEST_F(TestTlsClientManagementCluster, TestAcceptedCommands)
     EXPECT_TRUE(EqualAcceptedCommandSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
 }
 
-TEST_F(TestTlsClientManagementCluster, TestReadMaxProvisioned)
+TEST_F(TestTLSClientManagementCluster, TestReadMaxProvisioned)
 {
     uint8_t maxProvisioned = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::MaxProvisioned::Id, maxProvisioned), CHIP_NO_ERROR);
     EXPECT_EQ(maxProvisioned, kMaxProvisioned);
 }
 
-TEST_F(TestTlsClientManagementCluster, TestReadClusterRevision)
+TEST_F(TestTLSClientManagementCluster, TestReadClusterRevision)
 {
     uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, kRevision);
 }
 
-TEST_F(TestTlsClientManagementCluster, TestReadFeatureMap)
+TEST_F(TestTLSClientManagementCluster, TestReadFeatureMap)
 {
     uint32_t featureMap = 1;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, 0u);
 }
 
-TEST_F(TestTlsClientManagementCluster, TestReadProvisionedEndpointsEmpty)
+TEST_F(TestTLSClientManagementCluster, TestReadProvisionedEndpointsEmpty)
 {
     Attributes::ProvisionedEndpoints::TypeInfo::DecodableType list;
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::ProvisionedEndpoints::Id, list), CHIP_NO_ERROR);
@@ -366,7 +370,7 @@ TEST_F(TestTlsClientManagementCluster, TestReadProvisionedEndpointsEmpty)
     EXPECT_FALSE(it.Next());
 }
 
-TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointSuccess)
+TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointSuccess)
 {
     Commands::ProvisionEndpoint::Type request;
     const char * hostnameStr = "example.com";
@@ -387,7 +391,7 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointSuccess)
     EXPECT_EQ(mMockDelegate.endpoints[0].endpointID, 1);
 }
 
-TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointConstraintErrors)
+TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
 {
     // Test hostname too short
     Commands::ProvisionEndpoint::Type request;
@@ -411,7 +415,7 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointConstraintErrors)
     EXPECT_FALSE(result.IsSuccess());
 }
 
-TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointRootCertNotFound)
+TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRootCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
     const char * exampleHostname = "example.com";
@@ -428,7 +432,7 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointRootCertNotFound)
     }
 }
 
-TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointClientCertNotFound)
+TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointClientCertNotFound)
 {
     Commands::ProvisionEndpoint::Type request;
     const char * hostnameForClientTest = "example.com";
@@ -440,7 +444,7 @@ TEST_F(TestTlsClientManagementCluster, TestProvisionEndpointClientCertNotFound)
     EXPECT_FALSE(result.IsSuccess());
 }
 
-TEST_F(TestTlsClientManagementCluster, TestFindEndpointSuccess)
+TEST_F(TestTLSClientManagementCluster, TestFindEndpointSuccess)
 {
     // First provision an endpoint
     Commands::ProvisionEndpoint::Type provisionReq;
@@ -475,7 +479,7 @@ TEST_F(TestTlsClientManagementCluster, TestFindEndpointSuccess)
     }
 }
 
-TEST_F(TestTlsClientManagementCluster, TestFindEndpointNotFound)
+TEST_F(TestTLSClientManagementCluster, TestFindEndpointNotFound)
 {
     Commands::FindEndpoint::Type request;
     request.endpointID = 999; // Non-existent endpoint
@@ -488,7 +492,7 @@ TEST_F(TestTlsClientManagementCluster, TestFindEndpointNotFound)
     }
 }
 
-TEST_F(TestTlsClientManagementCluster, TestFindEndpointConstraintError)
+TEST_F(TestTLSClientManagementCluster, TestFindEndpointConstraintError)
 {
     Commands::FindEndpoint::Type request;
     request.endpointID = 65535; // Exceeds kMaxTlsEndpointId
@@ -501,7 +505,7 @@ TEST_F(TestTlsClientManagementCluster, TestFindEndpointConstraintError)
     }
 }
 
-TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointSuccess)
+TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointSuccess)
 {
     // First provision an endpoint
     Commands::ProvisionEndpoint::Type provisionReq;
@@ -533,7 +537,7 @@ TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointSuccess)
     EXPECT_EQ(mMockDelegate.endpoints.size(), 0u);
 }
 
-TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointNotFound)
+TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointNotFound)
 {
     Commands::RemoveEndpoint::Type request;
     request.endpointID = 999; // Non-existent endpoint
@@ -546,7 +550,7 @@ TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointNotFound)
     }
 }
 
-TEST_F(TestTlsClientManagementCluster, TestRemoveEndpointConstraintError)
+TEST_F(TestTLSClientManagementCluster, TestRemoveEndpointConstraintError)
 {
     Commands::RemoveEndpoint::Type request;
     request.endpointID = 65535; // Exceeds kMaxTlsEndpointId
