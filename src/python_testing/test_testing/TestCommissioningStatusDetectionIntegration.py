@@ -57,7 +57,9 @@ from mobly import asserts
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 # Add python_testing directory to path so mdns_discovery module is available
 PYTHON_TESTING_DIR = Path(__file__).parent.parent
