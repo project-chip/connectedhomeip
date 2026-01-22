@@ -51,7 +51,6 @@ public:
 
     DataModel::ActionReturnStatus TriggerDyingLight(OnOff::DyingLightEffectVariantEnum e) override
     {
-
         switch (e)
         {
         case OnOff::DyingLightEffectVariantEnum::kDyingLightFadeOff:

@@ -70,7 +70,6 @@ class CodeDrivenDataModelDevices
 public:
     CodeDrivenDataModelDevices(chip::PersistentStorageDelegate & storageDelegate) :
         mStorageDelegate(storageDelegate), mDataModelProvider(storageDelegate, mAttributePersistence), mRootNode(&mWifiDriver)
-
     {
         mWifiDriver.Set5gSupport(true);
     }
