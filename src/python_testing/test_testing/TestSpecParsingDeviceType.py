@@ -453,7 +453,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             self.create_good_device(id)
             for cluster_id, cluster in dt.server_clusters.items():
                 if not conformance_allowed(cluster.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES), False):
-                    self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList].append(cluster_id)
+                    self.test.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList].append(cluster_id)
                     expected_problems += 1
             if expected_problems == 0:
                 continue
