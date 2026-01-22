@@ -95,6 +95,46 @@
         {
             "name": "placeholder_comment",
             "path": "partials/placeholder_comment.zapt"
+        },
+        {
+            "name": "command_timed_invoke_properties",
+            "path": "partials/command_timed_invoke_properties.zapt"
+        },
+        {
+            "name": "command_init_with_response_value_decl",
+            "path": "partials/command_init_with_response_value_decl.zapt"
+        },
+        {
+            "name": "command_params_init_impl",
+            "path": "partials/command_params_init_impl.zapt"
+        },
+        {
+            "name": "command_params_copy_impl",
+            "path": "partials/command_params_copy_impl.zapt"
+        },
+        {
+            "name": "command_params_description_impl",
+            "path": "partials/command_params_description_impl.zapt"
+        },
+        {
+            "name": "command_params_internal_methods",
+            "path": "partials/command_params_internal_methods.zapt"
+        },
+        {
+            "name": "command_old_name_decl",
+            "path": "partials/command_old_name_decl.zapt"
+        },
+        {
+            "name": "command_old_name_impl",
+            "path": "partials/command_old_name_impl.zapt"
+        },
+        {
+            "name": "command_deprecated_fields_decl",
+            "path": "partials/command_deprecated_fields_decl.zapt"
+        },
+        {
+            "name": "command_deprecated_fields_impl",
+            "path": "partials/command_deprecated_fields_impl.zapt"
         }
     ],
     "templates": [
