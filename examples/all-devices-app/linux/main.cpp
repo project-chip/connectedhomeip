@@ -59,7 +59,9 @@ void StopSignalHandler(int /* signal */)
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
-        SuccessOrDie(SystemLayer().ScheduleLambda([]() { SuccessOrDie(PlatformMgr().StopEventLoopTask()); }));
+        // NOTE: using VerifyOrDie instead of SuccessOrDie to not have nested `__err` declarations because
+        //       that causes compilers to complain about shadowing.
+        VerifyOrDie(SystemLayer().ScheduleLambda([]() { SuccessOrDie(PlatformMgr().StopEventLoopTask()); }) == CHIP_NO_ERROR);
     }
 }
 
