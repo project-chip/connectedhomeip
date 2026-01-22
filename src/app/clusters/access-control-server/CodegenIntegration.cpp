@@ -18,6 +18,7 @@
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/static-cluster-config/AccessControl.h>
 #include <app/util/config.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
 namespace {
@@ -69,7 +70,7 @@ void MatterAccessControlClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterAccessControlClusterShutdownCallback(EndpointId endpointId)
+void MatterAccessControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -80,7 +81,7 @@ void MatterAccessControlClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = AccessControl::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterAccessControlPluginServerInitCallback() {}

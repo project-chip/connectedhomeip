@@ -325,15 +325,6 @@ config("strict_warnings") {
     ]
 
     configs += [ "$dir_pw_build:clang_thread_safety_warnings" ]
-
-    # TODO: can make this back fatal in once pigweed updates can be taken again.
-    #       See https://github.com/project-chip/connectedhomeip/pull/22079
-    #
-    # Currently `./scripts/build/build_examples.py --target linux-arm64-light-rpc-ipv6only-clang build`
-    # fails in third_party/pigweed/repo/pw_protobuf
-    if (current_cpu == "arm64" && current_os == "linux") {
-      cflags += [ "-Wno-error=shorten-64-to-32" ]
-    }
   }
 
   if (!is_asan && (current_os == "linux" || current_os == "android")) {

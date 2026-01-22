@@ -28,12 +28,11 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-table.h>
 #include <app/util/ember-strings.h>
-#include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/odd-sized-integers.h>
 
 namespace chip {
 namespace app {
@@ -10615,53 +10614,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
 }
 
 } // namespace FeatureMap
-
-namespace ClusterRevision {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ScenesManagement::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
-}
-
-} // namespace ClusterRevision
 
 } // namespace Attributes
 } // namespace ScenesManagement

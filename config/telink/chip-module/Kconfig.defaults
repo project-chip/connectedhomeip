@@ -252,6 +252,13 @@ config RISCV_MTVEC_VECTORED_MODE
 config CHIP_OTA_REQUESTOR
     default y
 
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
+
 config MCUBOOT_SIGNATURE_KEY_FILE
     default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     depends on BOOTLOADER_MCUBOOT
@@ -382,9 +389,8 @@ config NET_MAX_CONTEXTS
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-    bool "Enable Telink Wi-Fi support"
     default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     select WIFI_W91
     select WIFI
@@ -516,10 +522,6 @@ config MBEDTLS_PSA_STATIC_KEY_SLOTS
 
 config MBEDTLS_PSA_CRYPTO_C
     bool "MBEDTLS_PSA_CRYPTO_C"
-    default n
-
-config CHIP_CRYPTO_PSA
-    bool "CHIP_CRYPTO_PSA"
     default n
 
 endif # !ZEPHYR_VERSION_3_3

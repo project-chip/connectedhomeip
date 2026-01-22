@@ -16,11 +16,12 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Enums.h>
 #include <clusters/UserLabel/Metadata.h>
@@ -35,6 +36,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
 using namespace chip::Testing;
+using chip::Testing::IsAttributesListEqualTo;
 
 // Mock DeviceInfoProvider for testing
 class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
@@ -75,7 +77,7 @@ struct TestUserLabelCluster : public ::testing::Test
 
     void TearDown() override
     {
-        userLabel.Shutdown();
+        userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
         DeviceLayer::SetDeviceInfoProvider(nullptr);
     }
 
@@ -90,13 +92,10 @@ struct TestUserLabelCluster : public ::testing::Test
 
 TEST_F(TestUserLabelCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(userLabel.Attributes(ConcreteClusterPath(kRootEndpointId, UserLabel::Id), attributes), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(UserLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(userLabel,
+                                        {
+                                            UserLabel::Attributes::LabelList::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestUserLabelCluster, ReadAttributeTest)

@@ -69,13 +69,13 @@ public:
 };
 #elif CHIP_SYSTEM_CONFIG_USE_SOCKETS
 template <class LayerImpl>
-class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerSocketsLoop, LayerImpl>::value>::type>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerSelectLoop, LayerImpl>::value>::type>
 {
 public:
     static bool HasServiceEvents() { return true; }
     static void ServiceEvents(Layer & aLayer)
     {
-        LayerSocketsLoop & layer = static_cast<LayerSocketsLoop &>(aLayer);
+        LayerSelectLoop & layer = static_cast<LayerSelectLoop &>(aLayer);
         layer.PrepareEvents();
         layer.WaitForEvents();
         layer.HandleEvents();
