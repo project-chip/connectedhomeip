@@ -90,7 +90,6 @@ PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
-    LogErrorOnFailure(mCluster->LoadCurrentConnections());
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
 }
@@ -136,9 +135,9 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
     {
         mCurrentConnections.push_back(transportConfiguration);
         result = UpsertResultEnum::kInserted;
+        LogErrorOnFailure(PersistAndNotify());
     }
 
-    if (mCluster) { LogErrorOnFailure(mCluster->PersistAndNotify()); }
     MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
                                            PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
@@ -159,7 +158,8 @@ void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uin
     // If a connection was removed, the size will be smaller.
     if (mCurrentConnections.size() < originalSize)
     {
-        if (mCluster) { LogErrorOnFailure(mCluster->PersistAndNotify()); }
+        LogErrorOnFailure(PersistAndNotify());
+
         // Notify the stack that the CurrentConnections attribute has changed.
         MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
                                                PushAvStreamTransport::Attributes::CurrentConnections::Id);
@@ -186,7 +186,7 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
 void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
-    ChipLogFailure(mDelegate->LoadCurrentConnections(mCurrentConnections), Zcl,
+    ChipLogFailure(LoadCurrentConnections(), Zcl,
                    "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
 
     // Signal delegate that all persistent configuration attributes have been loaded.
@@ -1736,9 +1736,9 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 CHIP_ERROR PushAvStreamTransportServerLogic::PersistAndNotify()
 {
     ReturnErrorAndLogOnFailure(StoreCurrentConnections(), Zcl,
-                               "PushAVStreamTransport[ep=%d]: Failed to persist current connections", mLogic.mEndpointId);
+                               "PushAVStreamTransport[ep=%d]: Failed to persist current connections", mEndpointId);
 
-    MatterReportingAttributeChangeCallback(mLogic.mEndpointId, PushAvStreamTransport::Id,
+    MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
                                            PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
     return CHIP_NO_ERROR;
@@ -1753,19 +1753,19 @@ CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
-    for (const auto & connection : mLogic.mCurrentConnections)
+    for (const auto & connection : mCurrentConnections)
     {
-        ReturnErrorOnFailure(connection.Encode(writer, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(connection.EncodeForWrite(writer, TLV::AnonymousTag()));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
     size_t len = writer.GetLengthWritten();
 
-    auto path = ConcreteAttributePath(mLogic.mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
     ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
 
-    ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mLogic.mCurrentConnections.size()));
+    ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
     return CHIP_NO_ERROR;
 }
 
@@ -1774,12 +1774,12 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
     MutableByteSpan span(buffer);
 
-    auto path = ConcreteAttributePath(mLogic.mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
 
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadValue(path, span);
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        mLogic.mCurrentConnections.clear();
+        mCurrentConnections.clear();
         ChipLogProgress(Zcl, "No persisted CurrentConnections found.");
         return CHIP_NO_ERROR;
     }
@@ -1792,19 +1792,18 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
-    mLogic.mCurrentConnections.clear();
+    mCurrentConnections.clear();
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TransportConfigurationStorage connection;
-        ReturnErrorOnFailure(connection.Decode(reader));
-        mLogic.mCurrentConnections.push_back(connection);
+        mCurrentConnections.push_back(connection);
     }
 
     VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
 
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
 
-    ChipLogProgress(Zcl, "Loaded %u CurrentConnections", static_cast<unsigned int>(mLogic.mCurrentConnections.size()));
+    ChipLogProgress(Zcl, "Loaded %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
 
     return reader.VerifyEndOfContainer();
 }

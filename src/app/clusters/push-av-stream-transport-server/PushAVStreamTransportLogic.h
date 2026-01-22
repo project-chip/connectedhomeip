@@ -32,7 +32,7 @@ std::string extractPath(const UriPathSegmentA * pathHead);
 class PushAvStreamTransportServerLogic
 {
 public:
-    PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures, PushAvStreamTransportServer * cluster);
+    PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     ~PushAvStreamTransportServerLogic();
 
     void SetDelegate(PushAvStreamTransportDelegate * delegate)
@@ -142,7 +142,6 @@ public:
     Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
-    PushAvStreamTransportServer * mCluster                               = nullptr;
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
