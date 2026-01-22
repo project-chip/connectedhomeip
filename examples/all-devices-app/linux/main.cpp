@@ -71,7 +71,9 @@ public:
     CodeDrivenDataModelDevices(chip::PersistentStorageDelegate & storageDelegate) :
         mStorageDelegate(storageDelegate), mDataModelProvider(storageDelegate, mAttributePersistence), mRootNode(&mWifiDriver)
     {
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
         mWifiDriver.Set5gSupport(true);
+#endif
     }
 
     CHIP_ERROR Init()
@@ -101,7 +103,15 @@ public:
 private:
     chip::PersistentStorageDelegate & mStorageDelegate;
     chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
     DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWifiDriver;
+#elif CHIP_DEVICE_LAYER_TARGET_DARWIN
+    DeviceLayer::NetworkCommissioning::DarwinWiFiDriver mWifiDriver;
+#else
+    #error "App can only be compiled on linux or darwin"
+#endif
+
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     WifiRootNodeDevice mRootNode;
