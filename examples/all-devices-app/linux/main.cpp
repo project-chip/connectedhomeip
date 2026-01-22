@@ -84,12 +84,9 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
             .configurationManager       = DeviceLayer::ConfigurationMgr(),
             .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-            .fabricTable                = Server::GetInstance().GetFabricTable(),
-            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),
-            .platformManager            = DeviceLayer::PlatformMgr(),
-            .groupDataProvider          = groupDataProvider,
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
-            .dnssdServer                = DnssdServer::Instance(),
+            .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
+            .platformManager = DeviceLayer::PlatformMgr(), .groupDataProvider = gGroupDataProvider,
+            .sessionManager = Server::GetInstance().GetSecureSessionManager(), .dnssdServer = DnssdServer::Instance(),
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
