@@ -74,9 +74,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
-    // Initialize the global provider with the storage delegate
-    SuccessOrDie(gGroupDataProvider.Init(delegate));
-
+    gGroupDataProvider.SetStorageDelegate(delegate);
+    SuccessOrDie(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     static WifiRootNodeDevice rootNodeDevice(
