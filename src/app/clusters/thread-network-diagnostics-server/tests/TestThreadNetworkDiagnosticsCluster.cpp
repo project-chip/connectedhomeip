@@ -245,6 +245,72 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
     }
 }
 
+void TestMandatoryAttributes(ClusterTester & tester)
+{
+    uint16_t revision{};
+    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
+
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+
+    Attributes::Channel::TypeInfo::Type channel;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::Channel::Id, channel), CHIP_NO_ERROR);
+
+    RoutingRole::TypeInfo::Type routingRole;
+    ASSERT_EQ(tester.ReadAttribute(RoutingRole::Id, routingRole), CHIP_NO_ERROR);
+
+    NetworkName::TypeInfo::Type networkName;
+    ASSERT_EQ(tester.ReadAttribute(NetworkName::Id, networkName), CHIP_NO_ERROR);
+
+    PanId::TypeInfo::Type panId;
+    ASSERT_EQ(tester.ReadAttribute(PanId::Id, panId), CHIP_NO_ERROR);
+
+    ExtendedPanId::TypeInfo::Type extendedPanId;
+    ASSERT_EQ(tester.ReadAttribute(ExtendedPanId::Id, extendedPanId), CHIP_NO_ERROR);
+
+    MeshLocalPrefix::TypeInfo::Type meshLocalPrefix;
+    ASSERT_EQ(tester.ReadAttribute(MeshLocalPrefix::Id, meshLocalPrefix), CHIP_NO_ERROR);
+
+    NeighborTable::TypeInfo::DecodableType neighborTable;
+    ASSERT_EQ(tester.ReadAttribute(NeighborTable::Id, neighborTable), CHIP_NO_ERROR);
+
+    RouteTable::TypeInfo::DecodableType routeTable;
+    ASSERT_EQ(tester.ReadAttribute(RouteTable::Id, routeTable), CHIP_NO_ERROR);
+
+    PartitionId::TypeInfo::Type partitionId;
+    ASSERT_EQ(tester.ReadAttribute(PartitionId::Id, partitionId), CHIP_NO_ERROR);
+
+    Weighting::TypeInfo::Type weighting;
+    ASSERT_EQ(tester.ReadAttribute(Weighting::Id, weighting), CHIP_NO_ERROR);
+
+    Attributes::DataVersion::TypeInfo::Type dataVersion;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DataVersion::Id, dataVersion), CHIP_NO_ERROR);
+
+    StableDataVersion::TypeInfo::Type stableDataVersion;
+    ASSERT_EQ(tester.ReadAttribute(StableDataVersion::Id, stableDataVersion), CHIP_NO_ERROR);
+
+    LeaderRouterId::TypeInfo::Type leaderRouterId;
+    ASSERT_EQ(tester.ReadAttribute(LeaderRouterId::Id, leaderRouterId), CHIP_NO_ERROR);
+
+    SecurityPolicy::TypeInfo::DecodableType securityPolicy;
+    ASSERT_EQ(tester.ReadAttribute(SecurityPolicy::Id, securityPolicy), CHIP_NO_ERROR);
+
+    ChannelPage0Mask::TypeInfo::Type channelPage0Mask;
+    ASSERT_EQ(tester.ReadAttribute(ChannelPage0Mask::Id, channelPage0Mask), CHIP_NO_ERROR);
+
+    OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
+    ASSERT_EQ(tester.ReadAttribute(OperationalDatasetComponents::Id, operationalDatasetComponents), CHIP_NO_ERROR);
+
+    ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
+    ASSERT_EQ(tester.ReadAttribute(ActiveNetworkFaultsList::Id, activeNetworkFaultsList), CHIP_NO_ERROR);
+
+    ExtAddress::TypeInfo::Type extAddress;
+    ASSERT_EQ(tester.ReadAttribute(ExtAddress::Id, extAddress), CHIP_NO_ERROR);
+
+    Rloc16::TypeInfo::Type rloc16;
+    ASSERT_EQ(tester.ReadAttribute(Rloc16::Id, rloc16), CHIP_NO_ERROR);
+}
+
 TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 {
     {
@@ -255,68 +321,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
         ClusterTester tester(threadNetworkDiagnostics);
 
-        uint16_t revision{};
-        ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-
-        uint32_t featureMap{};
-        ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-
-        Attributes::Channel::TypeInfo::Type channel;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::Channel::Id, channel), CHIP_NO_ERROR);
-
-        RoutingRole::TypeInfo::Type routingRole;
-        ASSERT_EQ(tester.ReadAttribute(RoutingRole::Id, routingRole), CHIP_NO_ERROR);
-
-        NetworkName::TypeInfo::Type networkName;
-        ASSERT_EQ(tester.ReadAttribute(NetworkName::Id, networkName), CHIP_NO_ERROR);
-
-        PanId::TypeInfo::Type panId;
-        ASSERT_EQ(tester.ReadAttribute(PanId::Id, panId), CHIP_NO_ERROR);
-
-        ExtendedPanId::TypeInfo::Type extendedPanId;
-        ASSERT_EQ(tester.ReadAttribute(ExtendedPanId::Id, extendedPanId), CHIP_NO_ERROR);
-
-        MeshLocalPrefix::TypeInfo::Type meshLocalPrefix;
-        ASSERT_EQ(tester.ReadAttribute(MeshLocalPrefix::Id, meshLocalPrefix), CHIP_NO_ERROR);
-
-        NeighborTable::TypeInfo::DecodableType neighborTable;
-        ASSERT_EQ(tester.ReadAttribute(NeighborTable::Id, neighborTable), CHIP_NO_ERROR);
-
-        RouteTable::TypeInfo::DecodableType routeTable;
-        ASSERT_EQ(tester.ReadAttribute(RouteTable::Id, routeTable), CHIP_NO_ERROR);
-
-        PartitionId::TypeInfo::Type partitionId;
-        ASSERT_EQ(tester.ReadAttribute(PartitionId::Id, partitionId), CHIP_NO_ERROR);
-
-        Weighting::TypeInfo::Type weighting;
-        ASSERT_EQ(tester.ReadAttribute(Weighting::Id, weighting), CHIP_NO_ERROR);
-
-        Attributes::DataVersion::TypeInfo::Type dataVersion;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::DataVersion::Id, dataVersion), CHIP_NO_ERROR);
-
-        StableDataVersion::TypeInfo::Type stableDataVersion;
-        ASSERT_EQ(tester.ReadAttribute(StableDataVersion::Id, stableDataVersion), CHIP_NO_ERROR);
-
-        LeaderRouterId::TypeInfo::Type leaderRouterId;
-        ASSERT_EQ(tester.ReadAttribute(LeaderRouterId::Id, leaderRouterId), CHIP_NO_ERROR);
-
-        SecurityPolicy::TypeInfo::DecodableType securityPolicy;
-        ASSERT_EQ(tester.ReadAttribute(SecurityPolicy::Id, securityPolicy), CHIP_NO_ERROR);
-
-        ChannelPage0Mask::TypeInfo::Type channelPage0Mask;
-        ASSERT_EQ(tester.ReadAttribute(ChannelPage0Mask::Id, channelPage0Mask), CHIP_NO_ERROR);
-
-        OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
-        ASSERT_EQ(tester.ReadAttribute(OperationalDatasetComponents::Id, operationalDatasetComponents), CHIP_NO_ERROR);
-
-        ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
-        ASSERT_EQ(tester.ReadAttribute(ActiveNetworkFaultsList::Id, activeNetworkFaultsList), CHIP_NO_ERROR);
-
-        ExtAddress::TypeInfo::Type extAddress;
-        ASSERT_EQ(tester.ReadAttribute(ExtAddress::Id, extAddress), CHIP_NO_ERROR);
-
-        Rloc16::TypeInfo::Type rloc16;
-        ASSERT_EQ(tester.ReadAttribute(Rloc16::Id, rloc16), CHIP_NO_ERROR);
+        TestMandatoryAttributes(tester);
 
         threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -332,68 +337,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
         ClusterTester tester(threadNetworkDiagnostics);
 
-        uint16_t revision{};
-        ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-
-        uint32_t featureMap{};
-        ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-
-        Attributes::Channel::TypeInfo::Type channel;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::Channel::Id, channel), CHIP_NO_ERROR);
-
-        RoutingRole::TypeInfo::Type routingRole;
-        ASSERT_EQ(tester.ReadAttribute(RoutingRole::Id, routingRole), CHIP_NO_ERROR);
-
-        NetworkName::TypeInfo::Type networkName;
-        ASSERT_EQ(tester.ReadAttribute(NetworkName::Id, networkName), CHIP_NO_ERROR);
-
-        PanId::TypeInfo::Type panId;
-        ASSERT_EQ(tester.ReadAttribute(PanId::Id, panId), CHIP_NO_ERROR);
-
-        ExtendedPanId::TypeInfo::Type extendedPanId;
-        ASSERT_EQ(tester.ReadAttribute(ExtendedPanId::Id, extendedPanId), CHIP_NO_ERROR);
-
-        MeshLocalPrefix::TypeInfo::Type meshLocalPrefix;
-        ASSERT_EQ(tester.ReadAttribute(MeshLocalPrefix::Id, meshLocalPrefix), CHIP_NO_ERROR);
-
-        NeighborTable::TypeInfo::DecodableType neighborTable;
-        ASSERT_EQ(tester.ReadAttribute(NeighborTable::Id, neighborTable), CHIP_NO_ERROR);
-
-        RouteTable::TypeInfo::DecodableType routeTable;
-        ASSERT_EQ(tester.ReadAttribute(RouteTable::Id, routeTable), CHIP_NO_ERROR);
-
-        PartitionId::TypeInfo::Type partitionId;
-        ASSERT_EQ(tester.ReadAttribute(PartitionId::Id, partitionId), CHIP_NO_ERROR);
-
-        Weighting::TypeInfo::Type weighting;
-        ASSERT_EQ(tester.ReadAttribute(Weighting::Id, weighting), CHIP_NO_ERROR);
-
-        Attributes::DataVersion::TypeInfo::Type dataVersion;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::DataVersion::Id, dataVersion), CHIP_NO_ERROR);
-
-        StableDataVersion::TypeInfo::Type stableDataVersion;
-        ASSERT_EQ(tester.ReadAttribute(StableDataVersion::Id, stableDataVersion), CHIP_NO_ERROR);
-
-        LeaderRouterId::TypeInfo::Type leaderRouterId;
-        ASSERT_EQ(tester.ReadAttribute(LeaderRouterId::Id, leaderRouterId), CHIP_NO_ERROR);
-
-        SecurityPolicy::TypeInfo::DecodableType securityPolicy;
-        ASSERT_EQ(tester.ReadAttribute(SecurityPolicy::Id, securityPolicy), CHIP_NO_ERROR);
-
-        ChannelPage0Mask::TypeInfo::Type channelPage0Mask;
-        ASSERT_EQ(tester.ReadAttribute(ChannelPage0Mask::Id, channelPage0Mask), CHIP_NO_ERROR);
-
-        OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
-        ASSERT_EQ(tester.ReadAttribute(OperationalDatasetComponents::Id, operationalDatasetComponents), CHIP_NO_ERROR);
-
-        ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
-        ASSERT_EQ(tester.ReadAttribute(ActiveNetworkFaultsList::Id, activeNetworkFaultsList), CHIP_NO_ERROR);
-
-        ExtAddress::TypeInfo::Type extAddress;
-        ASSERT_EQ(tester.ReadAttribute(ExtAddress::Id, extAddress), CHIP_NO_ERROR);
-
-        Rloc16::TypeInfo::Type rloc16;
-        ASSERT_EQ(tester.ReadAttribute(Rloc16::Id, rloc16), CHIP_NO_ERROR);
+        TestMandatoryAttributes(tester);
 
         ActiveTimestamp::TypeInfo::Type activeTimestamp;
         ASSERT_EQ(tester.ReadAttribute(ActiveTimestamp::Id, activeTimestamp), CHIP_NO_ERROR);
@@ -423,68 +367,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
         ClusterTester tester(threadNetworkDiagnostics);
 
-        uint16_t revision{};
-        ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-
-        uint32_t featureMap{};
-        ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-
-        Attributes::Channel::TypeInfo::Type channel;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::Channel::Id, channel), CHIP_NO_ERROR);
-
-        RoutingRole::TypeInfo::Type routingRole;
-        ASSERT_EQ(tester.ReadAttribute(RoutingRole::Id, routingRole), CHIP_NO_ERROR);
-
-        NetworkName::TypeInfo::Type networkName;
-        ASSERT_EQ(tester.ReadAttribute(NetworkName::Id, networkName), CHIP_NO_ERROR);
-
-        PanId::TypeInfo::Type panId;
-        ASSERT_EQ(tester.ReadAttribute(PanId::Id, panId), CHIP_NO_ERROR);
-
-        ExtendedPanId::TypeInfo::Type extendedPanId;
-        ASSERT_EQ(tester.ReadAttribute(ExtendedPanId::Id, extendedPanId), CHIP_NO_ERROR);
-
-        MeshLocalPrefix::TypeInfo::Type meshLocalPrefix;
-        ASSERT_EQ(tester.ReadAttribute(MeshLocalPrefix::Id, meshLocalPrefix), CHIP_NO_ERROR);
-
-        NeighborTable::TypeInfo::DecodableType neighborTable;
-        ASSERT_EQ(tester.ReadAttribute(NeighborTable::Id, neighborTable), CHIP_NO_ERROR);
-
-        RouteTable::TypeInfo::DecodableType routeTable;
-        ASSERT_EQ(tester.ReadAttribute(RouteTable::Id, routeTable), CHIP_NO_ERROR);
-
-        PartitionId::TypeInfo::Type partitionId;
-        ASSERT_EQ(tester.ReadAttribute(PartitionId::Id, partitionId), CHIP_NO_ERROR);
-
-        Weighting::TypeInfo::Type weighting;
-        ASSERT_EQ(tester.ReadAttribute(Weighting::Id, weighting), CHIP_NO_ERROR);
-
-        Attributes::DataVersion::TypeInfo::Type dataVersion;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::DataVersion::Id, dataVersion), CHIP_NO_ERROR);
-
-        StableDataVersion::TypeInfo::Type stableDataVersion;
-        ASSERT_EQ(tester.ReadAttribute(StableDataVersion::Id, stableDataVersion), CHIP_NO_ERROR);
-
-        LeaderRouterId::TypeInfo::Type leaderRouterId;
-        ASSERT_EQ(tester.ReadAttribute(LeaderRouterId::Id, leaderRouterId), CHIP_NO_ERROR);
-
-        SecurityPolicy::TypeInfo::DecodableType securityPolicy;
-        ASSERT_EQ(tester.ReadAttribute(SecurityPolicy::Id, securityPolicy), CHIP_NO_ERROR);
-
-        ChannelPage0Mask::TypeInfo::Type channelPage0Mask;
-        ASSERT_EQ(tester.ReadAttribute(ChannelPage0Mask::Id, channelPage0Mask), CHIP_NO_ERROR);
-
-        OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
-        ASSERT_EQ(tester.ReadAttribute(OperationalDatasetComponents::Id, operationalDatasetComponents), CHIP_NO_ERROR);
-
-        ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
-        ASSERT_EQ(tester.ReadAttribute(ActiveNetworkFaultsList::Id, activeNetworkFaultsList), CHIP_NO_ERROR);
-
-        ExtAddress::TypeInfo::Type extAddress;
-        ASSERT_EQ(tester.ReadAttribute(ExtAddress::Id, extAddress), CHIP_NO_ERROR);
-
-        Rloc16::TypeInfo::Type rloc16;
-        ASSERT_EQ(tester.ReadAttribute(Rloc16::Id, rloc16), CHIP_NO_ERROR);
+        TestMandatoryAttributes(tester);
 
         DetachedRoleCount::TypeInfo::Type detachedRoleCount;
         ASSERT_EQ(tester.ReadAttribute(DetachedRoleCount::Id, detachedRoleCount), CHIP_NO_ERROR);
@@ -555,68 +438,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
         ClusterTester tester(threadNetworkDiagnostics);
 
-        uint16_t revision{};
-        ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-
-        uint32_t featureMap{};
-        ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-
-        Attributes::Channel::TypeInfo::Type channel;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::Channel::Id, channel), CHIP_NO_ERROR);
-
-        RoutingRole::TypeInfo::Type routingRole;
-        ASSERT_EQ(tester.ReadAttribute(RoutingRole::Id, routingRole), CHIP_NO_ERROR);
-
-        NetworkName::TypeInfo::Type networkName;
-        ASSERT_EQ(tester.ReadAttribute(NetworkName::Id, networkName), CHIP_NO_ERROR);
-
-        PanId::TypeInfo::Type panId;
-        ASSERT_EQ(tester.ReadAttribute(PanId::Id, panId), CHIP_NO_ERROR);
-
-        ExtendedPanId::TypeInfo::Type extendedPanId;
-        ASSERT_EQ(tester.ReadAttribute(ExtendedPanId::Id, extendedPanId), CHIP_NO_ERROR);
-
-        MeshLocalPrefix::TypeInfo::Type meshLocalPrefix;
-        ASSERT_EQ(tester.ReadAttribute(MeshLocalPrefix::Id, meshLocalPrefix), CHIP_NO_ERROR);
-
-        NeighborTable::TypeInfo::DecodableType neighborTable;
-        ASSERT_EQ(tester.ReadAttribute(NeighborTable::Id, neighborTable), CHIP_NO_ERROR);
-
-        RouteTable::TypeInfo::DecodableType routeTable;
-        ASSERT_EQ(tester.ReadAttribute(RouteTable::Id, routeTable), CHIP_NO_ERROR);
-
-        PartitionId::TypeInfo::Type partitionId;
-        ASSERT_EQ(tester.ReadAttribute(PartitionId::Id, partitionId), CHIP_NO_ERROR);
-
-        Weighting::TypeInfo::Type weighting;
-        ASSERT_EQ(tester.ReadAttribute(Weighting::Id, weighting), CHIP_NO_ERROR);
-
-        Attributes::DataVersion::TypeInfo::Type dataVersion;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::DataVersion::Id, dataVersion), CHIP_NO_ERROR);
-
-        StableDataVersion::TypeInfo::Type stableDataVersion;
-        ASSERT_EQ(tester.ReadAttribute(StableDataVersion::Id, stableDataVersion), CHIP_NO_ERROR);
-
-        LeaderRouterId::TypeInfo::Type leaderRouterId;
-        ASSERT_EQ(tester.ReadAttribute(LeaderRouterId::Id, leaderRouterId), CHIP_NO_ERROR);
-
-        SecurityPolicy::TypeInfo::DecodableType securityPolicy;
-        ASSERT_EQ(tester.ReadAttribute(SecurityPolicy::Id, securityPolicy), CHIP_NO_ERROR);
-
-        ChannelPage0Mask::TypeInfo::Type channelPage0Mask;
-        ASSERT_EQ(tester.ReadAttribute(ChannelPage0Mask::Id, channelPage0Mask), CHIP_NO_ERROR);
-
-        OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
-        ASSERT_EQ(tester.ReadAttribute(OperationalDatasetComponents::Id, operationalDatasetComponents), CHIP_NO_ERROR);
-
-        ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
-        ASSERT_EQ(tester.ReadAttribute(ActiveNetworkFaultsList::Id, activeNetworkFaultsList), CHIP_NO_ERROR);
-
-        ExtAddress::TypeInfo::Type extAddress;
-        ASSERT_EQ(tester.ReadAttribute(ExtAddress::Id, extAddress), CHIP_NO_ERROR);
-
-        Rloc16::TypeInfo::Type rloc16;
-        ASSERT_EQ(tester.ReadAttribute(Rloc16::Id, rloc16), CHIP_NO_ERROR);
+        TestMandatoryAttributes(tester);
 
         TxTotalCount::TypeInfo::Type txTotalCount;
         ASSERT_EQ(tester.ReadAttribute(TxTotalCount::Id, txTotalCount), CHIP_NO_ERROR);
@@ -731,68 +553,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
         ClusterTester tester(threadNetworkDiagnostics);
 
-        uint16_t revision{};
-        ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-
-        uint32_t featureMap{};
-        ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-
-        Attributes::Channel::TypeInfo::Type channel;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::Channel::Id, channel), CHIP_NO_ERROR);
-
-        RoutingRole::TypeInfo::Type routingRole;
-        ASSERT_EQ(tester.ReadAttribute(RoutingRole::Id, routingRole), CHIP_NO_ERROR);
-
-        NetworkName::TypeInfo::Type networkName;
-        ASSERT_EQ(tester.ReadAttribute(NetworkName::Id, networkName), CHIP_NO_ERROR);
-
-        PanId::TypeInfo::Type panId;
-        ASSERT_EQ(tester.ReadAttribute(PanId::Id, panId), CHIP_NO_ERROR);
-
-        ExtendedPanId::TypeInfo::Type extendedPanId;
-        ASSERT_EQ(tester.ReadAttribute(ExtendedPanId::Id, extendedPanId), CHIP_NO_ERROR);
-
-        MeshLocalPrefix::TypeInfo::Type meshLocalPrefix;
-        ASSERT_EQ(tester.ReadAttribute(MeshLocalPrefix::Id, meshLocalPrefix), CHIP_NO_ERROR);
-
-        NeighborTable::TypeInfo::DecodableType neighborTable;
-        ASSERT_EQ(tester.ReadAttribute(NeighborTable::Id, neighborTable), CHIP_NO_ERROR);
-
-        RouteTable::TypeInfo::DecodableType routeTable;
-        ASSERT_EQ(tester.ReadAttribute(RouteTable::Id, routeTable), CHIP_NO_ERROR);
-
-        PartitionId::TypeInfo::Type partitionId;
-        ASSERT_EQ(tester.ReadAttribute(PartitionId::Id, partitionId), CHIP_NO_ERROR);
-
-        Weighting::TypeInfo::Type weighting;
-        ASSERT_EQ(tester.ReadAttribute(Weighting::Id, weighting), CHIP_NO_ERROR);
-
-        Attributes::DataVersion::TypeInfo::Type dataVersion;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::DataVersion::Id, dataVersion), CHIP_NO_ERROR);
-
-        StableDataVersion::TypeInfo::Type stableDataVersion;
-        ASSERT_EQ(tester.ReadAttribute(StableDataVersion::Id, stableDataVersion), CHIP_NO_ERROR);
-
-        LeaderRouterId::TypeInfo::Type leaderRouterId;
-        ASSERT_EQ(tester.ReadAttribute(LeaderRouterId::Id, leaderRouterId), CHIP_NO_ERROR);
-
-        SecurityPolicy::TypeInfo::DecodableType securityPolicy;
-        ASSERT_EQ(tester.ReadAttribute(SecurityPolicy::Id, securityPolicy), CHIP_NO_ERROR);
-
-        ChannelPage0Mask::TypeInfo::Type channelPage0Mask;
-        ASSERT_EQ(tester.ReadAttribute(ChannelPage0Mask::Id, channelPage0Mask), CHIP_NO_ERROR);
-
-        OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
-        ASSERT_EQ(tester.ReadAttribute(OperationalDatasetComponents::Id, operationalDatasetComponents), CHIP_NO_ERROR);
-
-        ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
-        ASSERT_EQ(tester.ReadAttribute(ActiveNetworkFaultsList::Id, activeNetworkFaultsList), CHIP_NO_ERROR);
-
-        ExtAddress::TypeInfo::Type extAddress;
-        ASSERT_EQ(tester.ReadAttribute(ExtAddress::Id, extAddress), CHIP_NO_ERROR);
-
-        Rloc16::TypeInfo::Type rloc16;
-        ASSERT_EQ(tester.ReadAttribute(Rloc16::Id, rloc16), CHIP_NO_ERROR);
+        TestMandatoryAttributes(tester);
 
         OverrunCount::TypeInfo::Type overrunCount;
         ASSERT_EQ(tester.ReadAttribute(OverrunCount::Id, overrunCount), CHIP_NO_ERROR);
