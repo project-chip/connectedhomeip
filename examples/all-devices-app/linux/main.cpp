@@ -116,7 +116,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
-
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     SuccessOrDie(gGroupDataProvider.Init());
 
