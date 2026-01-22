@@ -49,7 +49,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(mEndpoint,
                                                                     &Clusters::TlsClientManagementCommandDelegate::GetInstance());
 
-    Clusters::PushAvStreamTransport::SetTlsCertificateManagementDelegate(
+    Clusters::PushAvStreamTransport::SetTLSCertificateManagementDelegate(
         mEndpoint, &Clusters::TlsCertificateManagementCommandDelegate::GetInstance());
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
