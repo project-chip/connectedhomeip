@@ -187,11 +187,24 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
     struct sigaction sa = {};
     sa.sa_handler       = StopSignalHandler;
     sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
+#elif CHIP_DEVICE_LAYER_TARGET_DARWIN
+    auto & platformMgr = chip::DeviceLayer::PlatformMgrImpl();
+    platformMgr.RegisterSignalHandler(SIGINT, ^{
+        platformMgr.UnregisterAllSignalHandlers();
+        StopSignalHandler(SIGINT);
+    });
+
+    platformMgr.RegisterSignalHandler(SIGTERM, ^{
+        platformMgr.UnregisterAllSignalHandlers();
+        StopSignalHandler(SIGTERM);
+    });
+#endif
 
     // This message is used as a marker for when the application process has started.
     // See: scripts/tests/chiptest/test_definition.py
