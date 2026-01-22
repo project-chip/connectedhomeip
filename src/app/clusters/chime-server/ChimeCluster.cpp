@@ -225,11 +225,8 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
     {
         return Protocols::InteractionModel::Status::NotFound;
     }
-    if (mSelectedChime != chimeID)
+    if (SetAttributeValue(mSelectedChime, chimeID, Attributes::SelectedChime::Id))
     {
-        mSelectedChime = chimeID;
-        NotifyAttributeChanged(Attributes::SelectedChime::Id);
-
         // TODO: Migrate to use context.attributeStorage
         TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
             { mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id }, mSelectedChime);
@@ -239,11 +236,8 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
 
 Status ChimeCluster::SetEnabled(bool enabled)
 {
-    if (mEnabled != enabled)
+    if (SetAttributeValue(mEnabled, enabled, Attributes::Enabled::Id))
     {
-        mEnabled = enabled;
-        NotifyAttributeChanged(Attributes::Enabled::Id);
-
         // TODO: Migrate to use context.attributeStorage
         TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
             { mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id }, mEnabled);

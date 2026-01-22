@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 
 namespace chip {
 namespace app {
@@ -36,13 +36,13 @@ namespace Clusters {
  *
  * @param delegate The delegate to be used by the TLS Client Management cluster.
  */
-void MatterTlsClientManagementSetDelegate(TlsClientManagementDelegate & delegate);
+void MatterTlsClientManagementSetDelegate(TLSClientManagementDelegate & delegate);
 
 /**
  * Set the certificate table for the TLS Client Management cluster.
  *
  * MUST be called before Matter data model initialization (e.g. in main() before ServerInit()).
- * The certificate table is used during cluster initialization via MatterTlsClientManagementClusterInitCallback.
+ * The certificate table is used during cluster initialization via MatterTLSClientManagementClusterInitCallback.
  * If called after cluster initialization, it will have no effect as the cluster instance
  * has already been created with the previous certificate table.
  *
