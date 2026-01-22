@@ -84,7 +84,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeDefault)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    uint16_t remainingTime;
+    uint16_t remainingTime = 0;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, remainingTime).IsSuccess());
     EXPECT_EQ(remainingTime, 0u);
 }
