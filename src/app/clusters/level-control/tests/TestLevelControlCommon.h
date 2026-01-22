@@ -53,17 +53,19 @@ public:
         mLevelChangedCalled = true;
     }
 
-        // OnOff methods
+    // OnOff methods
 
-        void SetOnOff(bool on) override { mSetOnOffCalled = true; mOn = on; }
+    void SetOnOff(bool on) override
+    {
+        mSetOnOffCalled = true;
+        mOn             = on;
+    }
 
-        bool GetOnOff() override { return mOn; }
+    bool GetOnOff() override { return mOn; }
 
-    
+    BitMask<OptionsBitmap> mOptions;
 
-        BitMask<OptionsBitmap> mOptions;
-
-        DataModel::Nullable<uint8_t> mOnLevel;
+    DataModel::Nullable<uint8_t> mOnLevel;
 
     DataModel::Nullable<uint8_t> mDefaultMoveRate;
 

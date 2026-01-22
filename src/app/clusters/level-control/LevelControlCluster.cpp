@@ -297,7 +297,6 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelHandler(CommandId 
     uint8_t currentLevel = mCurrentLevel.Value();
     mTargetLevel         = level;
     mCurrentCommandId    = commandId;
-    mIncreasing          = (mTargetLevel > currentLevel);
 
     // Calculate Transition Time in Milliseconds
     // Priority: Command argument > OnOffTransitionTime > 0 (Immediate)
@@ -311,28 +310,17 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelHandler(CommandId 
         transitionTimeMs = mOnOffTransitionTime * 100;
     }
 
-    mTransitionTimeMs = transitionTimeMs;
-    mElapsedTimeMs    = 0;
+    // Handle "With On/Off" commands
+    // Note: MoveToLevelWithOnOff always turns On if Off, regardless of direction.
+    HandleOnOffTask(commandId, true);
 
-    // Handle "With On/Off" commands: Turn On if moving up.
-    if ((commandId == Commands::MoveToLevelWithOnOff::Id) && mIncreasing)
-    {
-        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
-
-        // If turning on, ensure we start at least at MinLevel (Spec: "set CurrentLevel to MinLevel")
-        if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
-        {
-            SetCurrentLevel(mMinLevel);
-        }
-
-        if (!mCurrentLevel.IsNull())
-        {
-            currentLevel = mCurrentLevel.Value();
-        }
-    }
+    // Refresh CurrentLevel (might have changed due to OnOff logic) and set Direction
+    if (!mCurrentLevel.IsNull())
+        currentLevel = mCurrentLevel.Value();
+    mIncreasing = (mTargetLevel > currentLevel);
 
     // Immediate move
-    if (mTransitionTimeMs == 0)
+    if (transitionTimeMs == 0)
         return SetCurrentLevel(mTargetLevel);
 
     // Calculate duration per step
@@ -340,14 +328,11 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelHandler(CommandId 
     if (totalSteps == 0)
         return Protocols::InteractionModel::Status::Success;
 
-    mEventDurationMs = mTransitionTimeMs / totalSteps;
+    mEventDurationMs = transitionTimeMs / totalSteps;
     if (mEventDurationMs == 0)
         mEventDurationMs = 1;
 
-    // Update RemainingTime immediately for start of transition
-    UpdateRemainingTime(mTransitionTimeMs, true);
-
-    StartTimer(mEventDurationMs);
+    ScheduleTimer(mEventDurationMs, transitionTimeMs);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -377,9 +362,6 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
     if (currentRate == 0)
         return Protocols::InteractionModel::Status::Success;
 
-    mEventDurationMs = 1000 / currentRate;
-    mElapsedTimeMs   = 0;
-
     // Determine Direction first
     if (moveMode == MoveModeEnum::kUp)
     {
@@ -390,15 +372,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
         mIncreasing = false;
     }
 
-    if ((commandId == Commands::MoveWithOnOff::Id) && mIncreasing)
-    {
-        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
-
-        if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
-        {
-            SetCurrentLevel(mMinLevel);
-        }
-    }
+    HandleOnOffTask(commandId, mIncreasing);
 
     // Now determine Target and Check Constraints (safe from clobbering)
     if (mIncreasing)
@@ -433,10 +407,8 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
     else
         difference = currentLevel - mTargetLevel;
 
-    mTransitionTimeMs = difference * mEventDurationMs;
-    UpdateRemainingTime(mTransitionTimeMs, true);
-
-    StartTimer(mEventDurationMs);
+    mEventDurationMs = 1000 / currentRate;
+    ScheduleTimer(mEventDurationMs, difference * mEventDurationMs);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -470,15 +442,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StepHandler(CommandId command
         mIncreasing = false;
     }
 
-    if ((commandId == Commands::StepWithOnOff::Id) && mIncreasing)
-    {
-        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
-
-        if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
-        {
-            SetCurrentLevel(mMinLevel);
-        }
-    }
+    HandleOnOffTask(commandId, mIncreasing);
 
     // Recalculate everything based on potential new current level
     uint8_t currentLevel = mCurrentLevel.Value();
@@ -501,21 +465,18 @@ DataModel::ActionReturnStatus LevelControlCluster::StepHandler(CommandId command
         mTargetLevel = static_cast<uint8_t>(next);
     }
 
-    mTransitionTimeMs = transitionTimeMs;
-
-    if (mTransitionTimeMs == 0)
+    if (transitionTimeMs == 0)
         return SetCurrentLevel(mTargetLevel);
 
     uint8_t totalSteps = (mIncreasing) ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel);
     if (totalSteps == 0)
         return Protocols::InteractionModel::Status::Success;
 
-    mEventDurationMs = mTransitionTimeMs / totalSteps;
+    mEventDurationMs = transitionTimeMs / totalSteps;
     if (mEventDurationMs == 0)
         mEventDurationMs = 1;
 
-    UpdateRemainingTime(mTransitionTimeMs, true);
-    StartTimer(mEventDurationMs);
+    ScheduleTimer(mEventDurationMs, transitionTimeMs);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -882,6 +843,39 @@ void LevelControlCluster::OnOffChanged(bool isOn)
         BitMask<OptionsBitmap> options;
         MoveToLevelHandler(Commands::MoveToLevelWithOnOff::Id, mMinLevel, transitionTime, options, options);
     }
+}
+
+void LevelControlCluster::HandleOnOffTask(CommandId commandId, bool isMoveUp)
+{
+    if (mDelegate.GetOnOff())
+        return;
+
+    bool shouldTurnOn = false;
+    if (commandId == Commands::MoveToLevelWithOnOff::Id)
+    {
+        shouldTurnOn = true;
+    }
+    else if ((commandId == Commands::MoveWithOnOff::Id || commandId == Commands::StepWithOnOff::Id) && isMoveUp)
+    {
+        shouldTurnOn = true;
+    }
+
+    if (shouldTurnOn)
+    {
+        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
+        if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
+        {
+            SetCurrentLevel(mMinLevel);
+        }
+    }
+}
+
+void LevelControlCluster::ScheduleTimer(uint32_t durationMs, uint32_t transitionTimeMs)
+{
+    mTransitionTimeMs = transitionTimeMs;
+    mEventDurationMs  = durationMs;
+    UpdateRemainingTime(mTransitionTimeMs, true);
+    StartTimer(mEventDurationMs);
 }
 
 } // namespace chip::app::Clusters
