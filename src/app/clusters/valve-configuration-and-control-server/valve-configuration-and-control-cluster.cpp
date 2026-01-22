@@ -219,7 +219,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 
     // TargetState shall be set to Closed and CurrentState to Transitioning.
     SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kClosed), Attributes::TargetState::Id);
-    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
+    SetCurrentState(ValveStateEnum::kTransitioning);
 
     // If Level feature is supported, TargetLevel shall be set to 0.
     if (mFeatures.Has(Feature::kLevel))
@@ -317,7 +317,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Pe
 
     // Set TargetState to Open and CurrentState to Transitioning
     SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
-    SetCurrentState(DataModel::MakeNullable(ValveStateEnum::kTransitioning));
+    SetCurrentState(ValveStateEnum::kTransitioning);
 
     // Set OpenDuration to the provided value (can be null).
     SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
@@ -426,18 +426,13 @@ void ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::
 }
 
 // Function to handle the StateChange that also allows to generate an event if needed.
-void ValveConfigurationAndControlCluster::SetCurrentState(
-    const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState)
+void ValveConfigurationAndControlCluster::SetCurrentState(const ValveStateEnum & newState)
 {
     VerifyOrReturn(mCurrentState != newState);
     mCurrentState = newState;
     NotifyAttributeChanged(Attributes::CurrentState::Id);
 
-    // Only emit ValveStateChanged when the new state is non-null; transitions to null are not reported.
-    if (!mCurrentState.IsNull())
-    {
-        EmitValveChangeEvent(mCurrentState.Value());
-    }
+    EmitValveChangeEvent(newState);
 }
 
 // According to the spec, when using a TargetLevel while the attribute LevelStep is set
@@ -458,7 +453,7 @@ void ValveConfigurationAndControlCluster::SetDelegate(Delegate * delegate)
 
 void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigurationAndControl::ValveStateEnum currentState)
 {
-    SetCurrentState(DataModel::MakeNullable(currentState));
+    SetCurrentState(currentState);
 
     if (mTargetState == currentState)
     {
@@ -492,7 +487,7 @@ void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfiguratio
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void ValveConfigurationAndControlCluster::EmitValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+void ValveConfigurationAndControlCluster::SetValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
 {
     ValveConfigurationAndControl::Events::ValveFault::Type event;
     event.valveFault = fault;

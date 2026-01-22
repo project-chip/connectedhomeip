@@ -207,7 +207,7 @@ CHIP_ERROR EmitValveFault(EndpointId ep, BitMask<ValveConfigurationAndControl::V
 {
     ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
-    interface->EmitValveFault(fault);
+    interface->SetValveFault(fault);
     return CHIP_NO_ERROR;
 }
 

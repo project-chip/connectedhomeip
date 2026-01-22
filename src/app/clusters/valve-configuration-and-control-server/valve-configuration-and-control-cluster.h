@@ -79,7 +79,8 @@ public:
     CHIP_ERROR OpenValve(DataModel::Nullable<Percent> targetLevel, DataModel::Nullable<uint32_t> openDuration);
     void UpdateCurrentLevel(Percent currentLevel);
     void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
-    void EmitValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
+    // This methods set the ValveFault attribute of the cluster, it also emits an event for said fault.
+    void SetValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
     void UpdateAutoCloseTime(uint64_t epochTime);
 
 private:
@@ -90,7 +91,7 @@ private:
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
-    void SetCurrentState(const DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> & newState);
+    void SetCurrentState(const ValveConfigurationAndControl::ValveStateEnum & newState);
     CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
     void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState);
 
