@@ -240,6 +240,9 @@ void InitServer(intptr_t context)
         return;
     }
 
+    gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    SuccessOrDie(gGroupDataProvider.Init());
+
     initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;

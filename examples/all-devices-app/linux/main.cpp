@@ -114,7 +114,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
-    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
+    SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
+
+
+    gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    SuccessOrDie(gGroupDataProvider.Init());
 
     static CodeDrivenDataModelDevices devices(*initParams.persistentStorageDelegate);
     SuccessOrDie(devices.Init());
