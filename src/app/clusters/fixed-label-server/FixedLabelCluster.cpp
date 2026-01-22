@@ -67,6 +67,8 @@ FixedLabelCluster::FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInf
     DefaultServerCluster({ endpoint, FixedLabel::Id }), mDeviceInfoProvider(deviceInfoProvider)
 {}
 
+FixedLabelCluster::FixedLabelCluster(EndpointId endpoint) : FixedLabelCluster(endpoint, DeviceLayer::GetDeviceInfoProvider()) {}
+
 DataModel::ActionReturnStatus FixedLabelCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
 {
