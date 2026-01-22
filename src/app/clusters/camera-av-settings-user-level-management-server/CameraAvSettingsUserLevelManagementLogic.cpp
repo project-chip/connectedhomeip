@@ -305,7 +305,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadDPTZStreams()
     {
         DPTZStruct::Type stream;
         ReturnErrorOnFailure(DataModel::Decode(reader, stream));
-    
+
         mDptzStreams.push_back(stream);
     }
 
