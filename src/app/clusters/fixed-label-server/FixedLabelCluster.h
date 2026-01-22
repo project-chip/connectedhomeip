@@ -17,7 +17,6 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app::Clusters {
 
