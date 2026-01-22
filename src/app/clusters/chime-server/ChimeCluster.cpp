@@ -22,10 +22,12 @@
 
 #include "ChimeCluster.h"
 
+#include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Chime/Attributes.h>
 #include <clusters/Chime/Commands.h>
+#include <clusters/Chime/Events.h>
 #include <clusters/Chime/Metadata.h>
 #include <clusters/Chime/Structs.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -258,19 +260,60 @@ std::optional<DataModel::ActionReturnStatus> ChimeCluster::InvokeCommand(const D
     {
     case Commands::PlayChimeSound::Id: {
         ChipLogDetail(Zcl, "Chime: PlayChimeSound");
-        Status status = Status::Success;
 
-        // Only invoke the delegate if enabled, otherwise don't play a sound, and "silently" return
-        if (mEnabled)
-        {
-            // call the delegate to play the chime
-            status = mDelegate.PlayChimeSound();
-        }
-
-        return status;
+        Commands::PlayChimeSound::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandlePlayChimeSound(*handler, request.path, commandData);
     }
     default:
         return Status::UnsupportedCommand;
+    }
+}
+
+DataModel::ActionReturnStatus ChimeCluster::HandlePlayChimeSound(CommandHandler & aHandler, const ConcreteCommandPath & aPath,
+                                                                 const Commands::PlayChimeSound::DecodableType & commandData)
+{
+    // Immediately return if we're not enabled
+    //
+    if (!mEnabled)
+    {
+        return Status::Success;
+    }
+
+    // If we have a provided Chime ID, ensure it is valid
+    //
+    uint8_t chimeIDToUse = mSelectedChime;
+    if (commandData.chimeID.HasValue())
+    {
+        if (!IsSupportedChimeID(commandData.chimeID.Value()))
+        {
+            ChipLogError(Zcl, "Chime: Unknown Chime ID provided to PlayChimeSound");
+            return Status::NotFound;
+        }
+
+        chimeIDToUse = commandData.chimeID.Value();
+    }
+
+    Status status = mDelegate.PlayChimeSound(chimeIDToUse);
+    if (status == Status::Success)
+    {
+        // Generate the event
+        GenerateChimeStartedPlayingEvent(chimeIDToUse);
+    }
+    return status;
+}
+
+void ChimeCluster::GenerateChimeStartedPlayingEvent(const uint8_t chimeID)
+{
+    Events::ChimeStartedPlaying::Type event;
+    EventNumber eventNumber;
+
+    event.chimeID = chimeID;
+
+    CHIP_ERROR err = LogEvent(event, GetPaths().data()->mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl, "Unable to generate ChimeStartedPlaying event");
     }
 }
 
