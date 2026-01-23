@@ -22,6 +22,7 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
+<<<<<<< HEAD
 LoggingSpeakerDevice::LoggingSpeakerDevice(TimerDelegate & timerDelegate) : SpeakerDevice(*this, *this, timerDelegate)
 {}
 
@@ -35,6 +36,11 @@ LoggingSpeakerDevice::~LoggingSpeakerDevice()
     if (mIdentifyCluster.IsConstructed())
         mIdentifyCluster.Destroy();
 }
+=======
+LoggingSpeakerDevice::LoggingSpeakerDevice(TimerDelegate & timerDelegate) : SpeakerDevice(*this, *this, timerDelegate) {}
+
+LoggingSpeakerDevice::~LoggingSpeakerDevice() {}
+>>>>>>> 1647735d7b (Big clean up and address soome of the code review comments)
 
 // LevelControlDelegate
 

@@ -98,7 +98,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(1);
+    EXPECT_EQ(cluster.SetCurrentLevel(1), CHIP_NO_ERROR);
 
     // Move to 101 over 100ds (10s).
     Commands::MoveToLevel::Type data;
@@ -138,4 +138,110 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
 
     EXPECT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, remainingTime).IsSuccess());
     EXPECT_EQ(remainingTime, 0);
+}
+
+TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
+{
+    chip::Testing::TestServerClusterContext context;
+    LevelControlCluster cluster{
+        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(DataModel::NullNullable)
+    };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    chip::Testing::ClusterTester tester(cluster);
+    auto & changeListener = context.ChangeListener();
+
+    EXPECT_EQ(cluster.SetCurrentLevel(1), CHIP_NO_ERROR);
+
+    // 1. Short transition (< 1s). Should NOT report.
+    // Move to 10 over 5ds (0.5s).
+    Commands::MoveToLevel::Type data;
+    data.level = 10;
+    data.transitionTime.SetNonNull(5);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    changeListener.DirtyList().clear();
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    // Should NOT report RemainingTime (value 5)
+    bool reported = false;
+    for (auto & id : changeListener.DirtyList())
+    {
+        if (id.mAttributeId == Attributes::RemainingTime::Id)
+            reported = true;
+    }
+    EXPECT_FALSE(reported);
+
+    // Wait to finish
+    while (mockTimer.IsTimerActive(&cluster))
+    {
+        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+    }
+
+    // At end (0), it might report? Logic says: if (remainingTimeDs == 0 && mLastReported != 0).
+    // mLastReported is 0. So no report.
+    changeListener.DirtyList().clear();
+
+    // 2. Long transition (10s). Should report.
+    data.level = 100;
+    data.transitionTime.SetNonNull(100);
+
+    changeListener.DirtyList().clear();
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    // Should report start (100ds)
+    // Case 1: mLast=0, remaining=100 > 10. Yes.
+    reported = false;
+    for (auto & id : changeListener.DirtyList())
+    {
+        if (id.mAttributeId == Attributes::RemainingTime::Id)
+            reported = true;
+    }
+    EXPECT_TRUE(reported);
+    changeListener.DirtyList().clear();
+
+    // Advance 0.5s. Remaining 95. Delta 5. No report (countdown).
+    for (int i = 0; i < 5; ++i)
+        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+
+    reported = false;
+    for (auto & id : changeListener.DirtyList())
+    {
+        if (id.mAttributeId == Attributes::RemainingTime::Id)
+            reported = true;
+    }
+    EXPECT_FALSE(reported);
+
+    // Advance 1s more (total 1.5s). Remaining 85.
+    // Not a new transition. Not 0. Should NOT report.
+    for (int i = 0; i < 10; ++i)
+        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+    reported = false;
+    for (auto & id : changeListener.DirtyList())
+    {
+        if (id.mAttributeId == Attributes::RemainingTime::Id)
+            reported = true;
+    }
+    EXPECT_FALSE(reported);
+
+    // 3. New Command (Interrupt).
+    // Invoke MoveToLevel to same level but faster?
+    // Let's invoke new command. Transition 20s (200ds).
+    // Remaining was 85. New will be 200.
+    // Delta |200 - 85| = 115 > 10.
+    // Should report.
+
+    data.level = 200;
+    data.transitionTime.SetNonNull(200);
+    changeListener.DirtyList().clear();
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    reported = false;
+    for (auto & id : changeListener.DirtyList())
+    {
+        if (id.mAttributeId == Attributes::RemainingTime::Id)
+            reported = true;
+    }
+    EXPECT_TRUE(reported);
 }

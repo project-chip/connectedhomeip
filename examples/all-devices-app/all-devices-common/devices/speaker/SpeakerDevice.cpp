@@ -34,9 +34,8 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
 
-    // Identify
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
+    if (mIdentifyCluster.IsConstructed())
+        ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
     // OnOff (Mute)
     OnOffCluster::Context onOffContext{ mTimerDelegate };
