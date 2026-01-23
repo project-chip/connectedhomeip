@@ -258,7 +258,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
         return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
     }
 
-    // In the spec, the setting of the TargetState and CurrentState goes before the handling of the 
+    // In the spec, the setting of the TargetState and CurrentState goes before the handling of the
     // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep backwards compatibility.
     // Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL enabled valves).
 
