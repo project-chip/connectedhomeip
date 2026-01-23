@@ -314,5 +314,10 @@ DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider();
  */
 void SetDeviceInstanceInfoProvider(DeviceInstanceInfoProvider * provider);
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+DeviceInstanceInfoProvider * TestOnlyTryGetDeviceInstanceInfoProvider();
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
 } // namespace DeviceLayer
 } // namespace chip
