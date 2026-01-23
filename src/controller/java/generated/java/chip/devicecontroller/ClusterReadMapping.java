@@ -20925,6 +20925,76 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readTestHiddenManufacturerSpecificInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificTestAttributeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificTestAttributeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readTestAttributeAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readTestHiddenManufacturerSpecificTestAttributeCommandParams
+        );
+        result.put("readTestAttributeAttribute", readTestHiddenManufacturerSpecificTestAttributeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.TestHiddenManufacturerSpecificCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTestHiddenManufacturerSpecificClusterGeneratedCommandListAttributeCallback(),
+          readTestHiddenManufacturerSpecificGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readTestHiddenManufacturerSpecificGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.TestHiddenManufacturerSpecificCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTestHiddenManufacturerSpecificClusterAcceptedCommandListAttributeCallback(),
+          readTestHiddenManufacturerSpecificAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readTestHiddenManufacturerSpecificAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.TestHiddenManufacturerSpecificCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTestHiddenManufacturerSpecificClusterAttributeListAttributeCallback(),
+          readTestHiddenManufacturerSpecificAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readTestHiddenManufacturerSpecificAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readTestHiddenManufacturerSpecificFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readTestHiddenManufacturerSpecificFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTestHiddenManufacturerSpecificClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTestHiddenManufacturerSpecificClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TestHiddenManufacturerSpecificCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTestHiddenManufacturerSpecificClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readTestHiddenManufacturerSpecificClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     @SuppressWarnings("serial")
     public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
 
@@ -21071,7 +21141,8 @@ public class ClusterReadMapping {
             put("commodityMetering", readCommodityMeteringInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());
-            put("sampleMei", readSampleMeiInteractionInfo());}};
+            put("sampleMei", readSampleMeiInteractionInfo());
+            put("testHiddenManufacturerSpecific", readTestHiddenManufacturerSpecificInteractionInfo());}};
     }
 }
 

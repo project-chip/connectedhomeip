@@ -155,3 +155,4 @@ Generally regenerate using one of:
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |
+| 4294048801 | 0xFFF1FC21 | TestHiddenManufacturerSpecific                          |
