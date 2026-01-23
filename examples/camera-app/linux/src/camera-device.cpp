@@ -119,8 +119,8 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
         else
         {
             ChipLogError(Camera,
-                        "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                        rawPts, self->mVideoStreamFirstPts[videoStreamID], videoStreamID);
+                         "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mVideoStreamFirstPts[videoStreamID], videoStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
@@ -183,7 +183,7 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         {
             offsetNs = rawPts - self->mAudioStreamFirstPts[audioStreamID];
             ts       = startEpoch + (offsetNs / 1000000); // Convert ns to ms
-                                                        // Forward raw Opus encoded frames to media controller with timestamp
+            // Forward raw Opus encoded frames to media controller with timestamp
             // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
             // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
             self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID, ts);
@@ -191,8 +191,8 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         else
         {
             ChipLogError(Camera,
-                        "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                        rawPts, self->mAudioStreamFirstPts[audioStreamID], audioStreamID);
+                         "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mAudioStreamFirstPts[audioStreamID], audioStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
