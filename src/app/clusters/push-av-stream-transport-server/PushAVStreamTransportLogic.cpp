@@ -1421,7 +1421,29 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
 
     if (status == Status::Success)
     {
-        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason));
+        // Get container type from transport configuration
+        ContainerFormatEnum containerType = transportConfiguration->transportOptions.Value().containerOptions.containerType;
+
+        // For CMAF container type, we need to provide CMAF session number
+        Optional<uint64_t> cmafSessionNumber;
+        if (containerType == ContainerFormatEnum::kCmaf)
+        {
+            uint64_t sessionNumber = 0;
+            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
+            {
+                cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
+            }
+            else
+            {
+                ChipLogError(Zcl, "GeneratePushTransportBeginEvent: Unable to get CMAF session number for connection %u",
+                             connectionID);
+                // Don't include the session number if we can't get it
+                cmafSessionNumber = Optional<uint64_t>();
+            }
+        }
+
+        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
+                                        containerType, cmafSessionNumber);
     }
 
     handler.AddStatus(commandPath, status);
@@ -1547,17 +1569,19 @@ Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum strea
     return Status::Success;
 }
 
-Status
-PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(const uint16_t connectionID,
-                                                                  const TransportTriggerTypeEnum triggerType,
-                                                                  const Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
+    const uint16_t connectionID, const TransportTriggerTypeEnum triggerType,
+    const Optional<TriggerActivationReasonEnum> activationReason, const ContainerFormatEnum containerType,
+    const Optional<uint64_t> cmafSessionNumber)
 {
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
 
-    event.connectionID     = connectionID;
-    event.triggerType      = triggerType;
-    event.activationReason = activationReason;
+    event.connectionID      = connectionID;
+    event.triggerType       = triggerType;
+    event.activationReason  = activationReason;
+    event.containerType     = containerType;
+    event.cmafSessionNumber = cmafSessionNumber;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1575,6 +1599,40 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     EventNumber eventNumber;
 
     event.connectionID = connectionID;
+
+    // Get container type from transport configuration to include in the event
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig != nullptr)
+    {
+        event.containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+
+        // For CMAF container type, we need to provide CMAF session number
+        if (event.containerType == ContainerFormatEnum::kCmaf)
+        {
+            uint64_t sessionNumber = 0;
+            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
+            {
+                event.cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
+            }
+            else
+            {
+                ChipLogError(Zcl, "GeneratePushTransportEndEvent: Unable to get CMAF session number for connection %u",
+                             connectionID);
+                // Don't include the session number if we can't get it
+                event.cmafSessionNumber = Optional<uint64_t>();
+            }
+        }
+        else
+        {
+            event.cmafSessionNumber = Optional<uint64_t>();
+        }
+    }
+    else
+    {
+        // Fallback values if transport config not found
+        event.containerType     = ContainerFormatEnum::kCmaf; // Default fallback
+        event.cmafSessionNumber = Optional<uint64_t>();
+    }
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1600,8 +1658,28 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connect
         return Status::NotFound;
     }
 
+    // Get container type from transport configuration
+    ContainerFormatEnum containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+
+    // For CMAF container type, we need to provide CMAF session number
+    Optional<uint64_t> cmafSessionNumber;
+    if (containerType == ContainerFormatEnum::kCmaf)
+    {
+        uint64_t sessionNumber = 0;
+        if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
+        {
+            cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
+        }
+        else
+        {
+            ChipLogError(Zcl, "NotifyTransportStarted: Unable to get CMAF session number for connection %u", connectionID);
+            // Don't include the session number if we can't get it
+            cmafSessionNumber = Optional<uint64_t>();
+        }
+    }
+
     // Generate the PushTransportBegin event
-    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
+    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason, containerType, cmafSessionNumber);
 }
 
 Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType)
