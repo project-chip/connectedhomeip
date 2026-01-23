@@ -50,6 +50,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
                              "Incorrect directory selected for 1.4.2")
         asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.k1_5,
                              "Incorrect directory selected for 1.5")
+        asserts.assert_equal(dm_from_spec_version(0x01050100), PrebuiltDataModelDirectory.k1_5_1,
+                             "Incorrect directory selected for 1.5.1")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -62,9 +64,9 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.4.FF"):
             dm_from_spec_version(0x0104FF00)
 
-        # Any dot release besides 0 for 1.5 should error
-        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.1"):
-            dm_from_spec_version(0x01050100)
+        # Any dot release above .1 should error for 1.5
+        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.2"):
+            dm_from_spec_version(0x01050200)
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.FF"):
             dm_from_spec_version(0x0105FF00)
 
