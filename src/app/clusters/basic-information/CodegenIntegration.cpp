@@ -36,6 +36,21 @@ namespace {
 //   - we have a fixed config and it is endpoint 0 OR
 //   - we have a fully dynamic config
 
+class BasicInfoDelegate : public BasicInformationCluster::Delegate
+{
+public:
+    DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() override
+    {
+        return DeviceLayer::GetDeviceInstanceInfoProvider();
+    }
+
+    DeviceLayer::ConfigurationManager & GetConfigurationManager() override { return DeviceLayer::ConfigurationMgr(); }
+
+    DeviceLayer::PlatformManager & GetPlatformManager() override { return DeviceLayer::PlatformMgr(); }
+};
+
+static BasicInfoDelegate gDelegate;
+
 static constexpr size_t kBasicInformationFixedClusterCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size();
 
 static_assert((kBasicInformationFixedClusterCount == 0) ||
@@ -59,7 +74,7 @@ public:
 
         BasicInformationCluster::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
 
-        gServer.Create(optionalAttributeSet);
+        gServer.Create(optionalAttributeSet, &gDelegate);
 
         // This disabling of the unique id attribute is here only for test purposes. The uniqe id attribute
         // is mandatory, but was optional in previous versions. It is forced to be enabled in the basic information
