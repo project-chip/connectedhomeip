@@ -374,11 +374,10 @@ class Terminable(Protocol):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
-    '--ble-wifi',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
+    '--commissioning-method',
+    type=click.Choice(['on-network', 'ble-wifi', 'wifi-paf'], case_sensitive=False),
+    default='on-network',
+    help='Commissioning method to use. "ble-wifi" uses Bluetooth and WiFi mock servers. "wifi-paf" uses WiFi-PAF (NAN/USD) mock. Both options are Linux-only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
@@ -388,7 +387,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
             energy_management_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
             chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, ble_wifi: bool) -> None:
+            expected_failures: int, commissioning_method: str | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -457,11 +456,16 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     except (ValueError, LookupError) as e:
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
-    if ble_wifi and sys.platform != "linux":
-        raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
+    # Derive boolean flags from commissioning parameter
+    wifi_required = commissioning_method in ['ble-wifi', 'wifi-paf']
+
+    if wifi_required and sys.platform != "linux":
+        raise click.BadOptionUsage("commissioning_method",
+                                   f"Option --commissioning_method={commissioning_method} is available on Linux platform only")
 
     ble_controller_app = None
     ble_controller_tool = None
+
     to_terminate: list[Terminable] = []
 
     def cleanup() -> None:
@@ -475,20 +479,37 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
+            app_name = 'wlx-app' if wifi_required else 'eth-app'
+            tool_name = 'wlx-tool' if commissioning_method == 'wifi-paf' else 'eth-tool'
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
-                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not ble_wifi,
+                # Do not bring up the app interface link automatically when doing BLE-WiFi or WiFi-PAF commissioning.
+                setup_app_link_up=not wifi_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if ble_wifi else 'eth-app'))
+                app_link_name=app_name,
+                tool_link_name=tool_name))
 
-            if ble_wifi:
+            if wifi_required:
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
+
+                interfaces_params = []
+
+                if commissioning_method == 'ble-wifi':
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    interfaces_params = [
+                        {"name": app_name}
+                    ]
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+
+                if commissioning_method == 'wifi-paf':
+                    # Single mock with two interfaces (like real wpa_supplicant)
+                    interfaces_params = [
+                        {"name": app_name},
+                        {"name": tool_name}
+                    ]
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, interfaces_params))
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -520,6 +541,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
+                        wifi_paf=commissioning_method == 'wifi-paf'
                     )
                     if not dry_run:
                         test_end = time.monotonic()

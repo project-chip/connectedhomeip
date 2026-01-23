@@ -265,7 +265,9 @@ private:
     std::optional<DataModel::ActionReturnStatus>
     HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                          const NetworkCommissioning::Commands::ReorderNetwork::DecodableType & req);
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     std::optional<DataModel::ActionReturnStatus> HandleNonConcurrentConnectNetwork();
+#endif // !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 };
 
 } // namespace Clusters

@@ -454,7 +454,8 @@ class TestDefinition:
             pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: int | None = None,
-            ble_controller_tool: int | None = None):
+            ble_controller_tool: int | None = None,
+            wifi_paf: bool = False):
         """
         Executes the given test case using the provided runner for execution.
         Will iterate and execute every target.
@@ -462,13 +463,14 @@ class TestDefinition:
         for target in self.targets:
             log.info('Executing %s::%s', self.name, target.name)
             self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
-                          test_runtime, ble_controller_app, ble_controller_tool)
+                          test_runtime, ble_controller_app, ble_controller_tool, wifi_paf)
 
     def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
                  pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
                  test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
                  ble_controller_app: int | None = None,
-                 ble_controller_tool: int | None = None):
+                 ble_controller_tool: int | None = None,
+                 wifi_paf: bool = False):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
@@ -492,6 +494,9 @@ class TestDefinition:
 
                     if ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(ble_controller_app), "--wifi")
+                    elif wifi_paf:
+                        # Use WiFi PAF mode for testing
+                        subproc = subproc.with_args("--wifi", "--wifipaf", "freq_list=2437")
                     app = App(runner, subproc)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
@@ -546,6 +551,10 @@ class TestDefinition:
                     pairing_cmd = pairing_cmd.with_args(
                         "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
                     pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                elif wifi_paf:
+                    pairing_cmd = pairing_cmd.with_args("pairing", "wifipaf-wifi", TEST_NODE_ID,
+                                                        "MatterAP", "MatterAPPassword", TEST_PASSCODE, TEST_DISCRIMINATOR)
+
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 
