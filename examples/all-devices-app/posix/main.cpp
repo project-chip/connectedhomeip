@@ -203,9 +203,13 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ConfigurationMgr().LogDeviceConfig();
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
+
+
+#if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
     ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, false));
     ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+#endif
 
     return CHIP_NO_ERROR;
 }
