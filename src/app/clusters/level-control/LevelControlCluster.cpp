@@ -30,6 +30,7 @@
 namespace chip::app::Clusters {
 
 using namespace chip::app::Clusters::LevelControl;
+using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
@@ -51,13 +52,18 @@ LevelControlValidator & GlobalLevelControlValidator()
     return sValidator;
 }
 
+constexpr uint8_t kLightingMinLevel = 1;
+constexpr uint8_t kMaxLevel         = 254;
+
 } // namespace
 
 LevelControlCluster::LevelControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
-    mOnLevel(DataModel::Nullable<uint8_t>()), mMinLevel(config.mMinLevel), mMaxLevel(config.mMaxLevel),
-    mDefaultMoveRate(config.mDefaultMoveRate), mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(0),
+    mOnLevel(DataModel::Nullable<uint8_t>()),
+    mMinLevel(config.mFeatureMap.Has(Feature::kLighting) ? kLightingMinLevel : config.mMinLevel),
+    mMaxLevel(config.mFeatureMap.Has(Feature::kLighting) ? kMaxLevel : config.mMaxLevel), mDefaultMoveRate(config.mDefaultMoveRate),
+    mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(0), mLastReportedRemainingTime(0),
     mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
     mOnOffTransitionTime(config.mOnOffTransitionTime), mOptionalAttributes(config.mOptionalAttributes),
     mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate)
@@ -74,36 +80,42 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence attributePersistence(context.attributeStorage);
 
-    // Restore N attributes from storage
-    // If storage has value, it overrides Config default.
-    // If storage is empty, Config default remains.
+    attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::OnLevel::Id),
+                                               mOnLevel, mOnLevel);
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), mCurrentLevel, mCurrentLevel);
+
     if (mFeatureMap.Has(Feature::kLighting))
     {
         attributePersistence.LoadNativeEndianValue(
             ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id), mStartUpCurrentLevel,
             mStartUpCurrentLevel);
+
+        if (!mStartUpCurrentLevel.IsNull())
+        {
+            // Apply StartUpCurrentLevel logic (0 -> Min, Null -> Ignore, Value -> Value)
+            uint8_t target = mStartUpCurrentLevel.Value();
+            if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) && target < mMinLevel)
+            {
+                target = mMinLevel;
+            }
+            if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) && target > mMaxLevel)
+            {
+                target = mMaxLevel;
+            }
+
+            // Use SetValue to update internal state without triggering a report or check
+            mCurrentLevel.SetNonNull(target);
+        }
     }
 
-    attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::OnLevel::Id),
-                                               mOnLevel, mOnLevel);
-
-    if (mFeatureMap.Has(Feature::kLighting) && !mStartUpCurrentLevel.IsNull())
+    if (!mCurrentLevel.IsNull())
     {
-        // Apply StartUpCurrentLevel logic (0 -> Min, Null -> Ignore, Value -> Value)
-        uint8_t target = mStartUpCurrentLevel.Value();
-        if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) && target < mMinLevel)
-            target = mMinLevel;
-        if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) && target > mMaxLevel)
-            target = mMaxLevel;
-
-        // Use SetValue to update internal state without triggering a report or check
-        mCurrentLevel.SetNonNull(target);
-        mDelegate.OnLevelChanged(target);
+        mDelegate.OnLevelChanged(mCurrentLevel.Value());
     }
+
     return CHIP_NO_ERROR;
 }
-
-// ... Standard Attribute Methods ...
 
 DataModel::ActionReturnStatus LevelControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                  AttributeValueEncoder & encoder)
@@ -137,7 +149,7 @@ DataModel::ActionReturnStatus LevelControlCluster::ReadAttribute(const DataModel
     case Attributes::OnOffTransitionTime::Id:
         return encoder.Encode(mOnOffTransitionTime);
     default:
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return Status::UnsupportedAttribute;
     }
 }
 
@@ -149,41 +161,49 @@ DataModel::ActionReturnStatus LevelControlCluster::WriteAttribute(const DataMode
     case Attributes::Options::Id: {
         BitMask<OptionsBitmap> options;
         ReturnErrorOnFailure(decoder.Decode(options));
-        return SetOptions(options);
+        ReturnErrorOnFailure(SetOptions(options));
+        return Status::Success;
     }
     case Attributes::OnLevel::Id: {
         DataModel::Nullable<uint8_t> onLevel;
         ReturnErrorOnFailure(decoder.Decode(onLevel));
-        return SetOnLevel(onLevel);
+        ReturnErrorOnFailure(SetOnLevel(onLevel));
+        return Status::Success;
     }
     case Attributes::DefaultMoveRate::Id: {
         DataModel::Nullable<uint8_t> rate;
         ReturnErrorOnFailure(decoder.Decode(rate));
-        return SetDefaultMoveRate(rate);
+        ReturnErrorOnFailure(SetDefaultMoveRate(rate));
+        return Status::Success;
     }
     case Attributes::StartUpCurrentLevel::Id: {
         DataModel::Nullable<uint8_t> startup;
         ReturnErrorOnFailure(decoder.Decode(startup));
-        return SetStartUpCurrentLevel(startup);
+        ReturnErrorOnFailure(SetStartUpCurrentLevel(startup));
+        return Status::Success;
     }
     case Attributes::OnTransitionTime::Id: {
         DataModel::Nullable<uint16_t> onTransitionTime;
         ReturnErrorOnFailure(decoder.Decode(onTransitionTime));
-        return SetOnTransitionTime(onTransitionTime);
+        ReturnErrorOnFailure(SetOnTransitionTime(onTransitionTime));
+        return Status::Success;
     }
     case Attributes::OffTransitionTime::Id: {
         DataModel::Nullable<uint16_t> offTransitionTime;
         ReturnErrorOnFailure(decoder.Decode(offTransitionTime));
-        return SetOffTransitionTime(offTransitionTime);
+        ReturnErrorOnFailure(SetOffTransitionTime(offTransitionTime));
+        return Status::Success;
     }
     case Attributes::OnOffTransitionTime::Id: {
         uint16_t onOffTransitionTime;
         ReturnErrorOnFailure(decoder.Decode(onOffTransitionTime));
-        return SetOnOffTransitionTime(onOffTransitionTime);
+        ReturnErrorOnFailure(SetOnOffTransitionTime(onOffTransitionTime));
+        return Status::Success;
     }
     default:
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return Status::UnsupportedAttribute;
     }
+    return Status::Success;
 }
 
 CHIP_ERROR LevelControlCluster::Attributes(const ConcreteClusterPath & path,
@@ -208,23 +228,18 @@ CHIP_ERROR LevelControlCluster::Attributes(const ConcreteClusterPath & path,
 CHIP_ERROR LevelControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    DataModel::AcceptedCommandEntry commands[8];
-    size_t count = 0;
-
-    commands[count++] = Commands::MoveToLevel::kMetadataEntry;
-    commands[count++] = Commands::Move::kMetadataEntry;
-    commands[count++] = Commands::Step::kMetadataEntry;
-    commands[count++] = Commands::Stop::kMetadataEntry;
-
-    if (mFeatureMap.Has(Feature::kOnOff))
-    {
-        commands[count++] = Commands::MoveToLevelWithOnOff::kMetadataEntry;
-        commands[count++] = Commands::MoveWithOnOff::kMetadataEntry;
-        commands[count++] = Commands::StepWithOnOff::kMetadataEntry;
-        commands[count++] = Commands::StopWithOnOff::kMetadataEntry;
-    }
-
-    return builder.AppendElements(Span<DataModel::AcceptedCommandEntry>(commands, count));
+    DataModel::AcceptedCommandEntry commands[] = {
+        Commands::MoveToLevel::kMetadataEntry,
+        Commands::Move::kMetadataEntry,
+        Commands::Step::kMetadataEntry,
+        Commands::Stop::kMetadataEntry,
+        // This is odd but the spec mandates these commands even if the On/Off feature is not present
+        Commands::MoveToLevelWithOnOff::kMetadataEntry,
+        Commands::MoveWithOnOff::kMetadataEntry,
+        Commands::StepWithOnOff::kMetadataEntry,
+        Commands::StopWithOnOff::kMetadataEntry,
+    };
+    return builder.AppendElements(Span<DataModel::AcceptedCommandEntry>(commands));
 }
 
 std::optional<DataModel::ActionReturnStatus> LevelControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -235,80 +250,70 @@ std::optional<DataModel::ActionReturnStatus> LevelControlCluster::InvokeCommand(
     {
     case Commands::MoveToLevel::Id: {
         Commands::MoveToLevel::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return MoveToLevelHandler(request.path.mCommandId, data.level, data.transitionTime, data.optionsMask, data.optionsOverride);
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return MoveToLevelCommand(request.path.mCommandId, data.level, data.transitionTime, data.optionsMask, data.optionsOverride);
     }
     case Commands::MoveToLevelWithOnOff::Id: {
         Commands::MoveToLevelWithOnOff::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return MoveToLevelHandler(request.path.mCommandId, data.level, data.transitionTime, data.optionsMask, data.optionsOverride);
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return MoveToLevelWithOnOffCommand(request.path.mCommandId, data.level, data.transitionTime, data.optionsMask,
+                                           data.optionsOverride);
     }
     case Commands::Move::Id: {
         Commands::Move::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return MoveHandler(request.path.mCommandId, data.moveMode, data.rate, data.optionsMask, data.optionsOverride);
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return MoveCommand(request.path.mCommandId, data.moveMode, data.rate, data.optionsMask, data.optionsOverride);
     }
     case Commands::MoveWithOnOff::Id: {
         Commands::MoveWithOnOff::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return MoveHandler(request.path.mCommandId, data.moveMode, data.rate, data.optionsMask, data.optionsOverride);
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return MoveWithOnOffCommand(request.path.mCommandId, data.moveMode, data.rate, data.optionsMask, data.optionsOverride);
     }
     case Commands::Step::Id: {
         Commands::Step::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return StepHandler(request.path.mCommandId, data.stepMode, data.stepSize, data.transitionTime, data.optionsMask,
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return StepCommand(request.path.mCommandId, data.stepMode, data.stepSize, data.transitionTime, data.optionsMask,
                            data.optionsOverride);
     }
     case Commands::StepWithOnOff::Id: {
         Commands::StepWithOnOff::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return StepHandler(request.path.mCommandId, data.stepMode, data.stepSize, data.transitionTime, data.optionsMask,
-                           data.optionsOverride);
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return StepWithOnOffCommand(request.path.mCommandId, data.stepMode, data.stepSize, data.transitionTime, data.optionsMask,
+                                    data.optionsOverride);
     }
     case Commands::Stop::Id: {
         Commands::Stop::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return StopHandler(request.path.mCommandId, data.optionsMask, data.optionsOverride);
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return StopCommand(request.path.mCommandId, data.optionsMask, data.optionsOverride);
     }
     case Commands::StopWithOnOff::Id: {
         Commands::StopWithOnOff::DecodableType data;
-        if (DataModel::Decode(input_arguments, data) != CHIP_NO_ERROR)
-            return DataModel::ActionReturnStatus(CHIP_IM_GLOBAL_STATUS(InvalidCommand));
-        return StopHandler(request.path.mCommandId, data.optionsMask, data.optionsOverride);
+        VerifyOrReturnError(DataModel::Decode(input_arguments, data) == CHIP_NO_ERROR, Status::InvalidCommand);
+        return StopCommand(request.path.mCommandId, data.optionsMask, data.optionsOverride);
     }
+    default:
+        return Status::UnsupportedCommand;
     }
-    return std::nullopt;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelHandler(CommandId commandId, uint8_t level,
+DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId commandId, uint8_t level,
                                                                       DataModel::Nullable<uint16_t> transitionTimeDS,
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    // Check if command execution is allowed by On/Off state (ExecuteIfOff bit)
-    if (!ShouldExecuteIfOff(commandId, optionsMask, optionsOverride))
-        return Protocols::InteractionModel::Status::Success;
+    // Check if command execution is allowed by On/Off state (ExecuteIfOff bit) or ignore
+    VerifyOrReturnError(ShouldExecuteIfOff(commandId, optionsMask, optionsOverride), Status::Success);
 
-    // Cancel any currently active transition before starting a new one.
-    CancelTimer();
+    CancelTimer(); // Cancel any currently active transition before starting a new one.
 
     // Validate level against Min/Max constraints
-    if (level > 254)
-        return Protocols::InteractionModel::Status::ConstraintError;
-    if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) && level < mMinLevel)
-        return Protocols::InteractionModel::Status::ConstraintError;
-    if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) && level > mMaxLevel)
-        return Protocols::InteractionModel::Status::ConstraintError;
+    if ((level > kMaxLevel) || (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) && level < mMinLevel) ||
+        (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) && level > mMaxLevel))
+    {
+        return Status::ConstraintError;
+    }
 
-    if (mCurrentLevel.IsNull())
-        return Protocols::InteractionModel::Status::Failure;
+    VerifyOrReturnError(!mCurrentLevel.IsNull(), Status::Failure);
 
     uint8_t currentLevel = mCurrentLevel.Value();
     mTargetLevel         = level;
@@ -316,54 +321,56 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelHandler(CommandId 
 
     // Calculate Transition Time in Milliseconds
     // Priority: Command argument > OnOffTransitionTime > 0 (Immediate)
-    uint32_t transitionTimeMs = 0;
-    if (!transitionTimeDS.IsNull())
-    {
-        transitionTimeMs = transitionTimeDS.Value() * 100;
-    }
-    else
-    {
-        transitionTimeMs = mOnOffTransitionTime * 100;
-    }
-
-    // Handle "With On/Off" commands
-    // Note: MoveToLevelWithOnOff always turns On if Off, regardless of direction.
-    HandleOnOffTask(commandId, true);
+    const uint32_t transitionTimeMs = transitionTimeDS.ValueOr(mOnOffTransitionTime) * 100;
 
     // Refresh CurrentLevel (might have changed due to OnOff logic) and set Direction
-    if (!mCurrentLevel.IsNull())
-        currentLevel = mCurrentLevel.Value();
-    mIncreasing = (mTargetLevel > currentLevel);
-
-    // Immediate move
-    if (transitionTimeMs == 0)
-        return SetCurrentLevel(mTargetLevel);
+    currentLevel = mCurrentLevel.ValueOr(currentLevel);
+    mIncreasing  = (mTargetLevel > currentLevel);
 
     // Calculate duration per step
     uint8_t totalSteps = (mIncreasing) ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel);
-    if (totalSteps == 0)
-        return Protocols::InteractionModel::Status::Success;
+    mEventDurationMs   = transitionTimeMs / totalSteps;
 
-    mEventDurationMs = transitionTimeMs / totalSteps;
-    if (mEventDurationMs == 0)
-        mEventDurationMs = 1;
+    // Immediate move
+    if (transitionTimeMs == 0 || totalSteps == 0 || mEventDurationMs == 0)
+    {
+        return SetCurrentLevel(mTargetLevel);
+    }
 
     ScheduleTimer(mEventDurationMs, transitionTimeMs);
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId commandId, MoveModeEnum moveMode,
+DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelWithOnOffCommand(CommandId commandId, uint8_t level,
+                                                                               DataModel::Nullable<uint16_t> transitionTimeDS,
+                                                                               BitMask<OptionsBitmap> optionsMask,
+                                                                               BitMask<OptionsBitmap> optionsOverride)
+{
+    EnsureOn();
+
+    auto status = MoveToLevelCommand(commandId, level, transitionTimeDS, optionsMask, optionsOverride);
+    VerifyOrReturnValue(status.IsSuccess(), status);
+    VerifyOrReturnError(mTargetLevel == mMinLevel, Status::Success);
+
+    if ((!transitionTimeDS.IsNull() && transitionTimeDS.Value() == 0) || (transitionTimeDS.IsNull() && mOnOffTransitionTime == 0))
+    {
+        UpdateOnOff(false);
+    }
+    return CHIP_NO_ERROR;
+}
+
+DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId commandId, MoveModeEnum moveMode,
                                                                DataModel::Nullable<uint8_t> rate,
                                                                BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    if (!ShouldExecuteIfOff(commandId, optionsMask, optionsOverride))
-        return Protocols::InteractionModel::Status::Success;
-
+    // Check if command execution is allowed by On/Off state (ExecuteIfOff bit) or ignore
+    VerifyOrReturnError(ShouldExecuteIfOff(commandId, optionsMask, optionsOverride), Status::Success);
     if (!rate.IsNull() && rate.Value() == 0)
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    if (mCurrentLevel.IsNull())
-        return Protocols::InteractionModel::Status::Failure;
+    {
+        return Status::InvalidCommand;
+    }
+    VerifyOrReturnError(!mCurrentLevel.IsNull(), Status::Failure);
 
     mCurrentCommandId = commandId;
     CancelTimer();
@@ -371,46 +378,33 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
     // Determine Rate (units/s)
     uint8_t currentRate = 0;
     if (!rate.IsNull())
+    {
         currentRate = rate.Value();
+    }
     else if (!mDefaultMoveRate.IsNull())
+    {
         currentRate = mDefaultMoveRate.Value();
+    }
 
-    if (currentRate == 0)
-        return Protocols::InteractionModel::Status::Success;
+    VerifyOrReturnError(currentRate != 0, Status::Success); // No movement if rate is unspecified
 
     // Determine Direction first
-    if (moveMode == MoveModeEnum::kUp)
-    {
-        mIncreasing = true;
-    }
-    else
-    {
-        mIncreasing = false;
-    }
-
-    HandleOnOffTask(commandId, mIncreasing);
+    mIncreasing = moveMode == MoveModeEnum::kUp;
 
     // Now determine Target and Check Constraints (safe from clobbering)
     if (mIncreasing)
     {
-        mTargetLevel = 254; // Default max
-        if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id))
-            mTargetLevel = mMaxLevel;
-
+        mTargetLevel = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
         // Check if already at target
         uint8_t currentLevel = mCurrentLevel.Value();
-        if (currentLevel >= mTargetLevel)
-            return Protocols::InteractionModel::Status::Success;
+        VerifyOrReturnError(currentLevel < mTargetLevel, Status::Success);
     }
     else
     {
-        mTargetLevel = 0; // Default min
-        if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id))
-            mTargetLevel = mMinLevel;
-
+        mTargetLevel = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
+        // Check if already at target
         uint8_t currentLevel = mCurrentLevel.Value();
-        if (currentLevel <= mTargetLevel)
-            return Protocols::InteractionModel::Status::Success;
+        VerifyOrReturnError(currentLevel > mTargetLevel, Status::Success);
     }
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
@@ -423,40 +417,42 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveHandler(CommandId command
 
     mEventDurationMs = 1000 / currentRate;
     ScheduleTimer(mEventDurationMs, difference * mEventDurationMs);
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::StepHandler(CommandId commandId, StepModeEnum stepMode, uint8_t stepSize,
+DataModel::ActionReturnStatus LevelControlCluster::MoveWithOnOffCommand(CommandId commandId, MoveModeEnum moveMode,
+                                                                        DataModel::Nullable<uint8_t> rate,
+                                                                        BitMask<OptionsBitmap> optionsMask,
+                                                                        BitMask<OptionsBitmap> optionsOverride)
+{
+    if (moveMode == MoveModeEnum::kUp)
+    {
+        EnsureOn();
+    }
+    return MoveCommand(commandId, moveMode, rate, optionsMask, optionsOverride);
+}
+
+DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId commandId, StepModeEnum stepMode, uint8_t stepSize,
                                                                DataModel::Nullable<uint16_t> transitionTime,
                                                                BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    if (!ShouldExecuteIfOff(commandId, optionsMask, optionsOverride))
-        return Protocols::InteractionModel::Status::Success;
-
-    if (stepSize == 0)
-        return Protocols::InteractionModel::Status::InvalidCommand;
-    if (mCurrentLevel.IsNull())
-        return Protocols::InteractionModel::Status::Failure;
+    // Check if command execution is allowed by On/Off state (ExecuteIfOff bit) or ignore
+    VerifyOrReturnError(ShouldExecuteIfOff(commandId, optionsMask, optionsOverride), Status::Success);
+    VerifyOrReturnError(stepSize > 0, Status::InvalidCommand);
+    VerifyOrReturnError(!mCurrentLevel.IsNull(), Status::Failure);
 
     mCurrentCommandId = commandId;
     CancelTimer();
 
     uint32_t transitionTimeMs = 0;
     if (!transitionTime.IsNull())
+    {
         transitionTimeMs = transitionTime.Value() * 100;
+    }
 
     // Determine Direction first
-    if (stepMode == StepModeEnum::kUp)
-    {
-        mIncreasing = true;
-    }
-    else
-    {
-        mIncreasing = false;
-    }
-
-    HandleOnOffTask(commandId, mIncreasing);
+    mIncreasing = stepMode == StepModeEnum::kUp ? true : false;
 
     // Recalculate everything based on potential new current level
     uint8_t currentLevel = mCurrentLevel.Value();
@@ -464,210 +460,190 @@ DataModel::ActionReturnStatus LevelControlCluster::StepHandler(CommandId command
     // Calculate Target based on Step Size
     if (mIncreasing)
     {
-        uint16_t next = currentLevel + stepSize;
-        uint8_t max   = 254; // Default max
-        if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id))
-            max = mMaxLevel;
-        if (next > max)
-            next = max;
-        mTargetLevel = static_cast<uint8_t>(next);
+        int max      = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
+        mTargetLevel = static_cast<uint8_t>(std::min(currentLevel + stepSize, max));
     }
     else
     {
-        int16_t next = currentLevel - stepSize;
-        uint8_t min  = 0; // Default min
-        if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id))
-            min = mMinLevel;
-        if (next < min)
-            next = min;
-        mTargetLevel = static_cast<uint8_t>(next);
+        int min      = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
+        mTargetLevel = static_cast<uint8_t>(std::max(currentLevel - stepSize, min));
     }
 
     if (transitionTimeMs == 0)
+    {
         return SetCurrentLevel(mTargetLevel);
+    }
 
     uint8_t totalSteps = (mIncreasing) ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel);
     if (totalSteps == 0)
-        return Protocols::InteractionModel::Status::Success;
+    {
+        return Status::Success;
+    }
 
     mEventDurationMs = transitionTimeMs / totalSteps;
-    if (mEventDurationMs == 0)
-        mEventDurationMs = 1;
-
     ScheduleTimer(mEventDurationMs, transitionTimeMs);
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::StopHandler(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
+DataModel::ActionReturnStatus LevelControlCluster::StepWithOnOffCommand(CommandId commandId, StepModeEnum stepMode,
+                                                                        uint8_t stepSize,
+                                                                        DataModel::Nullable<uint16_t> transitionTime,
+                                                                        BitMask<OptionsBitmap> optionsMask,
+                                                                        BitMask<OptionsBitmap> optionsOverride)
+{
+    if (stepMode == StepModeEnum::kUp)
+    {
+        EnsureOn();
+    }
+
+    auto status = StepCommand(commandId, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    VerifyOrReturnValue(status.IsSuccess(), status);
+    VerifyOrReturnError(mTargetLevel == mMinLevel, Status::Success);
+
+    if (!transitionTime.IsNull() && transitionTime.Value() == 0)
+    {
+        UpdateOnOff(false);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    if (!ShouldExecuteIfOff(commandId, optionsMask, optionsOverride))
-        return Protocols::InteractionModel::Status::Success;
+    // Check if command execution is allowed by On/Off state (ExecuteIfOff bit) or ignore
+    VerifyOrReturnError(ShouldExecuteIfOff(commandId, optionsMask, optionsOverride), Status::Success);
 
     CancelTimer();
     // Force report of current level and reset remaining time
-    SetCurrentLevelQuietReport(mCurrentLevel, true /*isEndOfTransition*/);
+    // Ignore error as we are stopping and best-effort reporting is acceptable.
+    RETURN_SAFELY_IGNORED SetCurrentLevelQuietReport(mCurrentLevel, true /*isEndOfTransition*/);
     UpdateRemainingTime(0, false);
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetOptions(BitMask<OptionsBitmap> newOptions)
+CHIP_ERROR LevelControlCluster::SetOptions(BitMask<OptionsBitmap> newOptions)
 {
-    if (mOptions == newOptions)
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    VerifyOrReturnError(mOptions != newOptions, CHIP_NO_ERROR);
     mOptions = newOptions;
     mDelegate.OnOptionsChanged(mOptions);
-    return NotifyAttributeChangedIfSuccess(Attributes::Options::Id, Protocols::InteractionModel::Status::Success);
+    NotifyAttributeChanged(Attributes::Options::Id);
+    return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetOnLevel(DataModel::Nullable<uint8_t> newOnLevel)
+CHIP_ERROR LevelControlCluster::SetOnLevel(DataModel::Nullable<uint8_t> newOnLevel)
 {
-    if (mOnLevel == newOnLevel)
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-
-    // Store if changed (N attribute)
-    if (mContext)
-    {
-        NumericAttributeTraits<uint8_t>::StorageType storageValue;
-        DataModel::NullableToStorage(newOnLevel, storageValue);
-        if (mContext->attributeStorage.WriteValue(
-                ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::OnLevel::Id),
-                ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))) != CHIP_NO_ERROR)
-        {
-            return CHIP_IM_GLOBAL_STATUS(Failure);
-        }
-    }
-
+    VerifyOrReturnError(mOnLevel != newOnLevel, CHIP_NO_ERROR);
     mOnLevel = newOnLevel;
     mDelegate.OnOnLevelChanged(mOnLevel);
-    return NotifyAttributeChangedIfSuccess(Attributes::OnLevel::Id, Protocols::InteractionModel::Status::Success);
+    NotifyAttributeChanged(Attributes::OnLevel::Id);
+    return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetDefaultMoveRate(DataModel::Nullable<uint8_t> newDefaultMoveRate)
+CHIP_ERROR LevelControlCluster::SetDefaultMoveRate(DataModel::Nullable<uint8_t> newDefaultMoveRate)
 {
     // Validate constraint: Min 1
     if (!newDefaultMoveRate.IsNull() && newDefaultMoveRate.Value() < 1)
+    {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    if (mDefaultMoveRate == newDefaultMoveRate)
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-    mDefaultMoveRate = newDefaultMoveRate;
-    mDelegate.OnDefaultMoveRateChanged(mDefaultMoveRate);
-    return NotifyAttributeChangedIfSuccess(Attributes::DefaultMoveRate::Id, Protocols::InteractionModel::Status::Success);
+    }
+    if (mDefaultMoveRate != newDefaultMoveRate)
+    {
+        mDefaultMoveRate = newDefaultMoveRate;
+        mDelegate.OnDefaultMoveRateChanged(mDefaultMoveRate);
+        NotifyAttributeChanged(Attributes::DefaultMoveRate::Id);
+    }
+    return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetCurrentLevel(uint8_t level)
+CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level)
 {
     // Validate constraints against Min/Max
-    if (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) && level < mMinLevel)
+    if ((mOptionalAttributes.IsSet(Attributes::MinLevel::Id) && level < mMinLevel) || level > kMaxLevel)
+    {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    if (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) && level > mMaxLevel)
+    }
+    if ((mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) && level > mMaxLevel) || level < mMinLevel)
+    {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
 
     if (mCurrentLevel.IsNull() || mCurrentLevel.Value() != level)
     {
         mDelegate.OnLevelChanged(level);
         return SetCurrentLevelQuietReport(DataModel::MakeNullable(level), true);
     }
-    return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
+CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
 {
-    if (mStartUpCurrentLevel == startupLevel)
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
-
-    // Store if changed (N attribute)
-    if (mContext)
-    {
-        NumericAttributeTraits<uint8_t>::StorageType storageValue;
-        DataModel::NullableToStorage(startupLevel, storageValue);
-        if (mContext->attributeStorage.WriteValue(
-                ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id),
-                ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))) != CHIP_NO_ERROR)
-        {
-            return CHIP_IM_GLOBAL_STATUS(Failure);
-        }
-    }
-
+    VerifyOrReturnError(mStartUpCurrentLevel != startupLevel, CHIP_NO_ERROR);
     mStartUpCurrentLevel = startupLevel;
-    return NotifyAttributeChangedIfSuccess(Attributes::StartUpCurrentLevel::Id, Protocols::InteractionModel::Status::Success);
+    NotifyAttributeChanged(Attributes::StartUpCurrentLevel::Id);
+
+    VerifyOrReturnError(mContext != nullptr, CHIP_NO_ERROR);
+
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    DataModel::NullableToStorage(startupLevel, storageValue);
+    return mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue)));
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime)
+CHIP_ERROR LevelControlCluster::SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime)
 {
-    if (mOnTransitionTime == onTransitionTime)
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    VerifyOrReturnError(mOnTransitionTime != onTransitionTime, CHIP_NO_ERROR);
     mOnTransitionTime = onTransitionTime;
-    return NotifyAttributeChangedIfSuccess(Attributes::OnTransitionTime::Id, Protocols::InteractionModel::Status::Success);
+    NotifyAttributeChanged(Attributes::OnTransitionTime::Id);
+    return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetOffTransitionTime(DataModel::Nullable<uint16_t> offTransitionTime)
+CHIP_ERROR LevelControlCluster::SetOffTransitionTime(DataModel::Nullable<uint16_t> offTransitionTime)
 {
-    if (mOffTransitionTime == offTransitionTime)
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    VerifyOrReturnError(mOffTransitionTime != offTransitionTime, CHIP_NO_ERROR);
     mOffTransitionTime = offTransitionTime;
-    return NotifyAttributeChangedIfSuccess(Attributes::OffTransitionTime::Id, Protocols::InteractionModel::Status::Success);
+    NotifyAttributeChanged(Attributes::OffTransitionTime::Id);
+    return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetOnOffTransitionTime(uint16_t onOffTransitionTime)
+CHIP_ERROR LevelControlCluster::SetOnOffTransitionTime(uint16_t onOffTransitionTime)
 {
-    if (mOnOffTransitionTime == onOffTransitionTime)
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    VerifyOrReturnError(mOnOffTransitionTime != onOffTransitionTime, CHIP_NO_ERROR);
     mOnOffTransitionTime = onOffTransitionTime;
-    return NotifyAttributeChangedIfSuccess(Attributes::OnOffTransitionTime::Id, Protocols::InteractionModel::Status::Success);
+    NotifyAttributeChanged(Attributes::OnOffTransitionTime::Id);
+    return CHIP_NO_ERROR;
 }
 
 void LevelControlCluster::UpdateOnOff(bool on, bool temporarilyIgnoreOnOffCallbacks)
 {
-    if (mFeatureMap.Has(Feature::kOnOff))
-    {
-        if (temporarilyIgnoreOnOffCallbacks)
-            mTemporarilyIgnoreOnOffCallbacks = true;
-
-        mDelegate.SetOnOff(on);
-
-        if (temporarilyIgnoreOnOffCallbacks)
-            mTemporarilyIgnoreOnOffCallbacks = false;
-    }
+    ReturnOnFailure(!mFeatureMap.Has(Feature::kOnOff));
+    // Prevent potential callback loops
+    mTemporarilyIgnoreOnOffCallbacks = temporarilyIgnoreOnOffCallbacks;
+    mDelegate.SetOnOff(on);
+    mTemporarilyIgnoreOnOffCallbacks = false;
 }
 
 bool LevelControlCluster::ShouldExecuteIfOff(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
                                              BitMask<OptionsBitmap> optionsOverride)
 {
-    if (!mFeatureMap.Has(Feature::kOnOff))
-        return true;
+    VerifyOrReturnValue(mFeatureMap.Has(Feature::kOnOff), true);
 
-    // Commands that bypass the check
-    if (commandId == Commands::MoveToLevelWithOnOff::Id || commandId == Commands::MoveWithOnOff::Id ||
+    // If it's ON or it's one of the *WithOnOffCommands
+    if (mDelegate.GetOnOff() || commandId == Commands::MoveToLevelWithOnOff::Id || commandId == Commands::MoveWithOnOff::Id ||
         commandId == Commands::StepWithOnOff::Id || commandId == Commands::StopWithOnOff::Id)
     {
         return true;
     }
 
-    if (mDelegate.GetOnOff())
-        return true;
-
-    bool executeIfOff = false;
-    if (mOptions.Has(OptionsBitmap::kExecuteIfOff))
-        executeIfOff = true;
+    // Check for ExecuteIfOff bit in Options attribute or command overrides
+    bool executeIfOff = mOptions.Has(OptionsBitmap::kExecuteIfOff);
     if (optionsMask.Has(OptionsBitmap::kExecuteIfOff))
     {
-        if (optionsOverride.Has(OptionsBitmap::kExecuteIfOff))
-        {
-            executeIfOff = true;
-        }
-        else
-        {
-            executeIfOff = false;
-        }
+        executeIfOff = optionsOverride.Has(OptionsBitmap::kExecuteIfOff) ? true : false;
     }
 
     return executeIfOff;
-}
-
-void LevelControlCluster::TimerFired()
-{
-    HandleTick();
 }
 
 bool LevelControlCluster::SupportsCluster(EndpointId endpoint, ClusterId cluster)
@@ -680,7 +656,9 @@ CHIP_ERROR LevelControlCluster::SerializeSave(EndpointId endpoint, ClusterId clu
     using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
     if (!SupportsCluster(endpoint, cluster))
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     AttributeValuePair pairs[1];
     pairs[0].attributeID = Attributes::CurrentLevel::Id;
@@ -699,7 +677,9 @@ CHIP_ERROR LevelControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
     if (!SupportsCluster(endpoint, cluster))
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -707,75 +687,100 @@ CHIP_ERROR LevelControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     while (pair_iterator.Next())
     {
         auto & decodePair = pair_iterator.GetValue();
-        if (decodePair.attributeID == Attributes::CurrentLevel::Id)
+        if (decodePair.attributeID == Attributes::CurrentLevel::Id && decodePair.valueUnsigned8.HasValue())
         {
-            if (decodePair.valueUnsigned8.HasValue())
-            {
-                uint8_t level = decodePair.valueUnsigned8.Value();
-                DataModel::Nullable<uint16_t> ds;
-                ds.SetNonNull(static_cast<uint16_t>(timeMs / 100));
+            uint8_t level = decodePair.valueUnsigned8.Value();
+            DataModel::Nullable<uint16_t> ds;
+            ds.SetNonNull(static_cast<uint16_t>(timeMs / 100));
 
-                // Force execution even if Off
-                BitMask<OptionsBitmap> optionsMask(OptionsBitmap::kExecuteIfOff);
-                BitMask<OptionsBitmap> optionsOverride(OptionsBitmap::kExecuteIfOff);
+            // Scenes must be applied even if the device is Off, overriding the Options attribute.
+            BitMask<OptionsBitmap> optionsMask(OptionsBitmap::kExecuteIfOff);
+            BitMask<OptionsBitmap> optionsOverride(OptionsBitmap::kExecuteIfOff);
 
-                MoveToLevelHandler(Commands::MoveToLevel::Id, level, ds, optionsMask, optionsOverride);
-            }
+            MoveToLevelCommand(Commands::MoveToLevel::Id, level, ds, optionsMask, optionsOverride);
         }
     }
     return pair_iterator.GetStatus();
 }
 
-DataModel::ActionReturnStatus LevelControlCluster::SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue,
-                                                                              bool isEndOfTransition)
+CHIP_ERROR LevelControlCluster::SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition)
 {
-    if (mCurrentLevel != newValue)
+    VerifyOrReturnError(mCurrentLevel != newValue, CHIP_NO_ERROR);
+
+    uint64_t nowMs    = System::SystemClock().GetMonotonicMilliseconds64().count();
+    bool shouldReport = false;
+
+    if (isEndOfTransition || (mCurrentLevel.IsNull() != newValue.IsNull()) || (nowMs - mLastReportTimeMs >= 1000))
     {
-        uint64_t nowMs    = System::SystemClock().GetMonotonicMilliseconds64().count();
-        bool shouldReport = false;
-
-        if (isEndOfTransition)
-        {
-            shouldReport = true;
-        }
-        else if (mCurrentLevel.IsNull() != newValue.IsNull())
-        {
-            shouldReport = true;
-        }
-        else if (nowMs - mLastReportTimeMs >= 1000)
-        {
-            shouldReport = true;
-        }
-
-        mCurrentLevel = newValue;
-
-        if (shouldReport)
-        {
-            mLastReportTimeMs = nowMs;
-            return NotifyAttributeChangedIfSuccess(Attributes::CurrentLevel::Id, Protocols::InteractionModel::Status::Success);
-        }
+        shouldReport = true;
     }
-    return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+
+    mCurrentLevel = newValue;
+
+    // Store if changed (N attribute)
+    if (mContext)
+    {
+        NumericAttributeTraits<uint8_t>::StorageType storageValue;
+        DataModel::NullableToStorage(mCurrentLevel, storageValue);
+        // Ignore write errors, as we can't really do anything about them here and
+        // we've already updated the in-memory state.
+        (void) mContext->attributeStorage.WriteValue(
+            ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id),
+            ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue)));
+    }
+
+    if (shouldReport)
+    {
+        mLastReportTimeMs = nowMs;
+        NotifyAttributeChanged(Attributes::CurrentLevel::Id);
+    }
+    return CHIP_NO_ERROR;
 }
 
 void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, bool isNewTransition)
 {
-    if (mFeatureMap.Has(Feature::kLighting))
-    {
-        // Convert ms to ds (rounding up)
-        uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
+    VerifyOrReturn(mFeatureMap.Has(Feature::kLighting));
 
-        if (mRemainingTime != remainingTimeDs)
+    // Convert ms to ds (rounding up)
+    uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
+    mRemainingTime           = remainingTimeDs;
+
+    bool shouldReport = false;
+
+    // "For commands with a transition time or changes to the transition time less than 1 second,
+    // changes to this attribute SHALL NOT be reported."
+    if (mTransitionTimeMs >= 1000)
+    {
+        // Case 1: Changes from 0 to any value higher than 10
+        if (mLastReportedRemainingTime == 0 && remainingTimeDs > 10)
         {
-            mRemainingTime = remainingTimeDs;
-            NotifyAttributeChanged(Attributes::RemainingTime::Id);
+            shouldReport = true;
         }
+        // Case 2: Changes with a delta larger than 10, caused by the invoke of a command
+        else if (isNewTransition)
+        {
+            if (remainingTimeDs > mLastReportedRemainingTime + 10 || mLastReportedRemainingTime > remainingTimeDs + 10)
+            {
+                shouldReport = true;
+            }
+        }
+        // Case 3: Changes to 0
+        else if (remainingTimeDs == 0 && mLastReportedRemainingTime != 0)
+        {
+            shouldReport = true;
+        }
+    }
+
+    if (shouldReport)
+    {
+        mLastReportedRemainingTime = remainingTimeDs;
+        NotifyAttributeChanged(Attributes::RemainingTime::Id);
     }
 }
 
 void LevelControlCluster::StartTimer(uint32_t delayMs)
 {
-    RETURN_SAFELY_IGNORED mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(delayMs));
+    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(delayMs)) == CHIP_NO_ERROR);
 }
 
 void LevelControlCluster::CancelTimer()
@@ -783,7 +788,7 @@ void LevelControlCluster::CancelTimer()
     mTimerDelegate.CancelTimer(this);
 }
 
-void LevelControlCluster::HandleTick()
+void LevelControlCluster::TimerFired()
 {
     if (mCurrentLevel.IsNull())
         return;
@@ -814,7 +819,8 @@ void LevelControlCluster::HandleTick()
     bool isEndOfTransition = (currentLevel == mTargetLevel);
 
     mDelegate.OnLevelChanged(currentLevel);
-    SetCurrentLevelQuietReport(DataModel::MakeNullable(currentLevel), isEndOfTransition);
+    // Ignore error as this is a background tick.
+    RETURN_SAFELY_IGNORED SetCurrentLevelQuietReport(DataModel::MakeNullable(currentLevel), isEndOfTransition);
 
     if (isEndOfTransition)
     {
@@ -822,7 +828,7 @@ void LevelControlCluster::HandleTick()
         if (mCurrentCommandId == Commands::MoveToLevelWithOnOff::Id || mCurrentCommandId == Commands::MoveWithOnOff::Id ||
             mCurrentCommandId == Commands::StepWithOnOff::Id)
         {
-            if (currentLevel == mMinLevel)
+            if (currentLevel == mMinLevel || currentLevel == 0)
                 UpdateOnOff(false);
         }
         return;
@@ -842,14 +848,15 @@ void LevelControlCluster::OnOffChanged(bool isOn)
     {
         // On Transition
         // 2. Determine Target Level (Capture before setting to Min)
-        uint8_t target = 254; // Default Max
+        uint8_t target = kMaxLevel; // Default Max
         if (!mOnLevel.IsNull())
             target = mOnLevel.Value();
         else if (!mStoredLevel.IsNull())
             target = mStoredLevel.Value();
 
         // 1. Set to MinLevel
-        SetCurrentLevel(mMinLevel);
+        // Ignore error as we are internally forcing a valid level (MinLevel) to start the transition.
+        RETURN_SAFELY_IGNORED SetCurrentLevel(mMinLevel);
 
         // 3. Determine Transition Time
         DataModel::Nullable<uint16_t> transitionTime;
@@ -864,7 +871,7 @@ void LevelControlCluster::OnOffChanged(bool isOn)
 
         // 4. Move
         BitMask<OptionsBitmap> options;
-        MoveToLevelHandler(Commands::MoveToLevelWithOnOff::Id, target, transitionTime, options, options);
+        MoveToLevelWithOnOffCommand(Commands::MoveToLevelWithOnOff::Id, target, transitionTime, options, options);
     }
     else
     {
@@ -884,32 +891,20 @@ void LevelControlCluster::OnOffChanged(bool isOn)
         }
 
         BitMask<OptionsBitmap> options;
-        MoveToLevelHandler(Commands::MoveToLevelWithOnOff::Id, mMinLevel, transitionTime, options, options);
+        MoveToLevelWithOnOffCommand(Commands::MoveToLevelWithOnOff::Id, mMinLevel, transitionTime, options, options);
     }
 }
 
-void LevelControlCluster::HandleOnOffTask(CommandId commandId, bool isMoveUp)
+void LevelControlCluster::EnsureOn()
 {
     if (mDelegate.GetOnOff())
         return;
 
-    bool shouldTurnOn = false;
-    if (commandId == Commands::MoveToLevelWithOnOff::Id)
+    UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
+    if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
     {
-        shouldTurnOn = true;
-    }
-    else if ((commandId == Commands::MoveWithOnOff::Id || commandId == Commands::StepWithOnOff::Id) && isMoveUp)
-    {
-        shouldTurnOn = true;
-    }
-
-    if (shouldTurnOn)
-    {
-        UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
-        if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
-        {
-            SetCurrentLevel(mMinLevel);
-        }
+        // Ignore error as we are fixing up an invalid state (Current < Min) by forcing to Min.
+        RETURN_SAFELY_IGNORED SetCurrentLevel(mMinLevel);
     }
 }
 

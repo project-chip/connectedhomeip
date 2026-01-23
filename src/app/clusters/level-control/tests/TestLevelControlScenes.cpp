@@ -35,7 +35,7 @@ TEST_F(TestLevelControlScenes, TestSerializeScene)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(55);
+    EXPECT_EQ(cluster.SetCurrentLevel(55), CHIP_NO_ERROR);
 
     uint8_t buffer[128];
     MutableByteSpan serializedBytes(buffer);
@@ -60,7 +60,7 @@ TEST_F(TestLevelControlScenes, TestApplyScene)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Create serialized scene with level 20
     uint8_t buffer[128];
@@ -101,7 +101,7 @@ TEST_F(TestLevelControlScenes, TestApplySceneImmediate)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Scene with level 50
     uint8_t buffer[128];
@@ -130,7 +130,7 @@ TEST_F(TestLevelControlScenes, TestApplySceneWhileOff)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
     mockDelegate.mOn = false; // OFF
 
     // Scene with level 50

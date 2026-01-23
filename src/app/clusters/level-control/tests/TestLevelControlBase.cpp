@@ -15,6 +15,7 @@
  */
 
 #include <app/clusters/level-control/tests/TestLevelControlCommon.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -36,7 +37,8 @@ struct TestLevelControlBase : public LevelControlTestBase
 
 TEST_F(TestLevelControlBase, TestAcceptedCommands)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff() };
+    // Verify that all commands are present even without the OnOff feature enabled
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -178,7 +180,7 @@ TEST_F(TestLevelControlBase, TestMaxLevelConstraint)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(10);
+    EXPECT_EQ(cluster.SetCurrentLevel(10), CHIP_NO_ERROR);
 
     Commands::MoveToLevel::Type data;
     data.level = 201; // > MaxLevel
@@ -236,7 +238,7 @@ TEST_F(TestLevelControlBase, TestImmediateExecution)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     Commands::MoveToLevel::Type data;
     data.level = 100;
@@ -283,11 +285,11 @@ TEST_F(TestLevelControlBase, TestStateGetters)
     LevelControlCluster::Config config(kTestEndpointId, mockTimer, mockDelegate);
     LevelControlCluster cluster(config);
 
-    cluster.SetCurrentLevel(100);
+    EXPECT_EQ(cluster.SetCurrentLevel(100), CHIP_NO_ERROR);
 
     BitMask<LevelControl::OptionsBitmap> options;
     options.Set(LevelControl::OptionsBitmap::kExecuteIfOff);
-    cluster.SetOptions(options);
+    EXPECT_EQ(cluster.SetOptions(options), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.GetCurrentLevel().Value(), 100u);
     EXPECT_EQ(cluster.GetOptions(), options);
@@ -301,7 +303,7 @@ TEST_F(TestLevelControlBase, TestMoveToLevelCommand)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     Commands::MoveToLevel::Type data;
     data.level = 100;
@@ -326,7 +328,7 @@ TEST_F(TestLevelControlBase, TestTimerFired)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Move to 2 over 2 seconds (20ds). 2 steps. 1000ms per step.
     Commands::MoveToLevel::Type data;
@@ -362,7 +364,7 @@ TEST_F(TestLevelControlBase, TestStopCommand)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Start transition
     Commands::MoveToLevel::Type data;
@@ -388,7 +390,7 @@ TEST_F(TestLevelControlBase, TestMoveToLevelFallback)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Case 1: OnOffTransitionTime = 100 (10s).
     uint16_t onOffTransitionTime = 100;
@@ -430,7 +432,7 @@ TEST_F(TestLevelControlBase, TestMoveCommand)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Move Up at rate 10 units/s.
     Commands::Move::Type data;
@@ -468,7 +470,7 @@ TEST_F(TestLevelControlBase, TestStepCommand)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Step Up 10 units in 10s (100ds).
     Commands::Step::Type data;
@@ -503,7 +505,7 @@ TEST_F(TestLevelControlBase, TestCurrentLevelReporting)
     chip::Testing::ClusterTester tester(cluster);
     auto & changeListener = context.ChangeListener();
 
-    cluster.SetCurrentLevel(0);
+    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
 
     // Verify initial set reported (discrete event)
     bool initReported = false;
@@ -558,4 +560,63 @@ TEST_F(TestLevelControlBase, TestCurrentLevelReporting)
             reported = true;
     }
     EXPECT_TRUE(reported);
+}
+
+TEST_F(TestLevelControlBase, TestStartUpCurrentLevelPersistence)
+{
+    chip::Testing::TestServerClusterContext context;
+
+    // 1. Initialize and Write StartUpCurrentLevel
+    {
+        LevelControlCluster cluster{
+            LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithLighting(DataModel::NullNullable)
+        };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        chip::Testing::ClusterTester tester(cluster);
+        DataModel::Nullable<uint8_t> startupLevel;
+        startupLevel.SetNonNull(50);
+        EXPECT_TRUE(tester.WriteAttribute(Attributes::StartUpCurrentLevel::Id, startupLevel).IsSuccess());
+    }
+
+    // 2. Verify Storage directly
+    uint8_t buffer[1];
+    MutableByteSpan span(buffer);
+    EXPECT_EQ(context.AttributePersistenceProvider().ReadValue(
+                  ConcreteAttributePath(kTestEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id), span),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), 1u);
+    EXPECT_EQ(buffer[0], 50u);
+}
+
+TEST_F(TestLevelControlBase, TestCurrentLevelPersistence)
+{
+    chip::Testing::TestServerClusterContext context;
+
+    // 1. Initialize and Set CurrentLevel
+    {
+        // Start with an initial level so the attribute is not null (MoveToLevel fails if current is null)
+        LevelControlCluster cluster{
+            LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithInitialCurrentLevel(10)
+        };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        chip::Testing::ClusterTester tester(cluster);
+
+        Commands::MoveToLevel::Type data;
+        data.level = 123;
+        data.transitionTime.SetNonNull(0);
+        data.optionsMask.Set(OptionsBitmap::kExecuteIfOff);
+        data.optionsOverride.Set(OptionsBitmap::kExecuteIfOff);
+        EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+    }
+
+    // 2. Verify Storage directly
+    uint8_t buffer[1];
+    MutableByteSpan span(buffer);
+    EXPECT_EQ(context.AttributePersistenceProvider().ReadValue(
+                  ConcreteAttributePath(kTestEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), span),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(span.size(), 1u);
+    EXPECT_EQ(buffer[0], 123u);
 }

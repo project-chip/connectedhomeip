@@ -46,11 +46,14 @@ class LevelControlCluster : public DefaultServerCluster, public TimerContext, pu
 {
 public:
     // Helper set for managing optional attributes availability based on configuration.
-    using OptionalAttributes =
-        app::OptionalAttributeSet<LevelControl::Attributes::MinLevel::Id, LevelControl::Attributes::MaxLevel::Id,
-                                  LevelControl::Attributes::DefaultMoveRate::Id, LevelControl::Attributes::OnTransitionTime::Id,
-                                  LevelControl::Attributes::OffTransitionTime::Id,
-                                  LevelControl::Attributes::OnOffTransitionTime::Id>;
+    using OptionalAttributes = app::OptionalAttributeSet< //
+        LevelControl::Attributes::MinLevel::Id,           //
+        LevelControl::Attributes::MaxLevel::Id,           //
+        LevelControl::Attributes::OnOffTransitionTime::Id,
+        LevelControl::Attributes::OnTransitionTime::Id, //
+        LevelControl::Attributes::OffTransitionTime::Id,
+        LevelControl::Attributes::DefaultMoveRate::Id //
+        >;
 
     struct Config
     {
@@ -73,13 +76,13 @@ public:
         }
         Config & WithMinLevel(uint8_t min)
         {
-            mMinLevel = mFeatureMap.Has(LevelControl::Feature::kLighting) ? 1 : min;
+            mMinLevel = min;
             mOptionalAttributes.Set<LevelControl::Attributes::MinLevel::Id>();
             return *this;
         }
         Config & WithMaxLevel(uint8_t max)
         {
-            mMaxLevel = mFeatureMap.Has(LevelControl::Feature::kLighting) ? 254 : max;
+            mMaxLevel = max;
             mOptionalAttributes.Set<LevelControl::Attributes::MaxLevel::Id>();
             return *this;
         }
@@ -146,14 +149,14 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     // Cluster Public API
-    DataModel::ActionReturnStatus SetOptions(BitMask<LevelControl::OptionsBitmap> newOptions);
-    DataModel::ActionReturnStatus SetOnLevel(DataModel::Nullable<uint8_t> newOnLevel);
-    DataModel::ActionReturnStatus SetDefaultMoveRate(DataModel::Nullable<uint8_t> newDefaultMoveRate);
-    DataModel::ActionReturnStatus SetCurrentLevel(uint8_t level);
-    DataModel::ActionReturnStatus SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel);
-    DataModel::ActionReturnStatus SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime);
-    DataModel::ActionReturnStatus SetOffTransitionTime(DataModel::Nullable<uint16_t> offTransitionTime);
-    DataModel::ActionReturnStatus SetOnOffTransitionTime(uint16_t onOffTransitionTime);
+    CHIP_ERROR SetOptions(BitMask<LevelControl::OptionsBitmap> newOptions);
+    CHIP_ERROR SetOnLevel(DataModel::Nullable<uint8_t> newOnLevel);
+    CHIP_ERROR SetDefaultMoveRate(DataModel::Nullable<uint8_t> newDefaultMoveRate);
+    CHIP_ERROR SetCurrentLevel(uint8_t level);
+    CHIP_ERROR SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel);
+    CHIP_ERROR SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime);
+    CHIP_ERROR SetOffTransitionTime(DataModel::Nullable<uint16_t> offTransitionTime);
+    CHIP_ERROR SetOnOffTransitionTime(uint16_t onOffTransitionTime);
 
     // Getters
     DataModel::Nullable<uint8_t> GetCurrentLevel() const { return mCurrentLevel; }
@@ -191,7 +194,8 @@ private:
     DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
 
     // Extended Attributes (Lighting/Transitions)
-    uint16_t mRemainingTime = 0;
+    uint16_t mRemainingTime             = 0;
+    uint16_t mLastReportedRemainingTime = 0;
     DataModel::Nullable<uint16_t> mOnTransitionTime;
     DataModel::Nullable<uint16_t> mOffTransitionTime;
     uint16_t mOnOffTransitionTime = 0;
@@ -221,8 +225,8 @@ private:
     bool ShouldExecuteIfOff(CommandId commandId, BitMask<LevelControl::OptionsBitmap> optionsMask,
                             BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
-    // Handles the "With On/Off" command logic: Turns device On if needed and resets level to MinLevel.
-    void HandleOnOffTask(CommandId commandId, bool isMoveUp);
+    // Turns device On if currently Off, handling related level adjustments (e.g. MinLevel).
+    void EnsureOn();
 
     // Setup and start the transition timer
     void ScheduleTimer(uint32_t durationMs, uint32_t transitionTimeMs);
@@ -233,27 +237,37 @@ private:
     //  At most once per second, or
     //  At the end of the movement/transition, or
     //  When it changes from null to any other value and vice versa."
-    DataModel::ActionReturnStatus SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
+    CHIP_ERROR SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
     // Helper to update RemainingTime attribute with quiet reporting rules (delta check).
     void UpdateRemainingTime(uint32_t remainingTimeMs, bool isNewTransition);
 
     void StartTimer(uint32_t delayMs);
     void CancelTimer();
-    void HandleTick();
 
-    // Handlers
-    DataModel::ActionReturnStatus MoveToLevelHandler(CommandId commandId, uint8_t level,
+    DataModel::ActionReturnStatus MoveToLevelCommand(CommandId commandId, uint8_t level,
                                                      DataModel::Nullable<uint16_t> transitionTimeDS,
                                                      BitMask<LevelControl::OptionsBitmap> optionsMask,
                                                      BitMask<LevelControl::OptionsBitmap> optionsOverride);
-    DataModel::ActionReturnStatus MoveHandler(CommandId commandId, LevelControl::MoveModeEnum moveMode,
+    DataModel::ActionReturnStatus MoveToLevelWithOnOffCommand(CommandId commandId, uint8_t level,
+                                                              DataModel::Nullable<uint16_t> transitionTimeDS,
+                                                              BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                                              BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus MoveCommand(CommandId commandId, LevelControl::MoveModeEnum moveMode,
                                               DataModel::Nullable<uint8_t> rate, BitMask<LevelControl::OptionsBitmap> optionsMask,
                                               BitMask<LevelControl::OptionsBitmap> optionsOverride);
-    DataModel::ActionReturnStatus StepHandler(CommandId commandId, LevelControl::StepModeEnum stepMode, uint8_t stepSize,
+    DataModel::ActionReturnStatus MoveWithOnOffCommand(CommandId commandId, LevelControl::MoveModeEnum moveMode,
+                                                       DataModel::Nullable<uint8_t> rate,
+                                                       BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus StepCommand(CommandId commandId, LevelControl::StepModeEnum stepMode, uint8_t stepSize,
                                               DataModel::Nullable<uint16_t> transitionTime,
                                               BitMask<LevelControl::OptionsBitmap> optionsMask,
                                               BitMask<LevelControl::OptionsBitmap> optionsOverride);
-    DataModel::ActionReturnStatus StopHandler(CommandId commandId, BitMask<LevelControl::OptionsBitmap> optionsMask,
+    DataModel::ActionReturnStatus StepWithOnOffCommand(CommandId commandId, LevelControl::StepModeEnum stepMode, uint8_t stepSize,
+                                                       DataModel::Nullable<uint16_t> transitionTime,
+                                                       BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus StopCommand(CommandId commandId, BitMask<LevelControl::OptionsBitmap> optionsMask,
                                               BitMask<LevelControl::OptionsBitmap> optionsOverride);
 };
 

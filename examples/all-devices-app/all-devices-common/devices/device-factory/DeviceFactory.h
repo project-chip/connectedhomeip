@@ -101,7 +101,7 @@ private:
         };
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
         mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };
-        mRegistry["speaker"]          = []() { return std::make_unique<LoggingSpeakerDevice>(); };
+        mRegistry["speaker"]          = [this]() { return std::make_unique<LoggingSpeakerDevice>(timer); };
     }
 };
 
