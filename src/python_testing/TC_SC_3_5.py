@@ -326,7 +326,7 @@ class TC_SC_3_5(MatterBaseTest):
         self.step("2c")
         prompt_msg = (
             "\nPlease commission the TH_SERVER app from DUT:\n"
-            f"  pairing onnetwork 1 {th_server_passcode}\n"
+            f"  pairing onnetwork 2 {th_server_passcode}\n"
             "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
             "Input 'N' if commissioner DUT commissions successfully \n "
             "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
@@ -360,7 +360,7 @@ class TC_SC_3_5(MatterBaseTest):
         prompt_msg = (
             "\nPlease commission the TH_SERVER app from DUT:\n"
             "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
-            f"  pairing onnetwork 2 {th_server_passcode}\n"
+            f"  pairing onnetwork 3 {th_server_passcode}\n"
             "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
             "Input 'N' if commissioner DUT commissions successfully \n "
             "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
@@ -400,7 +400,7 @@ class TC_SC_3_5(MatterBaseTest):
             prompt_msg = (
                 "\nPlease commission the TH_SERVER app from DUT:\n"
                 "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
-                f"  pairing onnetwork 3 {th_server_passcode}\n"
+                f"  pairing onnetwork 4 {th_server_passcode}\n"
                 "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
                 "Input 'N' if commissioner DUT commissions successfully \n "
                 "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
@@ -434,7 +434,7 @@ class TC_SC_3_5(MatterBaseTest):
         prompt_msg = (
             "\nPlease commission the TH_SERVER app from DUT:\n"
             "\nWARNING: Make sure that the Commissioner restarts commissioning from scratch, such as by changing NodeID or by restarting the commissioner\n"
-            f"  pairing onnetwork 4 {th_server_passcode}\n"
+            f"  pairing onnetwork 5 {th_server_passcode}\n"
             "Input 'Y' if commissioner DUT fails commissioning AND TH Server Logs display CHIP ERROR = 0x00000054 (INVALID CASE PARAMETER) equivalent to Status Report with protocol code 2 \n"
             "Input 'N' if commissioner DUT commissions successfully \n "
             "Or failure in TH Server Logs IS NOT = 'INVALID CASE PARAMETER'\n"
