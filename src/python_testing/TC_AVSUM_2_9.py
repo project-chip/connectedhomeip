@@ -42,7 +42,6 @@ from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
@@ -68,7 +67,7 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
             TestStep(10,"If Zoom is supported read and verify ZoomMax attribute. Store in myZoomMax."),
             TestStep(11,"Set newZoom to be a value in the range 2 to myZoomMax different from initialZoom."),
             TestStep(12,"Send MPTZSetPosition command with Pan set to newPan, Tilt set to newTilt, Zoom set to newZoom as appropriate."),
-            TestStep(13,"Once the MovementState has returned to _Idle_, read and verify the MPTZPosition attribute."),        
+            TestStep(13,"Once the MovementState has returned to _Idle_, read and verify the MPTZPosition attribute."),
             TestStep(14,"If MaxPresets is supported, read the MaxPresets attribute. Store the returned value in myMaxPresets."),
             TestStep(15,"Read the MPTZPresets attribute.  Save this in myPresets."),
             TestStep(16,"Fail if the number of entries in myPresets is greater than myMaxPresets."),
@@ -179,7 +178,7 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
         else:
             self.skip_step(10)
             self.skip_step(11)
-        
+
         self.step(12)
         sub_handler.reset()
         # Invoke the command with the new values
@@ -238,7 +237,7 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
             self.step(19)
             clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
             attributesAVSTR = clusterAVSTR.Attributes
-   
+
             # Ensure that the DUTs Viewport and Sensor Size are coherent, the viewport cannot be larger than the sensor
             sensordimensions = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.VideoSensorParams)
             viewport = await self.read_avstr_attribute_expect_success(endpoint, attributesAVSTR.Viewport)
