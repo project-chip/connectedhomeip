@@ -14,9 +14,29 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/platform/device.gni")
 
 config("includes") {
-  include_dirs = [ "." ]
+  include_dirs = [
+      ".",
+      "include",
+  ]
+}
+
+source_set("darwin") {
+  sources = [
+    "include/TermHandling.h",
+    "darwin/TermHandling.cpp",
+  ]
+  public_configs = [":includes"]
+}
+
+source_set("linux") {
+  sources = [
+    "include/TermHandling.h",
+    "linux/TermHandling.cpp",
+  ]
+  public_configs = [":includes"]
 }
 
 executable("all-devices-app") {
@@ -39,6 +59,12 @@ executable("all-devices-app") {
     "${chip_root}/src/lib",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
+
+  if (chip_device_platform == "darwin") {
+    deps += [ ":darwin" ]
+  } else {
+    deps += [ ":linux" ]
+  }
 
   include_dirs = [ "${chip_root}/examples/common" ]
 

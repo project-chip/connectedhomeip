@@ -34,6 +34,8 @@
 #include <string>
 #include <system/SystemLayer.h>
 
+#include <TermHandling.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Platform;
@@ -60,7 +62,7 @@ void StopSignalHandler(int /* signal */)
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
-        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
+        SuccessOrDie(SystemLayer().ScheduleLambda([]() { VerifyOrDie(PlatformMgr().StopEventLoopTask() == CHIP_NO_ERROR); }));
     }
 }
 
@@ -132,11 +134,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     sWiFiDriver.Set5gSupport(true);
 
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
-    sigaction(SIGINT, &sa, nullptr);
-    sigaction(SIGTERM, &sa, nullptr);
+    chip::app::SetTermiateHandler(StopSignalHandler);
 
     if (mainLoop != nullptr)
     {
