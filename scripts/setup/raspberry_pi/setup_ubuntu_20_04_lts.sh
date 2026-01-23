@@ -30,6 +30,7 @@ sudo apt-get install -fy \
     libavahi-client-dev \
     libcairo2-dev \
     libdbus-1-dev \
+    libevent-dev \
     libgirepository1.0-dev \
     libglib2.0-dev \
     libssl-dev \

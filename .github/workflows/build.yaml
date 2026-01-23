@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:177
+            image: ghcr.io/project-chip/chip-build:181
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -153,7 +153,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:177
+            image: ghcr.io/project-chip/chip-build:181
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -326,7 +326,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:177
+            image: ghcr.io/project-chip/chip-build:181
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -389,7 +389,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:177
+            image: ghcr.io/project-chip/chip-build:181
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -515,7 +515,7 @@ jobs:
         runs-on: namespace-profile-4x8
 
         container:
-            image: ghcr.io/project-chip/chip-build:177
+            image: ghcr.io/project-chip/chip-build:181
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
