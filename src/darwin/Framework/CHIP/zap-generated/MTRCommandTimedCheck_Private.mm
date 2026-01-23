@@ -15,13 +15,22 @@
  *    limitations under the License.
  */
 
-#import "MTRStructsObjc_Private.h"
-#import <Matter/MTRCommandPayloadsObjc.h>
-#import <Matter/MTRDefines.h>
-#import <Matter/MTRStructsObjc.h>
+#import "MTRCommandTimedCheck.h"
 
-NS_ASSUME_NONNULL_BEGIN
-// Nothing here for now, but leaving this file in place in case we need to add
-// something.
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 
-NS_ASSUME_NONNULL_END
+using namespace chip;
+using namespace chip::app;
+
+BOOL MTRPrivateCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonnull aCommandID)
+{
+    ClusterId clusterID = static_cast<ClusterId>(aClusterID.unsignedLongLongValue);
+    __unused CommandId commandID = static_cast<CommandId>(aCommandID.unsignedLongLongValue);
+
+    switch (clusterID) {
+    default: {
+        return NO;
+    }
+    }
+}

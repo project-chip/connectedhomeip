@@ -15,13 +15,26 @@
  *    limitations under the License.
  */
 
-#import "MTRStructsObjc_Private.h"
-#import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRDefines.h>
-#import <Matter/MTRStructsObjc.h>
+#import <stdint.h>
 
-NS_ASSUME_NONNULL_BEGIN
-// Nothing here for now, but leaving this file in place in case we need to add
-// something.
+#pragma mark - Private Cluster IDs
 
-NS_ASSUME_NONNULL_END
+typedef NS_ENUM(uint32_t, MTRPrivateClusterIDType) {
+};
+
+#pragma mark - Private Attribute IDs
+
+typedef NS_ENUM(uint32_t, MTRPrivateAttributeIDType) {
+};
+
+#pragma mark - Private Command IDs
+
+typedef NS_ENUM(uint32_t, MTRPrivateCommandIDType) {
+};
+
+#pragma mark - Private Event IDs
+
+typedef NS_ENUM(uint32_t, MTRPrivateEventIDType) {
+};

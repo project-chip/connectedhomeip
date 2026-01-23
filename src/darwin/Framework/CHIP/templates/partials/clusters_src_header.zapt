@@ -3,6 +3,9 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRClusterConstants.h"
+{{#if isPrivate}}
+#import "MTRClusterConstants_Private.h"
+{{/if}}
 #import "MTRDevice_Internal.h"
 #import "MTRCluster_Internal.h"
 #import "{{#if clustersHeader}}{{clustersHeader}}{{else}}MTRClusters_Internal.h{{/if}}"

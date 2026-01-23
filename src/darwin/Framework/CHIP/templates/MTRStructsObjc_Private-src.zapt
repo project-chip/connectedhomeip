@@ -1,17 +1,12 @@
 {{> header excludeZapComment=true}}
 
 #import "MTRStructsObjc.h"
+#import "MTRStructsObjc_Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#zcl_structs}}
-{{#if has_no_clusters}}
-{{> struct_interface_impl cluster="Globals" struct=name}}
-{{/if}}
-{{/zcl_structs}}
-
 {{#zcl_clusters}}
-{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#zcl_structs}}
 {{> struct_interface_impl cluster=parent.name struct=name}}
 
@@ -131,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{/zcl_events}}
 
-{{/unless}}
+{{/if}}
 {{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END

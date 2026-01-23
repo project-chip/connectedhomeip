@@ -15,13 +15,9 @@
  *    limitations under the License.
  */
 
-#import "MTRStructsObjc_Private.h"
-#import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRStructsObjc.h>
 
 NS_ASSUME_NONNULL_BEGIN
-// Nothing here for now, but leaving this file in place in case we need to add
-// something.
 
 NS_ASSUME_NONNULL_END

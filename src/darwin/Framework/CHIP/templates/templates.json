@@ -143,6 +143,10 @@
         {
             "name": "command_payload_impl_imports",
             "path": "partials/command_payload_impl_imports.zapt"
+        },
+        {
+            "name": "struct_old_name_variants",
+            "path": "partials/struct_old_name_variants.zapt"
         }
     ],
     "templates": [
@@ -207,6 +211,16 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc.mm"
         },
         {
+            "path": "MTRStructsObjc_Private.zapt",
+            "name": "Objc reflections of MTR spec structs Private header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc_Private.h"
+        },
+        {
+            "path": "MTRStructsObjc_Private-src.zapt",
+            "name": "Objc reflections of MTR spec structs Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc_Private.mm"
+        },
+        {
             "path": "MTRCommandPayloadsObjc.zapt",
             "name": "Objc reflections of MTR command payloads header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.h"
@@ -242,9 +256,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeTLVValueDecoder.mm"
         },
         {
+            "path": "MTRAttributeTLVValueDecoder_Private-src.zapt",
+            "name": "Decode TLV attribute values into Objc objects Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeTLVValueDecoder_Private.mm"
+        },
+        {
             "path": "MTREventTLVValueDecoder-src.zapt",
             "name": "Decode TLV event values into Objc objects",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTREventTLVValueDecoder.mm"
+        },
+        {
+            "path": "MTREventTLVValueDecoder_Private-src.zapt",
+            "name": "Decode TLV event values into Objc objects Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTREventTLVValueDecoder_Private.mm"
         },
         {
             "path": "MTRClusterConstants.zapt",
@@ -252,9 +276,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
         },
         {
+            "path": "MTRClusterConstants_Private.zapt",
+            "name": "Constants for cluster IDs Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants_Private.h"
+        },
+        {
             "path": "MTRClusterNames-src.zapt",
             "name": "Objc Cluster Names API",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterNames.mm"
+        },
+        {
+            "path": "MTRClusterNames_Private-src.zapt",
+            "name": "Objc Cluster Names API Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterNames_Private.mm"
         },
         {
             "path": "MTRAttributeSpecifiedCheck-src.zapt",
@@ -262,9 +296,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"
         },
         {
+            "path": "MTRAttributeSpecifiedCheck_Private-src.zapt",
+            "name": "Function to check if attribute is specified Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck_Private.mm"
+        },
+        {
             "path": "MTRCommandTimedCheck-src.zapt",
             "name": "Function to check if command needs timed invoke",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"
+        },
+        {
+            "path": "MTRCommandTimedCheck_Private-src.zapt",
+            "name": "Function to check if command needs timed invoke Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck_Private.mm"
         },
         {
             "path": "MTRDeviceTypeMetadata-src.zapt",
