@@ -125,8 +125,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         ChipLogError(AppServer, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
         chipDie();
     }
-    
-    
+
     err = gGroupDataProvider.Init();
     if (err != CHIP_NO_ERROR) 
     {
