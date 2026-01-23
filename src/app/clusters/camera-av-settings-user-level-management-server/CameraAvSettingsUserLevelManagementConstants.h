@@ -53,7 +53,7 @@ constexpr size_t kMptzPositionStructMaxSerializedSize =
 
 // Max size for an MPTZPresetStruct
 constexpr size_t kMaxMPTZPresetStructSerializedSize = TLV::EstimateStructOverhead(
-    sizeof(uint8_t), 32 /* max preset name length */, kMptzPositionStructMaxSerializedSize);
+    sizeof(uint8_t), static_cast<size_t>(32) /* max preset name length */, kMptzPositionStructMaxSerializedSize);
 
 // Max size for a TLV encoded array of DPTZStruct
 constexpr size_t kViewportStructMaxSerializedSize =
