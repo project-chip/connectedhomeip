@@ -25,7 +25,7 @@
         <ul>
         {% for session in stream.sessions %}
             <li> Session {{session.id}}
-                {%- set errors = stream.errors | selectattr('session_id', 'eq', session.id) | list -%}
+                {%- set errors = stream.error_uploads | selectattr('session_id', 'eq', session.id) | list -%}
                 <ul>
                     <li>
                         {{- errors|length}} errors{% if errors|length > 1 %}:{% endif %}

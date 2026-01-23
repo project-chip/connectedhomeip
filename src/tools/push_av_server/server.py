@@ -434,6 +434,10 @@ class UploadError(BaseModel):
     file_path: str
     reasons: list[str]
 
+class ValidUpload(BaseModel):
+    session_id: Optional[int]
+    file_path: str
+
 
 class Session(BaseModel):
     # The id is the index in the stream's list.
@@ -454,7 +458,10 @@ class Stream(BaseModel):
 
     # Keep track of the various sessions encountered
     sessions: list[Session] = []
-    errors: list[UploadError] = []
+    
+    # tracking uploads with unique file paths
+    error_uploads: list[UploadError] = []
+    valid_uploads: list[ValidUpload] = []
 
     # Utilities
 
@@ -478,6 +485,24 @@ class Stream(BaseModel):
             return last_session
 
         return None
+
+    def _is_file_in_error_uploads(self, file_path: str) -> bool:
+        """Check if a file path already exists in error_uploads"""
+        return any(error.file_path == file_path for error in self.error_uploads)
+
+    def _is_file_in_valid_uploads(self, file_path: str) -> bool:
+        """Check if a file path already exists in valid_uploads"""
+        return any(valid.file_path == file_path for valid in self.valid_uploads)
+
+    def add_error_upload(self, session_id: Optional[int], file_path: str, reasons: list[str]):
+        """Add a file to error_uploads if it doesn't already exist"""
+        if not self._is_file_in_error_uploads(file_path):
+            self.error_uploads.append(UploadError(session_id=session_id, file_path=file_path, reasons=reasons))
+
+    def add_valid_upload(self, session_id: Optional[int], file_path: str):
+        """Add a file to valid_uploads if it doesn't already exist and isn't in error_uploads"""
+        if not self._is_file_in_valid_uploads(file_path) and not self._is_file_in_error_uploads(file_path):
+            self.valid_uploads.append(ValidUpload(session_id=session_id, file_path=file_path))
 
 
 class PushAvServer:
@@ -686,7 +711,7 @@ class PushAvServer:
                 if session is not None:
                     session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
                 else:
-                    errors.append("No active session when uploading " + file_path_with_ext)
+                    errors.append("No active session when uploading " + file_path_with_ext + ", segment uploaded before mpd")
 
                 # The Track's init segment is uploaded as `session_name/track_name/track_name.init`.
                 # Note that the extension is not part of the `file_path` variable.
@@ -725,11 +750,6 @@ class PushAvServer:
                 errors.append(f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}")
 
             # Validation complete, now saving data to disk
-
-            if len(errors) > 0:
-                session_id = session.id if session else None
-                stream.errors.append(UploadError(session_id=session_id, file_path=file_path_with_ext, reasons=errors))
-
             file_local_path = self.wd.mkdir("streams", str(stream_id), file_path_with_ext, is_file=True)
 
             # If file already exists, create versioned backup.
@@ -743,17 +763,30 @@ class PushAvServer:
                 file_local_path.rename(backup_path)
                 log.info(f"Backed up existing file to {backup_path}")
 
-            cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
+            cert_details = req.scope["extensions"]["ssl"].get('client_certificate', None)
 
-            # TODO If file already exists, come up with a way to version it instead of overwriting it.
-            with open(file_local_path.with_suffix(file_local_path.suffix + ".crt"), "w") as f:
-                f.write(json.dumps(cert_details))
+            # TODO If file already exists, come up with   a way to version it instead of overwriting it.
 
+            if cert_details:
+                with open(file_local_path.with_suffix(file_local_path.suffix + ".crt"), "w") as f:
+                    f.write(json.dumps(cert_details))
+            else:
+                errors.append("File upload did not happen with SSL context")
+
+            # Save the file to disk
             with open(file_local_path, "wb") as f:
                 f.write(body)
 
-            # And finally return the appropriate response to the camera
+            # Update the new upload tracking lists
+            session_id = session.id if session else None
+            if len(errors) > 0:
+                # Add to error uploads (only if not already present)
+                stream.add_error_upload(session_id, file_path_with_ext, errors)
+            else:
+                # Add to valid uploads (only if not already in error uploads)
+                stream.add_valid_upload(session_id, file_path_with_ext)
 
+            # And finally return the appropriate response to the camera
             if stream.strict_mode and len(errors) > 0:
                 log.warning(f"Upload validation failed: {errors}")
                 return JSONResponse(
