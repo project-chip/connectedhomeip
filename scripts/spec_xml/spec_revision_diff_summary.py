@@ -148,7 +148,7 @@ def get_provisional_diff(rev1: PrebuiltDataModelDirectory, rev2: PrebuiltDataMod
             continue
         c1 = clusters_rev1[id]
         rev2_provisional_features = _get_provisional(c2.features.values())
-        rev1_provisional_features = _get_provisional(c2.features.values())
+        rev1_provisional_features = _get_provisional(c1.features.values())
         features = rev2_provisional_features - rev1_provisional_features
 
         rev2_provisional_attributes = _get_provisional(c2.attributes.values())
