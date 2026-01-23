@@ -74,6 +74,7 @@ public:
 
     void SetDelegate(ValveConfigurationAndControl::Delegate * delegate);
     static void HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context);
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     CHIP_ERROR CloseValve();
     CHIP_ERROR OpenValve(DataModel::Nullable<Percent> targetLevel, DataModel::Nullable<uint32_t> openDuration);

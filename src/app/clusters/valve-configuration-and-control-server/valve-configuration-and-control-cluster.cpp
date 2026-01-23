@@ -77,6 +77,13 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
     return CHIP_NO_ERROR;
 }
 
+void ValveConfigurationAndControlCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    // Call CancelTimer in the instance shutdown to avoid "use after free" scenarios.
+    DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
 CHIP_ERROR ValveConfigurationAndControlCluster::Attributes(const ConcreteClusterPath & path,
                                                            ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -238,31 +245,30 @@ std::optional<DataModel::ActionReturnStatus>
 ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                        CommandHandler * handler)
 {
+    Commands::Open::DecodableType commandData;
+    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+
+    // Check the "min 1" constraint in the command fields.
+    VerifyOrReturnValue((!commandData.openDuration.HasValue() ? true : commandData.openDuration.Value().ValueOr(1) > 0), Status::ConstraintError);
+    VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
+
     // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault.
     if (mValveFault.HasAny())
     {
         return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
     }
 
-    Commands::Open::DecodableType commandData;
-    ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    // In the spec, the setting of the TargetState and CurrentState goes before the handling of the 
+    // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep backwards compatibility.
+    // Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL enabled valves).
 
-    // Verify "min 1" constraint on TargetLevel field.
-    VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
-
-    // In the spec, the setting of the TargetState and Current state goes before the validation of the
-    // fields of the command, however this was deferred to the OpenValve function to keep backwards compatibility.
-    // Also this avoids setting the attributes if some of the command fields is not correct.
-
-    // Check if the provided openDuration has a value and validate the "min 1" constraint in this field.
+    // Check the rules for the OpenDuration field of the command.
     // This value will be used to set the OpenDuration attribute, initialize the RemainingDuration attribute and
     // calculate the AutoCloseTime attribute (if supported in) the OpenValve function
     DataModel::Nullable<uint32_t> openDuration;
     if (commandData.openDuration.HasValue())
     {
-        // Save the duration if provided, this field is nullable and if a value is provided
-        // there is a "min 1" constraint in that value.
-        VerifyOrReturnValue(commandData.openDuration.Value().ValueOr(1) > 0, Status::ConstraintError);
+        // Save the duration if provided.
         openDuration = commandData.openDuration.Value();
     }
     else
@@ -302,7 +308,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
         }
     }
 
-    // Use the SetValveLevel function to handle the setting of internal values.
+    // Use the OpenValve function to handle the setting of internal values.
     return OpenValve(openTargetLevel, openDuration);
 }
 

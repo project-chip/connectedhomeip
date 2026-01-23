@@ -44,9 +44,9 @@ public:
     DummyDelegate(){};
     ~DummyDelegate() override = default;
 
-    DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override
+    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override
     {
-        return DataModel::Nullable<chip::Percent>();
+        return DataModel::Nullable<Percent>();
     }
 
     CHIP_ERROR HandleCloseValve() override { return CHIP_NO_ERROR; }
@@ -60,9 +60,9 @@ public:
     InstantDelegate(){};
     ~InstantDelegate() override = default;
 
-    DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override
+    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override
     {
-        return DataModel::Nullable<chip::Percent>(100);
+        return DataModel::Nullable<Percent>(100);
     }
 
     CHIP_ERROR HandleCloseValve() override { return CHIP_NO_ERROR; }
@@ -77,8 +77,8 @@ public:
 
 struct TestValveConfigurationAndControlCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     TestValveConfigurationAndControlCluster() {}
 
@@ -308,7 +308,7 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLeve
     ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
     EXPECT_EQ(revision, kRevision);
 
-    chip::Percent defaultOpenLevel{};
+    Percent defaultOpenLevel{};
     ASSERT_EQ(tester.ReadAttribute(DefaultOpenLevel::Id, defaultOpenLevel), CHIP_NO_ERROR);
     EXPECT_EQ(defaultOpenLevel, ValveConfigurationAndControlCluster::kDefaultOpenLevel);
 

@@ -42,10 +42,10 @@ constexpr size_t kValveConfigurationAndControlMaxClusterCount =
 
 LazyRegisteredServerCluster<ValveConfigurationAndControlCluster> gServers[kValveConfigurationAndControlMaxClusterCount];
 
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 class CodegenTimeSyncTracker : public TimeSyncTracker
 {
 public:
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
     bool IsValidUTCTime() override
     {
         if (TimeSynchronization::GetClusterInstance() != nullptr)
@@ -55,12 +55,11 @@ public:
         }
         return false;
     }
-#else
-    bool IsValidUTCTime() override { return false; }
-#endif
 };
 
-CodegenTimeSyncTracker codegenTracker;
+CodegenTimeSyncTracker sCodegenTracker;
+#endif
+
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
@@ -95,7 +94,11 @@ public:
             .features             = BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
             .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
             .config               = startupConfig,
-            .tsTracker            = &codegenTracker,
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+            .tsTracker            = &sCodegenTracker,
+#else
+            .tsTracker            = nullptr,
+#endif
             .delegate             = nullptr,
         };
 
