@@ -2,26 +2,26 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import "MTRCommandPayloadsObjc_Private.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 
 NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
 
 {{#zcl_clusters}}
-{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#zcl_commands}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
 
 {{> command_internal_methods_decl categoryName="InternalMethods"}}
 
 {{/if}}
-{{/zcl_commands}}
-{{/unless}}
-{{/zcl_clusters}}
 
-// Make sure that MTRBasicClusterMfgSpecificPingParams has _encodeAsDataValue just so it compiles.
-@interface MTRBasicClusterMfgSpecificPingParams (InternalMethods)
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-@end
+{{> command_internal_methods_decl categoryName="PrivateMethods"}}
+
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END
