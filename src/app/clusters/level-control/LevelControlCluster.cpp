@@ -329,7 +329,14 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
 
     // Calculate duration per step
     uint8_t totalSteps = (mIncreasing) ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel);
-    mEventDurationMs   = transitionTimeMs / totalSteps;
+    if (totalSteps > 0)
+    {
+        mEventDurationMs = transitionTimeMs / totalSteps;
+    }
+    else
+    {
+        mEventDurationMs = 0;
+    }
 
     // Immediate move
     if (transitionTimeMs == 0 || totalSteps == 0 || mEventDurationMs == 0)
@@ -354,7 +361,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelWithOnOffCommand(C
 
     if ((!transitionTimeDS.IsNull() && transitionTimeDS.Value() == 0) || (transitionTimeDS.IsNull() && mOnOffTransitionTime == 0))
     {
-        UpdateOnOff(false);
+        UpdateOnOff(false, true);
     }
     return CHIP_NO_ERROR;
 }
@@ -547,12 +554,10 @@ CHIP_ERROR LevelControlCluster::SetDefaultMoveRate(DataModel::Nullable<uint8_t> 
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
-    if (mDefaultMoveRate != newDefaultMoveRate)
-    {
-        mDefaultMoveRate = newDefaultMoveRate;
-        mDelegate.OnDefaultMoveRateChanged(mDefaultMoveRate);
-        NotifyAttributeChanged(Attributes::DefaultMoveRate::Id);
-    }
+    VerifyOrReturnError(mDefaultMoveRate != newDefaultMoveRate, CHIP_NO_ERROR);
+    mDefaultMoveRate = newDefaultMoveRate;
+    mDelegate.OnDefaultMoveRateChanged(mDefaultMoveRate);
+    NotifyAttributeChanged(Attributes::DefaultMoveRate::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -890,8 +895,10 @@ void LevelControlCluster::OnOffChanged(bool isOn)
             transitionTime.SetNonNull(mOnOffTransitionTime);
         }
 
-        BitMask<OptionsBitmap> options;
-        MoveToLevelWithOnOffCommand(Commands::MoveToLevelWithOnOff::Id, mMinLevel, transitionTime, options, options);
+        // Force execution to allow fading out even if device is technically "Off"
+        BitMask<OptionsBitmap> optionsMask(OptionsBitmap::kExecuteIfOff);
+        BitMask<OptionsBitmap> optionsOverride(OptionsBitmap::kExecuteIfOff);
+        MoveToLevelCommand(Commands::MoveToLevelWithOnOff::Id, mMinLevel, transitionTime, optionsMask, optionsOverride);
     }
 }
 
