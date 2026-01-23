@@ -74,7 +74,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
-
     static WifiRootNodeDevice rootNodeDevice(
         {
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
@@ -218,7 +217,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    gGroupDataProvider.SetStorageDelegate(&DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl());
+    gGroupDataProvider.SetStorageDelegate(&DeviceLayer::PersistedStorage::KeyValueStoreMgr());
     ReturnErrorOnFailure(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
