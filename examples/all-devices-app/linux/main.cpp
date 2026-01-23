@@ -126,6 +126,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
     
+    
     err = gGroupDataProvider.Init();
     if (err != CHIP_NO_ERROR) 
     {
