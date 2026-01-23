@@ -63,32 +63,65 @@ void StopSignalHandler(int /* signal */)
     }
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+class CodeDrivenDataModelDevices
 {
-    static chip::app::DefaultAttributePersistenceProvider attributePersistenceProvider;
-    SuccessOrDie(attributePersistenceProvider.Init(delegate));
+public:
+    CodeDrivenDataModelDevices(chip::PersistentStorageDelegate & storageDelegate) :
+        mStorageDelegate(storageDelegate), mDataModelProvider(storageDelegate, mAttributePersistence)
+    {}
 
-    static chip::app::CodeDrivenDataModelProvider dataModelProvider =
-        chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
+    CHIP_ERROR Startup()
+    {
+        ReturnErrorOnFailure(mAttributePersistence.Init(&mStorageDelegate));
+        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-    static AppRootNode rootNode;
-    static std::unique_ptr<DeviceInterface> constructedDevice;
+        mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
+        VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
 
-    SuccessOrDie(rootNode.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId));
-    constructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-    SuccessOrDie(constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId));
+        return CHIP_NO_ERROR;
+    }
 
-    return &dataModelProvider;
-}
+    void Shutdown()
+    {
+        if (mConstructedDevice)
+        {
+            mConstructedDevice->UnRegister(mDataModelProvider);
+            mConstructedDevice.reset();
+        }
+        mRootNode.UnRegister(mDataModelProvider);
+    }
+
+    chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
+
+private:
+    chip::PersistentStorageDelegate & mStorageDelegate;
+    chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
+
+    chip::app::CodeDrivenDataModelProvider mDataModelProvider;
+
+    AppRootNode mRootNode;
+    std::unique_ptr<DeviceInterface> mConstructedDevice;
+};
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
 
+    static DefaultTimerDelegate timerDelegate;
+    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+        .timerDelegate = timerDelegate,
+    });
+
     static chip::CommonCaseDeviceServerInitParams initParams;
+
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
-    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    static CodeDrivenDataModelDevices devices(*initParams.persistentStorageDelegate);
+
+    SuccessOrDie(devices.Startup());
+
+    initParams.dataModelProvider             = &devices.DataModelProvider();
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
     initParams.interfaceId                   = Inet::InterfaceId::Null();
@@ -141,6 +174,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
+    devices.Shutdown();
     Server::GetInstance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
     tracing_setup.StopTracing();
