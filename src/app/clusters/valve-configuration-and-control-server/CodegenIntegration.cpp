@@ -95,11 +95,11 @@ public:
             .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
             .config               = startupConfig,
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-            .tsTracker            = &sCodegenTracker,
+            .tsTracker = &sCodegenTracker,
 #else
-            .tsTracker            = nullptr,
+            .tsTracker = nullptr,
 #endif
-            .delegate             = nullptr,
+            .delegate = nullptr,
         };
 
         gServers[clusterInstanceIndex].Create(endpointId, context);

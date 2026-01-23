@@ -249,7 +249,8 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     // Check the "min 1" constraint in the command fields.
-    VerifyOrReturnValue((!commandData.openDuration.HasValue() ? true : commandData.openDuration.Value().ValueOr(1) > 0), Status::ConstraintError);
+    VerifyOrReturnValue((!commandData.openDuration.HasValue() ? true : commandData.openDuration.Value().ValueOr(1) > 0),
+                        Status::ConstraintError);
     VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
 
     // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault.
@@ -259,8 +260,9 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     }
 
     // In the spec, the setting of the TargetState and CurrentState goes before the handling of the
-    // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep backwards compatibility.
-    // Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL enabled valves).
+    // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep
+    // backwards compatibility. Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL
+    // enabled valves).
 
     // Check the rules for the OpenDuration field of the command.
     // This value will be used to set the OpenDuration attribute, initialize the RemainingDuration attribute and
