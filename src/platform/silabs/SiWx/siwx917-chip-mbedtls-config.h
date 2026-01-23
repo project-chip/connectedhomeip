@@ -23,6 +23,32 @@
 
 #pragma once
 
+// ChipCryptoPAL tinycrypt config
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+
+// Tinycrypt configurations
+#define TINYCRYPT_PRIMITIVES
+#define OPTIMIZE_TINYCRYPT_ASM
+
+#define MBEDTLS_FREERTOS
+
+#define MBEDTLS_MPI_WINDOW_SIZE 1
+
+// Added for codesize optimizations
+#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+#define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
+
+#define MBEDTLS_HAVE_ASM
+#define MBEDTLS_HKDF_C
+#define MBEDTLS_ECJPAKE_C
+#define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
+
+#if (!(SL_MATTER_ENABLE_AWS) || !defined(SL_MATTER_ENABLE_AWS))
+#define MBEDTLS_SSL_MAX_CONTENT_LEN 768
+#endif // !(SL_MATTER_ENABLE_AWS)
+
+#endif // SL_MBEDTLS_USE_TINYCRYPT
+
 // MATTER AWS Specific Configurations
 #ifdef SL_MATTER_ENABLE_AWS
 
@@ -59,36 +85,6 @@
 #define MBEDTLS_DEBUG_C
 
 #endif // SL_MATTER_ENABLE_AWS
-
-// ChipCryptoPAL tinycrypt config
-#ifdef SL_MBEDTLS_USE_TINYCRYPT
-
-// Tinycrypt configurations
-#define TINYCRYPT_PRIMITIVES
-#define OPTIMIZE_TINYCRYPT_ASM
-
-#define MBEDTLS_FREERTOS
-
-#if (!(SL_MATTER_ENABLE_AWS) || !defined(SL_MATTER_ENABLE_AWS))
-/**< Maximum windows size used. */
-#define MBEDTLS_MPI_WINDOW_SIZE 1
-
-/**< Maximum number of bytes for usable MPIs. */
-#define MBEDTLS_MPI_MAX_SIZE 32
-/**< Maxium fragment length in bytes */
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 768
-#endif // !(SL_MATTER_ENABLE_AWS)
-
-// Added for codesize optimizations
-#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
-#define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
-
-#define MBEDTLS_HAVE_ASM
-#define MBEDTLS_HKDF_C
-#define MBEDTLS_ECJPAKE_C
-#define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
-
-#endif // SL_MBEDTLS_USE_TINYCRYPT
 
 // SLC GENERATED
 #include "sl_mbedtls_config.h"
