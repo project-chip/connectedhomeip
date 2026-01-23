@@ -375,6 +375,7 @@ class ClusterParser:
         location = ClusterPathLocation(
             endpoint_id=0, cluster_id=self._cluster_id if self._cluster_id is not None else 0)
         self._revision_desc, problems = parse_revision_history(cluster, location)
+        self._problems.extend(problems)
 
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
         element, problem = get_conformance(element, self._cluster_id)
