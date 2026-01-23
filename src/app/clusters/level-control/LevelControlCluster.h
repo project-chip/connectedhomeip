@@ -167,6 +167,10 @@ public:
     BitMask<LevelControl::OptionsBitmap> GetOptions() const { return mOptions; }
     DataModel::Nullable<uint8_t> GetStartUpCurrentLevel() const { return mStartUpCurrentLevel; }
     BitMask<LevelControl::Feature> GetFeatureMap() const { return mFeatureMap; }
+    uint16_t GetRemainingTime() const { return mRemainingTime; }
+    DataModel::Nullable<uint16_t> GetOnTransitionTime() const { return mOnTransitionTime; }
+    DataModel::Nullable<uint16_t> GetOffTransitionTime() const { return mOffTransitionTime; }
+    uint16_t GetOnOffTransitionTime() const { return mOnOffTransitionTime; }
 
     // TimerContext
     void TimerFired() override;
