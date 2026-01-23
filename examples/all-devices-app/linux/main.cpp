@@ -111,14 +111,14 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     {
         gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
         CHIP_ERROR err = gGroupDataProvider.Init();
-        
+
         // If it's already init'd, we don't care, but we stop other errors
         if (err != CHIP_NO_ERROR && err != CHIP_ERROR_INCORRECT_STATE)
         {
             ChipLogError(AppServer, "Failed to initialize GroupDataProvider: %" CHIP_ERROR_FORMAT, err.Format());
             chipDie();
         }
-        
+
         Credentials::SetGroupDataProvider(&gGroupDataProvider);
         isGroupProviderInitialized = true;
     }
