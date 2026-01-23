@@ -26,7 +26,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
 from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
-from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
+from fastapi import APIRouter, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -434,6 +434,7 @@ class UploadError(BaseModel):
     file_path: str
     reasons: list[str]
 
+
 class ValidUpload(BaseModel):
     session_id: Optional[int]
     file_path: str
@@ -458,7 +459,7 @@ class Stream(BaseModel):
 
     # Keep track of the various sessions encountered
     sessions: list[Session] = []
-    
+
     # tracking uploads with unique file paths
     error_uploads: list[UploadError] = []
     valid_uploads: list[ValidUpload] = []
@@ -497,6 +498,9 @@ class Stream(BaseModel):
     def add_error_upload(self, session_id: Optional[int], file_path: str, reasons: list[str]):
         """Add a file to error_uploads if it doesn't already exist"""
         if not self._is_file_in_error_uploads(file_path):
+            # Check if file exists in valid_uploads and remove it
+            if self._is_file_in_valid_uploads(file_path):
+                self.valid_uploads = [valid for valid in self.valid_uploads if valid.file_path != file_path]
             self.error_uploads.append(UploadError(session_id=session_id, file_path=file_path, reasons=reasons))
 
     def add_valid_upload(self, session_id: Optional[int], file_path: str):
@@ -625,7 +629,7 @@ class PushAvServer:
 
     # APIs
 
-    def create_stream(self, interface: SupportedIngestInterface = SupportedIngestInterface.cmaf):
+    def create_stream(self, interface: SupportedIngestInterface = Query(default=SupportedIngestInterface.cmaf)):
         # Find the last registered stream
         stream_ids = [int(d.name) for d in self.wd.path("streams").iterdir() if d.is_dir() and d.name.isdigit()]
         last_stream = max(stream_ids) if stream_ids else 0
@@ -777,7 +781,6 @@ class PushAvServer:
             with open(file_local_path, "wb") as f:
                 f.write(body)
 
-            # Update the new upload tracking lists
             session_id = session.id if session else None
             if len(errors) > 0:
                 # Add to error uploads (only if not already present)
@@ -786,7 +789,6 @@ class PushAvServer:
                 # Add to valid uploads (only if not already in error uploads)
                 stream.add_valid_upload(session_id, file_path_with_ext)
 
-            # And finally return the appropriate response to the camera
             if stream.strict_mode and len(errors) > 0:
                 log.warning(f"Upload validation failed: {errors}")
                 return JSONResponse(

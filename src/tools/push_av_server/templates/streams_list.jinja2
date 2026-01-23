@@ -18,7 +18,7 @@
             {% for stream in streams %}
             <li> Stream {{stream.id}}
                 <ul>
-                    <li>Error{% if stream.error_uploads|length > 1 %}s{% endif %}: {{stream.errors|length}}</li>
+                    <li>Error{% if stream.error_uploads|length > 1 %}s{% endif %}: {{stream.error_uploads|length}}</li>
                     <li>Session{% if stream.sessions|length > 1 %}s{% endif %}: {{stream.sessions|length}}</li>
                     <li><a href="/ui/streams/{{stream.id}}">Open details</a></li>
                 </ul>
