@@ -302,7 +302,10 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
     // Check if command execution is allowed by On/Off state (ExecuteIfOff bit) or ignore
-    VerifyOrReturnError(ShouldExecuteIfOff(commandId, optionsMask, optionsOverride), Status::Success);
+    if (!ShouldExecuteIfOff(commandId, optionsMask, optionsOverride))
+    {
+        return Status::Success;
+    }
 
     CancelTimer(); // Cancel any currently active transition before starting a new one.
 
@@ -660,10 +663,7 @@ CHIP_ERROR LevelControlCluster::SerializeSave(EndpointId endpoint, ClusterId clu
 {
     using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
-    if (!SupportsCluster(endpoint, cluster))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
 
     AttributeValuePair pairs[1];
     pairs[0].attributeID = Attributes::CurrentLevel::Id;
@@ -681,11 +681,7 @@ CHIP_ERROR LevelControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
 {
     app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
-    if (!SupportsCluster(endpoint, cluster))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
+    VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
     auto pair_iterator = attributeValueList.begin();
@@ -708,17 +704,30 @@ CHIP_ERROR LevelControlCluster::ApplyScene(EndpointId endpoint, ClusterId cluste
     return pair_iterator.GetStatus();
 }
 
+bool LevelControlCluster::ShouldReportCurrentLevel(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition) const
+{
+    if (isEndOfTransition)
+    {
+        return true;
+    }
+    if (mCurrentLevel.IsNull() != newValue.IsNull())
+    {
+        return true;
+    }
+
+    uint64_t nowMs = System::SystemClock().GetMonotonicMilliseconds64().count();
+    if (nowMs - mLastReportTimeMs >= 1000)
+    {
+        return true;
+    }
+    return false;
+}
+
 CHIP_ERROR LevelControlCluster::SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition)
 {
     VerifyOrReturnError(mCurrentLevel != newValue, CHIP_NO_ERROR);
 
-    uint64_t nowMs    = System::SystemClock().GetMonotonicMilliseconds64().count();
-    bool shouldReport = false;
-
-    if (isEndOfTransition || (mCurrentLevel.IsNull() != newValue.IsNull()) || (nowMs - mLastReportTimeMs >= 1000))
-    {
-        shouldReport = true;
-    }
+    bool shouldReport = ShouldReportCurrentLevel(newValue, isEndOfTransition);
 
     mCurrentLevel = newValue;
 
@@ -736,10 +745,39 @@ CHIP_ERROR LevelControlCluster::SetCurrentLevelQuietReport(DataModel::Nullable<u
 
     if (shouldReport)
     {
-        mLastReportTimeMs = nowMs;
+        mLastReportTimeMs = System::SystemClock().GetMonotonicMilliseconds64().count();
         NotifyAttributeChanged(Attributes::CurrentLevel::Id);
     }
     return CHIP_NO_ERROR;
+}
+
+bool LevelControlCluster::ShouldReportRemainingTime(uint16_t remainingTimeDs, bool isNewTransition) const
+{
+    if (mTransitionTimeMs < 1000)
+    {
+        return false;
+    }
+
+    // Case 1: Changes from 0 to any value higher than 10
+    if (mLastReportedRemainingTime == 0 && remainingTimeDs > 10)
+    {
+        return true;
+    }
+    // Case 2: Changes with a delta larger than 10, caused by the invoke of a command
+    else if (isNewTransition)
+    {
+        if (remainingTimeDs > mLastReportedRemainingTime + 10 || mLastReportedRemainingTime > remainingTimeDs + 10)
+        {
+            return true;
+        }
+    }
+    // Case 3: Changes to 0
+    else if (remainingTimeDs == 0 && mLastReportedRemainingTime != 0)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, bool isNewTransition)
@@ -750,33 +788,7 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, bool isN
     uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
     mRemainingTime           = remainingTimeDs;
 
-    bool shouldReport = false;
-
-    // "For commands with a transition time or changes to the transition time less than 1 second,
-    // changes to this attribute SHALL NOT be reported."
-    if (mTransitionTimeMs >= 1000)
-    {
-        // Case 1: Changes from 0 to any value higher than 10
-        if (mLastReportedRemainingTime == 0 && remainingTimeDs > 10)
-        {
-            shouldReport = true;
-        }
-        // Case 2: Changes with a delta larger than 10, caused by the invoke of a command
-        else if (isNewTransition)
-        {
-            if (remainingTimeDs > mLastReportedRemainingTime + 10 || mLastReportedRemainingTime > remainingTimeDs + 10)
-            {
-                shouldReport = true;
-            }
-        }
-        // Case 3: Changes to 0
-        else if (remainingTimeDs == 0 && mLastReportedRemainingTime != 0)
-        {
-            shouldReport = true;
-        }
-    }
-
-    if (shouldReport)
+    if (ShouldReportRemainingTime(remainingTimeDs, isNewTransition))
     {
         mLastReportedRemainingTime = remainingTimeDs;
         NotifyAttributeChanged(Attributes::RemainingTime::Id);
