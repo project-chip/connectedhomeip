@@ -95,16 +95,6 @@ private:
     CHIP_ERROR SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration);
     void EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState);
 
-    template <typename T, typename U>
-    inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, AttributeId attributeId)
-    {
-        if (currentValue != newValue)
-        {
-            currentValue = newValue;
-            NotifyAttributeChanged(attributeId);
-        }
-    }
-
     // Attributes
     const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;

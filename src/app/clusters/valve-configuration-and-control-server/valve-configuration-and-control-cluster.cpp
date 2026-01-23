@@ -208,23 +208,23 @@ std::optional<DataModel::ActionReturnStatus> ValveConfigurationAndControlCluster
 CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 {
     // OpenDuration and RemainingDuration shall be set to null.
-    SaveAndReportIfChanged(mOpenDuration, DataModel::NullNullable, Attributes::OpenDuration::Id);
+    SetAttributeValue(mOpenDuration, DataModel::Nullable<uint32_t>{}, Attributes::OpenDuration::Id);
     SetRemainingDuration(DataModel::NullNullable);
 
     // If TimeSync feature is supported, AutoCloseTime shall be set to null.
     if (mFeatures.Has(Feature::kTimeSync))
     {
-        SaveAndReportIfChanged(mAutoCloseTime, DataModel::NullNullable, Attributes::AutoCloseTime::Id);
+        SetAttributeValue(mAutoCloseTime, DataModel::Nullable<uint64_t>{}, Attributes::AutoCloseTime::Id);
     }
 
     // TargetState shall be set to Closed and CurrentState to Transitioning.
-    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kClosed), Attributes::TargetState::Id);
+    SetAttributeValue(mTargetState, DataModel::MakeNullable(ValveStateEnum::kClosed), Attributes::TargetState::Id);
     SetCurrentState(ValveStateEnum::kTransitioning);
 
     // If Level feature is supported, TargetLevel shall be set to 0.
     if (mFeatures.Has(Feature::kLevel))
     {
-        SaveAndReportIfChanged(mTargetLevel, Percent(0), Attributes::TargetLevel::Id);
+        SetAttributeValue(mTargetLevel, DataModel::MakeNullable(Percent(0)), Attributes::TargetLevel::Id);
     }
 
     // Cancel timer if running.
@@ -316,11 +316,11 @@ CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Pe
     }
 
     // Set TargetState to Open and CurrentState to Transitioning
-    SaveAndReportIfChanged(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
+    SetAttributeValue(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
     SetCurrentState(ValveStateEnum::kTransitioning);
 
     // Set OpenDuration to the provided value (can be null).
-    SaveAndReportIfChanged(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
+    SetAttributeValue(mOpenDuration, openDuration, Attributes::OpenDuration::Id);
 
     // Set the RemainingDuration to the value of OpenDuration (either a value or null)
     SetRemainingDuration(mOpenDuration);
@@ -328,7 +328,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Pe
     // Set target level
     if (mFeatures.Has(Feature::kLevel) && !targetLevel.IsNull())
     {
-        SaveAndReportIfChanged(mTargetLevel, targetLevel, Attributes::TargetLevel::Id);
+        SetAttributeValue(mTargetLevel, targetLevel, Attributes::TargetLevel::Id);
     }
 
     if (mDelegate != nullptr)
@@ -360,12 +360,12 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Null
         VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
 
         uint64_t time = openDuration.Value() * kMicrosecondsPerSecond;
-        SaveAndReportIfChanged(mAutoCloseTime, DataModel::MakeNullable(time + chipEpochTime), Attributes::AutoCloseTime::Id);
+        SetAttributeValue(mAutoCloseTime, DataModel::MakeNullable(time + chipEpochTime), Attributes::AutoCloseTime::Id);
     }
     else
     {
         // No synchronized time or OpenDuration is null, setting the AutoCloseTime attribute to null
-        SaveAndReportIfChanged(mAutoCloseTime, DataModel::NullNullable, Attributes::AutoCloseTime::Id);
+        SetAttributeValue(mAutoCloseTime, DataModel::Nullable<uint64_t>{}, Attributes::AutoCloseTime::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -376,7 +376,7 @@ void ValveConfigurationAndControlCluster::UpdateAutoCloseTime(uint64_t epochTime
     if (!mRemainingDuration.value().IsNull() && mRemainingDuration.value().Value() != 0)
     {
         uint64_t closingTime = mRemainingDuration.value().Value() * kMicrosecondsPerSecond + epochTime;
-        SaveAndReportIfChanged(mAutoCloseTime, DataModel::MakeNullable(closingTime), Attributes::AutoCloseTime::Id);
+        SetAttributeValue(mAutoCloseTime, DataModel::MakeNullable(closingTime), Attributes::AutoCloseTime::Id);
     }
 }
 void ValveConfigurationAndControlCluster::HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context)
@@ -457,18 +457,18 @@ void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigur
 
     if (mTargetState == currentState)
     {
-        SaveAndReportIfChanged(mTargetState, DataModel::NullNullable, Attributes::TargetState::Id);
+        SetAttributeValue(mTargetState, DataModel::Nullable<ValveStateEnum>{}, Attributes::TargetState::Id);
     }
 }
 
 void ValveConfigurationAndControlCluster::UpdateCurrentLevel(Percent currentLevel)
 {
     VerifyOrReturn(mFeatures.Has(Feature::kLevel));
-    SaveAndReportIfChanged(mCurrentLevel, currentLevel, Attributes::CurrentLevel::Id);
+    SetAttributeValue(mCurrentLevel, DataModel::MakeNullable(currentLevel), Attributes::CurrentLevel::Id);
 
     if (mCurrentLevel == mTargetLevel)
     {
-        SaveAndReportIfChanged(mTargetLevel, DataModel::NullNullable, Attributes::TargetLevel::Id);
+        SetAttributeValue(mTargetLevel, DataModel::Nullable<Percent>{}, Attributes::TargetLevel::Id);
         UpdateCurrentState(currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
     }
 }
