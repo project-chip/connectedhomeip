@@ -119,14 +119,8 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
     mClipInfo.mAugmentationDurationS = timeControl.augmentationDuration;
     mClipInfo.mMaxClipDurationS      = timeControl.maxDuration;
     mClipInfo.mBlindDurationS        = timeControl.blindDuration;
-    mClipInfo.mElapsedTimeS          = 0;
-    mClipInfo.mClipStartPTS          = 0;
 
     PrintRecorderTimeSetting(mClipInfo);
-    if (mRecorder.get() != nullptr)
-    {
-        mRecorder->mClipInfo = mClipInfo;
-    }
 }
 
 CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
@@ -157,8 +151,8 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     }
 
     // Codecs are valid, proceed with configuration
-    mClipInfo.mHasAudio      = transportOptions.audioStreams.HasValue();
-    mClipInfo.mHasVideo      = transportOptions.videoStreams.HasValue();
+    mClipInfo.mHasAudio      = (transportOptions.audioStreams.HasValue() || transportOptions.audioStreamID.HasValue());
+    mClipInfo.mHasVideo      = (transportOptions.videoStreams.HasValue() || transportOptions.videoStreamID.HasValue());
     mSessionStartedTimestamp = std::chrono::system_clock::time_point();
 
     mClipInfo.mUrl         = std::string(transportOptions.url.data(), transportOptions.url.size());
@@ -171,6 +165,10 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     {
         mClipInfo.mPreRollLengthMs = 0; // Default pre roll length is zero
     }
+
+    mClipInfo.mMotionDetectedDurationS         = 0;
+    mClipInfo.mPreviousMotionDetectedDurationS = 0;
+
     if (transportOptions.triggerOptions.motionTimeControl.HasValue())
     {
         ConfigureRecorderTimeSetting(transportOptions.triggerOptions.motionTimeControl.Value());
@@ -244,6 +242,18 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     }
     mVideoInfo.mFrameRate = videoStreamParams.minFrameRate;
     mVideoInfo.mBitRate   = videoStreamParams.minBitRate;
+    if (mClipInfo.mHasVideo)
+    {
+        if (transportOptions.videoStreams.HasValue())
+        {
+            // Recoder module currently only supports one audio and one video stream
+            mVideoInfo.mVideoStreamName = transportOptions.videoStreams.Value().begin()->videoStreamName.data();
+        }
+        else
+        {
+            mVideoInfo.mVideoStreamName = "video";
+        }
+    }
 
     PrintTransportSettings(mClipInfo, mAudioInfo, mVideoInfo);
     UpdateSendFlags();
@@ -258,7 +268,7 @@ void PushAVTransport::InitializeRecorder()
 {
     if (mRecorder.get() == nullptr)
     {
-        mClipInfo.mSessionNumber = mSessionNumber++;
+        mClipInfo.mSessionNumber = mSessionNumber;
         mRecorder                = std::make_unique<PushAVClipRecorder>(mClipInfo, mAudioInfo, mVideoInfo, mUploader.get());
         mRecorder->SetFabricIndex(mFabricIndex);
         mRecorder->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
@@ -271,6 +281,7 @@ void PushAVTransport::InitializeRecorder()
     {
         ChipLogError(Camera, "Recorder already initialized");
     }
+    mSessionNumber++;
 }
 
 PushAVTransport::~PushAVTransport()
@@ -371,7 +382,7 @@ bool PushAVTransport::HandleTriggerDetected()
 
     if (mRecorder.get() != nullptr)
     {
-        mRecorder->mClipInfo = mClipInfo;
+        mRecorder->mClipInfo.mMotionDetectedDurationS = mClipInfo.mMotionDetectedDurationS;
         if (!mRecorder->GetRecorderStatus())
         {
             mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType, mActivationReason);
@@ -526,10 +537,18 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
         mUploader->setCertificateBuffer(mCertBuffer);
         mUploader->setCertificatePath(mCertPath);
         mUploader->Start();
+        if (mUploader.get() == nullptr)
+        {
+            mUploader = std::make_unique<PushAVUploader>();
+            mUploader->setCertificateBuffer(mCertBuffer);
+            mUploader->setCertificatePath(mCertPath);
+            mUploader->Start();
+        }
         InitializeRecorder();
 
         if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
         {
+            mClipInfo.mMotionDetectedDurationS =0; mClipInfo.mElapsedTimeS = 0;
             StartRecordingAndStreaming();
         }
         else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)

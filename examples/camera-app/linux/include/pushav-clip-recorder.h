@@ -278,6 +278,7 @@ private:
     int64_t mLastAudioPts        = 0;
     bool mMetadataSet            = false;
     bool mUploadMPD              = false;
+    bool firstSegmentReady       = false;
 
     std::vector<int> mUploadSegmentID;
     std::vector<bool> mUploadedInitSegment;

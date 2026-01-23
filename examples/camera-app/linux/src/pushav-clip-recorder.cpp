@@ -324,6 +324,11 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, int6
         packet->stream_index = mAudioInfo.mAudioOutputStreamId;
     }
 
+    if (packet->pts < 0)
+    {
+        return nullptr;
+    }
+
     return packet;
 }
 
@@ -853,7 +858,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
         mClipInfo.mMotionDetectedDurationS - mClipInfo.mElapsedTimeS + (mClipInfo.mPreRollLengthMs / 1000);
     int64_t clipDuration = 0;
 
-    if (remainingDuration <= 0)
+    if ((mClipInfo.mTriggerType != 2) && remainingDuration <= 0)
     {
         ChipLogError(Camera,
                      "Invalid remaining duration: %" PRId64 " for sessionID: %" PRIu64 " Track name: %s - stopping recording",
@@ -913,16 +918,15 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
     std::filesystem::path mpdPath = mUploadFileBasePath / "index.mpd";
 
     // Wait for the first segment (segment_0001.m4s) for any stream to be created before starting any uploads
-    bool first_segment_ready = false;
     for (size_t i = 0; i < mUploadSegmentID.size(); i++)
     {
         if (mUploadSegmentID[i] == 1 && IsFileReadyForUpload(make_segment_path(i, 1)))
         {
-            first_segment_ready = true;
+            firstSegmentReady = true;
             break;
         }
     }
-    if (!first_segment_ready)
+    if (!firstSegmentReady)
         return;
 
     if (mUploadMPD)
@@ -960,7 +964,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
         std::filesystem::path segment_path = make_segment_path(i, mUploadSegmentID[i]);
         while (IsFileReadyForUpload(segment_path))
         {
-            // std::string renamed_segment_path = RenameSegmentFile(segment_path.string());
             CheckAndUploadFile(segment_path.string());
             mUploadSegmentID[i]++;
             // For testing purpose
