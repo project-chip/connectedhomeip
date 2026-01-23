@@ -119,12 +119,16 @@ config CHIP_USE_GENERATED_CONFIG
 	help
 		Use the generated macro configs for CHIP configuration.
 
+# Define BT config for FreeRTOS compatibility with Zephyr (already defined in Zephyr module)
+# to enable shared code and Kconfig across both platforms.
 config BT
 	bool "Enable BLE"
 	default y
 	help
 		Enable BLE support.
 
+# Define NET_L2_OPENTHREAD config for FreeRTOS compatibility with Zephyr (already defined in Zephyr module)
+# to enable shared code and Kconfig across both platforms.
 config NET_L2_OPENTHREAD
 	bool "Enable Thread support"
 	default n
@@ -137,39 +141,6 @@ config CHIP_DEVICE_USE_ZEPHYR_BLE
 	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
 	help
 		Use Zephyr implementation for BLE manager.
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
-	int "Define the minimum connection recovery time interval in milliseconds"
-	depends on CHIP_WIFI
-	default 500
-	help
-		Specifies the minimum connection recovery interval (in milliseconds).
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
-	int "Define the maximum connection recovery time interval in milliseconds"
-	depends on CHIP_WIFI
-	default 3600000 # 1 hour
-	help
-		Specifies the maximum connection recovery interval (in milliseconds).
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
-	int "Define the maximum amount of connection recovery occurrences"
-	depends on CHIP_WIFI
-	default 0
-	help
-		Specifies the maximum number of connection recovery attempts.
-		If set to 0, no limitation is applied and attempts
-		to recover the connection are performed indefinitely.
-
-config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
-	int "Define the connection recovery jitter in milliseconds"
-	depends on CHIP_WIFI
-	default 2000
-	help
-		Specifies the maximum connection recovery jitter interval (in milliseconds).
-		Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
-		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
-		within range [-JITTER; +JITTER].
 
 # Secure Element Configurations
 
@@ -230,19 +201,7 @@ config CHIP_SE05X_DEVICE_ATTESTATION
 
 endif # CHIP_SE05X
 
-# Thread network features
-
-if NET_L2_OPENTHREAD
-
-endif # NET_L2_OPENTHREAD
-
 # App specific
-
-config NETWORK_LAYER_BLE
-	bool "Should be replaced by CONFIG_BT. Keep it for backwards compatibility"
-	default y if BT
-	help
-		Will be deprecated once application files replace CONFIG_NETWORK_LAYER_BLE with CONFIG_BT
 
 config OPERATIONAL_KEYSTORE
 	bool "Use custom implementation of operational keystore"
@@ -324,6 +283,8 @@ config NXP_CUSTOM_UNIT_TESTS_DIR
 
 endif # CHIP_BUILD_TESTS
 
+# Define Debug config for FreeRTOS compatibility with Zephyr (already defined in Zephyr module)
+# to enable shared code and Kconfig across both platforms.
 config DEBUG
 	bool "Build Matter stack with debugging enabled"
 	help
