@@ -60,7 +60,7 @@ public:
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType type) override;
     [[nodiscard]] Span<const ConcreteClusterPath> GetPaths() const override;
     [[nodiscard]] DataVersion GetDataVersion(const ConcreteClusterPath & path) const override;
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath & path) const override;

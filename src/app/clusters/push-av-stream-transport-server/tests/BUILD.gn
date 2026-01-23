@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestPushAVStreamTransportCluster.cpp",
     "TestPushAVStreamTransportStorage.cpp",
+    "TestURLParsing.cpp",
   ]
 
   sources = []
@@ -37,5 +38,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
+    "${chip_root}/third_party/uriparser:uriparser",
   ]
 }

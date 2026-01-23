@@ -5662,8 +5662,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LeaveGroup";
         case chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return "UpdateGroupKey";
-        case chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
-            return "ExpireGracePeriod";
         case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return "ConfigureAuxiliaryACL";
         default:
@@ -7323,6 +7321,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Camera Controller";
     case 0x00000148:
         return "Doorbell";
+    case 0x00000150:
+        return "Ambient Context Sensor";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
