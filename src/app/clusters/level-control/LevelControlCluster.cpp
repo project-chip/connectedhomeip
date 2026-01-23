@@ -60,9 +60,11 @@ constexpr uint8_t kMaxLevel         = 254;
 LevelControlCluster::LevelControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
-    mOnLevel(DataModel::Nullable<uint8_t>()), mMinLevel(config.mMinLevel), mMaxLevel(config.mMaxLevel),
-    mDefaultMoveRate(config.mDefaultMoveRate), mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(0),
-    mLastReportedRemainingTime(0), mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
+    mOnLevel(DataModel::Nullable<uint8_t>()),
+    mMinLevel(config.mFeatureMap.Has(Feature::kLighting) ? kLightingMinLevel : config.mMinLevel),
+    mMaxLevel(config.mFeatureMap.Has(Feature::kLighting) ? kMaxLevel : config.mMaxLevel), mDefaultMoveRate(config.mDefaultMoveRate),
+    mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(0), mLastReportedRemainingTime(0),
+    mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
     mOnOffTransitionTime(config.mOnOffTransitionTime), mOptionalAttributes(config.mOptionalAttributes),
     mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate)
 {
@@ -304,10 +306,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
     // Check if command execution is allowed by On/Off state (ExecuteIfOff bit) or ignore
-    if (!ShouldExecuteIfOff(commandId, optionsMask, optionsOverride))
-    {
-        return Status::Success;
-    }
+    VerifyOrReturnError(ShouldExecuteIfOff(commandId, optionsMask, optionsOverride), Status::Success);
 
     CancelTimer(); // Cancel any currently active transition before starting a new one.
 
@@ -763,7 +762,7 @@ bool LevelControlCluster::ShouldReportRemainingTime(uint16_t remainingTimeDs, bo
         return true;
     }
     // Case 2: Changes with a delta larger than 10, caused by the invoke of a command
-    else if (isNewTransition)
+    if (isNewTransition)
     {
         if (remainingTimeDs > mLastReportedRemainingTime + 10 || mLastReportedRemainingTime > remainingTimeDs + 10)
         {
@@ -771,7 +770,7 @@ bool LevelControlCluster::ShouldReportRemainingTime(uint16_t remainingTimeDs, bo
         }
     }
     // Case 3: Changes to 0
-    else if (remainingTimeDs == 0 && mLastReportedRemainingTime != 0)
+    if (remainingTimeDs == 0 && mLastReportedRemainingTime != 0)
     {
         return true;
     }
