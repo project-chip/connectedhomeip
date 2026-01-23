@@ -221,6 +221,9 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
+    // Get the startup timestamp from the event system via the context
+    mNodeStartupTimestamp = context.interactionContext.eventsGenerator.GetMonotonicStartupTime();
+
     // Calling OnDeviceReboot here to maintain the event generation of the old implementation of the
     // server init callback. We consider startup to be a boot event here.
     VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);

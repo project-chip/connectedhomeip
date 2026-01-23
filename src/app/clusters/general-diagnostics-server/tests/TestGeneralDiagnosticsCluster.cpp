@@ -101,14 +101,13 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 
 protected:
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
-    System::Clock::Microseconds64 nodeStartupTimestamp = System::Clock::Microseconds64(0);
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance(), nullProvider.GetProvider(), nodeStartupTimestamp);
+                                      InteractionModelEngine::GetInstance(), nullProvider.GetProvider());
     cluster.SetTestEventTriggerDelegate(nullptr);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
@@ -119,7 +118,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 
     GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(
         optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance(),
-        nullProvider.GetProvider(), nullptr, nodeStartupTimestamp, functionsConfig);
+        nullProvider.GetProvider(), nullptr, functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -132,7 +131,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         // Create cluster without enabling any feature flags
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                          InteractionModelEngine::GetInstance(), nullProvider.GetProvider(), nodeStartupTimestamp);
+                                          InteractionModelEngine::GetInstance(), nullProvider.GetProvider());
         cluster.SetTestEventTriggerDelegate(nullptr);
 
         // Check required accepted commands are present
@@ -207,7 +206,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
         GeneralDiagnosticsCluster cluster(allOptionalAttributesSet, features, InteractionModelEngine::GetInstance(),
-                                          allProvider.GetProvider(), nodeStartupTimestamp);
+                                          allProvider.GetProvider());
         cluster.SetTestEventTriggerDelegate(nullptr);
 
         // Check mandatory commands are present
@@ -266,7 +265,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     // Create a cluster with no optional attributes enabled
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance(), nullProvider.GetProvider(), nodeStartupTimestamp);
+                                      InteractionModelEngine::GetInstance(), nullProvider.GetProvider());
     cluster.SetTestEventTriggerDelegate(nullptr);
 
     ClusterTester tester(cluster);
@@ -290,7 +289,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
     };
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
                                                       InteractionModelEngine::GetInstance(), nullProvider.GetProvider(), nullptr,
-                                                      nodeStartupTimestamp, functionsConfig);
+                                                      functionsConfig);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -311,7 +310,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     // Create a cluster with no optional attributes enabled
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance(), nullProvider.GetProvider(), nodeStartupTimestamp);
+                                      InteractionModelEngine::GetInstance(), nullProvider.GetProvider());
     cluster.SetTestEventTriggerDelegate(nullptr);
 
     ClusterTester tester(cluster);
