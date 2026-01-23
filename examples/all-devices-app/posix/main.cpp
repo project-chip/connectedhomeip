@@ -18,6 +18,7 @@
 
 #include <AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <AppMainLoop.h>
+#include <AppRootNode.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
@@ -26,9 +27,7 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
-#include <devices/root-node/WifiRootNodeDevice.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
@@ -45,8 +44,6 @@ using namespace chip::ArgParser;
 
 namespace {
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
-
-DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 
 AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -74,12 +71,12 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
-    static WifiRootNodeDevice rootNodeDevice(&sWiFiDriver);
+    static AppRootNode rootNode;
     static std::unique_ptr<DeviceInterface> constructedDevice;
 
-    TEMPORARY_RETURN_IGNORED rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+    SuccessOrDie(rootNode.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId));
     constructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-    TEMPORARY_RETURN_IGNORED constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId);
+    SuccessOrDie(constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId));
 
     return &dataModelProvider;
 }
@@ -131,8 +128,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     PrintOnboardingCodes(payload);
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
-
-    sWiFiDriver.Set5gSupport(true);
 
     chip::app::SetTermiateHandler(StopSignalHandler);
 
@@ -203,7 +198,6 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ConfigurationMgr().LogDeviceConfig();
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
-
 
 #if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));

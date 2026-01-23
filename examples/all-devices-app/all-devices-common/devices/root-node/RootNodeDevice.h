@@ -35,6 +35,7 @@ namespace app {
 class RootNodeDevice : public SingleEndpointDevice
 {
 public:
+    RootNodeDevice() : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
     ~RootNodeDevice() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -42,8 +43,6 @@ public:
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
 protected:
-    // Most implementations require network commissioning, so only subclasses have access to this.
-    RootNodeDevice() : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
