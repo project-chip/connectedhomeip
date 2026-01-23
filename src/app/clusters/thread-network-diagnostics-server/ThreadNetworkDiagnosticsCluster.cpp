@@ -35,8 +35,7 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                                  const OptionalAttributes optionalAttributes) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
-    mFeatures(features), mOptionalAttributes(optionalAttributes)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -232,17 +231,15 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
     constexpr size_t NUM_ATTRIBUTES = sizeof(gAttributes) / sizeof(AttributeFeature);
     for (size_t i = 0; i < NUM_ATTRIBUTES; ++i)
     {
-        if (gAttributes[i].id != OverrunCount::Id)
+        gAttributeEntries[i].enabled = mFeatures.Has(gAttributes[i].feature.value_or(Feature(0)));
+
+        if (gAttributes[i].id == ActiveTimestamp::Id || gAttributes[i].id == PendingTimestamp::Id || gAttributes[i].id == Delay::Id)
         {
             gAttributeEntries[i].enabled = mOptionalAttributes.test(gAttributes[i].id);
-            if (gAttributes[i].feature.has_value())
-            {
-                gAttributeEntries[i].enabled = gAttributeEntries[i].enabled && mFeatures.Has(gAttributes[i].feature.value());
-            }
         }
-        else if (gAttributes[i].feature.has_value())
+        else if (gAttributes[i].id != OverrunCount::Id)
         {
-            gAttributeEntries[i].enabled = mFeatures.Has(gAttributes[i].feature.value());
+            gAttributeEntries[i].enabled = gAttributeEntries[i].enabled && mOptionalAttributes.test(gAttributes[i].id);
         }
     }
 
