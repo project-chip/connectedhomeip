@@ -35,7 +35,8 @@ using namespace ThreadNetworkDiagnostics::Attributes;
 
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                                  const OptionalAttributes optionalAttributes) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes)
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
+    mFeatures(features), mOptionalAttributes(optionalAttributes)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
