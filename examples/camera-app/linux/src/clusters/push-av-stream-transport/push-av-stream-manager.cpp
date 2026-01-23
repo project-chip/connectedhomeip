@@ -18,7 +18,6 @@
 
 #include "push-av-stream-manager.h"
 
-#include <algorithm>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -37,7 +36,6 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 {
     // Unregister all transports from Media Controller before deleting them. This will ensure that any ongoing streams are
     // stopped.
-    StopSessionMonitor();
     if (mMediaController != nullptr)
     {
         for (auto & kv : mTransportMap)
@@ -52,7 +50,6 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 void PushAvStreamTransportManager::Init()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
-    StartSessionMonitor();
     return;
 }
 
@@ -110,7 +107,6 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     }
     mTransportMap[connectionID] = std::move(transport);
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
-    mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
     mTransportMap[connectionID]->SetFabricIndex(accessingFabricIndex);
 
     if (mMediaController == nullptr)
@@ -659,7 +655,7 @@ void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {
-            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10, true);
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10);
         }
     }
 }
@@ -794,86 +790,6 @@ CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
 
     isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve || isSoftLivestreamPrivacyModeActive;
     return CHIP_NO_ERROR;
-}
-
-uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
-{
-    std::lock_guard<std::mutex> lock(mSessionMapMutex);
-    auto sessionKey = CreateSessionKey(fabricIdx, sessionGroup);
-    if (mSessionMap.find(sessionKey) == mSessionMap.end())
-    {
-        mSessionMap[sessionKey] = SessionInfo();
-    }
-    auto & sessionInfo = mSessionMap[sessionKey];
-    auto now           = std::chrono::system_clock::now();
-    if (sessionInfo.activeConnectionIDs.size() == 0)
-    {
-        // This case is a new trigger activation.
-        sessionInfo.sessionNumber++;
-        sessionInfo.sessionStartedTimestamp = now;
-    }
-    sessionInfo.activeConnectionIDs.insert(connectionID);
-    return sessionInfo.sessionNumber;
-}
-
-void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
-{
-    std::lock_guard<std::mutex> lock(mSessionMapMutex);
-    auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
-    auto & sessionInfo = mSessionMap[sessionKey];
-    sessionInfo.activeConnectionIDs.erase(connectionID);
-}
-
-void PushAvStreamTransportManager::StartSessionMonitor()
-{
-    mStopMonitoring       = false;
-    mSessionMonitorThread = std::thread(&PushAvStreamTransportManager::SessionMonitor, this);
-}
-
-void PushAvStreamTransportManager::StopSessionMonitor()
-{
-    mStopMonitoring = true;
-    if (mSessionMonitorThread.joinable())
-    {
-        mSessionMonitorThread.join();
-    }
-}
-
-void PushAvStreamTransportManager::SessionMonitor()
-{
-    while (!mStopMonitoring)
-    {
-        std::vector<std::pair<uint16_t, uint64_t>> sessionsToRestart;
-        {
-            std::lock_guard<std::mutex> lock(mSessionMapMutex);
-            for (auto & session : mSessionMap)
-            {
-                auto & sessionInfo = session.second;
-                auto now           = std::chrono::system_clock::now();
-                auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - sessionInfo.sessionStartedTimestamp).count();
-                if (!sessionInfo.activeConnectionIDs.empty() && elapsed >= kMaxSessionDuration)
-                {
-                    sessionInfo.sessionNumber++;
-                    sessionInfo.sessionStartedTimestamp = now;
-                    for (auto connectionID : sessionInfo.activeConnectionIDs)
-                    {
-                        sessionsToRestart.push_back({ connectionID, sessionInfo.sessionNumber });
-                    }
-                }
-            }
-        }
-
-        for (auto & [connectionID, newSessionNumber] : sessionsToRestart)
-        {
-            auto it = mTransportMap.find(connectionID);
-            if (it != mTransportMap.end())
-            {
-                it->second->StartNewSession(newSessionNumber);
-            }
-        }
-
-        std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
-    }
 }
 
 bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber)

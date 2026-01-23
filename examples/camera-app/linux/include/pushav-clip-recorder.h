@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -41,15 +42,7 @@ extern "C" {
 #include <libavutil/timestamp.h>
 }
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace PushAvStreamTransport {
-class PushAvStreamTransportManager; // Forward declaration
-} // namespace PushAvStreamTransport
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// #define TEST_UPLOAD_MPD_AFTER_EVERY_SEGMENT
 
 /**
  * @enum ClipFinalizationReason
@@ -102,8 +95,8 @@ public:
     {
         bool mHasVideo;                                        ///< Video recording enabled flag
         bool mHasAudio;                                        ///< Audio recording enabled flag
+        int64_t mClipStartPTS;                                 ///< Clip start presentation timestamp
         uint64_t mSessionNumber;                               ///< Session number for unique clip identification
-        uint8_t mSessionGroup;                                 ///< Session group for grouping multiple transports
         uint32_t mMaxClipDurationS;                            ///< Maximum clip duration in seconds
         uint16_t mInitialDurationS;                            ///< Initial clip duration in seconds
         uint16_t mAugmentationDurationS;                       ///< Duration increment on motion detect
@@ -117,6 +110,8 @@ public:
         std::string mUrl;                                      ///< URL for uploading clips;
         int mTriggerType;                                      ///< Recording trigger type
         std::chrono::steady_clock::time_point mActivationTime; ///< Time when the recording started
+        uint16_t mMotionDetectedDurationS;                     ///< Current motion detected duration
+        uint16_t mPreviousMotionDetectedDurationS;             ///< Previous duration before augmentation
     };
 
     /**
@@ -125,16 +120,15 @@ public:
      */
     struct AudioInfoStruct
     {
-        uint64_t mChannelLayout;   ///< Audio channel layout
-        int mChannels;             ///< Number of audio channels
-        AVCodecID mAudioCodecId;   ///< Audio codec identifier
-        int mSampleRate;           ///< Sampling rate in Hz
-        int mBitRate;              ///< Audio bitrate in bps
-        int64_t mAudioPts;         ///< Audio presentation timestamp
-        int64_t mAudioDts;         ///< Audio decoding timestamp
-        int mAudioStreamIndex;     ///< Audio stream index
-        int mAudioFrameDuration;   ///< Audio frame duration in samples
-        AVRational mAudioTimeBase; ///< Audio time base
+        uint64_t mChannelLayout;      ///< Audio channel layout
+        int mChannels;                ///< Number of audio channels
+        AVCodecID mAudioCodecId;      ///< Audio codec identifier
+        int mSampleRate;              ///< Sampling rate in Hz
+        int mBitRate;                 ///< Audio bitrate in bps
+        int mAudioInputStreamId;      ///< Input stream ID from camera
+        int mAudioOutputStreamId;     ///< Output stream ID for ffmpeg recording
+        AVRational mAudioTimeBase;    ///< Audio time base
+        std::string mAudioStreamName; ///< Audio stream name
     };
 
     /**
@@ -143,16 +137,15 @@ public:
      */
     struct VideoInfoStruct
     {
-        AVCodecID mVideoCodecId;   ///< Video codec identifier
-        int64_t mVideoPts;         ///< Video presentation timestamp
-        int64_t mVideoDts;         ///< Video decoding timestamp
-        int mWidth;                ///< Video frame width
-        int mHeight;               ///< Video frame height
-        int mFrameRate;            ///< Video frame rate (fps)
-        int mVideoFrameDuration;   ///< Video frame duration (μs)
-        AVRational mVideoTimeBase; ///< Video time base
-        int mVideoStreamIndex;     ///< Video stream index
-        uint32_t mBitRate;         ///< Video bitrate in bps
+        AVCodecID mVideoCodecId;      ///< Video codec identifier
+        int mWidth;                   ///< Video frame width
+        int mHeight;                  ///< Video frame height
+        int mFrameRate;               ///< Video frame rate (fps)
+        int mVideoInputStreamId;      ///< Input stream ID from camera
+        int mVideoOutputStreamId;     ///< Output stream ID for ffmpeg recording
+        uint32_t mBitRate;            ///< Video bitrate in bps
+        AVRational mVideoTimeBase;    ///< Video time base
+        std::string mVideoStreamName; ///< Video stream name
     };
 
     /// @name Construction/Destruction
@@ -200,9 +193,10 @@ public:
      * @brief Enqueues media data for processing
      * @param data Raw media data pointer containing encoded audio/video data
      * @param size Data size in bytes
+     * @param timestampMs Timestamp in milliseconds
      * @param isVideo True for video data, false for audio data
      */
-    void PushPacket(const uint8_t * data, size_t size, bool isVideo);
+    void PushPacket(const uint8_t * data, size_t size, int64_t timestampMs, bool isVideo);
 
     /**
      * @brief Sets the callback function to be called when recording stops
@@ -254,15 +248,6 @@ public:
      */
     void SetFabricIndex(chip::FabricIndex fabricIndex) { mFabricIndex = fabricIndex; }
 
-    /**
-     * @brief Sets the PushAV stream transport manager reference
-     * @param manager Pointer to the PushAV stream transport manager instance
-     */
-    void SetPushAvStreamTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
-    {
-        mPushAvStreamTransportManager = manager;
-    }
-
 private:
     long unsigned int kMaxQueueSize = 500; ///< Maximum queue size for media packets
     std::atomic<bool> mRunning{ false };   ///< Recording activity flag
@@ -287,23 +272,26 @@ private:
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
 
-    int mUploadSegmentID;
     int64_t mCurrentClipStartPts = AV_NOPTS_VALUE;
-    int64_t mFoundFirstIFramePts = -1;
     int64_t currentPts           = AV_NOPTS_VALUE;
+    int64_t mLastVideoPts        = 0;
+    int64_t mLastAudioPts        = 0;
     bool mMetadataSet            = false;
-    bool mUploadedInitSegment    = false;
     bool mUploadMPD              = false;
+
+    std::vector<int> mUploadSegmentID;
+    std::vector<bool> mUploadedInitSegment;
+    std::vector<std::string> mStreamIdNameMap;
 
     PushAVUploader * mUploader;
 
     // Cluster server reference for direct API calls
-    uint16_t mConnectionID                                                                                   = 0;
-    chip::FabricIndex mFabricIndex                                                                           = 0;
-    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer                          = nullptr;
-    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * mPushAvStreamTransportManager = nullptr;
+    uint16_t mConnectionID                                                          = 0;
+    chip::FabricIndex mFabricIndex                                                  = 0;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTriggerType;
     chip ::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> mReasonType;
+    std::filesystem::path mUploadFileBasePath;
 
     /// @name Internal Methods
     /// @{
@@ -320,7 +308,24 @@ private:
      * @param path The file path to check and upload
      * @return true if the file was successfully added to the upload queue, false otherwise
      */
-    bool CheckAndUploadFile(std::string path);
+    bool CheckAndUploadFile(std::string filename);
+
+    /**
+     * @brief Checks if a file is ready for upload (exists and not being written to).
+     * @param path The file path to check.
+     * @return true if the file is ready for upload, false otherwise.
+     */
+    bool IsFileReadyForUpload(const std::filesystem::path & path) const;
+
+    /**
+     * @brief Updates MPD parameters including startNumber and stream paths.
+     *
+     * This function reads an MPD file, finds the startNumber attribute and stream paths,
+     * and replaces them with appropriate values for the current streams.
+     *
+     * @param mpdPath Path to the MPD file to update
+     */
+    void UpdateMPDParams(const std::string & mpdPath);
 
     /**
      * @brief Determines if H.264 data contains an I-frame (IDR frame).
@@ -331,13 +336,14 @@ private:
     bool IsH264IFrame(const uint8_t * data, unsigned int length);
 
     /**
-     * @brief Creates an AVPacket from raw media data
-     * @param data Pointer to the raw media data
-     * @param size Size of the data in bytes
+     * @brief Creates an AVPacket from raw media data with timestamp conversion
+     * @param data Raw media data pointer
+     * @param size Data size in bytes
+     * @param timestampMs Timestamp in milliseconds
      * @param isVideo True for video data, false for audio data
-     * @return Pointer to the created AVPacket, or nullptr on failure
+     * @return Pointer to created AVPacket, or nullptr on failure
      */
-    AVPacket * CreatePacket(const uint8_t * data, int size, bool isVideo);
+    AVPacket * CreatePacket(const uint8_t * data, int size, int64_t timestampMs, bool isVideo);
 
     /**
      * @brief Processes queued packets and writes them to the output file.
@@ -376,12 +382,21 @@ private:
     void CleanupOutput();
 
     /**
-     * @brief Finalizes the current clip and prepares for a new one.
+     * @brief Finalizes the current clip and manages segment uploads.
      *
-     * Handles the clip finalization process based on the provided reason, including
-     * uploading segments, updating metadata, and preparing for the next recording session.
+     * This function handles the complex logic of clip finalization and segment upload management.
+     * It coordinates between multiple streams and ensures proper synchronization of uploads.
      *
-     * @param reason The reason for clip finalization (error, segment upload check, or cleanup)
+     * Key responsibilities:
+     * - Calculates clip duration and determines if finalization is needed
+     * - Manages upload of MPD manifest, initialization segments, and media segments
+     * - Handles different finalization reasons (error, segment check, cleanup)
+     * - Coordinates upload timing between multiple streams
+     *
+     * @param reason The reason for clip finalization
+     *              - kErrorOccurred: Finalize due to error condition
+     *              - kSegmentUploadCheck: Normal processing, check for segment uploads
+     *              - kCleanupUpload: Cleanup time, skip finalization logic
      */
     void FinalizeCurrentClip(ClipFinalizationReason reason);
     /// @}
