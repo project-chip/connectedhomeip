@@ -39,9 +39,9 @@ class AppRootNode : public DeviceInterface
 public:
     AppRootNode() : DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1))
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         mWiFiDriver.Set5gSupport(true);
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
     }
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
