@@ -30,6 +30,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Basic Information
     - Boolean State
     - Camera AV Settings User Level Management
+    - Camera AV Stream Management
     - Chime
     - Closure Control
     - Closure Dimension
