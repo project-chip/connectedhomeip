@@ -152,7 +152,7 @@ def get_provisional_diff(rev1: PrebuiltDataModelDirectory, rev2: PrebuiltDataMod
         features = rev2_provisional_features - rev1_provisional_features
 
         rev2_provisional_attributes = _get_provisional(c2.attributes.values())
-        rev1_provisional_attributes = _get_provisional(c2.attributes.values())
+        rev1_provisional_attributes = _get_provisional(c1.attributes.values())
         attributes = rev2_provisional_attributes - rev1_provisional_attributes
 
         rev2_provisional_accepted_commands = _get_provisional(c2.accepted_commands.values())
