@@ -60,14 +60,18 @@ constexpr uint8_t kMaxLevel         = 254;
 LevelControlCluster::LevelControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
-    mOnLevel(DataModel::Nullable<uint8_t>()),
-    mMinLevel(config.mFeatureMap.Has(Feature::kLighting) ? kLightingMinLevel : config.mMinLevel),
-    mMaxLevel(config.mFeatureMap.Has(Feature::kLighting) ? kMaxLevel : config.mMaxLevel), mDefaultMoveRate(config.mDefaultMoveRate),
-    mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(0), mLastReportedRemainingTime(0),
-    mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
+    mOnLevel(DataModel::Nullable<uint8_t>()), mMinLevel(config.mMinLevel), mMaxLevel(config.mMaxLevel),
+    mDefaultMoveRate(config.mDefaultMoveRate), mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(0),
+    mLastReportedRemainingTime(0), mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
     mOnOffTransitionTime(config.mOnOffTransitionTime), mOptionalAttributes(config.mOptionalAttributes),
     mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate)
-{}
+{
+    if (mFeatureMap.Has(Feature::kLighting))
+    {
+        VerifyOrDie(mMinLevel == kLightingMinLevel);
+        VerifyOrDie(mMaxLevel == kMaxLevel);
+    }
+}
 
 LevelControlCluster::~LevelControlCluster()
 {
@@ -80,8 +84,6 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence attributePersistence(context.attributeStorage);
 
-    attributePersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::OnLevel::Id),
-                                               mOnLevel, mOnLevel);
     attributePersistence.LoadNativeEndianValue(
         ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), mCurrentLevel, mCurrentLevel);
 

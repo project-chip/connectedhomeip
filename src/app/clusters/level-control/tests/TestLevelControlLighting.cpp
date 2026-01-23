@@ -93,7 +93,6 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
 {
     LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
                                      .WithLighting(DataModel::NullNullable)
-                                     .WithMinLevel(0)
                                      .WithMaxLevel(254) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
