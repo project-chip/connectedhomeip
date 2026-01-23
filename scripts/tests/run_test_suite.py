@@ -32,6 +32,7 @@ from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
+from matter.testing.linux import 
 
 log = logging.getLogger(__name__)
 
