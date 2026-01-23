@@ -177,7 +177,7 @@ class XmlCluster:
     bitmaps: dict[str, XmlDataType]
     pics: str
     is_provisional: bool
-    revision_desc: dict[str]
+    revision_desc: dict[int, str]
 
 
 class ClusterSide(Enum):
