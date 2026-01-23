@@ -60,12 +60,12 @@ public:
     /**
      * @return The Current SelectedChime.
      */
-    uint8_t GetSelectedChime() const;
+    uint8_t GetSelectedChime();
 
     /**
      * @return The Enabled attribute..
      */
-    bool GetEnabled() const;
+    bool GetEnabled();
 
     /**
      * @return The endpoint ID.

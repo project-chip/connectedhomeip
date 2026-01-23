@@ -46,12 +46,12 @@ Protocols::InteractionModel::Status ChimeServer::SetEnabled(bool Enabled)
     return mCluster.Cluster().SetEnabled(Enabled);
 }
 
-uint8_t ChimeServer::GetSelectedChime() const
+uint8_t ChimeServer::GetSelectedChime()
 {
     return mCluster.Cluster().GetSelectedChime();
 }
 
-bool ChimeServer::GetEnabled() const
+bool ChimeServer::GetEnabled()
 {
     return mCluster.Cluster().GetEnabled();
 }
