@@ -74,8 +74,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
-    gGroupDataProvider.SetStorageDelegate(delegate);
-    Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     static WifiRootNodeDevice rootNodeDevice(
         {
@@ -126,12 +124,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
-    err = gGroupDataProvider.Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "GroupDataProvider Init failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chipDie();
-    }
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
     // noise.
@@ -225,6 +217,10 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(ParseArguments(argc, argv, AppOptions::GetOptions()));
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
+
+    gGroupDataProvider.SetStorageDelegate(&DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl());
+    ReturnErrorOnFailure(gGroupDataProvider.Init());
+    Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
