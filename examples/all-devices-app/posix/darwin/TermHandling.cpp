@@ -16,9 +16,9 @@
  */
 #include "TermHandling.h"
 
+#include <csignal>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
-#include <csignal>
 
 namespace chip::app {
 

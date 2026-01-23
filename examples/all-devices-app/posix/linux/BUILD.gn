@@ -17,15 +17,15 @@ import("${chip_root}/src/app/common_flags.gni")
 
 config("includes") {
   include_dirs = [
-      ".",
-      "../include",
+    ".",
+    "../include",
   ]
 }
 
 source_set("linux") {
   sources = [
-    "../include/TermHandling.h",
     "../include/AppRootNode.h",
+    "../include/TermHandling.h",
     "TermHandling.cpp",
   ]
 
@@ -33,13 +33,12 @@ source_set("linux") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node:wifi",
-    "${chip_root}/src/data-model-providers/codedriven",
-    "${chip_root}/src/platform/Linux",
-    "${chip_root}/src/data-model-providers/codedriven/endpoint",
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/data-model-providers/codedriven/endpoint",
+    "${chip_root}/src/platform/Linux",
     "${chip_root}/zzz_generated/app-common/devices/",
   ]
 
-  public_configs = [":includes"]
+  public_configs = [ ":includes" ]
 }
-

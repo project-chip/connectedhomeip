@@ -34,10 +34,10 @@
 
 namespace chip::app {
 
-class AppRootNode : public DeviceInterface {
+class AppRootNode : public DeviceInterface
+{
 public:
-    AppRootNode()
-        : DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1))
+    AppRootNode() : DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1))
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
         mWifiDriver.Set5gSupport(true);
@@ -45,7 +45,7 @@ public:
     }
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-        EndpointId parentId = kInvalidEndpointId) override
+                        EndpointId parentId = kInvalidEndpointId) override
     {
         return mRootNodeDevice.Register(endpoint, provider, parentId);
     }
@@ -54,20 +54,14 @@ public:
     /// must only be called when register has succeeded before. Expected
     /// usage of this function is for when the device is no longer needed
     /// (for example, on shutown), to destory the device's clusters.
-    void UnRegister(CodeDrivenDataModelProvider & provider) override
-    {
-        return mRootNodeDevice.UnRegister(provider);
-    }
+    void UnRegister(CodeDrivenDataModelProvider & provider) override { return mRootNodeDevice.UnRegister(provider); }
 
     CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override
     {
         return mRootNodeDevice.DeviceTypes(out);
     }
 
-    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override
-    {
-        return mRootNodeDevice.ClientClusters(out);
-    }
+    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override { return mRootNodeDevice.ClientClusters(out); }
 
 private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -76,7 +70,7 @@ private:
 #else
     DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWifiDriver;
 #endif
-    WifiRootNodeDevice mRootNodeDevice { &mWifiDriver };
+    WifiRootNodeDevice mRootNodeDevice{ &mWifiDriver };
 #else
     RootNodeDevice mRootNodeDevice;
 #endif
