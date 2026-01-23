@@ -424,7 +424,7 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandFieldsValidation)
 
     // Validate "min 1" constraint in OpenDuration field.
     Commands::Open::Type request;
-    request.openDuration = MakeOptional(DataModel::MakeNullable(0u));
+    request.openDuration = MakeOptional(DataModel::Nullable<uint32_t>(0));
     request.targetLevel  = MakeOptional(Percent(10));
 
     auto result = tester.Invoke(request);
