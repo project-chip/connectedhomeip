@@ -165,6 +165,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         // TODO(#40708): Currently the `DecodeAndStoreNativeEndianValue` function doesn't allow performing specific checks
         // on provided values; update this logic once a fix for
         // https://github.com/project-chip/connectedhomeip/issues/40708 is merged.
+        // In the current tests for this cluster this specific part is not validated.
+        // https://github.com/CHIP-Specifications/chip-test-plans/issues/5835
         VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         mDefaultOpenLevel = defaultOpenLevel;
@@ -249,6 +251,9 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
     // Check the "min 1" constraint in the command fields.
+    // This mirrors the previous implementation for this cluster, however we need to validate properly the scenarios
+    // where the TargetLevel field is set while the LVL feature is not enabled.
+    // https://github.com/project-chip/connectedhomeip/issues/42777
     VerifyOrReturnValue((!commandData.openDuration.HasValue() ? true : commandData.openDuration.Value().ValueOr(1) > 0),
                         Status::ConstraintError);
     VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
@@ -263,10 +268,11 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep
     // backwards compatibility. Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL
     // enabled valves).
+    // Issue https://github.com/project-chip/connectedhomeip/issues/42777 created to follow up on the ordering.
 
     // Check the rules for the OpenDuration field of the command.
     // This value will be used to set the OpenDuration attribute, initialize the RemainingDuration attribute and
-    // calculate the AutoCloseTime attribute (if supported in) the OpenValve function
+    // calculate the AutoCloseTime attribute (if supported) in the OpenValve function
     DataModel::Nullable<uint32_t> openDuration;
     if (commandData.openDuration.HasValue())
     {
@@ -334,8 +340,10 @@ CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Pe
     SetRemainingDuration(mOpenDuration);
 
     // Set target level
-    if (mFeatures.Has(Feature::kLevel) && !targetLevel.IsNull())
+    if (mFeatures.Has(Feature::kLevel))
     {
+        // If the LVL feature is enabled this function should actually have a TargetLevel
+        VerifyOrDie(!targetLevel.IsNull());
         SetAttributeValue(mTargetLevel, targetLevel, Attributes::TargetLevel::Id);
     }
 
@@ -481,6 +489,8 @@ void ValveConfigurationAndControlCluster::UpdateCurrentLevel(Percent currentLeve
     }
 }
 
+// Name taken from previous cluster implementation, need to change to a more clear one and review the rest
+// to ensure that they are also fitting (https://github.com/project-chip/connectedhomeip/issues/42777)
 void ValveConfigurationAndControlCluster::EmitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum newState)
 {
     ValveConfigurationAndControl::Events::ValveStateChanged::Type event;

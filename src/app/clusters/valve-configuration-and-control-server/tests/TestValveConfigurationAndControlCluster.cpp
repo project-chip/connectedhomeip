@@ -405,6 +405,45 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestTimeSync)
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestValveConfigurationAndControlCluster, OpenCommandFieldsValidation)
+{
+    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
+                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
+    ValveConfigurationAndControlCluster::ValveContext context = {
+        .features             = {},
+        .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(),
+        .config               = config,
+        .tsTracker            = &timeSyncTracker,
+        .delegate             = &delegate,
+    };
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, context);
+    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(valveCluster);
+
+    // Validate "min 1" constraint in OpenDuration field.
+    Commands::Open::Type request;
+    request.openDuration = MakeOptional(DataModel::MakeNullable(0u));
+    request.targetLevel  = MakeOptional(Percent(10));
+    
+    auto result = tester.Invoke(request);
+    ASSERT_FALSE(result.IsSuccess());
+    ASSERT_TRUE(result.status.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+
+    // Validate "min 1" constraint in TargetLevel field.
+    request.openDuration = Optional<uint32_t>::Missing();
+    request.targetLevel  = MakeOptional(Percent(0));
+    
+    result = tester.Invoke(request);
+    ASSERT_FALSE(result.IsSuccess());
+    ASSERT_TRUE(result.status.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+}
+
 // Test Open command in a no-Level Valve with a DummyDelegate (non instant change).
 TEST_F(TestValveConfigurationAndControlCluster, OpenCommandWithoutFault)
 {
