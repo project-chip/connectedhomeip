@@ -18,6 +18,7 @@
 import importlib
 import importlib.resources as pkg_resources
 import logging
+import math
 import os
 import re
 import typing
@@ -191,12 +192,33 @@ class XmlDeviceTypeClusterRequirements:
     side: ClusterSide
     conformance: ConformanceCallable
     # Feature mask (1 << feature_id) to conformance
-    feature_overrides: dict[uint, Callable] = field(default_factory=dict)
-    attribute_overrides: dict[uint, Callable] = field(default_factory=dict)
-    command_overrides: dict[uint, Callable] = field(default_factory=dict)
+    feature_overrides: dict[uint, ConformanceCallable] = field(default_factory=dict)
+    attribute_overrides: dict[uint, ConformanceCallable] = field(default_factory=dict)
+    command_overrides: dict[uint, ConformanceCallable] = field(default_factory=dict)
+
+    def str_overrides(self):
+        ret = ""
+        if self.feature_overrides:
+            overrides = ""
+            for mask, conformance in self.feature_overrides.items():
+                bit = math.log2(mask)
+                overrides += f'bit {int(bit)}: {str(conformance)} '
+            ret += f'Feature overrides: {overrides}'
+        if self.attribute_overrides:
+            overrides = ""
+            for id, conformance in self.attribute_overrides.items():
+                overrides += f'{id:04X}: {str(conformance)} '
+            ret += f'Attribute overrides: {overrides}'
+        if self.command_overrides:
+            overrides = ""
+            for id, conformance in self.command_overrides.items():
+                overrides += f'{id:04X}: {str(conformance)} '
+            ret += f'Command overrides: {overrides}'
+
+        return ret
 
     def __str__(self):
-        return f'{self.name}: {str(self.conformance)}'
+        return f'{self.name} {self.side}: {str(self.conformance)} {self.str_overrides()}'
 
 
 @dataclass
@@ -1130,8 +1152,8 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 ret[id].write_access = override.write_access
 
         for attr_id, attribute in ret.items():
-            if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and \
-               attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
+            if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and
+            attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
                 location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attr_id)
                 problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                               severity=ProblemSeverity.WARNING, problem=f'Attribute {attribute.name} (ID: {attr_id}) in cluster {cluster_id} has unknown read and write access after combining base and derived values.'))
