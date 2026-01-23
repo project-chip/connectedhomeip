@@ -135,7 +135,7 @@ On systems with AppArmor (like Ubuntu), you also need:
 kernel.apparmor_restrict_unprivileged_userns = 0
 ```
 
-After adding these lines, apply the changes by running `sudo sysctl -p`.
+After adding these lines, apply the changes by running `sudo sysctl --system`.
 
 The simplest way to mock more complex network topologies is to use Linux network
 namespaces. Each device (controller or DUT) is run in its own network namespace,
