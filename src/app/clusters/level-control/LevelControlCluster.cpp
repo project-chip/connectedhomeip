@@ -820,15 +820,13 @@ void LevelControlCluster::TimerFired()
 
     uint8_t currentLevel = mCurrentLevel.Value();
 
-    if (mIncreasing)
+    if (mIncreasing && (currentLevel < mTargetLevel))
     {
-        if (currentLevel < mTargetLevel)
-            currentLevel++;
+        currentLevel++;
     }
-    else
+    else if (!mIncreasing && (currentLevel > mTargetLevel))
     {
-        if (currentLevel > mTargetLevel)
-            currentLevel--;
+        currentLevel--;
     }
 
     bool isEndOfTransition = (currentLevel == mTargetLevel);
@@ -844,7 +842,9 @@ void LevelControlCluster::TimerFired()
             mCurrentCommandId == Commands::StepWithOnOff::Id)
         {
             if (currentLevel == mMinLevel || currentLevel == 0)
+            {
                 UpdateOnOff(false);
+            }
         }
         return;
     }
@@ -854,10 +854,7 @@ void LevelControlCluster::TimerFired()
 
 void LevelControlCluster::OnOffChanged(bool isOn)
 {
-    if (mCurrentLevel.IsNull())
-        return;
-    if (mTemporarilyIgnoreOnOffCallbacks)
-        return;
+    VerifyOrReturn(!mCurrentLevel.IsNull() && !mTemporarilyIgnoreOnOffCallbacks);
 
     if (isOn)
     {
@@ -865,9 +862,13 @@ void LevelControlCluster::OnOffChanged(bool isOn)
         // 2. Determine Target Level (Capture before setting to Min)
         uint8_t target = kMaxLevel; // Default Max
         if (!mOnLevel.IsNull())
+        {
             target = mOnLevel.Value();
+        }
         else if (!mStoredLevel.IsNull())
+        {
             target = mStoredLevel.Value();
+        }
 
         // 1. Set to MinLevel
         // Ignore error as we are internally forcing a valid level (MinLevel) to start the transition.
@@ -914,8 +915,7 @@ void LevelControlCluster::OnOffChanged(bool isOn)
 
 void LevelControlCluster::EnsureOn()
 {
-    if (mDelegate.GetOnOff())
-        return;
+    VerifyOrReturn(mDelegate.GetOnOff() == false);
 
     UpdateOnOff(true, true /* temporarilyIgnoreOnOffCallbacks */);
     if (!mCurrentLevel.IsNull() && mCurrentLevel.Value() < mMinLevel)
