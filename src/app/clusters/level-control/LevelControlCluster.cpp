@@ -554,8 +554,7 @@ CHIP_ERROR LevelControlCluster::SetDefaultMoveRate(DataModel::Nullable<uint8_t> 
 {
     // Validate constraint: Min 1
     if (!newDefaultMoveRate.IsNull() && newDefaultMoveRate.Value() < 1)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    VerifyOrReturnError(newDefaultMoveRate.ValueOr(1) >= 1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
     VerifyOrReturnError(mDefaultMoveRate != newDefaultMoveRate, CHIP_NO_ERROR);
     mDefaultMoveRate = newDefaultMoveRate;
