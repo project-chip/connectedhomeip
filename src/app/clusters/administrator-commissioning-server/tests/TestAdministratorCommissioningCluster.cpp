@@ -44,16 +44,6 @@ using chip::Testing::IsAttributesListEqualTo;
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestAdministratorCommissioningCluster : public chip::Testing::AppContext
 {
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        chip::Testing::AppContext::SetUpTestSuite();
-    }
-    static void TearDownTestSuite()
-    {
-        AppContext::TearDownTestSuite();
-        chip::Platform::MemoryShutdown();
-    }
 };
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
@@ -117,11 +107,22 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
                                           }));
     }
 }
-// This test ensures that calling RevokeCommissioning does not expire the fail-safe if it is not held by a PASE session.
+class ScopedFailSafeDisarm
+{
+public:
+    explicit ScopedFailSafeDisarm(FailSafeContext & ctx) : mCtx(ctx) {}
+    ~ScopedFailSafeDisarm() { mCtx.DisarmFailSafe(); }
+
+private:
+    FailSafeContext & mCtx;
+};
+
+// This test ensures that calling RevokeCommissioning does NOT expire the fail-safe if it is NOT held by a PASE session. Which
+// proves that the RevokeCommissioning command does not interfere with fail-safes that are not related to commissioning.
 TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpireFailSafeIfNotHeldByPASE)
 {
-
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    ScopedFailSafeDisarm disarmFailSafe(failSafeContext);
 
     // Arming the fail-safe outside of the commissioning context
     ASSERT_SUCCESS(failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60)));
@@ -139,8 +140,5 @@ TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpi
     // Ensure that the fail-safe is still armed
     // RevokeCommissioning should NOT expire the fail-safe since it is not held by a PASE session
     ASSERT_TRUE(failSafeContext.IsFailSafeArmed());
-
-    // Teardown of Test (important when compiling all unit tests into a single binary, such as for nrfconnect)
-    failSafeContext.DisarmFailSafe();
 }
 } // namespace
