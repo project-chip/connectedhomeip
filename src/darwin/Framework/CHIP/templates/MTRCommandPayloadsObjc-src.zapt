@@ -17,7 +17,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {{#zcl_commands}}
 {{#*inline "completeImpl"}}
 {{#if (isSupported cluster command=command isForCommandPayload=true)}}
-{{#unless (isInConfigList cluster "DarwinPrivateClusters")}}
 @implementation MTR{{cluster}}Cluster{{command}}Params
 {{> command_params_init_impl}}
 
@@ -150,7 +149,6 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {{/if}}
 
 @end
-{{/unless}}
 {{/if}}
 {{/inline}}
 {{#*inline "oldNameImpl"}}
@@ -173,6 +171,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {{/if}}
 {{/inline}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
+{{#unless (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{> completeImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                  command=(asUpperCamelCase name preserveAcronyms=true)
                  includeRenamedProperties=false}}
@@ -181,6 +180,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 {{> command_old_name_impl}}
 {{> command_deprecated_fields_impl cluster=(asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/unless}}
 {{else}}
 {{> completeImpl cluster=(compatClusterNameRemapping parent.name)
                  command=(compatCommandNameRemapping parent.name name)

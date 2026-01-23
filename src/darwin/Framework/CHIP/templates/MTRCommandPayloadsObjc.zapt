@@ -9,7 +9,6 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_commands}}
 {{#*inline "completeDecl"}}
 {{#if (isSupported cluster command=command isForCommandPayload=true)}}
-{{#unless (isInConfigList cluster "DarwinPrivateClusters")}}
 
 {{availability cluster command=command isForCommandPayload=true deprecationMessage=deprecationMessage}}
 @interface MTR{{cluster}}Cluster{{command}}Params : {{base}}
@@ -32,20 +31,17 @@ NS_ASSUME_NONNULL_BEGIN
 {{> command_timed_invoke_properties}}
 {{> command_init_with_response_value_decl cluster=cluster command=command includeInitWithResponseValue=includeInitWithResponseValue deprecationMessage="This command has been removed"}}
 @end
-{{/unless}}
 {{/if}}
 {{/inline}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{> completeDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                  command=(asUpperCamelCase name preserveAcronyms=true)
                  includeRenamedProperties=false
                  deprecationMessage="This command has been removed"
                  base="NSObject <NSCopying>"
                  includeInitWithResponseValue=true}}
-{{#unless (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{> command_old_name_decl}}
-{{/unless}}
-{{#unless (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{> command_deprecated_fields_decl cluster=(asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/unless}}
 {{else}}
