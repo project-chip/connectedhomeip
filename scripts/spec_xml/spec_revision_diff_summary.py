@@ -144,7 +144,7 @@ def get_provisional_diff(rev1: PrebuiltDataModelDirectory, rev2: PrebuiltDataMod
     print(f'\t{sorted(rev2_additional_provisional_clusters)}')
 
     for id, c2 in clusters_rev2.items():
-        if id not in clusters_rev1.items():
+        if id not in clusters_rev1:
             continue
         c1 = clusters_rev1[id]
         rev2_provisional_features = _get_provisional(c2.features.values())
