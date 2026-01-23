@@ -106,9 +106,17 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
-    gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
-    SuccessOrDie(gGroupDataProvider.Init());
-    Credentials::SetGroupDataProvider(&gGroupDataProvider);
+    if (gGroupDataProvider.GetStorageDelegate() == nullptr)
+    {
+        gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+        CHIP_ERROR err = gGroupDataProvider.Init();
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_INCORRECT_STATE)
+        {
+            ChipLogError(AppServer, "Failed to initialize GroupDataProvider: %" CHIP_ERROR_FORMAT, err.Format());
+            chipDie();
+        }
+        Credentials::SetGroupDataProvider(&gGroupDataProvider);
+    }
 
     initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
     initParams.groupDataProvider             = &gGroupDataProvider;
