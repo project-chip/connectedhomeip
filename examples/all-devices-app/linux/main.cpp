@@ -127,7 +127,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
 
     err = gGroupDataProvider.Init();
-    if (err != CHIP_NO_ERROR) 
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GroupDataProvider Init failed: %" CHIP_ERROR_FORMAT, err.Format());
         chipDie();
