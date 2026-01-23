@@ -217,7 +217,8 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    gGroupDataProvider.SetStorageDelegate(&DeviceLayer::PersistedStorage::KeyValueStoreMgr());
+    auto & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
+    gGroupDataProvider.SetStorageDelegate(&kvsManager);
     ReturnErrorOnFailure(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
