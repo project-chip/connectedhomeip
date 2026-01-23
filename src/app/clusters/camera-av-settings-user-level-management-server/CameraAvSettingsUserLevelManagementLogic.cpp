@@ -177,7 +177,10 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
     MutableByteSpan bufferSpan;
     size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize * mMaxPresets);
 
-    presets.Alloc(maxBufferSize);
+    if (!presets.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
     bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
     TLV::TLVWriter writer;
 
@@ -212,7 +215,10 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
     MutableByteSpan bufferSpan;
     size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize * mMaxPresets);
 
-    presets.Alloc(maxBufferSize);
+    if (!presets.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
     bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
 
     auto path      = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
