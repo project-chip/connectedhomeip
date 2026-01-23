@@ -327,6 +327,7 @@ fi
 
 # Compile Python wheels
 ninja -C "$output_root" python_wheels
+ninja -C "$output_root" python_wheel_dist
 
 # Add wheels from matter_python_wheel_action templates.
 WHEEL=("$output_root"/controller/python/matter*.whl)
