@@ -9465,7 +9465,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_chimeIDClassName     = "java/lang/Integer";
             std::string value_chimeIDCtorSignature = "(I)V";
             jint jnivalue_chimeID                  = static_cast<jint>(cppValue.chimeID);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_chimeIDClassName.c_str(), value_chimeIDCtorSignature.c_str(), jnivalue_chimeID, value_chimeID);
 
             jclass chimeStartedPlayingStructClass;
