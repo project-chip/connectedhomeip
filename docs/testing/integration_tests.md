@@ -120,6 +120,23 @@ or ble-thread), some additional setup is needed.
 
 ### Running tests in Linux network namespaces
 
+The test suite on Linux uses user namespaces (`unshare --map-root-user`) to
+create these isolated network environments. On some systems, this feature might
+be disabled by default. To enable it, ensure the following lines are present in
+`/etc/sysctl.conf` or a new file under `/etc/sysctl.d/`:
+
+```
+kernel.unprivileged_userns_clone = 1
+```
+
+On systems with AppArmor (like Ubuntu), you also need:
+
+```
+kernel.apparmor_restrict_unprivileged_userns = 0
+```
+
+After adding these lines, apply the changes by running `sudo sysctl --system`.
+
 The simplest way to mock more complex network topologies is to use Linux network
 namespaces. Each device (controller or DUT) is run in its own network namespace,
 which allows them to have their own network interfaces and corresponding IP
