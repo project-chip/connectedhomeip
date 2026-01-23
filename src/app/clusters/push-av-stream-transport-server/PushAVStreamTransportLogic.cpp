@@ -30,6 +30,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <set>
+#include <uriparser/Uri.h>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -46,6 +47,38 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
+
+namespace Internal {
+
+std::string extractTextRange(const UriTextRangeA & range)
+{
+    if (range.first == nullptr || range.afterLast == nullptr || range.first >= range.afterLast)
+    {
+        return "";
+    }
+    return std::string(range.first, range.afterLast);
+}
+
+std::string extractPath(const UriPathSegmentA * pathHead)
+{
+    std::string path;
+    const UriPathSegmentA * segment = pathHead;
+
+    while (segment != nullptr)
+    {
+        path += "/";
+
+        if (segment->text.first != nullptr && segment->text.afterLast != nullptr)
+        {
+            path += std::string(segment->text.first, segment->text.afterLast);
+        }
+        segment = segment->next;
+    }
+
+    return path;
+}
+
+} // namespace Internal
 
 PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<Feature> aFeatures) :
     mEndpointId(aEndpoint), mFeatures(aFeatures),
@@ -229,48 +262,65 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
 
 bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
 {
-    const std::string https = "https://";
+    UriUriA uri;
+    const char * errorPos;
+    int result = uriParseSingleUriA(&uri, url.c_str(), &errorPos);
 
-    // Check minimum length and https prefix
-    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    // Check if URI parsing failed
+    if (result != URI_SUCCESS)
     {
+        // No need to call uriFreeUriMembersA on failure
+        ChipLogError(Zcl, "PushAVStreamTransport URL : %s is not RFC 3986 compliant", url.c_str());
         return false;
     }
 
-    // Check that URL does not contain fragment character '#'
-    if (url.find('#') != std::string::npos)
+    // Extract components
+    std::string scheme = Internal::extractTextRange(uri.scheme);
+    std::string host   = Internal::extractTextRange(uri.hostText);
+    std::string path   = Internal::extractPath(uri.pathHead);
+
+    // Free URI structure
+    uriFreeUriMembersA(&uri);
+
+    // Convert scheme to lowercase for case-insensitive comparison
+    for (char & c : scheme)
     {
-        ChipLogError(Camera, "URL contains fragment character '#'");
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+
+    if (scheme != "https")
+    {
+        ChipLogError(Camera, "URL does not have a https scheme");
         return false;
     }
 
-    // Check that URL does not contain query character '?'
-    if (url.find('?') != std::string::npos)
-    {
-        ChipLogError(Camera, "URL contains query character '?'");
-        return false;
-    }
-
-    // Check that URL ends with a forward slash '/'
-    if (url.back() != '/')
-    {
-        ChipLogError(Camera, "URL does not end with '/'");
-        return false;
-    }
-
-    // Extract host part
-    size_t hostStart = https.size();
-    size_t hostEnd   = url.find('/', hostStart);
-    std::string host = url.substr(hostStart, hostEnd - hostStart);
-
-    // Basic host validation: ensure non-empty
     if (host.empty())
     {
         ChipLogError(Camera, "URL does not contain a valid host.");
         return false;
     }
 
-    // Accept any host as long as non-empty
+    bool pathEndsWithSlash = !path.empty() && path.back() == '/';
+    if (!pathEndsWithSlash)
+    {
+        ChipLogError(Camera, "URL does not end with '/'");
+        return false;
+    }
+
+    bool noQuery = url.find('?') == std::string::npos;
+    if (!noQuery)
+    {
+        ChipLogError(Camera, "URL contains query character '?'");
+        return false;
+    }
+
+    bool noFragment = url.find('#') == std::string::npos;
+    if (!noFragment)
+    {
+        ChipLogError(Camera, "URL contains fragment character '#'");
+        return false;
+    }
+
     return true;
 }
 
@@ -864,6 +914,21 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
                 return std::nullopt;
             }
+        }
+    }
+
+    // Validate MaxPreRollLength constraint
+    if (transportOptionsPtr->videoStreamID.HasValue() && transportOptions.triggerOptions.maxPreRollLen.HasValue())
+    {
+        uint16_t maxPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
+        if (maxPreRollLength != 0 &&
+            !mDelegate->ValidateMaxPreRollLength(maxPreRollLength, transportOptionsPtr->videoStreamID.Value()))
+        {
+            auto maxPreRollLengthStatus = to_underlying(StatusCodeEnum::kInvalidPreRollLength);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed", mEndpointId,
+                         maxPreRollLength);
+            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, maxPreRollLengthStatus);
+            return std::nullopt;
         }
     }
 
