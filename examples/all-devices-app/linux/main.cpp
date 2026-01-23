@@ -75,7 +75,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
 
     gGroupDataProvider.SetStorageDelegate(delegate);
-    SuccessOrDie(gGroupDataProvider.Init());
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     static WifiRootNodeDevice rootNodeDevice(
@@ -126,7 +125,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         ChipLogError(AppServer, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
         chipDie();
     }
-
+    
+    err = gGroupDataProvider.Init();
+    if (err != CHIP_NO_ERROR) 
+    {
+        ChipLogError(AppServer, "GroupDataProvider Init failed: %" CHIP_ERROR_FORMAT, err.Format());
+        chipDie();
+    }
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
     // noise.
