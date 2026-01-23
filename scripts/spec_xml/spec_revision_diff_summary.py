@@ -170,7 +170,7 @@ def get_provisional_diff(rev1: PrebuiltDataModelDirectory, rev2: PrebuiltDataMod
         if not features and not attributes and not accepted_commands and not generated_commands and not events:
             continue
 
-        print(f'\n{c.name}')
+        print(f'\n{c2.name}')
         print(f'Provisional elements in {rev2.dirname} that are not provisional in {rev1.dirname}')
         if features:
             print(f'\tFeatures: {features}')
