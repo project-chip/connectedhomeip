@@ -426,7 +426,7 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandFieldsValidation)
     Commands::Open::Type request;
     request.openDuration = MakeOptional(DataModel::MakeNullable(0u));
     request.targetLevel  = MakeOptional(Percent(10));
-    
+
     auto result = tester.Invoke(request);
     ASSERT_FALSE(result.IsSuccess());
     ASSERT_TRUE(result.status.has_value());
@@ -436,7 +436,7 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandFieldsValidation)
     // Validate "min 1" constraint in TargetLevel field.
     request.openDuration = Optional<uint32_t>::Missing();
     request.targetLevel  = MakeOptional(Percent(0));
-    
+
     result = tester.Invoke(request);
     ASSERT_FALSE(result.IsSuccess());
     ASSERT_TRUE(result.status.has_value());
