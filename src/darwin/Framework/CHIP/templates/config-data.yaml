@@ -20,5 +20,4 @@ LegacyCommandsWithOnlyOptionalArguments:
     - UnitTesting::TestSimpleOptionalArgumentRequest
 
 # Clusters that should have private headers/implementations generated.
-DarwinPrivateClusters:
-  []
+DarwinPrivateClusters: []
