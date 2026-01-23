@@ -64,23 +64,23 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
             TestStep(7, "If Tilt is supported read and verify TiltMin attribute. Store in myTiltMin."),
             TestStep(8, "If Tilt is supported read and verify TiltMax attribute. Store in myTiltMax."),
             TestStep(9, "Set newTilt to be a value in the range myTiltMin to myTiltMax different from initialTilt."),
-            TestStep(10,"If Zoom is supported read and verify ZoomMax attribute. Store in myZoomMax."),
-            TestStep(11,"Set newZoom to be a value in the range 2 to myZoomMax different from initialZoom."),
-            TestStep(12,"Send MPTZSetPosition command with Pan set to newPan, Tilt set to newTilt, Zoom set to newZoom as appropriate."),
-            TestStep(13,"Once the MovementState has returned to _Idle_, read and verify the MPTZPosition attribute."),
-            TestStep(14,"If MaxPresets is supported, read the MaxPresets attribute. Store the returned value in myMaxPresets."),
-            TestStep(15,"Read the MPTZPresets attribute.  Save this in myPresets."),
-            TestStep(16,"Fail if the number of entries in myPresets is greater than myMaxPresets."),
-            TestStep(17,"Send the SavePreset command with PresetID set to myMaxPresets, Name set to 'newpreset'."),
-            TestStep(18,"Read} the MPTZPresets attribute. Verify the list includes a preset with PresetID equal to myMaxPresets."),
-            TestStep(19,"If DPTZ is supported, read AVStreamManagement.Viewport and AVStreamManagement.VideoSensorParams. Store the viewport in myViewport."),
-            TestStep(20,"If DPTZ is supported, send AVStreamManagement.VideoStreamAllocate command. Store the the allocated video stream ID."),
-            TestStep(21,"If DPTZ is supported read DPTZStreams attribute. Verify for the entry with a VideoStreamID of myStreamID the Viewport is myViewport."),
-            TestStep(22,"Reboot the DUT."),
-            TestStep(23,"Wait for the DUT to come back online."),
-            TestStep(24,"Read and verify the MPTZPosition attribute. Verify Pan, Tilt, and Zoom values are persisted."),
-            TestStep(25,"If MPTZPresets is supported, read the MPTZPresets attribute. Verify the list includes a preset with PresetID equal to myMaxPresets."),
-            TestStep(26,"If DPTZ is supported, read the DPTZStreams attribute. Verify for the entry with a VideoStreamID of myStreamID the Viewport is myViewport."),
+            TestStep(10, "If Zoom is supported read and verify ZoomMax attribute. Store in myZoomMax."),
+            TestStep(11, "Set newZoom to be a value in the range 2 to myZoomMax different from initialZoom."),
+            TestStep(12, "Send MPTZSetPosition command with Pan set to newPan, Tilt set to newTilt, Zoom set to newZoom as appropriate."),
+            TestStep(13, "Once the MovementState has returned to _Idle_, read and verify the MPTZPosition attribute."),
+            TestStep(14, "If MaxPresets is supported, read the MaxPresets attribute. Store the returned value in myMaxPresets."),
+            TestStep(15, "Read the MPTZPresets attribute.  Save this in myPresets."),
+            TestStep(16, "Fail if the number of entries in myPresets is greater than myMaxPresets."),
+            TestStep(17, "Send the SavePreset command with PresetID set to myMaxPresets, Name set to 'newpreset'."),
+            TestStep(18, "Read} the MPTZPresets attribute. Verify the list includes a preset with PresetID equal to myMaxPresets."),
+            TestStep(19, "If DPTZ is supported, read AVStreamManagement.Viewport and AVStreamManagement.VideoSensorParams. Store the viewport in myViewport."),
+            TestStep(20, "If DPTZ is supported, send AVStreamManagement.VideoStreamAllocate command. Store the the allocated video stream ID."),
+            TestStep(21, "If DPTZ is supported read DPTZStreams attribute. Verify for the entry with a VideoStreamID of myStreamID the Viewport is myViewport."),
+            TestStep(22, "Reboot the DUT."),
+            TestStep(23, "Wait for the DUT to come back online."),
+            TestStep(24, "Read and verify the MPTZPosition attribute. Verify Pan, Tilt, and Zoom values are persisted."),
+            TestStep(25, "If MPTZPresets is supported, read the MPTZPresets attribute. Verify the list includes a preset with PresetID equal to myMaxPresets."),
+            TestStep(26, "If DPTZ is supported, read the DPTZStreams attribute. Verify for the entry with a VideoStreamID of myStreamID the Viewport is myViewport."),
         ]
 
     def pics_TC_AVSUM_2_9(self) -> list[str]:
@@ -105,7 +105,7 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
         self.has_feature_mtilt = (feature_map & cluster.Bitmaps.Feature.kMechanicalTilt) != 0
         self.has_feature_mzoom = (feature_map & cluster.Bitmaps.Feature.kMechanicalZoom) != 0
         self.has_feature_mpresets = (feature_map & cluster.Bitmaps.Feature.kMechanicalPresets) != 0
-        self.has_feature_dptz = (feature_map & cluster.Bitmaps.Feature.kDigitalPTZ) !=0
+        self.has_feature_dptz = (feature_map & cluster.Bitmaps.Feature.kDigitalPTZ) != 0
 
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
 
@@ -254,7 +254,6 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
             if not await self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
                 asserts.assert_fail("No matching stream id and viewport found in DPTZStreams for the allocated video stream")
 
-
         self.step(22)
         # Reboot DUT
         # Check if restart flag file is available (indicates test runner supports app restart)
@@ -298,6 +297,7 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
                 asserts.assert_fail("No matching stream id and viewport found in DPTZStreams for the allocated video stream")
         else:
             self.skip_step(26)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
