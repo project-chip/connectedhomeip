@@ -22,7 +22,7 @@ namespace chip::app {
 
 /// Set the given function to be called when user requests
 /// application stop (generally SIGINT and/or SIGTERM)
-void SetTermiateHandler(void (*handler)(int))
+void SetTerminateHandler(void (*handler)(int))
 {
 
     struct sigaction sa = {};

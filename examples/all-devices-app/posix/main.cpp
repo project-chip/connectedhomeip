@@ -162,7 +162,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
-    chip::app::SetTermiateHandler(StopSignalHandler);
+    chip::app::SetTerminateHandler(StopSignalHandler);
 
     if (mainLoop != nullptr)
     {
