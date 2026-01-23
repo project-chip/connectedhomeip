@@ -135,6 +135,14 @@
         {
             "name": "command_deprecated_fields_impl",
             "path": "partials/command_deprecated_fields_impl.zapt"
+        },
+        {
+            "name": "command_internal_methods_decl",
+            "path": "partials/command_internal_methods_decl.zapt"
+        },
+        {
+            "name": "command_payload_impl_imports",
+            "path": "partials/command_payload_impl_imports.zapt"
         }
     ],
     "templates": [
