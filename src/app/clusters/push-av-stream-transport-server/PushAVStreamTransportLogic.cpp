@@ -841,16 +841,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    // Validate Bandwidth Requirement
-    Status retStatus = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
-                                                         transportOptions.audioStreamID);
-    if (retStatus != Status::Success)
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted", mEndpointId);
-        handler.AddStatus(commandPath, retStatus);
-        return std::nullopt;
-    }
-
     std::shared_ptr<TransportOptionsStorage> transportOptionsPtr{ new (std::nothrow) TransportOptionsStorage(transportOptions) };
 
     if (transportOptionsPtr == nullptr)
@@ -894,7 +884,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             if ((videoStreamNames.size() != videoStreamsCount) || (videoStreamIDs.size() != videoStreamsCount))
             {
                 auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate videoStreamName found", mEndpointId);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate videoStreamName or videoStreamID found",
+                             mEndpointId);
                 TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
                 return std::nullopt;
             }
@@ -930,7 +921,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
             if ((audioStreamNames.size() != audioStreamsCount) || (audioStreamIDs.size() != audioStreamsCount))
             {
                 auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate audioStreamName found", mEndpointId);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate audioStreamName or audioStreamID found",
+                             mEndpointId);
                 TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
                 return std::nullopt;
             }
@@ -1072,6 +1064,28 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 return std::nullopt;
             }
         }
+    }
+
+    // Validate Bandwidth Requirement
+    Optional<DataModel::Nullable<uint16_t>> firstVideoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> firstAudioStreamID;
+
+    if (transportOptions.videoStreams.HasValue())
+    {
+        firstVideoStreamID.SetValue(transportOptions.videoStreams.Value().front().videoStreamID);
+    }
+    if (transportOptions.audioStreams.HasValue())
+    {
+        firstAudioStreamID.SetValue(transportOptions.audioStreams.Value().front().audioStreamID);
+    }
+
+    Status retStatus = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, firstVideoStreamID, firstAudioStreamID);
+
+    if (retStatus != Status::Success)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted", mEndpointId);
+        handler.AddStatus(commandPath, retStatus);
+        return std::nullopt;
     }
 
     // Validate MaxPreRollLength constraint
