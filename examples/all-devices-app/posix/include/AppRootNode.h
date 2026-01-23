@@ -40,7 +40,7 @@ public:
     AppRootNode() : DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1))
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-        mWifiDriver.Set5gSupport(true);
+        mWiFiDriver.Set5gSupport(true);
 #endif
     }
 
@@ -65,15 +65,17 @@ public:
 
 private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     DeviceLayer::NetworkCommissioning::DarwinWiFiDriver mWiFiDriver;
 #else
-    DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWifiDriver;
-#endif
-    WifiRootNodeDevice mRootNodeDevice{ &mWifiDriver };
+    DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWiFiDriver;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+    WifiRootNodeDevice mRootNodeDevice{ &mWiFiDriver };
 #else
     RootNodeDevice mRootNodeDevice;
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 };
 
 } // namespace chip::app
