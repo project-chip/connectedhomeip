@@ -244,10 +244,10 @@ private:
     CHIP_ERROR SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
     // Helper to update RemainingTime attribute with quiet reporting rules (delta check).
     void UpdateRemainingTime(uint32_t remainingTimeMs, bool isNewTransition);
-
-    // Reporting predicates
-    bool ShouldReportCurrentLevel(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition) const;
+    // Predicate for RemainingTime reporting (since logic is complex).
     bool ShouldReportRemainingTime(uint16_t remainingTimeDs, bool isNewTransition) const;
+    // Predicate for CurrentLevel reporting (since logic is complex).
+    bool ShouldReportCurrentLevel(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition) const;
 
     void StartTimer(uint32_t delayMs);
     void CancelTimer();
