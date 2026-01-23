@@ -26,7 +26,7 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
-#include <devices/root-node/RootNodeDevice.h>
+#include <devices/root-node/WifiRootNodeDevice.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>

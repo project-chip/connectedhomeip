@@ -23,14 +23,11 @@
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
-#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
-#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace app {
@@ -58,23 +55,6 @@ private:
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
-};
-
-class WifiRootNodeDevice : public RootNodeDevice
-{
-public:
-    WifiRootNodeDevice(DeviceLayer::NetworkCommissioning::WiFiDriver * wifiDriver) : RootNodeDevice(), mWifiDriver(wifiDriver) {}
-
-    ~WifiRootNodeDevice() override = default;
-
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
-    void UnRegister(CodeDrivenDataModelProvider & provider) override;
-
-private:
-    LazyRegisteredServerCluster<Clusters::NetworkCommissioningCluster> mNetworkCommissioningCluster;
-    LazyRegisteredServerCluster<Clusters::WiFiDiagnosticsServerCluster> mWifiDiagnosticsCluster;
-    DeviceLayer::NetworkCommissioning::WiFiDriver * mWifiDriver;
 };
 
 } // namespace app
