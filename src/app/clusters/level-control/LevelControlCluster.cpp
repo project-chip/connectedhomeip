@@ -797,7 +797,7 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, bool isN
 
 void LevelControlCluster::StartTimer(uint32_t delayMs)
 {
-    VerifyOrDie(mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(delayMs)) == CHIP_NO_ERROR);
+    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(delayMs)));
 }
 
 void LevelControlCluster::CancelTimer()
@@ -807,8 +807,7 @@ void LevelControlCluster::CancelTimer()
 
 void LevelControlCluster::TimerFired()
 {
-    if (mCurrentLevel.IsNull())
-        return;
+    VerifyOrReturn(!mCurrentLevel.IsNull());
 
     mElapsedTimeMs += mEventDurationMs;
 

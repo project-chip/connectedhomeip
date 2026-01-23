@@ -260,13 +260,22 @@ TEST_F(TestLevelControlBase, TestImmediateExecution)
 TEST_F(TestLevelControlBase, TestGetters)
 {
     LevelControlCluster::Config config(kTestEndpointId, mockTimer, mockDelegate);
-    config.WithMinLevel(10).WithMaxLevel(200).WithDefaultMoveRate(50);
+    config.WithMinLevel(10)
+        .WithMaxLevel(200)
+        .WithDefaultMoveRate(50)
+        .WithOnTransitionTime(100)
+        .WithOffTransitionTime(200)
+        .WithOnOffTransitionTime(300);
 
     LevelControlCluster cluster(config);
 
     EXPECT_EQ(cluster.GetMinLevel(), 10u);
     EXPECT_EQ(cluster.GetMaxLevel(), 200u);
     EXPECT_EQ(cluster.GetDefaultMoveRate().Value(), 50u);
+    EXPECT_EQ(cluster.GetOnTransitionTime().Value(), 100u);
+    EXPECT_EQ(cluster.GetOffTransitionTime().Value(), 200u);
+    EXPECT_EQ(cluster.GetOnOffTransitionTime(), 300u);
+    EXPECT_EQ(cluster.GetRemainingTime(), 0u);
 }
 
 TEST_F(TestLevelControlBase, TestFeatureMap)
