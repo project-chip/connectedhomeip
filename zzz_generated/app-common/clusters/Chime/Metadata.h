@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Chime {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -53,7 +53,12 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PlayChimeSound::
 
 } // namespace Commands
 
-namespace Events {} // namespace Events
+namespace Events {
+namespace ChimeStartedPlaying {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ChimeStartedPlaying
+
+} // namespace Events
 } // namespace Chime
 } // namespace Clusters
 } // namespace app

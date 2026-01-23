@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
-#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
@@ -147,6 +147,16 @@ public:
      */
     virtual bool ValidateSegmentDuration(uint16_t segmentDuration,
                                          const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
+
+    /**
+     * @brief Validates the provided Max Pre Roll Length.
+     *
+     * @param maxPreRollLength Max Pre Roll length to validate
+     * @param videoStreamId The video stream ID to be validated against
+     * @return true if the Max pre-roll length is greater than or equal to KeyFrameInterval for the provided videoStreamId, false
+       otherwise
+     */
+    virtual bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
@@ -307,6 +317,7 @@ public:
      */
     virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
 };
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

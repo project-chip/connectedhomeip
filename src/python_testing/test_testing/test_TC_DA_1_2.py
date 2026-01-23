@@ -16,17 +16,19 @@
 #    limitations under the License.
 #
 
+import io
 import json
 import os
 import subprocess
 import sys
+from typing import Optional
 
 CHIP_ROOT = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '../../..'))
 RUNNER_SCRIPT_DIR = os.path.join(CHIP_ROOT, 'scripts/tests')
 
 
-def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = False) -> int:
+def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = False, additional_script_args: Optional[str] = None) -> int:
 
     reset = ""
     if factory_reset:
@@ -34,6 +36,7 @@ def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = Fa
 
     app = os.path.join(
         CHIP_ROOT, 'objdir-clone/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app')
+    app = os.path.join(CHIP_ROOT, 'out', 'linux-x64-all-clusters-no-ble', 'chip-all-clusters-app')
 
     # Certs in the commissioner_dut directory use 0x8000 as the PID
     app_args = '--discriminator 1234 --KVS kvs1 --product-id ' + \
@@ -43,6 +46,8 @@ def run_single_test(dac_provider: str, product_id: int, factory_reset: bool = Fa
         CHIP_ROOT, 'src/app/tests/suites/certification/ci-pics-values'))
     script_args = '--storage-path admin_storage.json --discriminator 1234 --passcode 20202021 --dut-node-id 1 --PICS ' + \
         str(ci_pics_values)
+    if additional_script_args:
+        script_args = script_args + ' ' + additional_script_args
 
     # for any test with a dac_provider, we don't want to recommission because there's a chance the
     # dac could be wrong and the commissioning would fail. Rely on the original commissioning. This is also faster.
@@ -78,12 +83,22 @@ def main():
     exclude_cases = ['struct_cd_version_number_wrong',
                      'struct_cd_cert_id_mismatch']
 
-    # struct_cd_provisional_cd and struct_cd_official_cd will be handled when TC-DA-1.2
-    # is updated to handle provisional CDs.
-    # https://github.com/project-chip/matter-test-scripts/issues/731 - fast follow to this PR
-    exclude_cases += ['struct_cd_provisional_cd', 'struct_cd_official_cd']
+    # Provisional CDs signed by the test key are handled two different ways by this test.
+    # By default, these fail DA-1.2 even though they work in the commissioner.
+    # They can be made to pass the test with a flag, so these are tested separately
+    exclude_cases += ['struct_cd_provisional_cd']
 
     passes = []
+
+    def load_test_case_vector(cert_path, p) -> tuple[str, bool, int]:
+        ''' Loads the test_case_vector.json and returns a tuple with the path, expected success response and the pid'''
+        path = str(os.path.join(cert_path, p, 'test_case_vector.json'))
+        with open(path, 'r') as f:
+            j = json.loads(f.read())
+            success_expected = j['is_success_case'].lower() == 'true'
+            pid = j['basic_info_pid']
+            return (path, success_expected, pid)
+
     for p in os.listdir(cert_path):
         matches = list(filter(lambda t: t in str(p), test_cases))
         if len(matches) != 1:
@@ -92,14 +107,28 @@ def main():
         if str(p) in exclude_cases:
             continue
 
-        path = str(os.path.join(cert_path, p, 'test_case_vector.json'))
-        with open(path, 'r') as f:
-            j = json.loads(f.read())
-            success_expected = j['is_success_case'].lower() == 'true'
-            pid = j['basic_info_pid']
+        path, success_expected, pid = load_test_case_vector(cert_path, p)
 
         ret = run_single_test(path, pid)
         passes.append((str(p), ret, success_expected))
+
+    # Provisional CDs work two ways currently, depending on the flag
+    p = 'struct_cd_provisional_cd'
+    path, _, pid = load_test_case_vector(cert_path, p)
+    # Default is to fail
+    ret = run_single_test(path, pid)
+    passes.append((f'{str(p)} (no flag)', ret, False))
+
+    # This should pass, but there is a manual step to acknowledge the provisional CD with the wrong signer
+    mock_input = io.StringIO("\n")
+    original_stdin = sys.stdin
+    sys.stdin = mock_input
+    ret = run_single_test(path, pid, additional_script_args='--bool-arg override_provisional_cd_check_warning:true')
+    passes.append((f'{str(p)} (flag=true)', ret, True))
+    sys.stdin = original_stdin
+
+    ret = run_single_test(path, pid, additional_script_args='--bool-arg override_provisional_cd_check_warning:false')
+    passes.append((f'{str(p)} (flag=false)', ret, False))
 
     retval = 0
     for p in passes:
