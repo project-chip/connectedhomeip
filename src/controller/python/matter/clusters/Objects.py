@@ -50332,7 +50332,10 @@ class Chime(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="chimeID", Tag=0, Type=typing.Optional[uint]),
                     ])
+
+            chimeID: typing.Optional[uint] = None
 
     class Attributes:
         @dataclass
@@ -50462,6 +50465,26 @@ class Chime(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class ChimeStartedPlaying(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000556
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="chimeID", Tag=0, Type=uint),
+                    ])
+
+            chimeID: uint = 0
 
 
 @dataclass
