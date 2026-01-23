@@ -21,6 +21,7 @@
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DeviceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::app;
