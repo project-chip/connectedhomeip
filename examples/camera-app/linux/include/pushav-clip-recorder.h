@@ -90,7 +90,6 @@ public:
         uint16_t mElapsedTimeS;                               ///< Elapsed time since recording start in seconds
         std::string mOutputPath;                              ///< Base output directory path
         std::string mTrackName;                               ///< Track name for segmented files
-        AVRational mInputTimeBase;                            ///< Input time base
         std::string mUrl;                                     ///< URL for uploading clips;
         int mTriggerType;                                     ///< Recording trigger type
         std::chrono::steady_clock::time_point activationTime; ///< Time when the recording started
