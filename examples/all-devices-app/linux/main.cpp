@@ -106,6 +106,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
+    gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    SuccessOrDie(gGroupDataProvider.Init());
+    Credentials::SetGroupDataProvider(&gGroupDataProvider);
+
     initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
     initParams.groupDataProvider             = &gGroupDataProvider;
     initParams.operationalServicePort        = CHIP_PORT;
@@ -216,11 +220,6 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(ParseArguments(argc, argv, AppOptions::GetOptions()));
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
-
-    PersistentStorageDelegate & storage = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-    gGroupDataProvider.SetStorageDelegate(&storage);
-    ReturnErrorOnFailure(gGroupDataProvider.Init());
-    Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
