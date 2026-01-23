@@ -13,6 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/tests/AppTestContext.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
@@ -30,6 +32,7 @@
 namespace {
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
 
@@ -39,10 +42,8 @@ using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
-struct TestAdministratorCommissioningCluster : public ::testing::Test
+struct TestAdministratorCommissioningCluster : public chip::Testing::AppContext
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
@@ -106,5 +107,38 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
                                           }));
     }
 }
+class ScopedFailSafeDisarm
+{
+public:
+    explicit ScopedFailSafeDisarm(FailSafeContext & ctx) : mCtx(ctx) {}
+    ~ScopedFailSafeDisarm() { mCtx.DisarmFailSafe(); }
 
+private:
+    FailSafeContext & mCtx;
+};
+
+// This test ensures that calling RevokeCommissioning does NOT expire the fail-safe if it is NOT held by a PASE session. Which
+// proves that the RevokeCommissioning command does not interfere with fail-safes that are not related to commissioning.
+TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpireFailSafeIfNotHeldByPASE)
+{
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    ScopedFailSafeDisarm disarmFailSafe(failSafeContext);
+
+    // Arming the fail-safe outside of the commissioning context
+    ASSERT_SUCCESS(failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60)));
+    ASSERT_TRUE(failSafeContext.IsFailSafeArmed());
+
+    AdministratorCommissioningLogic logic;
+    AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
+
+    // RevokeCommissioning attempts to expire the fail-safe (when it is held by a PASE session) regardless of the commissioning
+    // window state; therefore, for the sake of the test it is acceptable for it to return StatusCode::kWindowNotOpen instead of
+    // Status::Success.
+    ASSERT_EQ(logic.RevokeCommissioning(unused),
+              chip::Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCode::kWindowNotOpen));
+
+    // Ensure that the fail-safe is still armed
+    // RevokeCommissioning should NOT expire the fail-safe since it is not held by a PASE session
+    ASSERT_TRUE(failSafeContext.IsFailSafeArmed());
+}
 } // namespace
