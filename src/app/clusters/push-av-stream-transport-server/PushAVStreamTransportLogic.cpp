@@ -1062,11 +1062,21 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
     if (transportOptions.videoStreams.HasValue())
     {
-        firstVideoStreamID.SetValue(transportOptions.videoStreams.Value().front().videoStreamID);
+        auto videoIter = transportOptions.videoStreams.Value().begin();
+        if (videoIter.Next())
+        {
+            firstVideoStreamID.SetValue(videoIter.GetValue().videoStreamID);
+            transportOptionsPtr->videoStreamID = firstVideoStreamID;
+        }
     }
     if (transportOptions.audioStreams.HasValue())
     {
-        firstAudioStreamID.SetValue(transportOptions.audioStreams.Value().front().audioStreamID);
+        auto audioIter = transportOptions.audioStreams.Value().begin();
+        if (audioIter.Next())
+        {
+            firstAudioStreamID.SetValue(audioIter.GetValue().audioStreamID);
+            transportOptionsPtr->audioStreamID = firstAudioStreamID;
+        }
     }
 
     Status retStatus = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, firstVideoStreamID, firstAudioStreamID);
@@ -1571,7 +1581,7 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
     event.triggerType       = triggerType;
     event.activationReason  = activationReason;
     event.containerType     = containerType;
-    event.cmafSessionNumber = cmafSessionNumber;
+    event.CMAFSessionNumber = cmafSessionNumber;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1602,26 +1612,26 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
             uint64_t sessionNumber = 0;
             if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
             {
-                event.cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
+                event.CMAFSessionNumber = MakeOptional<uint64_t>(sessionNumber);
             }
             else
             {
                 ChipLogError(Zcl, "GeneratePushTransportEndEvent: Unable to get CMAF session number for connection %u",
                              connectionID);
                 // Don't include the session number if we can't get it
-                event.cmafSessionNumber = Optional<uint64_t>();
+                event.CMAFSessionNumber = Optional<uint64_t>();
             }
         }
         else
         {
-            event.cmafSessionNumber = Optional<uint64_t>();
+            event.CMAFSessionNumber = Optional<uint64_t>();
         }
     }
     else
     {
         // Fallback values if transport config not found
         event.containerType     = ContainerFormatEnum::kCmaf; // Default fallback
-        event.cmafSessionNumber = Optional<uint64_t>();
+        event.CMAFSessionNumber = Optional<uint64_t>();
     }
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);

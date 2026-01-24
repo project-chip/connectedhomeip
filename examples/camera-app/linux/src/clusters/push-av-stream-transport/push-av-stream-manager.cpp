@@ -128,21 +128,16 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     uint16_t videoStreamID = -1;
     uint16_t audioStreamID = -1;
 
-    // This is to support videoStreams, audioStreams passed in the structure for 1.5.1 spec
-    // TODO: Update below changes after application uses transportOptions.videoStreams, transportOptions.audioStreams for
-    // MediaController registration and Bandwidth calculation
-    Optional<Nullable<uint16_t>> firstVideoStream;
-    Optional<Nullable<uint16_t>> firstAudioStream;
-
-    if (transportOptions.videoStreams.HasValue())
+    //TODO: Supporting single video stream and single audio stream. This logic need to be updated for all the streams
+    // in future for application as part of 1.5.1
+    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
-        firstVideoStream.SetValue(transportOptions.videoStreams.Value().front().videoStreamID);
-        videoStreamID = firstVideoStream.Value().Value();
+        videoStreamID = transportOptions.videoStreamID.Value().Value();
     }
-    if (transportOptions.audioStreams.HasValue())
+
+    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
     {
-        firstAudioStream.SetValue(transportOptions.audioStreams.Value().front().audioStreamID);
-        audioStreamID = firstAudioStream.Value().Value();
+        audioStreamID = transportOptions.audioStreamID.Value().Value();
     }
 
     ChipLogProgress(
@@ -152,7 +147,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
     uint32_t newTransportBandwidthbps = 0;
-    GetBandwidthForStreams(firstVideoStream, firstAudioStream, newTransportBandwidthbps);
+    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
     mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthbps(newTransportBandwidthbps);
     mTotalUsedBandwidthbps += newTransportBandwidthbps;
@@ -879,4 +874,31 @@ void PushAvStreamTransportManager::SessionMonitor()
 
         std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
     }
+}
+
+bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+
+    // Look for the connection in any session
+    for (const auto & sessionPair : mSessionMap)
+    {
+        const auto & sessionInfo = sessionPair.second;
+        if (sessionInfo.activeConnectionIDs.find(connectionID) != sessionInfo.activeConnectionIDs.end())
+        {
+            sessionNumber = sessionInfo.sessionNumber;
+            return true;
+        }
+    }
+
+    // If not found in active sessions, check if we have transport options for this connection
+    auto transportIt = mTransportOptionsMap.find(connectionID);
+    if (transportIt != mTransportOptionsMap.end())
+    {
+        // For connections not in active sessions, return a default session number
+        sessionNumber = 0;
+        return true;
+    }
+
+    return false;
 }
