@@ -84,14 +84,14 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Chime::Id:
+        MatterChimeClusterInitCallback(endpoint);
+        break;
     case app::Clusters::TlsCertificateManagement::Id:
         MatterTlsCertificateManagementClusterInitCallback(endpoint);
         break;
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::Chime::Id:
-        MatterChimeClusterInitCallback(endpoint);
         break;
     }
 }
@@ -157,14 +157,14 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint);
         break;
+    case app::Clusters::Chime::Id:
+        MatterChimeClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::TlsCertificateManagement::Id:
         MatterTlsCertificateManagementClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterShutdownCallback(endpoint);
-        break;
-    case app::Clusters::Chime::Id:
-        MatterChimeClusterShutdownCallback(endpoint);
         break;
     }
 }

@@ -99,6 +99,10 @@ void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterChimeClusterInitCallback(chip::EndpointId endpointID);
+
+void MatterChimeClusterShutdownCallback(chip::EndpointId endpointID);
+
 void MatterTlsCertificateManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterTlsCertificateManagementClusterShutdownCallback(chip::EndpointId endpointId);
@@ -106,7 +110,3 @@ void MatterTlsCertificateManagementClusterShutdownCallback(chip::EndpointId endp
 void MatterTlsClientManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterTlsClientManagementClusterShutdownCallback(chip::EndpointId endpointId);
-
-void MatterChimeClusterInitCallback(chip::EndpointId endpointId);
-
-void MatterChimeClusterShutdownCallback(chip::EndpointId endpointId);
