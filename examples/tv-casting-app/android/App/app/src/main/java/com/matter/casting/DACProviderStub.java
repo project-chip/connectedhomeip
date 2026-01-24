@@ -107,7 +107,7 @@ public class DACProviderStub implements DACProvider {
       return signature.sign();
 
     } catch (Exception e) {
-      Log.i(TAG, "SignWithDeviceAttestationKey failed", e);
+      Log.e(TAG, "SignWithDeviceAttestationKey failed", e);
       return null;
     }
   }

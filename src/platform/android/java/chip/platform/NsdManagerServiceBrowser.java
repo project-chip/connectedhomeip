@@ -130,7 +130,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     try {
       this.nsdManager.stopServiceDiscovery(discovery);
     } catch (Exception e) {
-      Log.d(TAG, "Exception in stopDiscover " + e, e);
+      Log.e(TAG, "Exception in stopDiscover " + e, e);
     }
   }
 
