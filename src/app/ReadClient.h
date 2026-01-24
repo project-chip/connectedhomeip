@@ -194,6 +194,8 @@ public:
          *
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          *
+         * This callback is expected to be called inside the ReadClient.
+         *
          * @param[in] aError       A system error code that conveys the overall error code.
          */
         virtual void OnError(CHIP_ERROR aError) {}
@@ -288,6 +290,25 @@ public:
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          */
         virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
+
+        /*
+         * Get the last internal fatal error in callback
+         */
+        CHIP_ERROR GetLastFatalReportError() const { return mLastFatalReportError; }
+
+    protected:
+        /*
+         * Set the fatal report fatal error in report which would lead to ReadClient::Close()
+         */
+        void SetFatalReportError(CHIP_ERROR aError) { mLastFatalReportError = aError; }
+
+        /*
+         * Clear the fatal report fatal error
+         */
+        void ClearFatalReportError() { mLastFatalReportError = CHIP_NO_ERROR; }
+
+    private:
+        CHIP_ERROR mLastFatalReportError = CHIP_NO_ERROR;
     };
 
     enum class InteractionType : uint8_t
