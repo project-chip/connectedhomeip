@@ -238,12 +238,12 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Step 6: Allocate push transport with valid parameters
         self.step(6)
         status = await self.allocate_one_pushav_transport(
-            endpoint, 
-            tlsEndPoint=tlsEndpointId, 
+            endpoint,
+            tlsEndPoint=tlsEndpointId,
             url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully")
-        
+
         # Get the connection ID from CurrentConnections
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections)
@@ -273,7 +273,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.MaxZones
         )
         log.info(f"aMaxZones: {aMaxZones}")
-        
+
         # Read FeatureMap to check for PerZoneSensitivity support
         aFeatureMap = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.FeatureMap
@@ -288,7 +288,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 endpoint=endpoint, cluster=tlscluster, attribute=tlscluster.Attributes.ProvisionedEndpoints
             )
             log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
-        
+
         self.step(11)
         if self.pics_guard(self.check_pics("PAVST.S")):
             try:
@@ -312,14 +312,14 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             except InteractionModelError as e:
                 asserts.assert_equal(e.clusterStatus, pvcluster.Enums.StatusCodeEnum.kInvalidTLSEndpoint,
                                      "DUT must responds with Status Code InvalidTLSEndpoint.")
-        
+
         # Step 12: Try to allocate transport with invalid IngestMethod
         self.step(12)
         status = await self.allocate_one_pushav_transport(endpoint, ingestMethod=pvcluster.Enums.IngestMethodsEnum.kUnknownEnumValue,
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must respond with Status Code ConstraintError.")
-        
+
         # Step 13: Try to allocate transport with invalid URL
         self.step(13)
         stream_id = self.server.create_stream()
@@ -330,7 +330,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidURL)
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidURL,
                              "Push AV Transport should return InvalidURL for invalid URL")
-        
+
         # Step 14: Try to allocate transport with invalid TriggerType
         self.step(14)
         # Create transport options with invalid trigger type
@@ -344,7 +344,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.ConstraintError,
                                 "DUT must respond with Status Code ConstraintError.")
-        
+
         self.step(15)
         # Verify a null Zone is handled
         try:
@@ -357,7 +357,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             asserts.assert_equal(status, Status.Success, "DUT should respond with Status Code Success with a Null Zone.")
         except InteractionModelError as e:
             asserts.assert_fail(f"Unexpected error when setting a Zone that is Null (meaning all Zones). Error received {e.status}")
-        
+
         # Step 16: Try to allocate transport with duplicate numeric Zone IDs within MotionZones (if zone management cluster is present)
         self.step(16)
         zoneList = [{"zone": 1, "sensitivity": 4}, {"zone": 2, "sensitivity": 4},
@@ -370,7 +370,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(status, Status.AlreadyExists,
                              "DUT should respond with Status Code AlreadyExists with a Duplicate Zone.")
 
-        
+
         # Step 17: Try to allocate transport with duplicate Null Zone IDs within MotionZones (if zone management cluster is present)
         self.step(17)
         # Duplicate Zone ID rejection with Nulls
@@ -383,7 +383,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.AlreadyExists,
                              "DUT should respond with Status Code AlreadyExists with Duplicate Null Zones.")
-        
+
         # Step 18: Try to allocate transport with invalid ZoneID (if zone management cluster is present)
         self.step(18)
         try:
@@ -399,7 +399,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         except InteractionModelError as e:
             asserts.assert_equal(e.clusterStatus, pvcluster.Enums.StatusCodeEnum.kInvalidZone,
                                  "DUT must responds with Status Code InvalidZone.")
-        
+
         # Step 19: Try to allocate transport with invalid VideoStreamID
         self.step(19)
         invalid_video_stream_id = max(aAllocatedVideoStreams) + 100
@@ -411,7 +411,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStream)
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                              "Push AV Transport should return InvalidStream for invalid VideoStreamID")
-        
+
         # Step 20: Try to allocate transport with invalid AudioStreamID
         self.step(20)
         invalid_audio_stream_id = max(aAllocatedAudioStreams) + 100
@@ -423,7 +423,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStream)
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStream,
                              "Push AV Transport should return InvalidStream for invalid AudioStreamID")
-        
+
         # Step 21: Try to allocate transport with both VideoStreams and AudioStreams absent
         self.step(21)
         try:
@@ -439,20 +439,20 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                                          "sessionGroup": 3, "trackName": "media"},
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
-                {"streamUsage": streamUsage, 
-                 "TLSEndpointID": tlsEndpointId, 
-                 "url": f"https://{host_ip}:1234/streams/1/", 
-                 "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous}, 
-                 "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest, 
-                 "containerOptions": containerOptions, 
-                 "expiryTime": 5 
+                {"streamUsage": streamUsage,
+                 "TLSEndpointID": tlsEndpointId,
+                 "url": f"https://{host_ip}:1234/streams/1/",
+                 "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
+                 "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
+                 "containerOptions": containerOptions,
+                 "expiryTime": 5
                  }), endpoint=endpoint)
             asserts.assert_equal(status, Status.InvalidCommand,
                                  "DUT must respond with Status Code InvalidCommand.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand,
                                  "DUT must respond with Status Code InvalidCommand.")
-        
+
         # Step 21a: Try to allocate transport with VideoStreamID and VideoStreams containing same ID
         self.step("21a")
         # Get stream usage priorities for the command
@@ -460,7 +460,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=avcluster, attribute=avattr.StreamUsagePriorities
         )
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
-        
+
         # Create transport options with both VideoStreamID and VideoStreams containing the same ID
         # This should cause a conflict and return INVALID_COMMAND
         transport_options_21a = {
@@ -490,7 +490,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             },
             "expiryTime": 30
         }
-        
+
         try:
             await self.send_single_cmd(
                 cmd=pvcluster.Commands.AllocatePushTransport(transport_options_21a),
@@ -499,94 +499,94 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand,
                                  "Push AV Transport should return INVALID_COMMAND for step 21a")
-        
+
         # Step 22: Try to allocate transport with both VideoStreamID and AudioStreamID set to NULL
-        self.step(22)  
-        # TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to NULL  
-        # and no VideoStreams or AudioStreams fields present  
-        try:  
-            allocatePushTransportResponse = await self.send_single_cmd(  
-                cmd=pvcluster.Commands.AllocatePushTransport({  
-                    "streamUsage": streamUsage,  
-                    "videoStreamID": Nullable(),  
-                    "audioStreamID": Nullable(),  
-                    "TLSEndpointID": tlsEndpointId,  
-                    "url": f"https://{host_ip}:1234/streams/{uploadStreamId}/",  
-                    "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},  
-                    "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,  
-                    "containerOptions": {  
-                        "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,  
-                        "CMAFContainerOptions": {  
-                            "CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1,  
-                            "segmentDuration": 4000,  
-                            "chunkDuration": 2000,  
-                            "sessionGroup": 1,  
-                            "trackName": "media"  
-                        }  
-                    },  
-                    "expiryTime": 5  
-                }),  
-                endpoint=endpoint  
-            )  
-            
+        self.step(22)
+        # TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to NULL
+        # and no VideoStreams or AudioStreams fields present
+        try:
+            allocatePushTransportResponse = await self.send_single_cmd(
+                cmd=pvcluster.Commands.AllocatePushTransport({
+                    "streamUsage": streamUsage,
+                    "videoStreamID": Nullable(),
+                    "audioStreamID": Nullable(),
+                    "TLSEndpointID": tlsEndpointId,
+                    "url": f"https://{host_ip}:1234/streams/{uploadStreamId}/",
+                    "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
+                    "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
+                    "containerOptions": {
+                        "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
+                        "CMAFContainerOptions": {
+                            "CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1,
+                            "segmentDuration": 4000,
+                            "chunkDuration": 2000,
+                            "sessionGroup": 1,
+                            "trackName": "media"
+                        }
+                    },
+                    "expiryTime": 5
+                }),
+                endpoint=endpoint
+            )
+
             # DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, store this as aConnectionID-2
-            asserts.assert_is_not_none(allocatePushTransportResponse, "AllocatePushTransportResponse must not be None")  
-            asserts.assert_is_not_none(allocatePushTransportResponse.transportConfiguration.connectionID,   
-                                    "ConnectionID must be present in response")  
+            asserts.assert_is_not_none(allocatePushTransportResponse, "AllocatePushTransportResponse must not be None")
+            asserts.assert_is_not_none(allocatePushTransportResponse.transportConfiguration.connectionID,
+                                    "ConnectionID must be present in response")
             aConnectionID_2 = allocatePushTransportResponse.transportConfiguration.connectionID
-            
-            # If TransportOptions is present, verify the required fields  
-            transportOptions = allocatePushTransportResponse.transportConfiguration.transportOptions  
-            if transportOptions is not None:  
-                # Verify AudioStreamId field is present containing the allocated audio stream ID  
-                asserts.assert_true(hasattr(transportOptions, 'audioStreamID'),   
-                                "AudioStreamId field must be present in TransportOptions")  
-                
-                # Handle both nullable and plain uint cases  
-                if hasattr(transportOptions.audioStreamID, 'IsNull'):  
-                    asserts.assert_false(transportOptions.audioStreamID.IsNull(),   
-                                        "AudioStreamId must not be null")  
-                    allocatedAudioStreamID = transportOptions.audioStreamID.Value()  
-                else:  
-                    allocatedAudioStreamID = transportOptions.audioStreamID  
-                
-                # Verify VideoStreamId field is present containing the allocated video stream ID    
-                asserts.assert_true(hasattr(transportOptions, 'videoStreamID'),   
-                                "VideoStreamId field must be present in TransportOptions")  
-                
-                # Handle both nullable and plain uint cases  
-                if hasattr(transportOptions.videoStreamID, 'IsNull'):  
-                    asserts.assert_false(transportOptions.videoStreamID.IsNull(),   
-                                        "VideoStreamId must not be null")  
-                    allocatedVideoStreamID = transportOptions.videoStreamID.Value()  
-                else:  
-                    allocatedVideoStreamID = transportOptions.videoStreamID  
-                
-                # Verify VideoStreams field is present with correct entry  
-                asserts.assert_true(hasattr(transportOptions, 'videoStreams'),   
-                                "VideoStreams field must be present in TransportOptions")  
-                videoStreams = transportOptions.videoStreams  
-                asserts.assert_is_not_none(videoStreams, "VideoStreams must not be None")  
-                asserts.assert_equal(len(videoStreams), 1, "VideoStreams must contain exactly one entry")  
-                asserts.assert_equal(videoStreams[0].videoStreamID, allocatedVideoStreamID,  
-                                    "VideoStreamID in VideoStreams must match allocated VideoStreamId")  
-                asserts.assert_equal(videoStreams[0].videoStreamName, "video",  
-                                    "VideoStreamName must be 'video'")  
-                
-                # Verify AudioStreams field is present with correct entry  
-                asserts.assert_true(hasattr(transportOptions, 'audioStreams'),   
-                                "AudioStreams field must be present in TransportOptions")  
-                audioStreams = transportOptions.audioStreams  
-                asserts.assert_is_not_none(audioStreams, "AudioStreams must not be None")  
-                asserts.assert_equal(len(audioStreams), 1, "AudioStreams must contain exactly one entry")  
-                asserts.assert_equal(audioStreams[0].audioStreamID, allocatedAudioStreamID,  
-                                    "AudioStreamID in AudioStreams must match allocated AudioStreamId")  
-                asserts.assert_equal(audioStreams[0].audioStreamName, "audio",  
-                                    "AudioStreamName must be 'audio'")  
-            
-        except InteractionModelError as e:  
+
+            # If TransportOptions is present, verify the required fields
+            transportOptions = allocatePushTransportResponse.transportConfiguration.transportOptions
+            if transportOptions is not None:
+                # Verify AudioStreamId field is present containing the allocated audio stream ID
+                asserts.assert_true(hasattr(transportOptions, 'audioStreamID'),
+                                "AudioStreamId field must be present in TransportOptions")
+
+                # Handle both nullable and plain uint cases
+                if hasattr(transportOptions.audioStreamID, 'IsNull'):
+                    asserts.assert_false(transportOptions.audioStreamID.IsNull(),
+                                        "AudioStreamId must not be null")
+                    allocatedAudioStreamID = transportOptions.audioStreamID.Value()
+                else:
+                    allocatedAudioStreamID = transportOptions.audioStreamID
+
+                # Verify VideoStreamId field is present containing the allocated video stream ID
+                asserts.assert_true(hasattr(transportOptions, 'videoStreamID'),
+                                "VideoStreamId field must be present in TransportOptions")
+
+                # Handle both nullable and plain uint cases
+                if hasattr(transportOptions.videoStreamID, 'IsNull'):
+                    asserts.assert_false(transportOptions.videoStreamID.IsNull(),
+                                        "VideoStreamId must not be null")
+                    allocatedVideoStreamID = transportOptions.videoStreamID.Value()
+                else:
+                    allocatedVideoStreamID = transportOptions.videoStreamID
+
+                # Verify VideoStreams field is present with correct entry
+                asserts.assert_true(hasattr(transportOptions, 'videoStreams'),
+                                "VideoStreams field must be present in TransportOptions")
+                videoStreams = transportOptions.videoStreams
+                asserts.assert_is_not_none(videoStreams, "VideoStreams must not be None")
+                asserts.assert_equal(len(videoStreams), 1, "VideoStreams must contain exactly one entry")
+                asserts.assert_equal(videoStreams[0].videoStreamID, allocatedVideoStreamID,
+                                    "VideoStreamID in VideoStreams must match allocated VideoStreamId")
+                asserts.assert_equal(videoStreams[0].videoStreamName, "video",
+                                    "VideoStreamName must be 'video'")
+
+                # Verify AudioStreams field is present with correct entry
+                asserts.assert_true(hasattr(transportOptions, 'audioStreams'),
+                                "AudioStreams field must be present in TransportOptions")
+                audioStreams = transportOptions.audioStreams
+                asserts.assert_is_not_none(audioStreams, "AudioStreams must not be None")
+                asserts.assert_equal(len(audioStreams), 1, "AudioStreams must contain exactly one entry")
+                asserts.assert_equal(audioStreams[0].audioStreamID, allocatedAudioStreamID,
+                                    "AudioStreamID in AudioStreams must match allocated AudioStreamId")
+                asserts.assert_equal(audioStreams[0].audioStreamName, "audio",
+                                    "AudioStreamName must be 'audio'")
+
+        except InteractionModelError as e:
             asserts.fail(f"AllocatePushTransport command failed: {e.status}")
-        
+
         # Step 23: Try to allocate transport with MotionZones list size > aMaxZones (if zone management cluster is present)
         self.step(23)
         # Create a zoneList that is one larger than max zones that we have already read
@@ -602,7 +602,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                                                           tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.DynamicConstraintError,
                              "DUT must respond with Status code DynamicConstraintError")
-        
+
         # Step 24: Only run if DUT supports PerZoneSensitivity
         if self.perZoneSenseSupported:
             self.step(24)
@@ -630,7 +630,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                                  "DUT must responds with Status Code ConstraintError.")
         else:
             self.skip_step(25)
-        
+
         # Step 26: Try to allocate transport with MotionTimeControl omitted
         self.step(26)
         zoneList = []
@@ -640,7 +640,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status Code InvalidCommand.")
-        
+
         # Step 27: Try to allocate transport with MotionTimeControl.InitialDuration = 0
         self.step(27)
         zoneList = []
@@ -661,7 +661,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
-        
+
         # Step 29: Deallocate transport and allocate new one with MotionZones and MotionSensitivity NULL
         self.step(29)
         # First deallocate the existing transport
@@ -685,7 +685,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
         )
         aConnectionID = current_connections[len(current_connections)-1].connectionID
-        
+
         # Step 30: Deallocate transport and allocate new one with empty MotionZones
         self.step(30)
         # First deallocate the existing transport
@@ -708,7 +708,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
         )
         aConnectionID = current_connections[len(current_connections)-1].connectionID
-        
+
         # Step 31: Try to allocate transport with invalid StreamUsage
         self.step(31)
         status = await self.allocate_one_pushav_transport(
@@ -718,14 +718,14 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.ConstraintError,
                              "DUT must  responds with Status code ConstraintError")
-        
+
         # Step 32: Try to allocate transport with ContainerType = CMAF and CMAFContainerOptions omitted
         self.step(32)
         containerOptions = {"containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf}
         status = await self.allocate_one_pushav_transport(endpoint, container_Options=containerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.InvalidCommand,
                              "DUT must  responds with Status code InvalidCommand")
-        
+
         # Step 33: Try to allocate transport with CMAFContainerOptions having invalid segment duration
         self.step(33)
         # Get the key frame interval from the first allocated video stream
@@ -733,7 +733,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         if aAllocatedVideoStreams and len(aAllocatedVideoStreams) > 0:
             # We don't have direct access to keyFrameInterval, so we'll use a value that's not a multiple
             keyFrameInterval = 33  # This should not be a multiple of common segment durations
-        
+
         # Create CMAF container options with segment duration that's not a multiple of keyFrameInterval
         invalid_segment_container_options = {
             "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
@@ -753,7 +753,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidOptions)
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidOptions,
                              "Push AV Transport should return InvalidOptions for invalid segment duration")
-        
+
         # Step 34: Try to allocate transport with StreamUsage not in SupportedStreamUsages
         self.step(34)
         # We'll use an invalid StreamUsage value
@@ -766,36 +766,36 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidStreamUsage)
         asserts.assert_equal(status, pvcluster.Enums.StatusCodeEnum.kInvalidStreamUsage,
                              "Push AV Transport should return InvalidStreamUsage for invalid StreamUsage")
-        
+
         # Step 35: Try to allocate transport with MaxPreRollLen less than KeyFrameInterval
-        self.step(35)  
-        # Read the KeyFrameInterval from the allocated video stream  
-        videoStreamConfig = await self.read_single_attribute_check_success(  
-            endpoint=endpoint,  
-            cluster=avcluster,  
+        self.step(35)
+        # Read the KeyFrameInterval from the allocated video stream
+        videoStreamConfig = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=avcluster,
             attribute=avattr.AllocatedVideoStreams
-        )  
+        )
         keyFrameInterval = videoStreamConfig[0].keyFrameInterval
         print(f"keyframeinterval: {keyFrameInterval}")
-        
-        # Send AllocatePushTransport with maxPreRollLen < KeyFrameInterval  
-        triggerOptions = {  
-            "triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,  
+
+        # Send AllocatePushTransport with maxPreRollLen < KeyFrameInterval
+        triggerOptions = {
+            "triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
             "maxPreRollLen": 200,  # Less than KeyFrameInterval
             "motionZones": [],  # Required for kMotion trigger type
             "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}  # Required for kMotion trigger type
-        }  
-        
-        status = await self.allocate_one_pushav_transport(  
-            endpoint,   
-            trigger_Options=triggerOptions,  
-            tlsEndPoint=tlsEndpointId,   
-            url=f"https://{host_ip}:1234/streams/{uploadStreamId}/",  
-            expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidPreRollLength  
-        )  
-        asserts.assert_equal(  
-            status, pvcluster.Enums.StatusCodeEnum.kInvalidPreRollLength,  
-            "DUT must respond with InvalidPreRollLength when maxPreRollLen < KeyFrameInterval"  
+        }
+
+        status = await self.allocate_one_pushav_transport(
+            endpoint,
+            trigger_Options=triggerOptions,
+            tlsEndPoint=tlsEndpointId,
+            url=f"https://{host_ip}:1234/streams/{uploadStreamId}/",
+            expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidPreRollLength
+        )
+        asserts.assert_equal(
+            status, pvcluster.Enums.StatusCodeEnum.kInvalidPreRollLength,
+            "DUT must respond with InvalidPreRollLength when maxPreRollLen < KeyFrameInterval"
         )
 
 if __name__ == "__main__":
