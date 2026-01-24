@@ -206,7 +206,7 @@ void CameraApp::InitCameraDeviceClusters()
 void CameraApp::ShutdownCameraDeviceClusters()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
-    mAVSettingsUserLevelMgmtServer.Cluster().Shutdown(ClusterShutdownType::kClusterShutdown);
+    mAVSettingsUserLevelMgmtServer.Cluster().Shutdown(/* ClusterShutdownType::kClusterShutdown */);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster());
     if (err != CHIP_NO_ERROR)
