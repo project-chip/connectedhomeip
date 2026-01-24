@@ -24,6 +24,7 @@ import queue
 import random
 import select
 import shlex
+import signal
 import subprocess
 import textwrap
 import time
@@ -1547,6 +1548,17 @@ class MatterBaseTest(base_test.BaseTestClass):
                 with open(restart_flag_file, "w") as f:
                     f.write("reset")
                     LOGGER.info("Created restart flag file to signal app factory reset")
+
+                # When app PID is known, kill it
+                LOGGER.info(f"Checking app_pid for factory reset: {self.matter_test_config.app_pid}")
+                if self.matter_test_config.app_pid != 0:
+                    try:
+                        os.kill(self.matter_test_config.app_pid, signal.SIGKILL)
+                        LOGGER.info(f"Killed app with PID {self.matter_test_config.app_pid}")
+                    except ProcessLookupError:
+                         LOGGER.info(f"App with PID {self.matter_test_config.app_pid} already dead")
+                    except Exception as e:
+                         LOGGER.warning(f"Failed to kill app: {e}")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
 
