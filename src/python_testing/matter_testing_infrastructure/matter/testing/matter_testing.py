@@ -1556,9 +1556,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                         os.kill(self.matter_test_config.app_pid, signal.SIGKILL)
                         LOGGER.info(f"Killed app with PID {self.matter_test_config.app_pid}")
                     except ProcessLookupError:
-                         LOGGER.info(f"App with PID {self.matter_test_config.app_pid} already dead")
+                        LOGGER.info(f"App with PID {self.matter_test_config.app_pid} already dead")
                     except Exception as e:
-                         LOGGER.warning(f"Failed to kill app: {e}")
+                        LOGGER.warning(f"Failed to kill app: {e}")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
 
