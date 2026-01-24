@@ -172,6 +172,11 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     }
 }
 
+bool ConnectivityManagerImpl::_IsWiFiAPActive()
+{
+    return mWiFiAPState == kWiFiAPState_Active;
+}
+
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
 {
     return mWiFiAPMode;
