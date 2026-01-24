@@ -30,6 +30,8 @@ using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::ZoneManagement;
 
+static constexpr uint32_t kBitsPerMegabit = 1000000;
+
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
 using Status = Protocols::InteractionModel::Status;
