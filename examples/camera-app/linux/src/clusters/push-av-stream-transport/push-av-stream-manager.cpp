@@ -602,7 +602,7 @@ void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {
-            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10);
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10, true);
         }
     }
 }

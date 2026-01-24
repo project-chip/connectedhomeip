@@ -1854,8 +1854,7 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
     return mCameraAVStreamManager;
 }
 
-CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
-CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+CameraAvSettingsUserLevelManagementDelegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
 }
