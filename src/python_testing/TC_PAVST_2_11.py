@@ -343,7 +343,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             tlsEndPoint=tlsEndpointId,
             url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.ConstraintError,
-                                "DUT must respond with Status Code ConstraintError.")
+                             "DUT must respond with Status Code ConstraintError.")
 
         self.step(15)
         # Verify a null Zone is handled
@@ -369,7 +369,6 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(status, Status.AlreadyExists,
                              "DUT should respond with Status Code AlreadyExists with a Duplicate Zone.")
-
 
         # Step 17: Try to allocate transport with duplicate Null Zone IDs within MotionZones (if zone management cluster is present)
         self.step(17)
@@ -532,7 +531,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             # DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, store this as aConnectionID-2
             asserts.assert_is_not_none(allocatePushTransportResponse, "AllocatePushTransportResponse must not be None")
             asserts.assert_is_not_none(allocatePushTransportResponse.transportConfiguration.connectionID,
-                                    "ConnectionID must be present in response")
+                                       "ConnectionID must be present in response")
             aConnectionID_2 = allocatePushTransportResponse.transportConfiguration.connectionID
 
             # If TransportOptions is present, verify the required fields
@@ -540,49 +539,49 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             if transportOptions is not None:
                 # Verify AudioStreamId field is present containing the allocated audio stream ID
                 asserts.assert_true(hasattr(transportOptions, 'audioStreamID'),
-                                "AudioStreamId field must be present in TransportOptions")
+                                    "AudioStreamId field must be present in TransportOptions")
 
                 # Handle both nullable and plain uint cases
                 if hasattr(transportOptions.audioStreamID, 'IsNull'):
                     asserts.assert_false(transportOptions.audioStreamID.IsNull(),
-                                        "AudioStreamId must not be null")
+                                         "AudioStreamId must not be null")
                     allocatedAudioStreamID = transportOptions.audioStreamID.Value()
                 else:
                     allocatedAudioStreamID = transportOptions.audioStreamID
 
                 # Verify VideoStreamId field is present containing the allocated video stream ID
                 asserts.assert_true(hasattr(transportOptions, 'videoStreamID'),
-                                "VideoStreamId field must be present in TransportOptions")
+                                    "VideoStreamId field must be present in TransportOptions")
 
                 # Handle both nullable and plain uint cases
                 if hasattr(transportOptions.videoStreamID, 'IsNull'):
                     asserts.assert_false(transportOptions.videoStreamID.IsNull(),
-                                        "VideoStreamId must not be null")
+                                         "VideoStreamId must not be null")
                     allocatedVideoStreamID = transportOptions.videoStreamID.Value()
                 else:
                     allocatedVideoStreamID = transportOptions.videoStreamID
 
                 # Verify VideoStreams field is present with correct entry
                 asserts.assert_true(hasattr(transportOptions, 'videoStreams'),
-                                "VideoStreams field must be present in TransportOptions")
+                                    "VideoStreams field must be present in TransportOptions")
                 videoStreams = transportOptions.videoStreams
                 asserts.assert_is_not_none(videoStreams, "VideoStreams must not be None")
                 asserts.assert_equal(len(videoStreams), 1, "VideoStreams must contain exactly one entry")
                 asserts.assert_equal(videoStreams[0].videoStreamID, allocatedVideoStreamID,
-                                    "VideoStreamID in VideoStreams must match allocated VideoStreamId")
+                                     "VideoStreamID in VideoStreams must match allocated VideoStreamId")
                 asserts.assert_equal(videoStreams[0].videoStreamName, "video",
-                                    "VideoStreamName must be 'video'")
+                                     "VideoStreamName must be 'video'")
 
                 # Verify AudioStreams field is present with correct entry
                 asserts.assert_true(hasattr(transportOptions, 'audioStreams'),
-                                "AudioStreams field must be present in TransportOptions")
+                                    "AudioStreams field must be present in TransportOptions")
                 audioStreams = transportOptions.audioStreams
                 asserts.assert_is_not_none(audioStreams, "AudioStreams must not be None")
                 asserts.assert_equal(len(audioStreams), 1, "AudioStreams must contain exactly one entry")
                 asserts.assert_equal(audioStreams[0].audioStreamID, allocatedAudioStreamID,
-                                    "AudioStreamID in AudioStreams must match allocated AudioStreamId")
+                                     "AudioStreamID in AudioStreams must match allocated AudioStreamId")
                 asserts.assert_equal(audioStreams[0].audioStreamName, "audio",
-                                    "AudioStreamName must be 'audio'")
+                                     "AudioStreamName must be 'audio'")
 
         except InteractionModelError as e:
             asserts.fail(f"AllocatePushTransport command failed: {e.status}")
@@ -783,7 +782,8 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
             "maxPreRollLen": 200,  # Less than KeyFrameInterval
             "motionZones": [],  # Required for kMotion trigger type
-            "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}  # Required for kMotion trigger type
+            # Required for kMotion trigger type
+            "motionTimeControl": {"initialDuration": 1, "augmentationDuration": 1, "maxDuration": 1, "blindDuration": 1}
         }
 
         status = await self.allocate_one_pushav_transport(
@@ -797,6 +797,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             status, pvcluster.Enums.StatusCodeEnum.kInvalidPreRollLength,
             "DUT must respond with InvalidPreRollLength when maxPreRollLen < KeyFrameInterval"
         )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
