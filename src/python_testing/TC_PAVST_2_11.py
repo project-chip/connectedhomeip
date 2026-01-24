@@ -91,7 +91,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep(5, "If no audio streams are allocated, TH sends a AudioStreamAllocate command. Otherwise the first allocated audio stream is used.",
                      "If the command is sent, the DUT responds with AudioStreamAllocateResponse, store this as aAllocatedAudioStreams."),
             TestStep(6, "TH sends the AllocatePushTransport command with valid parameters",
-                     "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct. Store ConnectionID as aConnectionID."),
+                     "DUT responds with `AllocatePushTransportResponse` containing the allocated `ConnectionID`, `TransportOptions`, and `TransportStatus` in the `TransportConfigurationStruct`. Store ConnectionID as `aConnectionID_1`."),
             TestStep(7, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session",
                      "Verify the number of PushAV Connections is 1. Verify that the TransportStatus field is Inactive."),
             TestStep(8, "TH Reads Zones attribute from Zones Management Cluster on DUT, if the zone management cluster is present on this endpoint",
@@ -120,12 +120,12 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                      "DUT responds with Status Code InvalidStream."),
             TestStep(20, "TH sends the AllocatePushTransport command with AudioStreams containing an AudioStreamID not present in aAllocatedAudioStreams.",
                      "DUT responds with Status Code InvalidStream."),
-            TestStep(21, "TH sends the AllocatePushTransport command with both VideoStreams and AudioStreams absent.",
-                     "DUT responds with Status Code InvalidCommand."),
-            TestStep("21a", "TH send the AllocatePushTransport command with a VideoStreamID set to an allocated stream ID, and a VideoStreams containing the same allocated stream ID",
+            TestStep(21, "TH sends the AllocatePushTransport command with both `VideoStreams` and `AudioStreams` absent.",
+                     "DUT responds with Status Code `InvalidCommand`."),
+            TestStep("21a", "TH sends the AllocatePushTransport command with a VideoStreamID set to an allocated stream ID, and a VideoStreams containing the same allocated stream ID",
                      "DUT responds with INVALID_COMMAND status code."),
-            TestStep(22, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to NULL and no VideoStreams or AudioStreams fields present.",
-                     "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID. If the AllocatePushTransportResponse contains a TransportOptions, verify the following: * AudioStreamId field is present containing the allocated audio stream ID * VideoStreamId field is present containing the allocated video stream ID * VideoStreams field is present with an entry that has the allocated video stream ID, and a VideoStreamName of \"video1\" * AudioStreams field is present with an entry that has the allocated audio stream ID, and an AudioStreamName of \"audio1\""),
+            TestStep(22, "TH sends the AllocatePushTransport command with both `VideoStreamID` and `AudioStreamID` set to NULL and no `VideoStreams` or `AudioStreams` fields present.",
+                     "DUT responds with `AllocatePushTransportResponse` containing the allocated `ConnectionID`, store this as 'aConnectionID-2'. If the `AllocatePushTransportResponse` contains a TransportOptions, verify the following: * AudioStreamId field is present containing the allocated audio stream ID * VideoStreamId field is present containing the allocated video stream ID * VideoStreams field is present with an entry that has the allocated video stream ID, and a VideoStreamName of \"video\" * AudioStreams field is present with an entry that has the allocated audio stream ID, and an AudioStreamName of \"audio\""),
             TestStep(23, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with the TriggerType = Motion and size of the MotionZones list to be greater than aMaxZones.",
                      "DUT responds with DynamicConstraintError."),
             TestStep(24, "TH sends the AllocatePushTransport command with the TriggerType = Motion and valid value for MotionSensitivity if DUT supports PerZoneSensitivity.",
@@ -138,19 +138,19 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                      "DUT responds with ConstraintError."),
             TestStep(28, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl struct with MaxDuration = 0.",
                      "DUT responds with ConstraintError."),
-            TestStep(29, "TH deallocates transport allocated in step 6 using DeallocatePushTransport command successfully. TH sends the AllocatePushTransport command with all valid parameters. The TriggerType = Motion and MotionZones and MotionSensitivity fields are present and NULL.",
+            TestStep(29, "TH sends a `DeallocatePushTransport`command with `aConnectionID_1`. TH sends the AllocatePushTransport command with all valid parameters. The `TriggerType = Motion` and `MotionZones` and `MotionSensitivity` fields are present and NULL.",
                      "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
-            TestStep(30, "TH deallocates transport allocated in step 26 using DeallocatePushTransport command successfully. TH sends the AllocatePushTransport command with all valid parameters. The TriggerType = Motion and MotionZones field is empty.",
-                     "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
+            TestStep(30, "TH sends a `DeallocatePushTransport` command with `aConnectionID-2`. TH sends the AllocatePushTransport command with all valid parameters. The `TriggerType = Motion` and `MotionZones` field is empty.",
+                     "DUT responds with `AllocatePushTransportResponse` containing the allocated `ConnectionID`."),
             TestStep(31, "TH sends the AllocatePushTransport command with an invalid value for StreamUsage in the TransportOptions struct.",
                      "DUT responds with InvalidCommand."),
             TestStep(32, "TH sends the AllocatePushTransport command with ContainerType = CMAF and CMAFContainerOptions omitted.",
                      "DUT responds with InvalidCommand."),
-            TestStep(33, "TH sends the AllocatePushTransport command with ContainerType = CMAF and CMAFContainerOptions having a segment that is not an exact multiplier of the KeyFrameInterval of the selected allocated video stream ID.",
+            TestStep(33, "TH sends the AllocatePushTransport command with ContainerType = CMAF and CMAFContainerOptions having a segment that is not an exact multiplier of the KeyFrameInterval of the allocated video stream ID.",
                      "DUT responds with InvalidOptions."),
             TestStep(34, "TH sends the AllocatePushTransport command with a value for StreamUsage not in SupportedStreamUsages.",
                      "DUT responds with InvalidStreamUsage."),
-            TestStep(35, "TH sends the AllocatePushTransport command with a non-zero MaxPreRollLen that is less than the KeyFrameInterval value of of the selected allocated video stream ID",
+            TestStep(35, "TH sends the AllocatePushTransport command with a non-zero MaxPreRollLen that is less than the KeyFrameInterval value of the selected allocated video stream ID",
                      "DUT responds with InvalidPreRollLength."),
         ]
 
@@ -247,10 +247,10 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Get the connection ID from CurrentConnections
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections)
-        aConnectionID = None
+        aConnectionID_1 = None
         if len(transport_configs) > 0:
-            aConnectionID = transport_configs[0].connectionID
-        asserts.assert_is_not_none(aConnectionID, "ConnectionID should be present")
+            aConnectionID_1 = transport_configs[0].connectionID
+        asserts.assert_is_not_none(aConnectionID_1, "ConnectionID should be present")
 
         # Step 7: Read CurrentConnections over large-payload session
         self.step(7)
@@ -435,17 +435,17 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             streamUsage = aStreamUsagePriorities[0]
             containerOptions = {
                 "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
-                "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
+                "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
                                          "sessionGroup": 3, "trackName": "media"},
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
-                {"streamUsage": streamUsage,
-                 "TLSEndpointID": endpoint,
-                 "url": "https://{host_ip}:1234/streams/1",
-                 "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
-                 "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
-                 "containerOptions": containerOptions,
-                 "expiryTime": 5
+                {"streamUsage": streamUsage, 
+                 "TLSEndpointID": tlsEndpointId, 
+                 "url": f"https://{host_ip}:1234/streams/1/", 
+                 "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous}, 
+                 "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest, 
+                 "containerOptions": containerOptions, 
+                 "expiryTime": 5 
                  }), endpoint=endpoint)
             asserts.assert_equal(status, Status.InvalidCommand,
                                  "DUT must respond with Status Code InvalidCommand.")
@@ -469,7 +469,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "audioStreamID": NullValue,
             "videoStreams": [{
                 "videoStreamID": aAllocatedVideoStreams[0],  # Same ID as videoStreamID - this creates the conflict
-                "videoStreamName": "video1"
+                "videoStreamName": "video"
             }],
             "audioStreams": [],
             "TLSEndpointID": tlsEndpointId,
@@ -500,7 +500,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             asserts.assert_equal(e.status, Status.InvalidCommand,
                                  "Push AV Transport should return INVALID_COMMAND for step 21a")
         
-        # # Step 22: Try to allocate transport with both VideoStreamID and AudioStreamID set to NULL
+        # Step 22: Try to allocate transport with both VideoStreamID and AudioStreamID set to NULL
         self.step(22)  
         # TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to NULL  
         # and no VideoStreams or AudioStreams fields present  
@@ -529,10 +529,11 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 endpoint=endpoint  
             )  
             
-            # DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID  
+            # DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, store this as aConnectionID-2
             asserts.assert_is_not_none(allocatePushTransportResponse, "AllocatePushTransportResponse must not be None")  
             asserts.assert_is_not_none(allocatePushTransportResponse.transportConfiguration.connectionID,   
                                     "ConnectionID must be present in response")  
+            aConnectionID_2 = allocatePushTransportResponse.transportConfiguration.connectionID
             
             # If TransportOptions is present, verify the required fields  
             transportOptions = allocatePushTransportResponse.transportConfiguration.transportOptions  
@@ -569,8 +570,8 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 asserts.assert_equal(len(videoStreams), 1, "VideoStreams must contain exactly one entry")  
                 asserts.assert_equal(videoStreams[0].videoStreamID, allocatedVideoStreamID,  
                                     "VideoStreamID in VideoStreams must match allocated VideoStreamId")  
-                asserts.assert_equal(videoStreams[0].videoStreamName, "video1",  
-                                    "VideoStreamName must be 'video1'")  
+                asserts.assert_equal(videoStreams[0].videoStreamName, "video",  
+                                    "VideoStreamName must be 'video'")  
                 
                 # Verify AudioStreams field is present with correct entry  
                 asserts.assert_true(hasattr(transportOptions, 'audioStreams'),   
@@ -580,8 +581,8 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 asserts.assert_equal(len(audioStreams), 1, "AudioStreams must contain exactly one entry")  
                 asserts.assert_equal(audioStreams[0].audioStreamID, allocatedAudioStreamID,  
                                     "AudioStreamID in AudioStreams must match allocated AudioStreamId")  
-                asserts.assert_equal(audioStreams[0].audioStreamName, "audio1",  
-                                    "AudioStreamName must be 'audio1'")  
+                asserts.assert_equal(audioStreams[0].audioStreamName, "audio",  
+                                    "AudioStreamName must be 'audio'")  
             
         except InteractionModelError as e:  
             asserts.fail(f"AllocatePushTransport command failed: {e.status}")
@@ -665,7 +666,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(29)
         # First deallocate the existing transport
         cmd = pvcluster.Commands.DeallocatePushTransport(
-            connectionID=aConnectionID
+            connectionID=aConnectionID_1
         )
         status = await self.psvt_deallocate_push_transport(cmd)
         asserts.assert_true(status == Status.Success,
@@ -689,7 +690,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(30)
         # First deallocate the existing transport
         cmd = pvcluster.Commands.DeallocatePushTransport(
-            connectionID=aConnectionID
+            connectionID=aConnectionID_2
         )
         status = await self.psvt_deallocate_push_transport(cmd)
         asserts.assert_true(status == Status.Success,
