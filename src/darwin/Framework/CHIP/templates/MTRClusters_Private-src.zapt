@@ -1,4 +1,4 @@
-{{> clusters_src_header clustersHeader="MTRClusters_Private.h"}}
+{{> clusters_src_header clustersHeader="MTRClusters_Private.h" isPrivate=true}}
 {{> placeholder_comment}}
 
 {{#zcl_clusters}}
@@ -28,7 +28,7 @@
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRPrivateClusterIDType{{>cluster}}ID) attributeID:@(MTRPrivateAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
 {{#if (or isWritableAttribute
@@ -47,7 +47,7 @@
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRPrivateClusterIDType{{>cluster}}ID) attributeID:@(MTRPrivateAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}

@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRClusterConstants.h"
+#import "MTRClusterConstants_Private.h"
 #import "MTRCluster_Internal.h"
 #import "MTRClusters_Private.h"
 #import "MTRCommandPayloadsObjc.h"

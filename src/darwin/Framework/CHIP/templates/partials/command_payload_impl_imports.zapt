@@ -1,4 +1,7 @@
 #import "MTRCommandPayloadsObjc.h"
+{{#if (isStrEqual privateOrInternal "Private")}}
+#import "MTRCommandPayloadsObjc_Private.h"
+{{/if}}
 #import "MTRCommandPayloads_{{privateOrInternal}}.h"
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRBaseDevice_Internal.h"

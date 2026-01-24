@@ -1,17 +1,12 @@
 {{> header excludeZapComment=true}}
 
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRStructsObjc.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#zcl_structs}}
-{{#if has_no_clusters}}
-{{> struct_interface_decl cluster="Globals" originalCluster="Globals" struct=(asUpperCamelCase name preserveAcronyms=true) baseName="" deprecationMessage="This struct is unused and will be removed"}}
-{{/if}}
-{{/zcl_structs}}
-
 {{#zcl_clusters}}
-{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#zcl_structs}}
 {{> struct_interface_decl cluster=(asUpperCamelCase parent.name preserveAcronyms=true) originalCluster=parent.name struct=(asUpperCamelCase name preserveAcronyms=true) baseName="" deprecationMessage="This struct is unused and will be removed"}}
 {{> struct_old_name_variants clusterName=(asUpperCamelCase parent.name preserveAcronyms=true) originalClusterName=parent.name structName=(asUpperCamelCase name preserveAcronyms=true) oldStructName=(oldName (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true))}}
@@ -63,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_events}}
 
 
-{{/unless}}
+{{/if}}
 {{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END

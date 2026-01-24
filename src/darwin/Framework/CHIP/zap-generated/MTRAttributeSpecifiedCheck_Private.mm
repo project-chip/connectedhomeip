@@ -15,13 +15,19 @@
  *    limitations under the License.
  */
 
-#import "MTRStructsObjc_Private.h"
-#import <Matter/MTRCommandPayloadsObjc.h>
-#import <Matter/MTRDefines.h>
-#import <Matter/MTRStructsObjc.h>
+#import "MTRAttributeSpecifiedCheck.h"
 
-NS_ASSUME_NONNULL_BEGIN
-// Nothing here for now, but leaving this file in place in case we need to add
-// something.
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
-NS_ASSUME_NONNULL_END
+using namespace chip;
+using namespace chip::app;
+
+BOOL MTRPrivateAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
+{
+    switch (aClusterId) {
+    default: {
+        return NO;
+    }
+    }
+}
