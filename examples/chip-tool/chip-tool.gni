@@ -22,4 +22,7 @@ declare_args() {
   config_enable_yaml_tests = true
   config_use_local_storage = true
   config_enable_https_requests = true
+
+  # Disable OpenThread Commissioner if cross-compiling by default.
+  chip_enable_ot_commissioner = current_cpu == host_cpu && current_os == host_os
 }

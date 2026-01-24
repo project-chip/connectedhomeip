@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
+#include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
@@ -27,7 +28,6 @@ using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::PushAvStreamTransport;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
-using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::ZoneManagement;
 
 static constexpr uint32_t kBitsPerMegabit = 1000000;
@@ -58,28 +58,27 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
         CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
-    BitFlags<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzStreams,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState);
+
     const uint8_t appMaxPresets = 5;
 
     // Instantiate the CameraAVSettingsUserLevelMgmt Server
-    mAVSettingsUserLevelMgmtServerPtr = std::make_unique<CameraAvSettingsUserLevelManagementCluster>(
-        mEndpoint, mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate(), avsumFeatures, avsumAttrs, appMaxPresets);
+    mAVSettingsUserLevelMgmtServer.Create(mEndpoint, avsumFeatures, appMaxPresets);
+    mAVSettingsUserLevelMgmtServer.Cluster().SetDelegate(&mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAVSettingsUserLevelMgmtServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to register CameraAvSettingsUserLevelManagement on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     mEndpoint, err.Format());
+    }
 
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServerPtr->SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServerPtr->SetPanMax(mCameraDevice->GetCameraHALInterface().GetPanMax());
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServerPtr->SetTiltMin(mCameraDevice->GetCameraHALInterface().GetTiltMin());
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServerPtr->SetTiltMax(mCameraDevice->GetCameraHALInterface().GetTiltMax());
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServerPtr->SetZoomMax(mCameraDevice->GetCameraHALInterface().GetZoomMax());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetPanMax(mCameraDevice->GetCameraHALInterface().GetPanMax());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetTiltMin(
+        mCameraDevice->GetCameraHALInterface().GetTiltMin());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetTiltMax(
+        mCameraDevice->GetCameraHALInterface().GetTiltMax());
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().SetZoomMax(
+        mCameraDevice->GetCameraHALInterface().GetZoomMax());
 
     // Fetch all initialization parameters for the ZoneManagement Server
     BitFlags<ZoneManagement::Feature, uint32_t> zoneMgmtFeatures(
@@ -317,7 +316,7 @@ void CameraApp::InitCameraDeviceClusters()
 
     TEMPORARY_RETURN_IGNORED mChimeServerPtr->Init();
 
-    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServerPtr->Init();
+    TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().Init();
 
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->Init();
 }
@@ -325,7 +324,7 @@ void CameraApp::InitCameraDeviceClusters()
 void CameraApp::ShutdownCameraDeviceClusters()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera device clusters");
-    mAVSettingsUserLevelMgmtServerPtr->Shutdown();
+    mAVSettingsUserLevelMgmtServer.Cluster().Shutdown(ClusterShutdownType::kClusterShutdown);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCTransportProviderServer.Cluster());
     if (err != CHIP_NO_ERROR)

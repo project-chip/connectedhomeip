@@ -1,0 +1,27 @@
+{{> header excludeZapComment=true}}
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+#import "MTRCommandPayloadsObjc_Private.h"
+
+#include <app-common/zap-generated/cluster-objects.h>
+
+NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#zcl_commands}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
+
+{{> command_internal_methods_decl categoryName="InternalMethods"}}
+
+{{/if}}
+
+{{> command_internal_methods_decl categoryName="PrivateMethods"}}
+
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END
