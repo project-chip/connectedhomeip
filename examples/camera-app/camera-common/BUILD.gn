@@ -60,4 +60,7 @@ source_set("camera-lib") {
     "${chip_root}/src/app/clusters/webrtc-transport-provider-server",
     "${chip_root}/src/lib",
   ]
+
+  public_deps =
+      [ "${chip_root}/src/app/clusters/camera-av-stream-management-server" ]
 }

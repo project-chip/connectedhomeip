@@ -98,84 +98,202 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
 }
 
-void CameraApp::InitializeCameraAVStreamMgmt()
+CHIP_ERROR CameraApp::InitializeCameraAVStreamMgmt()
 {
+    VerifyOrReturnError(mAVStreamMgmtServer.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+
     // Set the attribute defaults
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetSoftRecordingPrivacyModeEnabled(
-            mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetSoftLivestreamPrivacyModeEnabled(
-            mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetSoftRecordingPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled()));
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetSoftLivestreamPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetHardPrivacyModeOn(
-            mCameraDevice->GetCameraHALInterface().GetHardPrivacyMode());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetHardPrivacyModeOn(mCameraDevice->GetCameraHALInterface().GetHardPrivacyMode()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetNightVision(mCameraDevice->GetCameraHALInterface().GetNightVision());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetNightVision(mCameraDevice->GetCameraHALInterface().GetNightVision()));
     }
 
-    TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
+    ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport()));
 
     if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetSpeakerMuted(mCameraDevice->GetCameraHALInterface().GetSpeakerMuted());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetSpeakerVolumeLevel(
-            mCameraDevice->GetCameraHALInterface().GetSpeakerVolume());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetSpeakerMaxLevel(
-            mCameraDevice->GetCameraHALInterface().GetSpeakerMaxLevel());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetSpeakerMinLevel(
-            mCameraDevice->GetCameraHALInterface().GetSpeakerMinLevel());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerMuted(mCameraDevice->GetCameraHALInterface().GetSpeakerMuted()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerVolumeLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerVolume()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerMaxLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMaxLevel()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetSpeakerMinLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMinLevel()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetMicrophoneMuted(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneMuted());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetMicrophoneVolumeLevel(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneVolume());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetMicrophoneMaxLevel(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneMaxLevel());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetMicrophoneMinLevel(
-            mCameraDevice->GetCameraHALInterface().GetMicrophoneMinLevel());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneMuted(mCameraDevice->GetCameraHALInterface().GetMicrophoneMuted()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneVolumeLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneVolume()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneMaxLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMaxLevel()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetMicrophoneMinLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMinLevel()));
     }
 
     // Video and Snapshot features are already enabled.
     if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetLocalVideoRecordingEnabled(
-            mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetLocalSnapshotRecordingEnabled(
-            mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled());
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetLocalVideoRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled()));
+        ReturnErrorOnFailure(mAVStreamMgmtServer.Cluster().SetLocalSnapshotRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetStatusLightEnabled(
-            mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetStatusLightEnabled(mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled()));
     }
 
     if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
     {
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetImageRotation(
-            mCameraDevice->GetCameraHALInterface().GetImageRotation());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetImageFlipVertical(
-            mCameraDevice->GetCameraHALInterface().GetImageFlipVertical());
-        TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->SetImageFlipHorizontal(
-            mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal());
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetImageRotation(mCameraDevice->GetCameraHALInterface().GetImageRotation()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetImageFlipVertical(mCameraDevice->GetCameraHALInterface().GetImageFlipVertical()));
+        ReturnErrorOnFailure(
+            mAVStreamMgmtServer.Cluster().SetImageFlipHorizontal(mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal()));
     }
 
-    TEMPORARY_RETURN_IGNORED mAVStreamMgmtServerPtr->Init();
+    return mAVStreamMgmtServer.Cluster().Init();
+}
+
+void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
+{
+
+    // Fetch all initialization parameters for CameraAVStreamMgmt Server
+    BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
+    BitFlags<CameraAvStreamManagement::OptionalAttribute> avsmOptionalAttrs;
+    avsmFeatures.Set(CameraAvStreamManagement::Feature::kSnapshot);
+    avsmFeatures.Set(CameraAvStreamManagement::Feature::kVideo);
+
+    // Enable the Watermark and OSD features if camera supports
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsWatermark())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kWatermark);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsOSD())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kOnScreenDisplay);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kPrivacy);
+    }
+
+    // Check microphone support to set Audio feature
+    if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kAudio);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kMicrophoneAGCEnabled);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kLocalStorage);
+    }
+
+    // Check if camera has speaker
+    if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kSpeaker);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kNightVision);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
+    {
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kHardPrivacyModeOn);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
+    {
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
+    {
+        avsmFeatures.Set(CameraAvStreamManagement::Feature::kImageControl);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal);
+        avsmOptionalAttrs.Set(CameraAvStreamManagement::OptionalAttribute::kImageRotation);
+    }
+
+    uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
+    uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
+    VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
+    bool nightVisionUsesInfrared         = mCameraDevice->GetCameraHALInterface().GetNightVisionUsesInfrared();
+    VideoResolutionStruct minViewport    = mCameraDevice->GetCameraHALInterface().GetMinViewport();
+    std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints =
+        mCameraDevice->GetCameraHALInterface().GetRateDistortionTradeOffPoints();
+
+    uint32_t maxContentBufferSize            = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
+    AudioCapabilitiesStruct micCapabilities  = mCameraDevice->GetCameraHALInterface().GetMicrophoneCapabilities();
+    AudioCapabilitiesStruct spkrCapabilities = mCameraDevice->GetCameraHALInterface().GetSpeakerCapabilities();
+    TwoWayTalkSupportTypeEnum twowayTalkSupport =
+        mCameraDevice->GetCameraHALInterface().HasMicrophone() && mCameraDevice->GetCameraHALInterface().HasSpeaker()
+        ? TwoWayTalkSupportTypeEnum::kFullDuplex
+        : TwoWayTalkSupportTypeEnum::kNotSupported;
+    std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = mCameraDevice->GetCameraHALInterface().GetSnapshotCapabilities();
+    uint32_t maxNetworkBandwidth = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth() * kBitsPerMegabit;
+    std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
+    std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
+
+    // Instantiate the CameraAVStreamMgmt Server
+    mAVStreamMgmtServer.Create(mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs,
+                               maxConcurrentVideoEncoders, maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport,
+                               rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities, spkrCapabilities,
+                               twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
+                               streamUsagePriorities);
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mAVStreamMgmtServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to register CameraAVStreamManagementServer on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
+    }
+
+    err = InitializeCameraAVStreamMgmt();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to initialize CameraAVStreamManagementServer on endpoint %u: %" CHIP_ERROR_FORMAT, mEndpoint,
+                     err.Format());
+    }
 }
 
 void CameraApp::InitCameraDeviceClusters()
@@ -189,14 +307,14 @@ void CameraApp::InitCameraDeviceClusters()
                      err.Format());
     }
 
+    CreateAndInitializeCameraAVStreamMgmt();
+
     // Set the WebRTCTransportProvider server in the manager
     mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
 
     TEMPORARY_RETURN_IGNORED mChimeServerPtr->Init();
 
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().Init();
-
-    InitializeCameraAVStreamMgmt();
 
     TEMPORARY_RETURN_IGNORED mZoneMgmtServerPtr->Init();
 }
@@ -212,6 +330,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
         ChipLogError(Camera, "WebRTCTransportProvider unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     mWebRTCTransportProviderServer.Destroy();
+
+    err = CodegenDataModelProvider::Instance().Registry().Unregister(&mAVStreamMgmtServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "CameraAVStreamMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mAVStreamMgmtServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;
