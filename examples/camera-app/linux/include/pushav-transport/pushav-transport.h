@@ -128,6 +128,8 @@ public:
 
     void SetFabricIndex(chip::FabricIndex accessingFabricIndex) { mFabricIndex = accessingFabricIndex; }
 
+    uint64_t GetSessionNumber() const { return mSessionNumber; }
+
 private:
     void CheckAndUpdateSession();
     void GeneratePushTransportBeginEvent();

@@ -794,26 +794,17 @@ CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
 
 bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber)
 {
-    std::lock_guard<std::mutex> lock(mSessionMapMutex);
-
-    // Look for the connection in any session
-    for (const auto & sessionPair : mSessionMap)
+    sessionNumber = 0;
+    // find the transport for the given connection id and return its session number
+    auto transportIt = mTransportMap.find(connectionID);
+    if (transportIt == mTransportMap.end())
     {
-        const auto & sessionInfo = sessionPair.second;
-        if (sessionInfo.activeConnectionIDs.find(connectionID) != sessionInfo.activeConnectionIDs.end())
-        {
-            sessionNumber = sessionInfo.sessionNumber;
-            return true;
-        }
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+        return false;
     }
-
-    // If not found in active sessions, check if we have transport options for this connection
-    auto transportIt = mTransportOptionsMap.find(connectionID);
-    if (transportIt != mTransportOptionsMap.end())
-    {
-        // For connections not in active sessions, return a default session number
-        sessionNumber = 0;
-        return true;
+    else
+    {   
+        sessionNumber = transportIt->second->GetSessionNumber();
     }
 
     return false;
