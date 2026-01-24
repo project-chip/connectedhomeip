@@ -128,8 +128,8 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     uint16_t videoStreamID = -1;
     uint16_t audioStreamID = -1;
 
-    //TODO: Supporting single video stream and single audio stream. This logic need to be updated for all the streams
-    // in future for application as part of 1.5.1
+    // TODO: Supporting single video stream and single audio stream. This logic need to be updated for all the streams
+    //  in future for application as part of 1.5.1
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
         videoStreamID = transportOptions.videoStreamID.Value().Value();
