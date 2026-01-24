@@ -324,11 +324,6 @@ private:
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
-{
-    return mWiFiAPMode;
-}
-
 inline bool ConnectivityManagerImpl::_IsWiFiAPActive()
 {
     return mWiFiAPState == kWiFiAPState_Active;

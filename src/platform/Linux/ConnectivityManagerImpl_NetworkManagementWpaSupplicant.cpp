@@ -172,6 +172,11 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     }
 }
 
+ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
+{
+    return mWiFiAPMode;
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
