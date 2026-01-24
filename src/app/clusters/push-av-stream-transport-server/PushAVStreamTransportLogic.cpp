@@ -577,16 +577,6 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                          "Duration field not within allowed range",
                                          mEndpointId));
 
-        VerifyOrReturnValue(
-            containerOptions.CMAFContainerOptions.Value().trackName.size() >= 1 &&
-                containerOptions.CMAFContainerOptions.Value().trackName.size() <= kMaxTrackNameLength,
-            Status::ConstraintError,
-            ChipLogError(Zcl,
-                         "Transport Options verification from command data[ep=%d]: CMAF Container Options Track Name "
-                         "Error, actual length: %" PRIu32 " not "
-                         "within expected range of 1 to 16",
-                         mEndpointId, static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().trackName.size())));
-
         if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
         {
             VerifyOrReturnValue(
