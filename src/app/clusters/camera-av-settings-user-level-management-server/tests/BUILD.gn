@@ -20,7 +20,8 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestCameraAvSettingsUserLevelManagementCluster"
 
-  test_sources = [ "TestCameraAvSettingsUserLevelManagementCluster.cpp" ]
+  # Comment out unit tests due to dependencies that aren't in the 1.5 branch
+  # test_sources = [ "TestCameraAvSettingsUserLevelManagementCluster.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
