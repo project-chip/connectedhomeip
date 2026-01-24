@@ -177,6 +177,11 @@ bool ConnectivityManagerImpl::_IsWiFiAPActive()
     return mWiFiAPState == kWiFiAPState_Active;
 }
 
+bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
+{
+    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
+}
+
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
 {
     return mWiFiAPMode;

@@ -324,11 +324,6 @@ private:
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
-{
-    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
-}
-
 inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 {
     return mWiFiAPIdleTimeout;
