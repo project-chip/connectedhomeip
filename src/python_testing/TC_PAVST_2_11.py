@@ -40,17 +40,16 @@
 import logging
 
 from mobly import asserts
-
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
-from matter.clusters import Globals
 
 log = logging.getLogger(__name__)
 
