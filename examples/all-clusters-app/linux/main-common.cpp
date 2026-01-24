@@ -22,7 +22,6 @@
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
-#include "camera-av-settings-user-level-management-instance.h"
 #include "dishwasher-mode.h"
 #include "include/diagnostic-logs-provider-delegate-impl.h"
 #include "include/tv-callbacks.h"
