@@ -284,7 +284,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(10)
         if self.pics_guard(self.check_pics("PAVST.S")):
             aProvisionedEndpoints = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=tlscluster, attribute=tlscluster.Attributes.ProvisionedEndpoints
+                endpoint=endpoint, cluster=tlscluster, attribute=tlsattr
             )
             log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
 
@@ -706,6 +706,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
         )
         aConnectionID = current_connections[len(current_connections)-1].connectionID
+        log.info(f"aConnectionID: {aConnectionID}")
 
         # Step 31: Try to allocate transport with invalid StreamUsage
         self.step(31)
