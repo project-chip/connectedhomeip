@@ -1550,8 +1550,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                     LOGGER.info("Created restart flag file to signal app factory reset")
 
                 # When app PID is known, kill it
-                LOGGER.info(f"Checking app_pid for factory reset: {self.matter_test_config.app_pid}")
                 if self.matter_test_config.app_pid != 0:
+                    LOGGER.info(f"Attempting to kill app with PID {self.matter_test_config.app_pid} for factory reset.")
                     try:
                         os.kill(self.matter_test_config.app_pid, signal.SIGKILL)
                         LOGGER.info(f"Killed app with PID {self.matter_test_config.app_pid}")
