@@ -9060,7 +9060,6 @@ endpoint 1 {
     handle command Sleep;
   }
 
-<<<<<<< HEAD
   server cluster CameraAvStreamManagement {
     callback attribute maxConcurrentEncoders;
     callback attribute maxEncodedPixelRate;
@@ -9117,32 +9116,6 @@ endpoint 1 {
     handle command CaptureSnapshotResponse;
   }
 
-  server cluster CameraAvSettingsUserLevelManagement {
-    callback attribute MPTZPosition;
-    ram      attribute maxPresets default = 5;
-    callback attribute MPTZPresets;
-    callback attribute DPTZStreams;
-    ram      attribute zoomMax default = 100;
-    ram      attribute tiltMin default = -90;
-    ram      attribute tiltMax default = 90;
-    ram      attribute panMin default = -180;
-    ram      attribute panMax default = 180;
-    ram      attribute movementState;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command MPTZSetPosition;
-    handle command MPTZRelativeMove;
-    handle command MPTZMoveToPreset;
-    handle command MPTZSavePreset;
-    handle command MPTZRemovePreset;
-    handle command DPTZSetViewport;
-    handle command DPTZRelativeMove;
-  }
-
   server cluster PushAvStreamTransport {
     emits event PushTransportBegin;
     emits event PushTransportEnd;
@@ -9164,8 +9137,6 @@ endpoint 1 {
     handle command FindTransportResponse;
   }
 
-=======
->>>>>>> b70875f7d1 ([AVSUM] Migrate to use of the DefaultServerCluster (code driven( (#42334))
   server cluster Chime {
     callback attribute installedChimeSounds;
     callback attribute selectedChime;
