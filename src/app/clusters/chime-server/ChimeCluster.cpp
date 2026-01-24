@@ -78,7 +78,6 @@ CHIP_ERROR ChimeCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBu
     return listBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {});
 }
 
-// TODO: Migrate to use context.attributeStorage instead of SafeAttributePersistenceProvider
 void ChimeCluster::LoadPersistentAttributes()
 {
     // Load Active Chime ID
