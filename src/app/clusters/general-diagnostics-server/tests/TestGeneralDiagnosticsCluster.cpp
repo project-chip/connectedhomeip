@@ -30,7 +30,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <lib/support/Span.h>
 #include <messaging/ExchangeContext.h>
 #include <platform/DiagnosticDataProvider.h>
 
