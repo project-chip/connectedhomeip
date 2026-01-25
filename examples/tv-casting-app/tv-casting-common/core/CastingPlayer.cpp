@@ -116,7 +116,12 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
             ChipLogProgress(
                 AppServer,
                 "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer found in cache; checking for TargetApp(s)");
-            if (ContainsDesiredTargetApp(&*it, idOptions.getTargetAppInfoList()))
+            if (!ContainsDesiredTargetApp(&*it, idOptions.getTargetAppInfoList()))
+            {
+                ChipLogProgress(
+                    AppServer,
+                    "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer not found in cache; TargetApp(s) not found");
+            }
             {
                 ChipLogProgress(
                     AppServer,
@@ -172,7 +177,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             //
                             // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                             support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
-                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance()->Load();
+                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance() -> Load();
                         },
                         [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                             ChipLogError(AppServer,
