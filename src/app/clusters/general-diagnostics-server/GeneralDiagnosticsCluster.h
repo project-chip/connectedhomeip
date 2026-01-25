@@ -21,7 +21,6 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
 #include <lib/support/CodeUtils.h>
