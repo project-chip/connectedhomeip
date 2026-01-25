@@ -33,6 +33,7 @@ constexpr chip::DeviceTypeId kOvenDeviceId                         = 0x007B;
 constexpr chip::DeviceTypeId kPumpDeviceId                         = 0x0303;
 constexpr chip::DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
 constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
+constexpr chip::DeviceTypeId kGenericSwitchDeviceId                = 0x000F;
 
 // Expected endpoint IDs for different device types
 namespace ExpectedEndpointId {
