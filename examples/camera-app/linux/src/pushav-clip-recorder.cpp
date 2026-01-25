@@ -329,7 +329,7 @@ void PushAVClipRecorder::Start()
     if (!EnsureDirectoryExists(mClipInfo.mOutputPath))
     {
         ChipLogError(Camera, "ERROR: Invalid output directory");
-        Stop();
+        mDeinitializeRecorder = true;
     }
 
     SetRecorderStatus(true);
@@ -417,19 +417,19 @@ void PushAVClipRecorder::PushPacket(const uint8_t * data, size_t size, bool isVi
     mCondition.notify_one();
 }
 
-int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern,
-                                    const std::string & mediaSegPattern)
+RecorderStatus PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern,
+                                               const std::string & mediaSegPattern)
 {
     const std::string mpdFilename = outputPrefix + ".mpd";
     if (avformat_alloc_output_context2(&mFormatContext, nullptr, nullptr, mpdFilename.c_str()) < 0)
     {
         ChipLogError(Camera, "ERROR: Failed to allocate output context");
-        Stop();
-        return -1;
+        return RecorderStatus::kFail;
     }
     if (!mFormatContext)
     {
         ChipLogError(Camera, "ERROR: Output context is null");
+        return RecorderStatus::kFail;
     }
     double segSeconds = static_cast<double>(mClipInfo.mSegmentDurationMs) / 1000.0;
     // Set DASH/CMAF options
@@ -454,15 +454,15 @@ int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std:
     av_dict_set_int(&options, "use_timeline", 1, 0);
     av_dict_set(&options, "strict", "experimental", 0);
     av_dict_set(&options, "start_number", std::to_string(kSegmentIdOffset).c_str(), 0);
-    if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) < 0))
+    if (mClipInfo.mHasVideo && (AddStreamToOutput(AVMEDIA_TYPE_VIDEO) == RecorderStatus::kFail))
     {
         ChipLogError(Camera, "ERROR: adding video stream to output");
-        return -1;
+        return RecorderStatus::kFail;
     }
-    if (mClipInfo.mHasAudio && (AddStreamToOutput(AVMEDIA_TYPE_AUDIO) < 0))
+    if (mClipInfo.mHasAudio && (AddStreamToOutput(AVMEDIA_TYPE_AUDIO) == RecorderStatus::kFail))
     {
         ChipLogError(Camera, "ERROR: adding video stream to output");
-        return -1;
+        return RecorderStatus::kFail;
     }
 
     if (!(mFormatContext->oformat->flags & AVFMT_NOFILE))
@@ -470,27 +470,27 @@ int PushAVClipRecorder::SetupOutput(const std::string & outputPrefix, const std:
         if (avio_open(&mFormatContext->pb, mpdFilename.c_str(), AVIO_FLAG_WRITE) < 0)
         {
             ChipLogError(Camera, "ERROR: Failed to open output file: %s", mpdFilename.c_str());
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
     }
 
     if (avformat_write_header(mFormatContext, &options) < 0)
     {
         ChipLogError(Camera, "Error: writing output header");
-        Stop();
-        return -1;
+        return RecorderStatus::kFail;
     }
-    return 0;
+    return RecorderStatus::kSuccess;
 }
 
-int PushAVClipRecorder::StartClipRecording()
+RecorderStatus PushAVClipRecorder::StartClipRecording()
 {
     if (!mClipInfo.mHasVideo && !mClipInfo.mHasAudio)
     {
         ChipLogError(Camera, "ERROR: No video or audio stream available. Not starting recording");
-        return -1;
+        return RecorderStatus::kFail;
     }
+
+    RecorderStatus result = RecorderStatus::kSuccess;
 
     while (GetRecorderStatus())
     {
@@ -503,14 +503,19 @@ int PushAVClipRecorder::StartClipRecording()
                             mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
             break; // Exit loop
         }
-        ProcessBuffersAndWrite();
+        if (ProcessBuffersAndWrite() == RecorderStatus::kFail)
+        {
+            ChipLogError(Camera, "Error processing buffers and writing");
+            result = RecorderStatus::kFail;
+            Stop();
+        }
     }
     CleanupOutput();
     ChipLogProgress(Camera, "Recorder thread closing");
-    return 0;
+    return result;
 }
 
-int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
+RecorderStatus PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
 {
     if (type == AVMEDIA_TYPE_VIDEO)
     {
@@ -518,8 +523,7 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         if (avcodec_parameters_copy(mVideoStream->codecpar, mInputFormatContext->streams[0]->codecpar) < 0)
         {
             ChipLogError(Camera, "ERROR: Failed to copy codec parameters for media type: %d", type);
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
         mVideoStream->codecpar->codec_tag = 0;
         mVideoStream->codecpar->width     = mVideoInfo.mWidth;
@@ -532,22 +536,19 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         if (!mAudioStream)
         {
             ChipLogError(Camera, "ERROR: Failed to add audio stream");
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
         const AVCodec * audioCodec = avcodec_find_encoder(mAudioInfo.mAudioCodecId);
         if (!audioCodec)
         {
             ChipLogError(Camera, "ERROR: Audio encoder not found");
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
         mAudioEncoderContext = avcodec_alloc_context3(audioCodec);
         if (!mAudioEncoderContext)
         {
             ChipLogError(Camera, "Error: failed to allocate the encoder context");
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
 
         mAudioEncoderContext->sample_rate = mAudioInfo.mSampleRate;
@@ -570,28 +571,26 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         if (avcodec_open2(mAudioEncoderContext, audioCodec, &opts) < 0)
         {
             ChipLogError(Camera, "Error: Cannot open audio encoder for audio stream");
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
         if (avcodec_parameters_from_context(mAudioStream->codecpar, mAudioEncoderContext) < 0)
         {
             ChipLogError(Camera, "Error: Failed to copy encoder parameters to audio output stream");
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
         if (mFormatContext->oformat->flags & AVFMT_GLOBALHEADER)
         {
             mAudioEncoderContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
     }
-    return 0;
+    return RecorderStatus::kSuccess;
 }
 
-int PushAVClipRecorder::ProcessBuffersAndWrite()
+RecorderStatus PushAVClipRecorder::ProcessBuffersAndWrite()
 {
     if (mVideoQueue.empty() && mAudioQueue.empty())
     {
-        return -1;
+        return RecorderStatus::kWarning;
     }
 
     bool useVideo  = false;
@@ -602,17 +601,16 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         AVPacket * videoPkt = mVideoQueue.front();
         AVPacket * audioPkt = mAudioQueue.front();
 
-        if (videoPkt->pts != AV_NOPTS_VALUE && audioPkt->pts != AV_NOPTS_VALUE)
+        const bool videoHasValidPts = (videoPkt->pts != AV_NOPTS_VALUE);
+        const bool audioHasValidPts = (audioPkt->pts != AV_NOPTS_VALUE);
+
+        if (videoHasValidPts && audioHasValidPts)
         {
             useVideo = (videoPkt->pts <= audioPkt->pts);
         }
-        else if (videoPkt->pts != AV_NOPTS_VALUE)
+        else
         {
-            useVideo = true;
-        }
-        else if (audioPkt->pts != AV_NOPTS_VALUE)
-        {
-            useVideo = false;
+            useVideo = videoHasValidPts;
         }
         pkt = useVideo ? videoPkt : audioPkt;
     }
@@ -621,28 +619,14 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         pkt      = mVideoQueue.front();
         useVideo = true;
     }
-    else if (!mAudioQueue.empty())
+    else
     {
         pkt      = mAudioQueue.front();
         useVideo = false;
     }
-    else
-    {
-        return false;
-    }
-    if (!pkt)
-    {
-        ChipLogError(Camera, "Error: No valid packet to process");
-        return -1;
-    }
 
     if (mMetadataSet == false)
     {
-        if (mClipInfo.mHasVideo && !useVideo)
-        {
-            return false;
-        }
-
         std::string initSegName =
             mClipInfo.mTrackName + std::filesystem::path::preferred_separator + mClipInfo.mTrackName + ".init";
         std::string mediaSegName = mClipInfo.mTrackName + std::filesystem::path::preferred_separator + "segment_$Number%04d$.m4s";
@@ -664,15 +648,13 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             if (avformat_open_input(&mInputFormatContext, "", nullptr, nullptr) < 0)
             {
                 ChipLogError(Camera, "Error: Failed to open input format for video");
-                Stop();
-                return -1;
+                return RecorderStatus::kFail;
             }
 
             if (avformat_find_stream_info(mInputFormatContext, nullptr) < 0)
             {
                 ChipLogError(Camera, "Error: Failed to find stream info for video");
-                Stop();
-                return -1;
+                return RecorderStatus::kFail;
             }
         }
         else if (mClipInfo.mHasAudio)
@@ -682,25 +664,24 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
             ChipLogProgress(Camera, "Setting up audio-only stream, skipping input format initialization");
         }
 
-        if (SetupOutput(mClipInfo.mOutputPath + mpdPrefix, initSegName, mediaSegName) < 0)
+        if (SetupOutput(mClipInfo.mOutputPath + mpdPrefix, initSegName, mediaSegName) == RecorderStatus::kFail)
         {
             ChipLogError(Camera, "Error: setting up output");
-            return -1;
+            return RecorderStatus::kFail;
         }
         if (!mFormatContext)
         {
             ChipLogError(Camera, "Error: Output context not initialized. Skipping packet");
-            Stop();
-            return -1;
+            return RecorderStatus::kFail;
         }
         mMetadataSet = true;
     }
 
     if (pkt->pts == AV_NOPTS_VALUE && pkt->dts == AV_NOPTS_VALUE)
     {
-        ChipLogError(Camera, "Warning packet has no valid timestamps\n");
+        ChipLogError(Camera, "Warning packet has no valid timestamps");
         av_packet_unref(pkt);
-        return 0;
+        return RecorderStatus::kSuccess;
     }
 
     currentPts = (pkt->pts != AV_NOPTS_VALUE) ? pkt->pts : pkt->dts;
@@ -719,8 +700,8 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
     if (av_interleaved_write_frame(mFormatContext, pkt) < 0)
     {
         ChipLogError(Camera, "Error writing frame to output file");
-        FinalizeCurrentClip(1);
-        return -1;
+        FinalizeCurrentClip(ClipFinalizationReason::kErrorOccurred);
+        return RecorderStatus::kWarning;
     }
 
     av_packet_free(&pkt);
@@ -732,9 +713,9 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
     {
         mAudioQueue.pop();
     }
-    FinalizeCurrentClip(0);
+    FinalizeCurrentClip(ClipFinalizationReason::kSegmentUploadCheck);
 
-    return 0;
+    return RecorderStatus::kSuccess;
 }
 
 void PushAVClipRecorder::CleanupOutput()
@@ -762,7 +743,7 @@ void PushAVClipRecorder::CleanupOutput()
     {
         avcodec_free_context(&mAudioEncoderContext);
     }
-    FinalizeCurrentClip(0);
+    FinalizeCurrentClip(ClipFinalizationReason::kCleanupUpload);
     mVideoStream = nullptr;
     mAudioStream = nullptr;
     mMetadataSet = false;
@@ -858,7 +839,7 @@ void UpdateMPDStartNumber(const std::string & mpdPath)
  * Writes the trailer of the current clip and initializes a new output file.
  */
 
-void PushAVClipRecorder::FinalizeCurrentClip(int reason)
+void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
 {
     int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
     // Final duration has to be (clipDuration + preRollLen) seconds
@@ -869,7 +850,7 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     {
         ChipLogError(Camera, "Invalid remaining duration: %ld for sessionID: %lu Track name: %s - stopping recording",
                      remainingDuration, mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
-        reason = 1; // Set reason to trigger existing stop logic
+        reason = ClipFinalizationReason::kErrorOccurred;
     }
     else
     {
@@ -889,11 +870,27 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     std::filesystem::path basePath = std::filesystem::path(mClipInfo.mOutputPath) /
         ("session_" + std::to_string(mClipInfo.mSessionNumber)) / mClipInfo.mTrackName;
 
-    if (reason || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2)))
+    const char * reasonStr = "Unknown";
+    switch (reason)
+    {
+    case ClipFinalizationReason::kErrorOccurred:
+        reasonStr = "Error occurred";
+        break;
+    case ClipFinalizationReason::kSegmentUploadCheck:
+        reasonStr = "Segment upload check";
+        break;
+    case ClipFinalizationReason::kCleanupUpload:
+        reasonStr = "Cleanup upload";
+        break;
+    }
+
+    bool shouldFinalize =
+        (reason == ClipFinalizationReason::kErrorOccurred) || ((clipLengthInPTS >= clipDuration) && (mClipInfo.mTriggerType != 2));
+
+    if (shouldFinalize)
     {
         ChipLogDetail(Camera, "Clip record completed, finalizing clip for sessionID: %lu Track name: %s, Reason: %s",
-                      mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(),
-                      (reason == 0) ? "End of clip reached" : "Error occurred");
+                      mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str(), reasonStr);
         Stop();
         mCurrentClipStartPts = AV_NOPTS_VALUE;
     }
