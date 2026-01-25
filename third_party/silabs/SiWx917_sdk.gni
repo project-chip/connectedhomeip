@@ -365,6 +365,8 @@ template("siwx917_sdk") {
 
       config("sl_si91x_psa_crypto_config") {
         defines = [
+          "MBEDTLS_CONFIG_FILE=<sl_mbedtls_config.h>",
+          "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=<psa_crypto_config.h>",
           "MBEDTLS_USER_CONFIG_FILE=<siwx917-chip-mbedtls-config.h>",
           "MBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE=<siwx917-chip-psa-config.h>",
 
@@ -532,6 +534,7 @@ template("siwx917_sdk") {
 
       config("siwx917_tinycrypt_config") {
         defines = [
+          "MBEDTLS_CONFIG_FILE=<sl_mbedtls_config.h>",
           "SL_MBEDTLS_USE_TINYCRYPT",
           "MBEDTLS_USER_CONFIG_FILE=<siwx917-chip-mbedtls-config.h>",
         ]
