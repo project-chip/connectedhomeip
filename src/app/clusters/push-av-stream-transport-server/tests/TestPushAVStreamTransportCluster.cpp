@@ -335,6 +335,12 @@ public:
     {
         // No-op implementation for tests
     }
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override
+    {
+        // Mock implementation for tests - return a simple session number
+        sessionNumber = static_cast<uint64_t>(connectionID) + 2000;
+        return true;
+    }
 
 private:
     std::vector<Clusters::PushAvStreamTransport::PushAvStream> pushavStreams;
