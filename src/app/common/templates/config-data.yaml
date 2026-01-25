@@ -149,6 +149,7 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Camera AV Stream Management
+    - Chime
     - Descriptor
     - Diagnostic Logs
     - Ethernet Network Diagnostics
