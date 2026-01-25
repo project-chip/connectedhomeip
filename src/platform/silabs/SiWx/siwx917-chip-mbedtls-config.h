@@ -85,6 +85,3 @@
 #define MBEDTLS_DEBUG_C
 
 #endif // SL_MATTER_ENABLE_AWS
-
-// SLC GENERATED
-#include "sl_mbedtls_config.h"
