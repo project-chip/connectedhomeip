@@ -82,6 +82,17 @@ using namespace ::chip::WiFiPAF;
 
 namespace chip {
 namespace DeviceLayer {
+namespace {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
+static constexpr char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+static constexpr char kWpaSupplicantBlobUnknown[] = "fi.w1.wpa_supplicant1.BlobUnknown";
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+} // namespace
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 

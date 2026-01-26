@@ -30,6 +30,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <set>
+#include <uriparser/Uri.h>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -46,6 +47,38 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
+
+namespace Internal {
+
+std::string extractTextRange(const UriTextRangeA & range)
+{
+    if (range.first == nullptr || range.afterLast == nullptr || range.first >= range.afterLast)
+    {
+        return "";
+    }
+    return std::string(range.first, range.afterLast);
+}
+
+std::string extractPath(const UriPathSegmentA * pathHead)
+{
+    std::string path;
+    const UriPathSegmentA * segment = pathHead;
+
+    while (segment != nullptr)
+    {
+        path += "/";
+
+        if (segment->text.first != nullptr && segment->text.afterLast != nullptr)
+        {
+            path += std::string(segment->text.first, segment->text.afterLast);
+        }
+        segment = segment->next;
+    }
+
+    return path;
+}
+
+} // namespace Internal
 
 PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<Feature> aFeatures) :
     mEndpointId(aEndpoint), mFeatures(aFeatures),
@@ -229,48 +262,65 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
 
 bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
 {
-    const std::string https = "https://";
+    UriUriA uri;
+    const char * errorPos;
+    int result = uriParseSingleUriA(&uri, url.c_str(), &errorPos);
 
-    // Check minimum length and https prefix
-    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    // Check if URI parsing failed
+    if (result != URI_SUCCESS)
     {
+        // No need to call uriFreeUriMembersA on failure
+        ChipLogError(Zcl, "PushAVStreamTransport URL : %s is not RFC 3986 compliant", url.c_str());
         return false;
     }
 
-    // Check that URL does not contain fragment character '#'
-    if (url.find('#') != std::string::npos)
+    // Extract components
+    std::string scheme = Internal::extractTextRange(uri.scheme);
+    std::string host   = Internal::extractTextRange(uri.hostText);
+    std::string path   = Internal::extractPath(uri.pathHead);
+
+    // Free URI structure
+    uriFreeUriMembersA(&uri);
+
+    // Convert scheme to lowercase for case-insensitive comparison
+    for (char & c : scheme)
     {
-        ChipLogError(Camera, "URL contains fragment character '#'");
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+
+    if (scheme != "https")
+    {
+        ChipLogError(Camera, "URL does not have a https scheme");
         return false;
     }
 
-    // Check that URL does not contain query character '?'
-    if (url.find('?') != std::string::npos)
-    {
-        ChipLogError(Camera, "URL contains query character '?'");
-        return false;
-    }
-
-    // Check that URL ends with a forward slash '/'
-    if (url.back() != '/')
-    {
-        ChipLogError(Camera, "URL does not end with '/'");
-        return false;
-    }
-
-    // Extract host part
-    size_t hostStart = https.size();
-    size_t hostEnd   = url.find('/', hostStart);
-    std::string host = url.substr(hostStart, hostEnd - hostStart);
-
-    // Basic host validation: ensure non-empty
     if (host.empty())
     {
         ChipLogError(Camera, "URL does not contain a valid host.");
         return false;
     }
 
-    // Accept any host as long as non-empty
+    bool pathEndsWithSlash = !path.empty() && path.back() == '/';
+    if (!pathEndsWithSlash)
+    {
+        ChipLogError(Camera, "URL does not end with '/'");
+        return false;
+    }
+
+    bool noQuery = url.find('?') == std::string::npos;
+    if (!noQuery)
+    {
+        ChipLogError(Camera, "URL contains query character '?'");
+        return false;
+    }
+
+    bool noFragment = url.find('#') == std::string::npos;
+    if (!noFragment)
+    {
+        ChipLogError(Camera, "URL contains fragment character '#'");
+        return false;
+    }
+
     return true;
 }
 
@@ -312,10 +362,36 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         transportOptions.streamUsage != StreamUsageEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid streamUsage ", mEndpointId));
 
-    VerifyOrReturnValue(
-        transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue(), Status::InvalidCommand,
-        ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing videoStreamID and audioStreamID",
-                     mEndpointId));
+    // Check for video stream name length constraints
+    if (transportOptions.videoStreams.HasValue())
+    {
+        for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
+        {
+            auto streamName = iter.GetValue().videoStreamName;
+            VerifyOrReturnValue(streamName.size() >= kMinStreamNameLength && streamName.size() <= kMaxStreamNameLength,
+                                Status::ConstraintError,
+                                ChipLogError(Zcl,
+                                             "Transport Options verification from command data[ep=%d]: Video Stream Name "
+                                             "Constraint Error",
+                                             mEndpointId));
+        }
+    }
+
+    // Check for audio stream name length constraints
+    if (transportOptions.audioStreams.HasValue())
+    {
+        for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
+        {
+            auto streamName = iter.GetValue().audioStreamName;
+            VerifyOrReturnValue(streamName.size() >= kMinStreamNameLength && streamName.size() <= kMaxStreamNameLength,
+                                Status::ConstraintError,
+                                ChipLogError(Zcl,
+                                             "Transport Options verification from command data[ep=%d]: Audio Stream Name "
+                                             "Constraint Error",
+                                             mEndpointId));
+        }
+    }
+
     VerifyOrReturnValue(transportOptions.TLSEndpointID <= kMaxEndpointId, Status::ConstraintError,
                         ChipLogError(Zcl,
                                      "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
@@ -500,16 +576,6 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
                                          "Transport Options verification from command data[ep=%d]: CMAF Container Options Chunk "
                                          "Duration field not within allowed range",
                                          mEndpointId));
-
-        VerifyOrReturnValue(
-            containerOptions.CMAFContainerOptions.Value().trackName.size() >= 1 &&
-                containerOptions.CMAFContainerOptions.Value().trackName.size() <= kMaxTrackNameLength,
-            Status::ConstraintError,
-            ChipLogError(Zcl,
-                         "Transport Options verification from command data[ep=%d]: CMAF Container Options Track Name "
-                         "Error, actual length: %" PRIu32 " not "
-                         "within expected range of 1 to 16",
-                         mEndpointId, static_cast<uint32_t>(containerOptions.CMAFContainerOptions.Value().trackName.size())));
 
         if (containerOptions.CMAFContainerOptions.Value().CENCKey.HasValue())
         {
@@ -765,16 +831,6 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
-    // Validate Bandwidth Requirement
-    Status status = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, transportOptions.videoStreamID,
-                                                      transportOptions.audioStreamID);
-    if (status != Status::Success)
-    {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted", mEndpointId);
-        handler.AddStatus(commandPath, status);
-        return std::nullopt;
-    }
-
     std::shared_ptr<TransportOptionsStorage> transportOptionsPtr{ new (std::nothrow) TransportOptionsStorage(transportOptions) };
 
     if (transportOptionsPtr == nullptr)
@@ -784,67 +840,200 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    if (transportOptions.videoStreamID.HasValue())
+    // Check mutual exclusivity and presence of stream fields
+    bool hasNewStreamFields = transportOptions.videoStreams.HasValue() || transportOptions.audioStreams.HasValue();
+    bool hasOldStreamFields = transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue();
+
+    VerifyOrReturnValue(!(hasNewStreamFields && hasOldStreamFields), Status::InvalidCommand,
+                        ChipLogError(Zcl, "Transport Options[ep=%d]: Both new and old stream fields are present", mEndpointId));
+
+    VerifyOrReturnValue(hasNewStreamFields || hasOldStreamFields, Status::InvalidCommand,
+                        ChipLogError(Zcl, "Transport Options[ep=%d]: Missing stream fields", mEndpointId));
+
+    // Validate new multistream fields
+    if (hasNewStreamFields)
     {
-        if (transportOptions.videoStreamID.Value().IsNull())
+        std::set<std::string> videoStreamNames;
+
+        // Validate videoStreams
+        uint16_t videoStreamsCount = 0;
+        if (transportOptions.videoStreams.HasValue())
         {
-            uint16_t videoStreamID;
+            std::set<uint16_t> videoStreamIDs;
 
-            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->SelectVideoStream(transportOptions.streamUsage, videoStreamID));
-
-            if (!delegateStatus.IsSuccess())
+            for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
             {
-                handler.AddStatus(commandPath, delegateStatus);
+                auto & videoStream = iter.GetValue();
+
+                videoStreamsCount++;
+                videoStreamNames.insert(std::string(videoStream.videoStreamName.data(), videoStream.videoStreamName.size()));
+                videoStreamIDs.insert(videoStream.videoStreamID);
+            }
+
+            // Check for duplicates within video streams
+            if ((videoStreamNames.size() != videoStreamsCount) || (videoStreamIDs.size() != videoStreamsCount))
+            {
+                auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate videoStreamName or videoStreamID found",
+                             mEndpointId);
+                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
                 return std::nullopt;
             }
 
-            transportOptionsPtr->videoStreamID.SetValue(videoStreamID);
+            for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
+            {
+                auto & videoStream = iter.GetValue();
+                // Validate videoStreamID
+                auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->SetVideoStream(videoStream.videoStreamID));
+                VerifyOrReturnValue(status.IsSuccess(), Status::InvalidCommand,
+                                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ID", mEndpointId));
+            }
         }
-        else
-        {
-            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->SetVideoStream(transportOptions.videoStreamID.Value().Value()));
 
-            if (!delegateStatus.IsSuccess())
+        // Validate audioStreams
+        uint16_t audioStreamsCount = 0;
+        if (transportOptions.audioStreams.HasValue())
+        {
+            std::set<std::string> audioStreamNames;
+            std::set<uint16_t> audioStreamIDs;
+
+            // Check against video stream names
+            for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
             {
-                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
+                auto & audioStream = iter.GetValue();
+
+                audioStreamsCount++;
+                audioStreamNames.insert(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size()));
+                audioStreamIDs.insert(audioStream.audioStreamID);
+            }
+
+            // Check for duplicates within audio streams
+            if ((audioStreamNames.size() != audioStreamsCount) || (audioStreamIDs.size() != audioStreamsCount))
+            {
+                auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate audioStreamName or audioStreamID found",
+                             mEndpointId);
+                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
                 return std::nullopt;
             }
+
+            for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
+            {
+                auto & audioStream = iter.GetValue();
+                // Check for duplicate with video streams
+                if (videoStreamNames.find(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size())) !=
+                    videoStreamNames.end())
+                {
+                    auto status = to_underlying(StatusCodeEnum::kInvalidStream);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AudioStreamName conflicts with video stream",
+                                 mEndpointId);
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                    return std::nullopt;
+                }
+
+                // Validate audioStreamID
+                auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->SetAudioStream(audioStream.audioStreamID));
+                VerifyOrReturnValue(status.IsSuccess(), Status::InvalidCommand,
+                                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ID", mEndpointId));
+            }
+        }
+
+        // Check if both videoStreams and audioStreams are empty
+        if (videoStreamsCount == 0 && audioStreamsCount == 0)
+        {
+            auto status = to_underlying(StatusCodeEnum::kInvalidStream);
+            ChipLogError(Zcl, "Transport Options[ep=%d]: Both VideoStreams and AudioStreams empty", mEndpointId);
+            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
         }
     }
 
-    if (transportOptions.audioStreamID.HasValue())
+    // Validate old format single stream fields
+    if (hasOldStreamFields)
     {
-        if (transportOptions.audioStreamID.Value().IsNull())
+
+        if (transportOptions.videoStreamID.HasValue())
         {
-            uint16_t audioStreamID;
+            uint16_t finalVideoStreamID;
 
-            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->SelectAudioStream(transportOptions.streamUsage, audioStreamID));
-
-            if (!delegateStatus.IsSuccess())
+            if (transportOptions.videoStreamID.Value().IsNull())
             {
-                handler.AddStatus(commandPath, delegateStatus);
-                return std::nullopt;
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SelectVideoStream(transportOptions.streamUsage, finalVideoStreamID));
+                if (!delegateStatus.IsSuccess())
+                {
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedVideoStreamsAttribute is empty", mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidInState);
+                    return std::nullopt;
+                }
+
+                transportOptionsPtr->videoStreamID.SetValue(finalVideoStreamID);
+            }
+            else
+            {
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SetVideoStream(transportOptions.videoStreamID.Value().Value()));
+
+                if (!delegateStatus.IsSuccess())
+                {
+                    auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
+                    return std::nullopt;
+                }
+
+                finalVideoStreamID = transportOptions.videoStreamID.Value().Value();
             }
 
-            transportOptionsPtr->audioStreamID.SetValue(audioStreamID);
+            // Create new video stream entry with name 'video' and the provided or selected VideoStreamID i.e; finalVideoStreamID
+            Structs::VideoStreamStruct::Type newVideoStream;
+            newVideoStream.videoStreamName = CharSpan::fromCharString("video");
+            newVideoStream.videoStreamID   = finalVideoStreamID;
+
+            // Add to storage and update the list
+            transportOptionsPtr->AddVideoStream(newVideoStream);
         }
-        else
-        {
-            auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                mDelegate->SetAudioStream(transportOptions.audioStreamID.Value().Value()));
 
-            if (!delegateStatus.IsSuccess())
+        if (transportOptions.audioStreamID.HasValue())
+        {
+            uint16_t finalAudioStreamID;
+
+            if (transportOptions.audioStreamID.Value().IsNull())
             {
-                auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
-                return std::nullopt;
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SelectAudioStream(transportOptions.streamUsage, finalAudioStreamID));
+                if (!delegateStatus.IsSuccess())
+                {
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedAudioStreamsAttribute is empty", mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidInState);
+                    return std::nullopt;
+                }
+
+                transportOptionsPtr->audioStreamID.SetValue(finalAudioStreamID);
             }
+            else
+            {
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SetAudioStream(transportOptions.audioStreamID.Value().Value()));
+
+                if (!delegateStatus.IsSuccess())
+                {
+                    auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
+                    return std::nullopt;
+                }
+
+                finalAudioStreamID = transportOptions.audioStreamID.Value().Value();
+            }
+
+            // Create new audio stream entry with name 'audio' and the provided or selected AudioStreamID i.e; finalAudioStreamID
+            Structs::AudioStreamStruct::Type newAudioStream;
+            newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
+            newAudioStream.audioStreamID   = finalAudioStreamID;
+
+            // Add to storage and update the list
+            transportOptionsPtr->AddAudioStream(newAudioStream);
         }
     }
 
@@ -867,6 +1056,53 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         }
     }
 
+    // Validate Bandwidth Requirement
+    Optional<DataModel::Nullable<uint16_t>> firstVideoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> firstAudioStreamID;
+
+    if (transportOptions.videoStreams.HasValue())
+    {
+        auto videoIter = transportOptions.videoStreams.Value().begin();
+        if (videoIter.Next())
+        {
+            firstVideoStreamID.SetValue(videoIter.GetValue().videoStreamID);
+            transportOptionsPtr->videoStreamID = firstVideoStreamID;
+        }
+    }
+    if (transportOptions.audioStreams.HasValue())
+    {
+        auto audioIter = transportOptions.audioStreams.Value().begin();
+        if (audioIter.Next())
+        {
+            firstAudioStreamID.SetValue(audioIter.GetValue().audioStreamID);
+            transportOptionsPtr->audioStreamID = firstAudioStreamID;
+        }
+    }
+
+    Status retStatus = mDelegate->ValidateBandwidthLimit(transportOptions.streamUsage, firstVideoStreamID, firstAudioStreamID);
+
+    if (retStatus != Status::Success)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Resource Exhausted", mEndpointId);
+        handler.AddStatus(commandPath, retStatus);
+        return std::nullopt;
+    }
+
+    // Validate MaxPreRollLength constraint
+    if (transportOptionsPtr->videoStreamID.HasValue() && transportOptions.triggerOptions.maxPreRollLen.HasValue())
+    {
+        uint16_t maxPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
+        if (maxPreRollLength != 0 &&
+            !mDelegate->ValidateMaxPreRollLength(maxPreRollLength, transportOptionsPtr->videoStreamID.Value()))
+        {
+            auto maxPreRollLengthStatus = to_underlying(StatusCodeEnum::kInvalidPreRollLength);
+            ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed", mEndpointId,
+                         maxPreRollLength);
+            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, maxPreRollLengthStatus);
+            return std::nullopt;
+        }
+    }
+
     uint16_t connectionID = GenerateConnectionID();
 
     if (connectionID == kMaxConnectionId)
@@ -878,9 +1114,9 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
     FabricIndex accessingFabricIndex = handler.GetAccessingFabricIndex();
 
-    status = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
+    retStatus = mDelegate->AllocatePushTransport(*transportOptionsPtr, connectionID, accessingFabricIndex);
 
-    if (status == Status::Success)
+    if (retStatus == Status::Success)
     {
         // add connection to CurrentConnections
         TransportConfigurationStorage outTransportConfiguration(connectionID, transportOptionsPtr);
@@ -903,7 +1139,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     }
     else
     {
-        handler.AddStatus(commandPath, status);
+        handler.AddStatus(commandPath, retStatus);
     }
 
     return std::nullopt;
@@ -1185,7 +1421,29 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
 
     if (status == Status::Success)
     {
-        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason));
+        // Get container type from transport configuration
+        ContainerFormatEnum containerType = transportConfiguration->transportOptions.Value().containerOptions.containerType;
+
+        // For CMAF container type, we need to provide CMAF session number
+        Optional<uint64_t> cmafSessionNumber;
+        if (containerType == ContainerFormatEnum::kCmaf)
+        {
+            uint64_t sessionNumber = 0;
+            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
+            {
+                cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
+            }
+            else
+            {
+                ChipLogError(Zcl, "GeneratePushTransportBeginEvent: Unable to get CMAF session number for connection %u",
+                             connectionID);
+                // Don't include the session number if we can't get it
+                cmafSessionNumber = Optional<uint64_t>();
+            }
+        }
+
+        GeneratePushTransportBeginEvent(connectionID, TransportTriggerTypeEnum::kCommand, MakeOptional(activationReason),
+                                        containerType, cmafSessionNumber);
     }
 
     handler.AddStatus(commandPath, status);
@@ -1311,17 +1569,19 @@ Status PushAvStreamTransportServerLogic::CheckPrivacyModes(StreamUsageEnum strea
     return Status::Success;
 }
 
-Status
-PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(const uint16_t connectionID,
-                                                                  const TransportTriggerTypeEnum triggerType,
-                                                                  const Optional<TriggerActivationReasonEnum> activationReason)
+Status PushAvStreamTransportServerLogic::GeneratePushTransportBeginEvent(
+    const uint16_t connectionID, const TransportTriggerTypeEnum triggerType,
+    const Optional<TriggerActivationReasonEnum> activationReason, const ContainerFormatEnum containerType,
+    const Optional<uint64_t> cmafSessionNumber)
 {
     Events::PushTransportBegin::Type event;
     EventNumber eventNumber;
 
-    event.connectionID     = connectionID;
-    event.triggerType      = triggerType;
-    event.activationReason = activationReason;
+    event.connectionID      = connectionID;
+    event.triggerType       = triggerType;
+    event.activationReason  = activationReason;
+    event.containerType     = containerType;
+    event.CMAFSessionNumber = cmafSessionNumber;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1339,6 +1599,40 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     EventNumber eventNumber;
 
     event.connectionID = connectionID;
+
+    // Get container type from transport configuration to include in the event
+    TransportConfigurationStorage * transportConfig = FindStreamTransportConnection(connectionID);
+    if (transportConfig != nullptr)
+    {
+        event.containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+
+        // For CMAF container type, we need to provide CMAF session number
+        if (event.containerType == ContainerFormatEnum::kCmaf)
+        {
+            uint64_t sessionNumber = 0;
+            if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
+            {
+                event.CMAFSessionNumber = MakeOptional<uint64_t>(sessionNumber);
+            }
+            else
+            {
+                ChipLogError(Zcl, "GeneratePushTransportEndEvent: Unable to get CMAF session number for connection %u",
+                             connectionID);
+                // Don't include the session number if we can't get it
+                event.CMAFSessionNumber = Optional<uint64_t>();
+            }
+        }
+        else
+        {
+            event.CMAFSessionNumber = Optional<uint64_t>();
+        }
+    }
+    else
+    {
+        // Fallback values if transport config not found
+        event.containerType     = ContainerFormatEnum::kCmaf; // Default fallback
+        event.CMAFSessionNumber = Optional<uint64_t>();
+    }
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1364,8 +1658,28 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStarted(uint16_t connect
         return Status::NotFound;
     }
 
+    // Get container type from transport configuration
+    ContainerFormatEnum containerType = transportConfig->transportOptions.Value().containerOptions.containerType;
+
+    // For CMAF container type, we need to provide CMAF session number
+    Optional<uint64_t> cmafSessionNumber;
+    if (containerType == ContainerFormatEnum::kCmaf)
+    {
+        uint64_t sessionNumber = 0;
+        if (mDelegate != nullptr && mDelegate->GetCMAFSessionNumber(connectionID, sessionNumber))
+        {
+            cmafSessionNumber = MakeOptional<uint64_t>(sessionNumber);
+        }
+        else
+        {
+            ChipLogError(Zcl, "NotifyTransportStarted: Unable to get CMAF session number for connection %u", connectionID);
+            // Don't include the session number if we can't get it
+            cmafSessionNumber = Optional<uint64_t>();
+        }
+    }
+
     // Generate the PushTransportBegin event
-    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason);
+    return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason, containerType, cmafSessionNumber);
 }
 
 Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType)

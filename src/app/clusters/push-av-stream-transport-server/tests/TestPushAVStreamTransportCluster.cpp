@@ -188,6 +188,11 @@ public:
         return true;
     }
 
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) override
+    {
+        return true;
+    }
+
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override
@@ -297,6 +302,12 @@ public:
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) override
     {
         // No-op implementation for tests
+    }
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override
+    {
+        // Mock implementation for tests - return a simple session number
+        sessionNumber = static_cast<uint64_t>(connectionID) + 2000;
+        return true;
     }
 
 private:

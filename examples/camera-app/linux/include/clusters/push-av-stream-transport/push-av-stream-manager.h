@@ -100,6 +100,8 @@ public:
 
     bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) override;
+
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
@@ -129,6 +131,8 @@ public:
     CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
 
     CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
+
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override;
 
     void HandleZoneTrigger(uint16_t zoneId);
 
