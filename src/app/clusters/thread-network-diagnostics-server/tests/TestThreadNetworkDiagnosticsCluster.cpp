@@ -70,34 +70,14 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
     }
 
     {
-        const BitFlags<Feature> features;
+        Feature combinedFeatures =
+            static_cast<Feature>(static_cast<uint16_t>(Feature::kMLECounts) | static_cast<uint16_t>(Feature::kMACCounts) |
+                                 static_cast<uint16_t>(Feature::kErrorCounts));
+        const BitFlags<Feature> features{ combinedFeatures };
         OptionalAttributes optionalAttributes;
         optionalAttributes.set(ActiveTimestamp::Id);
         optionalAttributes.set(PendingTimestamp::Id);
         optionalAttributes.set(Delay::Id);
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(
-            threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
-            CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-            { true, ActiveTimestamp::kMetadataEntry }, { true, PendingTimestamp::kMetadataEntry }, { true, Delay::kMetadataEntry }
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributeEntries)), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    {
-        const BitFlags<Feature> features{ Feature::kMLECounts };
-        OptionalAttributes optionalAttributes;
         optionalAttributes.set(DetachedRoleCount::Id);
         optionalAttributes.set(ChildRoleCount::Id);
         optionalAttributes.set(RouterRoleCount::Id);
@@ -106,36 +86,6 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
         optionalAttributes.set(PartitionIdChangeCount::Id);
         optionalAttributes.set(BetterPartitionAttachAttemptCount::Id);
         optionalAttributes.set(ParentChangeCount::Id);
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(
-            threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
-            CHIP_NO_ERROR);
-
-        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-            { true, DetachedRoleCount::kMetadataEntry },
-            { true, ChildRoleCount::kMetadataEntry },
-            { true, RouterRoleCount::kMetadataEntry },
-            { true, LeaderRoleCount::kMetadataEntry },
-            { true, AttachAttemptCount::kMetadataEntry },
-            { true, PartitionIdChangeCount::kMetadataEntry },
-            { true, BetterPartitionAttachAttemptCount::kMetadataEntry },
-            { true, ParentChangeCount::kMetadataEntry }
-        };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributeEntries)), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    {
-        const BitFlags<Feature> features{ Feature::kMACCounts };
-        OptionalAttributes optionalAttributes;
         optionalAttributes.set(TxTotalCount::Id);
         optionalAttributes.set(TxUnicastCount::Id);
         optionalAttributes.set(TxBroadcastCount::Id);
@@ -179,6 +129,17 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
             CHIP_NO_ERROR);
 
         const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
+            { true, ActiveTimestamp::kMetadataEntry },
+            { true, PendingTimestamp::kMetadataEntry },
+            { true, Delay::kMetadataEntry },
+            { true, DetachedRoleCount::kMetadataEntry },
+            { true, ChildRoleCount::kMetadataEntry },
+            { true, RouterRoleCount::kMetadataEntry },
+            { true, LeaderRoleCount::kMetadataEntry },
+            { true, AttachAttemptCount::kMetadataEntry },
+            { true, PartitionIdChangeCount::kMetadataEntry },
+            { true, BetterPartitionAttachAttemptCount::kMetadataEntry },
+            { true, ParentChangeCount::kMetadataEntry },
             { true, TxTotalCount::kMetadataEntry },
             { true, TxUnicastCount::kMetadataEntry },
             { true, TxBroadcastCount::kMetadataEntry },
@@ -212,29 +173,9 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
             { true, RxErrInvalidSrcAddrCount::kMetadataEntry },
             { true, RxErrSecCount::kMetadataEntry },
             { true, RxErrFcsCount::kMetadataEntry },
-            { true, RxErrOtherCount::kMetadataEntry }
+            { true, RxErrOtherCount::kMetadataEntry },
+            { true, OverrunCount::kMetadataEntry }
         };
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributeEntries)), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    {
-        const BitFlags<Feature> features{ Feature::kErrorCounts };
-        OptionalAttributes optionalAttributes;
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(
-            threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
-            CHIP_NO_ERROR);
-
-        AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, OverrunCount::kMetadataEntry } };
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
@@ -327,33 +268,14 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
     }
 
     {
-        const BitFlags<Feature> features;
+        Feature combinedFeatures =
+            static_cast<Feature>(static_cast<uint16_t>(Feature::kMLECounts) | static_cast<uint16_t>(Feature::kMACCounts) |
+                                 static_cast<uint16_t>(Feature::kErrorCounts));
+        const BitFlags<Feature> features{ combinedFeatures };
         OptionalAttributes optionalAttributes;
         optionalAttributes.set(ActiveTimestamp::Id);
         optionalAttributes.set(PendingTimestamp::Id);
         optionalAttributes.set(Delay::Id);
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ClusterTester tester(threadNetworkDiagnostics);
-
-        TestMandatoryAttributes(tester);
-
-        ActiveTimestamp::TypeInfo::Type activeTimestamp;
-        ASSERT_EQ(tester.ReadAttribute(ActiveTimestamp::Id, activeTimestamp), CHIP_NO_ERROR);
-
-        PendingTimestamp::TypeInfo::Type pendingTimestamp;
-        ASSERT_EQ(tester.ReadAttribute(PendingTimestamp::Id, pendingTimestamp), CHIP_NO_ERROR);
-
-        Delay::TypeInfo::Type delay;
-        ASSERT_EQ(tester.ReadAttribute(Delay::Id, delay), CHIP_NO_ERROR);
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    {
-        const BitFlags<Feature> features{ Feature::kMLECounts };
-        OptionalAttributes optionalAttributes;
         optionalAttributes.set(DetachedRoleCount::Id);
         optionalAttributes.set(ChildRoleCount::Id);
         optionalAttributes.set(RouterRoleCount::Id);
@@ -362,43 +284,6 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
         optionalAttributes.set(PartitionIdChangeCount::Id);
         optionalAttributes.set(BetterPartitionAttachAttemptCount::Id);
         optionalAttributes.set(ParentChangeCount::Id);
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ClusterTester tester(threadNetworkDiagnostics);
-
-        TestMandatoryAttributes(tester);
-
-        DetachedRoleCount::TypeInfo::Type detachedRoleCount;
-        ASSERT_EQ(tester.ReadAttribute(DetachedRoleCount::Id, detachedRoleCount), CHIP_NO_ERROR);
-
-        ChildRoleCount::TypeInfo::Type childRoleCount;
-        ASSERT_EQ(tester.ReadAttribute(ChildRoleCount::Id, childRoleCount), CHIP_NO_ERROR);
-
-        RouterRoleCount::TypeInfo::Type routerRoleCount;
-        ASSERT_EQ(tester.ReadAttribute(RouterRoleCount::Id, routerRoleCount), CHIP_NO_ERROR);
-
-        LeaderRoleCount::TypeInfo::Type leaderRoleCount;
-        ASSERT_EQ(tester.ReadAttribute(LeaderRoleCount::Id, leaderRoleCount), CHIP_NO_ERROR);
-
-        AttachAttemptCount::TypeInfo::Type attachAttemptCount;
-        ASSERT_EQ(tester.ReadAttribute(AttachAttemptCount::Id, attachAttemptCount), CHIP_NO_ERROR);
-
-        PartitionIdChangeCount::TypeInfo::Type partitionIdChangeCount;
-        ASSERT_EQ(tester.ReadAttribute(PartitionIdChangeCount::Id, partitionIdChangeCount), CHIP_NO_ERROR);
-
-        BetterPartitionAttachAttemptCount::TypeInfo::Type betterPartitionAttachAttemptCount;
-        ASSERT_EQ(tester.ReadAttribute(BetterPartitionAttachAttemptCount::Id, betterPartitionAttachAttemptCount), CHIP_NO_ERROR);
-
-        ParentChangeCount::TypeInfo::Type parentChangeCount;
-        ASSERT_EQ(tester.ReadAttribute(ParentChangeCount::Id, parentChangeCount), CHIP_NO_ERROR);
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    {
-        const BitFlags<Feature> features{ Feature::kMACCounts };
-        OptionalAttributes optionalAttributes;
         optionalAttributes.set(TxTotalCount::Id);
         optionalAttributes.set(TxUnicastCount::Id);
         optionalAttributes.set(TxBroadcastCount::Id);
@@ -439,6 +324,39 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
         ClusterTester tester(threadNetworkDiagnostics);
 
         TestMandatoryAttributes(tester);
+
+        ActiveTimestamp::TypeInfo::Type activeTimestamp;
+        ASSERT_EQ(tester.ReadAttribute(ActiveTimestamp::Id, activeTimestamp), CHIP_NO_ERROR);
+
+        PendingTimestamp::TypeInfo::Type pendingTimestamp;
+        ASSERT_EQ(tester.ReadAttribute(PendingTimestamp::Id, pendingTimestamp), CHIP_NO_ERROR);
+
+        Delay::TypeInfo::Type delay;
+        ASSERT_EQ(tester.ReadAttribute(Delay::Id, delay), CHIP_NO_ERROR);
+
+        DetachedRoleCount::TypeInfo::Type detachedRoleCount;
+        ASSERT_EQ(tester.ReadAttribute(DetachedRoleCount::Id, detachedRoleCount), CHIP_NO_ERROR);
+
+        ChildRoleCount::TypeInfo::Type childRoleCount;
+        ASSERT_EQ(tester.ReadAttribute(ChildRoleCount::Id, childRoleCount), CHIP_NO_ERROR);
+
+        RouterRoleCount::TypeInfo::Type routerRoleCount;
+        ASSERT_EQ(tester.ReadAttribute(RouterRoleCount::Id, routerRoleCount), CHIP_NO_ERROR);
+
+        LeaderRoleCount::TypeInfo::Type leaderRoleCount;
+        ASSERT_EQ(tester.ReadAttribute(LeaderRoleCount::Id, leaderRoleCount), CHIP_NO_ERROR);
+
+        AttachAttemptCount::TypeInfo::Type attachAttemptCount;
+        ASSERT_EQ(tester.ReadAttribute(AttachAttemptCount::Id, attachAttemptCount), CHIP_NO_ERROR);
+
+        PartitionIdChangeCount::TypeInfo::Type partitionIdChangeCount;
+        ASSERT_EQ(tester.ReadAttribute(PartitionIdChangeCount::Id, partitionIdChangeCount), CHIP_NO_ERROR);
+
+        BetterPartitionAttachAttemptCount::TypeInfo::Type betterPartitionAttachAttemptCount;
+        ASSERT_EQ(tester.ReadAttribute(BetterPartitionAttachAttemptCount::Id, betterPartitionAttachAttemptCount), CHIP_NO_ERROR);
+
+        ParentChangeCount::TypeInfo::Type parentChangeCount;
+        ASSERT_EQ(tester.ReadAttribute(ParentChangeCount::Id, parentChangeCount), CHIP_NO_ERROR);
 
         TxTotalCount::TypeInfo::Type txTotalCount;
         ASSERT_EQ(tester.ReadAttribute(TxTotalCount::Id, txTotalCount), CHIP_NO_ERROR);
@@ -541,19 +459,6 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 
         RxErrOtherCount::TypeInfo::Type rxErrOtherCount;
         ASSERT_EQ(tester.ReadAttribute(RxErrOtherCount::Id, rxErrOtherCount), CHIP_NO_ERROR);
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    {
-        const BitFlags<Feature> features{ Feature::kErrorCounts };
-        OptionalAttributes optionalAttributes;
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
-
-        ClusterTester tester(threadNetworkDiagnostics);
-
-        TestMandatoryAttributes(tester);
 
         OverrunCount::TypeInfo::Type overrunCount;
         ASSERT_EQ(tester.ReadAttribute(OverrunCount::Id, overrunCount), CHIP_NO_ERROR);

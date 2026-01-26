@@ -96,11 +96,13 @@ public:
 
         for (auto id : optionalAttributeIds)
         {
-            if (emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id))
-            {
-                optionalAttributes.set(id);
-            }
+            VerifyOrDie(emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id));
+            optionalAttributes.set(id);
         }
+
+        VerifyOrDie(
+            featureMap.Raw() == 0 ||
+            (featureMap.Has(Feature::kMLECounts) && featureMap.Has(Feature::kMACCounts) && featureMap.Has(Feature::kErrorCounts)));
 
         gServers[clusterInstanceIndex].Create(endpointId, featureMap, optionalAttributes);
         return gServers[clusterInstanceIndex].Registration();
