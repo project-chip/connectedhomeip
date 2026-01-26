@@ -134,5 +134,6 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
         asserts.assert_equal(raw_value, True, "TestAttribute default value should be True")
         print(f"TestAttribute value: {raw_value}")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
