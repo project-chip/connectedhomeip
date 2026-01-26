@@ -305,10 +305,8 @@ class TC_CNET_4_24(MatterBaseTest):
 
         # Save correct Thread operational dataset from test config (used by commissioning framework and for final connection)
         correct_thread_dataset = self.matter_test_config.thread_operational_dataset
-        asserts.assert_is_not_none(
-            correct_thread_dataset,
-            "Thread operational dataset must be provided via --thread-dataset-hex parameter for this test"
-        )
+        if correct_thread_dataset is None:
+            asserts.fail("Thread operational dataset must be provided via --thread-dataset-hex parameter for this test")
         logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
 
         # Create incorrect Thread operational datasets for testing
