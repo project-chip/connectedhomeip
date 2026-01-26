@@ -16,7 +16,6 @@
  */
 
 /**
-/**
  * @file test-hidden-manufacturer-specific-stub.cpp
  *
  * Stub implementation for the TestHiddenManufacturerSpecific cluster.
