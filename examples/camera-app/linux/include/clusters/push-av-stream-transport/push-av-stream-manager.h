@@ -19,7 +19,7 @@
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 #include <camera-device-interface.h>
 #include <chrono>
 #include <credentials/CHIPCert.h>
@@ -100,6 +100,8 @@ public:
 
     bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) override;
+
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
@@ -129,6 +131,8 @@ public:
     CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
 
     CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
+
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override;
 
     void HandleZoneTrigger(uint16_t zoneId);
 

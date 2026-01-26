@@ -177,6 +177,7 @@ def BuildHostTarget():
     target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier("openthread-endpoint", openthread_endpoint=True)
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
@@ -753,6 +754,7 @@ def BuildIMXTarget():
 
     target.AppendModifier('release', release=True)
     target.AppendModifier('trusty', trusty=True)
+    target.AppendModifier('ele', ele=True)
 
     return target
 
@@ -812,6 +814,7 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
+    target.AppendModifier('nfc-payload', chip_enable_nfc_onboarding_payload=True)
 
     return target
 

@@ -191,9 +191,6 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
@@ -221,7 +218,6 @@ void SilabsMatterConfig::AppInit()
 
     TEMPORARY_RETURN_IGNORED GetPlatform().Init();
     sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
-    ChipLogProgress(DeviceLayer, "Starting scheduler");
     VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
 
 // Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
@@ -239,9 +235,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     using namespace chip::DeviceLayer::Silabs;
 
-    ChipLogProgress(DeviceLayer, "==================================================");
-    ChipLogProgress(DeviceLayer, "%s starting", appName);
-    ChipLogProgress(DeviceLayer, "==================================================");
+    SILABS_LOG("=====%s starting=====", appName);
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
@@ -254,7 +248,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     //==============================================
     // Init Matter Stack
     //==============================================
-    ChipLogProgress(DeviceLayer, "Init CHIP Stack");
 
 #ifdef SL_WIFI
     ReturnErrorOnFailure(WifiInterface::GetInstance().InitWiFiStack());
@@ -333,6 +326,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.appDelegate       = &BaseApplication::sAppDelegate;
+
+    // This is needed by localization configuration cluster so we set it before the initialization
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     // Init Matter Server and Start Event Loop
     CHIP_ERROR err = chip::Server::GetInstance().Init(initParams);
 

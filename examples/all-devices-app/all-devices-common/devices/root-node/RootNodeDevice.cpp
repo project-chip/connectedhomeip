@@ -35,32 +35,31 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 {
     ReturnErrorOnFailure(SingleEndpointRegistration(endpointId, provider, parentId));
 
-    mBasicInformationCluster.Create();
-
-    // TODO: This needs to be refactored so the optional attributes being set for
+    // TODO: This needs to be refactored so the optional attributes, commands and features being set for
     //  the cluster are configurable to allow different settings
-    mBasicInformationCluster.Cluster()
-        .OptionalAttributes()
-        .Set<BasicInformation::Attributes::ManufacturingDate::Id>()
-        .Set<BasicInformation::Attributes::PartNumber::Id>()
-        .Set<BasicInformation::Attributes::ProductURL::Id>()
-        .Set<BasicInformation::Attributes::ProductLabel::Id>()
-        .Set<BasicInformation::Attributes::SerialNumber::Id>()
-        .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
-        .Set<BasicInformation::Attributes::Reachable::Id>();
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet =
+        BasicInformationCluster::OptionalAttributesSet()
+            .Set<BasicInformation::Attributes::ManufacturingDate::Id>()
+            .Set<BasicInformation::Attributes::PartNumber::Id>()
+            .Set<BasicInformation::Attributes::ProductURL::Id>()
+            .Set<BasicInformation::Attributes::ProductLabel::Id>()
+            .Set<BasicInformation::Attributes::SerialNumber::Id>()
+            .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
+            .Set<BasicInformation::Attributes::Reachable::Id>();
+
+    mBasicInformationCluster.Create(optionalAttributeSet);
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
-
     mGeneralCommissioningCluster.Create(
         GeneralCommissioningCluster::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+            .commissioningWindowManager = mContext.commissioningWindowManager, //
+                .configurationManager   = mContext.configurationManager,       //
+                .deviceControlServer    = mContext.deviceControlServer,        //
+                .fabricTable            = mContext.fabricTable,                //
+                .failsafeContext        = mContext.failsafeContext,            //
+                .platformManager        = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -73,7 +72,10 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                       InteractionModelEngine::GetInstance());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
-    mGroupKeyManagementCluster.Create();
+    mGroupKeyManagementCluster.Create(GroupKeyManagementCluster::Context{
+        .fabricTable       = mContext.fabricTable,
+        .groupDataProvider = mContext.groupDataProvider,
+    });
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet{});
@@ -82,14 +84,14 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mAccessControlCluster.Create();
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
-    mOperationalCredentialsCluster.Create(
-        endpointId,
-        OperationalCredentialsCluster::Context{ .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                .dnssdServer     = app::DnssdServer::Instance(),
-                                                .commissioningWindowManager =
-                                                    Server::GetInstance().GetCommissioningWindowManager() });
+    mOperationalCredentialsCluster.Create(endpointId,
+                                          OperationalCredentialsCluster::Context{
+                                              .fabricTable                = mContext.fabricTable,
+                                              .failSafeContext            = mContext.failsafeContext,
+                                              .sessionManager             = mContext.sessionManager,
+                                              .dnssdServer                = mContext.dnssdServer,
+                                              .commissioningWindowManager = mContext.commissioningWindowManager,
+                                          });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
@@ -100,42 +102,42 @@ void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     SingleEndpointUnregistration(provider);
     if (mBasicInformationCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mBasicInformationCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mBasicInformationCluster.Cluster()));
         mBasicInformationCluster.Destroy();
     }
     if (mGeneralCommissioningCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster()));
         mGeneralCommissioningCluster.Destroy();
     }
     if (mAdministratorCommissioningCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster()));
         mAdministratorCommissioningCluster.Destroy();
     }
     if (mGeneralDiagnosticsCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster()));
         mGeneralDiagnosticsCluster.Destroy();
     }
     if (mGroupKeyManagementCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster()));
         mGroupKeyManagementCluster.Destroy();
     }
     if (mSoftwareDiagnosticsServerCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster()));
         mSoftwareDiagnosticsServerCluster.Destroy();
     }
     if (mAccessControlCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mAccessControlCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mAccessControlCluster.Cluster()));
         mAccessControlCluster.Destroy();
     }
     if (mOperationalCredentialsCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
         mOperationalCredentialsCluster.Destroy();
     }
 }
@@ -149,7 +151,7 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));
 
-    mNetworkCommissioningCluster.Create(endpointId, mWifiDriver, mGeneralCommissioningCluster.Cluster());
+    mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver, mGeneralCommissioningCluster.Cluster());
     ReturnErrorOnFailure(mNetworkCommissioningCluster.Cluster().Init());
     ReturnErrorOnFailure(provider.AddCluster(mNetworkCommissioningCluster.Registration()));
 
@@ -161,12 +163,12 @@ void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
     RootNodeDevice::UnRegister(provider);
     if (mNetworkCommissioningCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));
         mNetworkCommissioningCluster.Destroy();
     }
     if (mWifiDiagnosticsCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mWifiDiagnosticsCluster.Cluster()));
         mWifiDiagnosticsCluster.Destroy();
     }
 }

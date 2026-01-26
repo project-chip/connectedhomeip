@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/camera-av-settings-user-level-management-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/camera-av-stream-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp",
@@ -49,7 +47,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/push-av-stream-transport-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
@@ -140,6 +137,7 @@ if (is_libfuzzer) {
     deps = [
       ":chip-all-clusters-common",
       "${chip_root}/examples/platform/linux:app-main",
+      "${chip_root}/examples/providers:all_clusters_device_info_provider",
     ]
 
     cflags = [ "-Wconversion" ]
@@ -200,6 +198,7 @@ if (enable_fuzz_test_targets) {
     public_deps = [
       ":chip-all-clusters-common",
       "${chip_root}/examples/platform/linux:app-main",
+      "${chip_root}/examples/providers:all_clusters_device_info_provider",
     ]
   }
 }

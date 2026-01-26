@@ -28,6 +28,7 @@
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
 #include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <platform/NetworkCommissioning.h>
@@ -38,6 +39,23 @@ namespace app {
 class RootNodeDevice : public SingleEndpointDevice
 {
 public:
+    struct Context
+    {
+        CommissioningWindowManager & commissioningWindowManager;
+        DeviceLayer::ConfigurationManager & configurationManager;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
+        FabricTable & fabricTable;
+        FailSafeContext & failsafeContext;
+        DeviceLayer::PlatformManager & platformManager;
+        Credentials::GroupDataProvider & groupDataProvider;
+        SessionManager & sessionManager;
+        DnssdServer & dnssdServer;
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        TermsAndConditionsProvider & termsAndConditionsProvider;
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    };
+
     ~RootNodeDevice() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -46,10 +64,14 @@ public:
 
 protected:
     // Most implementations require network commissioning, so only subclasses have access to this.
-    RootNodeDevice() : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
+    RootNodeDevice(const Context & context) :
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
+    {}
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
+    Context mContext;
+
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;
@@ -63,7 +85,14 @@ private:
 class WifiRootNodeDevice : public RootNodeDevice
 {
 public:
-    WifiRootNodeDevice(DeviceLayer::NetworkCommissioning::WiFiDriver * wifiDriver) : RootNodeDevice(), mWifiDriver(wifiDriver) {}
+    struct WifiContext
+    {
+        DeviceLayer::NetworkCommissioning::WiFiDriver & wifiDriver;
+    };
+
+    WifiRootNodeDevice(const Context & context, const WifiContext & wifiContext) :
+        RootNodeDevice(context), mWifiContext(wifiContext)
+    {}
 
     ~WifiRootNodeDevice() override = default;
 
@@ -72,9 +101,10 @@ public:
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
 private:
+    WifiContext mWifiContext;
+
     LazyRegisteredServerCluster<Clusters::NetworkCommissioningCluster> mNetworkCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::WiFiDiagnosticsServerCluster> mWifiDiagnosticsCluster;
-    DeviceLayer::NetworkCommissioning::WiFiDriver * mWifiDriver;
 };
 
 } // namespace app
