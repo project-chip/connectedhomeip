@@ -168,7 +168,7 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
 
     mClipInfo.mMotionDetectedDurationS         = 0;
     mClipInfo.mPreviousMotionDetectedDurationS = 0;
-    mClipInfo.mElapsedTimeS = 0;
+    mClipInfo.mElapsedTimeS                    = 0;
 
     if (transportOptions.triggerOptions.motionTimeControl.HasValue())
     {
@@ -276,7 +276,7 @@ void PushAVTransport::InitializeRecorder()
         mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
                                      chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
         ChipLogProgress(Camera, "PushAVTransport, Initialize Recorder done !!! FabricIdx: %u Session Id: %ld", mFabricIndex,
-                        mSessionNumber-1);
+                        mSessionNumber - 1);
     }
     else
     {
