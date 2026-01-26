@@ -803,7 +803,7 @@ bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectio
         return false;
     }
     else
-    {   
+    {
         sessionNumber = transportIt->second->GetSessionNumber();
     }
 
