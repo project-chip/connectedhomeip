@@ -36,7 +36,7 @@ from chipyaml.paths_finder import PathsFinder
 log = logging.getLogger(__name__)
 
 if sys.platform == "linux":
-    from matter.testing import (
+    from matter.testing.linux import (
         IsolatedNetworkNamespace,
         LinuxNamespacedExecutor,
         ensure_network_namespace_availability,
