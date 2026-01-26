@@ -129,7 +129,9 @@ public:
     // Send Push AV Stream Transport events
     Protocols::InteractionModel::Status
     GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason,
+                                    const PushAvStreamTransport::ContainerFormatEnum containerType,
+                                    const Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>());
     Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:

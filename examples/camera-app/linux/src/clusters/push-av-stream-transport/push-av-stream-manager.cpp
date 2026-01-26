@@ -128,6 +128,8 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     uint16_t videoStreamID = -1;
     uint16_t audioStreamID = -1;
 
+    // TODO: Supporting single video stream and single audio stream. This logic need to be updated for all the streams
+    //  in future for application as part of 1.5.1
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
         videoStreamID = transportOptions.videoStreamID.Value().Value();
@@ -137,6 +139,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     {
         audioStreamID = transportOptions.audioStreamID.Value().Value();
     }
+
     ChipLogProgress(
         Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
         connectionID, videoStreamID, audioStreamID);
@@ -871,4 +874,31 @@ void PushAvStreamTransportManager::SessionMonitor()
 
         std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
     }
+}
+
+bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+
+    // Look for the connection in any session
+    for (const auto & sessionPair : mSessionMap)
+    {
+        const auto & sessionInfo = sessionPair.second;
+        if (sessionInfo.activeConnectionIDs.find(connectionID) != sessionInfo.activeConnectionIDs.end())
+        {
+            sessionNumber = sessionInfo.sessionNumber;
+            return true;
+        }
+    }
+
+    // If not found in active sessions, check if we have transport options for this connection
+    auto transportIt = mTransportOptionsMap.find(connectionID);
+    if (transportIt != mTransportOptionsMap.end())
+    {
+        // For connections not in active sessions, return a default session number
+        sessionNumber = 0;
+        return true;
+    }
+
+    return false;
 }

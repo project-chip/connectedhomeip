@@ -43,6 +43,7 @@ chip_test_suite("tests") {
     "TestCHIPMemString.cpp",
     "TestDefer.cpp",
     "TestErrorStr.cpp",
+    "TestFixedBuffer.cpp",
     "TestFixedBufferAllocator.cpp",
     "TestFold.cpp",
     "TestIniEscaping.cpp",
