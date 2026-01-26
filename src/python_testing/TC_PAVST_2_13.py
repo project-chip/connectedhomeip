@@ -176,7 +176,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # CI: Use app pipe to trigger zone event.
         # Manual: User should trigger a motion event from the defined zone.
         if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id},app_pipe="/tmp/app_pipe_pavstmgmt")
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id}, app_pipe="/tmp/app_pipe_pavstmgmt")
         else:
             if prompt_msg is None:
                 prompt_msg = f"Press enter and immediately start motion activity in zone {zone_id}."
@@ -196,7 +196,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             logger.info("Session timed out, re-establishing...")
             await self.default_controller.EstablishSession(self.dut_node_id)
 
-    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)and has_cluster(Clusters.ZoneManagement) and has_cluster(Clusters.CameraAvStreamManagement))
+    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport) and has_cluster(Clusters.ZoneManagement) and has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_PAVST_2_13(self):
         endpoint = self.get_endpoint()
         self.endpoint = endpoint
@@ -435,7 +435,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(17)
-        maxDuration=10
+        maxDuration = 10
         try:
             zoneList = [{"zone": zoneID1, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
