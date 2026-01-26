@@ -34,8 +34,6 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
 
 } // namespace
 
-
-
 CHIP_ERROR IdentifyInit()
 {
     if (CodegenDataModelProvider::Instance().Registry().Get({ GetIdentifyEndpointId(), Clusters::Identify::Id }) != nullptr)

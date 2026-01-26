@@ -18,9 +18,9 @@
 
 namespace chip::app::Clusters::EnergyEvse {
 
-constexpr int64_t kMinimumChargeCurrentLimit    = 0;
+constexpr int64_t kMinimumChargeCurrentLimit       = 0;
 constexpr uint32_t kMaxRandomizationDelayWindowSec = 86400;
-constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
-constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
+constexpr uint8_t kEvseTargetsMaxNumberOfDays      = 7;
+constexpr uint8_t kEvseTargetsMaxTargetsPerDay     = 10;
 
 } // namespace chip::app::Clusters::EnergyEvse
