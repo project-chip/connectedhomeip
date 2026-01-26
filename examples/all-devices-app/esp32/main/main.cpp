@@ -197,19 +197,22 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     gDataModelProvider = &dataModelProvider;
 
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
-        {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-            .configurationManager       = DeviceLayer::ConfigurationMgr(),
-            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-            .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
-            .platformManager = DeviceLayer::PlatformMgr(), .gGropupDataProvider = gGropupDataProvider,
-            .sessionManager = Server::GetInstance().GetSecureSessionManager(), .dnssdServer = DnssdServer::Instance(),
+        RootNodeDevice::Context{
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
+            .groupDataProvider          = gGropupDataProvider,                                   //
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+            .dnssdServer                = DnssdServer::Instance(),                               //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        {
+        WifiRootNodeDevice::WifiContext{
             .wifiDriver = sWiFiDriver,
         });
     err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
@@ -294,7 +297,7 @@ void InitServerWithDeviceType(std::string deviceType)
     gDeviceType = std::move(deviceType);
 
     // Init the server
-    PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    SuccessOrDie(PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }
 
 extern "C" void app_main()
@@ -342,7 +345,7 @@ extern "C" void app_main()
     }
 
     // Register event handler to restart DNS-SD on connectivity change
-    PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
+    SuccessOrDie(PlatformMgr().AddEventHandler(DeviceEventHandler, 0));
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
     SetCommissionableDataProvider(&sFactoryDataProvider);
