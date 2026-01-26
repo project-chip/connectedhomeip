@@ -18,6 +18,7 @@
 
 #include <AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <AppMainLoop.h>
+#include <AppRootNode.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
@@ -26,13 +27,13 @@
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
-#include <devices/root-node/RootNodeDevice.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
 #include <system/SystemLayer.h>
+
+#include <TermHandling.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -44,10 +45,7 @@ using namespace chip::ArgParser;
 namespace {
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
-DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
-
 AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -62,54 +60,119 @@ void StopSignalHandler(int /* signal */)
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
-        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([]() { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
+        SuccessOrDie(SystemLayer().ScheduleLambda([]() { VerifyOrDie(PlatformMgr().StopEventLoopTask() == CHIP_NO_ERROR); }));
     }
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+class CodeDrivenDataModelDevices
 {
-    static chip::app::DefaultAttributePersistenceProvider attributePersistenceProvider;
-    SuccessOrDie(attributePersistenceProvider.Init(delegate));
-
-    static chip::app::CodeDrivenDataModelProvider dataModelProvider =
-        chip::app::CodeDrivenDataModelProvider(*delegate, attributePersistenceProvider);
-
-    static WifiRootNodeDevice rootNodeDevice(
-        {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-            .configurationManager       = DeviceLayer::ConfigurationMgr(),
-            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
-            .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
-            .platformManager = DeviceLayer::PlatformMgr(), .groupDataProvider = gGroupDataProvider,
-            .sessionManager = Server::GetInstance().GetSecureSessionManager(), .dnssdServer = DnssdServer::Instance(),
+public:
+    struct Context
+    {
+        chip::PersistentStorageDelegate & storageDelegate;
+        CommissioningWindowManager & commissioningWindowManager;
+        DeviceLayer::ConfigurationManager & configurationManager;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
+        FabricTable & fabricTable;
+        FailSafeContext & failsafeContext;
+        DeviceLayer::PlatformManager & platformManager;
+        Credentials::GroupDataProvider & groupDataProvider;
+        SessionManager & sessionManager;
+        DnssdServer & dnssdServer;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        },
+    };
+
+    CodeDrivenDataModelDevices(const Context & context) :
+        mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
+        mRootNode({
+            .commissioningWindowManager = mContext.commissioningWindowManager,
+            .configurationManager       = mContext.configurationManager,
+            .deviceControlServer        = mContext.deviceControlServer,
+            .fabricTable                = mContext.fabricTable,
+            .failsafeContext            = mContext.failsafeContext,
+            .platformManager            = mContext.platformManager,
+            .groupDataProvider          = mContext.groupDataProvider,
+            .sessionManager             = mContext.sessionManager,
+            .dnssdServer                = mContext.dnssdServer,
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        })
+    {}
+
+    CHIP_ERROR Startup()
+    {
+        ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
+        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
+
+        mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
+        VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
+
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown()
+    {
+        if (mConstructedDevice)
         {
-            .wifiDriver = sWiFiDriver,
-        });
-    static std::unique_ptr<DeviceInterface> constructedDevice;
+            mConstructedDevice->UnRegister(mDataModelProvider);
+            mConstructedDevice.reset();
+        }
+        mRootNode.UnRegister(mDataModelProvider);
+    }
 
-    TEMPORARY_RETURN_IGNORED rootNodeDevice.Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
-    constructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-    TEMPORARY_RETURN_IGNORED constructedDevice->Register(AppOptions::GetDeviceEndpoint(), dataModelProvider, kInvalidEndpointId);
+    chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
 
-    return &dataModelProvider;
-}
+private:
+    Context mContext;
+    chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
+
+    chip::app::CodeDrivenDataModelProvider mDataModelProvider;
+
+    AppRootNode mRootNode;
+    std::unique_ptr<DeviceInterface> mConstructedDevice;
+};
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
 
+    static DefaultTimerDelegate timerDelegate;
+    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+        .timerDelegate = timerDelegate,
+    });
+
     static chip::CommonCaseDeviceServerInitParams initParams;
+
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
-    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    static CodeDrivenDataModelDevices devices({
+        .storageDelegate            = *initParams.persistentStorageDelegate,
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .configurationManager       = DeviceLayer::ConfigurationMgr(),
+        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .failsafeContext            = Server::GetInstance().GetFailSafeContext(),
+        .platformManager            = DeviceLayer::PlatformMgr(),
+        .groupDataProvider          = gGroupDataProvider,
+        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                = DnssdServer::Instance(),
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    });
+
+    SuccessOrDie(devices.Startup());
+
+    initParams.dataModelProvider             = &devices.DataModelProvider();
     initParams.groupDataProvider             = &gGroupDataProvider;
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
@@ -151,13 +214,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
-    sWiFiDriver.Set5gSupport(true);
-
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
-    sigaction(SIGINT, &sa, nullptr);
-    sigaction(SIGTERM, &sa, nullptr);
+    chip::app::SetTerminateHandler(StopSignalHandler);
 
     if (mainLoop != nullptr)
     {
@@ -169,6 +226,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
     gMainLoopImplementation = nullptr;
 
+    devices.Shutdown();
     Server::GetInstance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
     tracing_setup.StopTracing();
@@ -226,9 +284,12 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ConfigurationMgr().LogDeviceConfig();
 
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0));
+
+#if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr));
     ReturnErrorOnFailure(DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, false));
     ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+#endif
 
     return CHIP_NO_ERROR;
 }

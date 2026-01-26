@@ -367,7 +367,7 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             kind=SubprocessKind.APP,
             env_key="ALL_DEVICES_APP",
             cli_key="all-devices",
-            target=f"{target_prefix}-all-devices-app",
+            target=f"{target_prefix}-all-devices",
             binary="all-devices-app"
         )
     )
