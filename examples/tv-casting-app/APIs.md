@@ -1149,6 +1149,32 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
 }
 ```
 
+### Persistent Storage and Cached Credentials
+
+The tv-casting-app utilizes persistent storage to remember each TV (CastingPlayer) it has successfully connected to. This allows for faster reconnections and a better user experience by avoiding repeated commissioning flows.
+
+#### Cached Credentials
+
+Once the phone app has successfully been commissioned by a TV, it obtains a cached credential (an operational cert signed by the TV). With this cached credential, the phone app should not need to follow the pin code flow again for subsequent connections to that TV.
+
+#### Key Behaviors and Caveats
+
+1. **Credential Storage Deletion**: If you delete the phone app's stored configuration, the cached credential is dropped and commissioning (including the pin code flow) will be required again on the next connection attempt.
+
+2. **Automatic Credential Matching**: When you call `verifyOrEstablishConnection` on a CastingPlayer for which the phone app has a cached credential, the app will match its cached credentials with the discovered CastingPlayer based on fields in the DNS-SD information. If a match is found, the pin code flow will not be triggered. Instead, the app will attempt to establish a secure connection with the TV by calling `FindOrEstablishSession`.
+
+3. **DNS-SD Information Changes**: If the credential matching fails for a TV with a cached credential (for example, if fields in the DNS-SD information change, such as the IP address or device name), the pin code flow and commissioning will be triggered. During this commissioning process, the TV will discover that a cached credential already exists. It will then:
+   - Cancel the current commissioning attempt
+   - Remotely delete the cached credential
+   - Immediately perform commissioning again
+   
+   In this scenario, the phone app will receive a failure callback, but the next commissioning attempt should succeed.
+
+4. **TV Factory Reset Recovery**: If the phone app believes it has a cached credential for a given TV (the DNS-SD information match succeeds), but the TV does not recognize the phone app (this would happen if the TV has been factory reset), the phone app will receive authentication failure errors with error code `0x7e` when it attempts any cluster commands (reading attributes, sending commands, etc.). When the phone app receives error code `0x7e`, it should detect this condition and call `removeFabric()` to recover. Then it will need to perform the pin code flow for this TV again.
+
+5. **Shared Credentials Across TVs**: When there are 2 TVs that use the same middleware (e.g., FireTV) and are associated with the same customer account, they will often use the same cached credential (they use the same Matter fabric), however, the DNS-SD information is different. The resulting behavior is similar to item (3) - the pin code flow will be attempted and fail, the cached credential will be deleted which allows the next attempt to succeed. Some middleware providers may handle this scenario differently.
+
+
 ### Select an Endpoint on the Casting Player
 
 _{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp) |
