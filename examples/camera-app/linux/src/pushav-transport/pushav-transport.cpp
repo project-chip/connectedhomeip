@@ -548,7 +548,8 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
 
         if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
         {
-            mClipInfo.mMotionDetectedDurationS =0; mClipInfo.mElapsedTimeS = 0;
+            mClipInfo.mMotionDetectedDurationS = 0;
+            mClipInfo.mElapsedTimeS            = 0;
             StartRecordingAndStreaming();
         }
         else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
