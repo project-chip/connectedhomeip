@@ -240,8 +240,7 @@ class TC_CNET_4_24(MatterBaseTest):
             TestStep(
                 3,
                 "TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 2",
-                "Verify DUT returns ConnectNetworkResponse with NetworkingStatus kSuccess (0).\n"
-                "Non-concurrent mode: connection happens asynchronously, failure reported in Step 4",
+                "Verify DUT returns ConnectNetworkResponse with NetworkingStatus kSuccess (0)",
             ),
             TestStep(
                 4,
@@ -266,8 +265,7 @@ class TC_CNET_4_24(MatterBaseTest):
             TestStep(
                 9,
                 "TH sends ConnectNetwork command with dataset containing incorrect Network Key, Breadcrumb = 5",
-                "Verify DUT returns ConnectNetworkResponse with NetworkingStatus kSuccess (0).\n"
-                "Non-concurrent mode: connection happens asynchronously, failure reported in Step 10",
+                "Verify DUT returns ConnectNetworkResponse with NetworkingStatus kSuccess (0)",
             ),
             TestStep(
                 10,
@@ -337,9 +335,6 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 0: Commission device if not already done
         self.step(0)
 
-        # For non-concurrent mode, ConnectNetwork returns kSuccess immediately, actual connection is async so
-        # CASE Session cannot be established and falls back to PASE over Thread during commissioning.
-        # This allows testing with different Thread datasets (bad extended PAN ID and bad Network Key).
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
@@ -431,14 +426,13 @@ class TC_CNET_4_24(MatterBaseTest):
         network_id_1 = get_thread_tlv(incorrect_thread_dataset_1, tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(f" --- Step 3: Sending ConnectNetwork with incorrect Extended PAN ID: {network_id_1.hex()}")
 
-        # Non-concurrent mode: ConnectNetwork returns kSuccess immediately, actual connection is async
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(networkID=network_id_1, breadcrumb=2),
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS,
         )
         await self._validate_connect_network_response(response, expect_success=True)
-        logger.info(" --- ConnectNetwork returned kSuccess (correct for non-concurrent mode)")
+        logger.info(" --- ConnectNetwork returned kSuccess")
 
         # Wait for device to complete connection attempt
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for device to update network status...")
@@ -494,14 +488,13 @@ class TC_CNET_4_24(MatterBaseTest):
         network_id_2 = get_thread_tlv(incorrect_thread_dataset_2, tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(f" --- Step 9: Sending ConnectNetwork with incorrect Network Key: {network_id_2.hex()}")
 
-        # Non-concurrent mode: ConnectNetwork returns kSuccess immediately, actual connection is async
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(networkID=network_id_2, breadcrumb=5),
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS,
         )
         await self._validate_connect_network_response(response, expect_success=True)
-        logger.info(" --- ConnectNetwork returned kSuccess (correct for non-concurrent mode)")
+        logger.info(" --- ConnectNetwork returned kSuccess")
 
         # Wait for device to complete connection attempt
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for device to update network status...")
