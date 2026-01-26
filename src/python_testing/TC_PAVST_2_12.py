@@ -275,7 +275,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         except InteractionModelError as e:
             asserts.assert_equal(e.clusterStatus, Status.Success,
                                  "Unexpected error: DUT must respond with Status Code Success.")
-        
+
         transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
                                                                           pvattr.CurrentConnections,
                                                                           )
@@ -283,7 +283,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aConnectionID1 = transportConfigs[0].connectionID
-        
+
         self.step(7)
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=aConnectionID1,
@@ -305,7 +305,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID1, "Unexpected value for ConnectionID returned")
-        
+
         self.step(10)
         cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID1
@@ -314,13 +314,13 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-        
+
         self.step(11)
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
         asserts.assert_equal(
             status, Status.Success, "Status must be SUCCESS!"
         )
-        
+
         self.step(12)
         try:
             zoneList = [{"zone": aZones, "sensitivity": 4}]
@@ -335,7 +335,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         except InteractionModelError as e:
             asserts.assert_equal(e.clusterStatus, Status.Success,
                                  "Unexpected error: DUT must respond with Status Code Success.")
-        
+
         transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
                                                                           pvattr.CurrentConnections,
                                                                           )
@@ -343,18 +343,18 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aConnectionID2 = transportConfigs[0].connectionID
-        
+
         self.step(13)
         event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
                                    self.get_endpoint())
         await self._trigger_motion_event(aZones, prompt_msg=f"Press enter and immediately start motion activity in zone {aZones} and stop any motion after {initDuration} seconds of pressing enter.")
-        
+
         self.step(14)
         event = event_callback.wait_for_event_expect_no_report(timeout_sec=5)
         logger.info(f"Successfully timed out without receiving any PushTransportBegin event for zone: {aZones}")
-        
+
         self.step(15)
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=aConnectionID2,
@@ -364,12 +364,12 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-        
+
         self.step(16)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
-        
+
         self.step(17)
         cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID2

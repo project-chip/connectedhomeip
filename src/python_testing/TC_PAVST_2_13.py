@@ -196,7 +196,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             logger.info("Session timed out, re-establishing...")
             await self.default_controller.EstablishSession(self.dut_node_id)
 
-    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)and has_cluster(Clusters.ZoneManagement) and has_cluster(Clusters.CameraAvStreamManagement)) 
+    @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport)and has_cluster(Clusters.ZoneManagement) and has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_PAVST_2_13(self):
         endpoint = self.get_endpoint()
         self.endpoint = endpoint
@@ -329,7 +329,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             status == Status.Success,
             "DUT responds with Success status code.",
         )
- 
+
         self.step(9)
         event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
         await event_callback.start(self.default_controller,
@@ -394,13 +394,13 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
-        
+
         time.sleep(initDuration + 1)
 
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
- 
+
         self.step(15)
         # Recording stopped and now waiting for blind period to finish
         time.sleep(blindDuration + 1)
@@ -409,9 +409,9 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
-        
+
         time.sleep(initDuration + maxPreRollLen + 1)
-        
+
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
@@ -428,12 +428,12 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-        
+
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
         asserts.assert_equal(
             status, Status.Success, "Status must be SUCCESS!"
         )
-   
+
         self.step(17)
         maxDuration=10
         try:
@@ -449,7 +449,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         except InteractionModelError as e:
             asserts.assert_equal(e.clusterStatus, Status.Success,
                                  "DUT must responds with Status Code Success.")
-            
+
         transportConfigs = await self.read_pavst_attribute_expect_success(endpoint,
                                                                           pvattr.CurrentConnections,
                                                                           )
@@ -457,7 +457,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             len(transportConfigs), 1, "TransportConfigurations must not be empty!"
         )
         aConnectionID2 = transportConfigs[0].connectionID
-        
+
         cmd = pvcluster.Commands.SetTransportStatus(
             connectionID=aConnectionID2,
             transportStatus=pvcluster.Enums.TransportStatusEnum.kActive
@@ -466,7 +466,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_true(
             status == Status.Success,
             "DUT responds with SUCCESS status code.")
-   
+
         # MAX DURATION Check
         #  Triggering 2 motion event -> recording starts -> wait for max duration -> recording stops
         self.step(18)
@@ -474,12 +474,12 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
                                    self.get_endpoint())
-        
+
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
-        
+
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         # Second motion trigger during ongoing recording should NOT generate PushTransportBegin, only extend duration
 
