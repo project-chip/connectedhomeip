@@ -802,10 +802,7 @@ bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectio
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return false;
     }
-    else
-    {
-        sessionNumber = transportIt->second->GetSessionNumber();
-    }
 
-    return false;
+    sessionNumber = transportIt->second->GetSessionNumber();
+    return true;
 }

@@ -168,6 +168,7 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
 
     mClipInfo.mMotionDetectedDurationS         = 0;
     mClipInfo.mPreviousMotionDetectedDurationS = 0;
+    mClipInfo.mElapsedTimeS = 0;
 
     if (transportOptions.triggerOptions.motionTimeControl.HasValue())
     {
@@ -268,20 +269,19 @@ void PushAVTransport::InitializeRecorder()
 {
     if (mRecorder.get() == nullptr)
     {
-        mClipInfo.mSessionNumber = mSessionNumber;
+        mClipInfo.mSessionNumber = mSessionNumber++;
         mRecorder                = std::make_unique<PushAVClipRecorder>(mClipInfo, mAudioInfo, mVideoInfo, mUploader.get());
         mRecorder->SetFabricIndex(mFabricIndex);
         mRecorder->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
         mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
                                      chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
         ChipLogProgress(Camera, "PushAVTransport, Initialize Recorder done !!! FabricIdx: %u Session Id: %ld", mFabricIndex,
-                        mSessionNumber);
+                        mSessionNumber-1);
     }
     else
     {
         ChipLogError(Camera, "Recorder already initialized");
     }
-    mSessionNumber++;
 }
 
 PushAVTransport::~PushAVTransport()
@@ -355,6 +355,7 @@ bool PushAVTransport::HandleTriggerDetected()
         mPreviousActivationByManualTrigger         = mCurrentActivationByManualTrigger;
         mClipInfo.mMotionDetectedDurationS         = mClipInfo.mInitialDurationS;
         mClipInfo.mPreviousMotionDetectedDurationS = 0;
+        mClipInfo.mElapsedTimeS                    = 0;
     }
     else
     {
