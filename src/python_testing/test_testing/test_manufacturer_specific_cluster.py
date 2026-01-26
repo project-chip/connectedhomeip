@@ -98,17 +98,8 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
         asserts.assert_is_not_none(read_response.tlvAttributes, "tlvAttributes should not be None")
         print("Wildcard read successful")
 
-        # Test 5: Verify endpoint exists
-        self.print_step(5, f"Verify endpoint {TEST_HIDDEN_MEI_ENDPOINT} exists in response")
-        asserts.assert_in(
-            TEST_HIDDEN_MEI_ENDPOINT,
-            read_response.tlvAttributes,
-            f"Endpoint {TEST_HIDDEN_MEI_ENDPOINT} not found in response"
-        )
-        print(f"Endpoint {TEST_HIDDEN_MEI_ENDPOINT} found")
-
-        # Test 6: Verify TestHiddenMei is in ServerList
-        self.print_step(6, "Verify TestHiddenMei appears in ServerList on endpoint 1")
+        # Test 5: Verify TestHiddenMei is in ServerList
+        self.print_step(5, "Verify TestHiddenMei appears in ServerList")
         server_list = read_response.tlvAttributes[TEST_HIDDEN_MEI_ENDPOINT][Clusters.Descriptor.id][
             Clusters.Descriptor.Attributes.ServerList.attribute_id
         ]
@@ -119,8 +110,8 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
         )
         print(f"TestHiddenMei (0x{TEST_HIDDEN_MEI_CLUSTER_ID:08X}) found in ServerList")
 
-        # Test 7: Verify cluster is readable via tlvAttributes
-        self.print_step(7, "Verify TestHiddenMei cluster is readable via tlvAttributes")
+        # Test 6: Verify cluster is readable via tlvAttributes
+        self.print_step(6, "Verify TestHiddenMei cluster is readable via tlvAttributes")
         asserts.assert_in(
             TEST_HIDDEN_MEI_CLUSTER_ID,
             read_response.tlvAttributes[TEST_HIDDEN_MEI_ENDPOINT],
@@ -128,8 +119,8 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
         )
         print("TestHiddenMei readable via tlvAttributes")
 
-        # Test 8: Read specific attribute from manufacturer-specific cluster using raw path
-        self.print_step(8, "Read TestAttribute from TestHiddenMei using raw AttributePath")
+        # Test 7: Read specific attribute from manufacturer-specific cluster using raw path
+        self.print_step(7, "Read TestAttribute from TestHiddenMei using raw AttributePath")
         mei_attribute_path = AttributePath(
             EndpointId=TEST_HIDDEN_MEI_ENDPOINT,
             ClusterId=TEST_HIDDEN_MEI_CLUSTER_ID,
@@ -140,13 +131,8 @@ class TC_ManufacturerSpecificCluster(MatterBaseTest):
         raw_value = specific_read_response.tlvAttributes[TEST_HIDDEN_MEI_ENDPOINT][TEST_HIDDEN_MEI_CLUSTER_ID][TEST_HIDDEN_MEI_ATTRIBUTE_ID]
 
         # Verify the default value from XML definition
-        asserts.assert_equal(raw_value, True, "TestAttribute default value should be True per XML definition")
-        print(f" TestAttribute value: {raw_value} (correctly read via raw path)")
-
-        print("\n" + "=" * 20)
-        print("All manufacturer-specific cluster handling tests passed!")
-        print("=" * 20)
-
+        asserts.assert_equal(raw_value, True, "TestAttribute default value should be True")
+        print(f"TestAttribute value: {raw_value}")
 
 if __name__ == "__main__":
     default_matter_test_main()
