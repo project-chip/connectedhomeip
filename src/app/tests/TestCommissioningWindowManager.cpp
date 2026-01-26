@@ -658,7 +658,7 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTime
     ASSERT_FALSE(commissionMgr.IsCommissioningWindowOpen());
     ASSERT_TRUE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
 
-    Clusters::AdministratorCommissioningLogic logic;
+    Clusters::AdministratorCommissioningLogic logic(CreateContext());
     Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
 
     // RevokeCommissioning is invoked after the commissioning window has timed out and therefore returns StatusCode::kWindowNotOpen.
