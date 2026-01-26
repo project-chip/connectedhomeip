@@ -115,12 +115,12 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 8,
-                "TH sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID1",
-                "DUT responds with SUCCESS status code.",
+                "TH subscribes for the events from the DUT and sends the ManuallyTriggerTransport command with ConnectionID = aConnectionID1 and time control fields",
+                "DUT generates PushTransportBegin Event and responds with SUCCESS status code.",
             ),
             TestStep(
                 9,
-                "Motion Event triggers the DUT to generate PushAV Event to increment the Clip duration by the AugmentationDuration - AUGMENTATION DURATION Check",
+                "TH waits with a timeout of 5 seconds for PushTransportBeginEvent from DUT and then Motion event triggers the DUT to increment the Clip duration by the AugmentationDuration - AUGMENTATION DURATION Check",
                 "Verify that the TH receives the PushTransportEnd event after (InitialDuration + AugmentationDuration) and the connectionID matches aConnectionID1.",
             ),
             TestStep(
@@ -130,7 +130,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 11,
-                "After Blind duration of previous recording passes, Motion Event triggers the DUT to generate PushAV Event and then TH waits for the events from DUT",
+                "TH waits for PushTransportEnd event, then, after blind duration of previous recording passes, Motion Event triggers the DUT to generate PushAV Event and then TH waits for the events from DUT",
                 "Verify that the TH receives the PushTransportBegin event.",
             ),
             TestStep(
@@ -317,6 +317,11 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Manual trigger + Motion trigger case -> Step handle Augmentation and blind duration
         # Manual Trigger -> Recording start -> Motion trigger -> Clip Duration extended -> Recording stop -> Trigger motion event without waiting for blind period -> Recording should start
         self.step(8)
+        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
+        await event_callback.start(self.default_controller,
+                                   self.dut_node_id,
+                                   self.get_endpoint())
+
         timeControl = {"initialDuration": 5, "augmentationDuration": 2, "maxDuration": 15, "blindDuration": 3}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
@@ -330,10 +335,9 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(9)
-        event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
-        await event_callback.start(self.default_controller,
-                                   self.dut_node_id,
-                                   self.get_endpoint())
+        event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         # Clip duration is augmented
@@ -350,15 +354,16 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
+
+        # Motion Trigger - Motion Trigger case (Check Augment duration and blind duration)
+        # Motion Trigger -> Recording Start -> Motion Trigger -> Clip Duration extended -> Recording stop -> Trigger motion event without waiting for blind period -> Recording should not start
+        self.step(11)
         await asyncio.sleep(initDuration + 1)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
         await asyncio.sleep(blindDuration + 1)
 
-        # Motion Trigger - Motion Trigger case (Check Augment duration and blind duration)
-        # Motion Trigger -> Recording Start -> Motion Trigger -> Clip Duration extended -> Recording stop -> Trigger motion event without waiting for blind period -> Recording should not start
-        self.step(11)
         event_callback = EventSubscriptionHandler(expected_cluster=pvcluster)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
