@@ -174,6 +174,13 @@ private:
         CHIP_REQUIRES(mWpaSupplicantMutex);
 #endif
 
+    // ===== Members for internal use by the following friends.
+
+    friend ConnectivityManager & ConnectivityMgr();
+    friend ConnectivityManagerImpl & ConnectivityMgrImpl();
+
+    static ConnectivityManagerImpl & GetDefaultInstance(void);
+
 public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
     void UpdateEthernetNetworkingStatus();
@@ -273,13 +280,6 @@ private:
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
 #endif
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConnectivityManager & ConnectivityMgr();
-    friend ConnectivityManagerImpl & ConnectivityMgrImpl();
-
-    static ConnectivityManagerImpl sInstance;
-
     // ===== Private members reserved for use by this class only.
 
     char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
@@ -336,7 +336,7 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
  */
 inline ConnectivityManager & ConnectivityMgr()
 {
-    return ConnectivityManagerImpl::sInstance;
+    return ConnectivityManagerImpl::GetDefaultInstance();
 }
 
 /**
@@ -347,7 +347,7 @@ inline ConnectivityManager & ConnectivityMgr()
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl()
 {
-    return ConnectivityManagerImpl::sInstance;
+    return ConnectivityManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

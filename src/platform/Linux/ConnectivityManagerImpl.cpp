@@ -94,7 +94,13 @@ static constexpr char kWpaSupplicantBlobUnknown[] = "fi.w1.wpa_supplicant1.BlobU
 
 } // namespace
 
-ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
+// MARK: Singleton
+
+ConnectivityManagerImpl & ConnectivityManagerImpl::GetDefaultInstance()
+{
+    static ConnectivityManagerImpl sInstance;
+    return sInstance;
+}
 
 void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
 {
