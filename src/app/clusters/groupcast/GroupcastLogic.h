@@ -39,8 +39,15 @@ class GroupcastLogic
 {
 public:
     static constexpr uint16_t kMaxMembershipCount     = CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT;
+    static constexpr uint16_t kMaxFabricMemberships   = static_cast<uint16_t>(kMaxMembershipCount / 2);
     static constexpr uint16_t kMaxMembershipEndpoints = 255;
     static constexpr uint16_t kMaxCommandEndpoints    = 20;
+
+    struct EndpointList
+    {
+        EndpointId entries[kMaxMembershipEndpoints];
+        uint16_t count = 0;
+    };
 
     GroupcastLogic() {}
     GroupcastLogic(BitFlags<Groupcast::Feature> features) : mFeatures(features) {}
@@ -52,16 +59,18 @@ public:
 
     CHIP_ERROR JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
     CHIP_ERROR LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                          Groupcast::Commands::LeaveGroupResponse::Type & response);
+                          EndpointList & endpoints);
     CHIP_ERROR UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
     CHIP_ERROR ConfigureAuxiliaryACL(FabricIndex fabric_index,
                                      const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
 private:
     CHIP_ERROR SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key);
+    CHIP_ERROR RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                           EndpointList & endpoints);
+    CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList & endpoints);
 
     const BitFlags<Groupcast::Feature> mFeatures;
-    EndpointId mEndpoints[kMaxMembershipEndpoints];
 };
 
 } // namespace Clusters
