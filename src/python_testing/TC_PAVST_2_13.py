@@ -40,7 +40,6 @@
 
 import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -338,7 +337,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         # Clip duration is augmented
-        time.sleep(initDuration + augDuration + 1)
+        await asyncio.sleep(initDuration + augDuration + 1)
 
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
@@ -351,11 +350,11 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
-        time.sleep(initDuration + 1)
+        await asyncio.sleep(initDuration + 1)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
-        time.sleep(blindDuration + 1)
+        await asyncio.sleep(blindDuration + 1)
 
         # Motion Trigger - Motion Trigger case (Check Augment duration and blind duration)
         # Motion Trigger -> Recording Start -> Motion Trigger -> Clip Duration extended -> Recording stop -> Trigger motion event without waiting for blind period -> Recording should not start
@@ -375,7 +374,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         # Motion trigger during ongoing recording should NOT generate PushTransportBegin, only extend duration
         # Clip duration augmented
-        time.sleep(initDuration + augDuration + 1)
+        await asyncio.sleep(initDuration + augDuration + 1)
 
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
@@ -384,7 +383,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # Previous recording stops, didn't waited for blind period-> sended another motion trigger -> new recording should not start -> Because previous Recording started due to motion trigger
         self.step(13)
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
-        event = event_callback.wait_for_event_expect_no_report(timeout_sec=blindDuration+1)
+        event_data = event_callback.wait_for_event_expect_no_report(timeout_sec=blindDuration+1)
 
         # Motion Trigger - Motion Trigger case (Check blind duration)
         # Trigger motion event-> wait for recording to stop. Wait for blind period to finish before sending another trigger -> Recording should start.
@@ -395,7 +394,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
-        time.sleep(initDuration + 1)
+        await asyncio.sleep(initDuration + 1)
 
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
@@ -403,19 +402,19 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step(15)
         # Recording stopped and now waiting for blind period to finish
-        time.sleep(blindDuration + 1)
+        await asyncio.sleep(blindDuration + 1)
         # Previous recording stops and also waited for blind period before triggering another motion event -> Recording starts
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportBegin, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
 
-        time.sleep(initDuration + maxPreRollLen + 1)
+        await asyncio.sleep(initDuration + maxPreRollLen + 1)
 
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID, "Unexpected value for ConnectionID returned")
-        time.sleep(blindDuration + 1)
+        await asyncio.sleep(blindDuration + 1)
 
         # Max Duration
         # Deallocating all active connection -> Allocate one pushav with time control such that max duration is tested
@@ -483,7 +482,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
         # Second motion trigger during ongoing recording should NOT generate PushTransportBegin, only extend duration
 
-        time.sleep(maxDuration + 1)
+        await asyncio.sleep(maxDuration + 1)
         event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=5)
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")

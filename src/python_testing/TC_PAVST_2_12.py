@@ -352,7 +352,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         await self._trigger_motion_event(aZones, prompt_msg=f"Press enter and immediately start motion activity in zone {aZones} and stop any motion after {initDuration} seconds of pressing enter.")
 
         self.step(14)
-        event = event_callback.wait_for_event_expect_no_report(timeout_sec=5)
+        event_data = event_callback.wait_for_event_expect_no_report(timeout_sec=5)
         logger.info(f"Successfully timed out without receiving any PushTransportBegin event for zone: {aZones}")
 
         self.step(15)
