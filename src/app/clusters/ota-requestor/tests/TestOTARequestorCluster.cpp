@@ -19,15 +19,15 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Enums.h>

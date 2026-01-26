@@ -146,7 +146,7 @@ void RegisterCluster(EndpointId endpointId)
         integrationDelegate);
 }
 
-void UnregisterCluster(EndpointId endpointId)
+void UnregisterCluster(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -157,7 +157,7 @@ void UnregisterCluster(EndpointId endpointId)
             .fixedClusterInstanceCount = kOtaRequestorFixedClusterCount,
             .maxClusterInstanceCount   = kOtaRequestorMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
@@ -168,7 +168,7 @@ void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
         if (server.IsConstructed())
         {
             EndpointId endpoint = server.Cluster().GetPaths()[0].mEndpointId;
-            UnregisterCluster(endpoint);
+            UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
             RegisterCluster(endpoint);
         }
     }
@@ -177,7 +177,7 @@ void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
         if (server.IsConstructed())
         {
             EndpointId endpoint = server.Cluster().GetPaths()[0].mEndpointId;
-            UnregisterCluster(endpoint);
+            UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
             RegisterCluster(endpoint);
         }
     }
@@ -191,9 +191,9 @@ void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
     RegisterCluster(endpointId);
 }
 
-void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    UnregisterCluster(endpointId);
+    UnregisterCluster(endpointId, shutdownType);
 }
 
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
