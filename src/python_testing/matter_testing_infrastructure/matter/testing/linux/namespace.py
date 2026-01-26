@@ -28,7 +28,7 @@ import sys
 import time
 from typing import IO, Any, Union
 
-from .runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
+from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 

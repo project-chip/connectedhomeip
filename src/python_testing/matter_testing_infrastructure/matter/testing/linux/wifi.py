@@ -27,7 +27,8 @@ import pathlib
 import subprocess
 import threading
 from typing import Union
-from linux import IsolatedNetworkNamespace
+
+from .namespace import IsolatedNetworkNamespace
 
 import sdbus
 
