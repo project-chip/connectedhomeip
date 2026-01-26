@@ -107,7 +107,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             TestStep("2b", "TH reads the Presets attribute and saves it in a SupportedPresets variable.",
                      "Verify that the read returned a list of presets with count >=2."),
             TestStep("3", "TH checks if the Thermostat does not have a valid UTC time.",
-                     "Verify if the Thermostat does not have a valid UTC time and set the has_valid_time variable to true"),
+                     "Verify if the Thermostat does not have a valid UTC time and set the has_valid_time variable to false"),
             TestStep("4a", "If has_valid_time is False, TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.",
                      "Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE."),
             TestStep("4b", "If has_valid_time is False, TH sends Time Synchronization command to DUT using a time source.",
