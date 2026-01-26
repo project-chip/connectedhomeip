@@ -38,6 +38,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -114,7 +115,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 8,
-                "Motion Event triggers the DUT to generate PushAV Event",
+                "TH subscribes to the DUT's PushTransportBegin event and Motion Event triggers the DUT to generate PushAV Event",
                 "Successful completion of steps"
             ),
             TestStep(
@@ -159,7 +160,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             ),
             TestStep(
                 17,
-                "TH sends DeallocatePushTransport command with ConnectionID = aConnectionID2",
+                "TH waits with a timeout of initial duration + pre-roll length sec for PushTransportEnd event then waits for 5 sec and sends DeallocatePushTransport command with ConnectionID = aConnectionID2",
                 "DUT responds with SUCCESS status code.",
             ),
         ]
@@ -262,10 +263,11 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         augDuration = 5
         maxDuration = 20
         blindDuration = 1
+        preRollLength = 4
         try:
             zoneList = [{"zone": aZones, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
-                              "maxPreRollLen": 4000,
+                              "maxPreRollLen": preRollLength*1000,
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
@@ -325,7 +327,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         try:
             zoneList = [{"zone": aZones, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
-                              "maxPreRollLen": 4000,
+                              "maxPreRollLen": preRollLength*1000,
                               "motionZones": zoneList,
                               "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
@@ -371,7 +373,12 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
 
         self.step(17)
-        cmd = pvcluster.Commands.DeallocatePushTransport(
+        event_data = event_callback.wait_for_event_report(pvcluster.Events.PushTransportEnd, timeout_sec=initDuration+preRollLength)
+        logger.info(f"Event data {event_data}")
+        asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
+
+        asyncio.sleep(5) # Wait for 5 seconds before sending DelocatePushTransport command
+        cmd = pvcluster.Commands.DelocatePushTransport(
             connectionID=aConnectionID2
         )
         status = await self.psvt_deallocate_push_transport(cmd)

@@ -284,7 +284,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(10)
         if self.pics_guard(self.check_pics("PAVST.S")):
             aProvisionedEndpoints = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=tlscluster, attribute=tlsattr
+                endpoint=endpoint, cluster=tlscluster, attribute=tlsattr.ProvisionedEndpoints
             )
             log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
 

@@ -918,12 +918,15 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
     std::filesystem::path mpdPath = mUploadFileBasePath / "index.mpd";
 
     // Wait for the first segment (segment_0001.m4s) for any stream to be created before starting any uploads
-    for (size_t i = 0; i < mUploadSegmentID.size(); i++)
+    if (!firstSegmentReady)
     {
-        if (mUploadSegmentID[i] == 1 && IsFileReadyForUpload(make_segment_path(i, 1)))
+        for (size_t i = 0; i < mUploadSegmentID.size(); i++)
         {
-            firstSegmentReady = true;
-            break;
+            if (mUploadSegmentID[i] == 1 && IsFileReadyForUpload(make_segment_path(i, 1)))
+            {
+                firstSegmentReady = true;
+                break;
+            }
         }
     }
     if (!firstSegmentReady)

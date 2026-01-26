@@ -323,8 +323,7 @@ bool InBlindPeriod(std::chrono::steady_clock::time_point blindStartTime, uint16_
     }
 
     const auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(now - blindStartTime).count();
-    ChipLogProgress(Camera, "PushAVTransport blind period elapsed: %" PRId64 " seconds (duration: %u seconds)", elapsedSeconds,
-                    blindDuration);
+    ChipLogProgress(Camera, "PushAVTransport blind period, blindDuration: %u seconds", blindDuration);
     return ((elapsedSeconds >= 0) && (elapsedSeconds < blindDuration));
 }
 
@@ -534,10 +533,6 @@ void PushAVTransport::SetTransportStatus(TransportStatusEnum status)
     {
         ChipLogProgress(Camera, "PushAVTransport transport status changed to active");
 
-        mUploader = std::make_unique<PushAVUploader>();
-        mUploader->setCertificateBuffer(mCertBuffer);
-        mUploader->setCertificatePath(mCertPath);
-        mUploader->Start();
         if (mUploader.get() == nullptr)
         {
             mUploader = std::make_unique<PushAVUploader>();
