@@ -17,9 +17,11 @@
  */
 
 #pragma once
-
+#include <lib/core/DataModelTypes.h>
 /**
  * @brief Top-level application entry points for EVSE app initialization and shutdown.
  */
 void EvseApplicationInit();
 void EvseApplicationShutdown();
+
+chip::EndpointId GetEnergyDeviceEndpointId();

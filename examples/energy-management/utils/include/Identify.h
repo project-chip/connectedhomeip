@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <lib/core/DataModelTypes.h>
 
 using chip::app::Clusters::IdentifyCluster;
 using chip::app::Clusters::IdentifyDelegate;
@@ -31,5 +32,8 @@ public:
     void OnTriggerEffect(IdentifyCluster & cluster) override {}
     bool IsTriggerEffectEnabled() const override { return false; }
 };
+
+// Common interface to get the Identify endpoint ID.
+chip::EndpointId GetIdentifyEndpointId();
 
 CHIP_ERROR IdentifyInit();

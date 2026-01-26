@@ -95,16 +95,6 @@ void DeviceEnergyManagementMode::Shutdown()
 
 void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    /* emberAfDeviceEnergyManagementModeClusterInitCallback() is called for all endpoints
-       that include this cluster (even the one we disable dynamically). So here, we only
-       proceed when it's called for the right endpoint determined by GetEnergyDeviceEndpointId()
-       (a cmd line argument on linux or #define on other platforms).
-    */
-    if (endpointId != GetEnergyDeviceEndpointId())
-    {
-        return;
-    }
-
     VerifyOrDie(!gDeviceEnergyManagementModeDelegate && !gDeviceEnergyManagementModeInstance);
     gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
     gDeviceEnergyManagementModeInstance = std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(),
@@ -114,11 +104,6 @@ void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpo
 
 void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId)
 {
-    if (endpointId != GetEnergyDeviceEndpointId())
-    {
-        return;
-    }
-
     if (gDeviceEnergyManagementModeInstance)
     {
         gDeviceEnergyManagementModeInstance->Shutdown();
@@ -128,10 +113,5 @@ void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId e
 
 void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpointId)
 {
-    if (endpointId != GetEnergyDeviceEndpointId())
-    {
-        return;
-    }
-
     DeviceEnergyManagementMode::Shutdown();
 }

@@ -1712,7 +1712,7 @@ uint32_t EnergyEvseDelegate::GetRandomizationDelayWindow()
 CHIP_ERROR EnergyEvseDelegate::SetRandomizationDelayWindow(uint32_t newValue)
 {
     uint32_t oldValue = mRandomizationDelayWindow;
-    if (newValue > kMaxRandomizationDelayWindow)
+    if (newValue > kMaxRandomizationDelayWindowSec)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }

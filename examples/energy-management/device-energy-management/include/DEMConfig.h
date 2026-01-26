@@ -22,6 +22,3 @@
 
 // The DEM Delegate is used for the TestEventTriggers
 chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate();
-
-// This DEM device endpoint is configured at the app level so we give an interface for the common code to get it.
-chip::EndpointId GetEnergyDeviceEndpointId();

@@ -16,25 +16,19 @@ import("//build_overrides/chip.gni")
 
 config("config") {
   include_dirs =
-      [ "${chip_root}/examples/energy-management/electrical-sensor/include" ]
+      [ "${chip_root}/examples/energy-management/utils/include" ]
 }
 
-static_library("electrical-sensor") {
+static_library("energy-management-utils") {
   sources = [
-    "${chip_root}/examples/energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management/electrical-sensor/src/PowerTopologyDelegate.cpp",
+    "${chip_root}/examples/energy-management/utils/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management/utils/src/Identify.cpp",
   ]
 
   public_configs = [ ":config" ]
 
   public_deps = [
-    "${chip_root}/src/app:interaction-model",
-    "${chip_root}/src/app/clusters/electrical-energy-measurement-server",
-    "${chip_root}/src/app/clusters/electrical-power-measurement-server",
-    "${chip_root}/src/app/clusters/power-topology-server",
-    "${chip_root}/src/app/server:server",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/protocols:protocols",
-    "${chip_root}/src/system",
+    "${chip_root}/src/app/clusters/identify-server:identify-server",
+    "${chip_root}/src/data-model-providers/codegen:headers",
   ]
 }

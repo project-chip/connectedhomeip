@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "Identify.h"
+#include <Identify.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -26,18 +26,19 @@ namespace {
 
 DefaultTimerDelegate sTimerDelegate;
 IdentifyDelegateImpl sIdentifyDelegate;
-constexpr chip::EndpointId kEndpointId = 1;
 
 RegisteredServerCluster<Clusters::IdentifyCluster>
-    gIdentifyCluster1(Clusters::IdentifyCluster::Config(kEndpointId, sTimerDelegate)
+    gIdentifyCluster1(Clusters::IdentifyCluster::Config(GetIdentifyEndpointId(), sTimerDelegate)
                           .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
                           .WithDelegate(&sIdentifyDelegate));
 
 } // namespace
 
+
+
 CHIP_ERROR IdentifyInit()
 {
-    if (CodegenDataModelProvider::Instance().Registry().Get({ kEndpointId, Clusters::Identify::Id }) != nullptr)
+    if (CodegenDataModelProvider::Instance().Registry().Get({ GetIdentifyEndpointId(), Clusters::Identify::Id }) != nullptr)
     {
         // Already registered
         return CHIP_NO_ERROR;

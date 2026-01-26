@@ -88,10 +88,22 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-// TODO: This needs to come from zap or a config file
+// Keep track of the parsed featureMap option
+#if (SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING) && (SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING)
+#error Cannot define SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING and SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
+#endif
+
+#if SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
                                           Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
                                           Feature::kConstraintBasedAdjustment);
+#elif SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kStateForecastReporting,
+                                          Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
+                                          Feature::kConstraintBasedAdjustment);
+#else
+static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment);
+#endif
 
 chip::BitMask<Feature> GetFeatureMapFromCmdLine()
 {
@@ -114,7 +126,7 @@ void ApplicationInit()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     SILABS_LOG("==================================================");
-    SILABS_LOG("energy-management-example EVSE starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
+    SILABS_LOG("evse-app starting. featureMap 0x%08lx", DeviceEnergyManagement::sFeatureMap.Raw());
     EvseApplicationInit();
     SILABS_LOG("==================================================");
 

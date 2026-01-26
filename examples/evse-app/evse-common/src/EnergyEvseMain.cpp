@@ -18,7 +18,6 @@
 
 #include <EnergyEvseMain.h>
 
-#include <DEMConfig.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
@@ -425,7 +424,7 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
 
     ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type energyAccuracyRanges[] = {
         { .rangeMin   = 0,
-          .rangeMax   = 1'000'000'000'000'000,
+          .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
           .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
           .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
     };
@@ -486,4 +485,9 @@ void EvseApplicationShutdown()
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
+}
+
+EndpointId GetIdentifyEndpointId()
+{
+    return GetEnergyDeviceEndpointId();
 }

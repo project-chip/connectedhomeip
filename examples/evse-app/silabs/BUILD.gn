@@ -47,6 +47,11 @@ import("${examples_common_plat_dir}/args.gni")
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
+
+  # Device Energy Management feature support - only one of these can be true
+  # or both can be disabled if forecasting is not supported
+  sl_dem_support_power_forecast_reporting = true
+  sl_dem_support_state_forecast_reporting = false
 }
 
 if (slc_generate) {
@@ -120,7 +125,10 @@ if (wifi_soc) {
 silabs_executable("evse-app") {
   output_name = "matter-silabs-evse-example.out"
   include_dirs = [ "include" ]
-  defines = []
+  defines = [
+    "SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=${sl_dem_support_power_forecast_reporting}",
+    "SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING=${sl_dem_support_state_forecast_reporting}",
+  ]
 
   if (silabs_board == "BRD2704A") {
     defines += [ "SL_STATUS_LED=0" ]
