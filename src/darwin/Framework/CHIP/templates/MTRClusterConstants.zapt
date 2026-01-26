@@ -7,16 +7,20 @@
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping name) isForIds=true)
            (isSupported (compatClusterNameRemapping name) isForIds=true))}}
 MTRCluster{{compatClusterNameRemapping label}}ID {{availability (compatClusterNameRemapping name) deprecatedRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat "Please use MTRClusterIDType" (asUpperCamelCase label preserveAcronyms=true) "ID") isForIds=true}} = {{asMEI manufacturerCode code}},
 {{/if}}
+{{/unless}}
 {{/zcl_clusters}}
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
 {{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 MTRClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " cluster will be removed")}} = {{asMEI manufacturerCode code}},
 {{/if}}
+{{/unless}}
 {{/zcl_clusters}}
 
 {{> cluster_id_shims}}
@@ -47,6 +51,7 @@ MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID {{availability "" globalAttrib
 {{/zcl_attributes_server}}
 
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#*inline "attributeIDs"}}
 {{#zcl_attributes_server}}
 {{#first}}
@@ -113,6 +118,7 @@ MTRAttributeIDTypeCluster{{compatClusterNameRemapping ../clusterName}}Attribute{
 {{/inline}}
 
 {{> attributeIDs clusterName=label}}
+{{/unless}}
 {{/zcl_clusters}}
 
 {{> attribute_id_shims}}
@@ -122,6 +128,7 @@ MTRAttributeIDTypeCluster{{compatClusterNameRemapping ../clusterName}}Attribute{
 
 typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#*inline "commandIDs"}}
 {{#zcl_commands}}
 {{#first}}
@@ -177,6 +184,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster co
 {{/inline}}
 
 {{> commandIDs clusterName=label}}
+{{/unless}}
 {{/zcl_clusters}}
 
 {{> command_id_shims}}
@@ -186,6 +194,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster co
 
 typedef NS_ENUM(uint32_t, MTREventIDType) {
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#*inline "eventIDs"}}
 {{#zcl_events}}
 {{#first}}
@@ -223,6 +232,7 @@ MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID {{availability (asUpperCamelC
 {{/inline}}
 
 {{> eventIDs clusterName=label}}
+{{/unless}}
 {{/zcl_clusters}}
 };
 

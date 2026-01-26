@@ -34,19 +34,18 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 #endif
     error = DecodeTlv();
 
-    if (error != CHIP_NO_ERROR)
+    // The factory data payload can contain a variable number of fields
+    // to be updated. CHIP_END_OF_TLV is returned if no more fields are
+    // found.
+    if (error == CHIP_END_OF_TLV)
     {
-        // The factory data payload can contain a variable number of fields
-        // to be updated. CHIP_END_OF_TLV is returned if no more fields are
-        // found.
-        if (error == CHIP_END_OF_TLV)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        Clear();
+        return CHIP_NO_ERROR;
     }
 
+    if (error != CHIP_NO_ERROR)
+    {
+        TEMPORARY_RETURN_IGNORED Clear();
+    }
     return error;
 }
 

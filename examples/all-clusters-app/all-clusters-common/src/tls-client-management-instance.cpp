@@ -21,7 +21,7 @@
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/clusters/tls-certificate-management-server/IncrementingIdHelper.h>
 #include <app/clusters/tls-client-management-server/CodegenIntegration.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.ipp>
 #include <app/util/af-types.h>
 #include <clusters/TlsClientManagement/Commands.h>
@@ -41,8 +41,8 @@ using namespace chip::Platform;
 using namespace chip::TLV;
 using namespace Protocols::InteractionModel;
 
-using EndpointSerializer = DefaultSerializer<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>;
-using InnerIterator      = TableEntryDataConvertingIterator<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>;
+using EndpointSerializer = DefaultSerializer<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>;
+using InnerIterator      = TableEntryDataConvertingIterator<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>;
 
 namespace {
 enum class TagEndpoint : uint8_t
@@ -71,7 +71,7 @@ static constexpr size_t kTlsEndpointMaxBytes =
                                                   sizeof(chip::FabricIndex) /* fabricIndex */));
 struct BufferedEndpoint
 {
-    TlsClientManagementDelegate::EndpointStructType mEndpoint;
+    TLSClientManagementDelegate::EndpointStructType mEndpoint;
     PersistenceBuffer<kTlsEndpointMaxBytes> mBuffer;
 };
 
@@ -206,25 +206,25 @@ CHIP_ERROR EndpointSerializer::DeserializeId(TLV::TLVReader & reader, TlsEndpoin
 }
 
 template <>
-CHIP_ERROR EndpointSerializer::SerializeData(TLV::TLVWriter & writer, const TlsClientManagementDelegate::EndpointStructType & data)
+CHIP_ERROR EndpointSerializer::SerializeData(TLV::TLVWriter & writer, const TLSClientManagementDelegate::EndpointStructType & data)
 {
     return data.EncodeForRead(writer, TLV::ContextTag(TagEndpoint::kEndpointPayload), data.GetFabricIndex());
 }
 
 template <>
-CHIP_ERROR EndpointSerializer::DeserializeData(TLV::TLVReader & reader, TlsClientManagementDelegate::EndpointStructType & data)
+CHIP_ERROR EndpointSerializer::DeserializeData(TLV::TLVReader & reader, TLSClientManagementDelegate::EndpointStructType & data)
 {
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TagEndpoint::kEndpointPayload)));
     return data.Decode(reader);
 }
 
 template <>
-void EndpointSerializer::Clear(TlsClientManagementDelegate::EndpointStructType & data)
+void EndpointSerializer::Clear(TLSClientManagementDelegate::EndpointStructType & data)
 {
-    new (&data) TlsClientManagementDelegate::EndpointStructType();
+    new (&data) TLSClientManagementDelegate::EndpointStructType();
 }
 
-template class chip::app::Storage::FabricTableImpl<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>;
+template class chip::app::Storage::FabricTableImpl<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>;
 
 CHIP_ERROR TlsClientManagementCommandDelegate::Init(PersistentStorageDelegate & storage)
 {
@@ -293,7 +293,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 
     if (provisionReq.endpointID.IsNull())
     {
-        VerifyOrReturnError(numInFabric < mTlsClientManagementCluster->GetMaxProvisioned(),
+        VerifyOrReturnError(numInFabric < mTLSClientManagementCluster->GetMaxProvisioned(),
                             ClusterStatusCode(Status::ResourceExhausted));
         EndpointSerializer::Clear(endpoint.mEndpoint);
         auto & endpointStruct = endpoint.mEndpoint;

@@ -93,6 +93,9 @@ declare_args() {
   sl_verbose_mode = false
 
   sl_em4_sleep = false
+
+  # Enable Multi-PAN support for Matter over Thread devices
+  sl_openthread_multi_pan_enable = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -491,6 +494,18 @@ template("efr32_sdk") {
       "SL_APP_PROPERTIES",
       "SL_MATTER_EM4_SLEEP=${sl_em4_sleep}",
     ]
+
+    # Enable OpenThread multiple instance support when multi-PAN is enabled
+    if (sl_openthread_multi_pan_enable) {
+      defines += [
+        "SL_OPENTHREAD_MULTI_PAN_ENABLE=1",
+        "OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE=1",
+        "OPENTHREAD_CONFIG_MULTIPLE_STATIC_INSTANCE_ENABLE=1",
+        "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
+      ]
+    } else {
+      defines += [ "SL_OPENTHREAD_MULTI_PAN_ENABLE=0" ]
+    }
 
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
