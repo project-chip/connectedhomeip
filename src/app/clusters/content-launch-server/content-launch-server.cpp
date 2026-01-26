@@ -168,6 +168,8 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::ClusterRevision::Id: {
+        VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
+
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     }
     default:
