@@ -45,15 +45,6 @@ jobs:
               name: Checkout
               with:
                 token: ${{ github.token }}
-              # To use act like:
-            #   act -j full_android
-            #
-            # Note you likely still need to have non submodules setup for the
-            # local machine, like:
-            #   git submodule deinit --all
-            - uses: actions/checkout@v4
-              if: ${{ env.ACT }}
-              name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
