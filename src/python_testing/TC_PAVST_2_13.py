@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/app_pipe_pavstmgmt
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/pavst_2_13_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
@@ -33,7 +33,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --app-pipe /tmp/app_pipe_pavstmgmt
+#       --app-pipe /tmp/pavst_2_13_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -175,7 +175,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         # CI: Use app pipe to trigger zone event.
         # Manual: User should trigger a motion event from the defined zone.
         if self.is_pics_sdk_ci_only:
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id}, app_pipe="/tmp/app_pipe_pavstmgmt")
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id})
         else:
             if prompt_msg is None:
                 prompt_msg = f"Press enter and immediately start motion activity in zone {zone_id}."
