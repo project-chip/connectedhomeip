@@ -47,7 +47,6 @@ public:
 #else
         mRootNodeDevice(context)
     {
-        mWiFiDriver.Set5gSupport(true);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
