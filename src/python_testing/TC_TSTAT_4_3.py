@@ -374,7 +374,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # "ActivePresetHandle attribute should not be equal to the PresetHandle in the CurrentThermostatSuggestion attribute.")
 
         self.step("7b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a") and self.check_pics("TSTAT.S.A0023") and self.check_pics("TSTAT.S.A0024")):
             # TH sets TemperatureSetpointHold to SetpointHoldOff after 2 seconds.
             await asyncio.sleep(2)
             await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOff), endpoint_id=endpoint, expect_success=True)
