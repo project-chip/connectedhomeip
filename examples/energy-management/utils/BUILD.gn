@@ -15,8 +15,7 @@
 import("//build_overrides/chip.gni")
 
 config("config") {
-  include_dirs =
-      [ "${chip_root}/examples/energy-management/utils/include" ]
+  include_dirs = [ "${chip_root}/examples/energy-management/utils/include" ]
 }
 
 static_library("energy-management-utils") {
