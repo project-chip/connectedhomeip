@@ -29,7 +29,6 @@ namespace chip::app::Clusters {
 class FixedLabelCluster : public DefaultServerCluster
 {
 public:
-    FixedLabelCluster(EndpointId endpoint);
     FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider * deviceInfoProvider);
 
     // Server cluster implementation
