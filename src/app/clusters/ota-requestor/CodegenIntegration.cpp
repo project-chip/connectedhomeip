@@ -52,7 +52,8 @@ class FallbackOtaRequestorCluster : public DefaultServerCluster
 {
 public:
     FallbackOtaRequestorCluster(EndpointId endpointId) :
-        DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)) {}
+        DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id))
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override

@@ -718,7 +718,8 @@ void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReas
 
     DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
     VerifyOrDie(dataModelProvider != nullptr);
-    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event{ mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode };
+    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
+                                                                   progressPercent, platformCode };
 
     for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
     {

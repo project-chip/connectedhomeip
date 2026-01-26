@@ -70,8 +70,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
         return encoder.Encode(mUpdatePossible);
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
         return encoder.Encode(mOtaRequestor.GetCurrentUpdateState());
-    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
-    {
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id: {
         DataModel::Nullable<uint8_t> progress;
         ReturnErrorOnFailure(mOtaRequestor.GetUpdateStateProgressAttribute(mPath.mEndpointId, progress));
         return encoder.Encode(progress);
