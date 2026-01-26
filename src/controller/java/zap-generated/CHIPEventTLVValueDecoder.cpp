@@ -9384,14 +9384,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_containerTypeClassName     = "java/lang/Integer";
             std::string value_containerTypeCtorSignature = "(I)V";
             jint jnivalue_containerType                  = static_cast<jint>(cppValue.containerType);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_containerTypeClassName.c_str(), value_containerTypeCtorSignature.c_str(), jnivalue_containerType,
-                value_containerType);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_containerTypeClassName.c_str(),
+                                                                       value_containerTypeCtorSignature.c_str(),
+                                                                       jnivalue_containerType, value_containerType);
 
             jobject value_CMAFSessionNumber;
             if (!cppValue.CMAFSessionNumber.HasValue())
             {
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_CMAFSessionNumber);
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_CMAFSessionNumber);
             }
             else
             {
@@ -9399,12 +9399,11 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 std::string value_CMAFSessionNumberInsideOptionalClassName     = "java/lang/Long";
                 std::string value_CMAFSessionNumberInsideOptionalCtorSignature = "(J)V";
                 jlong jnivalue_CMAFSessionNumberInsideOptional = static_cast<jlong>(cppValue.CMAFSessionNumber.Value());
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
                     value_CMAFSessionNumberInsideOptionalClassName.c_str(),
                     value_CMAFSessionNumberInsideOptionalCtorSignature.c_str(), jnivalue_CMAFSessionNumberInsideOptional,
                     value_CMAFSessionNumberInsideOptional);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_CMAFSessionNumberInsideOptional,
-                                                                                           value_CMAFSessionNumber);
+                chip::JniReferences::GetInstance().CreateOptional(value_CMAFSessionNumberInsideOptional, value_CMAFSessionNumber);
             }
 
             jclass pushTransportBeginStructClass;
@@ -9453,14 +9452,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_containerTypeClassName     = "java/lang/Integer";
             std::string value_containerTypeCtorSignature = "(I)V";
             jint jnivalue_containerType                  = static_cast<jint>(cppValue.containerType);
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_containerTypeClassName.c_str(), value_containerTypeCtorSignature.c_str(), jnivalue_containerType,
-                value_containerType);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_containerTypeClassName.c_str(),
+                                                                       value_containerTypeCtorSignature.c_str(),
+                                                                       jnivalue_containerType, value_containerType);
 
             jobject value_CMAFSessionNumber;
             if (!cppValue.CMAFSessionNumber.HasValue())
             {
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_CMAFSessionNumber);
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_CMAFSessionNumber);
             }
             else
             {
@@ -9468,12 +9467,11 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 std::string value_CMAFSessionNumberInsideOptionalClassName     = "java/lang/Long";
                 std::string value_CMAFSessionNumberInsideOptionalCtorSignature = "(J)V";
                 jlong jnivalue_CMAFSessionNumberInsideOptional = static_cast<jlong>(cppValue.CMAFSessionNumber.Value());
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
                     value_CMAFSessionNumberInsideOptionalClassName.c_str(),
                     value_CMAFSessionNumberInsideOptionalCtorSignature.c_str(), jnivalue_CMAFSessionNumberInsideOptional,
                     value_CMAFSessionNumberInsideOptional);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_CMAFSessionNumberInsideOptional,
-                                                                                           value_CMAFSessionNumber);
+                chip::JniReferences::GetInstance().CreateOptional(value_CMAFSessionNumberInsideOptional, value_CMAFSessionNumber);
             }
 
             jclass pushTransportEndStructClass;
