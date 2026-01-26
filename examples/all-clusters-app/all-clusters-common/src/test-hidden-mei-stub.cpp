@@ -16,9 +16,10 @@
  */
 
 /**
- * @file test-hidden-mei-stub.cpp
+/**
+ * @file test-hidden-manufacturer-specific-stub.cpp
  *
- * Stub implementation for the TestHiddenMei cluster.
+ * Stub implementation for the TestHiddenManufacturerSpecific cluster.
  * This cluster is intentionally NOT in controller-clusters.matter to test
  * how the test harness handles MEI clusters that the controller has no
  * knowledge of (simulating real-world vendor-specific clusters).
