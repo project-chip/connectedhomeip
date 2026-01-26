@@ -75,7 +75,7 @@ public:
         }
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    Protocols::InteractionModel::Status PlayChimeSound() override
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override
     {
         playChimeSoundCalled = true;
         return playChimeSoundStatus;

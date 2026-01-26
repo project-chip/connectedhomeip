@@ -1,33 +1,7 @@
-{{> header excludeZapComment=true}}
-
-#import <Foundation/Foundation.h>
-
-#import "MTRClusterConstants.h"
-#import "MTRDevice_Internal.h"
-#import "MTRCluster_Internal.h"
-#import "MTRClusters_Internal.h"
-#import "MTRStructsObjc.h"
-#import "MTRCommandPayloadsObjc.h"
-#import "MTRLogging_Internal.h"
-#import "MTRDefines_Internal.h"
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <platform/CHIPDeviceLayer.h>
-
-#include <type_traits>
-
-using chip::Callback::Callback;
-using chip::Callback::Cancelable;
-using namespace chip::app::Clusters;
-using chip::Messaging::ExchangeManager;
-using chip::SessionHandle;
-using chip::Optional;
-using chip::System::Clock::Timeout;
-using chip::System::Clock::Seconds16;
-
-// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+{{> clusters_src_header}}
 {{#zcl_clusters}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 {{#zcl_commands}}
@@ -50,44 +24,7 @@ MTR{{cluster}}Cluster{{command}}Params
   [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
-{
-    if (params == nil) {
-        params = [[{{> paramsType}} alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        {{#if hasSpecificResponse}}
-        completion(response, error);
-        {{else}}
-        completion(error);
-        {{/if}}
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-    {{#if mustUseTimedInvoke}}
-    if (timedInvokeTimeoutMs == nil) {
-      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
-    }
-    {{/if}}
-
-    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-{{#if hasSpecificResponse}}
-                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
-{{else}}
-                                     responseClass:nil
-{{/if}}
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
+{{> clusters_command_impl cluster=cluster}}
 {{/if}}
 {{/inline}}
 {{#if (is_str_equal source 'client')}}
@@ -135,16 +72,20 @@ MTR{{cluster}}Cluster{{command}}Params
 {{/zcl_attributes_server}}
 
 @end
+{{/unless}}
 {{/if}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (compatClusterNameRemapping name))}}
 @implementation MTRCluster{{compatClusterNameRemapping name}}
 @end
 {{/if}}
 {{/unless}}
+{{/unless}}
 
 {{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 @implementation MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
@@ -215,6 +156,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{> attributeImpls attribute=(compatAttributeNameRemapping parent.name name)}}
 {{/zcl_attributes_server}}
 @end
+{{/unless}}
 {{/if}}
 
 {{/zcl_clusters}}

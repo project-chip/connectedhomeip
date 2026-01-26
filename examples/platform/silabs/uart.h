@@ -20,13 +20,19 @@
 
 #include <stdint.h>
 
+constexpr uint8_t kLogHeader     = 0x01; // ASCII Start of Heading
+constexpr uint8_t kLogFooter     = 0x04; // ASCII End of Transmission
+constexpr uint8_t kHeaderSize    = 1;
+constexpr uint8_t kFooterSize    = 1;
+constexpr uint8_t kEndOfLineSize = 2; // \r\n
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void uartConsoleInit(void);
 int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength);
-int16_t uartLogWrite(const char * log, uint16_t length);
+int16_t uartLogWrite(const char * log, uint8_t length, uint8_t category, uint64_t timestamp);
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead);
 void uartFlushTxQueue(void);
 void uartForceTransmit(const uint8_t * data, uint16_t length);
