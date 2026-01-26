@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/pavst_2_13_fifo
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/pavst_2_13_fifo --camera-test-videosrc --camera-test-audiosrc
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
