@@ -172,7 +172,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # TH checks if the Thermostat does not have a valid UTC time.
             currentUTC = await self.read_single_attribute_check_success(endpoint=0, cluster=time_cluster, attribute=time_cluster.Attributes.UTCTime)
 
-            if currentUTC is NullValue:
+            if currentUTC is NullValue or currentUTC is None:
                 has_valid_time = False
 
         if not has_valid_time:
