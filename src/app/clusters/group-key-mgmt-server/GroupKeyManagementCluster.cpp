@@ -593,8 +593,8 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCo
 
     if (fabric == nullptr)
     {
-        handler->AddStatus(request.path, Status::Failure, "Internal consistency error on access fabric!");
-        return std::nullopt;
+        ChipLogError(Zcl, "GroupKeyManagement: Failed to find fabric for index %u", handler->GetAccessingFabricIndex());
+        return CHIP_ERROR_INTERNAL;
     }
 
     const FabricIndex fabric_index = fabric->GetFabricIndex();
