@@ -22,6 +22,8 @@
  * @file EvseTargetsConfig.h
  *
  * This file contains constants needed by evse-common code that are not defined in the EVSE cluster.
+ * TODO: Move these defines back into EnergyEvseDelegateImpl.h once the EVSE cluster is converted
+ * to code driven.
  */
 
 #include <cstdint>

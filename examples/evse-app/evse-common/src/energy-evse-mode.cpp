@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <DEMConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <energy-evse-modes.h>
 
