@@ -13,8 +13,11 @@ concurrency:
 
 
 jobs:
+
+  # This test is currently disabled due to Issue #41932
   detekt:
     name: Static code analysis
+    if: false
     runs-on: ubuntu-latest
 
     steps:
