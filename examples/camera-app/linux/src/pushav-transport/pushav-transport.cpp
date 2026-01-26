@@ -29,7 +29,6 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     mAudioStreamParams(audioStreamParams),
     mVideoStreamParams(videoStreamParams)
 {
-    ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID                     = connectionID;
     mTransportStatus                  = TransportStatusEnum::kInactive;
     mActivationTimeSetByManualTrigger = false;
@@ -132,9 +131,34 @@ void PushAVTransport::ConfigureRecorderTimeSetting(
     }
 }
 
-void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
-                                                AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams)
+CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & transportOptions,
+                                                      AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams)
 {
+    uint8_t audioCodec = static_cast<uint8_t>(audioStreamParams.audioCodec);
+    if (audioCodec == 2)
+    {
+        ChipLogError(Camera, "Unknown Audio codec");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else if (audioCodec != 0)
+    {
+        ChipLogError(Camera, "Unsupported Audio codec");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    int8_t videoCodec = static_cast<uint8_t>(videoStreamParams.videoCodec);
+    if (videoCodec == 4)
+    {
+        ChipLogError(Camera, "Unknown Video codec");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else if (videoCodec != 0)
+    {
+        ChipLogError(Camera, "Unsupported Video codec");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Codecs are valid, proceed with configuration
     mClipInfo.mHasAudio = transportOptions.audioStreamID.HasValue();
     mClipInfo.mHasVideo = transportOptions.videoStreamID.HasValue();
     if (mClipInfo.mHasAudio && mClipInfo.mHasVideo)
@@ -166,7 +190,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     mTransportTriggerType = transportOptions.triggerOptions.triggerType;
 
-    uint8_t audioCodec = static_cast<uint8_t>(audioStreamParams.audioCodec);
+    // Configure audio settings
     if (audioStreamParams.channelCount == 0)
     {
         ChipLogError(Camera, "Invalid channel count: 0. Using fallback 1 channel.");
@@ -185,14 +209,6 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         mAudioInfo.mAudioTimeBase      = { 1, static_cast<int>(audioStreamParams.sampleRate) };
         mAudioInfo.mAudioFrameDuration = 20000; // Default OPUS frame duration
     }
-    else if (audioCodec == 2)
-    {
-        ChipLogError(Camera, "Unknown Audio codec")
-    }
-    else
-    {
-        ChipLogError(Camera, "Unsupported Audio codec");
-    }
 
     mAudioInfo.mSampleRate = audioStreamParams.sampleRate;
     if (audioStreamParams.bitRate == 0)
@@ -205,19 +221,11 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     mAudioInfo.mAudioDts         = 0;
     mAudioInfo.mAudioStreamIndex = -1;
 
-    int8_t VideoCodec = static_cast<uint8_t>(videoStreamParams.videoCodec);
-    if (VideoCodec == 0)
+    // Configure video settings
+    if (videoCodec == 0)
     {
         mVideoInfo.mVideoCodecId  = AV_CODEC_ID_H264;
         mVideoInfo.mVideoTimeBase = { 1, 90000 };
-    }
-    else if (VideoCodec == 4)
-    {
-        ChipLogError(Camera, "Unknown Video codec")
-    }
-    else
-    {
-        ChipLogError(Camera, "Unsupported Video codec");
     }
     mVideoInfo.mVideoPts = 0;
     mVideoInfo.mVideoDts = 0;
@@ -241,6 +249,8 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     PrintTransportSettings(mClipInfo, mAudioInfo, mVideoInfo);
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Configure Recorder Settings done !!!");
+
+    return CHIP_NO_ERROR;
 }
 
 void PushAVTransport::InitializeRecorder()
@@ -321,7 +331,7 @@ bool PushAVTransport::HandleTriggerDetected()
         elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - mClipInfo.mActivationTime).count();
     }
 
-    ChipLogDetail(Camera, "PushAVTransport HandleTriggerDetected elapsed: %ld", elapsed);
+    ChipLogDetail(Camera, "PushAVTransport HandleTriggerDetected elapsed: %" PRId64, elapsed);
 
     if (!mRecorder->GetRecorderStatus())
     {
@@ -687,9 +697,15 @@ bool PushAVTransport::CanSendAudio()
     return IsStreaming() && mClipInfo.mHasAudio;
 }
 
-void PushAVTransport::ModifyPushTransport(const TransportOptionsStorage & transportOptions)
+CHIP_ERROR PushAVTransport::ModifyPushTransport(const TransportOptionsStorage & transportOptions)
 {
-    ConfigureRecorderSettings(transportOptions, mAudioStreamParams, mVideoStreamParams);
+    CHIP_ERROR err = ConfigureRecorderSettings(transportOptions, mAudioStreamParams, mVideoStreamParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to modify push transport settings for connection %u: %s", mConnectionID, chip::ErrorStr(err));
+        return err;
+    }
+    return CHIP_NO_ERROR;
 }
 
 bool PushAVTransport::GetBusyStatus()
@@ -705,7 +721,7 @@ uint16_t PushAVTransport::GetPreRollLength()
 void PushAVTransport::StartNewSession(uint64_t newSessionID)
 {
     mClipInfo.mSessionNumber = newSessionID;
-    ChipLogProgress(Camera, "Session completed, New session started with session number [%ld]", mClipInfo.mSessionNumber);
+    ChipLogProgress(Camera, "Session completed, New session started with session number [%" PRIu64 "]", mClipInfo.mSessionNumber);
     mStreaming    = false;
     mCanSendVideo = false;
     mCanSendAudio = false;

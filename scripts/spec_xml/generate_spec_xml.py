@@ -29,7 +29,7 @@ import click
 import paths
 from lxml import etree
 
-from matter.testing.conformance import ConformanceDecision
+from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceDecision
 from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 
 log = logging.getLogger(__name__)
@@ -46,22 +46,7 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
-    "access-closure",
-    "cameras",
-    "closures",
-    "electrical-grid-conditions",
-    "energy-mtrid",
-    "energy-price",
-    "energy-tariff",
-    "irrigation-system",
-    "metering",
-    "nfcCommissioning",
-    "q-phase-2",
-    "rvc-direct-mode",
-    "rvc-go-home",
-    "soil-sensor",
-    "temperature-sensor-with-screen",
-    "tls"
+    "cameras"
 ]
 
 
@@ -431,10 +416,10 @@ def dump_ids_from_data_model_dirs():
         def device_type_support_str(d):
             log.info("checking device type for '%s' for '%s'", d.name, dir)
             dt_server_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
-                [], 0, 0).decision == ConformanceDecision.MANDATORY]
+                EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.MANDATORY]
             server_provisional = [clusters[c].name for c in dt_server_mandatory if clusters[c].is_provisional]
             dt_client_mandatory = [id for id, requirement in d.client_clusters.items(
-            ) if requirement.conformance([], 0, 0).decision == ConformanceDecision.MANDATORY]
+            ) if requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.MANDATORY]
             client_provisional = [clusters[c].name for c in dt_client_mandatory if clusters[c].is_provisional]
             if server_provisional or client_provisional:
                 log.info("Found provisional mandatory clusters server:'%s' "

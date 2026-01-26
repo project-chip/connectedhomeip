@@ -98,9 +98,17 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mTransportOptionsMap[connectionID] = transportOptions;
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
-    mTransportMap[connectionID] =
-        std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
 
+    auto transport = std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
+
+    CHIP_ERROR err = transport->ConfigureRecorderSettings(transportOptions, mAudioStreamParams, mVideoStreamParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to configure recorder settings for Connection: [%u], error: %s",
+                     connectionID, ErrorStr(err));
+        return Status::Failure;
+    }
+    mTransportMap[connectionID] = std::move(transport);
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
     mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
     mTransportMap[connectionID]->SetFabricIndex(accessingFabricIndex);
@@ -120,6 +128,8 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     uint16_t videoStreamID = -1;
     uint16_t audioStreamID = -1;
 
+    // TODO: Supporting single video stream and single audio stream. This logic need to be updated for all the streams
+    //  in future for application as part of 1.5.1
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
         videoStreamID = transportOptions.videoStreamID.Value().Value();
@@ -129,6 +139,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     {
         audioStreamID = transportOptions.audioStreamID.Value().Value();
     }
+
     ChipLogProgress(
         Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
         connectionID, videoStreamID, audioStreamID);
@@ -206,6 +217,14 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         return Status::NotFound;
     }
 
+    CHIP_ERROR err = mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to modify Connection :[%u], error: %s", connectionID,
+                     ErrorStr(err));
+        return Status::Failure;
+    }
+
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
@@ -220,7 +239,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
                   connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     mTransportOptionsMap[connectionID] = transportOptions;
-    mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
+
     ChipLogProgress(Camera, "PushAvStreamTransportManager, success to modify Connection :[%u]", connectionID);
 
     return Status::Success;
@@ -415,6 +434,44 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
             {
                 return true;
             }
+            break;
+        }
+    }
+
+    return false;
+}
+
+bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollLength,
+                                                            const DataModel::Nullable<uint16_t> & videoStreamId)
+{
+    // If the video stream ID is null, log error and return false
+    if (videoStreamId.IsNull())
+    {
+        ChipLogError(Camera, "MaxPreRollLength validation requested with null video stream ID");
+        return false;
+    }
+
+    auto & videoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+
+    if (videoStreams.empty())
+    {
+        ChipLogError(Camera, "Attempt to validate max pre-roll length when no video streams are allocated.");
+        return false;
+    }
+
+    for (const VideoStreamStruct & stream : videoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId.Value())
+        {
+            // If non-zero, Max pre roll length must be greater than or equal to key frame interval
+            if (maxPreRollLength >= stream.keyFrameInterval)
+            {
+                return true;
+            }
+            ChipLogError(Camera,
+                         "Max pre-roll length validation failed for video stream id [%u], max pre-roll length [%u], key frame "
+                         "interval [%u] ",
+                         stream.videoStreamID, maxPreRollLength, stream.keyFrameInterval);
             break;
         }
     }
@@ -635,7 +692,7 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
         }
         else
         {
-            ChipLogProgress(Camera, "Intermediate certificates fetched and stored. Size: %ld", mBufferIntermediateCerts.size());
+            ChipLogProgress(Camera, "Intermediate certificates fetched and stored. Size: %zu", mBufferIntermediateCerts.size());
         }
     }
     else
@@ -646,7 +703,7 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     const ByteSpan rawKeySpan = clientCertEntry.mCertWithKey.key.Span();
     if (rawKeySpan.size() != Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length)
     {
-        ChipLogError(Camera, "Raw key pair has incorrect size: %ld (expected %ld)", rawKeySpan.size(),
+        ChipLogError(Camera, "Raw key pair has incorrect size: %zu (expected %zu)", rawKeySpan.size(),
                      static_cast<size_t>(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length));
         return;
     }
@@ -817,4 +874,31 @@ void PushAvStreamTransportManager::SessionMonitor()
 
         std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
     }
+}
+
+bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+
+    // Look for the connection in any session
+    for (const auto & sessionPair : mSessionMap)
+    {
+        const auto & sessionInfo = sessionPair.second;
+        if (sessionInfo.activeConnectionIDs.find(connectionID) != sessionInfo.activeConnectionIDs.end())
+        {
+            sessionNumber = sessionInfo.sessionNumber;
+            return true;
+        }
+    }
+
+    // If not found in active sessions, check if we have transport options for this connection
+    auto transportIt = mTransportOptionsMap.find(connectionID);
+    if (transportIt != mTransportOptionsMap.end())
+    {
+        // For connections not in active sessions, return a default session number
+        sessionNumber = 0;
+        return true;
+    }
+
+    return false;
 }
