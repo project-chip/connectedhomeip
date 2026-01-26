@@ -90,16 +90,24 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
-
-    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
-
     const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
 
     const std::vector<chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct> & GetAllocatedAudioStreams() const override;
 
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                 const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps) override;
+
+    /**
+     * @brief Called by transports when they start using the corresponding audio and video streams.
+     *
+     */
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
+
+    /**
+     * @brief Called by transports when they release the corresponding audio and video streams.
+     *
+     */
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
 
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
