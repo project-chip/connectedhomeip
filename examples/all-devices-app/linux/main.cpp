@@ -108,7 +108,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
-    
+
     initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
     initParams.groupDataProvider             = &gGroupDataProvider;
     initParams.operationalServicePort        = CHIP_PORT;
