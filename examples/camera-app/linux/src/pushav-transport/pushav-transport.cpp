@@ -212,10 +212,11 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     mAudioInfo.mBitRate = audioStreamParams.bitRate;
     if (mClipInfo.mHasAudio)
     {
-        if (transportOptions.audioStreams.HasValue())
+        if (transportOptions.audioStreams.HasValue() && !transportOptions.audioStreams.Value().empty())
         {
             // Recoder module currently only supports one audio and one video stream
-            mAudioInfo.mAudioStreamName = transportOptions.audioStreams.Value().begin()->audioStreamName.data();
+            auto audioStreamName        = transportOptions.audioStreams.Value().begin()->audioStreamName;
+            mAudioInfo.mAudioStreamName = std::string(audioStreamName.data(), audioStreamName.size());
         }
         else
         {
@@ -245,10 +246,11 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     mVideoInfo.mBitRate   = videoStreamParams.minBitRate;
     if (mClipInfo.mHasVideo)
     {
-        if (transportOptions.videoStreams.HasValue())
+        if (transportOptions.videoStreams.HasValue() && !transportOptions.videoStreams.Value().empty())
         {
             // Recoder module currently only supports one audio and one video stream
-            mVideoInfo.mVideoStreamName = transportOptions.videoStreams.Value().begin()->videoStreamName.data();
+            auto videoStreamName        = transportOptions.videoStreams.Value().begin()->videoStreamName;
+            mVideoInfo.mVideoStreamName = std::string(videoStreamName.data(), videoStreamName.size());
         }
         else
         {
