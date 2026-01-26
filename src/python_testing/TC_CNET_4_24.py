@@ -17,8 +17,10 @@
 
 import asyncio
 import logging
+import socket
 
 from mobly import asserts
+from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -33,6 +35,11 @@ logger = logging.getLogger(__name__)
 TIMED_REQUEST_TIMEOUT_MS = 5000  # Matter command timeout (5s)
 CONNECT_NETWORK_TIMEOUT_MS = 60000  # ConnectNetwork timeout (60s - Thread needs more time to scan/fail)
 NETWORK_STATUS_UPDATE_DELAY = 5  # Delay for DUT to update LastNetworkingStatus (5s for Thread)
+MDNS_DISCOVERY_TIMEOUT = 10  # mDNS discovery timeout per attempt (10s)
+MDNS_DISCOVERY_PREP_DELAY = 5  # Delay before starting mDNS discovery (5s)
+SESSION_EXPIRY_DELAY = 5  # Delay for session expiry (5s)
+SCAN_RETRY_DELAY = 3  # Delay between scan retries (3s)
+MAX_ATTEMPTS = 3  # Maximum discovery attempts
 TIMEOUT = 300  # Overall test timeout (5 min)
 
 # Cluster references
@@ -42,6 +49,96 @@ cgen = Clusters.GeneralCommissioning
 # Thread TLV types (from Thread Operational Dataset specification)
 EXTENDED_PAN_ID_TLV_TYPE = 0x02  # 8 bytes
 NETWORK_KEY_TLV_TYPE = 0x05  # 16 bytes
+
+
+class MatterServiceListener(ServiceListener):
+    """
+    Zeroconf service listener for Matter devices.
+    Collects all discovered Matter services with optional device ID filtering.
+    """
+
+    def __init__(self, target_device_id=None):
+        self.discovered_services = []
+        self.target_device_id = target_device_id
+
+    def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:
+        info = zc.get_service_info(type_, name)
+        if info:
+            # Extract device information from mDNS service info
+            device_name = info.name
+            addresses = [socket.inet_ntoa(addr) for addr in info.addresses]
+            port = info.port
+
+            # Try to extract the device ID from the service name or properties
+            # Matter service names typically follow pattern: <device_id>-<discriminator>._matterc._udp.local.
+            device_id = None
+            if info.properties:
+                # Try D (discriminator) or DN (device name) properties
+                device_id_bytes = info.properties.get(b'D') or info.properties.get(b'DN')
+                if device_id_bytes:
+                    try:
+                        device_id = int(device_id_bytes)
+                    except (ValueError, TypeError):
+                        pass
+
+            # If target_device_id is set, filter by device ID
+            if self.target_device_id is not None:
+                if device_id != self.target_device_id:
+                    return  # Skip this service
+
+            service_dict = {
+                'name': device_name,
+                'addresses': addresses,
+                'port': port,
+                'device_id': device_id,
+                'properties': info.properties,
+            }
+
+            self.discovered_services.append(service_dict)
+            logger.info(f" --- mDNS: Discovered Matter service: {device_name} at {addresses}:{port}")
+
+    def remove_service(self, zc: Zeroconf, type_: str, name: str) -> None:
+        pass
+
+    def update_service(self, zc: Zeroconf, type_: str, name: str) -> None:
+        pass
+
+
+async def find_matter_devices_mdns(target_device_id: int = None) -> list:
+    """
+    Finds Matter devices via mDNS using zeroconf, optionally filtering by target device ID.
+    Raises an exception if no device is found after MAX_ATTEMPTS.
+    Returns the list of discovered services.
+    """
+    service_types = ["_matter._tcp.local.", "_matterc._udp.local."]
+
+    logger.info(
+        f" --- find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + str(target_device_id) if target_device_id else ''}")
+
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        logger.info(f" --- Attempt {attempt}/{MAX_ATTEMPTS}: Starting mDNS discovery...")
+        zeroconf = Zeroconf()
+        listener = MatterServiceListener(target_device_id=target_device_id)
+
+        try:
+            browsers = [ServiceBrowser(zeroconf, service_type, listener) for service_type in service_types]
+            await asyncio.sleep(MDNS_DISCOVERY_TIMEOUT)
+
+            if listener.discovered_services:
+                logger.info(
+                    f" --- find_matter_devices_mdns: Found {len(listener.discovered_services)} Matter device(s) on attempt {attempt}")
+                return listener.discovered_services
+            else:
+                logger.warning(f" --- Attempt {attempt}: No Matter devices found, retrying...")
+
+        finally:
+            zeroconf.close()
+
+        if attempt < MAX_ATTEMPTS:
+            await asyncio.sleep(SCAN_RETRY_DELAY)
+
+    raise Exception(
+        f"find_matter_devices_mdns: mDNS discovery failed after {MAX_ATTEMPTS} attempts - No Matter devices found{' for target device ID: ' + str(target_device_id) if target_device_id else ''}")
 
 
 def get_thread_tlv(dataset: bytes, tlv_type: int, expected_length: int = None) -> bytes:
@@ -290,8 +387,8 @@ class TC_CNET_4_24(MatterBaseTest):
             TestStep(14, "TH reads Networks attribute", "Verify the device is connected to the correct network"),
             TestStep(
                 15,
-                "TH sends ArmFailSafe(0) to close the fail-safe window and commit network changes",
-                "Verify that DUT sends ArmFailSafeResponse with the following fields:\n1. ErrorCode field set to OK (0)",
+                "TH sends CommissioningComplete to finalize commissioning",
+                "Verify that DUT sends CommissioningCompleteResponse with the following fields:\n1. ErrorCode field set to OK (0)",
             ),
         ]
 
@@ -333,16 +430,27 @@ class TC_CNET_4_24(MatterBaseTest):
         # Step 0: Commission device if not already done
         self.step(0)
 
+        # Modify the Thread dataset in config to use incorrect Extended PAN ID
+        # This ensures the device won't connect to Thread during commissioning and will fallback to PASE
+        original_dataset = self.matter_test_config.thread_operational_dataset
+        self.matter_test_config.thread_operational_dataset = incorrect_thread_dataset_1
+        logger.info(" --- Modified Thread dataset to incorrect Extended PAN ID for commissioning")
+        logger.info(" --- Device will fail to connect to Thread and test will run over PASE")
+
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
 
         try:
             await self.commission_devices()
-            logger.info(" --- Device commissioned successfully, now on Thread network")
+            logger.info(" --- Device commissioned successfully (not connected to Thread due to incorrect credentials)")
         except Exception as e:
             logger.error(f" --- Commissioning failed: {e}")
             asserts.fail(f"Step 0 failed: Device commissioning did not complete successfully. Error: {e}")
+        finally:
+            # Restore original correct dataset for use in later test steps
+            self.matter_test_config.thread_operational_dataset = original_dataset
+            logger.info(" --- Restored original Thread dataset for test execution")
 
         # Open a new fail-safe window (300 seconds) for network reconfiguration testing
         await self.send_single_cmd(
@@ -555,26 +663,38 @@ class TC_CNET_4_24(MatterBaseTest):
             f"Expected device to be connected to Thread network with Extended PAN ID '{correct_network_id.hex()}'",
         )
 
-        # Step 15: Close fail-safe to commit the network reconfiguration
+        # Step 15: TH sends CommissioningComplete to finalize commissioning
         self.step(15)
 
-        # Commissioning completed in Step 0 (CommissioningComplete was already sent)
-        # Close the fail-safe by sending ArmFailSafe(0) to commit the network configuration changes
-        logger.info(" --- Closing fail-safe window with ArmFailSafe(0) to commit network reconfiguration...")
+        await asyncio.sleep(MDNS_DISCOVERY_PREP_DELAY)
+
+        # Discover device on Thread network via mDNS to establish CASE session
+        logger.info(" --- Discovering device on Thread network via mDNS...")
+        discovered_devices = await find_matter_devices_mdns(self.dut_node_id)
+        logger.info(f" --- Found {len(discovered_devices)} device(s) via mDNS")
+        asserts.assert_greater(len(discovered_devices), 0,
+                               "No devices found via mDNS after Thread connection")
+
+        # Close PASE session to force CASE session establishment over Thread
+        logger.info(" --- Closing BLE connection and expiring PASE session...")
+        self.default_controller.CloseBLEConnection()
+        self.default_controller.ExpireSessions(self.dut_node_id)
+
+        await asyncio.sleep(SESSION_EXPIRY_DELAY)
+
         response = await self.send_single_cmd(
             endpoint=endpoint,
-            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=99),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS,
+            cmd=cgen.Commands.CommissioningComplete(),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
 
-        # Verify that DUT sends ArmFailSafeResponse with ErrorCode OK
-        asserts.assert_true(isinstance(response, cgen.Commands.ArmFailSafeResponse), "Expected ArmFailSafeResponse")
-        asserts.assert_equal(
-            response.errorCode,
-            cgen.Enums.CommissioningErrorEnum.kOk,
-            f"Expected ArmFailSafeResponse errorCode to be OK (0), but got {response.errorCode}",
-        )
-        logger.info(" --- Fail-safe closed successfully, network reconfiguration committed.")
+        # Verify that DUT sends CommissioningCompleteResponse with the following fields:
+        asserts.assert_true(isinstance(response, cgen.Commands.CommissioningCompleteResponse),
+                            "Expected CommissioningCompleteResponse")
+        # 1. ErrorCode field set to OK (0)
+        asserts.assert_equal(response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"Expected CommissioningCompleteResponse errorCode to be OK (0), but got {response.errorCode}")
+        logger.info(" --- CommissioningComplete command sent successfully, commissioning finalized.")
 
 
 if __name__ == "__main__":
