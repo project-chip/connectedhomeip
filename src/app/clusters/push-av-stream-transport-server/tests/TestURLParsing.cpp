@@ -102,6 +102,12 @@ public:
         return CHIP_NO_ERROR;
     }
     void SetPushAvStreamTransportServer(PushAvStreamTransportServer *) override {}
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override
+    {
+        // Mock implementation for tests - return a simple session number
+        sessionNumber = static_cast<uint64_t>(connectionID) + 1000;
+        return true;
+    }
 };
 
 class TestValidateUrlTLSDelegate : public TLSClientManagementDelegate

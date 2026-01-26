@@ -375,9 +375,9 @@ class Terminable(Protocol):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
     '--commissioning-method',
-    type=click.Choice(['on-network', 'ble-wifi'], case_sensitive=False),
+    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread'], case_sensitive=False),
     default='on-network',
-    help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. This option is Linux-only.')
+    help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. This option is Linux-only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
@@ -391,7 +391,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
-        raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
+        raise click.BadOptionUsage("--expected-failures",
+                                   f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
@@ -458,8 +459,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     # Derive boolean flags from commissioning_method parameter
     wifi_required = commissioning_method in ['ble-wifi']
+    thread_required = commissioning_method in ['ble-thread']
 
-    if wifi_required and sys.platform != "linux":
+    if (wifi_required or thread_required) and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
@@ -490,6 +492,12 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
                 to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                ble_controller_app = 0   # Bind app to the first BLE controller
+                ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif commissioning_method == 'ble-thread':
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.ThreadBorderRouter(ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 
@@ -523,6 +531,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
+                        op_network='Thread' if thread_required else 'WiFi',
                     )
                     if not dry_run:
                         test_end = time.monotonic()
@@ -535,7 +544,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         sys.exit(2)
 
             if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
+                log.error("Iteration %d: expected failure count %d, but got %d",
+                          i, expected_failures, observed_failures)
                 sys.exit(2)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")

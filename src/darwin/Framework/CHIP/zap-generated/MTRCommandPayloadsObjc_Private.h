@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "MTRStructsObjc_Private.h"
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRStructsObjc.h>

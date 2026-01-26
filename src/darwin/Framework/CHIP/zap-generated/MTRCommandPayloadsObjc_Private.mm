@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "MTRCommandPayloadsObjc_Private.h"
 #import "MTRBackwardsCompatShims.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommandPayloadExtensions_Internal.h"
