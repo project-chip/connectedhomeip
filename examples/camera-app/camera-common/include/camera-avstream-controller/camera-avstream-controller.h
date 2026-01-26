@@ -64,6 +64,18 @@ public:
     virtual void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                         const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
                                         uint32_t & outBandwidthbps) = 0;
+
+    /**
+     * @brief Called by transports when they start using the corresponding audio and video streams.
+     *
+     */
+    virtual CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
+
+    /**
+     * @brief Called by transports when they release the corresponding audio and video streams.
+     *
+     */
+    virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
 };
 
 } // namespace CameraAvStreamManagement
