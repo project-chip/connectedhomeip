@@ -361,9 +361,7 @@ source_set("required-privileges") {
   visibility = [
     # Test data models: mock models for testing
     # TODO: Some of these are questionable as they would not work as part of a monolith
-    #       (single app) test build: in particular the energy management bits seem wrong
     "${chip_root}/examples/common/server-cluster-shim:mock_data_model_with_shim",
-    "${chip_root}/examples/energy-management-app/energy-management-common",
     "${chip_root}/src/app/util/mock/*",
     "${chip_root}/src/data-model-providers/codegen/tests/*",
 

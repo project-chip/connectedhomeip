@@ -145,7 +145,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-gateway', app=HostApp.ENERGY_GATEWAY),
-        TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
+        TargetPart('evse', app=HostApp.EVSE),
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
         TargetPart('camera', app=HostApp.CAMERA),
@@ -199,7 +199,7 @@ def BuildHostTarget():
     target.AppendModifier('test', extra_tests=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ui', imgui_ui=True)
-    target.AppendModifier('evse-test-event', enable_test_event_triggers=['EVSE']).OnlyIfRe('-energy-management')
+    target.AppendModifier('evse-test-event', enable_test_event_triggers=['EVSE']).OnlyIfRe('-evse')
     target.AppendModifier('enable-dnssd-tests', enable_dnssd_tests=True).OnlyIfRe('-tests')
     target.AppendModifier('disable-dnssd-tests', enable_dnssd_tests=False).OnlyIfRe('-tests')
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
@@ -242,7 +242,7 @@ def BuildEsp32Target():
         TargetPart('all-clusters', app=Esp32App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL),
         TargetPart('energy-gateway', app=Esp32App.ENERGY_GATEWAY),
-        TargetPart('energy-management', app=Esp32App.ENERGY_MANAGEMENT),
+        TargetPart('evse', app=Esp32App.EVSE),
         TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
         TargetPart('shell', app=Esp32App.SHELL),
@@ -288,15 +288,16 @@ def BuildEfr32Target():
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
-        TargetPart('switch', app=Efr32App.SWITCH),
-        TargetPart('unit-test', app=Efr32App.UNIT_TEST),
+        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
+        TargetPart('closure', app=Efr32App.CLOSURE),
+        TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
-        TargetPart('thermostat', app=Efr32App.THERMOSTAT),
         TargetPart('pump', app=Efr32App.PUMP),
-        TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
-        TargetPart('closure', app=Efr32App.CLOSURE)
+        TargetPart('switch', app=Efr32App.SWITCH),
+        TargetPart('thermostat', app=Efr32App.THERMOSTAT),
+        TargetPart('unit-test', app=Efr32App.UNIT_TEST),
+        TargetPart('window-covering', app=Efr32App.WINDOW_COVERING),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
