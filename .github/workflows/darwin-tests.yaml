@@ -46,6 +46,7 @@ jobs:
           chip_tool: ""
     env:
       BUILD_VARIANT: ${{matrix.build_variant}}
+      PYTHON_BUILD_VENV: out/venv
 
       # We can't use the pigweed clang to build the Darwin framework once we start using
       # Swift, because it does not handle CLANG_ENABLE_MODULES correctly.
@@ -119,9 +120,18 @@ jobs:
                 build \
                 --copy-artifacts-to objdir-clone \
              "
+      - name: Build Python
+        run: |
+            ./scripts/run_in_build_env.sh \
+               "./scripts/build_python.sh \
+                  --install_virtual_env out/venv \
+                  --include_pytest_deps yes \
+                  $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
+               "
+
       - name: Run Tests
         run: |
-          ./scripts/run_in_build_env.sh \
+          ./scripts/run_in_python_env.sh ${PYTHON_BUILD_VENV} \
           "./scripts/tests/run_test_suite.py \
              --runner darwin_framework_tool_python \
              --target-skip-glob '{TestAccessControlConstraints}' \

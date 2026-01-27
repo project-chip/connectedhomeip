@@ -52,6 +52,7 @@ _abspath() {
 
 CHIP_ROOT=$(_abspath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
+PYTHON_TESTS_VENV="$CHIP_ROOT/out/venv"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 SUPPORTED_CODE=(core clusters all)
 CODE="core"
@@ -196,7 +197,7 @@ if [ "$skip_gn" == false ]; then
     if [ "$ENABLE_YAML" == true ]; then
         ninja -C "$OUTPUT_ROOT"
 
-        scripts/run_in_build_env.sh \
+        scripts/run_in_python_env.sh \"$PYTHON_TESTS_VENV\" \
             "./scripts/tests/run_test_suite.py \
              --runner chip_tool_python \
              --exclude-tags MANUAL \
