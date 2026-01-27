@@ -42,7 +42,7 @@ from modebase_cluster_check import ModeBaseClusterChecks
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 cluster_demm_mode = Clusters.DeviceEnergyManagementMode
 
@@ -97,17 +97,17 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
                     self.assert_true(False, "No Optimization cannot be combined with other optimization tags")
                 else:
                     # Success - No Optimization is not combined with other tags
-                    logger.info(
+                    log.info(
                         f'Extra Check - Mode {mode.label}: No Optimization is valid, not combined with any other optimization tags.')
             else:
                 # No Optimization tag is not found in mode
-                logger.info(f'Extra Check - {mode.label}: No Optimization tag not found.')
+                log.info(f'Extra Check - {mode.label}: No Optimization tag not found.')
 
         # Log the final result for the extra check after processing all modes
         if all_modes_valid:
-            logger.info('Extra Check: All modes passed No Optimization validation successfully.')
+            log.info('Extra Check: All modes passed No Optimization validation successfully.')
         else:
-            logger.info('Extra Check: One or more modes failed No Optimization validation.')
+            log.info('Extra Check: One or more modes failed No Optimization validation.')
 
     @property
     def default_endpoint(self) -> int:

@@ -42,6 +42,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 kRootEndpointId = 0
 kSecondaryNetworkInterfaceDeviceTypeId = 0x0019
 
@@ -78,7 +80,7 @@ class TC_CNET_1_4(MatterBaseTest):
         self.step(3)
         NumNetworkCommissioning = len(NetworkCommissioningResponse)
         if NumNetworkCommissioning == 0:
-            logging.info('No endpoint has Network Commissioning Cluster, skipping remaining steps')
+            log.info('No endpoint has Network Commissioning Cluster, skipping remaining steps')
             self.mark_all_remaining_steps_skipped(4)
             return
 
@@ -90,7 +92,7 @@ class TC_CNET_1_4(MatterBaseTest):
             asserts.assert_true(False, "There is no Network Commissioning Cluster on endpoint 0")
 
         if NumNetworkCommissioning == 1:
-            logging.info('Only endpoint 0 has Network Commissioning Cluster, skipping remaining steps')
+            log.info('Only endpoint 0 has Network Commissioning Cluster, skipping remaining steps')
             self.mark_all_remaining_steps_skipped(5)
             return
 

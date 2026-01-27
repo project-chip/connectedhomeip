@@ -18,7 +18,6 @@
 from typing import Optional
 
 import matter.clusters as Clusters
-from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, ProblemLocation, ProblemNotice,
                                             ProblemSeverity)
@@ -59,7 +58,7 @@ def warning_wrapper(override_flag: str):
     return warning_wrapper_internal
 
 
-class DefaultChecker(BasicCompositionTests):
+class DefaultChecker():
     @warning_wrapper(FLAG_PRODUCT_NAME)
     def check_default_product_name(self):
         cluster = Clusters.BasicInformation
@@ -91,7 +90,7 @@ class DefaultChecker(BasicCompositionTests):
     def check_default_calendar_format(self):
         cluster = Clusters.TimeFormatLocalization
         attr = cluster.Attributes.ActiveCalendarType
-        if cluster in self.endpoints[0].keys() and attr in self.endpoints[0][cluster].keys():
+        if cluster in self.endpoints[0] and attr in self.endpoints[0][cluster]:
             val = self.endpoints[0][cluster][attr]
             if val == cluster.Enums.CalendarTypeEnum.kBuddhist:
                 return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), "Calendar format is set to default (Buddhist)")
@@ -121,7 +120,7 @@ class DefaultChecker(BasicCompositionTests):
     def check_fixed_label_cluster_empty(self):
         cluster = Clusters.FixedLabel
         attr = cluster.Attributes.LabelList
-        if cluster in self.endpoints[0].keys():
+        if cluster in self.endpoints[0]:
             val = self.endpoints[0][cluster][attr]
             if val == []:
                 return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), "Fixed label list is empty")
@@ -133,7 +132,7 @@ class DefaultChecker(BasicCompositionTests):
     def check_fixed_label_cluster_defaults(self):
         cluster = Clusters.FixedLabel
         attr = cluster.Attributes.LabelList
-        if cluster in self.endpoints[0].keys():
+        if cluster in self.endpoints[0]:
             label_list = self.endpoints[0][cluster][attr]
 
             if any(label for label in label_list if label in DEFAULT_FIXED_LABEL_VALUES):

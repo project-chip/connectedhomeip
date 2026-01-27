@@ -44,6 +44,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 sensorTrigger = 0x0080_0000_0000_0000
 sensorUntrigger = 0x0080_0000_0000_0001
 
@@ -105,15 +107,15 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
 
         self.step(3)
         if not is_sprs_feature_supported:
-            logging.info("AlarmSuppress feature not supported skipping test case")
+            log.info("AlarmSuppress feature not supported skipping test case")
 
             # Skipping all remainig steps
             for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
                 self.step(step.test_plan_number)
-                logging.info("Test step skipped")
+                log.info("Test step skipped")
 
             return
-        logging.info("Test step skipped")
+        log.info("Test step skipped")
 
         self.step(4)
         enabledAlarms = 0
@@ -122,13 +124,13 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
         if is_vis_feature_supported:
             enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("5b")
         if is_aud_feature_supported:
             enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step("5c")
         try:
@@ -145,7 +147,7 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(7)
         if is_vis_feature_supported:
@@ -155,14 +157,14 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(8)
         if is_vis_feature_supported:
             alarms_suppressed_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
             asserts.assert_not_equal((alarms_suppressed_dut & 0b01), 0, "Bit 0 in AlarmsSuppressed is not 1")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(9)
         if is_aud_feature_supported:
@@ -172,14 +174,14 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(10)
         if is_aud_feature_supported:
             alarms_suppressed_dut = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSuppressed)
             asserts.assert_not_equal((alarms_suppressed_dut & 0b10), 0, "Bit 1 in AlarmsSuppressed is not 1")
         else:
-            logging.info("Test step skipped")
+            log.info("Test step skipped")
 
         self.step(11)
         if is_vis_feature_supported or is_aud_feature_supported:

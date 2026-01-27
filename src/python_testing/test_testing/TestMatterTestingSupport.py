@@ -132,7 +132,7 @@ class TestMatterTestingSupport(MatterBaseTest):
     @async_test_body
     async def test_type_checking(self):
         vals = get_raw_type_list()
-        for k in vals.keys():
+        for k in vals:
             run_all_match_tests_for_type(k)
 
     @async_test_body
@@ -570,8 +570,8 @@ class TestMatterTestingSupport(MatterBaseTest):
         problems = find_tag_list_problems(roots, device_types, simple)
         # expect this problem reported on both 2 and 3 endpoints
         expected_problem = TagProblem(root=1, missing_attribute=False, missing_feature=False, duplicates={2, 3}, same_tag={2, 3})
-        asserts.assert_true(2 in problems.keys(), "Missing problem report for ep2")
-        asserts.assert_true(3 in problems.keys(), "Missing problem report for ep3")
+        asserts.assert_true(2 in problems, "Missing problem report for ep2")
+        asserts.assert_true(3 in problems, "Missing problem report for ep3")
         asserts.assert_equal(problems[2], expected_problem, "Problem report for simple EP2 is not as expected")
         asserts.assert_equal(problems[3], expected_problem, "Problem report for simple EP3 is not as expected")
 

@@ -262,7 +262,7 @@ DEFAULT_ATTRIBUTEWRITE_APPID = 0
 
 def _GetCommandStatus(commandHandle: int):
     with _commandStatusLock:
-        return _commandStatusDict.get(commandHandle, None)
+        return _commandStatusDict.get(commandHandle)
 
 
 def _GetCommandIndexStatus(commandHandle: int, commandIndex: int):
@@ -396,9 +396,9 @@ def GetCommandSenderHandle() -> int:
 
 def GetAttributeReadResponse(appId: int) -> AttributeReadResult:
     with _attributeDictLock:
-        return _attributeDict.get(appId, None)
+        return _attributeDict.get(appId)
 
 
 def GetAttributeWriteResponse(appId: int) -> AttributeWriteResult:
     with _writeStatusDictLock:
-        return _writeStatusDict.get(appId, None)
+        return _writeStatusDict.get(appId)

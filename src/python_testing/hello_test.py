@@ -43,6 +43,8 @@ from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
 from matter.testing.runner import default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class HelloTest(MatterBaseTest):
     # This example test does not include the step_ and desc_ markers
@@ -60,7 +62,7 @@ class HelloTest(MatterBaseTest):
             Clusters.BasicInformation.Attributes.VendorName
         )
 
-        logging.info("Found VendorName: %s" % (vendor_name))
+        log.info("Found VendorName: %s" % (vendor_name))
         asserts.assert_equal(vendor_name, "TEST_VENDOR", "VendorName must be TEST_VENDOR!")
 
     # To include individual steps and description for the TH, define a steps_ and desc_ function

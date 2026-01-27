@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_FAN_3_5(MatterBaseTest):
@@ -88,7 +88,7 @@ class TC_FAN_3_5(MatterBaseTest):
     @async_test_body
     async def test_TC_FAN_3_5(self):
         if not self.check_pics("FAN.S.F04"):
-            logger.info("Test skipped because PICS FAN.S.F04 is not set")
+            log.info("Test skipped because PICS FAN.S.F04 is not set")
             return
 
         endpoint = self.get_endpoint()

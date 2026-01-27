@@ -87,31 +87,28 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             index = app_args.index('--crash_log')
             fileName = app_args[index + 1]
             log.info("Crash Log FileName: '%s'", fileName)
-            f = open(fileName, 'w')
-            for i in range(1, 1000):
-                data = "%d\n" % i
-                f.write(data)
-            f.close()
+            with open(fileName, 'w') as f:
+                for i in range(1, 1000):
+                    data = "%d\n" % i
+                    f.write(data)
 
         if '--network_diagnostics_log' in app_args:
             index = app_args.index('--network_diagnostics_log')
             fileName = app_args[index + 1]
             log.info("Network Diag Log FileName: '%s'", fileName)
-            f = open(fileName, 'w')
-            for i in range(1, 500):
-                data = "%d\n" % i
-                f.write(data)
-            f.close()
+            with open(fileName, 'w') as f:
+                for i in range(1, 500):
+                    data = "%d\n" % i
+                    f.write(data)
 
         if '--end_user_support_log' in app_args:
             index = app_args.index('--end_user_support_log')
             fileName = app_args[index + 1]
             log.info("EndUser Support Log FileName: '%s'", fileName)
-            f = open(fileName, 'w')
-            for i in range(1, 10):
-                data = "%d\n" % i
-                f.write(data)
-            f.close()
+            with open(fileName, 'w') as f:
+                for i in range(1, 10):
+                    data = "%d\n" % i
+                    f.write(data)
 
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)

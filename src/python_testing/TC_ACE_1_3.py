@@ -42,6 +42,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 def acl_subject(cat: int) -> int:
     return 0xFFFFFFFD00000000 | cat
@@ -142,7 +144,7 @@ class TC_ACE_1_3(MatterBaseTest):
         cat2v1 = cat2_id | 0x0001
         cat2v2 = cat2_id | 0x0002
         cat2v3 = cat2_id | 0x0003
-        logging.info('cat1v1 0x%x', cat1v1)
+        log.info('cat1v1 0x%x', cat1v1)
 
         self.step(1)
 

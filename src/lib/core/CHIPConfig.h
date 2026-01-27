@@ -738,6 +738,16 @@
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_TRACING_BACKENDS
+ *
+ * @brief The maximum number of tracing backends that can be registered.
+ * This value only takes effect if tracing is enabled at all.
+ */
+#ifndef CHIP_CONFIG_MAX_TRACING_BACKENDS
+#define CHIP_CONFIG_MAX_TRACING_BACKENDS 4
+#endif
+
+/**
  * @def CHIP_CONFIG_ENABLE_ARG_PARSER
  *
  * @brief Enable support functions for parsing command-line arguments

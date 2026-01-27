@@ -89,6 +89,17 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
+    created_codes = []
+    for idx, discriminator in enumerate(matter_test_config.discriminators):
+        created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
+
+    setup_codes = matter_test_config.qr_code_content + matter_test_config.manual_code + created_codes
+    if not setup_codes:
+        return None
+    return setup_codes[0]
+
+
 @dataclass
 class AttributeValue:
     endpoint_id: int
@@ -206,7 +217,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.stored_global_wildcard = None
 
     def teardown_class(self):
-        """Final teardown after all tests: log all problems.
+        """Final teardown after all tests: log all problems and dump device attributes if available.
             Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
              This function is called only once per class. To perform teardown after each test, use teardown_test.
              Test authors that implement steps in this function need to be careful of step handling if there is
@@ -216,6 +227,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
         if len(self.problems) > 0:
+            # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
+            if self.matter_test_config.debug:
+                self._dump_device_attributes_on_failure()
+
             LOGGER.info("###########################################################")
             LOGGER.info("Problems found:")
             LOGGER.info("===============")
@@ -223,6 +238,41 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
         super().teardown_class()
+
+    def _dump_device_attributes_on_failure(self):
+        """
+        Dump device attribute data when problems are found for debugging purposes.
+
+        This method attempts to generate a device attribute dump if the test has
+        collected endpoint data.
+        """
+        try:
+            # Check if we have endpoints_tlv data (from BasicCompositionTests or similar)
+            if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
+                # Check if we have the dump_wildcard method (from BasicCompositionTests)
+                if hasattr(self, 'dump_wildcard'):
+                    _, txt_str = self.dump_wildcard(None)
+                    # Only dump the text format - it's more readable for debugging
+                    self.log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+        except (AttributeError, KeyError, ValueError, TypeError):
+            # Don't let data access or serialization errors interfere with the original test failure
+            pass
+
+    def log_structured_data(self, start_tag: str, dump_string: str):
+        """Log structured data with a clear start and end marker.
+
+        This function is used to output device attribute dumps and other structured
+        data to logs in a format that can be easily extracted for debugging.
+
+        Args:
+            start_tag: A prefix tag to identify the type of data being logged
+            dump_string: The data to be logged
+        """
+        lines = dump_string.splitlines()
+        LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+        for line in lines:
+            LOGGER.info(f'{start_tag}{line}')
+        LOGGER.info(f'{start_tag}END ====')
 
     def setup_test(self):
         """Set up for each individual test execution.
@@ -310,7 +360,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 if not trace:
                     return no_stack_trace
 
-                if isinstance(exception, signals.TestError) or isinstance(exception, signals.TestFailure):
+                if isinstance(exception, (signals.TestError, signals.TestFailure)):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
                     assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
@@ -438,6 +488,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
+
+    @property
+    def first_setup_code(self) -> Optional[str]:
+        return get_first_setup_code(self.default_controller, self.matter_test_config)
 
     @property
     def is_pics_sdk_ci_only(self) -> bool:
@@ -1359,7 +1413,7 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
         Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
     ])
-    return [e for e in wildcard.attributes.keys()
+    return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
 
 

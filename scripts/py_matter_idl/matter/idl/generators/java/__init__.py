@@ -264,10 +264,7 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
     global_name = FieldToGlobalName(field, context)
-    if global_name:
-        return True
-
-    return False
+    return bool(global_name)
 
 
 def attributesWithSupportedCallback(attrs, context: TypeLookupContext):

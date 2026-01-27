@@ -29,7 +29,7 @@ using namespace Messaging;
 using namespace System::Clock::Literals;
 
 // TODO: #35369 Refactor the classes below to Fixtures once Errors related to FuzzTest Fixtures are resolved
-class FuzzLoopbackMessagingContext : public chip::Test::MessagingContext
+class FuzzLoopbackMessagingContext : public chip::Testing::MessagingContext
 {
 public:
     ~FuzzLoopbackMessagingContext() {}
@@ -53,7 +53,7 @@ public:
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         // Instantiate the LoopbackTransportManager.
         ASSERT_EQ(spLoopbackTransportManager, nullptr);
-        spLoopbackTransportManager = new chip::Test::LoopbackTransportManager();
+        spLoopbackTransportManager = new chip::Testing::LoopbackTransportManager();
         ASSERT_NE(spLoopbackTransportManager, nullptr);
         // Initialize the LoopbackTransportManager.
         ASSERT_EQ(spLoopbackTransportManager->Init(), CHIP_NO_ERROR);
@@ -80,9 +80,9 @@ public:
     // Performs teardown for each individual test in the test suite
     void TearDown() { MessagingContext::Shutdown(); }
 
-    static chip::Test::LoopbackTransportManager * spLoopbackTransportManager;
+    static chip::Testing::LoopbackTransportManager * spLoopbackTransportManager;
 };
-chip::Test::LoopbackTransportManager * FuzzLoopbackMessagingContext::spLoopbackTransportManager = nullptr;
+chip::Testing::LoopbackTransportManager * FuzzLoopbackMessagingContext::spLoopbackTransportManager = nullptr;
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
@@ -169,7 +169,7 @@ private:
     SessionManager mSessionManager;
 };
 
-class PASETestLoopbackTransportDelegate : public Test::LoopbackTransportDelegate
+class PASETestLoopbackTransportDelegate : public chip::Testing::LoopbackTransportDelegate
 {
 public:
     void OnMessageDropped() override { mMessageDropped = true; }

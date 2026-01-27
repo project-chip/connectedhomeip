@@ -123,7 +123,7 @@ public:
      */
     template <size_t kEntryMaxBytes>
     CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data,
-                             PersistentStore<kEntryMaxBytes> & writeBuffer);
+                             PersistenceBuffer<kEntryMaxBytes> & writeBuffer);
 
     /**
      * @brief Loads the entry from persistent storage.
@@ -136,7 +136,7 @@ public:
      */
     template <size_t kEntryMaxBytes>
     CHIP_ERROR GetTableEntry(FabricIndex fabric_index, StorageId & entry_id, StorageData & data,
-                             PersistentStore<kEntryMaxBytes> & buffer);
+                             PersistenceBuffer<kEntryMaxBytes> & buffer);
     CHIP_ERROR FindTableEntry(FabricIndex fabric_index, const StorageId & entry_id, EntryIndex & idx);
     CHIP_ERROR RemoveTableEntry(FabricIndex fabric_index, const StorageId & entry_id);
     CHIP_ERROR RemoveTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, EntryIndex entry_idx);
@@ -164,7 +164,7 @@ public:
      * and IterateEntries returns that same error result.
      */
     template <size_t kEntryMaxBytes, class UnaryFunc>
-    CHIP_ERROR IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store, UnaryFunc iterateFn);
+    CHIP_ERROR IterateEntries(FabricIndex fabric, PersistenceBuffer<kEntryMaxBytes> & buffer, UnaryFunc iterateFn);
 
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for entries per fabric and global, which
@@ -188,14 +188,14 @@ protected:
     {
     public:
         EntryIteratorImpl(FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxEntriesPerFabric,
-                          uint16_t maxEntriesPerEndpoint, PersistentStore<kEntryMaxBytes> & store);
+                          uint16_t maxEntriesPerEndpoint, PersistenceBuffer<kEntryMaxBytes> & buffer);
         size_t Count() override;
         bool Next(TableEntry & output) override;
         void Release() override;
 
     protected:
         FabricTableImpl & mProvider;
-        PersistentStore<kEntryMaxBytes> & mStore;
+        PersistenceBuffer<kEntryMaxBytes> & mBuffer;
         FabricIndex mFabric  = kUndefinedFabricIndex;
         EndpointId mEndpoint = kInvalidEndpointId;
         EntryIndex mNextEntryIdx;

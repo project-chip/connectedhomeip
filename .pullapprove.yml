@@ -109,6 +109,14 @@ groups:
       teams: [reviewers-comcast]
     reviews:
       request: 0 # Do not auto-add
+  shared-reviewers-cablelabs:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-cablelabs]
+    reviews:
+      request: 0 # Do not auto-add
   shared-reviewers-dyson:
     type: optional
     conditions:

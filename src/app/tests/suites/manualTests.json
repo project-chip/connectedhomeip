@@ -76,7 +76,6 @@
         "Test_TC_DISHM_3_3"
     ],
     "DeviceManagement": [
-        "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
         "Test_TC_OPCREDS_3_3",
         "Test_TC_OPCREDS_3_6",
@@ -264,10 +263,7 @@
     "PumpConfigurationControl": [],
     "AccessControl": [],
     "UserLabel": [],
-    "BridgedDeviceBasicInformation": [
-        "Test_TC_BRBINFO_2_2",
-        "Test_TC_BRBINFO_3_1"
-    ],
+    "BridgedDeviceBasicInformation": ["Test_TC_BRBINFO_2_2"],
     "LaundryWasherControl": [],
     "OvenMode": ["Test_TC_OTCCM_1_2", "Test_TC_OTCCM_3_2", "Test_TC_OTCCM_3_3"],
     "AccessControlEnforcement": [],

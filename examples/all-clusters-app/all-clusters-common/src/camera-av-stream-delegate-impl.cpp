@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <camera-av-stream-delegate-impl.h>
 #include <fstream>
 #include <iostream>
@@ -41,7 +41,7 @@ using chip::Protocols::InteractionModel::Status;
 std::unique_ptr<CameraAVStreamManager> sCameraAVStreamMgrInstance;
 
 // Global pointer to Camera AVStream Mgmt Server SDK cluster;
-std::unique_ptr<CameraAVStreamMgmtServer> sCameraAVStreamMgmtClusterServerInstance;
+std::unique_ptr<CameraAVStreamManagementCluster> sCameraAVStreamMgmtClusterServerInstance;
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
@@ -385,7 +385,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
     std::vector<StreamUsageEnum> streamUsagePriorities           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
-    sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
+    sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamManagementCluster>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
         spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,

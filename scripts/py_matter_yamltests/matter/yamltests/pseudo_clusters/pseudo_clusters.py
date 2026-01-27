@@ -30,7 +30,7 @@ class PseudoClusters:
         self.clusters = clusters
 
     def supports(self, request) -> bool:
-        return False if self.__get_command(request) is None else True
+        return self.__get_command(request) is not None
 
     def is_manual_step(self, request):
         return ((request.cluster == LogCommands().name and

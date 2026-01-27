@@ -61,7 +61,7 @@ struct TestElectricalEnergyMeasurementClusterBackwardsCompatibility : public ::t
 
     void TearDown() override { chip::app::EventManagement::DestroyEventManagement(); }
 
-    chip::Test::TestServerClusterContext mContext;
+    Testing::TestServerClusterContext mContext;
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 

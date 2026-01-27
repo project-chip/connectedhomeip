@@ -36,7 +36,7 @@ class BundleBuilder:
 
         log.info("Creating bundle '%s':", self.outputName)
 
-        self.output = tarfile.open(self.outputName, 'w:xz')
+        self.output = tarfile.open(self.outputName, "w:xz")  # noqa: SIM115
 
     def appendFile(self, name):
         """Appends the specified file in the working directory to the bundle."""
@@ -99,7 +99,7 @@ def main():
     bundle = BundleBuilder(args.bundle_name, args.bundle_name,
                            args.working_directory)
 
-    with open(args.bundle_files, 'rt') as bundleInputs:
+    with open(args.bundle_files) as bundleInputs:
         for fileName in bundleInputs.readlines():
             bundle.appendFile(fileName.strip())
 

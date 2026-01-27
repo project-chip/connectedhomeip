@@ -42,7 +42,6 @@
 # === END CI TEST ARGUMENTS ===
 
 
-import logging
 from typing import List
 
 from mobly import asserts
@@ -53,8 +52,6 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityTariff
 

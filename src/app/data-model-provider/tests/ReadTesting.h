@@ -28,7 +28,6 @@
 #include <vector>
 
 namespace chip {
-namespace app {
 namespace Testing {
 
 /// Contains information about a single parsed item inside an attribute data IB
@@ -117,7 +116,7 @@ public:
             return *this;
         }
 
-        EncodingParams & SetEncodingState(const AttributeEncodeState & state)
+        EncodingParams & SetEncodingState(const app::AttributeEncodeState & state)
         {
             mAttributeEncodeState = state;
             return *this;
@@ -125,22 +124,22 @@ public:
 
         chip::DataVersion GetDataVersion() const { return mDataVersion; }
         bool GetIsFabricFiltered() const { return mIsFabricFiltered; }
-        const AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncodeState; }
+        const app::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncodeState; }
 
     private:
         chip::DataVersion mDataVersion = 0x1234;
         bool mIsFabricFiltered         = false;
-        AttributeEncodeState mAttributeEncodeState;
+        app::AttributeEncodeState mAttributeEncodeState;
     };
 
-    ReadOperation(const ConcreteAttributePath & path)
+    ReadOperation(const app::ConcreteAttributePath & path)
     {
         mRequest.path              = path;
         mRequest.subjectDescriptor = &kDenySubjectDescriptor;
     }
 
     ReadOperation(EndpointId endpoint, ClusterId cluster, AttributeId attribute) :
-        ReadOperation(ConcreteAttributePath(endpoint, cluster, attribute))
+        ReadOperation(app::ConcreteAttributePath(endpoint, cluster, attribute))
     {}
 
     ReadOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
@@ -150,14 +149,14 @@ public:
         return *this;
     }
 
-    ReadOperation & SetReadFlags(const BitFlags<DataModel::ReadFlags> & flags)
+    ReadOperation & SetReadFlags(const BitFlags<app::DataModel::ReadFlags> & flags)
     {
         VerifyOrDie(mState == State::kInitializing);
         mRequest.readFlags = flags;
         return *this;
     }
 
-    ReadOperation & SetOperationFlags(const BitFlags<DataModel::OperationFlags> & flags)
+    ReadOperation & SetOperationFlags(const BitFlags<app::DataModel::OperationFlags> & flags)
     {
         VerifyOrDie(mState == State::kInitializing);
         mRequest.operationFlags = flags;
@@ -176,7 +175,7 @@ public:
     /// The input attribute encoding state will be attached to the returned value encoded (so that
     /// encoding for list elements is possible)
     ///
-    std::unique_ptr<AttributeValueEncoder> StartEncoding(const EncodingParams & params = EncodingParams());
+    std::unique_ptr<app::AttributeValueEncoder> StartEncoding(const EncodingParams & params = EncodingParams());
 
     /// Completes the encoding and finalizes the undelying AttributeReport.
     ///
@@ -185,7 +184,7 @@ public:
     CHIP_ERROR FinishEncoding();
 
     /// Get the underlying read request (i.e. path and flags) for this request
-    const DataModel::ReadAttributeRequest & GetRequest() const { return mRequest; }
+    const app::DataModel::ReadAttributeRequest & GetRequest() const { return mRequest; }
 
     /// Once encoding has finished, you can get access to the underlying
     /// written data via GetEncodedIBs.
@@ -205,13 +204,12 @@ private:
     };
     State mState = State::kInitializing;
 
-    DataModel::ReadAttributeRequest mRequest;
+    app::DataModel::ReadAttributeRequest mRequest;
 
     // encoded-used classes
     EncodedReportIBs mEncodedIBs;
-    AttributeReportIBs::Builder mAttributeReportIBsBuilder;
+    app::AttributeReportIBs::Builder mAttributeReportIBsBuilder;
 };
 
 } // namespace Testing
-} // namespace app
 } // namespace chip

@@ -41,6 +41,8 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_VALCC_4_3(MatterBaseTest):
     async def read_valcc_attribute_expect_success(self, endpoint, attribute):
@@ -87,32 +89,32 @@ class TC_VALCC_4_3(MatterBaseTest):
 
         self.step("2b")
         if not is_ts_feature_supported:
-            logging.info("TimeSync feature not supported skipping test case")
+            log.info("TimeSync feature not supported skipping test case")
 
             # Skipping all remainig steps
             for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
                 self.step(step.test_plan_number)
-                logging.info("Test step skipped")
+                log.info("Test step skipped")
 
             return
 
-        logging.info("Test step skipped")
+        log.info("Test step skipped")
 
         self.step("3a")
         utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
 
         self.step("3b")
         if utcTime is not NullValue:
-            logging.info("UTCTime is not null, skipping test case")
+            log.info("UTCTime is not null, skipping test case")
 
             # Skipping all remainig steps
             for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
                 self.step(step.test_plan_number)
-                logging.info("Test step skipped")
+                log.info("Test step skipped")
 
             return
 
-        logging.info("Test step skipped")
+        log.info("Test step skipped")
 
         self.step(4)
         try:

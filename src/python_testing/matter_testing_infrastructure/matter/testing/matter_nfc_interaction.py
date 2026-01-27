@@ -4,7 +4,7 @@ import ndef
 from mobly import asserts
 from smartcard.System import readers
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 # NFC transmission success status words
 NFC_SUCCESS_SW1 = 0x90
@@ -266,7 +266,7 @@ def _read_nfc_tag_data(reader_objects: list, nfc_reader_index: int):
         try:
             reader_connection_object.disconnect()
         except Exception as e:
-            logger.warning(f"Disconnect Failed Due to Reason: {e}")  # Ignore disconnect errors
+            log.warning(f"Disconnect Failed Due to Reason: {e}")  # Ignore disconnect errors
 
 
 def connect_read_nfc_tag_data(nfc_reader_index: int) -> str:

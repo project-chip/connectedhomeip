@@ -46,7 +46,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/occupancy-sensing-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",

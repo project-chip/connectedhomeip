@@ -56,6 +56,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 '''
 Purpose
 The purpose of this test case is to verify that a Matter node is discoverable
@@ -124,14 +126,14 @@ class TC_SC_4_3(MatterBaseTest):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
         if log_result:
-            logging.info(f"\n\n\tDUT Instance Name: {instance_name}\n")
+            log.info(f"\n\n\tDUT Instance Name: {instance_name}\n")
         return instance_name
 
     def get_operational_subtype(self, log_result: bool = False) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
         if log_result:
-            logging.info(f"\n\n\tOperational Subtype: {operational_subtype}\n")
+            log.info(f"\n\n\tOperational Subtype: {operational_subtype}\n")
         return operational_subtype
 
     @staticmethod
@@ -160,7 +162,7 @@ class TC_SC_4_3(MatterBaseTest):
             return True, 'T is not provided or required'
 
         t_value = operational_record.txt['T']
-        logging.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
+        log.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
             assert_valid_t_key(t_value, enforce_provisional=False)
@@ -201,7 +203,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # Check if ep0_servers contain the ICD Management cluster ID (0x0046)
         supports_icd = Clusters.IcdManagement.id in ep0_servers
-        logging.info(f"supports_icd: {supports_icd}")
+        log.info(f"supports_icd: {supports_icd}")
 
         # *** STEP 3 ***
         # If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves
@@ -209,7 +211,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(3)
         if supports_icd:
             active_mode_threshold_ms = await self.get_idle_mode_threshhold_ms()
-        logging.info(f"active_mode_threshold_ms: {active_mode_threshold_ms}")
+        log.info(f"active_mode_threshold_ms: {active_mode_threshold_ms}")
 
         # *** STEP 4 ***
         # If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature
@@ -219,7 +221,7 @@ class TC_SC_4_3(MatterBaseTest):
             feature_map = await self.get_icd_feature_map()
             LITS = Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
             supports_lit = bool(feature_map & LITS == LITS)
-            logging.info(f"kLongIdleTimeSupport set: {supports_lit}")
+            log.info(f"kLongIdleTimeSupport set: {supports_lit}")
 
         # *** STEP 5 ***
         # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
@@ -285,14 +287,14 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(9)
 
         def txt_has_key(key: str):
-            return txt_record_returned and key in txt_record.txt.keys()
+            return txt_record_returned and key in txt_record.txt
 
         # Verify hostname character length (12 or 16)
         assert_valid_hostname(srv_record.hostname)
 
         # ICD TXT KEY
         if supports_lit:
-            logging.info("supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII).")
+            log.info("supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII).")
 
             # Verify the ICD key IS present
             asserts.assert_true(txt_has_key('ICD'), "ICD key is NOT present in the TXT record.")
@@ -300,7 +302,7 @@ class TC_SC_4_3(MatterBaseTest):
             # Verify it has the value of 0 or 1 (ASCII)
             assert_valid_icd_key(txt_record.txt['ICD'])
         else:
-            logging.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
+            log.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
             if txt_record_returned:
                 asserts.assert_not_in('ICD', txt_record.txt, "ICD key is present in the TXT record.")
 
@@ -318,28 +320,28 @@ class TC_SC_4_3(MatterBaseTest):
             sit_mode = False
 
         if sit_mode:
-            logging.info("sit_mode is True, verify the SII key IS present.")
+            log.info("sit_mode is True, verify the SII key IS present.")
             asserts.assert_true(txt_has_key('SII'), "SII key is NOT present in the TXT record.")
 
-            logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
+            log.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             assert_valid_sii_key(txt_record.txt['SII'])
 
         # SAI TXT KEY
         if supports_icd:
-            logging.info("supports_icd is True, verify the SAI key IS present.")
+            log.info("supports_icd is True, verify the SAI key IS present.")
             asserts.assert_true(txt_has_key('SAI'), "SAI key is NOT present in the TXT record.")
 
-            logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
+            log.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             assert_valid_sai_key(txt_record.txt['SAI'])
 
         # SAT TXT KEY
         if txt_has_key('SAT'):
-            logging.info(
+            log.info(
                 "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
             assert_valid_sat_key(txt_record.txt['SAT'])
 
             if supports_icd:
-                logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
+                log.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
                 asserts.assert_equal(int(txt_record.txt['SAT']), active_mode_threshold_ms)
 
         # T TXT KEY
@@ -347,7 +349,7 @@ class TC_SC_4_3(MatterBaseTest):
         asserts.assert_true(result, message)
 
         # Verify the AAAA records contain a valid IPv6 address
-        logging.info("Verify the AAAA record contains a valid IPv6 address")
+        log.info("Verify the AAAA record contains a valid IPv6 address")
         ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
         assert_valid_ipv6_addresses(ipv6_addresses)
 

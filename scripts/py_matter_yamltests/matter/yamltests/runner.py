@@ -147,7 +147,7 @@ class TestRunner(TestRunnerBase):
                 continue
 
             result = await self._run_with_timeout(parser, runner_config)
-            if isinstance(result, Exception) or isinstance(result, CancelledError):
+            if isinstance(result, (Exception, CancelledError)):
                 raise (result)
             if not result:
                 return False
