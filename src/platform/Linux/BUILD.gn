@@ -47,6 +47,7 @@ static_library("Linux") {
     "../DeviceSafeQueue.h",
     "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
+    "../SingletonConnectivityManager.cpp",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPLinuxStorage.cpp",
