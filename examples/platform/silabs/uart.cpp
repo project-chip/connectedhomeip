@@ -165,13 +165,19 @@ static osThreadId_t sUartTaskHandle;
 constexpr uint32_t kUartTaskSize = 1024;
 static uint8_t uartStack[kUartTaskSize];
 static osThread_t sUartTaskControlBlock;
-constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
-                                           .attr_bits  = osThreadDetached,
-                                           .cb_mem     = &sUartTaskControlBlock,
-                                           .cb_size    = osThreadCbSize,
-                                           .stack_mem  = uartStack,
-                                           .stack_size = kUartTaskSize,
-                                           .priority   = osPriorityRealtime6 }; // Must be above Matter Task priority
+constexpr osThreadAttr_t kUartTaskAttr = {
+    .name       = "UART",
+    .attr_bits  = osThreadDetached,
+    .cb_mem     = &sUartTaskControlBlock,
+    .cb_size    = osThreadCbSize,
+    .stack_mem  = uartStack,
+    .stack_size = kUartTaskSize,
+#if SLI_SI91X_MCU_INTERFACE
+    .priority = osPriorityBelowNormal, // for SOC, must be below Matter Task priority
+#else
+    .priority = osPriorityRealtime6, // Must be above Matter Task priority
+#endif // SLI_SI91X_MCU_INTERFACE
+}; // Must be above Matter Task priority
 
 static uint32_t sMissedLogCount = 0; // Count of logs that were not sent to the UART due to queue full
 
