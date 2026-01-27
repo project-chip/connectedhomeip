@@ -194,13 +194,8 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
 
     WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
 
-    // Register for the first stream in the list for now, or iterate?
-    // Assuming MediaController handles single stream per transport or we need to call it multiple times.
-    // Given the previous signature was (transport, videoID, audioID), we take the first available.
-    uint16_t videoStreamID = args.videoStreams.empty() ? 0 : args.videoStreams[0];
-    uint16_t audioStreamID = args.audioStreams.empty() ? 0 : args.audioStreams[0];
-
-    mMediaController->RegisterTransport(transport, videoStreamID, audioStreamID);
+    // Register all video and audio streams for this transport
+    mMediaController->RegisterTransport(transport, args.videoStreams, args.audioStreams);
 }
 
 void WebRTCProviderManager::UnregisterWebrtcTransport(uint16_t sessionId)
