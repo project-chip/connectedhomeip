@@ -328,16 +328,5 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 
 #endif
 
-/**
- * Returns the platform-specific implementation of the ConnectivityManager singleton object.
- *
- * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
- */
-inline ConnectivityManagerImpl & ConnectivityMgrImpl()
-{
-    return ConnectivityManagerImpl::GetDefaultInstance();
-}
-
 } // namespace DeviceLayer
 } // namespace chip
