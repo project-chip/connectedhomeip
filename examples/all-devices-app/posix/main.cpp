@@ -60,6 +60,9 @@ void StopSignalHandler(int /* signal */)
     else
     {
         Server::GetInstance().GenerateShutDownEvent();
+        // Usage of VerifyOrDie in the nested lambda instead of SuccessOrDie is intentional:
+        // The SuccessOrDie macro uses a `__err` assignment and some compilers complain about
+        // variable shadowing.
         SuccessOrDie(SystemLayer().ScheduleLambda([]() { VerifyOrDie(PlatformMgr().StopEventLoopTask() == CHIP_NO_ERROR); }));
     }
 }
@@ -148,7 +151,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     static chip::CommonCaseDeviceServerInitParams initParams;
 
-    VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
+    SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
@@ -205,11 +208,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
 
     uint16_t discriminator = 0;
-    VerifyOrDie(GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator) == CHIP_NO_ERROR);
+    SuccessOrDie(GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
     payload.discriminator.SetLongValue(discriminator);
 
-    VerifyOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(payload.vendorID) == CHIP_NO_ERROR);
-    VerifyOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(payload.productID) == CHIP_NO_ERROR);
+    SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(payload.vendorID));
+    SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(payload.productID));
     PrintOnboardingCodes(payload);
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());

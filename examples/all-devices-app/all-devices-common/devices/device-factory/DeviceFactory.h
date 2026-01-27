@@ -85,6 +85,9 @@ private:
 
     DeviceFactory()
     {
+        // NOTE: context is set in `::Init`, so each lambda checks its
+        //       existence separately. `Init` must be called before mRegistry
+        //       factories are usable.
         mRegistry["contact-sensor"] = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<BooleanStateSensorDevice>(
