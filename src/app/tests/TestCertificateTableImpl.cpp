@@ -17,8 +17,11 @@
  */
 
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
+
+#include <app/InteractionModelEngine.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 #include <lib/core/StringBuilderAdapters.h>
@@ -63,9 +66,11 @@ public:
     static void SetUpTestSuite()
     {
         mpTestStorage = new chip::TestPersistentStorageDelegate;
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
         ASSERT_NE(mpTestStorage, nullptr);
         ASSERT_EQ(sCertificateTable.Init(*mpTestStorage), CHIP_NO_ERROR);
         ASSERT_EQ(sCertificateTable.SetEndpoint(kMockEndpoint1), CHIP_NO_ERROR);
+        app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&app::CodegenDataModelProvider::Instance());
     }
 
     static void TearDownTestSuite()
@@ -73,6 +78,7 @@ public:
         sCertificateTable.Finish();
         delete mpTestStorage;
         mpTestStorage = nullptr;
+        Platform::MemoryShutdown();
     }
 
     static void ResetCertificateTable()

@@ -217,3 +217,9 @@ tests:
       attribute: "CurrentMode"
       response:
           value: PIXIT.EEVSEM.MODE_CHANGE_OK
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: energy-management
+      app: energy-management

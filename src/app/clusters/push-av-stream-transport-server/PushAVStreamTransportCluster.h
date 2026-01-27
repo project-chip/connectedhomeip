@@ -59,11 +59,11 @@ public:
         }
     }
 
-    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
+    void SetTLSClientManagementDelegate(TLSClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
 
-    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
+    void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
     {
-        mLogic.SetTlsCertificateManagementDelegate(delegate);
+        mLogic.SetTLSCertificateManagementDelegate(delegate);
     }
 
     /**
@@ -103,9 +103,9 @@ public:
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
-    void Shutdown() override
+    void Shutdown(ClusterShutdownType shutdownType) override
     {
-        DefaultServerCluster::Shutdown();
+        DefaultServerCluster::Shutdown(shutdownType);
         mLogic.Shutdown();
     }
 
