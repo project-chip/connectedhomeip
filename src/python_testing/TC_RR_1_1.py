@@ -322,8 +322,8 @@ class TC_RR_1_1(MatterBaseTest):
         local_session_id_by_client_name = {client.name: client.GetConnectedDeviceSync(
             self.dut_node_id).localSessionId for client in client_list}
 
-        # Step 2: Set the Label field for each fabric and BasicInformation.NodeLabel to 32 characters
-        log.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to 32 characters")
+        # Step 2: Set the Label field for each fabric and BasicInformation.NodeLabel the string fabric index
+        log.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to the string fabricIndex")
 
         for fabric in fabric_table:
             client_name = generate_controller_name(fabric.fabricIndex, 0)
