@@ -42,7 +42,9 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         mRootNodeDevice(context, { .wifiDriver = mWiFiDriver })
     {
+#if !CHIP_DEVICE_LAYER_TARGET_DARWIN
         mWiFiDriver.Set5gSupport(true);
+#endif
     }
 #else
         mRootNodeDevice(context)
