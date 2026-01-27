@@ -96,7 +96,7 @@ scripts/tests/run_test_suite.py run --help-paths
   kind: app
 - key: energy-gateway
   kind: app
-- key: energy-management
+- key: evse
   kind: app
 - key: fabric-bridge
   kind: app

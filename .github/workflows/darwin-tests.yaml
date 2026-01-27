@@ -115,7 +115,7 @@ jobs:
                 --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT} \
                 --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
                 --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
-                --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-evse-${BUILD_VARIANT} \
                 build \
                 --copy-artifacts-to objdir-clone \
              "
@@ -140,7 +140,7 @@ jobs:
              --app-path rvc:./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
              --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
              --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-             --app-path energy-management:./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+             --app-path evse:./objdir-clone/darwin-${{matrix.arch}}-evse-${BUILD_VARIANT}/chip-evse-app \
           "
       - name: Run OTA Test
         run: |
