@@ -177,7 +177,7 @@ constexpr osThreadAttr_t kUartTaskAttr = {
 #else
     .priority = osPriorityRealtime6, // Must be above Matter Task priority
 #endif // SLI_SI91X_MCU_INTERFACE
-}; // Must be above Matter Task priority
+};     // Must be above Matter Task priority
 
 static uint32_t sMissedLogCount = 0; // Count of logs that were not sent to the UART due to queue full
 
