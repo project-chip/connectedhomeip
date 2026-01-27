@@ -1430,7 +1430,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
         Error Checking
     */
     uint16_t SetupDiscriminator;
-    TEMPORARY_RETURN_IGNORED DeviceLayer::GetCommissionableDataProvider() -> GetSetupDiscriminator(SetupDiscriminator);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(SetupDiscriminator);
     if ((pPublishSSI->DevInfo != SetupDiscriminator) || (srv_proto_type != nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER))
     {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: OnReplied, mismatched discriminator, got %u, ours: %u", pPublishSSI->DevInfo,
