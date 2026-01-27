@@ -93,6 +93,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
+Credentials::GroupDataProviderImpl gGropupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -195,8 +196,23 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
-    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(&sWiFiDriver);
-    err             = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
+        {
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+            .fabricTable = Server::GetInstance().GetFabricTable(), .failsafeContext = Server::GetInstance().GetFailSafeContext(),
+            .platformManager = DeviceLayer::PlatformMgr(), .gGropupDataProvider = gGropupDataProvider,
+            .sessionManager = Server::GetInstance().GetSecureSessionManager(), .dnssdServer = DnssdServer::Instance(),
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        },
+        {
+            .wifiDriver = sWiFiDriver,
+        });
+    err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
