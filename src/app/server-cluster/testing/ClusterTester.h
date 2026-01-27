@@ -91,6 +91,7 @@ public:
         mCluster(cluster), mFabricTestFixture(fabricHelper)
     {}
 
+    TestServerClusterContext & GetTestContext() { return mTestServerClusterContext; }
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
     // Read attribute into `out` parameter.

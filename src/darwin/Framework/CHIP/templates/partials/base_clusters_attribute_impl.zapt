@@ -1,0 +1,93 @@
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
+- (void)read{{>attribute}}With
+{{~#if_is_fabric_scoped_struct type cluster=../name~}}
+  Params:(MTRReadParams * _Nullable)params completion:
+{{~else~}}
+  Completion:
+{{~/if_is_fabric_scoped_struct~}}
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+    {{#if_is_fabric_scoped_struct type cluster=../name}}
+                                            params:params
+    {{else}}
+                                            params:nil
+    {{/if_is_fabric_scoped_struct}}
+                                             queue:self.callbackQueue
+                                        completion:completion];
+}
+
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion
+{
+  [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completion:completion];
+}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+{
+    // Make a copy of params before we go async.
+    params = [params copy];
+    value = [value copy];
+
+    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our completion handler. This is not great from a
+          type-safety perspective, of course. }}
+      ^(id _Nullable ignored, NSError * _Nullable error) {
+        completion(error);
+      },
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+        chip::Optional<uint16_t> timedWriteTimeout;
+        if (params != nil) {
+          if (params.timedWriteTimeout != nil){
+            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
+          }
+        }
+        {{#if mustUseTimedWrite}}
+        if (!timedWriteTimeout.HasValue()) {
+          timedWriteTimeout.SetValue(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+        }
+        {{/if}}
+
+        ListFreer listFreer;
+        using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+        TypeInfo::Type cppValue;
+        {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
+        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout);
+    });
+    std::move(*bridge).DispatchAction(self.device);
+}
+
+{{/if}}
+{{#if isReportableAttribute}}
+- (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams * _Nonnull)params
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
+}
+
++ (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
+{
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
+}
+
+{{/if}}

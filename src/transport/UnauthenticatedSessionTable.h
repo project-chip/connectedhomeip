@@ -294,6 +294,25 @@ public:
         return Optional<SessionHandle>::Missing();
     }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void MarkSessionOverTCPForEviction(Transport::ActiveTCPConnectionState & conn)
+    {
+        mEntries.ForEachActiveObject([&](UnauthenticatedSession * session) {
+            if (session->GetTCPConnection() == conn)
+            {
+                session->ReleaseTCPConnection();
+
+                // If the session has no other references, we can release it.
+                if (session->GetReferenceCount() == 0)
+                {
+                    mEntries.ReleaseObject(static_cast<EntryType *>(session));
+                }
+            }
+            return Loop::Continue;
+        });
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 private:
     using EntryType = detail::UnauthenticatedSessionPoolEntry<kMaxSessionCount>;
     friend EntryType;
@@ -304,7 +323,6 @@ private:
      * @returns CHIP_NO_ERROR if new session created. May fail if maximum session count has been reached (with
      * CHIP_ERROR_NO_MEMORY).
      */
-    CHECK_RETURN_VALUE
     CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
                           const PeerAddress & peerAddress, const ReliableMessageProtocolConfig & config,
                           UnauthenticatedSession *& entry)

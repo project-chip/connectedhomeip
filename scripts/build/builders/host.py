@@ -88,7 +88,7 @@ class HostApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     NETWORK_MANAGER = auto()
     ENERGY_GATEWAY = auto()
-    ENERGY_MANAGEMENT = auto()
+    EVSE = auto()
     WATER_LEAK_DETECTOR = auto()
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
@@ -125,7 +125,7 @@ class HostApp(Enum):
         if self == HostApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app/linux'
         if self == HostApp.ALL_DEVICES_APP:
-            return 'all-devices-app/linux'
+            return 'all-devices-app/posix'
         if self == HostApp.CHIP_TOOL:
             return 'chip-tool'
         if self == HostApp.CHIP_TOOL_DARWIN:
@@ -192,8 +192,8 @@ class HostApp(Enum):
             return 'network-manager-app/linux'
         if self == HostApp.ENERGY_GATEWAY:
             return 'energy-gateway-app/linux'
-        if self == HostApp.ENERGY_MANAGEMENT:
-            return 'energy-management-app/linux'
+        if self == HostApp.EVSE:
+            return 'evse-app/linux'
         if self == HostApp.WATER_LEAK_DETECTOR:
             return 'water-leak-detector-app/linux'
         if self == HostApp.TERMS_AND_CONDITIONS:
@@ -325,9 +325,9 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_GATEWAY:
             yield 'chip-energy-gateway-app'
             yield 'chip-energy-gateway-app.map'
-        elif self == HostApp.ENERGY_MANAGEMENT:
-            yield 'chip-energy-management-app'
-            yield 'chip-energy-management-app.map'
+        elif self == HostApp.EVSE:
+            yield 'chip-evse-app'
+            yield 'chip-evse-app.map'
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
@@ -405,6 +405,7 @@ class HostBuilder(GnBuilder):
                  use_googletest=False,
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
+                 openthread_endpoint=False,
                  unified=False
                  ):
         """
@@ -568,6 +569,12 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_terms_and_conditions_required=true')
             else:
                 self.extra_gn_options.append('chip_terms_and_conditions_required=false')
+
+        if openthread_endpoint:
+            if enable_wifi:
+                raise Exception("OpenThread EndPoint mode does not support Wifi")
+
+            self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:

@@ -60,6 +60,14 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_OPTIMIZE_DEBUG_LEVEL
+	string "Debug optimization level"
+	depends on DEBUG
+	default "0"
+	help
+	  Set the optimization level to use when building with debug symbols.
+	  This value is used with the -O compiler flag (e.g., -Og, -O0, -O1, -O2, -O3, -Os, -Oz).
+
 config CHIP_STRIP_SYMBOLS
 	bool "Strip symbols"
 	help
@@ -452,6 +460,18 @@ config CHIP_THREAD_NETWORK_ENDPOINT_ID
 	help
 	  Specify the endpoint ID of the Thread network.
 
+config CHIP_OPENTHREAD_FTD
+	bool "Enable OpenThread Full Thread Device (FTD) support"
+	default y
+	help
+	  Configure the platform as an OpenThread Full Thread Device (FTD).
+
+config CHIP_USE_OT_ENDPOINT
+	bool "Use OpenThread TCP/UDP stack directly"
+	help
+	  Use the OpenThread TCP/UDP stack directly instead of another networking stack like LwIP.
+	  This is useful for platforms that do not have LwIP but do have OpenThread.
+
 endif # NET_L2_OPENTHREAD
 
 config CHIP_ENABLE_ICD_SUPPORT
@@ -605,6 +625,39 @@ config CHIP_ENABLE_WIFI_AP
       Enable Wi-Fi Access Point mode for SoftAP commissioning.
       This allows the device to create its own Wi-Fi network for onboarding.
 
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+		Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+		Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+		Specifies the maximum number of connection recovery attempts.
+		If set to 0, no limitation is applied and attempts
+		to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+		Specifies the maximum connection recovery jitter interval (in milliseconds).
+		Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+		within a range of +/- the value of this option.
+
 # Platform additions and configuration
 
 config CHIP_SYSTEM_THREAD_LOCAL_STORAGE
@@ -646,6 +699,13 @@ config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
 	default 500
 	help
 	  Sets the local idle retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
+
+config CHIP_ENABLE_READ_CLIENT
+	bool "Enable Read Client in the Interaction Model"
+	help
+	  Enable support for Read Client in the Interaction Model.
+	  This config can be disabled for device types that do not require Read Client functionality.
+	  Disabling this config can save flash and RAM space.
 
 # Build system options
 
@@ -694,5 +754,17 @@ config CHIP_CUSTOM_BLE_ADV_DATA
     depends on BT
 	help
 	  Customization of BLE advertising data at the application layer
+
+config CHIP_INET_ENABLE_TCP_ENDPOINT
+	bool "Enable TCP endpoint in Inet layer"
+	default y if CHIP_BUILD_TESTS
+	help
+	  Enable TCP endpoint support in the Matter Inet layer.
+
+config NETWORK_LAYER_BLE
+	bool "Should be replaced by CONFIG_BT. Keep it for backwards compatibility"
+	default y if BT
+	help
+		Will be deprecated once application files replace CONFIG_NETWORK_LAYER_BLE with CONFIG_BT
 
 endif # CHIP

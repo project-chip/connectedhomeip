@@ -2989,11 +2989,15 @@ cluster PushAvStreamTransport = 1365 {
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 cluster Chime = 1366 {
-  revision 1;
+  revision 2;
 
   struct ChimeSoundStruct {
     int8u chimeID = 0;
     char_string<48> name = 1;
+  }
+
+  info event ChimeStartedPlaying = 0 {
+    int8u chimeID = 0;
   }
 
   readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
@@ -3005,8 +3009,12 @@ cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command will play the currently selected chime. */
-  command PlayChimeSound(): DefaultSuccess = 0;
+  request struct PlayChimeSoundRequest {
+    optional int8u chimeID = 0;
+  }
+
+  /** This command will play the currently selected chime or the chime passed in. */
+  command PlayChimeSound(PlayChimeSoundRequest): DefaultSuccess = 0;
 }
 
 /** This Cluster is used to manage TLS Client Certificates and to provision
@@ -3674,19 +3682,19 @@ endpoint 1 {
 
   server cluster CameraAvSettingsUserLevelManagement {
     callback attribute MPTZPosition;
-    ram      attribute maxPresets default = 5;
+    callback attribute maxPresets;
     callback attribute MPTZPresets;
     callback attribute DPTZStreams;
-    ram      attribute zoomMax default = 100;
-    ram      attribute tiltMin default = -90;
-    ram      attribute tiltMax default = 90;
-    ram      attribute panMin default = -180;
-    ram      attribute panMax default = 180;
-    ram      attribute movementState;
+    callback attribute zoomMax;
+    callback attribute tiltMin;
+    callback attribute tiltMax;
+    callback attribute panMin;
+    callback attribute panMax;
+    callback attribute movementState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 31;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
     handle command MPTZSetPosition;

@@ -19207,7 +19207,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            ChimeStartedPlaying(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -19246,7 +19247,24 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }@Override
+        }public enum PlayChimeSoundCommandField {ChimeID(0),;
+                    private final int id;
+                    PlayChimeSoundCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PlayChimeSoundCommandField value(int id) throws NoSuchFieldError {
+                        for (PlayChimeSoundCommandField field : PlayChimeSoundCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

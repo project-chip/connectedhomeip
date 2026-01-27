@@ -455,9 +455,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                                   DataModel::Nullable<uint16_t> videoStreamID,
-                                                   DataModel::Nullable<uint16_t> audioStreamID)
+CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode)
 {
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
@@ -1169,8 +1167,8 @@ CHIP_ERROR WebRTCProviderManager::AcquireAudioVideoStreams(uint16_t sessionId)
     }
 
     WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(args.audioStreamId,
-                                                                                              args.videoStreamId);
+    return mCameraDevice->GetCameraAVStreamMgmtController().OnTransportAcquireAudioVideoStreams(args.audioStreamId,
+                                                                                                args.videoStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams(uint16_t sessionId)
@@ -1183,7 +1181,7 @@ CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams(uint16_t sessionId)
     }
 
     WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-    // TODO: Use passed in audio/video stream ids corresponding to a sessionId.
-    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(args.audioStreamId,
-                                                                                              args.videoStreamId);
+
+    return mCameraDevice->GetCameraAVStreamMgmtController().OnTransportReleaseAudioVideoStreams(args.audioStreamId,
+                                                                                                args.videoStreamId);
 }
