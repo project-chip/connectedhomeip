@@ -125,7 +125,7 @@ class HostApp(Enum):
         if self == HostApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app/linux'
         if self == HostApp.ALL_DEVICES_APP:
-            return 'all-devices-app/linux'
+            return 'all-devices-app/posix'
         if self == HostApp.CHIP_TOOL:
             return 'chip-tool'
         if self == HostApp.CHIP_TOOL_DARWIN:

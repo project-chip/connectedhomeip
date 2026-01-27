@@ -31,6 +31,7 @@ class Esp32Board(Enum):
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     ENERGY_GATEWAY = auto()
     EVSE = auto()
     LIGHT = auto()
@@ -46,6 +47,8 @@ class Esp32App(Enum):
     def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'examples/all-clusters-app'
+        if self == Esp32App.ALL_DEVICES:
+            return 'examples/all-devices-app'
         if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'examples/all-clusters-minimal-app'
         if self == Esp32App.ENERGY_GATEWAY:
@@ -76,6 +79,8 @@ class Esp32App(Enum):
             return 'chip-all-clusters-app'
         if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'chip-all-clusters-minimal-app'
+        if self == Esp32App.ALL_DEVICES:
+            return 'all-devices-app'
         if self == Esp32App.ENERGY_GATEWAY:
             return 'chip-energy-gateway-app'
         if self == Esp32App.EVSE:
