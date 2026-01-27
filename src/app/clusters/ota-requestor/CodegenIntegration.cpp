@@ -63,7 +63,7 @@ public:
         case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
             return encoder.EncodeEmptyList();
         case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
-            return encoder.Encode(true);
+            return encoder.Encode<bool>(true);
         case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
             return encoder.Encode(OtaSoftwareUpdateRequestor::UpdateStateEnum::kUnknown);
         case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
@@ -93,16 +93,18 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
+        ServerClusterRegistration * result = nullptr;
         if (GetRequestorInstance())
         {
             gServers[clusterInstanceIndex].Create(endpointId, *GetRequestorInstance());
-            return gServers[clusterInstanceIndex].Registration();
+            result = &gServers[clusterInstanceIndex].Registration();
         }
         else
         {
             gFallbackServers[clusterInstanceIndex].Create(endpointId);
-            return gFallbackServers[clusterInstanceIndex].Registration();
+            result = &gFallbackServers[clusterInstanceIndex].Registration();
         }
+        return *result;
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
