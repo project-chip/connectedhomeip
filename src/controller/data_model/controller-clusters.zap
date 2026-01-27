@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 107,
+  "featureLevel": 109,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1638,6 +1638,48 @@
           ]
         },
         {
+          "name": "Groupcast",
+          "code": 101,
+          "mfgCode": null,
+          "define": "GROUPCAST_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "JoinGroup",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "LeaveGroup",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "LeaveGroupResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "UpdateGroupKey",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
           "name": "HEPA Filter Monitoring",
           "code": 113,
           "mfgCode": null,
@@ -2989,7 +3031,6 @@
           "define": "CHIME_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "PlayChimeSound",

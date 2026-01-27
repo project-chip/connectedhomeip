@@ -39,21 +39,25 @@ public:
     struct GroupInfo
     {
         static constexpr size_t kGroupNameMax = CHIP_CONFIG_MAX_GROUP_NAME_LENGTH;
+        enum class Flags : uint8_t
+        {
+            kHasAuxiliaryACL = 0b00000001,
+            kMcastAddrPolicy = 0b00000010,
+        };
 
         // Identifies group within the scope of the given Fabric
         GroupId group_id = kUndefinedGroupId;
         // Lastest group name written for a given GroupId on any Endpoint via the Groups cluster
         char name[kGroupNameMax + 1] = { 0 };
-        bool use_aux_acl             = false;
-        bool use_iana_addr           = false;
+        uint8_t flags                = 0;
         uint16_t count               = 0;
 
         GroupInfo() { SetName(nullptr); }
         GroupInfo(const GroupInfo & other) { Copy(other); }
         GroupInfo(const char * groupName) { SetName(groupName); }
         GroupInfo(const CharSpan & groupName) { SetName(groupName); }
-        GroupInfo(GroupId id, const char * groupName) : group_id(id) { SetName(groupName); }
-        GroupInfo(GroupId id, const CharSpan & groupName) : group_id(id) { SetName(groupName); }
+        GroupInfo(GroupId id, const char * groupName, uint8_t groupFlags = 0) : group_id(id), flags(groupFlags) { SetName(groupName); }
+        GroupInfo(GroupId id, const CharSpan & groupName, uint8_t groupFlags = 0) : group_id(id), flags(groupFlags) { SetName(groupName); }
         void SetName(const char * groupName)
         {
             if (nullptr == groupName)
@@ -80,9 +84,8 @@ public:
         {
             if (this != &other)
             {
-                group_id      = other.group_id;
-                use_aux_acl   = other.use_aux_acl;
-                use_iana_addr = other.use_iana_addr;
+                group_id = other.group_id;
+                flags    = other.flags;
                 SetName(other.name);
             }
         }
@@ -337,6 +340,9 @@ public:
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
+
+    // Groupcast MaxMembershipCount
+    virtual uint16_t getMaxMembershipCount() = 0;
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)

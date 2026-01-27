@@ -266,8 +266,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
     static constexpr TLV::Tag TagFirstEndpoint() { return TLV::ContextTag(2); }
     static constexpr TLV::Tag TagEndpointCount() { return TLV::ContextTag(3); }
     static constexpr TLV::Tag TagNext() { return TLV::ContextTag(4); }
-    static constexpr TLV::Tag TagHasAuxiliaryAcl() { return TLV::ContextTag(5); }
-    static constexpr TLV::Tag TagUseIANAaddr() { return TLV::ContextTag(6); }
+    static constexpr TLV::Tag TagFlags() { return TLV::ContextTag(5); }
 
     chip::FabricIndex fabric_index  = kUndefinedFabricIndex;
     chip::EndpointId first_endpoint = kInvalidEndpointId;
@@ -300,8 +299,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
         first_endpoint = kInvalidEndpointId;
         endpoint_count = 0;
         next           = 0;
-        use_aux_acl    = false;
-        use_iana_addr  = false;
+        flags          = 0;
     }
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
@@ -314,8 +312,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
         ReturnErrorOnFailure(writer.Put(TagFirstEndpoint(), static_cast<uint16_t>(first_endpoint)));
         ReturnErrorOnFailure(writer.Put(TagEndpointCount(), static_cast<uint16_t>(endpoint_count)));
         ReturnErrorOnFailure(writer.Put(TagNext(), static_cast<uint16_t>(next)));
-        ReturnErrorOnFailure(writer.Put(TagHasAuxiliaryAcl(), static_cast<uint8_t>(use_aux_acl)));
-        ReturnErrorOnFailure(writer.Put(TagUseIANAaddr(), static_cast<uint8_t>(use_iana_addr)));
+        ReturnErrorOnFailure(writer.Put(TagFlags(), static_cast<uint8_t>(flags)));
         return writer.EndContainer(container);
     }
 
@@ -342,17 +339,13 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
         ReturnErrorOnFailure(reader.Next(TagNext()));
         ReturnErrorOnFailure(reader.Get(next));
         // Groupcast
-        CHIP_ERROR err = reader.Next(TagHasAuxiliaryAcl());
+        CHIP_ERROR err = reader.Next(TagFlags());
         if (CHIP_NO_ERROR == err)
         {
-            // use_aux_acl
-            uint8_t flag = 0;
-            ReturnErrorOnFailure(reader.Get(flag));
-            use_aux_acl = flag;
-            // use_iana_addr
-            ReturnErrorOnFailure(reader.Next(TagUseIANAaddr()));
-            ReturnErrorOnFailure(reader.Get(flag));
-            use_iana_addr = flag;
+            // flags
+            uint8_t value = 0;
+            ReturnErrorOnFailure(reader.Get(value));
+            flags = value;
         }
         return reader.ExitContainer(container);
     }

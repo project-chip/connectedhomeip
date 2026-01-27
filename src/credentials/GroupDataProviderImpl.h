@@ -27,7 +27,8 @@ namespace Credentials {
 class GroupDataProviderImpl : public GroupDataProvider
 {
 public:
-    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+    static constexpr size_t kIteratorsMax         = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+    static constexpr uint16_t kMaxMembershipCount = 10;
 
     GroupDataProviderImpl() = default;
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
@@ -100,6 +101,9 @@ public:
     // Decryption
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) override;
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
+
+    // Groupcast MaxMembershipCount
+    uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
 
 protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator
