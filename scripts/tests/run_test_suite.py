@@ -319,8 +319,8 @@ class Terminable(Protocol):
     '--energy-gateway-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-gateway:<path>',
     help='what energy-gateway app to use')
 @click.option(
-    '--energy-management-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-management:<path>',
-    help='what energy-management app to use')
+    '--evse-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path evse:<path>',
+    help='what evse app to use')
 @click.option(
     '--closure-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path closure:<path>',
     help='what closure app to use')
@@ -385,7 +385,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
-            energy_management_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
+            evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
             chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
             expected_failures: int, commissioning_method: str | None) -> None:
     assert isinstance(context.obj, RunContext)
@@ -420,7 +420,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     handle_deprecated_pathopt('rvc', rvc_app, SubprocessKind.APP)
     handle_deprecated_pathopt('network-manager', network_manager_app, SubprocessKind.APP)
     handle_deprecated_pathopt('energy-gateway', energy_gateway_app, SubprocessKind.APP)
-    handle_deprecated_pathopt('energy-management', energy_management_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
     handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)

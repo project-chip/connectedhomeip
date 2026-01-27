@@ -30,6 +30,7 @@
 #import "MTRSetupPayload_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
+#import "zap-generated/MTRCommandPayloads_Private.h"
 
 #include <lib/core/DataModelTypes.h>
 

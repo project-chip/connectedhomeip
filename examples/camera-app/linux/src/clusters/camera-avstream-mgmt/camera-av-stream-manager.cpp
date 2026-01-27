@@ -890,12 +890,12 @@ CameraAVStreamManager::PersistentAttributesLoadedCallback()
 }
 
 CHIP_ERROR
-CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamId, uint16_t videoStreamId)
 {
     // Update the available audio stream in the HAL
     for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
-        if (stream.audioStreamParams.audioStreamID == audioStreamID && stream.isAllocated)
+        if (stream.audioStreamParams.audioStreamID == audioStreamId && stream.isAllocated)
         {
             if (stream.audioStreamParams.referenceCount < UINT8_MAX)
             {
@@ -903,7 +903,7 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
             }
             else
             {
-                ChipLogError(Camera, "Attempted to increment audio stream %u ref count beyond max limit", audioStreamID);
+                ChipLogError(Camera, "Attempted to increment audio stream %u ref count beyond max limit", audioStreamId);
             }
         }
     }
@@ -911,7 +911,7 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
     // Update the available video stream in the HAL
     for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
-        if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
+        if (stream.videoStreamParams.videoStreamID == videoStreamId && stream.isAllocated)
         {
             if (stream.videoStreamParams.referenceCount < UINT8_MAX)
             {
@@ -919,34 +919,34 @@ CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamI
             }
             else
             {
-                ChipLogError(Camera, "Attempted to increment video stream %u ref count beyond max limit", videoStreamID);
+                ChipLogError(Camera, "Attempted to increment video stream %u ref count beyond max limit", videoStreamId);
             }
         }
     }
 
     // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ true) !=
+    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamId, /* shouldIncrement = */ true) !=
         CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to increment audio stream %u ref count in SDK", audioStreamID);
+        ChipLogError(Camera, "Failed to increment audio stream %u ref count in SDK", audioStreamId);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ true) !=
+    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamId, /* shouldIncrement = */ true) !=
         CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to increment video stream %u ref count in SDK", videoStreamID);
+        ChipLogError(Camera, "Failed to increment video stream %u ref count in SDK", videoStreamId);
     }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
-CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamId, uint16_t videoStreamId)
 {
     // Update the available audio stream in the HAL
     for (AudioStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableAudioStreams())
     {
-        if (stream.audioStreamParams.audioStreamID == audioStreamID && stream.isAllocated)
+        if (stream.audioStreamParams.audioStreamID == audioStreamId && stream.isAllocated)
         {
             if (stream.audioStreamParams.referenceCount > 0)
             {
@@ -954,7 +954,7 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
             }
             else
             {
-                ChipLogError(Camera, "Attempted to decrement audio stream %u ref count when it was already 0", audioStreamID);
+                ChipLogError(Camera, "Attempted to decrement audio stream %u ref count when it was already 0", audioStreamId);
             }
         }
     }
@@ -962,7 +962,7 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
     // Update the available video stream in the HAL
     for (VideoStream & stream : mCameraDeviceHAL->GetCameraHALInterface().GetAvailableVideoStreams())
     {
-        if (stream.videoStreamParams.videoStreamID == videoStreamID && stream.isAllocated)
+        if (stream.videoStreamParams.videoStreamID == videoStreamId && stream.isAllocated)
         {
             if (stream.videoStreamParams.referenceCount > 0)
             {
@@ -970,22 +970,22 @@ CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamI
             }
             else
             {
-                ChipLogError(Camera, "Attempted to decrement video stream %u ref count when it was already 0", videoStreamID);
+                ChipLogError(Camera, "Attempted to decrement video stream %u ref count when it was already 0", videoStreamId);
             }
         }
     }
 
     // Update the counts in the SDK allocated stream attributes
-    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamID, /* shouldIncrement = */ false) !=
+    if (GetCameraAVStreamManagementCluster()->UpdateAudioStreamRefCount(audioStreamId, /* shouldIncrement = */ false) !=
         CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to decrement audio stream %u ref count in SDK", audioStreamID);
+        ChipLogError(Camera, "Failed to decrement audio stream %u ref count in SDK", audioStreamId);
     }
 
-    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamID, /* shouldIncrement = */ false) !=
+    if (GetCameraAVStreamManagementCluster()->UpdateVideoStreamRefCount(videoStreamId, /* shouldIncrement = */ false) !=
         CHIP_NO_ERROR)
     {
-        ChipLogError(Camera, "Failed to decrement video stream %u ref count in SDK", videoStreamID);
+        ChipLogError(Camera, "Failed to decrement video stream %u ref count in SDK", videoStreamId);
     }
 
     return CHIP_NO_ERROR;
