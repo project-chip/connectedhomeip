@@ -38,7 +38,6 @@ TARGET_SOURCES(
   PRIVATE
   "${CLUSTER_DIR}/OTARequestorCluster.cpp"
   "${CLUSTER_DIR}/OTARequestorCluster.h"
-  "${CLUSTER_DIR}/OTARequestorEventHandler.h"
 )
 
 # This is equivalent to BUILD.gn's interface source set.
