@@ -188,17 +188,18 @@ void GenericPlatformManagerImpl_CMSISOS<ImplClass>::_RunEventLoop(void)
 
         // Unlock the CHIP stack, allowing other threads to enter CHIP while
         // the event loop thread is sleeping.
-        StackUnlock unlock;
         ChipDeviceEvent event;
+        _UnlockChipStack();
         osStatus_t eventReceived = osMessageQueueGet(mChipEventQueue, &event, nullptr, waitTimeInTicks);
+        _LockChipStack();
 
         // If an event was received, dispatch it and continue until the queue is empty.
         while (eventReceived == osOK)
         {
-            StackLock lock;
             Impl()->DispatchEvent(&event);
-            StackUnlock unlock;
+            _UnlockChipStack();
             eventReceived = osMessageQueueGet(mChipEventQueue, &event, nullptr, 0);
+            _LockChipStack();
         }
     }
 }

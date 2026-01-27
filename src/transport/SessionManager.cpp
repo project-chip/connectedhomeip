@@ -716,6 +716,7 @@ void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState 
         appTCPConnCbCtxt->connClosedCb(conn, conErr);
     }
     MarkSecureSessionOverTCPForEviction(conn, conErr);
+    mUnauthenticatedSessions.MarkSessionOverTCPForEviction(conn);
 }
 
 CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,

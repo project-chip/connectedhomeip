@@ -52,6 +52,30 @@ class PushAvStreamTransportManager; // Forward declaration
 } // namespace chip
 
 /**
+ * @enum ClipFinalizationReason
+ *
+ * Enumerates the reasons why a clip recording is finalized.
+ */
+enum class ClipFinalizationReason : uint8_t
+{
+    kErrorOccurred      = 0, ///< Clip finalized due to an error
+    kSegmentUploadCheck = 1, ///< Normal packet processing - check for segment upload
+    kCleanupUpload      = 2, ///< Cleanup time - skip finalization logic, just upload segments
+};
+
+/**
+ * @enum RecorderStatus
+ *
+ * Status codes for recorder operations.
+ */
+enum class RecorderStatus : uint8_t
+{
+    kSuccess = 0, ///< Operation completed successfully
+    kWarning = 1, ///< Operation completed with warnings
+    kFail    = 2, ///< Operation failed
+};
+
+/**
  * @struct BufferData
  * @brief Contains buffer information for custom IO operations
  */
@@ -76,23 +100,23 @@ public:
      */
     struct ClipInfoStruct
     {
-        bool mHasVideo;                                       ///< Video recording enabled flag
-        bool mHasAudio;                                       ///< Audio recording enabled flag
-        uint64_t mSessionNumber;                              ///< Session number for unique clip identification
-        uint8_t mSessionGroup;                                ///< Session group for grouping multiple transports
-        uint32_t mMaxClipDurationS;                           ///< Maximum clip duration in seconds
-        uint16_t mInitialDurationS;                           ///< Initial clip duration in seconds
-        uint16_t mAugmentationDurationS;                      ///< Duration increment on motion detect
-        uint16_t mChunkDurationMs;                            ///< Chunk duration  milliseconds
-        uint16_t mSegmentDurationMs;                          ///< Segment duration in milliseconds
-        uint16_t mBlindDurationS;                             ///< Duration without recording after motion stop
-        uint16_t mPreRollLengthMs;                            ///< Pre-roll length in milliseconds
-        uint16_t mElapsedTimeS;                               ///< Elapsed time since recording start in seconds
-        std::string mOutputPath;                              ///< Base output directory path
-        std::string mTrackName;                               ///< Track name for segmented files
-        std::string mUrl;                                     ///< URL for uploading clips;
-        int mTriggerType;                                     ///< Recording trigger type
-        std::chrono::steady_clock::time_point activationTime; ///< Time when the recording started
+        bool mHasVideo;                                        ///< Video recording enabled flag
+        bool mHasAudio;                                        ///< Audio recording enabled flag
+        uint64_t mSessionNumber;                               ///< Session number for unique clip identification
+        uint8_t mSessionGroup;                                 ///< Session group for grouping multiple transports
+        uint32_t mMaxClipDurationS;                            ///< Maximum clip duration in seconds
+        uint16_t mInitialDurationS;                            ///< Initial clip duration in seconds
+        uint16_t mAugmentationDurationS;                       ///< Duration increment on motion detect
+        uint16_t mChunkDurationMs;                             ///< Chunk duration  milliseconds
+        uint16_t mSegmentDurationMs;                           ///< Segment duration in milliseconds
+        uint16_t mBlindDurationS;                              ///< Duration without recording after motion stop
+        uint16_t mPreRollLengthMs;                             ///< Pre-roll length in milliseconds
+        uint16_t mElapsedTimeS;                                ///< Elapsed time since recording start in seconds
+        std::string mOutputPath;                               ///< Base output directory path
+        std::string mTrackName;                                ///< Track name for segmented files
+        std::string mUrl;                                      ///< URL for uploading clips;
+        int mTriggerType;                                      ///< Recording trigger type
+        std::chrono::steady_clock::time_point mActivationTime; ///< Time when the recording started
     };
 
     /**
@@ -133,33 +157,74 @@ public:
 
     /// @name Construction/Destruction
     /// @{
+    /**
+     * @brief Constructs a PushAVClipRecorder instance
+     * @param aClipInfo Reference to clip configuration structure
+     * @param aAudioInfo Reference to audio stream configuration structure
+     * @param aVideoInfo Reference to video stream configuration structure
+     * @param aUploader Pointer to the uploader instance for file uploads
+     */
     PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                        PushAVUploader * aUploader);
+
+    /**
+     * @brief Destroys the PushAVClipRecorder instance
+     *
+     * Ensures proper cleanup of all resources including stopping the recording thread,
+     * cleaning up FFmpeg contexts, and releasing memory allocations.
+     */
     ~PushAVClipRecorder();
     /// @}
 
     /// @name Recording Control
     /// @{
+    /**
+     * @brief Starts the clip recording process
+     *
+     * Initializes the recording worker thread and begins processing media packets.
+     * Sets up the output format context and starts the DASH/CMAF segmentation.
+     */
     void Start();
+
+    /**
+     * @brief Stops the clip recording process
+     *
+     * Signals the worker thread to stop, finalizes the current clip,
+     * and cleans up all recording resources. Waits for the worker thread
+     * to complete before returning.
+     */
     void Stop();
     /// @}
 
     /**
      * @brief Enqueues media data for processing
-     * @param data Raw media data pointer
+     * @param data Raw media data pointer containing encoded audio/video data
      * @param size Data size in bytes
-     * @param isVideo True for video data, false for audio
+     * @param isVideo True for video data, false for audio data
      */
     void PushPacket(const uint8_t * data, size_t size, bool isVideo);
 
+    /**
+     * @brief Sets the callback function to be called when recording stops
+     * @param cb The callback function to execute on recording stop
+     */
     void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
 
-    // Set the cluster server reference for direct API calls
+    /**
+     * @brief Sets the PushAV stream transport server reference for direct API calls
+     * @param server Pointer to the PushAV stream transport server instance
+     */
     void SetPushAvStreamTransportServer(chip::app::Clusters::PushAvStreamTransportServer * server)
     {
         mPushAvStreamTransportServer = server;
     }
 
+    /**
+     * @brief Sets connection information for the recording session
+     * @param connectionID The unique connection identifier
+     * @param triggerType The type of transport trigger that initiated the recording
+     * @param reasonType The optional reason for trigger activation
+     */
     void SetConnectionInfo(uint16_t connectionID, chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                            chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> reasonType)
     {
@@ -170,9 +235,29 @@ public:
 
     std::atomic<bool> mDeinitializeRecorder{ false }; ///< Deinitialization flag
     ClipInfoStruct mClipInfo;                         ///< Clip configuration parameters
-    void SetRecorderStatus(bool status);              ///< Sets the recorder status
-    bool GetRecorderStatus();                         ///< Gets the recorder status
+
+    /**
+     * @brief Sets the recorder status
+     * @param status The recorder status to set (true for active, false for inactive)
+     */
+    void SetRecorderStatus(bool status);
+
+    /**
+     * @brief Gets the current recorder status
+     * @return true if recorder is active, false otherwise
+     */
+    bool GetRecorderStatus();
+
+    /**
+     * @brief Sets the fabric index for the recording session
+     * @param fabricIndex The fabric index to associate with this recorder
+     */
     void SetFabricIndex(chip::FabricIndex fabricIndex) { mFabricIndex = fabricIndex; }
+
+    /**
+     * @brief Sets the PushAV stream transport manager reference
+     * @param manager Pointer to the PushAV stream transport manager instance
+     */
     void SetPushAvStreamTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
     {
         mPushAvStreamTransportManager = manager;
@@ -230,17 +315,35 @@ private:
      */
     bool EnsureDirectoryExists(const std::string & path);
 
+    /**
+     * @brief Checks if a file exists and adds it to the upload queue.
+     * @param path The file path to check and upload
+     * @return true if the file was successfully added to the upload queue, false otherwise
+     */
     bool CheckAndUploadFile(std::string path);
 
+    /**
+     * @brief Determines if H.264 data contains an I-frame (IDR frame).
+     * @param data Pointer to the H.264 NALU data.
+     * @param length Length of the data in bytes.
+     * @return true if the data contains an I-frame, false otherwise.
+     */
     bool IsH264IFrame(const uint8_t * data, unsigned int length);
 
+    /**
+     * @brief Creates an AVPacket from raw media data
+     * @param data Pointer to the raw media data
+     * @param size Size of the data in bytes
+     * @param isVideo True for video data, false for audio data
+     * @return Pointer to the created AVPacket, or nullptr on failure
+     */
     AVPacket * CreatePacket(const uint8_t * data, int size, bool isVideo);
 
     /**
      * @brief Processes queued packets and writes them to the output file.
-     * @return Zero if processing was successful, negative otherwise, positive for warnings.
+     * @return RecorderStatus::kSuccess if processing was successful, RecorderStatus::kFail otherwise.
      */
-    int ProcessBuffersAndWrite();
+    RecorderStatus ProcessBuffersAndWrite();
 
     /**
      * @brief Configures the output format context for DASH/CMAF VoD.
@@ -248,21 +351,24 @@ private:
      * @param output_prefix Base path for output files.
      * @param init_seg_pattern Pattern for initialization segments.
      * @param media_seg_pattern Pattern for media segments.
+     * @return RecorderStatus::kSuccess on success, RecorderStatus::kFail otherwise.
      */
-    int SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern, const std::string & mediaSegPattern);
+    RecorderStatus SetupOutput(const std::string & outputPrefix, const std::string & initSegPattern,
+                               const std::string & mediaSegPattern);
 
     /**
      * @brief Starts the clip recording process.
-     * @return 0 on success, error code otherwise.
+     * @return RecorderStatus::kSuccess on success, RecorderStatus::kFail otherwise.
      */
-    int StartClipRecording();
+    RecorderStatus StartClipRecording();
 
     /**
      * @brief Adds a video or audio stream to the output context.
      *
      * @param type The type of stream to add (AVMEDIA_TYPE_VIDEO or AVMEDIA_TYPE_AUDIO).
+     * @return RecorderStatus::kSuccess on success, RecorderStatus::kFail otherwise.
      */
-    int AddStreamToOutput(AVMediaType type);
+    RecorderStatus AddStreamToOutput(AVMediaType type);
 
     /**
      * @brief Cleans up the output context and associated resources.
@@ -272,8 +378,11 @@ private:
     /**
      * @brief Finalizes the current clip and prepares for a new one.
      *
-     * @param reason Zero for normal clip finalization or Positive number for abrupt finalization
+     * Handles the clip finalization process based on the provided reason, including
+     * uploading segments, updating metadata, and preparing for the next recording session.
+     *
+     * @param reason The reason for clip finalization (error, segment upload check, or cleanup)
      */
-    void FinalizeCurrentClip(int reason);
+    void FinalizeCurrentClip(ClipFinalizationReason reason);
     /// @}
 };

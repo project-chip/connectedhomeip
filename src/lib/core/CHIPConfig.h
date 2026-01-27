@@ -748,26 +748,6 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER
- *
- * @brief Enable support functions for parsing command-line arguments
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 0
-#endif
-
-/**
- * @def CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
- *
- * @brief Enable validity checking of command-line argument definitions.
- *
- * // TODO: Determine why we wouldn't need this
- */
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-#define CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS 1
-#endif
-
-/**
  * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking Matter unauthenticated
@@ -2032,6 +2012,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+ *
+ * @brief The default maximum number of TLS endpoints that can be provisioned in the
+ *        TLS Client Management cluster when using the code-driven implementation. The Matter spec
+ *        requires this to be between 5 and 254. Applications can override this by providing a custom delegate.
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
+#define CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS 5
+#endif // CHIP_CONFIG_TLS_MAX_PROVISIONED_ENDPOINTS
 
 /**
  * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
