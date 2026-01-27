@@ -76,7 +76,8 @@ declare_args() {
   # cross-interface policy.
   #
   # In the future, this might be "connman", "iwd", "networkmanager",
-  # or "wpa_supplicant". At present, this must be "wpa_supplicant".
+  # or "wpa_supplicant". At present, this may be either "connman" or
+  # "wpa_supplicant".
   chip_linux_network_manager = "wpa_supplicant"
 
   # The Linux Wi-Fi Neighbor Awareness Networking (NAN)
@@ -272,16 +273,33 @@ static_library("Linux") {
       "CHIP_LINUX_WIFI_PAF_MANAGER=\"${chip_linux_wifi_paf_manager}\"",
     ]
 
-    if (chip_linux_network_manager == "wpa_supplicant") {
-      defines += [ "CHIP_LINUX_NETWORK_MANAGER_WPA_SUPPLICANT=1" ]
+    if (chip_linux_network_manager == "connman") {
+      defines += [
+        "CHIP_LINUX_NETWORK_MANAGER_CONNMAN=1",
+        "CHIP_LINUX_NETWORK_MANAGER_WPA_SUPPLICANT=0",
+      ]
 
-      sources +=
-          [ "ConnectivityManagerImpl_NetworkManagementWpaSupplicant.cpp" ]
+      sources += [
+        "ConnectivityManagerImpl_NetworkManagementConnMan.cpp",
+        "ConnectivityManagerImpl_NetworkManagementConnMan.h",
+      ]
+
+      public_deps += [ "dbus/connman" ]
+    } else if (chip_linux_network_manager == "wpa_supplicant") {
+      defines += [
+        "CHIP_LINUX_NETWORK_MANAGER_CONNMAN=0",
+        "CHIP_LINUX_NETWORK_MANAGER_WPA_SUPPLICANT=1",
+      ]
+
+      sources += [
+        "ConnectivityManagerImpl_NetworkManagementWpaSupplicant.cpp",
+        "ConnectivityManagerImpl_NetworkManagementWpaSupplicant.h",
+      ]
     } else {
-      assert(false,
-             "Linux network manager not specified or not supported: " +
-                 chip_linux_network_manager +
-                 ". chip_linux_network_manager must be 'wpa_supplicant'.")
+      assert(
+          false,
+          "Linux network manager not specified or not supported: " +
+              chip_linux_network_manager + ". chip_linux_network_manager must be 'connman' or 'wpa_supplicant'.")
     }
 
     # If Wi-Fi is enabled, validate and setup the Wi-Fi Neighbor
@@ -295,7 +313,10 @@ static_library("Linux") {
       } else if (chip_linux_wifi_paf_manager == "wpa_supplicant") {
         defines += [ "CHIP_LINUX_WIFI_PAF_MANAGER_WPA_SUPPLICANT=1" ]
 
-        sources += [ "ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp" ]
+        sources += [
+          "ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp",
+          "ConnectivityManagerImpl_WiFiPafWpaSupplicant.h",
+        ]
       } else {
         assert(
             false,

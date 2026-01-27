@@ -28,7 +28,7 @@
  *
  *  Because there is coordination between the Matter thread context
  *  and the GLib thread context, cross-thread mutual exclusion is
- *  absolutely required and few, short, mechanical rules must be
+ *  absolutely required and a few, short, mechanical rules must be
  *  observed:
  *
  *    1. There shall be no invocation of the synchronous (that is,
@@ -85,40 +85,40 @@ using namespace ::chip::app::Clusters::WiFiNetworkDiagnostics;
 
 // Preprocessor Definitions
 
-#define CONNMAN_SERVICE                                "net.connman"
+#define CONNMAN_SERVICE "net.connman"
 
-#define CONNMAN_AGENT_INTERFACE                        CONNMAN_SERVICE ".Agent"
+#define CONNMAN_AGENT_INTERFACE CONNMAN_SERVICE ".Agent"
 
-#define CONNMAN_MANAGER_INTERFACE                      CONNMAN_SERVICE ".Manager"
-#define CONNMAN_MANAGER_PATH                           "/"
-#define CONNMAN_MANAGER_OBJECT_PATH_STEM               CONNMAN_MANAGER_PATH "net/connman"
-#define CONNMAN_MANAGER_SERVICE_PATH_STEM              CONNMAN_MANAGER_OBJECT_PATH_STEM "/service"
-#define CONNMAN_MANAGER_TECHNOLOGY_PATH_STEM           CONNMAN_MANAGER_OBJECT_PATH_STEM "/technology"
+#define CONNMAN_MANAGER_INTERFACE CONNMAN_SERVICE ".Manager"
+#define CONNMAN_MANAGER_PATH "/"
+#define CONNMAN_MANAGER_OBJECT_PATH_STEM CONNMAN_MANAGER_PATH "net/connman"
+#define CONNMAN_MANAGER_SERVICE_PATH_STEM CONNMAN_MANAGER_OBJECT_PATH_STEM "/service"
+#define CONNMAN_MANAGER_TECHNOLOGY_PATH_STEM CONNMAN_MANAGER_OBJECT_PATH_STEM "/technology"
 
-#define CONNMAN_SERVICE_INTERFACE                      CONNMAN_SERVICE ".Service"
-#define CONNMAN_TECHNOLOGY_INTERFACE                   CONNMAN_SERVICE ".Technology"
+#define CONNMAN_SERVICE_INTERFACE CONNMAN_SERVICE ".Service"
+#define CONNMAN_TECHNOLOGY_INTERFACE CONNMAN_SERVICE ".Technology"
 
 // Note that dashes ("-") are not allowed in D-Bus
 // paths.
 
-#define MATTER_PATH                                    "/org/csa/matter"
-#define MATTER_CONNECTIVITY_MANGER_CONNMAN_AGENT_PATH  MATTER_PATH "/ConnectivityManager"
+#define MATTER_PATH "/org/csa/matter"
+#define MATTER_CONNECTIVITY_MANGER_CONNMAN_AGENT_PATH MATTER_PATH "/ConnectivityManager"
 
-#define kConnManObjectPropertyNameKey                  "Name"
+#define kConnManObjectPropertyNameKey "Name"
 
-#define kConnManObjectPropertyStateKey                 "State"
+#define kConnManObjectPropertyStateKey "State"
 
-#define kConnManObjectPropertyStateIdleValue           "idle"
-#define kConnManObjectPropertyStateOfflineValue        "offline"
-#define kConnManObjectPropertyStateOnlineValue         "online"
-#define kConnManObjectPropertyStateReadyValue          "ready"
+#define kConnManObjectPropertyStateIdleValue "idle"
+#define kConnManObjectPropertyStateOfflineValue "offline"
+#define kConnManObjectPropertyStateOnlineValue "online"
+#define kConnManObjectPropertyStateReadyValue "ready"
 
-#define kConnManObjectPropertyTypeKey                  "Type"
+#define kConnManObjectPropertyTypeKey "Type"
 
-#define kConnManObjectPropertyTypeEthernetValue        "ethernet"
-#define kConnManObjectPropertyTypeWiFiValue            "wifi"
+#define kConnManObjectPropertyTypeEthernetValue "ethernet"
+#define kConnManObjectPropertyTypeWiFiValue "wifi"
 
-#define CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX        "connman: "
+#define CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connman: "
 
 namespace chip {
 namespace DeviceLayer {
@@ -132,7 +132,7 @@ namespace {
 template <typename Callable>
 struct GLibInvokeContext
 {
-    Callable   mCallable;
+    Callable mCallable;
     CHIP_ERROR mStatus = CHIP_NO_ERROR;
 };
 
@@ -145,154 +145,154 @@ public:
     explicit operator bool(void) const noexcept;
 
 private:
-    GAutoPtr<GVariant> mOwned;           // owns unboxed value if we had to unbox
-    GVariant *         mValue = nullptr; // points to either inMaybeVariant or mOwned.get()
+    GAutoPtr<GVariant> mOwned;   // owns unboxed value if we had to unbox
+    GVariant * mValue = nullptr; // points to either inMaybeVariant or mOwned.get()
 };
 
 // Global Variables
 
-static constexpr char kConnManServiceName[]                                       = CONNMAN_SERVICE;
-static constexpr char kConnManManagerInterface[]                                  = CONNMAN_MANAGER_INTERFACE;
-static constexpr char kConnManManagerPath[]                                       = CONNMAN_MANAGER_PATH;
+static constexpr char kConnManServiceName[]      = CONNMAN_SERVICE;
+static constexpr char kConnManManagerInterface[] = CONNMAN_MANAGER_INTERFACE;
+static constexpr char kConnManManagerPath[]      = CONNMAN_MANAGER_PATH;
 
 // Service Agent Object Property Keys and Values
 
-static constexpr char kConnManServiceAgentPropertyAlternatesKey[]                 = "Alternates";
-static constexpr char kConnManServiceAgentPropertyIdentityKey[]                   = "Identity";
-static constexpr char kConnManServiceAgentPropertyNameKey[]                       = "Name";
-static constexpr char kConnManServiceAgentPropertyPassphraseKey[]                 = "Passphrase";
-static constexpr char kConnManServiceAgentPropertyPasswordKey[]                   = "Password";
-static constexpr char kConnManServiceAgentPropertyPreviousPassphraseKey[]         = "PreviousPassphrase";
+static constexpr char kConnManServiceAgentPropertyAlternatesKey[]         = "Alternates";
+static constexpr char kConnManServiceAgentPropertyIdentityKey[]           = "Identity";
+static constexpr char kConnManServiceAgentPropertyNameKey[]               = "Name";
+static constexpr char kConnManServiceAgentPropertyPassphraseKey[]         = "Passphrase";
+static constexpr char kConnManServiceAgentPropertyPasswordKey[]           = "Password";
+static constexpr char kConnManServiceAgentPropertyPreviousPassphraseKey[] = "PreviousPassphrase";
 
-static constexpr char kConnManServiceAgentPropertyRequirementKey[]                = "Requirement";
+static constexpr char kConnManServiceAgentPropertyRequirementKey[] = "Requirement";
 
 static constexpr char kConnManServiceAgentPropertyRequirementAlternateValue[]     = "alternate";
 static constexpr char kConnManServiceAgentPropertyRequirementInformationalValue[] = "informational";
 static constexpr char kConnManServiceAgentPropertyRequirementMandatoryValue[]     = "mandatory";
 static constexpr char kConnManServiceAgentPropertyRequirementOptionalValue[]      = "optional";
 
-static constexpr char kConnManServiceAgentPropertySSIDKey[]                       = "SSID";
+static constexpr char kConnManServiceAgentPropertySSIDKey[] = "SSID";
 
-static constexpr char kConnManServiceAgentPropertyTypeKey[]                       = "Type";
+static constexpr char kConnManServiceAgentPropertyTypeKey[] = "Type";
 
-static constexpr char kConnManServiceAgentPropertyTypePassphraseValue[]           = "passphrase";
-static constexpr char kConnManServiceAgentPropertyTypePSKValue[]                  = "psk";
-static constexpr char kConnManServiceAgentPropertyTypeResponseValue[]             = "response";
-static constexpr char kConnManServiceAgentPropertyTypeSSIDValue[]                 = "ssid";
-static constexpr char kConnManServiceAgentPropertyTypeStringValue[]               = "string";
-static constexpr char kConnManServiceAgentPropertyTypeWEPValue[]                  = "wep";
-static constexpr char kConnManServiceAgentPropertyTypeWPSPINValue[]               = "wpspin";
+static constexpr char kConnManServiceAgentPropertyTypePassphraseValue[] = "passphrase";
+static constexpr char kConnManServiceAgentPropertyTypePSKValue[]        = "psk";
+static constexpr char kConnManServiceAgentPropertyTypeResponseValue[]   = "response";
+static constexpr char kConnManServiceAgentPropertyTypeSSIDValue[]       = "ssid";
+static constexpr char kConnManServiceAgentPropertyTypeStringValue[]     = "string";
+static constexpr char kConnManServiceAgentPropertyTypeWEPValue[]        = "wep";
+static constexpr char kConnManServiceAgentPropertyTypeWPSPINValue[]     = "wpspin";
 
-static constexpr char kConnManServiceAgentPropertyUsernameKey[]                   = "Username";
-static constexpr char kConnManServiceAgentPropertyValueKey[]                      = "Value";
-static constexpr char kConnManServiceAgentPropertyWPSKey[]                        = "WPS";
+static constexpr char kConnManServiceAgentPropertyUsernameKey[] = "Username";
+static constexpr char kConnManServiceAgentPropertyValueKey[]    = "Value";
+static constexpr char kConnManServiceAgentPropertyWPSKey[]      = "WPS";
 
 // Manager Object Property Keys and Values
 
-static constexpr char kConnManManagerPropertyStateKey[]                           = kConnManObjectPropertyStateKey;
+static constexpr char kConnManManagerPropertyStateKey[] = kConnManObjectPropertyStateKey;
 
-static constexpr char kConnManManagerPropertyStateIdleValue[]                     = kConnManObjectPropertyStateIdleValue;
-static constexpr char kConnManManagerPropertyStateOfflineValue[]                  = kConnManObjectPropertyStateOfflineValue;
-static constexpr char kConnManManagerPropertyStateOnlineValue[]                   = kConnManObjectPropertyStateOnlineValue;
-static constexpr char kConnManManagerPropertyStateReadyValue[]                    = kConnManObjectPropertyStateReadyValue;
-static constexpr char kConnManManagerPropertyStateUnavailableValue[]              = "unavailable";
+static constexpr char kConnManManagerPropertyStateIdleValue[]        = kConnManObjectPropertyStateIdleValue;
+static constexpr char kConnManManagerPropertyStateOfflineValue[]     = kConnManObjectPropertyStateOfflineValue;
+static constexpr char kConnManManagerPropertyStateOnlineValue[]      = kConnManObjectPropertyStateOnlineValue;
+static constexpr char kConnManManagerPropertyStateReadyValue[]       = kConnManObjectPropertyStateReadyValue;
+static constexpr char kConnManManagerPropertyStateUnavailableValue[] = "unavailable";
 
 // Service Object Property Keys and Values
 
-static constexpr char kConnManServicePropertyAutoConnectKey[]                     = "AutoConnect";
-static constexpr char kConnManServicePropertyDomainsKey[]                         = "Domains";
-static constexpr char kConnManServicePropertyDomainsConfigurationKey[]            = "Domains.Configuration";
+static constexpr char kConnManServicePropertyAutoConnectKey[]          = "AutoConnect";
+static constexpr char kConnManServicePropertyDomainsKey[]              = "Domains";
+static constexpr char kConnManServicePropertyDomainsConfigurationKey[] = "Domains.Configuration";
 
-static constexpr char kConnManServicePropertyErrorKey[]                           = "Error";
+static constexpr char kConnManServicePropertyErrorKey[] = "Error";
 
-static constexpr char kConnManServicePropertyErrorAuthFailedValue[]               = "auth-failed";
-static constexpr char kConnManServicePropertyErrorBlockedValue[]                  = "blocked";
-static constexpr char kConnManServicePropertyErrorConnectFailedValue[]            = "connect-failed";
-static constexpr char kConnManServicePropertyErrorDHCPFailedValue[]               = "dhcp-failed";
-static constexpr char kConnManServicePropertyErrorInvalidKeyValue[]               = "invalid-key";
-static constexpr char kConnManServicePropertyErrorLoginFailedValue[]              = "login-failed";
-static constexpr char kConnManServicePropertyErrorOnlineCheckFailedValue[]        = "online-check-failed";
-static constexpr char kConnManServicePropertyErrorOutOfRangeValue[]               = "out-of-range";
-static constexpr char kConnManServicePropertyErrorPINMissingValue[]               = "pin-missing";
+static constexpr char kConnManServicePropertyErrorAuthFailedValue[]        = "auth-failed";
+static constexpr char kConnManServicePropertyErrorBlockedValue[]           = "blocked";
+static constexpr char kConnManServicePropertyErrorConnectFailedValue[]     = "connect-failed";
+static constexpr char kConnManServicePropertyErrorDHCPFailedValue[]        = "dhcp-failed";
+static constexpr char kConnManServicePropertyErrorInvalidKeyValue[]        = "invalid-key";
+static constexpr char kConnManServicePropertyErrorLoginFailedValue[]       = "login-failed";
+static constexpr char kConnManServicePropertyErrorOnlineCheckFailedValue[] = "online-check-failed";
+static constexpr char kConnManServicePropertyErrorOutOfRangeValue[]        = "out-of-range";
+static constexpr char kConnManServicePropertyErrorPINMissingValue[]        = "pin-missing";
 
-static constexpr char kConnManServicePropertyEthernetKey[]                        = "Ethernet";
+static constexpr char kConnManServicePropertyEthernetKey[] = "Ethernet";
 
-static constexpr char kConnManServicePropertyEthernetAddressKey[]                 = "Address";
-static constexpr char kConnManServicePropertyEthernetInterfaceKey[]               = "Interface";
-static constexpr char kConnManServicePropertyEthernetMTUKey[]                     = "MTU";
-static constexpr char kConnManServicePropertyEthernetMethodKey[]                  = "Method";
+static constexpr char kConnManServicePropertyEthernetAddressKey[]   = "Address";
+static constexpr char kConnManServicePropertyEthernetInterfaceKey[] = "Interface";
+static constexpr char kConnManServicePropertyEthernetMTUKey[]       = "MTU";
+static constexpr char kConnManServicePropertyEthernetMethodKey[]    = "Method";
 
-static constexpr char kConnManServicePropertyFavoriteKey[]                        = "Favorite";
-static constexpr char kConnManServicePropertyIPv4Key[]                            = "IPv4";
-static constexpr char kConnManServicePropertyIPv4ConfigurationKey[]               = "IPv4.Configuration";
-static constexpr char kConnManServicePropertyIPv6Key[]                            = "IPv6";
-static constexpr char kConnManServicePropertyIPv6ConfigurationKey[]               = "IPv6.Configuration";
-static constexpr char kConnManServicePropertymDNSKey[]                            = "mDNS";
-static constexpr char kConnManServicePropertymDNSConfigurationKey[]               = "mDNS.Configuration";
-static constexpr char kConnManServicePropertyNameKey[]                            = kConnManObjectPropertyNameKey;
-static constexpr char kConnManServicePropertyNameserversKey[]                     = "Nameservers";
-static constexpr char kConnManServicePropertyNameserversConfigurationKey[]        = "Nameservers.Configuration";
-static constexpr char kConnManServicePropertyProviderKey[]                        = "Provider";
-static constexpr char kConnManServicePropertyProxyConfigurationKey[]              = "Proxy.Configuration";
-static constexpr char kConnManServicePropertyProxyKey[]                           = "Proxy";
+static constexpr char kConnManServicePropertyFavoriteKey[]                 = "Favorite";
+static constexpr char kConnManServicePropertyIPv4Key[]                     = "IPv4";
+static constexpr char kConnManServicePropertyIPv4ConfigurationKey[]        = "IPv4.Configuration";
+static constexpr char kConnManServicePropertyIPv6Key[]                     = "IPv6";
+static constexpr char kConnManServicePropertyIPv6ConfigurationKey[]        = "IPv6.Configuration";
+static constexpr char kConnManServicePropertymDNSKey[]                     = "mDNS";
+static constexpr char kConnManServicePropertymDNSConfigurationKey[]        = "mDNS.Configuration";
+static constexpr char kConnManServicePropertyNameKey[]                     = kConnManObjectPropertyNameKey;
+static constexpr char kConnManServicePropertyNameserversKey[]              = "Nameservers";
+static constexpr char kConnManServicePropertyNameserversConfigurationKey[] = "Nameservers.Configuration";
+static constexpr char kConnManServicePropertyProviderKey[]                 = "Provider";
+static constexpr char kConnManServicePropertyProxyConfigurationKey[]       = "Proxy.Configuration";
+static constexpr char kConnManServicePropertyProxyKey[]                    = "Proxy";
 
-static constexpr char kConnManServicePropertyRoamingKey[]                         = "Roaming";
+static constexpr char kConnManServicePropertyRoamingKey[] = "Roaming";
 
-static constexpr char kConnManServicePropertySecurityKey[]                        = "Security";
+static constexpr char kConnManServicePropertySecurityKey[] = "Security";
 
-static constexpr char kConnManServicePropertySecurity8021XValue[]                 = "ieee8021x";
-static constexpr char kConnManServicePropertySecurityNoneValue[]                  = "none";
-static constexpr char kConnManServicePropertySecurityPSKValue[]                   = "psk";
-static constexpr char kConnManServicePropertySecurityRSNValue[]                   = "rsn";
-static constexpr char kConnManServicePropertySecurityWEPValue[]                   = "wep";
-static constexpr char kConnManServicePropertySecurityWPAValue[]                   = "wpa";
-static constexpr char kConnManServicePropertySecurityWPSAdvertisingValue[]        = "wps_advertising";
-static constexpr char kConnManServicePropertySecurityWPSValue[]                   = "wps";
+static constexpr char kConnManServicePropertySecurity8021XValue[]          = "ieee8021x";
+static constexpr char kConnManServicePropertySecurityNoneValue[]           = "none";
+static constexpr char kConnManServicePropertySecurityPSKValue[]            = "psk";
+static constexpr char kConnManServicePropertySecurityRSNValue[]            = "rsn";
+static constexpr char kConnManServicePropertySecurityWEPValue[]            = "wep";
+static constexpr char kConnManServicePropertySecurityWPAValue[]            = "wpa";
+static constexpr char kConnManServicePropertySecurityWPSAdvertisingValue[] = "wps_advertising";
+static constexpr char kConnManServicePropertySecurityWPSValue[]            = "wps";
 
-static constexpr char kConnManServicePropertyStateKey[]                           = "State";
+static constexpr char kConnManServicePropertyStateKey[] = "State";
 
-static constexpr char kConnManServicePropertyStateAssociationValue[]              = "association";
-static constexpr char kConnManServicePropertyStateConfigurationValue[]            = "configuration";
-static constexpr char kConnManServicePropertyStateDisconnectValue[]               = "disconnect";
-static constexpr char kConnManServicePropertyStateFailureValue[]                  = "failure";
-static constexpr char kConnManServicePropertyStateIdleValue[]                     = kConnManObjectPropertyStateIdleValue;
-static constexpr char kConnManServicePropertyStateOfflineValue[]                  = kConnManObjectPropertyStateOfflineValue;
-static constexpr char kConnManServicePropertyStateOnlineValue[]                   = kConnManObjectPropertyStateOnlineValue;
-static constexpr char kConnManServicePropertyStateReadyValue[]                    = kConnManObjectPropertyStateReadyValue;
+static constexpr char kConnManServicePropertyStateAssociationValue[]   = "association";
+static constexpr char kConnManServicePropertyStateConfigurationValue[] = "configuration";
+static constexpr char kConnManServicePropertyStateDisconnectValue[]    = "disconnect";
+static constexpr char kConnManServicePropertyStateFailureValue[]       = "failure";
+static constexpr char kConnManServicePropertyStateIdleValue[]          = kConnManObjectPropertyStateIdleValue;
+static constexpr char kConnManServicePropertyStateOfflineValue[]       = kConnManObjectPropertyStateOfflineValue;
+static constexpr char kConnManServicePropertyStateOnlineValue[]        = kConnManObjectPropertyStateOnlineValue;
+static constexpr char kConnManServicePropertyStateReadyValue[]         = kConnManObjectPropertyStateReadyValue;
 
-static constexpr char kConnManServicePropertyStrengthKey[]                        = "Strength";
-static constexpr char kConnManServicePropertyTimeserversKey[]                     = "Timeservers";
-static constexpr char kConnManServicePropertyTimeserversConfigurationKey[]        = "Timeservers.Configuration";
+static constexpr char kConnManServicePropertyStrengthKey[]                 = "Strength";
+static constexpr char kConnManServicePropertyTimeserversKey[]              = "Timeservers";
+static constexpr char kConnManServicePropertyTimeserversConfigurationKey[] = "Timeservers.Configuration";
 
-static constexpr char kConnManServicePropertyTypeKey[]                            = kConnManObjectPropertyTypeKey;
+static constexpr char kConnManServicePropertyTypeKey[] = kConnManObjectPropertyTypeKey;
 
-static constexpr char kConnManServicePropertyTypeEthernetValue[]                  = kConnManObjectPropertyTypeEthernetValue;
-static constexpr char kConnManServicePropertyTypeWiFiValue[]                      = kConnManObjectPropertyTypeWiFiValue;
+static constexpr char kConnManServicePropertyTypeEthernetValue[] = kConnManObjectPropertyTypeEthernetValue;
+static constexpr char kConnManServicePropertyTypeWiFiValue[]     = kConnManObjectPropertyTypeWiFiValue;
 
 // Technology Object Property Keys and Values
 
-static constexpr char kConnManTechnologyPropertyConnectedKey[]                    = "Connected";
-static constexpr char kConnManTechnologyPropertyNameKey[]                         = kConnManObjectPropertyNameKey;
-static constexpr char kConnManTechnologyPropertyPoweredKey[]                      = "Powered";
-static constexpr char kConnManTechnologyPropertyTypeKey[]                         = kConnManObjectPropertyTypeKey;
+static constexpr char kConnManTechnologyPropertyConnectedKey[] = "Connected";
+static constexpr char kConnManTechnologyPropertyNameKey[]      = kConnManObjectPropertyNameKey;
+static constexpr char kConnManTechnologyPropertyPoweredKey[]   = "Powered";
+static constexpr char kConnManTechnologyPropertyTypeKey[]      = kConnManObjectPropertyTypeKey;
 
-static constexpr char kConnManTechnologyPropertyTypeEthernetValue[]               = kConnManObjectPropertyTypeEthernetValue;
-static constexpr char kConnManTechnologyPropertyTypeWiFiValue[]                   = kConnManObjectPropertyTypeWiFiValue;
+static constexpr char kConnManTechnologyPropertyTypeEthernetValue[] = kConnManObjectPropertyTypeEthernetValue;
+static constexpr char kConnManTechnologyPropertyTypeWiFiValue[]     = kConnManObjectPropertyTypeWiFiValue;
 
 // Network Name and Passphrase Validate Check Failure Reason Strings
 
-static constexpr char kNetworkNameIsTooShort[]                                    = "name is too short";
-static constexpr char kNetworkNameIsTooLong[]                                     = "name is too long";
-static constexpr char kNetworkPassphraseIsTooShort[]                              = "passphrase is too short";
-static constexpr char kNetworkPassphraseIsTooLong[]                               = "passphrase is too long";
-static constexpr char kNetworkPassphraseHasInvalidCharacters[]                    = "passphrase contains an invalid character";
+static constexpr char kNetworkNameIsTooShort[]                 = "name is too short";
+static constexpr char kNetworkNameIsTooLong[]                  = "name is too long";
+static constexpr char kNetworkPassphraseIsTooShort[]           = "passphrase is too short";
+static constexpr char kNetworkPassphraseIsTooLong[]            = "passphrase is too long";
+static constexpr char kNetworkPassphraseHasInvalidCharacters[] = "passphrase contains an invalid character";
 
 /**
  *  The maximum number of "active" (connman does not actually do
  *  active, directed scans) scans for a particular SSID before
  *  failing.
  */
-static constexpr size_t kWiFiActiveScanLimit  = 4;
+static constexpr size_t kWiFiActiveScanLimit = 4;
 
 /**
  *  The maximum number of scans for connecting to a particular SSID
@@ -306,8 +306,7 @@ static constexpr size_t kWiFiConnectScanLimit = 4;
 
 // Construction
 
-UnboxedVariant::UnboxedVariant(GVariant * inMaybeVariant) noexcept :
-    mValue(inMaybeVariant)
+UnboxedVariant::UnboxedVariant(GVariant * inMaybeVariant) noexcept : mValue(inMaybeVariant)
 {
     if (mValue != nullptr && g_variant_is_of_type(mValue, G_VARIANT_TYPE_VARIANT))
     {
@@ -331,24 +330,25 @@ static CHIP_ERROR RemoveObjectLocked(GHashTable * inObjectTable, const char * in
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inObjectTable   != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inObjectPath    != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inObjectProxies != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
-    g_hash_table_remove(inObjectTable,   inObjectPath);
+    g_hash_table_remove(inObjectTable, inObjectPath);
     g_hash_table_remove(inObjectProxies, inObjectPath);
 
 exit:
     return retval;
 }
 
-static CHIP_ERROR GetObjectPropertiesFromPathLocked(GHashTable * inObjectTable, const char * inObjectPath, GVariant *& outProperties) noexcept
+static CHIP_ERROR GetObjectPropertiesFromPathLocked(GHashTable * inObjectTable, const char * inObjectPath,
+                                                    GVariant *& outProperties) noexcept
 {
     GVariant * props  = nullptr;
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inObjectPath  != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     props = static_cast<GVariant *>(g_hash_table_lookup(inObjectTable, inObjectPath));
     VerifyOrExit(props != nullptr, retval = ChipError(ChipError::Range::kPOSIX, ENOENT));
@@ -362,10 +362,10 @@ exit:
 static CHIP_ERROR GetObjectByteValueFromPropertiesLocked(GVariant * inProperties, const char * inKey, uint8_t & outValue) noexcept
 {
     GAutoPtr<GVariant> boxed;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrReturnError(inProperties != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inKey        != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrReturnError(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), CHIP_ERROR_WRONG_KEY_TYPE);
 
@@ -382,13 +382,14 @@ exit:
     return retval;
 }
 
-static CHIP_ERROR GetObjectStringValueFromPropertiesLocked(GVariant * inProperties, const char * inKey, const char *& outValue) noexcept
+static CHIP_ERROR GetObjectStringValueFromPropertiesLocked(GVariant * inProperties, const char * inKey,
+                                                           const char *& outValue) noexcept
 {
     GAutoPtr<GVariant> boxed;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrReturnError(inProperties != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inKey        != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrReturnError(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), CHIP_ERROR_WRONG_KEY_TYPE);
 
@@ -420,15 +421,16 @@ static CHIP_ERROR GetObjectTypeFromPropertiesLocked(GVariant * inProperties, con
     return GetObjectStringValueFromPropertiesLocked(inProperties, kConnManObjectPropertyTypeKey, outType);
 }
 
-static CHIP_ERROR GetObjectStringValueFromPathLocked(GHashTable * inObjectTable, const char * inObjectPath, const char * inKey, const char *& outValue) noexcept
+static CHIP_ERROR GetObjectStringValueFromPathLocked(GHashTable * inObjectTable, const char * inObjectPath, const char * inKey,
+                                                     const char *& outValue) noexcept
 {
-    GVariant *         props;
+    GVariant * props;
     GAutoPtr<GVariant> variant;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inObjectPath    != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inKey     != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inKey != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     props = static_cast<GVariant *>(g_hash_table_lookup(inObjectTable, inObjectPath));
     VerifyOrExit(props != nullptr, retval = CHIP_ERROR_KEY_NOT_FOUND);
@@ -448,7 +450,7 @@ static CHIP_ERROR GetObjectTypeFromPathLocked(GHashTable * inObjectTable, const 
 static CHIP_ERROR GetObjectPathFromProxyLocked(GDBusProxy * inProxy, const char *& outPath) noexcept
 {
     const char * path;
-    CHIP_ERROR   retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inProxy != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -464,9 +466,9 @@ exit:
 static CHIP_ERROR GetObjectTypeFromProxyLocked(GDBusProxy * inProxy, GHashTable * inObjectTable, const char *& outType) noexcept
 {
     const char * path;
-    CHIP_ERROR   retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inProxy   != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inProxy != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     retval = GetObjectPathFromProxyLocked(inProxy, path);
@@ -481,15 +483,15 @@ exit:
 
 static bool HasTechnologyLocked(GHashTable * inTechnologies, const char * inType) noexcept
 {
-    GHashTableIter     iter;
-    gpointer           key    = nullptr;
-    gpointer           value  = nullptr;
+    GHashTableIter iter;
+    gpointer key   = nullptr;
+    gpointer value = nullptr;
     GAutoPtr<GVariant> variant;
-    CHIP_ERROR         status;
-    bool               retval = false;
+    CHIP_ERROR status;
+    bool retval = false;
 
     VerifyOrExit(inTechnologies != nullptr, retval = false);
-    VerifyOrExit(inType         != nullptr, retval = false);
+    VerifyOrExit(inType != nullptr, retval = false);
 
     g_hash_table_iter_init(&iter, inTechnologies);
 
@@ -500,7 +502,7 @@ static bool HasTechnologyLocked(GHashTable * inTechnologies, const char * inType
             continue;
 
         const char * type = nullptr;
-        status = GetObjectTypeFromPropertiesLocked(props, type);
+        status            = GetObjectTypeFromPropertiesLocked(props, type);
         if (ChipError::IsSuccess(status) && type && strcmp(type, inType) == 0)
         {
             retval = true;
@@ -513,20 +515,15 @@ exit:
 
 static void LogProperty(const char * inDescription, const char * inPath, const char * inKey, GVariant * inValue) noexcept
 {
-    ChipLogDetail(DeviceLayer,
-                  CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX
-                  "%s: %s: key '%s' value type '%s'",
-                  inDescription,
-                  inPath,
-                  inKey,
-                  g_variant_get_type_string(inValue));
+    ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s: %s: key '%s' value type '%s'", inDescription, inPath,
+                  inKey, g_variant_get_type_string(inValue));
 }
 
 static void LogProperties(const char * inDescription, const char * inPath, GVariant * inDictionary) noexcept
 {
     GVariantIter it;
     const char * key = nullptr;
-    GVariant *   value = nullptr;
+    GVariant * value = nullptr;
 
     if (inDictionary == nullptr || !g_variant_is_of_type(inDictionary, G_VARIANT_TYPE_VARDICT))
     {
@@ -548,14 +545,14 @@ static void LogProperties(const char * inDescription, const char * inPath, GVari
 static CHIP_ERROR Merge(GVariant * inBase, GVariant * inDelta, GAutoPtr<GVariant> & outResult) noexcept
 {
     GAutoPtr<GHashTable> delta_keys;
-    GVariantIter         delta_iter;
-    const char *         delta_key   = nullptr;
-    GVariant *           delta_value = nullptr;
-    GVariantIter         base_iter;
-    const char *         base_key    = nullptr;
-    GVariant *           base_value  = nullptr;
-    GVariantBuilder      builder;
-    CHIP_ERROR           retval      = CHIP_NO_ERROR;
+    GVariantIter delta_iter;
+    const char * delta_key = nullptr;
+    GVariant * delta_value = nullptr;
+    GVariantIter base_iter;
+    const char * base_key = nullptr;
+    GVariant * base_value = nullptr;
+    GVariantBuilder builder;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inDelta != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -625,15 +622,16 @@ exit:
     return retval;
 }
 
-static CHIP_ERROR MergeObjectPropertiesLocked(const char * inDescription, GHashTable * inObjectTable, const char * inObjectPath, GVariant * inObjectProperties) noexcept
+static CHIP_ERROR MergeObjectPropertiesLocked(const char * inDescription, GHashTable * inObjectTable, const char * inObjectPath,
+                                              GVariant * inObjectProperties) noexcept
 {
-    GVariant *         current = nullptr;
+    GVariant * current = nullptr;
     GAutoPtr<GVariant> merged;
-    CHIP_ERROR         retval  = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inObjectTable      != nullptr,                                    retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inObjectPath       != nullptr,                                    retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inObjectProperties != nullptr,                                    retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectProperties != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(g_variant_is_of_type(inObjectProperties, G_VARIANT_TYPE_VARDICT), retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If the specified object properties are empty, then there is
@@ -657,16 +655,17 @@ exit:
     return retval;
 }
 
-static CHIP_ERROR MergeObjectPropertiesLocked(const char * inDescription, GHashTable * inObjectTable, const char * inObjectPath, const char * inKey, GVariant * inValue) noexcept
+static CHIP_ERROR MergeObjectPropertiesLocked(const char * inDescription, GHashTable * inObjectTable, const char * inObjectPath,
+                                              const char * inKey, GVariant * inValue) noexcept
 {
-    GVariantBuilder    builder;
+    GVariantBuilder builder;
     GAutoPtr<GVariant> property;
-    CHIP_ERROR         retval  = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inObjectPath  != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inKey         != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inValue       != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inKey != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inValue != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
 
@@ -684,15 +683,14 @@ exit:
 static CHIP_ERROR MergeObjectPropertiesLocked(const char * inDescription, GHashTable * inObjectTable, GVariant * inObjects) noexcept
 {
     GVariantIter iter;
-    const char * path   = nullptr;
-    GVariant *   props  = nullptr;
-    CHIP_ERROR   retval = CHIP_NO_ERROR;
+    const char * path = nullptr;
+    GVariant * props  = nullptr;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inObjects     != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjects != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(g_variant_is_of_type(inObjects, G_VARIANT_TYPE("a(oa{sv})")),
-                 retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(g_variant_is_of_type(inObjects, G_VARIANT_TYPE("a(oa{sv})")), retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     g_variant_iter_init(&iter, inObjects);
 
@@ -711,11 +709,12 @@ exit:
 static bool ByteSpanEqualsString(const ByteSpan & inSpan, const char * inString) noexcept
 {
     size_t length;
-    bool   retval;
+    bool retval;
 
     VerifyOrExit(inString != nullptr, retval = false);
 
-    ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s: comparing '%.*s' v. '%s'...", __func__, inSpan.size(), inSpan.data(), inString);
+    ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s: comparing '%.*s' v. '%s'...", __func__, inSpan.size(),
+                  inSpan.data(), inString);
 
     length = strlen(inString);
 
@@ -725,34 +724,35 @@ exit:
     return retval;
 }
 
-static ConnManService * GetWiFiServiceProxyFromSsidLocked(const ByteSpan & inSsid, GHashTable * inProxies, GHashTable * inServices) noexcept
+static ConnManService * GetWiFiServiceProxyFromSsidLocked(const ByteSpan & inSsid, GHashTable * inProxies,
+                                                          GHashTable * inServices) noexcept
 {
-    GHashTableIter   iter;
-    gpointer         key    = nullptr;
-    gpointer         value  = nullptr;
-    CHIP_ERROR       status;
+    GHashTableIter iter;
+    gpointer key   = nullptr;
+    gpointer value = nullptr;
+    CHIP_ERROR status;
     ConnManService * retval = nullptr;
 
-    VerifyOrExit(inSsid.size() > 0,     retval = nullptr);
-    VerifyOrExit(inProxies  != nullptr, retval = nullptr);
+    VerifyOrExit(inSsid.size() > 0, retval = nullptr);
+    VerifyOrExit(inProxies != nullptr, retval = nullptr);
     VerifyOrExit(inServices != nullptr, retval = nullptr);
 
     g_hash_table_iter_init(&iter, inServices);
 
     while (retval == nullptr && g_hash_table_iter_next(&iter, &key, &value))
     {
-        const char * const path  = static_cast<const char *>(key);
-        GVariant * const   props = static_cast<GVariant *>(value);
+        const char * const path = static_cast<const char *>(key);
+        GVariant * const props  = static_cast<GVariant *>(value);
         if (path == nullptr || props == nullptr || !g_variant_is_of_type(props, G_VARIANT_TYPE_VARDICT))
             continue;
 
         const char * type = nullptr;
-        status = GetObjectTypeFromPropertiesLocked(props, type);
+        status            = GetObjectTypeFromPropertiesLocked(props, type);
         if (!ChipError::IsSuccess(status) || type == nullptr || strcmp(type, kConnManServicePropertyTypeWiFiValue) != 0)
             continue;
 
         const char * name = nullptr;
-        status = GetObjectNameFromPropertiesLocked(props, name);
+        status            = GetObjectNameFromPropertiesLocked(props, name);
         if (ChipError::IsSuccess(status) && name != nullptr && ByteSpanEqualsString(inSsid, name))
             retval = static_cast<ConnManService *>(g_hash_table_lookup(inProxies, path));
     }
@@ -761,29 +761,30 @@ exit:
     return retval;
 }
 
-static ConnManTechnology * GetTechnologyProxyFromTypeLocked(const char * inType, GHashTable * inProxies, GHashTable * inTechnologies) noexcept
+static ConnManTechnology * GetTechnologyProxyFromTypeLocked(const char * inType, GHashTable * inProxies,
+                                                            GHashTable * inTechnologies) noexcept
 {
-    GHashTableIter      iter;
-    gpointer            key    = nullptr;
-    gpointer            value  = nullptr;
-    CHIP_ERROR          status;
+    GHashTableIter iter;
+    gpointer key   = nullptr;
+    gpointer value = nullptr;
+    CHIP_ERROR status;
     ConnManTechnology * retval = nullptr;
 
-    VerifyOrExit(inType         != nullptr, retval = nullptr);
-    VerifyOrExit(inProxies      != nullptr, retval = nullptr);
+    VerifyOrExit(inType != nullptr, retval = nullptr);
+    VerifyOrExit(inProxies != nullptr, retval = nullptr);
     VerifyOrExit(inTechnologies != nullptr, retval = nullptr);
 
     g_hash_table_iter_init(&iter, inTechnologies);
 
     while (retval == nullptr && g_hash_table_iter_next(&iter, &key, &value))
     {
-        const char * const path  = static_cast<const char *>(key);
-        GVariant * const   props = static_cast<GVariant *>(value);
+        const char * const path = static_cast<const char *>(key);
+        GVariant * const props  = static_cast<GVariant *>(value);
         if (path == nullptr || props == nullptr || !g_variant_is_of_type(props, G_VARIANT_TYPE_VARDICT))
             continue;
 
         const char * type = nullptr;
-        status = GetObjectTypeFromPropertiesLocked(props, type);
+        status            = GetObjectTypeFromPropertiesLocked(props, type);
         if (ChipError::IsSuccess(status) && type && strcmp(type, inType) == 0)
         {
             retval = static_cast<ConnManTechnology *>(g_hash_table_lookup(inProxies, path));
@@ -797,8 +798,8 @@ exit:
 static CHIP_ERROR GetServiceInterfaceFromEthernetLocked(GVariant * inEthernet, GAutoPtr<char> & outInterface) noexcept
 {
     const char * interface;
-    gboolean     status;
-    CHIP_ERROR   retval = CHIP_NO_ERROR;
+    gboolean status;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inEthernet != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(g_variant_is_of_type(inEthernet, G_VARIANT_TYPE_VARDICT), retval = CHIP_ERROR_WRONG_KEY_TYPE);
@@ -816,7 +817,7 @@ exit:
 static CHIP_ERROR GetServiceInterfaceFromPropertiesLocked(GVariant * inProperties, GAutoPtr<char> & outInterface) noexcept
 {
     GAutoPtr<GVariant> variant;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inProperties != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), retval = CHIP_ERROR_WRONG_KEY_TYPE);
@@ -838,7 +839,7 @@ static CHIP_ERROR GetServiceInterfaceFromPathLocked(GHashTable * inObjectTable, 
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inObjectPath  != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inObjectPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     props = static_cast<GVariant *>(g_hash_table_lookup(inObjectTable, inObjectPath));
     VerifyOrExit(props != nullptr, retval = CHIP_ERROR_KEY_NOT_FOUND);
@@ -856,13 +857,20 @@ static int GetServiceStateScore(const char * inState) noexcept
 
     nlEXPECT(inState != nullptr, exit);
 
-    if      (strcmp(inState, kConnManServicePropertyStateOnlineValue       ) == 0) retval = 7;
-    else if (strcmp(inState, kConnManServicePropertyStateReadyValue        ) == 0) retval = 6;
-    else if (strcmp(inState, kConnManServicePropertyStateConfigurationValue) == 0) retval = 5;
-    else if (strcmp(inState, kConnManServicePropertyStateAssociationValue  ) == 0) retval = 4;
-    else if (strcmp(inState, kConnManServicePropertyStateIdleValue         ) == 0) retval = 3;
-    else if (strcmp(inState, kConnManServicePropertyStateDisconnectValue   ) == 0) retval = 2;
-    else if (strcmp(inState, kConnManServicePropertyStateOfflineValue      ) == 0) retval = 1;
+    if (strcmp(inState, kConnManServicePropertyStateOnlineValue) == 0)
+        retval = 7;
+    else if (strcmp(inState, kConnManServicePropertyStateReadyValue) == 0)
+        retval = 6;
+    else if (strcmp(inState, kConnManServicePropertyStateConfigurationValue) == 0)
+        retval = 5;
+    else if (strcmp(inState, kConnManServicePropertyStateAssociationValue) == 0)
+        retval = 4;
+    else if (strcmp(inState, kConnManServicePropertyStateIdleValue) == 0)
+        retval = 3;
+    else if (strcmp(inState, kConnManServicePropertyStateDisconnectValue) == 0)
+        retval = 2;
+    else if (strcmp(inState, kConnManServicePropertyStateOfflineValue) == 0)
+        retval = 1;
 
 exit:
     return retval;
@@ -871,25 +879,25 @@ exit:
 static CHIP_ERROR GetBestServicePathForTypeLocked(const char * inType, GHashTable * inServices, GAutoPtr<char> & outPath) noexcept
 {
     GHashTableIter iter;
-    gpointer       key = nullptr;
-    gpointer       value = nullptr;
-    int            best_score = -1;
-    int            current_score;
+    gpointer key   = nullptr;
+    gpointer value = nullptr;
+    int best_score = -1;
+    int current_score;
     GAutoPtr<char> best_path;
-    CHIP_ERROR     status;
-    CHIP_ERROR     retval = CHIP_NO_ERROR;
+    CHIP_ERROR status;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inType           != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inServices       != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inType != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inServices != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     g_hash_table_iter_init(&iter, inServices);
 
     while (g_hash_table_iter_next(&iter, &key, &value))
     {
         const char * const current_path = static_cast<const char *>(key);
-        GVariant * const   props        = static_cast<GVariant *>(value);
-        const char *       type         = nullptr;
-        const char *       state        = nullptr;
+        GVariant * const props          = static_cast<GVariant *>(value);
+        const char * type               = nullptr;
+        const char * state              = nullptr;
 
         if (props == nullptr || !g_variant_is_of_type(props, G_VARIANT_TYPE_VARDICT))
             continue;
@@ -922,19 +930,20 @@ exit:
     return retval;
 }
 
-static CHIP_ERROR GetBestServiceInterfaceForTypeLocked(const char * inType, GHashTable * inServices, GAutoPtr<char> & outInterface) noexcept
+static CHIP_ERROR GetBestServiceInterfaceForTypeLocked(const char * inType, GHashTable * inServices,
+                                                       GAutoPtr<char> & outInterface) noexcept
 {
     GHashTableIter iter;
-    gpointer       key = nullptr;
-    gpointer       value = nullptr;
-    int            best_score = -1;
-    int            current_score;
+    gpointer key   = nullptr;
+    gpointer value = nullptr;
+    int best_score = -1;
+    int current_score;
     GAutoPtr<char> best_interface;
     GAutoPtr<char> current_interface;
-    CHIP_ERROR     status;
-    CHIP_ERROR     retval = CHIP_NO_ERROR;
+    CHIP_ERROR status;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inType     != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inType != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inServices != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     g_hash_table_iter_init(&iter, inServices);
@@ -942,8 +951,8 @@ static CHIP_ERROR GetBestServiceInterfaceForTypeLocked(const char * inType, GHas
     while (g_hash_table_iter_next(&iter, &key, &value))
     {
         GVariant * const props = static_cast<GVariant *>(value);
-        const char *     type  = nullptr;
-        const char *     state = nullptr;
+        const char * type      = nullptr;
+        const char * state     = nullptr;
 
         if (props == nullptr || !g_variant_is_of_type(props, G_VARIANT_TYPE_VARDICT))
             continue;
@@ -978,28 +987,29 @@ exit:
     return retval;
 }
 
-static CHIP_ERROR GetWiFiServicePropertiesFromSsidLocked(const ByteSpan & inSsid, GHashTable * inObjectTable, GAutoPtr<GVariant> & outProperties) noexcept
+static CHIP_ERROR GetWiFiServicePropertiesFromSsidLocked(const ByteSpan & inSsid, GHashTable * inObjectTable,
+                                                         GAutoPtr<GVariant> & outProperties) noexcept
 {
     GHashTableIter iter;
-    gpointer       key    = nullptr;
-    gpointer       value  = nullptr;
-    CHIP_ERROR     retval = CHIP_NO_ERROR;
+    gpointer key      = nullptr;
+    gpointer value    = nullptr;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inSsid.size() > 0,    retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inSsid.size() > 0, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inObjectTable != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     g_hash_table_iter_init(&iter, inObjectTable);
 
     while (g_hash_table_iter_next(&iter, &key, &value))
     {
-        const char * const path  = static_cast<const char *>(key);
-        GVariant * const   props = static_cast<GVariant *>(value);
+        const char * const path = static_cast<const char *>(key);
+        GVariant * const props  = static_cast<GVariant *>(value);
 
         if (path == nullptr || props == nullptr || !g_variant_is_of_type(props, G_VARIANT_TYPE_VARDICT))
             continue;
 
         const char * type = nullptr;
-        retval = GetObjectTypeFromPropertiesLocked(props, type);
+        retval            = GetObjectTypeFromPropertiesLocked(props, type);
         if (!ChipError::IsSuccess(retval) || type == nullptr || strcmp(type, kConnManServicePropertyTypeWiFiValue) != 0)
         {
             continue;
@@ -1008,7 +1018,7 @@ static CHIP_ERROR GetWiFiServicePropertiesFromSsidLocked(const ByteSpan & inSsid
         // ConnMan's "Name" for Wi-Fi services is the SSID string.
 
         const char * name = nullptr;
-        retval = GetObjectNameFromPropertiesLocked(props, name);
+        retval            = GetObjectNameFromPropertiesLocked(props, name);
         if (ChipError::IsSuccess(retval) && name != nullptr && ByteSpanEqualsString(inSsid, name))
         {
             outProperties.reset(g_variant_ref(props));
@@ -1031,15 +1041,13 @@ exit:
 
 static CHIP_ERROR GetWiFiServiceStrengthLocked(GVariant * inProperties, int8_t & outStrength) noexcept
 {
-    uint8_t            value;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    uint8_t value;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     retval = GetObjectByteValueFromPropertiesLocked(inProperties, kConnManServicePropertyStrengthKey, value);
     SuccessOrExit(retval);
 
-    outStrength = std::clamp(static_cast<int8_t>(value),
-                             static_cast<int8_t>(0),
-                             static_cast<int8_t>(100));
+    outStrength = std::clamp(static_cast<int8_t>(value), static_cast<int8_t>(0), static_cast<int8_t>(100));
 
 exit:
     return retval;
@@ -1063,18 +1071,14 @@ exit:
  */
 static CHIP_ERROR ValidateWiFiServiceSsid(const ByteSpan & inSsid, const char *& outReason) noexcept
 {
-    static constexpr size_t          kMinLength =  1;
-    static constexpr size_t          kMaxLength = 32;
-    size_t                           lLength;
-    CHIP_ERROR                       lRetval = CHIP_NO_ERROR;
+    static constexpr size_t kMinLength = 1;
+    static constexpr size_t kMaxLength = 32;
+    size_t lLength;
+    CHIP_ERROR lRetval = CHIP_NO_ERROR;
 
     lLength = inSsid.size();
-    VerifyOrExit(lLength >= kMinLength,
-                 outReason = kNetworkNameIsTooShort;
-                 lRetval   = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(lLength <= kMaxLength,
-                 outReason = kNetworkNameIsTooLong;
-                 lRetval   = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(lLength >= kMinLength, outReason = kNetworkNameIsTooShort; lRetval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(lLength <= kMaxLength, outReason = kNetworkNameIsTooLong; lRetval = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
     return lRetval;
@@ -1109,20 +1113,16 @@ exit:
  */
 static CHIP_ERROR ValidateWiFiServicePassphrase(const ByteSpan & inPassphrase, const char *& outReason) noexcept
 {
-    static constexpr size_t          kMinLength =  8;
-    static constexpr size_t          kMaxLength = Internal::kMaxWiFiKeyLength;
-    size_t                           lLength;
-    CHIP_ERROR                       lRetval    = CHIP_NO_ERROR;
+    static constexpr size_t kMinLength = 8;
+    static constexpr size_t kMaxLength = Internal::kMaxWiFiKeyLength;
+    size_t lLength;
+    CHIP_ERROR lRetval = CHIP_NO_ERROR;
 
     // Do a quick character range sanity check.
 
     lLength = inPassphrase.size();
-    VerifyOrExit(lLength >= kMinLength,
-                 outReason = kNetworkPassphraseIsTooShort;
-                 lRetval   = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(lLength <= kMaxLength,
-                 outReason = kNetworkPassphraseIsTooLong;
-                 lRetval   = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(lLength >= kMinLength, outReason = kNetworkPassphraseIsTooShort; lRetval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(lLength <= kMaxLength, outReason = kNetworkPassphraseIsTooLong; lRetval = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
     return lRetval;
@@ -1130,7 +1130,7 @@ exit:
 
 static void _MaybeClearInterfaceName(const char * inInterfaceName, char * inOutInterfaceName) noexcept
 {
-    VerifyOrReturn(inInterfaceName    != nullptr);
+    VerifyOrReturn(inInterfaceName != nullptr);
     VerifyOrReturn(inOutInterfaceName != nullptr);
 
     if (strncmp(inInterfaceName, inOutInterfaceName, Inet::InterfaceId::kMaxIfNameLength) == 0)
@@ -1141,8 +1141,8 @@ static void _MaybeClearInterfaceName(const char * inInterfaceName, char * inOutI
 
 static void _MaybeSetInterfaceName(const char * inDescription, const char * inInterfaceName, char * inOutInterfaceName) noexcept
 {
-    VerifyOrReturn(inDescription      != nullptr);
-    VerifyOrReturn(inInterfaceName    != nullptr);
+    VerifyOrReturn(inDescription != nullptr);
+    VerifyOrReturn(inInterfaceName != nullptr);
     VerifyOrReturn(inOutInterfaceName != nullptr);
 
     if (strncmp(inOutInterfaceName, inInterfaceName, Inet::InterfaceId::kMaxIfNameLength) != 0)
@@ -1150,7 +1150,8 @@ static void _MaybeSetInterfaceName(const char * inDescription, const char * inIn
         strncpy(inOutInterfaceName, inInterfaceName, Inet::InterfaceId::kMaxIfNameLength);
         inOutInterfaceName[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "Got %s interface: %s", inDescription, inOutInterfaceName);
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "Got %s interface: %s", inDescription,
+                        inOutInterfaceName);
     }
 }
 
@@ -1175,11 +1176,11 @@ static CHIP_ERROR InvokeOnGLibContextSync(Callable && inCallable) noexcept
     static_assert(std::is_same_v<std::invoke_result_t<DecayedCallable &>, CHIP_ERROR>,
                   "InvokeOnGLibMainLoopSync callable must return CHIP_ERROR");
 
-    DecayedCallable                    callable(std::forward<Callable>(inCallable));
+    DecayedCallable callable(std::forward<Callable>(inCallable));
     GLibInvokeContext<DecayedCallable> context{ callable };
 
-    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(&InvokeOnGLibContextSyncTrampoline<DecayedCallable>,
-                                                                       &context));
+    ReturnErrorOnFailure(
+        PlatformMgrImpl().GLibMatterContextInvokeSync(&InvokeOnGLibContextSyncTrampoline<DecayedCallable>, &context));
 
     return context.mStatus;
 }
@@ -1199,14 +1200,11 @@ auto UnlockAndInvoke(LockT & inOutLock, Callable && inCallable) noexcept -> decl
 }
 
 template <typename LockT, typename Callable>
-static CHIP_ERROR UnlockAndInvokeOnGLibContextSync(LockT & inOutLock,
-                                                   Callable && inCallable) noexcept
+static CHIP_ERROR UnlockAndInvokeOnGLibContextSync(LockT & inOutLock, Callable && inCallable) noexcept
 {
     VerifyOrDie(inOutLock.owns_lock());
 
-    return UnlockAndInvoke(inOutLock, [&]() {
-        return InvokeOnGLibContextSync(std::forward<Callable>(inCallable));
-    });
+    return UnlockAndInvoke(inOutLock, [&]() { return InvokeOnGLibContextSync(std::forward<Callable>(inCallable)); });
 }
 
 } // namespace
@@ -1224,11 +1222,11 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::Init(ConnectivityMa
     retval = NetworkManagementBasis::Init();
     SuccessOrExit(retval);
 
-    mConnectivityManagerImpl      = &inConnectivityManagerImpl;
+    mConnectivityManagerImpl = &inConnectivityManagerImpl;
 
-    mEthernetIfName[0]            = '\0';
+    mEthernetIfName[0] = '\0';
     mWiFiActiveScanSsid.reset();
-    mWiFiActiveScanCount          = 0;
+    mWiFiActiveScanCount = 0;
     mWiFiConnectPassphrase.reset();
     mWiFiConnectSsid.reset();
     mWiFiConnectScanCount         = 0;
@@ -1241,22 +1239,21 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::InitAgentOnGLib(ConnectivityManagerImpl_NetworkManagementConnMan * inSelf,
-                                                                             GDBusConnection * inConnection,
-                                                                             const char * inPath,
-                                                                             ConnManAgent *& outSkeleton,
-                                                                             GError ** outError) noexcept
+CHIP_ERROR
+ConnectivityManagerImpl_NetworkManagementConnMan::InitAgentOnGLib(ConnectivityManagerImpl_NetworkManagementConnMan * inSelf,
+                                                                  GDBusConnection * inConnection, const char * inPath,
+                                                                  ConnManAgent *& outSkeleton, GError ** outError) noexcept
 {
     GAutoPtr<ConnManAgent> skeleton;
-    GAutoPtr<GError>       err;
-    gboolean               exported;
-    CHIP_ERROR             retval = CHIP_NO_ERROR;
+    GAutoPtr<GError> err;
+    gboolean exported;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    VerifyOrExit(inSelf       != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inSelf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inConnection != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inPath       != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     skeleton.reset(conn_man_agent_skeleton_new());
     VerifyOrExit(skeleton.get() != nullptr, retval = CHIP_ERROR_INTERNAL);
@@ -1266,56 +1263,44 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::InitAgentOnGLib(Con
 
     // Cancel
 
-    g_signal_connect(
-        skeleton.get(), "handle-cancel",
-        G_CALLBACK(+[](ConnManAgent * inAgent_,
-                       GDBusMethodInvocation * inInvocation_,
-                       ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
-                       return inSelf_->OnAgentCancel(inAgent_, inInvocation_);
-                   }),
-        inSelf);
+    g_signal_connect(skeleton.get(), "handle-cancel",
+                     G_CALLBACK(+[](ConnManAgent * inAgent_, GDBusMethodInvocation * inInvocation_,
+                                    ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
+                         return inSelf_->OnAgentCancel(inAgent_, inInvocation_);
+                     }),
+                     inSelf);
 
     // Release
 
-    g_signal_connect(
-        skeleton.get(), "handle-release",
-        G_CALLBACK(+[](ConnManAgent * inAgent_,
-                       GDBusMethodInvocation * inInvocation_,
-                       ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
-                       return inSelf_->OnAgentRelease(inAgent_, inInvocation_);
-                   }),
-        inSelf);
+    g_signal_connect(skeleton.get(), "handle-release",
+                     G_CALLBACK(+[](ConnManAgent * inAgent_, GDBusMethodInvocation * inInvocation_,
+                                    ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
+                         return inSelf_->OnAgentRelease(inAgent_, inInvocation_);
+                     }),
+                     inSelf);
 
     // Request Input
 
     g_signal_connect(
         skeleton.get(), "handle-request-input",
-        G_CALLBACK(+[](ConnManAgent * inAgent_,
-                       GDBusMethodInvocation * inInvocation_,
-                       const gchar * inPath_,
-                       GVariant * inProperties_,
-                       ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
-                       return inSelf_->OnAgentRequestInput(inAgent_, inInvocation_, inPath_, inProperties_);
-                   }),
+        G_CALLBACK(+[](ConnManAgent * inAgent_, GDBusMethodInvocation * inInvocation_, const gchar * inPath_,
+                       GVariant * inProperties_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
+            return inSelf_->OnAgentRequestInput(inAgent_, inInvocation_, inPath_, inProperties_);
+        }),
         inSelf);
 
     // Report Error
 
     g_signal_connect(
         skeleton.get(), "handle-report-error",
-        G_CALLBACK(+[](ConnManAgent * inAgent_,
-                       GDBusMethodInvocation * inInvocation_,
-                       const gchar * inPath_,
-                       const gchar * inError_,
-                       ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
-                       return inSelf_->OnAgentReportError(inAgent_, inInvocation_, inPath_, inError_);
-                   }),
+        G_CALLBACK(+[](ConnManAgent * inAgent_, GDBusMethodInvocation * inInvocation_, const gchar * inPath_,
+                       const gchar * inError_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) -> gboolean {
+            return inSelf_->OnAgentReportError(inAgent_, inInvocation_, inPath_, inError_);
+        }),
         inSelf);
 
-    exported = g_dbus_interface_skeleton_export(G_DBUS_INTERFACE_SKELETON(skeleton.get()),
-                                                inConnection,
-                                                inPath,
-                                                &err.GetReceiver());
+    exported =
+        g_dbus_interface_skeleton_export(G_DBUS_INTERFACE_SKELETON(skeleton.get()), inConnection, inPath, &err.GetReceiver());
     VerifyOrExit(exported && err.get() == nullptr, retval = CHIP_ERROR_INTERNAL);
 
     outSkeleton = CONN_MAN_AGENT(g_object_ref(skeleton.get()));
@@ -1336,7 +1321,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ShutdownAgentLocked(std::
                                                                            const char * inPath) noexcept
 {
     GAutoPtr<GDBusConnection> connection;
-    GAutoPtr<ConnManAgent>    skeleton;
+    GAutoPtr<ConnManAgent> skeleton;
 
     VerifyOrDie(inOutLock.owns_lock());
 
@@ -1365,15 +1350,14 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ShutdownAgentLocked(std::
     }
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::ShutdownAgentOnGLib(ConnectivityManagerImpl_NetworkManagementConnMan * inSelf,
-                                                                           GDBusConnection * inConnection,
-                                                                           const char * inPath,
-                                                                           ConnManAgent * inSkeleton) noexcept
+void ConnectivityManagerImpl_NetworkManagementConnMan::ShutdownAgentOnGLib(
+    ConnectivityManagerImpl_NetworkManagementConnMan * inSelf, GDBusConnection * inConnection, const char * inPath,
+    ConnManAgent * inSkeleton) noexcept
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    (void)inSelf;
-    (void)inPath;
+    (void) inSelf;
+    (void) inPath;
 
     if (inConnection != nullptr && inSkeleton != nullptr)
     {
@@ -1386,11 +1370,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ShutdownAgentOnGLib(Conne
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::GetConfiguredNetwork(NetworkCommissioning::Network & outNetwork)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    GAutoPtr<char>              path;
-    GVariant *                  props  = nullptr;
-    const char *                name   = nullptr;
-    size_t                      length;
-    CHIP_ERROR                  retval = CHIP_NO_ERROR;
+    GAutoPtr<char> path;
+    GVariant * props  = nullptr;
+    const char * name = nullptr;
+    size_t length;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     // Iterate over all Wi-Fi networks and get the best connected
     // network. From that network, copy its SSID.
@@ -1417,7 +1401,7 @@ exit:
 
 // Event Handling
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::OnPlatformEvent(const ChipDeviceEvent &inDeviceEvent)
+void ConnectivityManagerImpl_NetworkManagementConnMan::OnPlatformEvent(const ChipDeviceEvent & inDeviceEvent)
 {
     return;
 }
@@ -1461,9 +1445,10 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::StartNetworkManagem
 
     conn_man_manager_proxy_new_for_bus(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kConnManServiceName, kConnManManagerPath, nullptr,
-        reinterpret_cast<GAsyncReadyCallback>(+[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
-            inSelf_->OnManagerReady(sourceObject_, res_);
-        }),
+        reinterpret_cast<GAsyncReadyCallback>(
+            +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
+                inSelf_->OnManagerReady(sourceObject_, res_);
+            }),
         this);
 
     return CHIP_NO_ERROR;
@@ -1503,9 +1488,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiManagement(void)
     // deadlock when GLib callbacks re-enter and attempt to take
     // mConnManMutex.
 
-    CHIP_ERROR err = UnlockAndInvokeOnGLibContextSync(lock, [this]() -> CHIP_ERROR {
-        return StartNetworkManagementOnGLib();
-    });
+    CHIP_ERROR err = UnlockAndInvokeOnGLibContextSync(lock, [this]() -> CHIP_ERROR { return StartNetworkManagementOnGLib(); });
 
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start Wi-Fi management"));
 }
@@ -1517,7 +1500,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiManagement(void)
 bool ConnectivityManagerImpl_NetworkManagementConnMan::IsWiFiManagementStarted(void)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    const bool                  retval = !!mConnManClient.mManagerProxy;
+    const bool retval = !!mConnManClient.mManagerProxy;
 
     return retval;
 }
@@ -1525,7 +1508,7 @@ bool ConnectivityManagerImpl_NetworkManagementConnMan::IsWiFiManagementStarted(v
 bool ConnectivityManagerImpl_NetworkManagementConnMan::IsWiFiStationApplicationControlled(void)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    const bool                  retval = (mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled);
+    const bool retval = (mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled);
 
     return retval;
 }
@@ -1545,7 +1528,7 @@ bool ConnectivityManagerImpl_NetworkManagementConnMan::IsWiFiStationConnected(vo
 bool ConnectivityManagerImpl_NetworkManagementConnMan::IsWiFiStationEnabled(void)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    const bool                  retval = (mWiFiStationMode == ConnectivityManager::kWiFiStationMode_Enabled);
+    const bool retval = (mWiFiStationMode == ConnectivityManager::kWiFiStationMode_Enabled);
 
     return retval;
 }
@@ -1577,7 +1560,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::GetWiFiBssId(Mutabl
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & outSecurityType)
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::GetWiFiSecurityType(
+    app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & outSecurityType)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -1605,7 +1589,8 @@ System::Clock::Timeout ConnectivityManagerImpl_NetworkManagementConnMan::GetWiFi
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & outVersion)
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::GetWiFiVersion(
+    app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & outVersion)
 {
     constexpr CHIP_ERROR retval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
@@ -1616,11 +1601,12 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::GetWiFiVersion(app:
 
 // Mutation
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiStationMode(const ConnectivityManager::WiFiStationMode &inWiFiStationMode)
+CHIP_ERROR
+ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiStationMode(const ConnectivityManager::WiFiStationMode & inWiFiStationMode)
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    ConnManTechnology *          technology;
-    CHIP_ERROR                   retval = CHIP_NO_ERROR;
+    ConnManTechnology * technology;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inWiFiStationMode != ConnectivityManager::kWiFiStationMode_NotSupported, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1633,16 +1619,16 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiStationMode(
         switch (inWiFiStationMode)
         {
 
-        // If the mode is enabled/disabled, then set the Wi-Fi
-        // technology "Powered" property to true/false.
+            // If the mode is enabled/disabled, then set the Wi-Fi
+            // technology "Powered" property to true/false.
 
         case ConnectivityManager::kWiFiStationMode_Disabled:
         case ConnectivityManager::kWiFiStationMode_Enabled: {
             const bool powered = (inWiFiStationMode == ConnectivityManager::kWiFiStationMode_Enabled);
 
-            technology = GetTechnologyProxyFromTypeLocked(kConnManTechnologyPropertyTypeWiFiValue,
-                                                          mConnManClient.mTechnologyProxies.get(),
-                                                          mConnManClient.mTechnologies.get());
+            technology =
+                GetTechnologyProxyFromTypeLocked(kConnManTechnologyPropertyTypeWiFiValue, mConnManClient.mTechnologyProxies.get(),
+                                                 mConnManClient.mTechnologies.get());
             VerifyOrExit(technology != nullptr, retval = ChipError(ChipError::Range::kPOSIX, ENOENT));
 
             retval = TechnologySetPoweredLocked(lock, technology, powered);
@@ -1652,7 +1638,6 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiStationMode(
 
         default:
             break;
-
         }
 
         mWiFiStationMode = inWiFiStationMode;
@@ -1662,7 +1647,8 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiStationReconnectInterval(const System::Clock::Timeout & inInterval)
+CHIP_ERROR
+ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiStationReconnectInterval(const System::Clock::Timeout & inInterval)
 {
     mWiFiStationReconnectInterval = inInterval;
 
@@ -1690,15 +1676,15 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::CommitConfig(void)
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkAsync(const ByteSpan & inSsid,
-                                                                                     const ByteSpan & inCredentials,
-                                                                                     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * inConnectCallback)
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkAsync(
+    const ByteSpan & inSsid, const ByteSpan & inCredentials,
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * inConnectCallback)
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    const char *                 reason = nullptr;
-    ConnManService *             service;
-    ConnManTechnology *          technology;
-    CHIP_ERROR                   retval = CHIP_NO_ERROR;
+    const char * reason = nullptr;
+    ConnManService * service;
+    ConnManTechnology * technology;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     // Ensure that we have an initialized Connectivity Manager
     // implementation pointer.
@@ -1721,7 +1707,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkA
 
     // Set the connection completion callback.
 
-    mConnectivityManagerImpl->SetConnectCallback(inConnectCallback);
+    mConnectivityManagerImpl->SetOneShotConnectCallback(inConnectCallback);
 
     // There will be one of two cases here given that connman cannot
     // connect to a service it does not know about or has not seen.
@@ -1743,7 +1729,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkA
     service = GetWiFiServiceProxyFromSsidLocked(inSsid, mConnManClient.mServiceProxies.get(), mConnManClient.mServices.get());
     if (service != nullptr)
     {
-        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting to '%.*s'...", inSsid.size(), inSsid.data());
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting to '%.*s'...", inSsid.size(),
+                        inSsid.data());
 
         // Cache the provided credentials.
 
@@ -1754,11 +1741,11 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkA
     }
     else
     {
-        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "scanning for '%.*s'...", inSsid.size(), inSsid.data());
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "scanning for '%.*s'...", inSsid.size(),
+                        inSsid.data());
 
         technology = GetTechnologyProxyFromTypeLocked(kConnManTechnologyPropertyTypeWiFiValue,
-                                                      mConnManClient.mTechnologyProxies.get(),
-                                                      mConnManClient.mTechnologies.get());
+                                                      mConnManClient.mTechnologyProxies.get(), mConnManClient.mTechnologies.get());
         VerifyOrExit(technology != nullptr, retval = ChipError(ChipError::Range::kPOSIX, ENOENT));
 
         // Cache the provided SSID.
@@ -1783,10 +1770,10 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkWithPDCAsync(const ByteSpan & inSsid, const ByteSpan & inNetworkIdentity,
-                                                                                            const ByteSpan & inClientIdentity,
-                                                                                            const Crypto::P256Keypair & inClientIdentityKeypair,
-                                                                                            NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * inConnectCallback)
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkWithPDCAsync(
+    const ByteSpan & inSsid, const ByteSpan & inNetworkIdentity, const ByteSpan & inClientIdentity,
+    const Crypto::P256Keypair & inClientIdentityKeypair,
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * inConnectCallback)
 {
     constexpr CHIP_ERROR retval = CHIP_ERROR_NOT_IMPLEMENTED;
 
@@ -1799,12 +1786,13 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ConnectWiFiNetworkW
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiScan(const ByteSpan & inSsid,
-                                                                           NetworkCommissioning::WiFiDriver::ScanCallback * inScanCallback)
+CHIP_ERROR
+ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiScan(const ByteSpan & inSsid,
+                                                                NetworkCommissioning::WiFiDriver::ScanCallback * inScanCallback)
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    bool                         has_technology;
-    CHIP_ERROR                   retval = CHIP_NO_ERROR;
+    bool has_technology;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     // Ensure that we have an initialized Connectivity Manager
     // implementation pointer.
@@ -1837,7 +1825,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiScan(const
 
     mWiFiActiveScanCount = 1;
 
-    mConnectivityManagerImpl->SetScanCallback(inScanCallback);
+    mConnectivityManagerImpl->SetOneShotScanCallback(inScanCallback);
 
     retval = TechnologyScanLocked(lock,
                                   GetTechnologyProxyFromTypeLocked(kConnManTechnologyPropertyTypeWiFiValue,
@@ -1848,7 +1836,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::StartWiFiScan(const
 exit:
     if (!ChipError::IsSuccess(retval))
     {
-        mConnectivityManagerImpl->SetScanCallback(nullptr);
+        mConnectivityManagerImpl->SetOneShotScanCallback(nullptr);
 
         mWiFiActiveScanCount = 0;
         mWiFiActiveScanSsid.reset();
@@ -1874,7 +1862,7 @@ ConnectivityManager::WiFiAPMode ConnectivityManagerImpl_NetworkManagementConnMan
 
 // Mutation
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiApMode(const ConnectivityManager::WiFiAPMode &inWiFiApMode)
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::SetWiFiApMode(const ConnectivityManager::WiFiAPMode & inWiFiApMode)
 {
     constexpr CHIP_ERROR retval = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
@@ -1918,15 +1906,16 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::MaintainOnDemandWiFiAp(vo
 
 // Helper Methods
 
-const char * ConnectivityManagerImpl_NetworkManagementConnMan::GetInterfaceName(const char * inDescription, const char * inType, char * inOutInterfaceName) noexcept
+const char * ConnectivityManagerImpl_NetworkManagementConnMan::GetInterfaceName(const char * inDescription, const char * inType,
+                                                                                char * inOutInterfaceName) noexcept
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    GAutoPtr<char>              interface;
-    CHIP_ERROR                  status;
-    const char *                retval = nullptr;
+    GAutoPtr<char> interface;
+    CHIP_ERROR status;
+    const char * retval = nullptr;
 
-    nlEXPECT(inDescription      != nullptr, exit);
-    nlEXPECT(inType             != nullptr, exit);
+    nlEXPECT(inDescription != nullptr, exit);
+    nlEXPECT(inType != nullptr, exit);
     nlEXPECT(inOutInterfaceName != nullptr, exit);
 
     // If we have a valid interface name, return it. Otherwise,
@@ -1962,14 +1951,13 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetPropertie
                                                                                   const GError * inError) noexcept
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    CHIP_ERROR                  status;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inProperties != nullptr);
 
     if (inError == nullptr)
     {
-        ChipLogProgress(DeviceLayer,
-                        CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "got %zu manager property/ies",
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "got %zu manager property/ies",
                         g_variant_n_children(inProperties));
 
         status = UpdateManagerPropertiesLocked(inProperties);
@@ -1988,23 +1976,21 @@ exit:
     return;
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetServices(ConnManManager * inManager,
-                                                                                GVariant * inServices,
+void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetServices(ConnManManager * inManager, GVariant * inServices,
                                                                                 const GError * inError) noexcept
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    CHIP_ERROR                   status;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inServices != nullptr);
 
     if (inError == nullptr)
     {
         GHashTableIter iter;
-        gpointer       key   = nullptr;
-        gpointer       value = nullptr;
+        gpointer key   = nullptr;
+        gpointer value = nullptr;
 
-        ChipLogProgress(DeviceLayer,
-                        CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "got %zu manager service(s)",
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "got %zu manager service(s)",
                         g_variant_n_children(inServices));
 
         status = UpdateServicesLocked(inServices);
@@ -2014,10 +2000,10 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetServices(
 
         while (g_hash_table_iter_next(&iter, &key, &value))
         {
-            const char * const path    = static_cast<const char *>(key);
-            GVariant * const   props   = static_cast<GVariant *>(value);
-            const char *       type    = nullptr;
-            ConnManService *   service = nullptr;
+            const char * const path  = static_cast<const char *>(key);
+            GVariant * const props   = static_cast<GVariant *>(value);
+            const char * type        = nullptr;
+            ConnManService * service = nullptr;
 
             status = UpdateServiceProxyLocked(lock, path, service);
             SuccessOrExit(status);
@@ -2043,23 +2029,22 @@ exit:
     return;
 }
 
-void  ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetTechnologies(ConnManManager * inManager,
-                                                                                     GVariant * inTechnologies,
-                                                                                     const GError * inError) noexcept
+void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetTechnologies(ConnManManager * inManager,
+                                                                                    GVariant * inTechnologies,
+                                                                                    const GError * inError) noexcept
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    CHIP_ERROR                   status;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inTechnologies != nullptr);
 
     if (inError == nullptr)
     {
         GHashTableIter iter;
-        gpointer       key   = nullptr;
-        gpointer       value = nullptr;
+        gpointer key   = nullptr;
+        gpointer value = nullptr;
 
-        ChipLogProgress(DeviceLayer,
-                        CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "got %zu manager technology/ies",
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "got %zu manager technology/ies",
                         g_variant_n_children(inTechnologies));
 
         status = UpdateTechnologiesLocked(inTechnologies);
@@ -2069,10 +2054,10 @@ void  ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetTechnolo
 
         while (g_hash_table_iter_next(&iter, &key, &value))
         {
-            const char * const   path       = static_cast<const char *>(key);
-            GVariant * const     props      = static_cast<GVariant *>(value);
-            const char *         type       = nullptr;
-            ConnManTechnology *  technology = nullptr;
+            const char * const path        = static_cast<const char *>(key);
+            GVariant * const props         = static_cast<GVariant *>(value);
+            const char * type              = nullptr;
+            ConnManTechnology * technology = nullptr;
 
             status = UpdateTechnologyProxyLocked(lock, path, technology);
             SuccessOrExit(status);
@@ -2099,21 +2084,20 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerProper
 {
     static const char * const kDescription = "manager";
 
-    return HandleObjectPropertiesChangedLocked(kDescription,
-                                               G_DBUS_PROXY(inManager),
-                                               inProperties,
-                                               &ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChangedAnyLocked);
+    return HandleObjectPropertiesChangedLocked(
+        kDescription, G_DBUS_PROXY(inManager), inProperties,
+        &ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChangedAnyLocked);
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChanged(ConnManManager * inManager, const char * inKey,
                                                                                     GVariant * inValue) noexcept
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    CHIP_ERROR                  status;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inManager != nullptr);
-    VerifyOrReturn(inKey     != nullptr);
-    VerifyOrReturn(inValue   != nullptr);
+    VerifyOrReturn(inKey != nullptr);
+    VerifyOrReturn(inValue != nullptr);
 
     ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "manager property changed");
 
@@ -2130,14 +2114,14 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChan
     ReturnOnFailure(status);
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChangedAnyLocked(GDBusProxy * inManager,
-                                                                                                   const char * inKey,
-                                                                                                   GVariant * inMaybeVariant) noexcept
+CHIP_ERROR
+ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChangedAnyLocked(GDBusProxy * inManager, const char * inKey,
+                                                                                        GVariant * inMaybeVariant) noexcept
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(inManager      != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inKey          != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inMaybeVariant != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     UnboxedVariant value(inMaybeVariant);
@@ -2150,14 +2134,15 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChangedLocked(ConnManManager * inManager, const char * inKey,
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerPropertyChangedLocked(ConnManManager * inManager,
+                                                                                                const char * inKey,
                                                                                                 GVariant * inValue) noexcept
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inManager != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inKey     != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inValue   != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inKey != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inValue != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "manager \"%s\" property changed", inKey);
 
@@ -2172,7 +2157,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerServicesChan
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
 
-    VerifyOrReturn(inManager         != nullptr);
+    VerifyOrReturn(inManager != nullptr);
     VerifyOrReturn(inServicesChanged != nullptr);
 
     // Handle removed service paths.
@@ -2189,19 +2174,16 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerServicesChan
                                                                                           GVariant * inServicesChanged) noexcept
 {
     GVariantIter iter;
-    const char * path   = nullptr;
-    GVariant *   props  = nullptr;
-    CHIP_ERROR   status = CHIP_NO_ERROR;
+    const char * path = nullptr;
+    GVariant * props  = nullptr;
+    CHIP_ERROR status = CHIP_NO_ERROR;
 
     VerifyOrDie(inOutLock.owns_lock());
 
-    VerifyOrExit(inManager         != nullptr,
-                 status = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inServicesChanged != nullptr,
-                 status = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inManager != nullptr, status = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inServicesChanged != nullptr, status = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(g_variant_is_of_type(inServicesChanged, G_VARIANT_TYPE("a(oa{sv})")),
-                 status = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(g_variant_is_of_type(inServicesChanged, G_VARIANT_TYPE("a(oa{sv})")), status = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Add or update any changed services to the hash table.
 
@@ -2231,11 +2213,12 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerServicesChan
 
     while (g_variant_iter_next(&iter, "(&o@a{sv})", &path, &props))
     {
-        const char *     type    = nullptr;
+        const char * type        = nullptr;
         ConnManService * service = nullptr;
-        GVariant *       current = nullptr;
+        GVariant * current       = nullptr;
 
-        ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s: %s has %zu properties", __func__, path, g_variant_n_children(props));
+        ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s: %s has %zu properties", __func__, path,
+                      g_variant_n_children(props));
 
         status = UpdateServiceProxyLocked(inOutLock, path, service);
         SuccessOrExit(status);
@@ -2260,9 +2243,8 @@ exit:
     }
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerServicesRemovedLocked(std::unique_lock<std::mutex> & inOutLock,
-                                                                                          ConnManManager * inManager,
-                                                                                          const char * const * inServicesRemoved) noexcept
+void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerServicesRemovedLocked(
+    std::unique_lock<std::mutex> & inOutLock, ConnManManager * inManager, const char * const * inServicesRemoved) noexcept
 {
     VerifyOrDie(inOutLock.owns_lock());
 
@@ -2287,12 +2269,12 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerTechnologyAd
                                                                                     GVariant * inProperties) noexcept
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    const char *                 type       = nullptr;
-    ConnManTechnology *          technology = nullptr;
-    CHIP_ERROR                   status;
+    const char * type              = nullptr;
+    ConnManTechnology * technology = nullptr;
+    CHIP_ERROR status;
 
-    VerifyOrReturn(inManager    != nullptr);
-    VerifyOrReturn(inPath       != nullptr);
+    VerifyOrReturn(inManager != nullptr);
+    VerifyOrReturn(inPath != nullptr);
     VerifyOrReturn(inProperties != nullptr);
 
     VerifyOrReturn(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT));
@@ -2315,11 +2297,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerTechnologyRe
                                                                                       const char * inPath) noexcept
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    const char *                type = nullptr;
-    CHIP_ERROR                  status;
+    const char * type = nullptr;
+    CHIP_ERROR status;
 
-    VerifyOrReturn(inManager      != nullptr);
-    VerifyOrReturn(inPath         != nullptr);
+    VerifyOrReturn(inManager != nullptr);
+    VerifyOrReturn(inPath != nullptr);
 
     ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "manager technology removed");
 
@@ -2349,37 +2331,33 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerTechnologyRe
     RemoveTechnologyLocked(inPath);
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertiesChangedLocked(const char * inDescription,
-                                                                                                 GDBusProxy * inProxy,
-                                                                                                 GVariant * inProperties,
-                                                                                                 ObjectPropertiesChangedAnyLockedMethod inObjectPropertiesChangedAnyLockedMethod) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertiesChangedLocked(
+    const char * inDescription, GDBusProxy * inProxy, GVariant * inProperties,
+    ObjectPropertiesChangedAnyLockedMethod inObjectPropertiesChangedAnyLockedMethod) noexcept
 {
-    size_t             count;
-    GVariantIter       iter;
-    const char *       key    = nullptr;
+    size_t count;
+    GVariantIter iter;
+    const char * key = nullptr;
     GAutoPtr<GVariant> boxed;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(inDescription                            != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inProxy                                  != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inProperties                             != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inDescription != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inProperties != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inObjectPropertiesChangedAnyLockedMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT),
-                 retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     count = g_variant_n_children(inProperties);
     if (count > 0)
     {
-        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%zu %s property/ies changed",
-                        count,
-                        inDescription);
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%zu %s property/ies changed", count, inDescription);
 
         g_variant_iter_init(&iter, inProperties);
 
         while (g_variant_iter_next(&iter, "{&s@v}", &key, &boxed.GetReceiver()))
         {
-            VerifyOrExit(key         != nullptr, retval = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(key != nullptr, retval = CHIP_ERROR_INTERNAL);
             VerifyOrExit(boxed.get() != nullptr, retval = CHIP_ERROR_INTERNAL);
 
             retval = (this->*inObjectPropertiesChangedAnyLockedMethod)(inProxy, key, boxed.get());
@@ -2391,41 +2369,35 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertiesChangedLocked(const char * inDescription,
-                                                                                                 GDBusProxy * inProxy,
-                                                                                                 const char * inPath,
-                                                                                                 const char * inType,
-                                                                                                 GVariant * inProperties,
-                                                                                                 TypedObjectPropertiesChangedAnyLockedMethod inTypedObjectPropertiesChangedAnyLockedMethod) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertiesChangedLocked(
+    const char * inDescription, GDBusProxy * inProxy, const char * inPath, const char * inType, GVariant * inProperties,
+    TypedObjectPropertiesChangedAnyLockedMethod inTypedObjectPropertiesChangedAnyLockedMethod) noexcept
 {
-    size_t             count;
-    GVariantIter       iter;
-    const char *       key    = nullptr;
+    size_t count;
+    GVariantIter iter;
+    const char * key = nullptr;
     GAutoPtr<GVariant> boxed;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(inDescription                                 != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inProxy                                       != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inType                                        != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inProperties                                  != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inDescription != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inType != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inProperties != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inTypedObjectPropertiesChangedAnyLockedMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT),
-                 retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     count = g_variant_n_children(inProperties);
     if (count > 0)
     {
-        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%zu %s %s property/ies changed",
-                        count,
-                        inType,
+        ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%zu %s %s property/ies changed", count, inType,
                         inDescription);
 
         g_variant_iter_init(&iter, inProperties);
 
         while (g_variant_iter_next(&iter, "{&s@v}", &key, &boxed.GetReceiver()))
         {
-            VerifyOrExit(key         != nullptr, retval = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(key != nullptr, retval = CHIP_ERROR_INTERNAL);
             VerifyOrExit(boxed.get() != nullptr, retval = CHIP_ERROR_INTERNAL);
 
             retval = (this->*inTypedObjectPropertiesChangedAnyLockedMethod)(inProxy, inPath, inType, key, boxed.get());
@@ -2437,20 +2409,17 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertyChangedAnyLocked(GDBusProxy * inProxy,
-                                                                                                  const char * inPath,
-                                                                                                  const char * inType,
-                                                                                                  const char * inKey,
-                                                                                                  GVariant * inMaybeVariant,
-                                                                                                  TypedObjectPropertyChangedLockedMethod inTypedObjectPropertyChangedLockedMethod) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleObjectPropertyChangedAnyLocked(
+    GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inMaybeVariant,
+    TypedObjectPropertyChangedLockedMethod inTypedObjectPropertyChangedLockedMethod) noexcept
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(inProxy                                  != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inPath                                   != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inType                                   != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inKey                                    != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(inMaybeVariant                           != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inProxy != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inPath != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inType != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(inMaybeVariant != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(inTypedObjectPropertyChangedLockedMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     UnboxedVariant value(inMaybeVariant);
@@ -2468,12 +2437,12 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectCompl
 {
 
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    CharSpan                     debug_text;
-    const char *                 path  = nullptr;
-    GVariant *                   props = nullptr;
-    const char *                 name  = nullptr;
-    const char *                 type  = nullptr;
-    CHIP_ERROR                   status;
+    CharSpan debug_text;
+    const char * path = nullptr;
+    GVariant * props  = nullptr;
+    const char * name = nullptr;
+    const char * type = nullptr;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inService != nullptr);
 
@@ -2492,7 +2461,8 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectCompl
         debug_text = CharSpan::fromCharString(name);
     }
 
-    ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s service %s connect done", type != nullptr ? type : "<null>", path);
+    ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s service %s connect done",
+                    type != nullptr ? type : "<null>", path);
 
     if (inError == nullptr)
     {
@@ -2503,9 +2473,10 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectCompl
     else
     {
         WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
-        constexpr int             reason   = 0;
+        constexpr int reason               = 0;
 
-        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to connect %s service: %s", type, inError->message);
+        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to connect %s service: %s", type,
+                     inError->message);
 
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, debug_text, reason]() {
             mConnectivityManagerImpl->OnConnectResult(NetworkCommissioning::Status::kUnknownError, debug_text, reason);
@@ -2513,12 +2484,13 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectCompl
 
         if (delegate != nullptr)
         {
-            constexpr uint8_t  associationFailureCause  = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
+            constexpr uint8_t associationFailureCause   = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
             constexpr uint16_t associationFailureStatus = WLAN_STATUS_UNSPECIFIED_FAILURE;
 
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate, associationFailureCause, associationFailureStatus]() {
-                delegate->OnAssociationFailureDetected(associationFailureCause, associationFailureStatus);
-            });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+                [delegate, associationFailureCause, associationFailureStatus]() {
+                    delegate->OnAssociationFailureDetected(associationFailureCause, associationFailureStatus);
+                });
         }
     }
 
@@ -2545,15 +2517,16 @@ exit:
     }
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectRequestLocked(std::unique_lock<std::mutex> & inOutLock,
-                                                                                               ConnManService * inService) noexcept
+CHIP_ERROR
+ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectRequestLocked(std::unique_lock<std::mutex> & inOutLock,
+                                                                                    ConnManService * inService) noexcept
 {
-    CharSpan     debug_text;
-    const char * path   = nullptr;
-    const char * name   = nullptr;
-    GVariant *   props  = nullptr;
-    CHIP_ERROR   status;
-    CHIP_ERROR   retval = CHIP_NO_ERROR;
+    CharSpan debug_text;
+    const char * path = nullptr;
+    const char * name = nullptr;
+    GVariant * props  = nullptr;
+    CHIP_ERROR status;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrDie(inOutLock.owns_lock());
 
@@ -2590,7 +2563,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnec
     retval = ServiceConnectLocked(inOutLock, inService);
     SuccessOrExit(retval);
 
- exit:
+exit:
     if (!ChipError::IsSuccess(retval))
     {
         if (mConnManAgentServer.mRegistered)
@@ -2616,22 +2589,22 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceProper
 {
     static const char * const kDescription = "service";
 
-    return HandleObjectPropertiesChangedLocked(kDescription, inProxy, inPath, inType, inProperties,
-                                               &ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedAnyLocked);
+    return HandleObjectPropertiesChangedLocked(
+        kDescription, inProxy, inPath, inType, inProperties,
+        &ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedAnyLocked);
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChanged(ConnManService * inService,
-                                                                                    const char * inKey,
+void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChanged(ConnManService * inService, const char * inKey,
                                                                                     GVariant * inValue) noexcept
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    const char *                path = nullptr;
-    const char *                type = nullptr;
-    CHIP_ERROR                  status;
+    const char * path = nullptr;
+    const char * type = nullptr;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inService != nullptr);
-    VerifyOrReturn(inKey     != nullptr);
-    VerifyOrReturn(inValue   != nullptr);
+    VerifyOrReturn(inKey != nullptr);
+    VerifyOrReturn(inValue != nullptr);
 
     status = GetObjectPathFromProxyLocked(G_DBUS_PROXY(inService), path);
     ReturnOnFailure(status);
@@ -2651,18 +2624,15 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChan
     ReturnOnFailure(status);
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedLocked(GDBusProxy * inProxy,
-                                                                                                const char * inPath,
-                                                                                                const char * inType,
-                                                                                                const char * inKey,
-                                                                                                GVariant * inValue) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedLocked(
+    GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inValue) noexcept
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inProxy != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inPath  != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inType  != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inKey   != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inType != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inKey != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inValue != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s service \"%s\" property changed", inType, inKey);
@@ -2682,33 +2652,22 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedAnyLocked(GDBusProxy * inService,
-                                                                                                   const char * inPath,
-                                                                                                   const char * inType,
-                                                                                                   const char * inKey,
-                                                                                                   GVariant * inMaybeVariant) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedAnyLocked(
+    GDBusProxy * inService, const char * inPath, const char * inType, const char * inKey, GVariant * inMaybeVariant) noexcept
 {
-    return HandleObjectPropertyChangedAnyLocked(G_DBUS_PROXY(inService),
-                                                inPath,
-                                                inType,
-                                                inKey,
-                                                inMaybeVariant,
-                                                &ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedLocked);
+    return HandleObjectPropertyChangedAnyLocked(
+        G_DBUS_PROXY(inService), inPath, inType, inKey, inMaybeVariant,
+        &ConnectivityManagerImpl_NetworkManagementConnMan::HandleServicePropertyChangedLocked);
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertiesChangedLocked(GDBusProxy * inProxy,
-                                                                                                     const char * inPath,
-                                                                                                     const char * inType,
-                                                                                                     GVariant * inProperties) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertiesChangedLocked(
+    GDBusProxy * inProxy, const char * inPath, const char * inType, GVariant * inProperties) noexcept
 {
     static const char * const kDescription = "technology";
 
-    return HandleObjectPropertiesChangedLocked(kDescription,
-                                               inProxy,
-                                               inPath,
-                                               inType,
-                                               inProperties,
-                                               &ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedAnyLocked);
+    return HandleObjectPropertiesChangedLocked(
+        kDescription, inProxy, inPath, inType, inProperties,
+        &ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedAnyLocked);
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChanged(ConnManTechnology * inTechnology,
@@ -2716,13 +2675,13 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyC
                                                                                        GVariant * inValue) noexcept
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    const char *                path = nullptr;
-    const char *                type = nullptr;
-    CHIP_ERROR                  status;
+    const char * path = nullptr;
+    const char * type = nullptr;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inTechnology != nullptr);
-    VerifyOrReturn(inKey        != nullptr);
-    VerifyOrReturn(inValue      != nullptr);
+    VerifyOrReturn(inKey != nullptr);
+    VerifyOrReturn(inValue != nullptr);
 
     status = GetObjectPathFromProxyLocked(G_DBUS_PROXY(inTechnology), path);
     ReturnOnFailure(status);
@@ -2742,18 +2701,15 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyC
     ReturnOnFailure(status);
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedLocked(GDBusProxy * inProxy,
-                                                                                                   const char * inPath,
-                                                                                                   const char * inType,
-                                                                                                   const char * inKey,
-                                                                                                   GVariant * inValue) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedLocked(
+    GDBusProxy * inProxy, const char * inPath, const char * inType, const char * inKey, GVariant * inValue) noexcept
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inProxy != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inPath  != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inType  != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inKey   != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inType != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inKey != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inValue != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s technology \"%s\" property changed", inType, inKey);
@@ -2769,8 +2725,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPro
             if (mWiFiStationConnected != connected)
             {
                 ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "Wi-Fi station connected: %u -> %u",
-                                mWiFiStationConnected,
-                                connected);
+                                mWiFiStationConnected, connected);
 
                 mWiFiStationConnected = connected;
             }
@@ -2782,13 +2737,13 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPro
 
         const bool powered = g_variant_get_boolean(inValue);
 
-        ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s %s=%u", inType, kConnManTechnologyPropertyPoweredKey, powered);
+        ChipLogDetail(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s %s=%u", inType, kConnManTechnologyPropertyPoweredKey,
+                      powered);
 
         if (strcmp(inType, kConnManTechnologyPropertyTypeWiFiValue) == 0)
         {
-            const auto newMode = (powered ?
-                                  ConnectivityManager::kWiFiStationMode_Enabled :
-                                  ConnectivityManager::kWiFiStationMode_Disabled);
+            const auto newMode =
+                (powered ? ConnectivityManager::kWiFiStationMode_Enabled : ConnectivityManager::kWiFiStationMode_Disabled);
 
             if (mWiFiStationMode != newMode)
             {
@@ -2805,26 +2760,20 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedAnyLocked(GDBusProxy * inTechnology,
-                                                                                                      const char * inPath,
-                                                                                                      const char * inType,
-                                                                                                      const char * inKey,
-                                                                                                      GVariant * inMaybeVariant) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedAnyLocked(
+    GDBusProxy * inTechnology, const char * inPath, const char * inType, const char * inKey, GVariant * inMaybeVariant) noexcept
 {
-    return HandleObjectPropertyChangedAnyLocked(inTechnology,
-                                                inPath,
-                                                inType,
-                                                inKey,
-                                                inMaybeVariant,
-                                                &ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedLocked);
+    return HandleObjectPropertyChangedAnyLocked(
+        inTechnology, inPath, inType, inKey, inMaybeVariant,
+        &ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyPropertyChangedLocked);
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyScanComplete(GDBusProxy * inTechnology,
                                                                                     const GError * inError) noexcept
 {
     std::unique_lock<std::mutex> lock(mConnManMutex);
-    const char *                 type = nullptr;
-    CHIP_ERROR                   status;
+    const char * type = nullptr;
+    CHIP_ERROR status;
 
     VerifyOrReturn(inTechnology != nullptr);
 
@@ -2843,30 +2792,28 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyScanCompl
     }
     else
     {
-        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to scan %s technology: %s", type, inError->message);
+        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to scan %s technology: %s", type,
+                     inError->message);
     }
 
 exit:
     return;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingConnectLocked(std::unique_lock<std::mutex> & inOutLock,
-                                                                                            ConnManTechnology * inTechnology,
-                                                                                            size_t & inOutScanCount,
-                                                                                            Internal::WiFiSSIDFixedBuffer & inOutSsid) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingConnectLocked(
+    std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology, size_t & inOutScanCount,
+    Internal::WiFiSSIDFixedBuffer & inOutSsid) noexcept
 {
-    const CharSpan   debug_text(reinterpret_cast<const char *>(inOutSsid.data()),
-                                inOutSsid.size());
+    const CharSpan debug_text(reinterpret_cast<const char *>(inOutSsid.data()), inOutSsid.size());
     ConnManService * service;
-    CHIP_ERROR       retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrDie(inOutLock.owns_lock());
 
     VerifyOrExit(inTechnology != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
-    service = GetWiFiServiceProxyFromSsidLocked(inOutSsid.span(),
-                                                mConnManClient.mServiceProxies.get(),
-                                                mConnManClient.mServices.get());
+    service =
+        GetWiFiServiceProxyFromSsidLocked(inOutSsid.span(), mConnManClient.mServiceProxies.get(), mConnManClient.mServices.get());
     if (service != nullptr)
     {
         ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting to '%.*s' after %zu scan(s)...",
@@ -2879,10 +2826,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingCo
     {
         if (inOutScanCount < kWiFiConnectScanLimit)
         {
-            ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX
-                         "could not connect to '%.*s' after %zu scan(s)",
-                         inOutSsid.size(),
-                         inOutSsid.data(), mWiFiConnectScanCount);
+            ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "could not connect to '%.*s' after %zu scan(s)",
+                         inOutSsid.size(), inOutSsid.data(), mWiFiConnectScanCount);
 
             // Reset the SSID and scan count.
 
@@ -2898,11 +2843,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingCo
         }
         else
         {
-            retval = HandleWiFiScanRetryLocked(inOutLock,
-                                               inTechnology,
-                                               "count not connect to",
-                                               inOutScanCount,
-                                               inOutSsid);
+            retval = HandleWiFiScanRetryLocked(inOutLock, inTechnology, "count not connect to", inOutScanCount, inOutSsid);
             SuccessOrExit(retval);
         }
     }
@@ -2911,15 +2852,13 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingScanLocked(std::unique_lock<std::mutex> & inOutLock,
-                                                                                         ConnManTechnology * inTechnology,
-                                                                                         size_t & inOutScanCount,
-                                                                                         Internal::WiFiSSIDFixedBuffer & inOutSsid) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingScanLocked(
+    std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology, size_t & inOutScanCount,
+    Internal::WiFiSSIDFixedBuffer & inOutSsid) noexcept
 {
-    const CharSpan     debug_text(reinterpret_cast<const char *>(inOutSsid.data()),
-                                  inOutSsid.size());
+    const CharSpan debug_text(reinterpret_cast<const char *>(inOutSsid.data()), inOutSsid.size());
     GAutoPtr<GVariant> properties;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrDie(inOutLock.owns_lock());
 
@@ -2928,9 +2867,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingSc
     // If no matching Wi-Fi network service is among the network
     // services, post a success with an empty/null result.
 
-    retval = GetWiFiServicePropertiesFromSsidLocked(inOutSsid.span(),
-                                                    mConnManClient.mServices.get(),
-                                                    properties);
+    retval = GetWiFiServicePropertiesFromSsidLocked(inOutSsid.span(), mConnManClient.mServices.get(), properties);
 
     if (ChipError::IsSuccess(retval))
     {
@@ -2938,7 +2875,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingSc
         VerifyOrExit(services != nullptr, retval = CHIP_ERROR_NO_MEMORY);
 
         WiFiScanResponse response;
-        int8_t           strength = 0;
+        int8_t strength = 0;
 
         // ConnMan only distinguishes between "psk" and "rsn" security
         // types, lumping all of WPA-, WPA-2-, and WPA-3-Personal
@@ -2986,28 +2923,21 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiPendingSc
         if (inOutScanCount < kWiFiActiveScanLimit)
         {
             ChipLogError(DeviceLayer,
-                         CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX
-                         "no Wi-Fi network found matching SSID '%.*s' after %zu scan(s)",
-                         inOutSsid.size(),
-                         inOutSsid.data(),
-                         inOutScanCount);
+                         CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "no Wi-Fi network found matching SSID '%.*s' after %zu scan(s)",
+                         inOutSsid.size(), inOutSsid.data(), inOutScanCount);
 
             // Reset the SSID and scan count.
 
             inOutScanCount = 0;
             inOutSsid.reset();
 
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, debug_text]() {
-                mConnectivityManagerImpl->OnScanFinished(Status::kNetworkNotFound, debug_text, nullptr);
-            });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+                [this, debug_text]() { mConnectivityManagerImpl->OnScanFinished(Status::kNetworkNotFound, debug_text, nullptr); });
         }
         else
         {
-            retval = HandleWiFiScanRetryLocked(inOutLock,
-                                               inTechnology,
-                                               "no Wi-Fi netork found matching",
-                                               inOutScanCount,
-                                               inOutSsid);
+            retval =
+                HandleWiFiScanRetryLocked(inOutLock, inTechnology, "no Wi-Fi netork found matching", inOutScanCount, inOutSsid);
             SuccessOrExit(retval);
         }
     }
@@ -3036,10 +2966,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanCompl
 
     if (!mWiFiConnectSsid.empty())
     {
-        retval = HandleWiFiPendingConnectLocked(inOutLock,
-                                                inTechnology,
-                                                mWiFiConnectScanCount,
-                                                mWiFiConnectSsid);
+        retval = HandleWiFiPendingConnectLocked(inOutLock, inTechnology, mWiFiConnectScanCount, mWiFiConnectSsid);
         SuccessOrExit(retval);
     }
 
@@ -3048,10 +2975,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanCompl
 
     if (!mWiFiActiveScanSsid.empty())
     {
-        retval = HandleWiFiPendingScanLocked(inOutLock,
-                                             inTechnology,
-                                             mWiFiActiveScanCount,
-                                             mWiFiActiveScanSsid);
+        retval = HandleWiFiPendingScanLocked(inOutLock, inTechnology, mWiFiActiveScanCount, mWiFiActiveScanSsid);
         SuccessOrExit(retval);
     }
 
@@ -3059,11 +2983,9 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanRetryLocked(std::unique_lock<std::mutex> & inOutLock,
-                                                                                       ConnManTechnology * inTechnology,
-                                                                                       const char * inReason,
-                                                                                       size_t & inOutScanCount,
-                                                                                       const Internal::WiFiSSIDFixedBuffer & inSsid) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanRetryLocked(
+    std::unique_lock<std::mutex> & inOutLock, ConnManTechnology * inTechnology, const char * inReason, size_t & inOutScanCount,
+    const Internal::WiFiSSIDFixedBuffer & inSsid) noexcept
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -3071,12 +2993,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::HandleWiFiScanRetry
 
     VerifyOrExit(inReason != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogProgress(DeviceLayer,
-                    CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX
-                    "%s SSID '%.*s' after %zu scan(s): retrying...",
-                    inReason,
-                    inSsid.size(), inSsid.data(),
-                    inOutScanCount);
+    ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "%s SSID '%.*s' after %zu scan(s): retrying...", inReason,
+                    inSsid.size(), inSsid.data(), inOutScanCount);
 
     // Increment the scan count.
 
@@ -3098,16 +3016,16 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerAgentOpLocke
                                                                                   const bool & inRegister) noexcept
 {
     GAutoPtr<ConnManManager> manager;
-    GAutoPtr<char>           message;
-    gboolean                 ok     = FALSE;
-    CHIP_ERROR               status;
-    CHIP_ERROR               retval = CHIP_NO_ERROR;
+    GAutoPtr<char> message;
+    gboolean ok = FALSE;
+    CHIP_ERROR status;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrDie(inOutLock.owns_lock());
 
-    VerifyOrExit(inPath               != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inManagerAgentOpFunc != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inAction             != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inAction != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(mConnManClient.mManagerProxy, retval = CHIP_ERROR_UNINITIALIZED);
 
@@ -3135,8 +3053,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerAgentOpLocke
 
     if (!ok)
     {
-        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "could not %s manager agent %s: %s",
-                     inAction, inPath, message.get() ? message.get() : "unknown error");
+        ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "could not %s manager agent %s: %s", inAction, inPath,
+                     message.get() ? message.get() : "unknown error");
 
         ExitNow(retval = CHIP_ERROR_INTERNAL);
     }
@@ -3149,9 +3067,9 @@ exit:
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::MaybeClearInterfaceNameLocked(const char * inPath) noexcept
 {
-    const char *   type      = nullptr;
+    const char * type = nullptr;
     GAutoPtr<char> interface;
-    CHIP_ERROR     status    = CHIP_NO_ERROR;
+    CHIP_ERROR status = CHIP_NO_ERROR;
 
     VerifyOrReturn(inPath != nullptr);
 
@@ -3184,9 +3102,9 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::MaybeSetInterfaceNa
                                                                                          const char * inInterface) noexcept
 {
     GAutoPtr<char> interface;
-    CHIP_ERROR     retval    = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    VerifyOrExit(inType      != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inType != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(inInterface != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If an Ethernet service was removed, clear the Ethernet
@@ -3234,20 +3152,17 @@ exit:
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateManagerPropertiesLocked(GVariant * inProperties) noexcept
 {
-    GHashTable * const table  = mConnManClient.mProperties.get();
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    GHashTable * const table = mConnManClient.mProperties.get();
+    CHIP_ERROR retval        = CHIP_NO_ERROR;
 
-    VerifyOrExit(inProperties != nullptr,                                    retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inProperties != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(table,                                                      retval = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(table, retval = CHIP_ERROR_INCORRECT_STATE);
 
     g_hash_table_remove(table, CONNMAN_MANAGER_PATH);
 
-    retval = MergeObjectPropertiesLocked("manager properties (update)",
-                                         table,
-                                         CONNMAN_MANAGER_PATH,
-                                         inProperties);
+    retval = MergeObjectPropertiesLocked("manager properties (update)", table, CONNMAN_MANAGER_PATH, inProperties);
 
 exit:
     return retval;
@@ -3258,9 +3173,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateServicesLocke
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inServices != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mConnManClient.mServices,    retval = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(g_variant_is_of_type(inServices, G_VARIANT_TYPE("a(oa{sv})")),
-                 retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mConnManClient.mServices, retval = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(g_variant_is_of_type(inServices, G_VARIANT_TYPE("a(oa{sv})")), retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     g_hash_table_remove_all(mConnManClient.mServices.get());
 
@@ -3276,7 +3190,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateServiceProxyL
                                                                                       ConnManService *& outService) noexcept
 {
     ConnManService * proxy;
-    CHIP_ERROR       retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -3287,12 +3201,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateServiceProxyL
     {
         retval = UnlockAndInvokeOnGLibContextSync(inOutLock, [&]() -> CHIP_ERROR {
             GAutoPtr<GError> err;
-            ConnManService * service = conn_man_service_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
-                                                                               G_DBUS_PROXY_FLAGS_NONE,
-                                                                               kConnManServiceName,
-                                                                               inPath,
-                                                                               nullptr,
-                                                                               &err.GetReceiver());
+            ConnManService * service = conn_man_service_proxy_new_for_bus_sync(
+                G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kConnManServiceName, inPath, nullptr, &err.GetReceiver());
 
             if (!service || err)
             {
@@ -3326,9 +3236,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateTechnologiesL
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inTechnologies != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mConnManClient.mTechnologies,    retval = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(g_variant_is_of_type(inTechnologies, G_VARIANT_TYPE("a(oa{sv})")),
-                 retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mConnManClient.mTechnologies, retval = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(g_variant_is_of_type(inTechnologies, G_VARIANT_TYPE("a(oa{sv})")), retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     g_hash_table_remove_all(mConnManClient.mTechnologies.get());
 
@@ -3339,12 +3248,11 @@ exit:
     return retval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateTechnologyProxyLocked(std::unique_lock<std::mutex> & inOutLock,
-                                                                                         const char * inPath,
-                                                                                         ConnManTechnology *& outTechnology) noexcept
+CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateTechnologyProxyLocked(
+    std::unique_lock<std::mutex> & inOutLock, const char * inPath, ConnManTechnology *& outTechnology) noexcept
 {
     ConnManTechnology * proxy;
-    CHIP_ERROR          retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inPath != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -3355,12 +3263,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::UpdateTechnologyPro
     {
         retval = UnlockAndInvokeOnGLibContextSync(inOutLock, [&]() -> CHIP_ERROR {
             GAutoPtr<GError> err;
-            ConnManTechnology * technology = conn_man_technology_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
-                                                                                        G_DBUS_PROXY_FLAGS_NONE,
-                                                                                        kConnManServiceName,
-                                                                                        inPath,
-                                                                                        nullptr,
-                                                                                        &err.GetReceiver());
+            ConnManTechnology * technology = conn_man_technology_proxy_new_for_bus_sync(
+                G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kConnManServiceName, inPath, nullptr, &err.GetReceiver());
 
             if (!technology || err)
             {
@@ -3401,12 +3305,12 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerRegisterAgen
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerRegisterAgentLocked(std::unique_lock<std::mutex> & inOutLock,
                                                                                         const char * inPath) noexcept
 {
-    GAutoPtr<char>            path;
+    GAutoPtr<char> path;
     GAutoPtr<GDBusConnection> connection;
-    ConnManAgent *            skeleton = nullptr;
-    GAutoPtr<GError>          exportError;
-    CHIP_ERROR                status;
-    CHIP_ERROR                retval = CHIP_NO_ERROR;
+    ConnManAgent * skeleton = nullptr;
+    GAutoPtr<GError> exportError;
+    CHIP_ERROR status;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrDie(inOutLock.owns_lock());
 
@@ -3448,11 +3352,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerRegisterAgen
     mConnManAgentServer.mSkeleton.reset(skeleton);
     mConnManAgentServer.mExported = true;
 
-    status = ManagerAgentOpLocked(inOutLock,
-                                  path.get(),
-                                  conn_man_manager_call_register_agent_sync,
-                                  "register",
-                                  true);
+    status = ManagerAgentOpLocked(inOutLock, path.get(), conn_man_manager_call_register_agent_sync, "register", true);
     if (!ChipError::IsSuccess(status))
     {
         ShutdownAgentLocked(inOutLock, inPath);
@@ -3474,8 +3374,8 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerUnregisterAg
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerUnregisterAgentLocked(std::unique_lock<std::mutex> & inOutLock,
                                                                                           const char * inPath) noexcept
 {
-    GAutoPtr<char>               path;
-    CHIP_ERROR                   retval = CHIP_NO_ERROR;
+    GAutoPtr<char> path;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrDie(inOutLock.owns_lock());
 
@@ -3484,11 +3384,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ManagerUnregisterAg
     path.reset(g_strdup(inPath));
     VerifyOrExit(path.get() != nullptr, retval = CHIP_ERROR_NO_MEMORY);
 
-    retval = ManagerAgentOpLocked(inOutLock,
-                                  path.get(),
-                                  conn_man_manager_call_unregister_agent_sync,
-                                  "unregister",
-                                  false);
+    retval = ManagerAgentOpLocked(inOutLock, path.get(), conn_man_manager_call_unregister_agent_sync, "unregister", false);
 
     ShutdownAgentLocked(inOutLock, inPath);
 
@@ -3514,8 +3410,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::ServiceConnectLocke
         VerifyOrReturnError(service.get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         conn_man_service_call_connect(
-            service.get(),
-            nullptr,
+            service.get(), nullptr,
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
                     inSelf_->OnServiceConnectReady(sourceObject_, res_);
@@ -3534,28 +3429,29 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::ServiceRegisterPropertyCh
 {
     VerifyOrReturn(inService != nullptr);
 
-    g_signal_connect(
-        inService, "property-changed",
-        G_CALLBACK(+[](ConnManService * inService_, const char * inKey_, GVariant * inValue_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
-            inSelf_->OnServicePropertyChanged(inService_, inKey_, inValue_);
-        }),
-        this);
+    g_signal_connect(inService, "property-changed",
+                     G_CALLBACK(+[](ConnManService * inService_, const char * inKey_, GVariant * inValue_,
+                                    ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
+                         inSelf_->OnServicePropertyChanged(inService_, inKey_, inValue_);
+                     }),
+                     this);
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::TechnologyRegisterPropertyChangedOnGLib(ConnManTechnology * inTechnology) noexcept
+void ConnectivityManagerImpl_NetworkManagementConnMan::TechnologyRegisterPropertyChangedOnGLib(
+    ConnManTechnology * inTechnology) noexcept
 {
     VerifyOrReturn(inTechnology != nullptr);
 
-    g_signal_connect(
-        inTechnology, "property-changed",
-        G_CALLBACK(+[](ConnManTechnology * inTechnology_, const char * inKey_, GVariant * inValue_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
-            inSelf_->OnTechnologyPropertyChanged(inTechnology_, inKey_, inValue_);
-        }),
-        this);
+    g_signal_connect(inTechnology, "property-changed",
+                     G_CALLBACK(+[](ConnManTechnology * inTechnology_, const char * inKey_, GVariant * inValue_,
+                                    ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
+                         inSelf_->OnTechnologyPropertyChanged(inTechnology_, inKey_, inValue_);
+                     }),
+                     this);
 }
 
 CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::TechnologyScanLocked(std::unique_lock<std::mutex> & inOutLock,
-                                                                     ConnManTechnology * inTechnology) noexcept
+                                                                                  ConnManTechnology * inTechnology) noexcept
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
@@ -3572,8 +3468,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::TechnologyScanLocke
         VerifyOrReturnError(technology.get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         conn_man_technology_call_scan(
-            technology.get(),
-            nullptr,
+            technology.get(), nullptr,
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
                     inSelf_->OnTechnologyScanReady(sourceObject_, res_);
@@ -3594,13 +3489,13 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::TechnologySetProper
                                                                                          GVariant * inValue) noexcept
 {
     ConnManTechnology * technology = nullptr;
-    const char *        key        = nullptr;
-    GVariant *          value      = nullptr;
-    CHIP_ERROR          retval     = CHIP_NO_ERROR;
+    const char * key               = nullptr;
+    GVariant * value               = nullptr;
+    CHIP_ERROR retval              = CHIP_NO_ERROR;
 
     VerifyOrExit(inTechnology != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inKey        != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(inValue      != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inKey != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inValue != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
     technology = g_object_ref(inTechnology);
 
@@ -3611,23 +3506,17 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::TechnologySetProper
 
     retval = UnlockAndInvokeOnGLibContextSync(inOutLock, [&]() -> CHIP_ERROR {
         GAutoPtr<ConnManTechnology> retained_technology(technology);
-        GAutoPtr<char>              retained_key(const_cast<char *>(key));
-        GAutoPtr<GVariant>          retained_value(value);
-        GAutoPtr<GError>            err;
-        gboolean                    status;
+        GAutoPtr<char> retained_key(const_cast<char *>(key));
+        GAutoPtr<GVariant> retained_value(value);
+        GAutoPtr<GError> err;
+        gboolean status;
 
-        status = conn_man_technology_call_set_property_sync(retained_technology.get(),
-                                                            retained_key.get(),
-                                                            retained_value.get(),
-                                                            nullptr,
-                                                            &err.GetReceiver());
+        status = conn_man_technology_call_set_property_sync(retained_technology.get(), retained_key.get(), retained_value.get(),
+                                                            nullptr, &err.GetReceiver());
         if (!status || err)
         {
-            ChipLogError(DeviceLayer,
-                         CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX
-                         "failed to set technology %s property %s: %s",
-                         g_dbus_proxy_get_object_path(G_DBUS_PROXY(retained_technology.get())),
-                         retained_key.get(),
+            ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "failed to set technology %s property %s: %s",
+                         g_dbus_proxy_get_object_path(G_DBUS_PROXY(retained_technology.get())), retained_key.get(),
                          err ? err->message : "unknown");
 
             return CHIP_ERROR_INTERNAL;
@@ -3648,7 +3537,7 @@ CHIP_ERROR ConnectivityManagerImpl_NetworkManagementConnMan::TechnologySetPowere
                                                                                         const bool & inPowered) noexcept
 {
     GAutoPtr<GVariant> value;
-    CHIP_ERROR         retval = CHIP_NO_ERROR;
+    CHIP_ERROR retval = CHIP_NO_ERROR;
 
     VerifyOrExit(inTechnology != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -3667,8 +3556,8 @@ exit:
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerReady(GObject * inObject, GAsyncResult * inResult)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManManager *            manager;
-    GAutoPtr<GError>            err;
+    ConnManManager * manager;
+    GAutoPtr<GError> err;
 
     ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "connecting to manager");
 
@@ -3693,46 +3582,48 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerReady(GObject * 
 
         // Property Changed
 
-        g_signal_connect(
-            mConnManClient.mManagerProxy.get(), "property-changed",
-            G_CALLBACK(+[](ConnManManager * inManager_, const char * inKey, GVariant * inValue, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
-                inSelf_->OnManagerPropertyChanged(inManager_, inKey, inValue);
-            }),
-            this);
+        g_signal_connect(mConnManClient.mManagerProxy.get(), "property-changed",
+                         G_CALLBACK(+[](ConnManManager * inManager_, const char * inKey, GVariant * inValue,
+                                        ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
+                             inSelf_->OnManagerPropertyChanged(inManager_, inKey, inValue);
+                         }),
+                         this);
 
         // Technology Added
 
-        g_signal_connect(
-            mConnManClient.mManagerProxy.get(), "technology-added",
-            G_CALLBACK(+[](ConnManManager * inManager_, const char * inPath, GVariant * inProperties, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
-                inSelf_->OnManagerTechnologyAdded(inManager_, inPath, inProperties);
-            }),
-            this);
+        g_signal_connect(mConnManClient.mManagerProxy.get(), "technology-added",
+                         G_CALLBACK(+[](ConnManManager * inManager_, const char * inPath, GVariant * inProperties,
+                                        ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
+                             inSelf_->OnManagerTechnologyAdded(inManager_, inPath, inProperties);
+                         }),
+                         this);
 
         // Technology Removed
 
-        g_signal_connect(
-            mConnManClient.mManagerProxy.get(), "technology-removed",
-            G_CALLBACK(+[](ConnManManager * inManager_, const char * inPath, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
-                inSelf_->OnManagerTechnologyRemoved(inManager_, inPath);
-            }),
-            this);
+        g_signal_connect(mConnManClient.mManagerProxy.get(), "technology-removed",
+                         G_CALLBACK(+[](ConnManManager * inManager_, const char * inPath,
+                                        ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
+                             inSelf_->OnManagerTechnologyRemoved(inManager_, inPath);
+                         }),
+                         this);
 
         // Services Changed
 
         g_signal_connect(
             mConnManClient.mManagerProxy.get(), "services-changed",
-            G_CALLBACK(+[](ConnManManager * inManager_, GVariant * inServicesChanged, const char * const * inServicesRemoved, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
+            G_CALLBACK(+[](ConnManManager * inManager_, GVariant * inServicesChanged, const char * const * inServicesRemoved,
+                           ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
                 inSelf_->OnManagerServicesChanged(inManager_, inServicesChanged, inServicesRemoved);
             }),
             this);
 
         // Prime the manager properties, services, and technologies.
 
-        mConnManClient.mProperties.reset(g_hash_table_new_full(g_str_hash, g_str_equal, g_free, reinterpret_cast<GDestroyNotify>(g_variant_unref)));
+        mConnManClient.mProperties.reset(
+            g_hash_table_new_full(g_str_hash, g_str_equal, g_free, reinterpret_cast<GDestroyNotify>(g_variant_unref)));
 
-        conn_man_manager_call_get_properties(mConnManClient.mManagerProxy.get(),
-            nullptr,
+        conn_man_manager_call_get_properties(
+            mConnManClient.mManagerProxy.get(), nullptr,
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
                     inSelf_->OnManagerGetPropertiesReady(sourceObject_, res_);
@@ -3740,10 +3631,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerReady(GObject * 
             this);
 
         mConnManClient.mServiceProxies.reset(g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref));
-        mConnManClient.mServices.reset(g_hash_table_new_full(g_str_hash, g_str_equal, g_free, reinterpret_cast<GDestroyNotify>(g_variant_unref)));
+        mConnManClient.mServices.reset(
+            g_hash_table_new_full(g_str_hash, g_str_equal, g_free, reinterpret_cast<GDestroyNotify>(g_variant_unref)));
 
-        conn_man_manager_call_get_services(mConnManClient.mManagerProxy.get(),
-            nullptr,
+        conn_man_manager_call_get_services(
+            mConnManClient.mManagerProxy.get(), nullptr,
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
                     inSelf_->OnManagerGetServicesReady(sourceObject_, res_);
@@ -3751,10 +3643,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerReady(GObject * 
             this);
 
         mConnManClient.mTechnologyProxies.reset(g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref));
-        mConnManClient.mTechnologies.reset(g_hash_table_new_full(g_str_hash, g_str_equal, g_free, reinterpret_cast<GDestroyNotify>(g_variant_unref)));
+        mConnManClient.mTechnologies.reset(
+            g_hash_table_new_full(g_str_hash, g_str_equal, g_free, reinterpret_cast<GDestroyNotify>(g_variant_unref)));
 
-        conn_man_manager_call_get_technologies(mConnManClient.mManagerProxy.get(),
-            nullptr,
+        conn_man_manager_call_get_technologies(
+            mConnManClient.mManagerProxy.get(), nullptr,
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl_NetworkManagementConnMan * inSelf_) {
                     inSelf_->OnManagerGetTechnologiesReady(sourceObject_, res_);
@@ -3768,19 +3661,19 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerReady(GObject * 
     }
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerGetObjectsReady(GObject * inObject, GAsyncResult * inResult,
-                                                                                ManagerGetObjectsFinishFunc inManagerGetObjectsFinishFunc,
-                                                                                HandleManagerGetObjectsMethod inHandleManagerGetObjectsMethod) noexcept
+void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerGetObjectsReady(
+    GObject * inObject, GAsyncResult * inResult, ManagerGetObjectsFinishFunc inManagerGetObjectsFinishFunc,
+    HandleManagerGetObjectsMethod inHandleManagerGetObjectsMethod) noexcept
 {
     GAutoPtr<GVariant> objects_pointer;
-    GAutoPtr<GError>   err_pointer;
-    GObject *          object  = nullptr;
-    GVariant *         objects = nullptr;
-    GError *           err     = nullptr;
+    GAutoPtr<GError> err_pointer;
+    GObject * object   = nullptr;
+    GVariant * objects = nullptr;
+    GError * err       = nullptr;
 
-    VerifyOrReturn(inObject                        != nullptr);
-    VerifyOrReturn(inResult                        != nullptr);
-    VerifyOrReturn(inManagerGetObjectsFinishFunc   != nullptr);
+    VerifyOrReturn(inObject != nullptr);
+    VerifyOrReturn(inResult != nullptr);
+    VerifyOrReturn(inManagerGetObjectsFinishFunc != nullptr);
     VerifyOrReturn(inHandleManagerGetObjectsMethod != nullptr);
 
     // Complete the asynchronous objects "big get" with the lock and
@@ -3789,9 +3682,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerGetObjectsReady(
     {
         std::lock_guard<std::mutex> lock(mConnManMutex);
 
-        inManagerGetObjectsFinishFunc(CONN_MAN_MANAGER(inObject),
-                                      &objects_pointer.GetReceiver(),
-                                      inResult,
+        inManagerGetObjectsFinishFunc(CONN_MAN_MANAGER(inObject), &objects_pointer.GetReceiver(), inResult,
                                       &err_pointer.GetReceiver());
     }
 
@@ -3820,52 +3711,48 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerGetObjectsReady(
         err = g_error_copy(err_pointer.get());
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, object, objects, err, inHandleManagerGetObjectsMethod]() -> void {
-        GAutoPtr<GObject>  retained_object(object);
-        GAutoPtr<GVariant> retained_objects(objects);
-        GAutoPtr<GError>   retained_err(err);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        [this, object, objects, err, inHandleManagerGetObjectsMethod]() -> void {
+            GAutoPtr<GObject> retained_object(object);
+            GAutoPtr<GVariant> retained_objects(objects);
+            GAutoPtr<GError> retained_err(err);
 
-        (this->*inHandleManagerGetObjectsMethod)(CONN_MAN_MANAGER(retained_object.get()), retained_objects.get(), retained_err.get());
-    });
+            (this->*inHandleManagerGetObjectsMethod)(CONN_MAN_MANAGER(retained_object.get()), retained_objects.get(),
+                                                     retained_err.get());
+        });
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerGetPropertiesReady(GObject * inObject, GAsyncResult * inResult)
 {
-    OnManagerGetObjectsReady(inObject,
-                             inResult,
-                             conn_man_manager_call_get_properties_finish,
+    OnManagerGetObjectsReady(inObject, inResult, conn_man_manager_call_get_properties_finish,
                              &ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetProperties);
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerGetServicesReady(GObject * inObject, GAsyncResult * inResult)
 {
-    OnManagerGetObjectsReady(inObject,
-                             inResult,
-                             conn_man_manager_call_get_services_finish,
+    OnManagerGetObjectsReady(inObject, inResult, conn_man_manager_call_get_services_finish,
                              &ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetServices);
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerGetTechnologiesReady(GObject * inObject, GAsyncResult * inResult)
 {
-    OnManagerGetObjectsReady(inObject,
-                             inResult,
-                             conn_man_manager_call_get_technologies_finish,
+    OnManagerGetObjectsReady(inObject, inResult, conn_man_manager_call_get_technologies_finish,
                              &ConnectivityManagerImpl_NetworkManagementConnMan::HandleManagerGetTechnologies);
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::OnObjectActionReady(GObject * inObject, GAsyncResult * inResult,
-                                                                           ObjectActionFinishFunc inObjectActionFinishFunc,
-                                                                           HandleObjectActionCompleteMethod inHandleObjectActionCompleteMethod) noexcept
+void ConnectivityManagerImpl_NetworkManagementConnMan::OnObjectActionReady(
+    GObject * inObject, GAsyncResult * inResult, ObjectActionFinishFunc inObjectActionFinishFunc,
+    HandleObjectActionCompleteMethod inHandleObjectActionCompleteMethod) noexcept
 {
     GAutoPtr<GError> err_pointer;
-    GObject *        object = nullptr;
-    GError *         err    = nullptr;
+    GObject * object = nullptr;
+    GError * err     = nullptr;
 
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    VerifyOrReturn(inObject                           != nullptr);
-    VerifyOrReturn(inResult                           != nullptr);
-    VerifyOrReturn(inObjectActionFinishFunc           != nullptr);
+    VerifyOrReturn(inObject != nullptr);
+    VerifyOrReturn(inResult != nullptr);
+    VerifyOrReturn(inObjectActionFinishFunc != nullptr);
     VerifyOrReturn(inHandleObjectActionCompleteMethod != nullptr);
 
     // Complete the asynchronous objects "big get" with the lock and
@@ -3874,9 +3761,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnObjectActionReady(GObje
     {
         std::lock_guard<std::mutex> lock(mConnManMutex);
 
-        inObjectActionFinishFunc(inObject,
-                                 inResult,
-                                 &err_pointer.GetReceiver());
+        inObjectActionFinishFunc(inObject, inResult, &err_pointer.GetReceiver());
     }
 
     // Defer the actual work to the main thread, outside the lock, via
@@ -3899,27 +3784,24 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnObjectActionReady(GObje
         err = g_error_copy(err_pointer.get());
     }
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, object, err, inHandleObjectActionCompleteMethod]() -> void {
-        GAutoPtr<GObject> retained_object(object);
-        GAutoPtr<GError>  retained_err(err);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        [this, object, err, inHandleObjectActionCompleteMethod]() -> void {
+            GAutoPtr<GObject> retained_object(object);
+            GAutoPtr<GError> retained_err(err);
 
-        (this->*inHandleObjectActionCompleteMethod)(G_DBUS_PROXY(retained_object.get()), retained_err.get());
-    });
+            (this->*inHandleObjectActionCompleteMethod)(G_DBUS_PROXY(retained_object.get()), retained_err.get());
+        });
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnServiceConnectReady(GObject * inObject, GAsyncResult * inResult)
 {
-    OnObjectActionReady(inObject,
-                        inResult,
-                        reinterpret_cast<ObjectActionFinishFunc>(conn_man_service_call_connect_finish),
+    OnObjectActionReady(inObject, inResult, reinterpret_cast<ObjectActionFinishFunc>(conn_man_service_call_connect_finish),
                         &ConnectivityManagerImpl_NetworkManagementConnMan::HandleServiceConnectComplete);
 }
 
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnTechnologyScanReady(GObject * inObject, GAsyncResult * inResult)
 {
-    OnObjectActionReady(inObject,
-                        inResult,
-                        reinterpret_cast<ObjectActionFinishFunc>(conn_man_technology_call_scan_finish),
+    OnObjectActionReady(inObject, inResult, reinterpret_cast<ObjectActionFinishFunc>(conn_man_technology_call_scan_finish),
                         &ConnectivityManagerImpl_NetworkManagementConnMan::HandleTechnologyScanComplete);
 }
 
@@ -3930,7 +3812,7 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentCancel(ConnMan
 {
     const gboolean retval = TRUE;
 
-    nlEXPECT(inAgent      != nullptr, exit);
+    nlEXPECT(inAgent != nullptr, exit);
     nlEXPECT(inInvocation != nullptr, exit);
 
     conn_man_agent_complete_cancel(inAgent, inInvocation);
@@ -3944,7 +3826,7 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRelease(ConnMa
 {
     const gboolean retval = TRUE;
 
-    nlEXPECT(inAgent      != nullptr, exit);
+    nlEXPECT(inAgent != nullptr, exit);
     nlEXPECT(inInvocation != nullptr, exit);
 
     conn_man_agent_complete_release(inAgent, inInvocation);
@@ -3959,29 +3841,30 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRequestInput(C
                                                                                GVariant * inProperties) noexcept
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    const GQuark    domain          = G_IO_ERROR;
-    Optional<gint>  code;
-    const gchar *   message         = nullptr;
-    const char *    pending_path    = nullptr;
-    bool            paths_match;
-    bool            want_passphrase = false;
-    GVariantIter    iter;
-    const char *    key             = nullptr;
-    GVariant *      boxed           = nullptr;
+    const GQuark domain = G_IO_ERROR;
+    Optional<gint> code;
+    const gchar * message     = nullptr;
+    const char * pending_path = nullptr;
+    bool paths_match;
+    bool want_passphrase = false;
+    GVariantIter iter;
+    const char * key = nullptr;
+    GVariant * boxed = nullptr;
     GVariantBuilder builder;
-    GVariant *      reply;
-    const gboolean  retval          = TRUE;
+    GVariant * reply;
+    const gboolean retval = TRUE;
 
-    VerifyOrExit(inAgent      != nullptr, code.SetValue(G_IO_ERROR_INVALID_ARGUMENT); message = "inAgent == nullptr");
+    VerifyOrExit(inAgent != nullptr, code.SetValue(G_IO_ERROR_INVALID_ARGUMENT); message = "inAgent == nullptr");
     VerifyOrExit(inInvocation != nullptr, code.SetValue(G_IO_ERROR_INVALID_ARGUMENT); message = "inInvocation == nullptr");
-    VerifyOrExit(inPath       != nullptr, code.SetValue(G_IO_ERROR_INVALID_ARGUMENT); message = "inPath == nullptr");
+    VerifyOrExit(inPath != nullptr, code.SetValue(G_IO_ERROR_INVALID_ARGUMENT); message = "inPath == nullptr");
     VerifyOrExit(inProperties != nullptr, code.SetValue(G_IO_ERROR_INVALID_ARGUMENT); message = "inProperties == nullptr");
 
     ChipLogProgress(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "agent service %s request input", inPath);
 
     // First, ensure there is a pending service we are currently connecting.
 
-    VerifyOrExit(mConnManAgentServer.mPendingService, code.SetValue(G_IO_ERROR_FAILED); message = "No pending service for RequestInput");
+    VerifyOrExit(mConnManAgentServer.mPendingService, code.SetValue(G_IO_ERROR_FAILED);
+                 message = "No pending service for RequestInput");
 
     // Second, ensure the pending service matches the one requesting input.
 
@@ -3993,7 +3876,8 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRequestInput(C
 
     // Third, validate the request type.
 
-    VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), code.SetValue(G_IO_ERROR_INVALID_ARGUMENT); message = "properties are not 'a{sv}' type");
+    VerifyOrExit(g_variant_is_of_type(inProperties, G_VARIANT_TYPE_VARDICT), code.SetValue(G_IO_ERROR_INVALID_ARGUMENT);
+                 message = "properties are not 'a{sv}' type");
 
     // Fourth, iterate over the requested property keys and decide
     // what we can satisfy relative to what is requested.
@@ -4023,16 +3907,15 @@ gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentRequestInput(C
 
     if (want_passphrase)
     {
-        VerifyOrExit(!mWiFiConnectPassphrase.empty(), code.SetValue(G_IO_ERROR_FAILED); message = "Passphrase requested but not available");
+        VerifyOrExit(!mWiFiConnectPassphrase.empty(), code.SetValue(G_IO_ERROR_FAILED);
+                     message = "Passphrase requested but not available");
 
         char passphrase[Internal::kMaxWiFiKeyLength + 1];
         const size_t n = std::min<size_t>(mWiFiConnectPassphrase.size(), Internal::kMaxWiFiKeyLength);
         memcpy(passphrase, mWiFiConnectPassphrase.data(), n);
         passphrase[n] = '\0';
 
-        g_variant_builder_add(&builder, "{sv}",
-                              kConnManServiceAgentPropertyPassphraseKey,
-                              g_variant_new_string(passphrase));
+        g_variant_builder_add(&builder, "{sv}", kConnManServiceAgentPropertyPassphraseKey, g_variant_new_string(passphrase));
     }
 
     reply = g_variant_builder_end(&builder);
@@ -4061,16 +3944,14 @@ exit:
 
 gboolean ConnectivityManagerImpl_NetworkManagementConnMan::OnAgentReportError(ConnManAgent * inAgent,
                                                                               GDBusMethodInvocation * inInvocation,
-                                                                              const gchar * inPath,
-                                                                              const gchar * inError) noexcept
+                                                                              const gchar * inPath, const gchar * inError) noexcept
 {
     const gboolean retval = TRUE;
 
-    nlEXPECT(inAgent      != nullptr, exit);
+    nlEXPECT(inAgent != nullptr, exit);
     nlEXPECT(inInvocation != nullptr, exit);
 
-    ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "service %s had error %s",
-                 inPath ? inPath : "(null)",
+    ChipLogError(DeviceLayer, CONNECTIVITY_MANAGER_CONNMAN_LOG_PREFIX "service %s had error %s", inPath ? inPath : "(null)",
                  inError ? inError : "(null)");
 
     conn_man_agent_complete_report_error(inAgent, inInvocation);
@@ -4079,18 +3960,17 @@ exit:
     return retval;
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerPropertyChanged(ConnManManager * inManager,
-                                                                                const char * inKey,
+void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerPropertyChanged(ConnManManager * inManager, const char * inKey,
                                                                                 GVariant * inValue)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManManager *            manager = nullptr;
-    const char *                key     = nullptr;
-    GVariant *                  value   = nullptr;
+    ConnManManager * manager = nullptr;
+    const char * key         = nullptr;
+    GVariant * value         = nullptr;
 
     VerifyOrReturn(inManager != nullptr);
-    VerifyOrReturn(inKey     != nullptr);
-    VerifyOrReturn(inValue   != nullptr);
+    VerifyOrReturn(inKey != nullptr);
+    VerifyOrReturn(inValue != nullptr);
 
     // Defer the actual work to the main thread, outside the lock, via
     // a lambda. The lock will be reacquired in the method called by
@@ -4105,8 +3985,8 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerPropertyChanged(
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, manager, key, value]() -> void {
         GAutoPtr<ConnManManager> retained_manager(manager);
-        GAutoPtr<char>           retained_key(const_cast<char *>(key));
-        GAutoPtr<GVariant>       retained_value(value);
+        GAutoPtr<char> retained_key(const_cast<char *>(key));
+        GAutoPtr<GVariant> retained_value(value);
 
         HandleManagerPropertyChanged(retained_manager.get(), retained_key.get(), retained_value.get());
     });
@@ -4117,11 +3997,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerServicesChanged(
                                                                                 const char * const * inServicesRemoved)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManManager *            manager = nullptr;
-    GVariant *                  changed = nullptr;
-    gchar **                    removed = nullptr;
+    ConnManManager * manager = nullptr;
+    GVariant * changed       = nullptr;
+    gchar ** removed         = nullptr;
 
-    VerifyOrReturn(inManager         != nullptr);
+    VerifyOrReturn(inManager != nullptr);
     VerifyOrReturn(inServicesChanged != nullptr);
 
     // Defer the actual work to the main thread, outside the lock, via
@@ -4139,24 +4019,23 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerServicesChanged(
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, manager, changed, removed]() -> void {
         GAutoPtr<ConnManManager> retained_manager(manager);
-        GAutoPtr<GVariant>       retained_changed(changed);
-        GAutoPtr<gchar *>        retained_removed(removed);
+        GAutoPtr<GVariant> retained_changed(changed);
+        GAutoPtr<gchar *> retained_removed(removed);
 
         HandleManagerServicesChanged(retained_manager.get(), retained_changed.get(), retained_removed.get());
     });
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerTechnologyAdded(ConnManManager * inManager,
-                                                                                const char * inPath,
+void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerTechnologyAdded(ConnManManager * inManager, const char * inPath,
                                                                                 GVariant * inProperties)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManManager *            manager    = nullptr;
-    char *                      path       = nullptr;
-    GVariant *                  properties = nullptr;
+    ConnManManager * manager = nullptr;
+    char * path              = nullptr;
+    GVariant * properties    = nullptr;
 
-    VerifyOrReturn(inManager    != nullptr);
-    VerifyOrReturn(inPath       != nullptr);
+    VerifyOrReturn(inManager != nullptr);
+    VerifyOrReturn(inPath != nullptr);
     VerifyOrReturn(inProperties != nullptr);
 
     // Defer the actual work to the main thread, outside the lock, via
@@ -4172,8 +4051,8 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerTechnologyAdded(
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, manager, path, properties]() -> void {
         GAutoPtr<ConnManManager> retained_manager(manager);
-        GAutoPtr<char>           retained_path(const_cast<char *>(path));
-        GAutoPtr<GVariant>       retained_properties(properties);
+        GAutoPtr<char> retained_path(const_cast<char *>(path));
+        GAutoPtr<GVariant> retained_properties(properties);
 
         HandleManagerTechnologyAdded(retained_manager.get(), retained_path.get(), retained_properties.get());
     });
@@ -4182,11 +4061,11 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerTechnologyAdded(
 void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerTechnologyRemoved(ConnManManager * inManager, const char * inPath)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManManager *            manager    = nullptr;
-    const char *                path       = nullptr;
+    ConnManManager * manager = nullptr;
+    const char * path        = nullptr;
 
-    VerifyOrReturn(inManager    != nullptr);
-    VerifyOrReturn(inPath       != nullptr);
+    VerifyOrReturn(inManager != nullptr);
+    VerifyOrReturn(inPath != nullptr);
 
     // Defer the actual work to the main thread, outside the lock, via
     // a lambda. The lock will be reacquired in the method called by
@@ -4199,7 +4078,7 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnManagerTechnologyRemove
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, manager, path]() -> void {
         GAutoPtr<ConnManManager> retained_manager(manager);
-        GAutoPtr<char>           retained_path(const_cast<char *>(path));
+        GAutoPtr<char> retained_path(const_cast<char *>(path));
 
         HandleManagerTechnologyRemoved(retained_manager.get(), retained_path.get());
     });
@@ -4209,13 +4088,13 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnServicePropertyChanged(
                                                                                 GVariant * inValue)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManService *            service = nullptr;
-    const char *                key     = nullptr;
-    GVariant *                  value   = nullptr;
+    ConnManService * service = nullptr;
+    const char * key         = nullptr;
+    GVariant * value         = nullptr;
 
     VerifyOrReturn(inService != nullptr);
-    VerifyOrReturn(inKey     != nullptr);
-    VerifyOrReturn(inValue   != nullptr);
+    VerifyOrReturn(inKey != nullptr);
+    VerifyOrReturn(inValue != nullptr);
 
     // Defer the actual work to the main thread, outside the lock, via
     // a lambda. The lock will be reacquired in the method called by
@@ -4230,24 +4109,24 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnServicePropertyChanged(
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, service, key, value]() -> void {
         GAutoPtr<ConnManService> retained_service(service);
-        GAutoPtr<char>           retained_key(const_cast<char *>(key));
-        GAutoPtr<GVariant>       retained_value(value);
+        GAutoPtr<char> retained_key(const_cast<char *>(key));
+        GAutoPtr<GVariant> retained_value(value);
 
         HandleServicePropertyChanged(retained_service.get(), retained_key.get(), retained_value.get());
     });
 }
 
-void ConnectivityManagerImpl_NetworkManagementConnMan::OnTechnologyPropertyChanged(ConnManTechnology * inTechnology, const char * inKey,
-                                                                                   GVariant * inValue)
+void ConnectivityManagerImpl_NetworkManagementConnMan::OnTechnologyPropertyChanged(ConnManTechnology * inTechnology,
+                                                                                   const char * inKey, GVariant * inValue)
 {
     std::lock_guard<std::mutex> lock(mConnManMutex);
-    ConnManTechnology *         technology = nullptr;
-    const char *                key        = nullptr;
-    GVariant *                  value      = nullptr;
+    ConnManTechnology * technology = nullptr;
+    const char * key               = nullptr;
+    GVariant * value               = nullptr;
 
     VerifyOrReturn(inTechnology != nullptr);
-    VerifyOrReturn(inKey     != nullptr);
-    VerifyOrReturn(inValue   != nullptr);
+    VerifyOrReturn(inKey != nullptr);
+    VerifyOrReturn(inValue != nullptr);
 
     // Defer the actual work to the main thread, outside the lock, via
     // a lambda. The lock will be reacquired in the method called by
@@ -4262,8 +4141,8 @@ void ConnectivityManagerImpl_NetworkManagementConnMan::OnTechnologyPropertyChang
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, technology, key, value]() -> void {
         GAutoPtr<ConnManTechnology> retained_technology(technology);
-        GAutoPtr<char>              retained_key(const_cast<char *>(key));
-        GAutoPtr<GVariant>          retained_value(value);
+        GAutoPtr<char> retained_key(const_cast<char *>(key));
+        GAutoPtr<GVariant> retained_value(value);
 
         HandleTechnologyPropertyChanged(retained_technology.get(), retained_key.get(), retained_value.get());
     });
