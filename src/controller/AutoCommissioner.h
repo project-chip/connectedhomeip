@@ -58,6 +58,17 @@ public:
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
+    bool IsConcurrentModeSupported() const
+    {
+        if (mParams.GetSupportsConcurrentConnection().HasValue()) {
+            return mParams.GetSupportsConcurrentConnection().Value();
+        } else {
+            // Attribute 'SupportsConcurrentConnection' was not found
+            // The default value for this attribute is 'true'
+            return true;
+        }
+    }
+
 protected:
     virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
