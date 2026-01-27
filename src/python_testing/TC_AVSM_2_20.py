@@ -138,7 +138,7 @@ class TC_AVSM_2_20(MatterBaseTest, AVSMTestBase):
             watermarkEnabled=watermark_enabled,
             OSDEnabled=osd_enabled,
             quality=quality,
-            referenceCount=1
+            referenceCount=0
         )
 
         self.step(8)

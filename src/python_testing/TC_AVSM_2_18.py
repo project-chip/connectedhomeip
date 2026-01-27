@@ -65,7 +65,7 @@ class TC_AVSM_2_18(MatterBaseTest, AVSMTestBase):
             TestStep(8, "TH reads MaxEncodedPixelrate attribute from CameraAVStreamManagement Cluster on DUT. Store this value in aMaxEncodedPixelRate."),
             TestStep(9, "If F_WMARK is supported, TH sets it's local aWatermark to True, otherwise this is Null."),
             TestStep(10, "If F_OSD is supported, TH sets its local aOSD to True, otherwise this is Null."),
-            TestStep(11, "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the MinKeyFrameInterval and MaxKeyFrameInterval = 4000. TH sets WatermarkEnabled to aWatermark, TH also sets OSDEnabled to aOSD. TH sends the VideoStreamAllocate command with these arguments."),
+            TestStep(11, "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the KeyFrameInterval = 4000. TH sets WatermarkEnabled to aWatermark, TH also sets OSDEnabled to aOSD. TH sends the VideoStreamAllocate command with these arguments."),
             TestStep(12, "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT. Verify the number of allocated video streams in the list is 1."),
             TestStep(13, "TH reboots the DUT."),
             TestStep(14, "TH waits for the DUT to come back online."),
@@ -94,7 +94,7 @@ class TC_AVSM_2_18(MatterBaseTest, AVSMTestBase):
         self.step(2)
         feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
         has_f_vdo = (feature_map & cluster.Bitmaps.Feature.kVideo) != 0
-        asserts.assert_true(has_f_vdo, "FeatureMap  F_VDO is not set")
+        asserts.assert_true(has_f_vdo, "FeatureMap F_VDO is not set")
 
         self.step(3)
         allocated_video_streams = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams)
@@ -176,7 +176,7 @@ class TC_AVSM_2_18(MatterBaseTest, AVSMTestBase):
             keyFrameInterval=key_frame_interval,
             watermarkEnabled=watermark_enabled,
             OSDEnabled=osd_enabled,
-            referenceCount=1
+            referenceCount=0
         )
 
         self.step(12)
