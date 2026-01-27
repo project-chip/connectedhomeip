@@ -2212,8 +2212,9 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
                 self->GetCommissioningStage() == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
 
-    if (!self->mAutoCommissioner.IsConcurrentModeSupported())
-    {
+    bool supportsConcurrent =
+        self->mCommissioningDelegate->GetCommissioningParameters().GetSupportsConcurrentConnection().ValueOr(true);
+    if (!supportsConcurrent) {
         // Concurrent mode not supported.
         // We are in operational phase so the commissioning channel is no more
         //  available and it is not possible to re-arm the fail-safe timer.

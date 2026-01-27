@@ -58,12 +58,6 @@ public:
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
-    bool IsConcurrentModeSupported() const
-    {
-        // If the 'SupportsConcurrentConnection' attribute was not found, concurrent commissioning is supported
-        return mParams.GetSupportsConcurrentConnection().ValueOr(true);
-    }
-
 protected:
     virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
