@@ -130,8 +130,12 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 public:
+    // Singleton
+
+    static ConnectivityManagerImpl & GetDefaultInstance(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -173,13 +177,6 @@ private:
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
 #endif
-
-    // ===== Members for internal use by the following friends.
-
-    friend ConnectivityManager & ConnectivityMgr();
-    friend ConnectivityManagerImpl & ConnectivityMgrImpl();
-
-    static ConnectivityManagerImpl & GetDefaultInstance(void);
 
 public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
