@@ -40,7 +40,7 @@ class TestMetadataReader(unittest.TestCase):
     ALL_CLUSTERS_APP: out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
     CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app
     ENERGY_GATEWAY_APP: out/linux-x64-energy-gateway-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-gateway-app
-    ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-management-app
+    EVSE_APP: out/linux-x64-evse-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-evse-app
     TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}
     TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}
     TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}
