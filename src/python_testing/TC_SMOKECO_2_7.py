@@ -37,16 +37,13 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import asyncio
 import logging
-from typing import Any, Optional
 
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -117,7 +114,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         self.step(4)
         sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.Unmounted)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint, max_interval_sec=30)
-        
+
         unmounted_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.Unmounted)
         asserts.assert_equal(unmounted_dut, 0, "Expect not unmounted")
 
