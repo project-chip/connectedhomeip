@@ -146,7 +146,6 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         if inoperative_when_unmounted_supported:
             expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
             asserts.assert_equal(expressed_state_dut, 9, "ExpressedState should be Inoperative")
-        else:
 
         # Step 9, "TH prompts operator to mount the device."
         self.step(9)
