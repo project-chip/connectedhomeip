@@ -109,15 +109,16 @@ public:
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
+        ServerClusterInterface * result = nullptr;
         if (gServers[clusterInstanceIndex].IsConstructed())
         {
-            return &gServers[clusterInstanceIndex].Cluster();
+            result = &gServers[clusterInstanceIndex].Cluster();
         }
         else if (gFallbackServers[clusterInstanceIndex].IsConstructed())
         {
-            return &gFallbackServers[clusterInstanceIndex].Cluster();
+            result = &gFallbackServers[clusterInstanceIndex].Cluster();
         }
-        return nullptr;
+        return result;
     }
 
     void ReleaseRegistration(unsigned clusterInstanceIndex) override
