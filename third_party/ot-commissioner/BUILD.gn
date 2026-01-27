@@ -57,6 +57,7 @@ static_library("ot-commissioner") {
     "repo/third_party/COSE-C/repo/include",
     "repo/third_party/googletest/repo/googletest/include",
     "repo/third_party/json/repo/single_include",
+    "repo/third_party/libevent/repo/include",
     "repo/third_party/mbedtls/repo/include",
     "repo/third_party/mdns/repo/include",
   ]
