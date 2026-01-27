@@ -15,18 +15,14 @@
  *    limitations under the License.
  */
 
-#include "sl_clock_manager.h"
-#include "sl_hal_wdog.h"
 #include <em_device.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #if defined(_SILICON_LABS_32B_SERIES_2)
-#include "em_cmu.h"
 #include "em_msc.h"
 #include "em_rmu.h"
 #elif defined(_SILICON_LABS_32B_SERIES_3)
 #include "sl_hal_emu.h"
-#include "sl_hal_wdog.h"
 #include "sl_se_manager.h"
 #include "sl_se_manager_types.h"
 #include <sl_se_manager_extmem.h>
@@ -36,6 +32,11 @@
 #if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
 #include "sl_system_kernel.h"
 #endif
+
+#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
+#include "sl_clock_manager.h"
+#include "sl_hal_wdog.h"
+#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
 
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {

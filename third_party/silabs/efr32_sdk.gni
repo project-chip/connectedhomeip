@@ -747,7 +747,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/peripheral/src/sl_hal_gpio.c",
       "${efr32_sdk_root}/platform/peripheral/src/sl_hal_sysrtc.c",
       "${efr32_sdk_root}/platform/peripheral/src/sl_hal_system.c",
-      "${efr32_sdk_root}/platform/peripheral/src/sl_hal_wdog.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
@@ -962,6 +961,10 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c",
       ]
+    }
+
+    if (sl_matter_debug_watchdog_enable){
+      sources += ["${efr32_sdk_root}/platform/peripheral/src/sl_hal_wdog.c"]
     }
 
     # COS and SWO sources files for when we use generate with slc
