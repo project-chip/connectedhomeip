@@ -150,10 +150,13 @@ static_library("Linux") {
       "ThreadStackManagerImpl_OpenThread.h",
     ]
 
-    deps += [
-      "${chip_root}/src/app:app_config",
-      "${chip_root}/third_party/openthread/platforms/simulation",
-    ]
+    deps += [ "${chip_root}/src/app:app_config" ]
+
+    if (chip_enable_otns) {
+      deps += [ "${chip_root}/third_party/openthread/platforms/otns" ]
+    } else {
+      deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    }
 
     if (chip_mdns == "platform") {
       sources += [

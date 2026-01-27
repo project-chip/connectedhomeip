@@ -406,6 +406,7 @@ class HostBuilder(GnBuilder):
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
+                 enable_otns=False,
                  unified=False
                  ):
         """
@@ -575,6 +576,17 @@ class HostBuilder(GnBuilder):
                 raise Exception("OpenThread EndPoint mode does not support Wifi")
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
+
+        if enable_otns:
+            if not openthread_endpoint:
+                raise Exception("OpenThread EndPoint mode is required")
+
+            self.extra_gn_options.append('chip_logging_backend="syslog"')
+            self.extra_gn_options.append('chip_enable_otns=true')
+            self.extra_gn_options.append('openthread_config_otns_enable=true')
+            self.extra_gn_options.append('import("//build_overrides/chip.gni")')
+            self.extra_gn_options.append(
+                'openthread_project_core_config_file=rebase_path(get_path_info("${chip_root}/third_party/ot-ns/repo/ot-rfsim/src/openthread-core-rfsim-config.h", "abspath"))')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
