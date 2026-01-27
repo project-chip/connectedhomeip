@@ -329,17 +329,6 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 #endif
 
 /**
- * Returns the public interface of the ConnectivityManager singleton object.
- *
- * chip applications should use this to access features of the ConnectivityManager object
- * that are common to all platforms.
- */
-inline ConnectivityManager & ConnectivityMgr()
-{
-    return ConnectivityManagerImpl::GetDefaultInstance();
-}
-
-/**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConnectivityManager
