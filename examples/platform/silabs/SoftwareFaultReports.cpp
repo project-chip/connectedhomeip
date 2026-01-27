@@ -153,7 +153,6 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
     configASSERTNULL(NULL);
 }
 
-
 /*
  * Note: All our Fault handlers are defined naked functions so they don't modify the stack or registers we are trying to capture.
  * Because of that, C statements are not allowed in the fault handlers as it could lead to unpredictable behavior.
