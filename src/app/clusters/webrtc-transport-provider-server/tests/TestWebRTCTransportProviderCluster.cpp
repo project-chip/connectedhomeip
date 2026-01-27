@@ -68,11 +68,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode, DataModel::Nullable<uint16_t> videoStreamID,
-                                DataModel::Nullable<uint16_t> audioStreamID) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                    Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override

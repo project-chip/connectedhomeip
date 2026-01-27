@@ -455,9 +455,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                                   DataModel::Nullable<uint16_t> videoStreamID,
-                                                   DataModel::Nullable<uint16_t> audioStreamID)
+CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode)
 {
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)

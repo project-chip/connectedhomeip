@@ -547,7 +547,7 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
         }
     }
 
-    // ===== Cluster logic starts here =====
+    // ===== Cluster logic starts here (Effect on Receipt) =====
 
     Status status = CheckPrivacyModes("HandleSolicitOffer", req.streamUsage);
     if (status != Status::Success)
@@ -800,7 +800,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         }
     }
 
-    // ===== Cluster logic starts here =====
+    // ===== Cluster logic starts here (Effect on Receipt) =====
 
     // If WebRTCSessionID is not null:
     // - If it does not match a value in CurrentSessions: Respond with NOT_FOUND
@@ -1081,7 +1081,7 @@ WebRTCTransportProviderCluster::HandleEndSession(CommandHandler & commandHandler
     }
 
     // Delegate handles decrementing reference counts on video/audio streams if applicable.
-    CHIP_ERROR err = mDelegate.HandleEndSession(sessionId, reason, existingSession->videoStreamID, existingSession->audioStreamID);
+    CHIP_ERROR err = mDelegate.HandleEndSession(sessionId, reason);
 
     // Remove the session entry from CurrentSessions.
     RemoveSession(sessionId);
