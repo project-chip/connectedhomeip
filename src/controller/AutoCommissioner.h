@@ -60,9 +60,12 @@ public:
 
     bool IsConcurrentModeSupported() const
     {
-        if (mParams.GetSupportsConcurrentConnection().HasValue()) {
+        if (mParams.GetSupportsConcurrentConnection().HasValue())
+        {
             return mParams.GetSupportsConcurrentConnection().Value();
-        } else {
+        }
+        else
+        {
             // Attribute 'SupportsConcurrentConnection' was not found
             // The default value for this attribute is 'true'
             return true;
