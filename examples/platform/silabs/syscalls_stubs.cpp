@@ -248,7 +248,8 @@ int __attribute__((weak)) _write(int file, const char * ptr, int len)
 void __attribute__((weak)) exit(int status)
 {
     (void) status;
-    _write(0, "exit not supported, resetting system...\r\n", 42);
+    static const char kExitMessage[] = "exit not supported, resetting system...\r\n";
+    _write(0, kExitMessage, sizeof(kExitMessage) - 1);
     NVIC_SystemReset();
     while (1)
     {
