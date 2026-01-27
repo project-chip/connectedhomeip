@@ -30,13 +30,24 @@ source_set("root-node") {
     "${chip_root}/src/app/clusters/general-commissioning-server:bread-crumb-tracker",
     "${chip_root}/src/app/clusters/general-diagnostics-server",
     "${chip_root}/src/app/clusters/group-key-mgmt-server",
-    "${chip_root}/src/app/clusters/network-commissioning",
     "${chip_root}/src/app/clusters/operational-credentials-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server",
-    "${chip_root}/src/app/clusters/wifi-network-diagnostics-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices/",
+  ]
+}
+
+source_set("wifi") {
+  sources = [
+    "WifiRootNodeDevice.cpp",
+    "WifiRootNodeDevice.h",
+  ]
+
+  public_deps = [
+    ":root-node",
+    "${chip_root}/src/app/clusters/network-commissioning",
+    "${chip_root}/src/app/clusters/wifi-network-diagnostics-server",
   ]
 }

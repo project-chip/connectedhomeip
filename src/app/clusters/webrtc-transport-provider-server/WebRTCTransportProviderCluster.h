@@ -182,16 +182,12 @@ public:
      *
      * @param[in] sessionId      The ID of the session to end.
      * @param[in] reasonCode     Reason for ending the session (e.g. normal closure, resource limit).
-     * @param[in] videoStreamID  The nullable ID of the video stream associated with the session.
-     * @param[in] audioStreamID  The nullable ID of the audio stream associated with the session.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success
      *   - Error if no matching session is found or some cleanup error occurs
      */
-    virtual CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                        DataModel::Nullable<uint16_t> videoStreamID,
-                                        DataModel::Nullable<uint16_t> audioStreamID) = 0;
+    virtual CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) = 0;
 
     /**
      * @brief Validates the requested stream usage against the camera's resource management
