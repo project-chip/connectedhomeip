@@ -22,6 +22,12 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
+extern "C" {
+#undef IS_ENABLED
+#include <wifi_mgmr.h>
+#include <wifi_mgmr_ext.h>
+}
+
 #include <bl_fw_api.h>
 
 using namespace ::chip;
@@ -31,7 +37,7 @@ namespace DeviceLayer {
 
 void ConnectivityManagerImpl::OnWiFiStationDisconnected()
 {
-    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
     uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);

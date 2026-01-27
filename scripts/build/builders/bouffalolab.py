@@ -183,7 +183,9 @@ class BouffalolabBuilder(GnBuilder):
         if enable_easyflash and enable_littlefs:
             raise Exception("Only one of easyflash and littlefs can be enabled.")
         if bouffalo_chip == "bl616":
-            if not enable_easyflash:
+            if enable_easyflash:
+                raise Exception("BL616 doesn't support easyflash.")
+            else:
                 enable_littlefs = True
         else:
             if not enable_easyflash and not enable_littlefs:

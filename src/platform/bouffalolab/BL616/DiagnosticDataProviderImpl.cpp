@@ -21,12 +21,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <lwip/tcpip.h>
-
 extern "C" {
+#undef IS_ENABLED
 #include <wifi_mgmr_ext.h>
 }
-#include <wifi_mgmr_portable.h>
 #endif
 
 namespace chip {

@@ -22,9 +22,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
 extern "C" {
+#undef IS_ENABLED
+#include <wifi_mgmr.h>
 #include <wifi_mgmr_ext.h>
-}
 #include <wifi_mgmr_portable.h>
+}
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
@@ -33,6 +35,28 @@ using namespace ::chip::Platform;
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
+
+bool BLScanResponseIterator::Next(WiFiScanResponse & item)
+{
+    if (mIternum >= mSize)
+    {
+        return false;
+    }
+
+    item.security.SetRaw(mpScanResults[mIternum].auth);
+    item.ssidLen  = (uint32_t) (mpScanResults[mIternum].ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+         ? mpScanResults[mIternum].ssid_len
+         : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+    item.channel  = mpScanResults[mIternum].channel;
+    item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+    item.rssi     = mpScanResults[mIternum].rssi;
+    memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
+    memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
+
+    mIternum++;
+    return true;
+}
+
 
 CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
@@ -225,7 +249,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
     uint32_t nums = wifi_mgmr_sta_scanlist_nums_get();
     if (nums)
     {
-        wifi_mgmr_scan_item_t * pScanList = (wifi_mgmr_scan_item_t *) MemoryAlloc(nums * sizeof(wifi_mgmr_scan_item_t));
+        struct wifi_mgmr_scan_item * pScanList = (struct wifi_mgmr_scan_item *) MemoryAlloc(nums * sizeof(wifi_mgmr_scan_item_t));
 
         if (NULL == pScanList || 0 == wifi_mgmr_sta_scanlist_dump(pScanList, nums))
         {
@@ -324,11 +348,9 @@ void BLWiFiDriver::OnNetworkStatusChange()
     }
 }
 
-CHIP_ERROR BLWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
+void BLWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
 {
     mLastDisconnectedReason = wifi_mgmr_sta_info_status_code_get();
-
-    return CHIP_NO_ERROR;
 }
 
 int32_t BLWiFiDriver::GetLastDisconnectReason()
@@ -406,20 +428,17 @@ void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-static wifi_conf_t conf = {
-    .country_code = "CN",
-};
-
-extern "C" void wifi_event_handler(uint32_t code)
+extern "C" void wifi_event_handler(async_input_event_t ev, void *priv)
 {
     ChipDeviceEvent event;
+    uint32_t code = ev->code;
 
     memset(&event, 0, sizeof(ChipDeviceEvent));
 
     switch (code)
     {
     case CODE_WIFI_ON_INIT_DONE:
-        wifi_mgmr_init(&conf);
+        wifi_mgmr_task_start();
         break;
     case CODE_WIFI_ON_MGMR_DONE:
         wifi_mgmr_sta_autoconnect_enable();

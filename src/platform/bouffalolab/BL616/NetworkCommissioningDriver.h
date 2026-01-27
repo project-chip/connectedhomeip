@@ -18,10 +18,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #pragma once
-extern "C" {
-#include <wifi_mgmr.h>
-}
 #include <platform/NetworkCommissioning.h>
+
+struct wifi_mgmr_scan_item;
 
 namespace chip {
 namespace DeviceLayer {
@@ -38,34 +37,15 @@ constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 class BLScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    BLScanResponseIterator(const size_t size, const wifi_mgmr_scan_item_t * scanResults) : mSize(size), mpScanResults(scanResults)
+    BLScanResponseIterator(const size_t size, const struct wifi_mgmr_scan_item * scanResults) : mSize(size), mpScanResults(scanResults)
     {}
     size_t Count() override { return mSize; }
-    bool Next(WiFiScanResponse & item) override
-    {
-        if (mIternum >= mSize)
-        {
-            return false;
-        }
-
-        item.security.SetRaw(mpScanResults[mIternum].auth);
-        item.ssidLen  = (uint32_t) (mpScanResults[mIternum].ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-             ? mpScanResults[mIternum].ssid_len
-             : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
-        item.channel  = mpScanResults[mIternum].channel;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults[mIternum].rssi;
-        memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
-        memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
-
-        mIternum++;
-        return true;
-    }
+    bool Next(WiFiScanResponse & item) override;
     void Release() override {}
 
 private:
     const size_t mSize;
-    const wifi_mgmr_scan_item_t * mpScanResults;
+    const struct wifi_mgmr_scan_item * mpScanResults;
     size_t mIternum = 0;
 };
 
@@ -123,7 +103,7 @@ public:
     void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 
-    CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
+    void SetLastDisconnectReason(const ChipDeviceEvent * event);
     int32_t GetLastDisconnectReason();
 
     static BLWiFiDriver & GetInstance()

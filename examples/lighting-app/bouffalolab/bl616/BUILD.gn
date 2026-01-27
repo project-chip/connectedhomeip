@@ -72,6 +72,9 @@ bouffalo_sdk("sdk") {
     "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_seconds}",
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "CHIP_UART_BAUDRATE=${baudrate}",
+    "APP_VER_X=2", # PROJECT_SDK_VERSION
+    "APP_VER_Y=3",
+    "APP_VER_Z=4",
   ]
 
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
@@ -121,12 +124,7 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BOOT_PIN_RESET=2" ]
   }
 
-  if (enable_lwip_pbuf_ram) {
-    defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
-  }
-
   defines += [ "BL616DK" ]
-
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${example_dir}/common/AppTask.cpp",
