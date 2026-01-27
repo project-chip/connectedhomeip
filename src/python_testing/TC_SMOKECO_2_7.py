@@ -123,7 +123,6 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
         asserts.assert_not_equal(expressed_state_dut, 9, "ExpressedState should not be Inoperative")
 
-
         # Step 6, "TH prompts operator to unmount the device."
         self.step(6)
         if self.is_ci:
@@ -136,7 +135,8 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         # Step 7, "TH waits for a report of Unmounted attribute from DUT with a timeout of 60 seconds."
         self.step(7)
         sub_handler.wait_for_attribute_report(timeout_sec=60)
-        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted][0].value, 1, msg="Received unexpected value for Unmounted")
+        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
+                             [0].value, 1, msg="Received unexpected value for Unmounted")
 
         # Step 8, "TH reads ExpressedState attribute from DUT."
         self.step(8)
@@ -156,14 +156,13 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         # Step 10, "TH waits for a report of Unmounted attribute from DUT with a timeout of 60 seconds."
         self.step(10)
         sub_handler.wait_for_attribute_report(timeout_sec=60)
-        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted][0].value, 0, msg="Received unexpected value for Unmounted")
+        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
+                             [0].value, 0, msg="Received unexpected value for Unmounted")
 
         # Step 11, "TH reads ExpressedState attribute from DUT."
         self.step(11)
         expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
         asserts.assert_not_equal(expressed_state_dut, 9, "ExpressedState should not be Inoperative")
-
-
 
 
 if __name__ == "__main__":
