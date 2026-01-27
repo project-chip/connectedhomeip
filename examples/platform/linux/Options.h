@@ -59,7 +59,7 @@ struct LinuxDeviceOptions
     bool mWiFi                 = false;
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    uint16_t mThreadNodeId = 0;
+    std::vector<std::string> mThreadArgs;
 #else
     bool mThread = false;
 #endif

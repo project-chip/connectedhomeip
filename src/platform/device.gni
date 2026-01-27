@@ -52,12 +52,14 @@ declare_args() {
   # DEPRECATED: Use 'chip_enable_thread' instead.
   chip_enable_openthread = "DEPRECATED"
 
-  # Enable openthread support.
   chip_enable_thread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
       chip_device_platform == "cc13x4_26x4" ||
       chip_device_platform == "tizen" || chip_device_platform == "stm32" ||
       chip_device_platform == "webos" || chip_device_platform == "realtek_bee"
+
+  # Enable openthread support.
+  chip_enable_otns = false
 }
 
 declare_args() {
