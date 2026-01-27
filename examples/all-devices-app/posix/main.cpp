@@ -146,7 +146,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .timerDelegate = timerDelegate,
+        .groupDataProvider = gGroupDataProvider,                     //
+        .fabricTable       = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate     = timerDelegate,                          //
+
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;

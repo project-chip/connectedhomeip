@@ -245,7 +245,9 @@ void InitServer(intptr_t context)
 {
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .timerDelegate = timerDelegate,
+        .groupDataProvider = gGroupDataProvider,                     //
+        .fabricTable       = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate     = timerDelegate,                          //
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
