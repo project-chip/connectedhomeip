@@ -192,6 +192,42 @@ void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nul
     return;
 }
 
+CHIP_ERROR CameraAVStreamManager::ValidateVideoStreamID(uint16_t videoStreamId)
+{
+    const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();
+
+    // Check if the videoStreamId exists in allocated streams
+    for (const auto & stream : allocatedVideoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId)
+        {
+            ChipLogProgress(Camera, "Video stream ID %u is valid and allocated", videoStreamId);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "Video stream ID %u not found in allocated video streams", videoStreamId);
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR CameraAVStreamManager::ValidateAudioStreamID(uint16_t audioStreamId)
+{
+    const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamManagementCluster()->GetAllocatedAudioStreams();
+
+    // Check if the audioStreamId exists in allocated streams
+    for (const auto & stream : allocatedAudioStreams)
+    {
+        if (stream.audioStreamID == audioStreamId)
+        {
+            ChipLogProgress(Camera, "Audio stream ID %u is valid and allocated", audioStreamId);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "Audio stream ID %u not found in allocated audio streams", audioStreamId);
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 CHIP_ERROR CameraAVStreamManager::ValidateVideoStreams(const std::vector<uint16_t> & videoStreams)
 {
     const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamManagementCluster()->GetAllocatedVideoStreams();

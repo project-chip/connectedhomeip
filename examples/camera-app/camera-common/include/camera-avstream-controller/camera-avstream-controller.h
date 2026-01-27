@@ -37,6 +37,10 @@ public:
     virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
                                            Optional<std::vector<uint16_t>> & audioStreams) = 0;
 
+    virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
+
+    virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
+
     virtual CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) = 0;
 
     virtual CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) = 0;

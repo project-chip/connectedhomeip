@@ -72,6 +72,10 @@ public:
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
+    CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
     CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
 
     CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override;

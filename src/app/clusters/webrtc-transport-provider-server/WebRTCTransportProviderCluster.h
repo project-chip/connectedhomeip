@@ -210,6 +210,38 @@ public:
 
     /**
      * @brief
+     *   Validates that the given VideoStreamID matches a value in AllocatedVideoStreams.
+     *
+     *   This method is called during SolicitOffer command processing when a VideoStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedVideoStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] videoStreamId  The video stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the VideoStreamID is valid and matches AllocatedVideoStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails or a match can't be found
+     */
+    virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given AudioStreamID matches a value in AllocatedAudioStreams.
+     *
+     *   This method is called during SolicitOffer command processing when an AudioStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedAudioStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] audioStreamId  The audio stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the AudioStreamID is valid and matches AllocatedAudioStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
+     */
+    virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
+
+    /**
+     * @brief
      *   Validates that the given VideoStreams match values in AllocatedVideoStreams.
      *
      *   This method is called during SolicitOffer command processing when VideoStreams

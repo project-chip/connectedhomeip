@@ -61,13 +61,12 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
         return [
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
             TestStep(2, "Send ProvideOffer with no audio or video id => expect INVALID_COMMAND"),
-            TestStep(3, "Send ProvideOffer with valid parameters, audio and video stream IDs are Null => expect INVALID_IN_STATE"),
-            TestStep(4, "Allocate Audio and Video Streams"),
-            TestStep(5, "Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(6, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer with StreamUsage = LiveView => expect INVALID_IN_STATE"),
-            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer with StreamUsage = LiveView => expect ProvideOfferResponse"),
-            TestStep(9, "Read CurrentSessions attribute => expect 1"),
+            TestStep(3, "Allocate Audio and Video Streams"),
+            TestStep(4, "Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
+            TestStep(5, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
+            TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer with StreamUsage = LiveView => expect INVALID_IN_STATE"),
+            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer with StreamUsage = LiveView => expect ProvideOfferResponse"),
+            TestStep(8, "Read CurrentSessions attribute => expect 1"),
         ]
 
     def pics_TC_WebRTCP_2_3(self) -> list[str]:
@@ -143,23 +142,13 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(e.status, Status.InvalidCommand, "Expected INVALID_COMMAND")
 
         self.step(3)
-        # Send ProvideOffer with null stream IDs
-        cmd = cluster.Commands.ProvideOffer(
-            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
-        try:
-            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Unexpected success on ProvideOffer with Null VideoStreamID and AudioStreamID")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
-
-        self.step(4)
         audioStreamID = await self.allocate_one_audio_stream()
         videoStreamID = await self.allocate_one_video_stream()
 
         await self.validate_allocated_audio_stream(audioStreamID)
         await self.validate_allocated_video_stream(videoStreamID)
 
-        self.step(5)
+        self.step(4)
         # Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
@@ -174,7 +163,7 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
-        self.step(6)
+        self.step(5)
         # Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
@@ -190,7 +179,7 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
         if privacySupported:
-            self.step(7)
+            self.step(6)
             # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
             await self.write_single_attribute(
                 attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(True),
@@ -211,9 +200,9 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
                 asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
         else:
             # Skip privacy mode test if not supported
-            self.skip_step(7)
+            self.skip_step(6)
 
-        self.step(8)
+        self.step(7)
         if privacySupported:
             # Write SoftLivestreamPrivacyModeEnabled=false and send valid ProvideOffer
             await self.write_single_attribute(
@@ -234,7 +223,7 @@ class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
                              "Incorrect response type")
 
-        self.step(9)
+        self.step(8)
         # Verify CurrentSessions contains the new session
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,

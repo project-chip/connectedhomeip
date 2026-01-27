@@ -502,6 +502,32 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage, Optional
     return avsmController.ValidateStreamUsage(streamUsage, videoStreams, audioStreams);
 }
 
+CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.ValidateVideoStreamID(videoStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.ValidateAudioStreamID(audioStreamId);
+}
+
 CHIP_ERROR WebRTCProviderManager::ValidateVideoStreams(const std::vector<uint16_t> & videoStreams)
 {
     if (mCameraDevice == nullptr)
