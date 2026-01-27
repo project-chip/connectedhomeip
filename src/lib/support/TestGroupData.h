@@ -51,11 +51,12 @@ inline CHIP_ERROR InitData(chip::Credentials::GroupDataProvider * provider, chip
 
     // Groups
 
-    const chip::Credentials::GroupDataProvider::GroupInfo group1(kGroup1, "Group #1");
+    const chip::Credentials::GroupDataProvider::GroupInfo group1(kGroup1, "Group #1", true, true);
+
     ReturnErrorOnFailure(provider->SetGroupInfo(fabric_index, group1));
     ReturnErrorOnFailure(provider->AddEndpoint(fabric_index, group1.group_id, 1));
 
-    const chip::Credentials::GroupDataProvider::GroupInfo group2(kGroup2, "Group #2");
+    const chip::Credentials::GroupDataProvider::GroupInfo group2(kGroup2, "Group #2", true, true);
     ReturnErrorOnFailure(provider->SetGroupInfo(fabric_index, group2));
     ReturnErrorOnFailure(provider->AddEndpoint(fabric_index, group2.group_id, 0));
 

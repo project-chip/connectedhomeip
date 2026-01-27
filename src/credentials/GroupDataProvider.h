@@ -52,8 +52,10 @@ public:
         GroupInfo(const GroupInfo & other) { Copy(other); }
         GroupInfo(const char * groupName) { SetName(groupName); }
         GroupInfo(const CharSpan & groupName) { SetName(groupName); }
-        GroupInfo(GroupId id, const char * groupName) : group_id(id) { SetName(groupName); }
-        GroupInfo(GroupId id, const CharSpan & groupName) : group_id(id) { SetName(groupName); }
+        GroupInfo(GroupId id, const char * groupName, bool aux_acl = false,  bool iana_addr = false) :
+            group_id(id), use_aux_acl(aux_acl), use_iana_addr(iana_addr) { SetName(groupName); }
+        GroupInfo(GroupId id, const CharSpan & groupName, bool aux_acl = false,  bool iana_addr = false) :
+            group_id(id), use_aux_acl(aux_acl), use_iana_addr(iana_addr) { SetName(groupName); }
         void SetName(const char * groupName)
         {
             if (nullptr == groupName)
