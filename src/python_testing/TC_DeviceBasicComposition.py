@@ -93,7 +93,7 @@
 #     factory-reset: false
 #     quiet: true
 #   run10: # Tests against energy-management-app
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
