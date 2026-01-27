@@ -25,6 +25,7 @@
 
 #include <mutex>
 #include <string>
+#include <vector>
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;

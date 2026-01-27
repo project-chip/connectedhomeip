@@ -51,8 +51,6 @@ public:
     {
         uint16_t sessionId;
         StreamUsageEnum streamUsage;
-        Optional<DataModel::Nullable<uint16_t>> videoStreamId;
-        Optional<DataModel::Nullable<uint16_t>> audioStreamId;
         Optional<std::vector<uint16_t>> videoStreams;
         Optional<std::vector<uint16_t>> audioStreams;
         Optional<Structs::SFrameStruct::Type> sFrameConfig;
@@ -201,19 +199,13 @@ public:
      *  - If the provided IDs are null, it matches against an allocated stream with the same stream usage
      *    and updates the IDs to those for the matching stream
      *
-     * This method supports both the deprecated single-stream fields and the new array-based fields.
-     *
      * @param[in] streamUsage       The desired usage type for the stream (e.g. live view, recording, etc.).
-     * @param[in,out] videoStreamId Optional identifier for the requested video stream (deprecated).
-     * @param[in,out] audioStreamId Optional identifier for the requested audio stream (deprecated).
-     * @param[in,out] videoStreams  Optional array of video stream IDs (new format).
-     * @param[in,out] audioStreams  Optional array of audio stream IDs (new format).
+     * @param[in,out] videoStreams  Optional array of video stream IDs.
+     * @param[in,out] audioStreams  Optional array of audio stream IDs.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
      */
-    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                           Optional<std::vector<uint16_t>> & videoStreams,
+    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
                                            Optional<std::vector<uint16_t>> & audioStreams) = 0;
 
     /**

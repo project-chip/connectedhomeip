@@ -67,10 +67,7 @@ public:
 
     CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override;
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId,
-                                   chip::Optional<std::vector<uint16_t>> & videoStreams,
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, chip::Optional<std::vector<uint16_t>> & videoStreams,
                                    chip::Optional<std::vector<uint16_t>> & audioStreams) override;
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);

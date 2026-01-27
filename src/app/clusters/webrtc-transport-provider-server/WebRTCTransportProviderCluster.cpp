@@ -488,9 +488,6 @@ std::optional<DataModel::ActionReturnStatus>
 WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandler,
                                                    const Commands::SolicitOffer::DecodableType & req)
 {
-    auto videoStreamID = req.videoStreamID;
-    auto audioStreamID = req.audioStreamID;
-
     // ===== Validate all conformance and constraint checks (data model validation) =====
 
     // Validate the streamUsage field against the allowed enum values.
@@ -644,8 +641,6 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
             streams.push_back(iter.GetValue());
         }
 
-        const auto & streams = audioStreams.Value();
-
         // Check if AllocatedAudioStreams is empty
         if (!mDelegate.HasAllocatedAudioStreams())
         {
@@ -691,8 +686,8 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     }
 
     // Check resource management and stream priorities. If the IDs are null the delegate will populate with
-    // a stream that matches the stream usage. Supports both deprecated single-stream fields and new arrays.
-    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID, videoStreams, audioStreams);
+    // a stream that matches the stream usage.
+    CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreams, audioStreams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
@@ -711,8 +706,6 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
 
     args.sessionId             = sessionId;
     args.streamUsage           = req.streamUsage;
-    args.videoStreamId         = videoStreamID;
-    args.audioStreamId         = audioStreamID;
     args.videoStreams          = videoStreams;
     args.audioStreams          = audioStreams;
     args.peerNodeId            = GetNodeIdFromCtx(commandHandler);
@@ -802,8 +795,6 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
                                                    const Commands::ProvideOffer::DecodableType & req)
 {
     auto webRTCSessionID = req.webRTCSessionID;
-    auto videoStreamID   = req.videoStreamID;
-    auto audioStreamID   = req.audioStreamID;
 
     NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
     FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
@@ -855,6 +846,10 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
     // ===== Cluster logic starts here (Effect on Receipt) =====
 
+    // Declare stream variables at function scope for use throughout the function
+    Optional<std::vector<uint16_t>> videoStreams;
+    Optional<std::vector<uint16_t>> audioStreams;
+
     // If WebRTCSessionID is not null:
     // - If it does not match a value in CurrentSessions: Respond with NOT_FOUND
     // - If the accessing Peer Node ID and fabric do not match the PeerNodeID and associated fabric
@@ -898,7 +893,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         if ((req.videoStreams.HasValue() || req.audioStreams.HasValue()) &&
             (req.videoStreamID.HasValue() || req.audioStreamID.HasValue()))
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: Cannot have both VideoStreams/AudioStreams and VideoStreamID/AudioStreamID");
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot have both VideoStreams/AudioStreams and VideoStreamID/AudioStreamID");
             return Status::InvalidCommand;
         }
 
@@ -908,14 +903,10 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         {
             if (!req.videoStreams.HasValue() && !req.audioStreams.HasValue())
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: At least one of VideoStreams or AudioStreams must be present");
+                ChipLogError(Zcl, "HandleProvideOffer: At least one of VideoStreams or AudioStreams must be present");
                 return Status::InvalidCommand;
             }
         }
-
-        // Normalize inputs to vectors
-        Optional<std::vector<uint16_t>> videoStreams;
-        Optional<std::vector<uint16_t>> audioStreams;
 
         // Deprecated field handling per spec:
         if (req.videoStreamID.HasValue())
@@ -959,7 +950,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             // Check if AllocatedVideoStreams is empty
             if (!mDelegate.HasAllocatedVideoStreams())
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: AllocatedVideoStreams is empty");
+                ChipLogError(Zcl, "HandleProvideOffer: AllocatedVideoStreams is empty");
                 return Status::InvalidInState;
             }
 
@@ -967,14 +958,14 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
             if (uniqueStreams.size() != streams.size())
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: Duplicate entries in VideoStreams");
+                ChipLogError(Zcl, "HandleProvideOffer: Duplicate entries in VideoStreams");
                 return Status::AlreadyExists;
             }
 
             // Validate each entry exists in AllocatedVideoStreams
             if (mDelegate.ValidateVideoStreams(streams) != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: VideoStreams entry not found in AllocatedVideoStreams");
+                ChipLogError(Zcl, "HandleProvideOffer: VideoStreams entry not found in AllocatedVideoStreams");
                 return Status::DynamicConstraintError;
             }
 
@@ -991,12 +982,10 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
                 streams.push_back(iter.GetValue());
             }
 
-            const auto & streams = audioStreams.Value();
-
             // Check if AllocatedAudioStreams is empty
             if (!mDelegate.HasAllocatedAudioStreams())
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: AllocatedAudioStreams is empty");
+                ChipLogError(Zcl, "HandleProvideOffer: AllocatedAudioStreams is empty");
                 return Status::InvalidInState;
             }
 
@@ -1004,14 +993,14 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
             std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
             if (uniqueStreams.size() != streams.size())
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: Duplicate entries in AudioStreams");
+                ChipLogError(Zcl, "HandleProvideOffer: Duplicate entries in AudioStreams");
                 return Status::AlreadyExists;
             }
 
             // Validate each entry exists in AllocatedAudioStreams
             if (mDelegate.ValidateAudioStreams(streams) != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: AudioStreams entry not found in AllocatedAudioStreams");
+                ChipLogError(Zcl, "HandleProvideOffer: AudioStreams entry not found in AllocatedAudioStreams");
                 return Status::DynamicConstraintError;
             }
 
@@ -1020,7 +1009,7 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
 
         // If not able to meet the Resource Management and Stream Priorities conditions or unable to provide another WebRTC session:
         // Respond with a response status of RESOURCE_EXHAUSTED
-        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
+        CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreams, audioStreams);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
@@ -1064,8 +1053,8 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
     }
 
     args.streamUsage           = req.streamUsage;
-    args.videoStreamId         = videoStreamID;
-    args.audioStreamId         = audioStreamID;
+    args.videoStreams          = videoStreams;
+    args.audioStreams          = audioStreams;
     args.peerNodeId            = peerNodeId;
     args.fabricIndex           = peerFabricIndex;
     args.sdp                   = std::string(req.sdp.data(), req.sdp.size());

@@ -67,8 +67,8 @@ public:
                                                         ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
-    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                        Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
+                        Optional<std::vector<uint16_t>> & audioStreams) override;
 
     CHIP_ERROR
     ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
