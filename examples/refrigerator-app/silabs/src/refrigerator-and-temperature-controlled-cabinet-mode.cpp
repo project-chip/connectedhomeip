@@ -42,7 +42,7 @@ void RefrigeratorAndTemperatureControlledCabinetModeDelegate::HandleChangeToMode
         response.statusText.SetValue(chip::CharSpan::fromCharString("Delegate not initialized"));
         return;
     }
-    uint8_t currentMode = gRefrigeratorAndTemperatureControlledCabinetModeInstance->GetCurrentMode();
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
 
     // Disallow transitions between Normal (0) and Rapid Freeze (2)
     if ((currentMode == ModeNormal && NewMode == ModeRapidFreeze) || (currentMode == ModeRapidFreeze && NewMode == ModeNormal))
