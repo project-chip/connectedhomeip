@@ -94,15 +94,18 @@ public:
                                                                 RxErrFcsCount::Id,
                                                                 RxErrOtherCount::Id };
 
-        for (auto id : optionalAttributeIds)
-        {
-            VerifyOrDie(emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id));
-            optionalAttributes.set(id);
-        }
-
         VerifyOrDie(
             featureMap.Raw() == 0 ||
             (featureMap.Has(Feature::kMLECounts) && featureMap.Has(Feature::kMACCounts) && featureMap.Has(Feature::kErrorCounts)));
+
+        if (featureMap.Raw() > 0)
+        {
+            for (auto id : optionalAttributeIds)
+            {
+                VerifyOrDie(emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id));
+                optionalAttributes.set(id);
+            }
+        }
 
         gServers[clusterInstanceIndex].Create(endpointId, featureMap, optionalAttributes);
         return gServers[clusterInstanceIndex].Registration();
