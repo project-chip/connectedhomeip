@@ -21,6 +21,8 @@ from pathlib import Path
 from handler import createMockServerHandler
 from route_configuration import Configuration, load_configurations
 
+log = logging.getLogger(__name__)
+
 
 def run_server(port: int, config_path: Path, routing_config_dir: Path, cert_path: Path, key_path: Path) -> None:
     """
@@ -86,12 +88,12 @@ def run_server(port: int, config_path: Path, routing_config_dir: Path, cert_path
     theMockServerHandler = createMockServerHandler(config)
     httpd = http.server.ThreadingHTTPServer(server_address, theMockServerHandler)
 
-    logging.info("Server starting on port %s", port)
+    log.info("Server starting on port %s", port)
     with context.wrap_socket(httpd.socket, server_side=True) as httpd.socket:
-        logging.info("Server started on port %s", port)
-        logging.info("HTTPS enabled with cert: %s and key: %s", cert_path, key_path)
+        log.info("Server started on port %s", port)
+        log.info("HTTPS enabled with cert: %s and key: %s", cert_path, key_path)
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
-            logging.info("Server is shutting down due to keyboard interrupt.")
+            log.info("Server is shutting down due to keyboard interrupt.")
             httpd.server_close()

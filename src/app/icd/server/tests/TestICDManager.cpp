@@ -40,7 +40,7 @@
 #include <system/SystemLayerImpl.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::AddressResolve;
 using namespace chip::System;
@@ -139,7 +139,7 @@ System::Clock::ClockBase * pRealClock           = nullptr;
 namespace chip {
 namespace app {
 
-class TestICDManager : public Test::LoopbackMessagingContext
+class TestICDManager : public LoopbackMessagingContext
 {
 public:
     /*

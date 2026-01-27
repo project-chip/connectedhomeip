@@ -16,11 +16,11 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/icd-management-server/ICDManagementCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
 #include <clusters/IcdManagement/Enums.h>
 #include <clusters/IcdManagement/Metadata.h>
 #include <credentials/FabricTable.h>

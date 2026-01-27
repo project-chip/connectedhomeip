@@ -214,7 +214,7 @@ class TLVWriter(object):
             self.putDouble(tag, val)
         elif isinstance(val, str):
             self.putString(tag, val)
-        elif isinstance(val, bytes) or isinstance(val, bytearray):
+        elif isinstance(val, (bytes, bytearray)):
             self.putBytes(tag, val)
         elif isinstance(val, Mapping):
             self.startStructure(tag)

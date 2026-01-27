@@ -40,7 +40,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 
 class TestProviderChangeListener : public DataModel::ProviderChangeListener
 {
@@ -222,15 +222,15 @@ public:
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
 protected:
-    TestProviderChangeListener mChangeListener;
-    chip::Test::LogOnlyEvents mEventGenerator;
+    ::TestProviderChangeListener mChangeListener;
+    chip::Testing::LogOnlyEvents mEventGenerator;
     TestActionContext mActionContext;
     DataModel::InteractionModelContext mContext{
         .eventsGenerator         = mEventGenerator,
         .dataModelChangeListener = mChangeListener,
         .actionContext           = mActionContext,
     };
-    chip::Test::TestServerClusterContext mServerClusterTestContext;
+    chip::Testing::TestServerClusterContext mServerClusterTestContext;
     CodeDrivenDataModelProvider mProvider;
     std::vector<std::unique_ptr<SpanEndpoint>> mEndpointStorage;                     // To keep providers alive
     std::vector<std::unique_ptr<EndpointInterfaceRegistration>> mOwnedRegistrations; // To keep registration objects alive

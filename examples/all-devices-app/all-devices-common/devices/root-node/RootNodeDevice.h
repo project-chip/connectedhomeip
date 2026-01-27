@@ -21,12 +21,12 @@
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
+#include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>

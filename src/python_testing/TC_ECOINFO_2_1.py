@@ -72,6 +72,8 @@ from matter.testing.commissioning import SetupParameters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from matter.tlv import uint
 
+log = logging.getLogger(__name__)
+
 
 class TC_ECOINFO_2_1(MatterBaseTest):
 
@@ -79,6 +81,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
     async def setup_class(self):
         super().setup_class()
 
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
@@ -86,6 +89,8 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             await self._setup_ci_prerequisites()
 
     def teardown_class(self):
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
@@ -105,11 +110,11 @@ class TC_ECOINFO_2_1(MatterBaseTest):
         dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
         if not dut_fsa_stdin_pipe:
             asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-        self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+        self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         # Create a temporary storage directory for keeping KVS files.
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-        logging.info("Temporary storage directory: %s", self.storage.name)
+        log.info("Temporary storage directory: %s", self.storage.name)
 
         self.th_server_port = 5544
         self.th_server_setup_params = SetupParameters(

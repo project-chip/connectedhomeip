@@ -36,7 +36,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 from dataclasses import dataclass
 
 from mobly import asserts
@@ -44,8 +43,6 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
 
 kRootEndpointId = 0
 

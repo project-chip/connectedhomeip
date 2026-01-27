@@ -42,7 +42,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 drlkcluster = Clusters.DoorLock
 
@@ -90,8 +90,8 @@ class TC_DRLK_2_5(MatterBaseTest):
             asserts.assert_equal(expected_status, Status.Success)
             return attribute_value
         except Exception as e:
-            logging.error(e)
-            logging.info("Error reading attributes,%s" % (attribute))
+            log.error(e)
+            log.info("Error reading attributes,%s" % (attribute))
 
     def pics_TC_DRLK_2_5(self) -> list[str]:
         return ["DRLK.S", "DRLK.S.F04"]
@@ -151,7 +151,7 @@ class TC_DRLK_2_5(MatterBaseTest):
 
             return response
         except InteractionModelError as e:
-            logging.error(e)
+            log.error(e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def set_week_days_schedule_cmd(self, week_day_index, user_index, day_mask_map_index, start_Hour, start_Minute, end_Hour, end_Minute, expected_status):
@@ -168,7 +168,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                 endpoint=self.app_cluster_endpoint,
                 timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
-            logging.error(e)
+            log.error(e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     async def clear_credentials_cmd(self, credential, step=None, expected_status: Status = Status.Success):
@@ -178,7 +178,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                                        endpoint=self.app_cluster_endpoint,
                                        timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
-            logging.exception(e)
+            log.exception(e)
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
     @async_test_body
@@ -204,7 +204,7 @@ class TC_DRLK_2_5(MatterBaseTest):
             number_week_day_schedules_supported_per_user = await self.read_attributes_from_dut(endpoint=self.app_cluster_endpoint,
                                                                                                cluster=drlkcluster,
                                                                                                attribute=Clusters.DoorLock.Attributes.NumberOfWeekDaySchedulesSupportedPerUser)
-            logging.info("NumberOfWeekDaySchedulesSupportedPerUser %s" % (number_week_day_schedules_supported_per_user))
+            log.info("NumberOfWeekDaySchedulesSupportedPerUser %s" % (number_week_day_schedules_supported_per_user))
             asserts.assert_in(number_week_day_schedules_supported_per_user, range(
                 0, 255), "NumberOfWeekDaySchedulesSupportedPerUser value is out of range")
         self.step("2a")
@@ -221,7 +221,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                     endpoint=self.app_cluster_endpoint,
                     timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
 
         self.step("2b")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
@@ -237,7 +237,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                     Status.Success)
 
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
         self.step("2c")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0b.Rsp")):
             try:
@@ -253,7 +253,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                         end_Minute,
                         Status.Success)
             except InteractionModelError as e:
-                logging.exception(e)
+                log.exception(e)
 
         self.step("3")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.C0c.Rsp") and self.check_pics("DRLK.S.C0c.Tx")):

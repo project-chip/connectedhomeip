@@ -267,7 +267,7 @@ class Esp32Builder(Builder):
     def build_outputs(self):
         if self.app == Esp32App.TESTS:
             # Include the runnable image names as artifacts
-            with open(os.path.join(self.output_dir, 'test_images.txt'), 'rt') as f:
+            with open(os.path.join(self.output_dir, 'test_images.txt')) as f:
                 for name in filter(None, [x.strip() for x in f.readlines()]):
                     yield BuilderOutput(os.path.join(self.output_dir, name), name)
             return

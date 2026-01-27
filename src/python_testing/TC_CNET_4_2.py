@@ -23,6 +23,8 @@ import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
+log = logging.getLogger(__name__)
+
 
 class TC_CNET_4_2(MatterBaseTest):
     """
@@ -103,18 +105,18 @@ class TC_CNET_4_2(MatterBaseTest):
         networks_dict = await self.read_single_attribute_all_endpoints(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.Networks)
-        logging.info(f"Networks by endpoint: {networks_dict}")
+        log.info(f"Networks by endpoint: {networks_dict}")
         connected_network_count = {}
         for ep in networks_dict:
             connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
-        logging.info(f"Connected networks count by endpoint: {connected_network_count}")
+        log.info(f"Connected networks count by endpoint: {connected_network_count}")
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
 
         self.step(3)
         current_cluster_connected = connected_network_count[self.get_endpoint()] == 1
         if not current_cluster_connected:
-            logging.info("Current cluster is not connected, skipping all remaining test steps")
+            log.info("Current cluster is not connected, skipping all remaining test steps")
             self.mark_all_remaining_steps_skipped(4)
             return
 
@@ -165,7 +167,7 @@ class TC_CNET_4_2(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
         matching_networks_count = sum(x.networkID == last_network_id for x in networks)
-        logging.info(f"last network id: {last_network_id}")
+        log.info(f"last network id: {last_network_id}")
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
         asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32,
@@ -184,7 +186,7 @@ class TC_CNET_4_2(MatterBaseTest):
         supported_thread_features = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.SupportedThreadFeatures)
-        logging.info(f"Supported thread features: {supported_thread_features}")
+        log.info(f"Supported thread features: {supported_thread_features}")
         asserts.assert_in(supported_thread_features, support_thread_features_expected_values, "SupportedThreadFeatures")
 
         self.step(12)

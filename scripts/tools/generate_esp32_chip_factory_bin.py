@@ -383,7 +383,7 @@ def populate_factory_data(args, spake2p_params):
     #  - st-mfg/<ep>/<index>/<ind>  : semantic tag mfg code key for the endpoint and index and ind
     if (args.supported_modes is not None):
         dictionary = get_supported_modes_dict(args.supported_modes)
-        for ep in dictionary.keys():
+        for ep in dictionary:
             _sz = {
                 'type': 'data',
                 'encoding': 'u32',

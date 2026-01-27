@@ -205,6 +205,19 @@ available based on the enabled features and optional items.
 -   Ensure your unit tests cover different combinations of enabled features and
     optional attributes/commands.
 
+#### Attribute Accessors
+
+Your cluster implementation must provide public getter and setter APIs for each
+attribute to allow applications to interact with cluster state.
+
+-   **Getter Methods:** Provide a getter method for every attribute (e.g.,
+    `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`).
+-   **Setter Methods:** Provide setter methods for all non-fixed (mutable)
+    attributes (e.g., `SetAlarmsActive()`, `SetCurrentSensitivityLevel()`).
+-   **Example:** The
+    [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
+    cluster demonstrates this pattern.
+
 #### Attribute Change Notifications
 
 For subscriptions to work correctly, you must notify the system whenever an
@@ -241,6 +254,18 @@ attribute's value changes.
         ```cpp
         VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ```
+
+-   **OnClusterAttributeChanged Pattern:** Each cluster should implement a
+    centralized helper method (e.g., `OnClusterAttributeChanged(AttributeId)`)
+    that combines both network and application notifications.
+    -   Call `NotifyAttributeChanged()` to notify network subscribers.
+    -   Call delegate callbacks to notify the application layer.
+    -   Invoke this method from `WriteAttribute`, `InvokeCommand`, and setter
+        methods.
+    -   **Example:** See
+        [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
+        which declares `OnClusterAttributeChanged(AttributeId)` as a private
+        helper.
 
 #### Persistent Storage
 

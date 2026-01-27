@@ -27,6 +27,8 @@ from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, matchers,
                                            run_if_endpoint_matches)
 
+log = logging.getLogger(__name__)
+
 
 class TC_CNET_4_4(MatterBaseTest):
     def steps_TC_CNET_4_4(self):
@@ -76,7 +78,7 @@ class TC_CNET_4_4(MatterBaseTest):
             scan_results = await self.send_single_cmd(cmd=cmd)
             asserts.assert_true(matchers.is_type(scan_results, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from scan network")
-            logging.info(f"Scan results: {scan_results}")
+            log.info(f"Scan results: {scan_results}")
 
             if scan_results.debugText:
                 debug_text_len = len(scan_results.debug_text)

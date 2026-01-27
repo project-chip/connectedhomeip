@@ -397,7 +397,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lowercase_name in ['bitmap8', 'bitmap16', 'bitmap32', 'bitmap64']:
         return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
-    int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    int_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if int_type is not None:
         return int_type
 
@@ -427,7 +427,7 @@ def IsSignedDataType(data_type: DataType) -> bool:
     Returns if the data type is a signed data type of False if the data type can not be found.
     """
     lowercase_name = data_type.name.lower()
-    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if sized_type is None:
         return False
 
@@ -440,7 +440,7 @@ def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
     """
 
     lowercase_name = data_type.name.lower()
-    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
+    sized_type = __CHIP_SIZED_TYPES__.get(lowercase_name)
     if sized_type is None:
         return None
 

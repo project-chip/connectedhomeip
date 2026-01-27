@@ -22,7 +22,7 @@
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsCluster.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
-#include <app/clusters/testing/MockCommandHandler.h>
+#include <app/server-cluster/testing/MockCommandHandler.h>
 #include <lib/support/Span.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 

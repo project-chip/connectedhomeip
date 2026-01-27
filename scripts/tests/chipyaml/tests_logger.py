@@ -177,7 +177,7 @@ class TestRunnerLogger(TestRunnerHooks):
         else:
             state = _SUCCESS
 
-        if self.__use_test_harness_log_format and (state == _SUCCESS or state == _WARNING):
+        if self.__use_test_harness_log_format and (state in (_SUCCESS, _WARNING)):
             print(self.__strings.test_harness_test_stop_success.format(filename=self.__filename))
 
         successes = click.style(self.__successes, bold=True)

@@ -68,7 +68,7 @@ class FileSystemGeneratorStorage(GeneratorStorage):
             return None
 
         log.info("Checking existing data in '%s'", target)
-        with open(target, 'rt') as existing:
+        with open(target) as existing:
             return existing.read()
 
     def write_new_data(self, relative_path: str, content: str):

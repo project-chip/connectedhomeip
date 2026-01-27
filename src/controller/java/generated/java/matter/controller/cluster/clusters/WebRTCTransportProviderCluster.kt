@@ -179,13 +179,9 @@ class WebRTCTransportProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_WEB_RTC_SESSION_ID)) {
         webRTCSessionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEFERRED_OFFER)) {
+      } else if (tag == ContextSpecificTag(TAG_DEFERRED_OFFER)) {
         deferredOffer_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
         videoStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -202,9 +198,7 @@ class WebRTCTransportProviderCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
         audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -331,9 +325,7 @@ class WebRTCTransportProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_WEB_RTC_SESSION_ID)) {
         webRTCSessionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
         videoStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -350,9 +342,7 @@ class WebRTCTransportProviderCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
         audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

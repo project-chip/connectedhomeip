@@ -45,7 +45,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
@@ -119,11 +119,11 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         snpSupport = (aFeatureMap & cluster.Bitmaps.Feature.kSnapshot) > 0
         wmarkSupport = (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) > 0
         osdSupport = (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) > 0
-        logger.info(f"Rx'd snpSupport: {snpSupport}, wmarkSupport: {wmarkSupport}, osdSupport: {osdSupport}")
+        log.info(f"Rx'd snpSupport: {snpSupport}, wmarkSupport: {wmarkSupport}, osdSupport: {osdSupport}")
         asserts.assert_true(
             (snpSupport and (wmarkSupport or osdSupport)),
             "SNP & (WMARK|OSD) is not supported.",
@@ -133,7 +133,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
         aWmark = aAllocatedSnapshotStreams[0].watermarkEnabled
@@ -198,7 +198,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         if wmarkSupport and aHardwareEncoder:
             asserts.assert_equal(
                 aAllocatedSnapshotStreams[0].watermarkEnabled, not aWmark, "WaterMarkEnabled is not equal to !aWmark"

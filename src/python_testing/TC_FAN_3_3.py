@@ -42,7 +42,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_FAN_3_3(MatterBaseTest):
@@ -94,7 +94,7 @@ class TC_FAN_3_3(MatterBaseTest):
     @async_test_body
     async def test_TC_FAN_3_3(self):
         if not self.check_pics("FAN.S.F02"):
-            logger.info("Test skipped because PICS FAN.S.F02 is not set")
+            log.info("Test skipped because PICS FAN.S.F02 is not set")
             self.mark_all_remaining_steps_skipped(1)
             return
 

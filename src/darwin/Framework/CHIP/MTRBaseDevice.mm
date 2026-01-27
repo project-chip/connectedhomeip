@@ -1924,20 +1924,10 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 #pragma mark - Utility for time conversion
 NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
 {
-    // Note: The event timestamp value as written in the spec is in microseconds, but the released 1.0 SDK implemented it in
-    // milliseconds. The following issue was filed to address the inconsistency:
-    //    https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6236
-    // For consistency with the released behavior, calculations here will be done in milliseconds.
-
-    // First convert the event timestamp value (in milliseconds) to NSTimeInterval - to minimize potential loss of precision
-    // of uint64 => NSTimeInterval (double), convert whole seconds and remainder separately and then combine
-    uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
-    uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
-    NSTimeInterval eventTimestampValueRemainder
-        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / static_cast<double>(chip::kMillisecondsPerSecond);
-    NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
-
-    return eventTimestampValue;
+    // Note: The event timestamp value was originally specified to be in microseconds, but the released 1.0 SDK
+    // implemented it as milliseconds. As of Matter 1.1 the specification has been updated to match.
+    // Implementation note: 2^53 ms =~ 285000 years, so NSTimeInterval (double) can store these without loss of precision.
+    return static_cast<NSTimeInterval>(timeValue) / chip::kMillisecondsPerSecond;
 }
 
 #pragma mark - Utility for event priority conversion

@@ -313,7 +313,7 @@ class FactoryDataGenerator:
             sys.exit(-1)
 
         try:
-            json_file = open(self._args.output+".json", "w+")
+            json_file = open(self._args.output+".json", "w+")  # noqa: SIM115
         except FileNotFoundError:
             print("Cannot create JSON file in this location: {}".format(self._args.output+".json"))
             sys.exit(-1)
@@ -371,7 +371,7 @@ class FactoryDataGenerator:
 
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
-        if (isinstance(value, bytes) or isinstance(value, bytearray)):
+        if (isinstance(value, (bytes, bytearray))):
             value = HEX_PREFIX + value.hex()
         if value or (isinstance(value, int) and value == 0):
             log.debug("Adding entry '%s' with size %d and type '%s'", name, sys.getsizeof(value), type(value))

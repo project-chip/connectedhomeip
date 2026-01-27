@@ -327,7 +327,7 @@ def gen_mfd_partition(args, mfd_output):
         return cryptor.encrypt(data_bytearray)
 
     def convert_to_bytes(data):
-        if isinstance(data, bytes) or isinstance(data, str):
+        if isinstance(data, (bytes, str)):
             if isinstance(data, str):
                 return data.encode()
             return data
@@ -344,7 +344,7 @@ def gen_mfd_partition(args, mfd_output):
         sec_tlvs = bytes([])
         raw_tlvs = bytes([])
 
-        for name in mfdDict.keys():
+        for name in mfdDict:
             d = mfdDict[name]
             if d["sec"] and need_sec:
                 if d["len"] and d["len"] < len(d["data"]):
@@ -353,7 +353,7 @@ def gen_mfd_partition(args, mfd_output):
                 sec_tlvs += int_to_2bytearray_l(len(d["data"]))
                 sec_tlvs += d["data"]
 
-        for name in mfdDict.keys():
+        for name in mfdDict:
             d = mfdDict[name]
             if not d["sec"] or not need_sec:
                 if d["len"] and d["len"] < len(d["data"]):

@@ -24,7 +24,7 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/WiFiDiagnosticsTestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/wifi-network-diagnostics-cluster.cpp"
-    "${CLUSTER_DIR}/wifi-network-diagnostics-cluster.h"
+    "${CLUSTER_DIR}/WiFiNetworkDiagnosticsCluster.cpp"
+    "${CLUSTER_DIR}/WiFiNetworkDiagnosticsCluster.h"
 
 )

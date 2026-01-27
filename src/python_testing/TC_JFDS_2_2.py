@@ -48,6 +48,8 @@ from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 
 class TC_JFDS_2_2(MatterBaseTest):
 
@@ -75,7 +77,7 @@ class TC_JFDS_2_2(MatterBaseTest):
         if self.storage_fabric_a is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
             self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            logging.info("Temporary storage directory: %s", self.storage_fabric_a)
+            log.info("Temporary storage directory: %s", self.storage_fabric_a)
 
         #####################################################################################################################################
         #

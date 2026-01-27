@@ -173,12 +173,8 @@ class PostProcessResponseResult:
         self.entries.append(log)
 
 
-def _value_or_none(data, key):
-    return data[key] if key in data else None
-
-
-def _value_or_config(data, key, config):
-    return data[key] if key in data else config.get(key)
+def _value_or_config(data: dict, key, config):
+    return data.get(key, config.get(key))
 
 
 class EnumType:
@@ -291,45 +287,43 @@ class _TestStepWithPlaceholders:
 
         self._parsing_config_variable_storage = config
 
-        self.label = _value_or_none(test, 'label')
+        self.label = test.get("label")
         self.node_id = _value_or_config(test, 'nodeId', config)
         self.group_id = _value_or_config(test, 'groupId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
         if not self.command:
             self.command = _value_or_config(test, 'wait', config)
-        self.attribute = _value_or_none(test, 'attribute')
-        self.event = _value_or_none(test, 'event')
+        self.attribute = test.get("attribute")
+        self.event = test.get("event")
         self.endpoint = _value_or_config(test, 'endpoint', config)
-        self.pics = _value_or_none(test, 'PICS')
-        self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
+        self.pics = test.get("PICS")
+        self.is_pics_enabled = pics_checker.check(test.get("PICS"))
 
-        self.identity = _value_or_none(test, 'identity')
-        self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
-        self.min_revision = _value_or_none(test, 'minRevision')
-        self.max_revision = _value_or_none(test, 'maxRevision')
-        self.min_interval = _value_or_none(test, 'minInterval')
-        self.max_interval = _value_or_none(test, 'maxInterval')
-        self.keep_subscriptions = _value_or_none(test, 'keepSubscriptions')
-        self.timed_interaction_timeout_ms = _value_or_none(
-            test, 'timedInteractionTimeoutMs')
-        self.timeout = _value_or_none(test, 'timeout')
-        self.data_version = _value_or_none(
-            test, 'dataVersion')
-        self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
-        self.wait_for = _value_or_none(test, 'wait')
-        self.event_number = _value_or_none(test, 'eventNumber')
-        self.run_if = _value_or_none(test, 'runIf')
-        self.save_response_as = _value_or_none(test, 'saveResponseAs')
+        self.identity = test.get("identity")
+        self.fabric_filtered = test.get("fabricFiltered")
+        self.min_revision = test.get("minRevision")
+        self.max_revision = test.get("maxRevision")
+        self.min_interval = test.get("minInterval")
+        self.max_interval = test.get("maxInterval")
+        self.keep_subscriptions = test.get("keepSubscriptions")
+        self.timed_interaction_timeout_ms = test.get("timedInteractionTimeoutMs")
+        self.timeout = test.get("timeout")
+        self.data_version = test.get("dataVersion")
+        self.busy_wait_ms = test.get("busyWaitMs")
+        self.wait_for = test.get("wait")
+        self.event_number = test.get("eventNumber")
+        self.run_if = test.get("runIf")
+        self.save_response_as = test.get("saveResponseAs")
 
         self.is_attribute = self.__is_attribute_command()
         self.is_event = self.__is_event_command()
 
-        arguments = _value_or_none(test, 'arguments')
+        arguments = test.get("arguments")
         self._convert_single_value_to_values(arguments)
         self.arguments_with_placeholders = arguments
 
-        responses = _value_or_none(test, 'response')
+        responses = test.get("response")
         # Test may expect multiple responses. For example reading events may
         # trigger multiple event responses. Or reading multiple attributes
         # at the same time, may trigger multiple responses too.

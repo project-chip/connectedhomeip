@@ -20,10 +20,7 @@ class Nullable():
         return 'Null'
 
     def __eq__(self, other):
-        if isinstance(other, Nullable):
-            return True
-
-        return False
+        return bool(isinstance(other, Nullable))
 
     def __ne__(self, other):
         return not self.__eq__(other)

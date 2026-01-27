@@ -22,6 +22,7 @@ import tempfile
 import threading
 import time
 import typing
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
@@ -70,7 +71,7 @@ class App:
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, _ = self.__startServer()
-            self.waitForAnyAdvertisement()
+            self.waitForApplicationUp()
             self.__updateSetUpCode()
             with self.cv_stopped:
                 self.stopped = False
@@ -102,11 +103,14 @@ class App:
 
         return True
 
-    def waitForAnyAdvertisement(self):
-        self.__waitFor("mDNS service published:", self.process, self.outpipe)
+    def waitForApplicationUp(self):
+        # Watch for both mDNS advertisement start as well as event loop start.
+        # These two messages can appear in any order depending on the implementation.
+        # Waiting for both makes the startup detection more robust.
+        self.__waitFor(["mDNS service published:", "APP STATUS: Starting event loop"])
 
-    def waitForMessage(self, message, timeoutInSeconds=10):
-        self.__waitFor(message, self.process, self.outpipe, timeoutInSeconds)
+    def waitForMessage(self, message: str, timeoutInSeconds: int = 10):
+        self.__waitFor([message], timeoutInSeconds=timeoutInSeconds)
         return True
 
     def kill(self):
@@ -147,30 +151,38 @@ class App:
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(subproc, name='APP ', wait=False)
 
-    def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
-        log.debug("Waiting for '%s'", waitForString)
+    def __waitFor(self, patterns: Iterable[str], timeoutInSeconds: int = 10):
+        """
+        Wait for all provided pattern strings to appear in the process output pipe (capture log).
+        """
+        log.debug('Waiting for all patterns %r', patterns)
 
         start_time = time.monotonic()
-        ready, self.lastLogIndex = outpipe.CapturedLogContains(
-            waitForString, self.lastLogIndex)
-        if ready:
-            self.lastLogIndex += 1
 
-        while not ready:
-            if server_process.poll() is not None:
-                died_str = ("Server died while waiting for %s, returncode %d" %
-                            (waitForString, server_process.returncode))
+        def allPatternsFound() -> int | None:
+            lastLogIndex = self.lastLogIndex
+            for p in patterns:
+                found, index = self.outpipe.CapturedLogContains(p, self.lastLogIndex)
+                if not found:
+                    return None
+                lastLogIndex = max(lastLogIndex, index)
+
+            return lastLogIndex
+
+        lastLogIndex = allPatternsFound()
+        while lastLogIndex is None:
+            if self.process.poll() is not None:
+                died_str = f'Server died while waiting for {patterns!r}, returncode {self.process.returncode}'
                 log.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
-                raise Exception('Timeout while waiting for %s' % waitForString)
+                raise Exception(f'Timeout while waiting for {patterns!r}')
             time.sleep(0.1)
-            ready, self.lastLogIndex = outpipe.CapturedLogContains(
-                waitForString, self.lastLogIndex)
-            if ready:
-                self.lastLogIndex += 1
 
-        log.debug("Success waiting for: '%s'", waitForString)
+            lastLogIndex = allPatternsFound()
+
+        self.lastLogIndex = lastLogIndex + 1
+        log.debug('Success waiting for: %r', patterns)
 
     def __updateSetUpCode(self):
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
@@ -198,6 +210,7 @@ class App:
                 self.process.wait(10)
             self.process = None
             self.outpipe = None
+            self.lastLogIndex = 0
         return True
 
 

@@ -371,7 +371,9 @@ class Encoder:
         if endpoint_argument_value == '*':
             endpoint_argument_value = 0xFFFF
 
-        if (request.is_attribute and not request.command == "writeAttribute") or request.is_event or (request.command in _ANY_COMMANDS_LIST and not request.command == "WriteById"):
+        if ((request.is_attribute and request.command != "writeAttribute")
+                or (request.command in _ANY_COMMANDS_LIST and request.command != "WriteById")
+                or request.is_event):
             endpoint_argument_name = 'endpoint-ids'
 
         if self.__is_darwin_framework_tool:

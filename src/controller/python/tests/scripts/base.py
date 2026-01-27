@@ -433,9 +433,7 @@ class BaseTestHelper:
             self.logger.error(
                 "Failed to send arm failsafe command error is {}".format(ex.status))
             return False
-        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin:
-            return True
-        return False
+        return resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin
 
     async def TestControllerCATValues(self, nodeId: int):
         ''' This tests controllers using CAT Values
@@ -1286,7 +1284,7 @@ class BaseTestHelper:
                 # is declared failed.
                 await taskAttributeChange
 
-            return True if receivedUpdate == 5 else False
+            return receivedUpdate == 5
 
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")

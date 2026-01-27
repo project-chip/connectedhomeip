@@ -42,14 +42,10 @@
 
 """Define Matter test case TC_COMMTR_2_1."""
 
-import logging
-
 from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityMetering
 

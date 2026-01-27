@@ -86,9 +86,7 @@ class ZapApplicationPregenerator:
             return False
 
         # FIXME: implement a proper check
-        if 'test_files' in idl.relative_path:
-            return False
-        return True
+        return 'test_files' not in idl.relative_path
 
     def CreateTarget(self, idl: InputIdlFile, runner):
         # TODO: add additional arguments: tell how to invoke zap/codegen

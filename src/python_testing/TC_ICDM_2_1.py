@@ -35,15 +35,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import re
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
 
 kRootEndpointId = 0
 kMaxUserActiveModeBitmap = 0x1FFFF

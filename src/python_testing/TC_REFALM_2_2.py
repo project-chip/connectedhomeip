@@ -53,7 +53,7 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 # TODO(#37217)  Refactor using generic method.
 # Implement fake commands for the RefrigeratorAlarm Cluster
@@ -167,7 +167,7 @@ class TC_REFALM_2_2(MatterBaseTest):
 
     async def _wait_thresshold(self):
         """Wait the defined time at the PIXIT.REFALM.AlarmThreshold to trigger it."""
-        logger.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
+        log.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
         await asyncio.sleep(self.refalm_threshold_seconds)
 
     def _send_open_door_command(self):
@@ -188,7 +188,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         """Run the test steps."""
         self.endpoint = self.get_endpoint()
         cluster = Clusters.RefrigeratorAlarm
-        logger.info(f"Default endpoint {self.endpoint}")
+        log.info(f"Default endpoint {self.endpoint}")
         # Commision the device.
         # Read required variables.
         self.step(1)
@@ -203,7 +203,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.step(3)
         # reads the state attribute , must be a bitMap32 ( list wich values are 32 bits)
         device_state = await self._read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        log.info(f"The device state is {device_state}")
         matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 0)
 
@@ -218,7 +218,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # read the status
         self.step(6)
         device_state = await self._read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        log.info(f"The device state is {device_state}")
         matter_asserts.assert_valid_uint32(device_state, "State")
         asserts.assert_equal(device_state, 1)
 
@@ -229,7 +229,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         # # read from the state attr
         self.step(8)
         device_status = await self._read_refalm_state_attribute()
-        logger.info(f"The device state is {device_state}")
+        log.info(f"The device state is {device_state}")
         asserts.assert_equal(device_status, 0)
         matter_asserts.assert_valid_uint32(device_state, "State")
 
@@ -252,21 +252,21 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         self.step(12)
         # repeat step 4 and 5
-        logger.info("Manually open the door on the DUT")
+        log.info("Manually open the door on the DUT")
         self._ask_for_open_door()
-        logger.info("Wait for the time defined in PIXIT.REFALM.AlarmThreshold")
+        log.info("Wait for the time defined in PIXIT.REFALM.AlarmThreshold")
         await self._wait_thresshold()
         # Wait for the Notify event with the State value.
         event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        log.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.state, 1, "Unexpected value for State returned")
 
         self.step(13)
-        logger.info("Ensure that the door on the DUT is closed")
+        log.info("Ensure that the door on the DUT is closed")
         self._ask_for_closed_door()
         # Wait for the Notify event with the State value.
         event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
-        logger.info(f"Event data {event_data}")
+        log.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.state, 0, "Unexpected value for State returned")
 
 
