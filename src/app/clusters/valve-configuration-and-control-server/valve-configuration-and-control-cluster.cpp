@@ -205,7 +205,9 @@ ValveConfigurationAndControlCluster::InvokeCommand(const DataModel::InvokeReques
 // Command Handlers
 std::optional<DataModel::ActionReturnStatus> ValveConfigurationAndControlCluster::HandleCloseCommand()
 {
-    // Check if there is any Fault registered
+    // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault.
+    // This logic keeps the previous implementation of this cluster, however it may be too strict since
+    // any fault will cause the command to fail.
     if (mValveFault.HasAny())
     {
         return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
@@ -259,6 +261,8 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
 
     // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault.
+    // This logic keeps the previous implementation of this cluster, however it may be too strict since
+    // any fault will cause the command to fail.
     if (mValveFault.HasAny())
     {
         return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
@@ -268,7 +272,9 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep
     // backwards compatibility. Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL
     // enabled valves).
-    // Issue https://github.com/project-chip/connectedhomeip/issues/42777 created to follow up on the ordering.
+    // Issue https://github.com/project-chip/connectedhomeip/issues/42777 created to follow up on the SDK changes.
+    // Issue https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/12666 to follow up on the spec.
+    // Issue https://github.com/CHIP-Specifications/chip-test-plans/issues/5837 to follow up on the test changes.
 
     // Check the rules for the OpenDuration field of the command.
     // This value will be used to set the OpenDuration attribute, initialize the RemainingDuration attribute and
