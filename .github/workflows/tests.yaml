@@ -526,10 +526,10 @@ jobs:
                 include:
                     - os: macos-26
                       arch: arm64     # observed, not configured
-                      build_variant: no-ble-no-shell-asan-clang
+                      build_variant: no-ble-no-wifi-no-shell-asan-clang
                     - os: macos-26
                       arch: arm64     # observed, not configured
-                      build_variant: no-ble-no-shell-tsan-clang
+                      build_variant: no-ble-no-wifi-no-shell-tsan-clang
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
