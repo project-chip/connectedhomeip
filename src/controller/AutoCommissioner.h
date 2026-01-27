@@ -60,16 +60,8 @@ public:
 
     bool IsConcurrentModeSupported() const
     {
-        if (mParams.GetSupportsConcurrentConnection().HasValue())
-        {
-            return mParams.GetSupportsConcurrentConnection().Value();
-        }
-        else
-        {
-            // Attribute 'SupportsConcurrentConnection' was not found
-            // The default value for this attribute is 'true'
-            return true;
-        }
+        // If the 'SupportsConcurrentConnection' attribute was not found, concurrent commissioning is supported
+        return mParams.GetSupportsConcurrentConnection().ValueOr(true);
     }
 
 protected:
