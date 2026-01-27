@@ -43,6 +43,7 @@
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
+#import "zap-generated/MTRCommandPayloads_Private.h"
 
 #import "lib/core/CHIPError.h"
 #import "lib/core/DataModelTypes.h"
