@@ -19,22 +19,18 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#include <bitset>
-
 namespace chip::app::Clusters {
-
-namespace ThreadNetworkDiagnostics {
-
-// The highest attribute ID is 62 (ActiveNetworkFaultsList), so a size of 64 is safe.
-using OptionalAttributes = std::bitset<64>;
-
-} // namespace ThreadNetworkDiagnostics
 
 class ThreadNetworkDiagnosticsCluster : public DefaultServerCluster, public DeviceLayer::ThreadDiagnosticsDelegate
 {
 public:
-    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, const BitFlags<ThreadNetworkDiagnostics::Feature> features,
-                                    const ThreadNetworkDiagnostics::OptionalAttributes optionalAttributes);
+    enum class ClusterType
+    {
+        kMinimal,
+        kFull
+    };
+
+    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -56,8 +52,7 @@ public:
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current) override;
 
 private:
-    const BitFlags<ThreadNetworkDiagnostics::Feature> mFeatures;
-    const ThreadNetworkDiagnostics::OptionalAttributes mOptionalAttributes;
+    const ClusterType mClusterType;
 };
 
 } // namespace chip::app::Clusters

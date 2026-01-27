@@ -35,6 +35,8 @@ using namespace chip::app::Clusters::ThreadNetworkDiagnostics;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics::Attributes;
 using namespace chip::Testing;
 
+using ClusterType = ThreadNetworkDiagnosticsCluster::ClusterType;
+
 struct TestThreadNetworkDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -51,9 +53,7 @@ struct TestThreadNetworkDiagnosticsCluster : public ::testing::Test
 TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
 {
     {
-        const BitFlags<Feature> features;
-        OptionalAttributes optionalAttributes;
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -70,57 +70,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
     }
 
     {
-        Feature combinedFeatures =
-            static_cast<Feature>(static_cast<uint16_t>(Feature::kMLECounts) | static_cast<uint16_t>(Feature::kMACCounts) |
-                                 static_cast<uint16_t>(Feature::kErrorCounts));
-        const BitFlags<Feature> features{ combinedFeatures };
-        OptionalAttributes optionalAttributes;
-        optionalAttributes.set(ActiveTimestamp::Id);
-        optionalAttributes.set(PendingTimestamp::Id);
-        optionalAttributes.set(Delay::Id);
-        optionalAttributes.set(DetachedRoleCount::Id);
-        optionalAttributes.set(ChildRoleCount::Id);
-        optionalAttributes.set(RouterRoleCount::Id);
-        optionalAttributes.set(LeaderRoleCount::Id);
-        optionalAttributes.set(AttachAttemptCount::Id);
-        optionalAttributes.set(PartitionIdChangeCount::Id);
-        optionalAttributes.set(BetterPartitionAttachAttemptCount::Id);
-        optionalAttributes.set(ParentChangeCount::Id);
-        optionalAttributes.set(TxTotalCount::Id);
-        optionalAttributes.set(TxUnicastCount::Id);
-        optionalAttributes.set(TxBroadcastCount::Id);
-        optionalAttributes.set(TxAckRequestedCount::Id);
-        optionalAttributes.set(TxAckedCount::Id);
-        optionalAttributes.set(TxNoAckRequestedCount::Id);
-        optionalAttributes.set(TxDataCount::Id);
-        optionalAttributes.set(TxDataPollCount::Id);
-        optionalAttributes.set(TxBeaconCount::Id);
-        optionalAttributes.set(TxBeaconRequestCount::Id);
-        optionalAttributes.set(TxOtherCount::Id);
-        optionalAttributes.set(TxRetryCount::Id);
-        optionalAttributes.set(TxDirectMaxRetryExpiryCount::Id);
-        optionalAttributes.set(TxIndirectMaxRetryExpiryCount::Id);
-        optionalAttributes.set(TxErrCcaCount::Id);
-        optionalAttributes.set(TxErrAbortCount::Id);
-        optionalAttributes.set(TxErrBusyChannelCount::Id);
-        optionalAttributes.set(RxTotalCount::Id);
-        optionalAttributes.set(RxUnicastCount::Id);
-        optionalAttributes.set(RxBroadcastCount::Id);
-        optionalAttributes.set(RxDataCount::Id);
-        optionalAttributes.set(RxDataPollCount::Id);
-        optionalAttributes.set(RxBeaconCount::Id);
-        optionalAttributes.set(RxBeaconRequestCount::Id);
-        optionalAttributes.set(RxOtherCount::Id);
-        optionalAttributes.set(RxAddressFilteredCount::Id);
-        optionalAttributes.set(RxDestAddrFilteredCount::Id);
-        optionalAttributes.set(RxDuplicatedCount::Id);
-        optionalAttributes.set(RxErrNoFrameCount::Id);
-        optionalAttributes.set(RxErrUnknownNeighborCount::Id);
-        optionalAttributes.set(RxErrInvalidSrcAddrCount::Id);
-        optionalAttributes.set(RxErrSecCount::Id);
-        optionalAttributes.set(RxErrFcsCount::Id);
-        optionalAttributes.set(RxErrOtherCount::Id);
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -128,58 +78,79 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
             threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
             CHIP_NO_ERROR);
 
-        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-            { true, ActiveTimestamp::kMetadataEntry },
-            { true, PendingTimestamp::kMetadataEntry },
-            { true, Delay::kMetadataEntry },
-            { true, DetachedRoleCount::kMetadataEntry },
-            { true, ChildRoleCount::kMetadataEntry },
-            { true, RouterRoleCount::kMetadataEntry },
-            { true, LeaderRoleCount::kMetadataEntry },
-            { true, AttachAttemptCount::kMetadataEntry },
-            { true, PartitionIdChangeCount::kMetadataEntry },
-            { true, BetterPartitionAttachAttemptCount::kMetadataEntry },
-            { true, ParentChangeCount::kMetadataEntry },
-            { true, TxTotalCount::kMetadataEntry },
-            { true, TxUnicastCount::kMetadataEntry },
-            { true, TxBroadcastCount::kMetadataEntry },
-            { true, TxAckRequestedCount::kMetadataEntry },
-            { true, TxAckedCount::kMetadataEntry },
-            { true, TxNoAckRequestedCount::kMetadataEntry },
-            { true, TxDataCount::kMetadataEntry },
-            { true, TxDataPollCount::kMetadataEntry },
-            { true, TxBeaconCount::kMetadataEntry },
-            { true, TxBeaconRequestCount::kMetadataEntry },
-            { true, TxOtherCount::kMetadataEntry },
-            { true, TxRetryCount::kMetadataEntry },
-            { true, TxDirectMaxRetryExpiryCount::kMetadataEntry },
-            { true, TxIndirectMaxRetryExpiryCount::kMetadataEntry },
-            { true, TxErrCcaCount::kMetadataEntry },
-            { true, TxErrAbortCount::kMetadataEntry },
-            { true, TxErrBusyChannelCount::kMetadataEntry },
-            { true, RxTotalCount::kMetadataEntry },
-            { true, RxUnicastCount::kMetadataEntry },
-            { true, RxBroadcastCount::kMetadataEntry },
-            { true, RxDataCount::kMetadataEntry },
-            { true, RxDataPollCount::kMetadataEntry },
-            { true, RxBeaconCount::kMetadataEntry },
-            { true, RxBeaconRequestCount::kMetadataEntry },
-            { true, RxOtherCount::kMetadataEntry },
-            { true, RxAddressFilteredCount::kMetadataEntry },
-            { true, RxDestAddrFilteredCount::kMetadataEntry },
-            { true, RxDuplicatedCount::kMetadataEntry },
-            { true, RxErrNoFrameCount::kMetadataEntry },
-            { true, RxErrUnknownNeighborCount::kMetadataEntry },
-            { true, RxErrInvalidSrcAddrCount::kMetadataEntry },
-            { true, RxErrSecCount::kMetadataEntry },
-            { true, RxErrFcsCount::kMetadataEntry },
-            { true, RxErrOtherCount::kMetadataEntry },
-            { true, OverrunCount::kMetadataEntry }
+        constexpr DataModel::AttributeEntry fullAttributes[] = {
+            // Mandatory Attributes
+            Attributes::Channel::kMetadataEntry,          //
+            RoutingRole::kMetadataEntry,                  //
+            NetworkName::kMetadataEntry,                  //
+            PanId::kMetadataEntry,                        //
+            ExtendedPanId::kMetadataEntry,                //
+            MeshLocalPrefix::kMetadataEntry,              //
+            NeighborTable::kMetadataEntry,                //
+            RouteTable::kMetadataEntry,                   //
+            PartitionId::kMetadataEntry,                  //
+            Weighting::kMetadataEntry,                    //
+            Attributes::DataVersion::kMetadataEntry,      //
+            StableDataVersion::kMetadataEntry,            //
+            LeaderRouterId::kMetadataEntry,               //
+            SecurityPolicy::kMetadataEntry,               //
+            ChannelPage0Mask::kMetadataEntry,             //
+            OperationalDatasetComponents::kMetadataEntry, //
+            ActiveNetworkFaultsList::kMetadataEntry,      //
+            ExtAddress::kMetadataEntry,                   //
+            Rloc16::kMetadataEntry,                       //
+            // Optional Attributes
+            ActiveTimestamp::kMetadataEntry,                   //
+            PendingTimestamp::kMetadataEntry,                  //
+            Delay::kMetadataEntry,                             //
+            DetachedRoleCount::kMetadataEntry,                 //
+            ChildRoleCount::kMetadataEntry,                    //
+            RouterRoleCount::kMetadataEntry,                   //
+            LeaderRoleCount::kMetadataEntry,                   //
+            AttachAttemptCount::kMetadataEntry,                //
+            PartitionIdChangeCount::kMetadataEntry,            //
+            BetterPartitionAttachAttemptCount::kMetadataEntry, //
+            ParentChangeCount::kMetadataEntry,                 //
+            TxTotalCount::kMetadataEntry,                      //
+            TxUnicastCount::kMetadataEntry,                    //
+            TxBroadcastCount::kMetadataEntry,                  //
+            TxAckRequestedCount::kMetadataEntry,               //
+            TxAckedCount::kMetadataEntry,                      //
+            TxNoAckRequestedCount::kMetadataEntry,             //
+            TxDataCount::kMetadataEntry,                       //
+            TxDataPollCount::kMetadataEntry,                   //
+            TxBeaconCount::kMetadataEntry,                     //
+            TxBeaconRequestCount::kMetadataEntry,              //
+            TxOtherCount::kMetadataEntry,                      //
+            TxRetryCount::kMetadataEntry,                      //
+            TxDirectMaxRetryExpiryCount::kMetadataEntry,       //
+            TxIndirectMaxRetryExpiryCount::kMetadataEntry,     //
+            TxErrCcaCount::kMetadataEntry,                     //
+            TxErrAbortCount::kMetadataEntry,                   //
+            TxErrBusyChannelCount::kMetadataEntry,             //
+            RxTotalCount::kMetadataEntry,                      //
+            RxUnicastCount::kMetadataEntry,                    //
+            RxBroadcastCount::kMetadataEntry,                  //
+            RxDataCount::kMetadataEntry,                       //
+            RxDataPollCount::kMetadataEntry,                   //
+            RxBeaconCount::kMetadataEntry,                     //
+            RxBeaconRequestCount::kMetadataEntry,              //
+            RxOtherCount::kMetadataEntry,                      //
+            RxAddressFilteredCount::kMetadataEntry,            //
+            RxDestAddrFilteredCount::kMetadataEntry,           //
+            RxDuplicatedCount::kMetadataEntry,                 //
+            RxErrNoFrameCount::kMetadataEntry,                 //
+            RxErrUnknownNeighborCount::kMetadataEntry,         //
+            RxErrInvalidSrcAddrCount::kMetadataEntry,          //
+            RxErrSecCount::kMetadataEntry,                     //
+            RxErrFcsCount::kMetadataEntry,                     //
+            RxErrOtherCount::kMetadataEntry,                   //
+            OverrunCount::kMetadataEntry                       //
         };
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributeEntries)), CHIP_NO_ERROR);
+        ASSERT_EQ(listBuilder.Append(Span(fullAttributes), {}), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
         threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -255,9 +226,7 @@ void TestMandatoryAttributes(ClusterTester & tester)
 TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
 {
     {
-        const BitFlags<Feature> features;
-        OptionalAttributes optionalAttributes;
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(threadNetworkDiagnostics);
@@ -268,57 +237,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
     }
 
     {
-        Feature combinedFeatures =
-            static_cast<Feature>(static_cast<uint16_t>(Feature::kMLECounts) | static_cast<uint16_t>(Feature::kMACCounts) |
-                                 static_cast<uint16_t>(Feature::kErrorCounts));
-        const BitFlags<Feature> features{ combinedFeatures };
-        OptionalAttributes optionalAttributes;
-        optionalAttributes.set(ActiveTimestamp::Id);
-        optionalAttributes.set(PendingTimestamp::Id);
-        optionalAttributes.set(Delay::Id);
-        optionalAttributes.set(DetachedRoleCount::Id);
-        optionalAttributes.set(ChildRoleCount::Id);
-        optionalAttributes.set(RouterRoleCount::Id);
-        optionalAttributes.set(LeaderRoleCount::Id);
-        optionalAttributes.set(AttachAttemptCount::Id);
-        optionalAttributes.set(PartitionIdChangeCount::Id);
-        optionalAttributes.set(BetterPartitionAttachAttemptCount::Id);
-        optionalAttributes.set(ParentChangeCount::Id);
-        optionalAttributes.set(TxTotalCount::Id);
-        optionalAttributes.set(TxUnicastCount::Id);
-        optionalAttributes.set(TxBroadcastCount::Id);
-        optionalAttributes.set(TxAckRequestedCount::Id);
-        optionalAttributes.set(TxAckedCount::Id);
-        optionalAttributes.set(TxNoAckRequestedCount::Id);
-        optionalAttributes.set(TxDataCount::Id);
-        optionalAttributes.set(TxDataPollCount::Id);
-        optionalAttributes.set(TxBeaconCount::Id);
-        optionalAttributes.set(TxBeaconRequestCount::Id);
-        optionalAttributes.set(TxOtherCount::Id);
-        optionalAttributes.set(TxRetryCount::Id);
-        optionalAttributes.set(TxDirectMaxRetryExpiryCount::Id);
-        optionalAttributes.set(TxIndirectMaxRetryExpiryCount::Id);
-        optionalAttributes.set(TxErrCcaCount::Id);
-        optionalAttributes.set(TxErrAbortCount::Id);
-        optionalAttributes.set(TxErrBusyChannelCount::Id);
-        optionalAttributes.set(RxTotalCount::Id);
-        optionalAttributes.set(RxUnicastCount::Id);
-        optionalAttributes.set(RxBroadcastCount::Id);
-        optionalAttributes.set(RxDataCount::Id);
-        optionalAttributes.set(RxDataPollCount::Id);
-        optionalAttributes.set(RxBeaconCount::Id);
-        optionalAttributes.set(RxBeaconRequestCount::Id);
-        optionalAttributes.set(RxOtherCount::Id);
-        optionalAttributes.set(RxAddressFilteredCount::Id);
-        optionalAttributes.set(RxDestAddrFilteredCount::Id);
-        optionalAttributes.set(RxDuplicatedCount::Id);
-        optionalAttributes.set(RxErrNoFrameCount::Id);
-        optionalAttributes.set(RxErrUnknownNeighborCount::Id);
-        optionalAttributes.set(RxErrInvalidSrcAddrCount::Id);
-        optionalAttributes.set(RxErrSecCount::Id);
-        optionalAttributes.set(RxErrFcsCount::Id);
-        optionalAttributes.set(RxErrOtherCount::Id);
-        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, features, optionalAttributes);
+        ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
         ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(threadNetworkDiagnostics);

@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "CodegenIntegration.h"
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/static-cluster-config/ThreadNetworkDiagnostics.h>
 #include <app/util/endpoint-config-api.h>
@@ -46,7 +45,6 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
     {
         const BitFlags<Feature> featureMap(rawFeatureMap);
-        OptionalAttributes optionalAttributes;
 
         static constexpr AttributeId optionalAttributeIds[] = { ActiveTimestamp::Id,
                                                                 PendingTimestamp::Id,
@@ -94,20 +92,19 @@ public:
                                                                 RxErrFcsCount::Id,
                                                                 RxErrOtherCount::Id };
 
-        VerifyOrDie(
-            featureMap.Raw() == 0 ||
-            (featureMap.Has(Feature::kMLECounts) && featureMap.Has(Feature::kMACCounts) && featureMap.Has(Feature::kErrorCounts)));
+        VerifyOrDie(featureMap.Raw() == 0 || featureMap.Raw() == 0xF);
 
-        if (featureMap.Raw() > 0)
+        if (featureMap.Raw() == 0xF)
         {
             for (auto id : optionalAttributeIds)
             {
                 VerifyOrDie(emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id));
-                optionalAttributes.set(id);
             }
         }
 
-        gServers[clusterInstanceIndex].Create(endpointId, featureMap, optionalAttributes);
+        using ClusterType       = ThreadNetworkDiagnosticsCluster::ClusterType;
+        ClusterType clusterType = (featureMap.Raw() == 0 ? ClusterType::kMinimal : ClusterType::kFull);
+        gServers[clusterInstanceIndex].Create(endpointId, clusterType);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -151,25 +148,5 @@ void MatterThreadNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId
         },
         integrationDelegate, shutdownType);
 }
-
-namespace chip::app::Clusters::ThreadNetworkDiagnostics {
-
-ThreadNetworkDiagnosticsCluster * FindClusterOnEndpoint(EndpointId endpointId)
-{
-    IntegrationDelegate integrationDelegate;
-
-    ServerClusterInterface * threadNetworkDiagnostics = CodegenClusterIntegration::FindClusterOnEndpoint(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = ThreadNetworkDiagnostics::Id,
-            .fixedClusterInstanceCount = kThreadNetworkDiagnosticsFixedClusterCount,
-            .maxClusterInstanceCount   = kThreadNetworkDiagnosticsMaxClusterCount,
-        },
-        integrationDelegate);
-
-    return static_cast<ThreadNetworkDiagnosticsCluster *>(threadNetworkDiagnostics);
-}
-
-} // namespace chip::app::Clusters::ThreadNetworkDiagnostics
 
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback() {}
