@@ -218,6 +218,9 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     MATTER_TRACE_SCOPE("AnnounceJointFabricAdministrator", "JointFabricAdministrator");
     ChipLogProgress(JointFabric, "Received an AnnounceJointFabricAdministrator command with endpointID=%u", commandData.endpointID);
 
+    // Clear verified fabric index if one exists from a previous VID verification
+    mVerifiedFabricIndex.reset();
+
     std::optional<Status> globalStatus = std::nullopt;
     ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
     const FabricIndex accessingFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
