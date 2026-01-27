@@ -74,7 +74,7 @@ enum
     kDeviceOption_BleDevice = 0x1000,
     kDeviceOption_WiFi,
     kDeviceOption_Thread,
-    kDeviceOption_ThreadNodeId,
+    kDeviceOption_ThreadArgs,
     kDeviceOption_Version,
     kDeviceOption_VendorID,
     kDeviceOption_ProductID,
@@ -184,7 +184,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    { "thread-node-id", kArgumentRequired, kDeviceOption_ThreadNodeId },
+    { "thread-args", kArgumentRequired, kDeviceOption_ThreadArgs },
 #else
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif
@@ -304,8 +304,8 @@ const char * sDeviceOptionHelp =
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     "\n"
-    "  --thread-node-id <node id>\n"
-    "       Enable Thread Simulation with the specified node id.\n"
+    "  --thread-args <arg>\n"
+    "       Enable Thread with the specified arguments.\n"
 #else
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
@@ -595,12 +595,8 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    case kDeviceOption_ThreadNodeId:
-        if (!ParseInt(aValue, LinuxDeviceOptions::GetInstance().mThreadNodeId))
-        {
-            PrintArgError("%s: invalid value specified for Thread node id: %s\n", aProgram, aValue);
-            retval = false;
-        }
+    case kDeviceOption_ThreadArgs:
+        LinuxDeviceOptions::GetInstance().mThreadArgs.push_back(aValue);
         break;
 #else
     case kDeviceOption_Thread:
