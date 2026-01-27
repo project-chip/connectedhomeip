@@ -12326,7 +12326,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
         if (decodableStruct.statusText.HasValue()) {
@@ -12508,7 +12508,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
         if (decodableStruct.statusText.HasValue()) {
@@ -12781,7 +12781,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
         if (decodableStruct.statusText.HasValue()) {

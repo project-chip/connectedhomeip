@@ -16739,6 +16739,17 @@ class RvcRunMode(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class ChangeToModeStatus(MatterIntEnum):
+            kSuccess = 0x00
+            kUnsupportedMode = 0x01
+            kGenericFailure = 0x02
+            kInvalidInMode = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
         class ModeTag(MatterIntEnum):
             kAuto = 0x00
             kQuick = 0x01
@@ -16835,11 +16846,11 @@ class RvcRunMode(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=RvcRunMode.Enums.ChangeToModeStatus),
                         ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: uint = 0
+            status: RvcRunMode.Enums.ChangeToModeStatus = 0
             statusText: typing.Optional[str] = None
 
     class Attributes:
@@ -16982,6 +16993,17 @@ class RvcCleanMode(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class ChangeToModeStatus(MatterIntEnum):
+            kSuccess = 0x00
+            kUnsupportedMode = 0x01
+            kGenericFailure = 0x02
+            kInvalidInMode = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
         class ModeTag(MatterIntEnum):
             kAuto = 0x00
             kQuick = 0x01
@@ -17072,11 +17094,11 @@ class RvcCleanMode(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=RvcCleanMode.Enums.ChangeToModeStatus),
                         ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: uint = 0
+            status: RvcCleanMode.Enums.ChangeToModeStatus = 0
             statusText: typing.Optional[str] = None
 
     class Attributes:
@@ -17642,6 +17664,17 @@ class DishwasherMode(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class ChangeToModeStatus(MatterIntEnum):
+            kSuccess = 0x00
+            kUnsupportedMode = 0x01
+            kGenericFailure = 0x02
+            kInvalidInMode = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
         class ModeTag(MatterIntEnum):
             kAuto = 0x00
             kQuick = 0x01
@@ -17719,11 +17752,11 @@ class DishwasherMode(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=DishwasherMode.Enums.ChangeToModeStatus),
                         ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: uint = 0
+            status: DishwasherMode.Enums.ChangeToModeStatus = 0
             statusText: typing.Optional[str] = None
 
     class Attributes:
