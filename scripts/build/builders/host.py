@@ -88,7 +88,7 @@ class HostApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     NETWORK_MANAGER = auto()
     ENERGY_GATEWAY = auto()
-    ENERGY_MANAGEMENT = auto()
+    EVSE = auto()
     WATER_LEAK_DETECTOR = auto()
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
@@ -192,8 +192,8 @@ class HostApp(Enum):
             return 'network-manager-app/linux'
         if self == HostApp.ENERGY_GATEWAY:
             return 'energy-gateway-app/linux'
-        if self == HostApp.ENERGY_MANAGEMENT:
-            return 'energy-management-app/linux'
+        if self == HostApp.EVSE:
+            return 'evse-app/linux'
         if self == HostApp.WATER_LEAK_DETECTOR:
             return 'water-leak-detector-app/linux'
         if self == HostApp.TERMS_AND_CONDITIONS:
@@ -325,9 +325,9 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_GATEWAY:
             yield 'chip-energy-gateway-app'
             yield 'chip-energy-gateway-app.map'
-        elif self == HostApp.ENERGY_MANAGEMENT:
-            yield 'chip-energy-management-app'
-            yield 'chip-energy-management-app.map'
+        elif self == HostApp.EVSE:
+            yield 'chip-evse-app'
+            yield 'chip-evse-app.map'
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
