@@ -297,7 +297,7 @@ jobs:
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
-                        --target linux-x64-all-devices-app-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-${BUILD_VARIANT} \
                         --target linux-x64-evse-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
@@ -378,7 +378,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-app-${BUILD_VARIANT}/all-devices-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -448,7 +448,7 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-app-${BUILD_VARIANT}/all-devices-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -473,7 +473,7 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-app-${BUILD_VARIANT}/all-devices-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -600,7 +600,7 @@ jobs:
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-evse-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-all-devices-app-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -628,7 +628,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --app-path all-devices:./objdir-clone/darwin-${{matrix.arch}}-all-devices-app-${BUILD_VARIANT}/all-devices-app \
+                     --app-path all-devices:./objdir-clone/darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -1016,7 +1016,7 @@ jobs:
                   # keep-sorted: start
                   echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
-                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-tsan-clang-test/all-devices-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
