@@ -963,8 +963,8 @@ template("efr32_sdk") {
       ]
     }
 
-    if (sl_matter_debug_watchdog_enable){
-      sources += ["${efr32_sdk_root}/platform/peripheral/src/sl_hal_wdog.c"]
+    if (sl_matter_debug_watchdog_enable) {
+      sources += [ "${efr32_sdk_root}/platform/peripheral/src/sl_hal_wdog.c" ]
     }
 
     # COS and SWO sources files for when we use generate with slc
