@@ -28,8 +28,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "sl_component_catalog.h"
-
 #ifdef SL_MATTER_ENABLE_AWS
 #include "MatterAwsControl.h"
 #endif // SL_MATTER_ENABLE_AWS
