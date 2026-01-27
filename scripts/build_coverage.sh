@@ -197,7 +197,7 @@ if [ "$skip_gn" == false ]; then
     if [ "$ENABLE_YAML" == true ]; then
         ninja -C "$OUTPUT_ROOT"
 
-        scripts/run_in_python_env.sh \"$PYTHON_TESTS_VENV\" \
+        scripts/run_in_python_env.sh "$PYTHON_TESTS_VENV" \
             "./scripts/tests/run_test_suite.py \
              --runner chip_tool_python \
              --exclude-tags MANUAL \
