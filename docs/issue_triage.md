@@ -110,7 +110,7 @@ types or functionality) as well as individual examples.
 | `examples/contact-sensor-app`                  |                              | UNMAINTAINED |
 | `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
 | `examples/dishwasher-app`                      |                              | UNMAINTAINED |
-| `examples/energy-management-app`               | James Harrow                 |              |
+| `examples/evse-app`                            | James Harrow                 |              |
 | `examples/fabric-admin`                        | Yufeng Wang, Terence Hampson |              |
 | `examples/fabric-bridge-app`                   | Yufeng Wang, Terence Hampson |              |
 | `examples/java-matter-controller`              | Yunhan Wang, Yufeng Wang     |              |

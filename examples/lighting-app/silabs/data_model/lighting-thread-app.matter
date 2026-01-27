@@ -2760,9 +2760,6 @@ endpoint 1 {
     ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
-    ram      attribute currentFrequency default = 0x0000;
-    ram      attribute minFrequency default = 0x0000;
-    ram      attribute maxFrequency default = 0x0000;
     ram      attribute options default = 0x00;
     ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel default = 0xFF;

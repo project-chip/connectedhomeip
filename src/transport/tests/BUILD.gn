@@ -46,7 +46,10 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "esp32" && chip_device_platform != "nrfconnect" &&
       chip_device_platform != "nxp") {
-    test_sources += [ "TestSecureSessionTable.cpp" ]
+    test_sources += [
+      "TestSecureSessionTable.cpp",
+      "TestTCPConnection.cpp",
+    ]
   }
 
   cflags = [ "-Wconversion" ]
@@ -58,6 +61,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",

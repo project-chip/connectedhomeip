@@ -128,6 +128,8 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     uint16_t videoStreamID = -1;
     uint16_t audioStreamID = -1;
 
+    // TODO: Supporting single video stream and single audio stream. This logic need to be updated for all the streams
+    //  in future for application as part of 1.5.1
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
         videoStreamID = transportOptions.videoStreamID.Value().Value();
@@ -137,6 +139,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     {
         audioStreamID = transportOptions.audioStreamID.Value().Value();
     }
+
     ChipLogProgress(
         Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
         connectionID, videoStreamID, audioStreamID);
@@ -431,6 +434,44 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
             {
                 return true;
             }
+            break;
+        }
+    }
+
+    return false;
+}
+
+bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollLength,
+                                                            const DataModel::Nullable<uint16_t> & videoStreamId)
+{
+    // If the video stream ID is null, log error and return false
+    if (videoStreamId.IsNull())
+    {
+        ChipLogError(Camera, "MaxPreRollLength validation requested with null video stream ID");
+        return false;
+    }
+
+    auto & videoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+
+    if (videoStreams.empty())
+    {
+        ChipLogError(Camera, "Attempt to validate max pre-roll length when no video streams are allocated.");
+        return false;
+    }
+
+    for (const VideoStreamStruct & stream : videoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId.Value())
+        {
+            // If non-zero, Max pre roll length must be greater than or equal to key frame interval
+            if (maxPreRollLength >= stream.keyFrameInterval)
+            {
+                return true;
+            }
+            ChipLogError(Camera,
+                         "Max pre-roll length validation failed for video stream id [%u], max pre-roll length [%u], key frame "
+                         "interval [%u] ",
+                         stream.videoStreamID, maxPreRollLength, stream.keyFrameInterval);
             break;
         }
     }
@@ -833,4 +874,31 @@ void PushAvStreamTransportManager::SessionMonitor()
 
         std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
     }
+}
+
+bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+
+    // Look for the connection in any session
+    for (const auto & sessionPair : mSessionMap)
+    {
+        const auto & sessionInfo = sessionPair.second;
+        if (sessionInfo.activeConnectionIDs.find(connectionID) != sessionInfo.activeConnectionIDs.end())
+        {
+            sessionNumber = sessionInfo.sessionNumber;
+            return true;
+        }
+    }
+
+    // If not found in active sessions, check if we have transport options for this connection
+    auto transportIt = mTransportOptionsMap.find(connectionID);
+    if (transportIt != mTransportOptionsMap.end())
+    {
+        // For connections not in active sessions, return a default session number
+        sessionNumber = 0;
+        return true;
+    }
+
+    return false;
 }

@@ -21,7 +21,6 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/impl/LoggingChimeDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
-#include <devices/on-off-light/LoggingOnOffLightDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
@@ -45,8 +44,6 @@ public:
     struct Context
     {
         TimerDelegate & timerDelegate;
-        Credentials::GroupDataProvider & groupDataProvider;
-        FabricTable & fabricTable;
     };
 
     static DeviceFactory & GetInstance()
@@ -65,7 +62,6 @@ public:
         {
             return mRegistry.find(deviceTypeArg)->second();
         }
-
         ChipLogError(
             Support,
             "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n",
@@ -89,6 +85,9 @@ private:
 
     DeviceFactory()
     {
+        // NOTE: context is set in `::Init`, so each lambda checks its
+        //       existence separately. `Init` must be called before mRegistry
+        //       factories are usable.
         mRegistry["contact-sensor"] = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<BooleanStateSensorDevice>(
@@ -101,14 +100,6 @@ private:
         };
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
         mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };
-        mRegistry["on-off-light"]     = [this]() {
-            VerifyOrDie(mContext.has_value());
-            return std::make_unique<LoggingOnOffLightDevice>(LoggingOnOffLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
-            });
-        };
     }
 };
 

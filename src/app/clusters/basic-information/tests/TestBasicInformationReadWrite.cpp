@@ -179,21 +179,34 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+
+        // Back up any existing DeviceInstanceInfoProvider and install the mock provider. This is required on platforms that build
+        // all unit tests into a single binary(e.g. Nordic), where global DeviceLayer state persists across test suites.
+        // DeviceInstanceInfoProvider has no universal default and cannot be reliably reset via Init/Shutdown, so without this
+        // backup/restore the mock would leak into subsequent tests.
+        sDeviceInstanceInfoProviderBackup = DeviceLayer::TestOnlyTryGetDeviceInstanceInfoProvider();
         DeviceLayer::SetDeviceInstanceInfoProvider(&gMockDeviceInstanceInfoProvider);
         DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
     }
 
     static void TearDownTestSuite()
     {
-        // For the DeviceInstanceInfoProvider there is no default instance.
-        // No need setting it to nullptr, as it won't do anything. It returns immediately if the input is nullptr.
+        // For the DeviceInstanceInfoProvider there is no default instance. Restore the provider that was installed prior to this
+        // test suite, if any.
+        if (sDeviceInstanceInfoProviderBackup != nullptr)
+        {
+            DeviceLayer::SetDeviceInstanceInfoProvider(sDeviceInstanceInfoProviderBackup);
+        }
         DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         chip::Platform::MemoryShutdown();
     }
 
     TestBasicInformationReadWrite() {}
     chip::Testing::TestServerClusterContext testContext;
+    static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup;
 };
+
+DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDeviceInstanceInfoProviderBackup = nullptr;
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {

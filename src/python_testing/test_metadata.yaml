@@ -156,6 +156,10 @@ not_automated:
       reason: Helper methods for Push AV Integration TCs
     - name: TC_TLS_Utils.py
       reason: Helper methods for TC tests dependent on TLS clusters
+    - name: TC_DD_1_5.py
+      reason:
+          No existing app corresponding to the test content (NFC-based
+          onboarding data security requirements)
     - name: TC_GCAST_common.py
       reason: Shared code for TC_GCAST, not a standalone test.
     - name: TC_GCAST_2_1.py
@@ -182,6 +186,30 @@ not_automated:
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.
+    - name: TC_WHM_1_2.py
+      reason:
+          Temporarily disabled Water Heater Manager test until energy management
+          refactoring is complete, see
+          https://github.com/project-chip/connectedhomeip/issues/42804
+    - name: TC_WHM_2_1.py
+      reason:
+          Temporarily disabled Water Heater Manager test until energy management
+          refactoring is complete, see
+          https://github.com/project-chip/connectedhomeip/issues/42804
+    - name: TC_EWATERHTR_2_1.py
+      reason:
+          Temporarily disabled Water Heater Manager test until energy management
+          refactoring is complete, see
+          https://github.com/project-chip/connectedhomeip/issues/42804
+    - name: TC_EWATERHTR_2_2.py
+      reason:
+          Temporarily disabled Water Heater Manager test until energy management
+          refactoring is complete
+    - name: TC_EWATERHTR_2_3.py
+      reason:
+          Temporarily disabled Water Heater Manager test until energy management
+          refactoring is complete
+
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
 # to consider improving. May not be exhaustive

@@ -48,6 +48,7 @@ public:
 
     CHIP_ERROR Init() override;
     void Finish() override;
+    bool IsInitialized() { return (mStorage != nullptr); }
 
     //
     // Group Info
@@ -243,9 +244,8 @@ protected:
         bool mFirstMap           = true;
         GroupKeyContext mGroupKeyContext;
     };
-    bool IsInitialized() { return (mStorage != nullptr); }
-    CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
+    CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
     PersistentStorageDelegate * mStorage       = nullptr;
     Crypto::SessionKeystore * mSessionKeystore = nullptr;
     ObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
