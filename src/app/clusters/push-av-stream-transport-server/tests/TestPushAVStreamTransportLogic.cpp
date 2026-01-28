@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <catch2/catch_test_macros.hpp>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/persistence/tests/TestPersistence.h>
 #include <lib/support/tests/CHIPFaultInjection.h>
@@ -59,7 +58,7 @@ struct TestContext
     }
 };
 
-TEST_CASE("PushAVStreamTransportLogic - StoreCurrentConnections", "[push-av-stream-transport]")
+TEST_F(TestPushAVStreamTransportLogic, TestStoreCurrentConnections)
 {
     TestContext testContext;
     TestPushAVStreamTransportLogic & logic = testContext.mLogic;
@@ -83,11 +82,42 @@ TEST_CASE("PushAVStreamTransportLogic - StoreCurrentConnections", "[push-av-stre
     MutableByteSpan span(buffer);
     REQUIRE(testContext.sTestPersistence.ReadValue(path, span) == CHIP_NO_ERROR);
 
-    // Basic check on size - more detailed check would involve TLV decoding
+    // Basic check on size
     REQUIRE(span.size() > 0);
+
+    // Decode the TLV data and verify contents
+    TLV::TLVReader reader;
+    reader.Init(span);
+
+    REQUIRE(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()) == CHIP_NO_ERROR);
+    TLV::TLVType arrayType;
+    REQUIRE(reader.EnterContainer(arrayType) == CHIP_NO_ERROR);
+
+    int count = 0;
+    TransportConfigurationStorage decodedConn;
+    CHIP_ERROR err;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        REQUIRE(decodedConn.Decode(reader) == CHIP_NO_ERROR);
+        if (count == 0)
+        {
+            REQUIRE(decodedConn.connectionID == 1);
+            REQUIRE(decodedConn.transportStatus == TransportStatusEnum::kActive);
+        }
+        else if (count == 1)
+        {
+            REQUIRE(decodedConn.connectionID == 2);
+            REQUIRE(decodedConn.transportStatus == TransportStatusEnum::kInactive);
+        }
+        count++;
+    }
+    REQUIRE(err == CHIP_ERROR_END_OF_TLV);
+    REQUIRE(count == 2);
+    REQUIRE(reader.ExitContainer(arrayType) == CHIP_NO_ERROR);
+    REQUIRE(reader.VerifyEndOfContainer() == CHIP_NO_ERROR);
 }
 
-TEST_CASE("PushAVStreamTransportLogic - LoadCurrentConnections - No Data", "[push-av-stream-transport]")
+TEST_F(TestPushAVStreamTransportLogic, TestLoadCurrentConnectionsNoData)
 {
     TestContext testContext;
     TestPushAVStreamTransportLogic & logic = testContext.mLogic;
@@ -97,7 +127,7 @@ TEST_CASE("PushAVStreamTransportLogic - LoadCurrentConnections - No Data", "[pus
     REQUIRE(logic.mCurrentConnections.empty());
 }
 
-TEST_CASE("PushAVStreamTransportLogic - LoadCurrentConnections - With Data", "[push-av-stream-transport]")
+TEST_F(TestPushAVStreamTransportLogic, TestLoadCurrentConnectionsWithData)
 {
     TestContext testContext;
     TestPushAVStreamTransportLogic & logic = testContext.mLogic;
