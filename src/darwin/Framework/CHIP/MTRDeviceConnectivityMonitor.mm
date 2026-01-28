@@ -332,16 +332,20 @@ static void ResolveCallback(
     return result;
 }
 
-- (void)_clearResolvers:(std::vector<DNSServiceRef>)resolversToCleanUp
+- (void)_clearResolvers:(std::vector<DNSServiceRef> &&)resolversToCleanUp
 {
     if (resolversToCleanUp.empty()) {
         return;
     }
 
     // Deallocate DNS resources on correct queue
+    // Use move semantics to transfer ownership and prevent double-delete
     dispatch_async(sSharedResolverQueue, ^{
+        // The vector has been moved into this block, ensuring single ownership
         for (auto & resolver : resolversToCleanUp) {
-            DNSServiceRefDeallocate(resolver);
+            if (resolver) {
+                DNSServiceRefDeallocate(resolver);
+            }
         }
 
         // Check if we should do linger cleanup
@@ -374,7 +378,7 @@ static void ResolveCallback(
     if (_resolvers.size() != 0) {
         sConnectivityMonitorCount--;
         auto resolversToCleanUp = std::move(_resolvers);
-        [self _clearResolvers:resolversToCleanUp]; // Async DNS cleanup
+        [self _clearResolvers:std::move(resolversToCleanUp)]; // Move ownership to async cleanup
     }
 }
 
