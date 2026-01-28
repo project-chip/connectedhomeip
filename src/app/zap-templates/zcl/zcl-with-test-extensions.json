@@ -776,7 +776,17 @@
         ],
         "Power Topology": ["FeatureMap"],
         "Power Source": ["ClusterRevision"],
-        "Valve Configuration and Control": ["RemainingDuration"],
+        "Valve Configuration and Control": [
+            "OpenDuration",
+            "AutoCloseTime",
+            "RemainingDuration",
+            "CurrentState",
+            "TargetState",
+            "CurrentLevel",
+            "TargetLevel",
+            "ValveFault",
+            "ClusterRevision"
+        ],
         "Boolean State Configuration": [
             "AlarmsActive",
             "AlarmsEnabled",

@@ -44,20 +44,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ambientContextTypeSupported);
     case Attributes::SimultaneousDetectionLimit::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, simultaneousDetectionLimit);
-    case Attributes::CountThresholdReached::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, countThresholdReached);
-    case Attributes::CountThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, countThreshold);
-    case Attributes::ObjectCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, objectCount);
+    case Attributes::ObjectCountReached::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, objectCountReached);
     case Attributes::HoldTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, holdTime);
     case Attributes::HoldTimeLimits::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, holdTimeLimits);
     case Attributes::PredictedActivity::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, predictedActivity);
-    case Attributes::PrivacyModeEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, privacyModeEnabled);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
