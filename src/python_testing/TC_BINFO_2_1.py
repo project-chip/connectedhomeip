@@ -613,40 +613,46 @@ class TC_BINFO_2_1(MatterBaseTest):
         caps = await self.read_single_attribute_check_success(cluster=cluster, attribute=attributes.CapabilityMinima, endpoint=self.endpoint)
         log.info(f"Read CapabilityMinima: {caps}")
 
-        # caseSessionsPerFabric: min 3
+        # caseSessionsPerFabric: min 3, max 10000
         asserts.assert_true(hasattr(caps, "caseSessionsPerFabric"),
                             "caseSessionsPerFabric is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking caseSessionsPerFabric: {caps.caseSessionsPerFabric} >= 3")
         asserts.assert_greater_equal(caps.caseSessionsPerFabric, 3, "caseSessionsPerFabric >= 3")
+        asserts.assert_less_equal(caps.caseSessionsPerFabric, 10000, "caseSessionsPerFabric <= 10000")
 
-        # subscriptionsPerFabric: min 3
+        # subscriptionsPerFabric: min 3, max 10000
         asserts.assert_true(hasattr(caps, "subscriptionsPerFabric"),
                             "subscriptionsPerFabric is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking subscriptionsPerFabric: {caps.subscriptionsPerFabric} >= 3")
         asserts.assert_greater_equal(caps.subscriptionsPerFabric, 3, "subscriptionsPerFabric >= 3")
+        asserts.assert_less_equal(caps.subscriptionsPerFabric, 10000, "subscriptionsPerFabric <= 10000")
 
-        # simultaneousInvocationsSupported: min 1 (New field)
+        # simultaneousInvocationsSupported: min 1, max 10000 (New field)
         asserts.assert_true(hasattr(caps, "simultaneousInvocationsSupported"),
                             "simultaneousInvocationsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking simultaneousInvocationsSupported: {caps.simultaneousInvocationsSupported} >= 1")
         asserts.assert_greater_equal(caps.simultaneousInvocationsSupported, 1, "simultaneousInvocationsSupported >= 1")
+        asserts.assert_less_equal(caps.simultaneousInvocationsSupported, 10000, "simultaneousInvocationsSupported <= 10000")
 
-        # simultaneousWritesSupported: min 1 (New field)
+        # simultaneousWritesSupported: min 1, max 10000 (New field)
         asserts.assert_true(hasattr(caps, "simultaneousWritesSupported"),
                             "simultaneousWritesSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking simultaneousWritesSupported: {caps.simultaneousWritesSupported} >= 1")
         asserts.assert_greater_equal(caps.simultaneousWritesSupported, 1, "simultaneousWritesSupported >= 1")
+        asserts.assert_less_equal(caps.simultaneousWritesSupported, 10000, "simultaneousWritesSupported <= 10000")
 
-        # readPathsSupported: min 9 (New field)
+        # readPathsSupported: min 9, max 10000 (New field)
         asserts.assert_true(hasattr(caps, "readPathsSupported"), "readPathsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking readPathsSupported: {caps.readPathsSupported} >= 9")
         asserts.assert_greater_equal(caps.readPathsSupported, 9, "readPathsSupported >= 9")
+        asserts.assert_less_equal(caps.readPathsSupported, 10000, "readPathsSupported <= 10000")
 
-        # subscribePathsSupported: min 3 (New field)
+        # subscribePathsSupported: min 3, max 10000 (New field)
         asserts.assert_true(hasattr(caps, "subscribePathsSupported"),
                             "subscribePathsSupported is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking subscribePathsSupported: {caps.subscribePathsSupported} >= 3")
         asserts.assert_greater_equal(caps.subscribePathsSupported, 3, "subscribePathsSupported >= 3")
+        asserts.assert_less_equal(caps.subscribePathsSupported, 10000, "subscribePathsSupported <= 10000")
 
         # Step 57: Write CapabilityMinima (Existing fields)
         self.step(57)
@@ -704,7 +710,7 @@ class TC_BINFO_2_1(MatterBaseTest):
         log.info(f"Read SpecificationVersion: {spec_ver}")
 
         # Verify valid values
-        allowed_versions = [0x01040000, 0x01040100, 0x01040200, 0x01050000]
+        allowed_versions = [0x01040000, 0x01040100, 0x01040200, 0x01050000, 0x01050100]
         if spec_ver not in allowed_versions:
             asserts.fail(
                 f"SpecificationVersion {spec_ver:#010x} is not one of the allowed values: {[hex(v) for v in allowed_versions]}")
