@@ -637,12 +637,14 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
     return Status::Success;
 }
 
-std::optional<DataModel::ActionReturnStatus>
-PushAvStreamTransportServerLogic::ValidateStreamParameters(CommandHandler & handler, const ConcreteCommandPath & commandPath, const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions,
-                             const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr)
+std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::ValidateStreamParameters(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions,
+    const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr)
 {
 
-    // Check mutual exclusivity and presence of stream fieldsconst PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType
+    // Check mutual exclusivity and presence of stream fieldsconst
+    // PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType
     bool hasNewStreamFields = transportOptions.videoStreams.HasValue() || transportOptions.audioStreams.HasValue();
     bool hasOldStreamFields = transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue();
 
