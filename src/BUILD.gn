@@ -93,6 +93,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/tls-client-management-server/tests",
       "${chip_root}/src/app/clusters/unit-localization-server/tests",
       "${chip_root}/src/app/clusters/user-label-server/tests",
+      "${chip_root}/src/app/clusters/valve-configuration-and-control-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
@@ -223,9 +224,10 @@ if (chip_build_tests) {
   chip_test_group("example_tests") {
     deps = []
     tests = []
+
     if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
         current_os != "android") {
-      tests += [ "${chip_root}/examples/energy-management-app/energy-management-common/tests" ]
+      tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
   }
 
