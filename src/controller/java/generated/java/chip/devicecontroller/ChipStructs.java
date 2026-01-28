@@ -11478,21 +11478,31 @@ public static class AmbientContextSensingClusterSemanticTagStruct {
 public static class AmbientContextSensingClusterAmbientContextTypeStruct {
   public ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed;
   public Optional<Long> detectionStartTime;
+  public Optional<Integer> objectCountThreshold;
+  public Optional<Integer> objectCount;
   private static final long AMBIENT_CONTEXT_SENSED_ID = 0L;
   private static final long DETECTION_START_TIME_ID = 1L;
+  private static final long OBJECT_COUNT_THRESHOLD_ID = 2L;
+  private static final long OBJECT_COUNT_ID = 3L;
 
   public AmbientContextSensingClusterAmbientContextTypeStruct(
     ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed,
-    Optional<Long> detectionStartTime
+    Optional<Long> detectionStartTime,
+    Optional<Integer> objectCountThreshold,
+    Optional<Integer> objectCount
   ) {
     this.ambientContextSensed = ambientContextSensed;
     this.detectionStartTime = detectionStartTime;
+    this.objectCountThreshold = objectCountThreshold;
+    this.objectCount = objectCount;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(AMBIENT_CONTEXT_SENSED_ID, ArrayType.generateArrayType(ambientContextSensed, (elementambientContextSensed) -> elementambientContextSensed.encodeTlv())));
     values.add(new StructElement(DETECTION_START_TIME_ID, detectionStartTime.<BaseTLVType>map((nonOptionaldetectionStartTime) -> new UIntType(nonOptionaldetectionStartTime)).orElse(new EmptyType())));
+    values.add(new StructElement(OBJECT_COUNT_THRESHOLD_ID, objectCountThreshold.<BaseTLVType>map((nonOptionalobjectCountThreshold) -> new UIntType(nonOptionalobjectCountThreshold)).orElse(new EmptyType())));
+    values.add(new StructElement(OBJECT_COUNT_ID, objectCount.<BaseTLVType>map((nonOptionalobjectCount) -> new UIntType(nonOptionalobjectCount)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -11503,6 +11513,8 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
     }
     ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed = null;
     Optional<Long> detectionStartTime = Optional.empty();
+    Optional<Integer> objectCountThreshold = Optional.empty();
+    Optional<Integer> objectCount = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == AMBIENT_CONTEXT_SENSED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -11514,11 +11526,23 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
           UIntType castingValue = element.value(UIntType.class);
           detectionStartTime = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == OBJECT_COUNT_THRESHOLD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          objectCountThreshold = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == OBJECT_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          objectCount = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new AmbientContextSensingClusterAmbientContextTypeStruct(
       ambientContextSensed,
-      detectionStartTime
+      detectionStartTime,
+      objectCountThreshold,
+      objectCount
     );
   }
 
@@ -11531,6 +11555,12 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
     output.append("\n");
     output.append("\tdetectionStartTime: ");
     output.append(detectionStartTime);
+    output.append("\n");
+    output.append("\tobjectCountThreshold: ");
+    output.append(objectCountThreshold);
+    output.append("\n");
+    output.append("\tobjectCount: ");
+    output.append(objectCount);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16092,8 +16122,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Long peerNodeID;
   public Integer peerEndpointID;
   public Integer streamUsage;
-  public @Nullable Integer videoStreamID;
-  public @Nullable Integer audioStreamID;
+  public @Nullable Optional<Integer> videoStreamID;
+  public @Nullable Optional<Integer> audioStreamID;
   public Boolean metadataEnabled;
   public Optional<ArrayList<Integer>> videoStreams;
   public Optional<ArrayList<Integer>> audioStreams;
@@ -16114,8 +16144,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     Long peerNodeID,
     Integer peerEndpointID,
     Integer streamUsage,
-    @Nullable Integer videoStreamID,
-    @Nullable Integer audioStreamID,
+    @Nullable Optional<Integer> videoStreamID,
+    @Nullable Optional<Integer> audioStreamID,
     Boolean metadataEnabled,
     Optional<ArrayList<Integer>> videoStreams,
     Optional<ArrayList<Integer>> audioStreams,
@@ -16139,8 +16169,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
     values.add(new StructElement(PEER_ENDPOINT_ID_ID, new UIntType(peerEndpointID)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
-    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
-    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(METADATA_ENABLED_ID, new BooleanType(metadataEnabled)));
     values.add(new StructElement(VIDEO_STREAMS_ID, videoStreams.<BaseTLVType>map((nonOptionalvideoStreams) -> ArrayType.generateArrayType(nonOptionalvideoStreams, (elementnonOptionalvideoStreams) -> new UIntType(elementnonOptionalvideoStreams))).orElse(new EmptyType())));
     values.add(new StructElement(AUDIO_STREAMS_ID, audioStreams.<BaseTLVType>map((nonOptionalaudioStreams) -> ArrayType.generateArrayType(nonOptionalaudioStreams, (elementnonOptionalaudioStreams) -> new UIntType(elementnonOptionalaudioStreams))).orElse(new EmptyType())));
@@ -16157,8 +16187,8 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     Long peerNodeID = null;
     Integer peerEndpointID = null;
     Integer streamUsage = null;
-    @Nullable Integer videoStreamID = null;
-    @Nullable Integer audioStreamID = null;
+    @Nullable Optional<Integer> videoStreamID = null;
+    @Nullable Optional<Integer> audioStreamID = null;
     Boolean metadataEnabled = null;
     Optional<ArrayList<Integer>> videoStreams = Optional.empty();
     Optional<ArrayList<Integer>> audioStreams = Optional.empty();
@@ -16187,12 +16217,12 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
       } else if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          videoStreamID = castingValue.value(Integer.class);
+          videoStreamID = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          audioStreamID = castingValue.value(Integer.class);
+          audioStreamID = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -16516,8 +16546,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Long peerNodeID;
   public Integer peerEndpointID;
   public Integer streamUsage;
-  public @Nullable Integer videoStreamID;
-  public @Nullable Integer audioStreamID;
+  public @Nullable Optional<Integer> videoStreamID;
+  public @Nullable Optional<Integer> audioStreamID;
   public Boolean metadataEnabled;
   public Optional<ArrayList<Integer>> videoStreams;
   public Optional<ArrayList<Integer>> audioStreams;
@@ -16538,8 +16568,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     Long peerNodeID,
     Integer peerEndpointID,
     Integer streamUsage,
-    @Nullable Integer videoStreamID,
-    @Nullable Integer audioStreamID,
+    @Nullable Optional<Integer> videoStreamID,
+    @Nullable Optional<Integer> audioStreamID,
     Boolean metadataEnabled,
     Optional<ArrayList<Integer>> videoStreams,
     Optional<ArrayList<Integer>> audioStreams,
@@ -16563,8 +16593,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
     values.add(new StructElement(PEER_ENDPOINT_ID_ID, new UIntType(peerEndpointID)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
-    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
-    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(METADATA_ENABLED_ID, new BooleanType(metadataEnabled)));
     values.add(new StructElement(VIDEO_STREAMS_ID, videoStreams.<BaseTLVType>map((nonOptionalvideoStreams) -> ArrayType.generateArrayType(nonOptionalvideoStreams, (elementnonOptionalvideoStreams) -> new UIntType(elementnonOptionalvideoStreams))).orElse(new EmptyType())));
     values.add(new StructElement(AUDIO_STREAMS_ID, audioStreams.<BaseTLVType>map((nonOptionalaudioStreams) -> ArrayType.generateArrayType(nonOptionalaudioStreams, (elementnonOptionalaudioStreams) -> new UIntType(elementnonOptionalaudioStreams))).orElse(new EmptyType())));
@@ -16581,8 +16611,8 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     Long peerNodeID = null;
     Integer peerEndpointID = null;
     Integer streamUsage = null;
-    @Nullable Integer videoStreamID = null;
-    @Nullable Integer audioStreamID = null;
+    @Nullable Optional<Integer> videoStreamID = null;
+    @Nullable Optional<Integer> audioStreamID = null;
     Boolean metadataEnabled = null;
     Optional<ArrayList<Integer>> videoStreams = Optional.empty();
     Optional<ArrayList<Integer>> audioStreams = Optional.empty();
@@ -16611,12 +16641,12 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
       } else if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          videoStreamID = castingValue.value(Integer.class);
+          videoStreamID = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == AUDIO_STREAM_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          audioStreamID = castingValue.value(Integer.class);
+          audioStreamID = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == METADATA_ENABLED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {

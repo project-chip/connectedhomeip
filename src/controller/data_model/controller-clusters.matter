@@ -211,6 +211,16 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum ServerAttributionContextInformation : enum8 {
+  kServerAutomationRule = 11;
+  kServerSchedule = 12;
+  kServerTimer = 13;
+  kSecurity = 14;
+  kDemandResponseEventOrSimilarServiceProviderSignalling = 15;
+  kPhysicalInteractionOnDevice = 16;
+  kInteractionViaAProtocolNotDefinedInThisSpecification = 17;
+}
+
 enum SoftwareVersionCertificationStatusEnum : enum8 {
   kDevTest = 0;
   kProvisional = 1;
@@ -223,6 +233,14 @@ enum StreamUsageEnum : enum8 {
   kRecording = 1;
   kAnalysis = 2;
   kLiveView = 3;
+}
+
+enum SuppliedAttributionContextInformation : enum8 {
+  kDefaultClientAction = 0;
+  kUserInteraction = 1;
+  kClientAutomationRule = 2;
+  kClientSchedule = 3;
+  kClientTimer = 4;
 }
 
 enum TariffPriceTypeEnum : enum8 {
@@ -306,6 +324,16 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
+struct AttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  optional node_id nodeID = 2;
+  optional group_id groupID = 3;
+  optional systime_ms systemTimeStamp = 4;
+  optional posix_ms epochTimeStamp = 5;
+  nullable fabric_idx fabricIndex = 6;
+}
+
 struct ICECandidateStruct {
   char_string candidate = 0;
   nullable char_string SDPMid = 1;
@@ -338,6 +366,12 @@ struct SemanticTagStruct {
   optional nullable char_string<64> label = 3;
 }
 
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -356,8 +390,8 @@ fabric_scoped struct WebRTCSessionStruct {
   node_id peerNodeID = 1;
   endpoint_no peerEndpointID = 2;
   StreamUsageEnum streamUsage = 3;
-  nullable int16u videoStreamID = 4;
-  nullable int16u audioStreamID = 5;
+  optional nullable int16u videoStreamID = 4;
+  optional nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
   optional int16u videoStreams[] = 7;
   optional int16u audioStreams[] = 8;
@@ -8709,13 +8743,15 @@ provisional cluster AmbientContextSensing = 1073 {
     kHumanActivity = 0x1;
     kObjectCounting = 0x2;
     kObjectIdentification = 0x4;
-    kSoundClassification = 0x8;
+    kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
     optional epoch_s detectionStartTime = 1;
+    optional int16u objectCountThreshold = 2;
+    optional int16u objectCount = 3;
   }
 
   struct HoldTimeLimitsStruct {
@@ -8733,19 +8769,20 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
+  info event AmbientContextDetected = 0 {
+    AmbientContextTypeStruct ambientContextType[] = 0;
+  }
+
   readonly attribute optional boolean humanActivityDetected = 0;
   readonly attribute optional boolean objectIdentified = 1;
   readonly attribute optional boolean audioContextDetected = 2;
   readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
   attribute int8u simultaneousDetectionLimit = 5;
-  readonly attribute optional boolean countThresholdReached = 6;
-  attribute optional int16u countThreshold = 7;
-  readonly attribute optional int16u objectCount = 8;
-  attribute access(write: manage) optional int16u holdTime = 9;
-  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 10;
-  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
-  readonly attribute optional boolean privacyModeEnabled = 12;
+  readonly attribute optional boolean objectCountReached = 6;
+  attribute access(write: manage) int16u holdTime = 7;
+  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 8;
+  readonly attribute access(write: manage) optional PredictedActivityStruct predictedActivity[] = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

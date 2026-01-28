@@ -29,8 +29,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val peerNodeID: ULong,
   val peerEndpointID: UInt,
   val streamUsage: UInt,
-  val videoStreamID: UInt?,
-  val audioStreamID: UInt?,
+  val videoStreamID: Optional<UInt>?,
+  val audioStreamID: Optional<UInt>?,
   val metadataEnabled: Boolean,
   val videoStreams: Optional<List<UInt>>,
   val audioStreams: Optional<List<UInt>>,
@@ -59,12 +59,18 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       put(ContextSpecificTag(TAG_PEER_ENDPOINT_ID), peerEndpointID)
       put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID != null) {
-        put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
+        if (videoStreamID.isPresent) {
+          val optvideoStreamID = videoStreamID.get()
+          put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), optvideoStreamID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
       }
       if (audioStreamID != null) {
-        put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), audioStreamID)
+        if (audioStreamID.isPresent) {
+          val optaudioStreamID = audioStreamID.get()
+          put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), optaudioStreamID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       }
@@ -113,14 +119,22 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoStreamID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
+          } else {
+            Optional.empty()
+          }
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
           null
         }
       val audioStreamID =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
+          } else {
+            Optional.empty()
+          }
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
           null
