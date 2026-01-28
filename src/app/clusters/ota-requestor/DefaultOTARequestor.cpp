@@ -982,24 +982,4 @@ void DefaultOTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::Ch
     driver->OTACommissioningCallback();
 }
 
-#if 0
-void DefaultOTARequestor::FindOtaSoftwareClusters(void (*callback)(EndpointId endpoint))
-{
-    VerifyOrDie(mServer != nullptr);
-    DataModel::Provider * dataModelProvider = mServer->dataModelProvider;
-    VerifyOrDie(dataModelProvider != nullptr);
-
-    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
-    {
-        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
-        {
-            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
-            {
-                callback(endpoint.id);
-            }
-        }
-    }
-}
-#endif
-
 } // namespace chip
