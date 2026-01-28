@@ -643,9 +643,14 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::V
     const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr)
 {
 
-    // Check mutual exclusivity and presence of stream fieldsconst
-    // PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType
-    bool hasNewStreamFields = transportOptions.videoStreams.HasValue() || transportOptions.audioStreams.HasValue();
+    // Check mutual exclusivity and presence of stream fields
+    auto listHasElements = [](const auto & list) {
+        size_t s = 0;
+        return list.ComputeSize(&s) == CHIP_NO_ERROR && s > 0;
+    };
+    bool hasNewStreamFields =
+        (transportOptions.videoStreams.HasValue() && listHasElements(transportOptions.videoStreams.Value())) ||
+        (transportOptions.audioStreams.HasValue() && listHasElements(transportOptions.audioStreams.Value()));
     bool hasOldStreamFields = transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue();
 
     VerifyOrReturnValue(!(hasNewStreamFields && hasOldStreamFields), Status::InvalidCommand,
@@ -1047,7 +1052,13 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    ValidateStreamParameters(handler, commandPath, transportOptions, transportOptionsPtr);
+    auto validateStreamStatus = ValidateStreamParameters(handler, commandPath, transportOptions, transportOptionsPtr);
+
+    if (validateStreamStatus != Status::Success)
+    {
+        ChipLogError(Camera, "HandleAllocatePushTransport[ep=%d]: Stream validation failed", mEndpointId);
+        return validateStreamStatus;
+    }
 
     if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
         transportOptions.containerOptions.CMAFContainerOptions.HasValue())
@@ -1249,7 +1260,13 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         return std::nullopt;
     }
 
-    ValidateStreamParameters(handler, commandPath, transportOptions, transportOptionsPtr);
+    auto validateStreamStatus = ValidateStreamParameters(handler, commandPath, transportOptions, transportOptionsPtr);
+
+    if (validateStreamStatus != Status::Success)
+    {
+        ChipLogError(Camera, "HandleAllocatePushTransport[ep=%d]: Stream validation failed", mEndpointId);
+        return validateStreamStatus;
+    }
 
     // Call the delegate
     status = mDelegate->ModifyPushTransport(connectionID, *transportOptionsPtr);

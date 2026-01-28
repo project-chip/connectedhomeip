@@ -40,6 +40,7 @@
 
 import asyncio
 import logging
+import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -377,8 +378,8 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
 
-        asyncio.sleep(5)  # Wait for 5 seconds before sending DelocatePushTransport command
-        cmd = pvcluster.Commands.DelocatePushTransport(
+        await asyncio.to_thread(time.sleep, 5) # Wait for 5 seconds before sending DeallocatePushTransport command
+        cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID2
         )
         status = await self.psvt_deallocate_push_transport(cmd)
