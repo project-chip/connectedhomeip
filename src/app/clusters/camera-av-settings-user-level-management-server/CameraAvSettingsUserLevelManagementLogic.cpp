@@ -63,14 +63,9 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Startup()
                                      "CameraAVSettingsUserLevelMgmt: Feature configuration error. At least one of "
                                      "Mechanical Pan, Tilt, Zoom, or Digital PTZ must be supported"));
 
-    // Set up our defaults
-    SetPan(MakeOptional(kDefaultPan));
-    SetTilt(MakeOptional(kDefaultTilt));
-    SetZoom(MakeOptional(kDefaultZoom));
+    LoadPersistentAttributes();
 
     SetMovementState(PhysicalMovementEnum::kIdle);
-
-    LoadPersistentAttributes();
 
     return CHIP_NO_ERROR;
 }
@@ -623,6 +618,11 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     else
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the MPTZPosition from the KVS.", mEndpointId);
+
+        // No stored value, set defaults
+        SetPan(MakeOptional(kDefaultPan));
+        SetTilt(MakeOptional(kDefaultTilt));
+        SetZoom(MakeOptional(kDefaultZoom));
     }
 
     // Load MPTZPresets
@@ -630,6 +630,9 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the MPTZPresets from the KVS.", mEndpointId);
+
+        // Clear the local storage
+        mMptzPresetHelpers.clear();
     }
 
     // Load DPTZRelativeMove
@@ -637,6 +640,9 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unable to load the DPTZRelativeMove from the KVS.", mEndpointId);
+
+        // Clear the local storage
+        mDptzStreams.clear();
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
