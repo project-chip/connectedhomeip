@@ -51,4 +51,7 @@ public:
     virtual void DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID, int64_t timestamp) = 0;
     virtual void DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID, int64_t timestamp) = 0;
     virtual void SetPreRollLength(Transport * transport, uint16_t PreRollBufferLength)                         = 0;
+    // Reset the transport's sink state (registration time and first frame flag)
+    // Call this when the transport is modified/restarted to allow proper preroll buffering
+    virtual void ResetTransportSinkState(Transport * transport) = 0;
 };

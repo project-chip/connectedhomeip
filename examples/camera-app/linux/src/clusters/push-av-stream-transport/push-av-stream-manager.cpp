@@ -221,6 +221,12 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         return Status::Failure;
     }
 
+    // Reset the sink state so the modified transport gets proper preroll frames for the new session
+    if (mMediaController)
+    {
+        mMediaController->ResetTransportSinkState(mTransportMap[connectionID].get());
+    }
+
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
