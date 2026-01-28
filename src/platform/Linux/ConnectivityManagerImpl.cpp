@@ -80,18 +80,18 @@ using namespace ::chip::DeviceLayer::NetworkCommissioning;
 using namespace ::chip::WiFiPAF;
 #endif
 
-/*
-During stress tests this we observed a maximum of 5 retries to be enough for successful
-connection in all cases outside of a few outliers. Adding +50% more retries for headroom
-we set the number to 8.
-*/
-constexpr unsigned int kWpaAssocMaxRetries = 8;
-
 namespace chip {
 namespace DeviceLayer {
 namespace {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+/*
+During stress tests  we observed a maximum of 5 retries to be enough for successful
+connection in all cases outside of a few outliers. Adding +50% more retries for headroom
+we set the number to 8.
+*/
+constexpr unsigned int kWpaAssocMaxRetries = 8;
+
 static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
 static constexpr char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -426,14 +426,18 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
     if (g_strcmp0(state, "associating") == 0)
     {
-        mAssociationStarted = true;
+        mAssociationStarted     = true;
+        mAssociationRetriesLeft = kWpaAssocMaxRetries;
     }
     else if (g_strcmp0(state, "disconnected") == 0)
     {
         int reason = wpa_supplicant_1_interface_get_disconnect_reason(iface);
 
-        ChipLogDetail(DeviceLayer, "wpa_supplicant: Disconnected with reason code: %d (associationStarted=%d)", reason,
-                      mAssociationStarted);
+        ChipLogDetail(
+            DeviceLayer,
+            "wpa_supplicant: Disconnected with reason code=%d, assoc status code=%d, auth status code=%d (associationStarted=%d)",
+            reason, wpa_supplicant_1_interface_get_assoc_status_code(iface), wpa_supplicant_1_interface_get_auth_status_code(iface),
+            mAssociationStarted);
 
         if (delegate != nullptr)
         {
@@ -451,10 +455,11 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             if (wpa_supplicant_1_interface_get_assoc_status_code(iface) == WLAN_STATUS_AUTH_TIMEOUT)
             {
                 /* Handle intermittent association failures */
-                if (mAssociationRetriesLeft-- > 0)
+                if (mAssociationRetriesLeft > 0)
                 {
                     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-                    ChipLogDetail(DeviceLayer, "wpa_supplicant: Association timeout, %d retries left", mAssociationRetriesLeft);
+                    mAssociationRetriesLeft--;
+                    ChipLogDetail(DeviceLayer, "wpa_supplicant: Association timeout, %u retries left", mAssociationRetriesLeft);
 
                     mAssociationStarted = false;
 
@@ -462,10 +467,14 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                     if (!wpa_supplicant_1_interface_call_select_network_sync(
                             mWpaSupplicant.iface.get(), mWpaSupplicant.networkPath.get(), nullptr, &err.GetReceiver()))
                     {
+                        // Fallthrough to existing error handling code as we could not retry.
                         ChipLogError(DeviceLayer, "wpa_supplicant: Failed to select network: '%s'", err->message);
                     }
-
-                    return;
+                    else
+                    {
+                        // Skip existing error handling code to not report error too early to the network commissioning cluster.
+                        return;
+                    }
                 }
             }
 
@@ -1109,8 +1118,6 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mPafChannelAvailable = false;
 #endif
-
-    mAssociationRetriesLeft = kWpaAssocMaxRetries;
 
     if (!wpa_supplicant_1_interface_call_add_network_sync(mWpaSupplicant.iface.get(), args,
                                                           &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver()))
