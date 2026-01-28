@@ -378,7 +378,7 @@ class TC_PAVST_2_12(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         logger.info(f"Event data {event_data}")
         asserts.assert_equal(event_data.connectionID, aConnectionID2, "Unexpected value for ConnectionID returned")
 
-        await asyncio.to_thread(time.sleep, 5) # Wait for 5 seconds before sending DeallocatePushTransport command
+        await asyncio.to_thread(time.sleep, 5)  # Wait for 5 seconds before sending DeallocatePushTransport command
         cmd = pvcluster.Commands.DeallocatePushTransport(
             connectionID=aConnectionID2
         )
