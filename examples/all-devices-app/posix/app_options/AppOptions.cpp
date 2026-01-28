@@ -93,8 +93,12 @@ OptionSet * AppOptions::GetOptions()
         // rest of the help
         result += "  --endpoint <endpoint-number>\n";
         result += "       Define the endpoint to start on (default 1)\n\n";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";
         result += "       Enable wifi support for commissioning\n\n";
+#endif
+
         return result;
     }();
 
