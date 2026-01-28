@@ -199,22 +199,22 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     gDataModelProvider = &dataModelProvider;
 
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
-        RootNodeDevice::Context{
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
-            .platformManager            = DeviceLayer::PlatformMgr(),                            //
-            .groupDataProvider          = gGropupDataProvider,                                   //
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
-            .dnssdServer                = DnssdServer::Instance(),                               //
-            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
-            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
-            .testEventTriggerDelegate   = Server::GetInstance().GetTestEventTriggerDelegate(),   //
+        RootNodeDevice::Context {
+            .commissioningWindowManager   = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager     = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer      = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable              = Server::GetInstance().GetFabricTable(),                //
+                .failsafeContext          = Server::GetInstance().GetFailSafeContext(),            //
+                .platformManager          = DeviceLayer::PlatformMgr(),                            //
+                .groupDataProvider        = gGropupDataProvider,                                   //
+                .sessionManager           = Server::GetInstance().GetSecureSessionManager(),       //
+                .dnssdServer              = DnssdServer::Instance(),                               //
+                .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),                //
+                .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),              //
+                .testEventTriggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate(),   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         WifiRootNodeDevice::WifiContext{
