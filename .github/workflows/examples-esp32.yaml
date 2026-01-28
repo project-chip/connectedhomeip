@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:177
+            image: ghcr.io/project-chip/chip-build-esp32:181
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -119,14 +119,13 @@ jobs:
                     - 'src/app/clusters/commodity-tariff-server/**'
                     - 'src/app/clusters/electrical-grid-conditions-server/**'
                     - 'src/app/clusters/meter-identification-server/**'
-                  energy_management:
-                    - 'examples/energy-management-app/**'
+                  evse:
+                    - 'examples/evse-app/**'
                     - 'src/app/clusters/device-energy-management-server/**'
                     - 'src/app/clusters/electrical-energy-measurement-server/**'
                     - 'src/app/clusters/electrical-power-measurement-server/**'
                     - 'src/app/clusters/energy-evse-server/**'
                     - 'src/app/clusters/power-topology-server/**'
-                    - 'src/app/clusters/water-heater-management-server/**'
 
             - name: Build example All Clusters App(Target:ESP32, pigweed RPC, IPv6 Only)
               if: steps.changed_paths.outputs.pigweed == 'true'
@@ -146,7 +145,7 @@ jobs:
               run: |
                 scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
-              
+
 
             - name: Build example Lighting App (external platform)
               run: |
@@ -162,8 +161,8 @@ jobs:
             - name: Build example Energy Management App
               if: steps.changed_paths.outputs.energy_management == 'true'
               run: |
-                scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults
-                rm -rf examples/energy-management-app/esp32/{build,managed_components}
+                scripts/examples/esp_example.sh evse-app sdkconfig.defaults
+                rm -rf examples/evse-app/esp32/{build,managed_components}
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
@@ -178,7 +177,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:177
+            image: ghcr.io/project-chip/chip-build-esp32:181
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -215,8 +214,8 @@ jobs:
             - name: Build example Energy Gateway App
               run: scripts/examples/esp_example.sh energy-gateway-app sdkconfig.defaults
 
-            - name: Build example Energy Management App
-              run: scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults
+            - name: Build example EVSE App
+              run: scripts/examples/esp_example.sh evse-app sdkconfig.defaults
 
             - name: Build example LIT ICD App (Target:ESP32H2)
               run: scripts/examples/esp_example.sh lit-icd-app sdkconfig.defaults esp32h2

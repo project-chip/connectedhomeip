@@ -1,0 +1,58 @@
+{{> header excludeZapComment=true}}
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRStructsObjc.h>
+#import "MTRStructsObjc_Private.h"
+
+NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#zcl_commands}}
+{{#*inline "completeDecl"}}
+{{#if (isSupported cluster command=command isForCommandPayload=true)}}
+
+@interface MTR{{cluster}}Cluster{{command}}Params : {{base}}
+{{#zcl_command_arguments}}
+
+{{#if (isSupported ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{> struct_field_decl cluster=parent.parent.name originalCluster=parent.parent.name type=type label=label}};
+{{/if}}
+{{#*inline "oldNameFieldDecl"}}
+
+{{#if (isSupported ../cluster command=../command commandField=commandField)}}
+{{> struct_field_decl cluster=parent.parent.name originalCluster=parent.parent.name type=type label=commandField}};
+{{/if}}
+{{/inline}}
+{{#if (and includeRenamedProperties
+           (hasOldName ../cluster command=../command commandField=(asStructPropertyName label)))}}
+{{> oldNameFieldDecl commandField=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
+{{> command_timed_invoke_properties}}
+{{> command_init_with_response_value_decl cluster=cluster command=command includeInitWithResponseValue=includeInitWithResponseValue}}
+@end
+{{/if}}
+{{/inline}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{> completeDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                 command=(asUpperCamelCase name preserveAcronyms=true)
+                 includeRenamedProperties=false
+                 base="NSObject <NSCopying>"
+                 includeInitWithResponseValue=true}}
+{{> command_old_name_decl}}
+{{> command_deprecated_fields_decl cluster=(asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{else}}
+{{> completeDecl cluster=(compatClusterNameRemapping parent.name)
+                 command=(compatCommandNameRemapping parent.name name)
+                 includeRenamedProperties=true
+                 base="NSObject <NSCopying>"
+                 includeInitWithResponseValue=true}}
+{{/if}}
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

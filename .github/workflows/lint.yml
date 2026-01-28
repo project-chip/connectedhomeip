@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:177
+            image: ghcr.io/project-chip/chip-build:181
 
         steps:
             - name: Checkout
@@ -121,6 +121,7 @@ jobs:
                      --known-failure platform/DeviceSafeQueue.h \
                      --known-failure platform/GLibTypeDeleter.h \
                      --known-failure platform/SingletonConfigurationManager.cpp \
+                     --known-failure platform/SingletonConnectivityManager.cpp \
                      src
                   scripts/tools/not_known_to_gn.py \
                      -e py -e matter -e lark -e yaml -e cpp -e java -e kt -e jinja -e proto \

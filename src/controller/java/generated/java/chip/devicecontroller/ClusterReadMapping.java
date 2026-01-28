@@ -16048,39 +16048,17 @@ public class ClusterReadMapping {
           readAmbientContextSensingSimultaneousDetectionLimitCommandParams
         );
         result.put("readSimultaneousDetectionLimitAttribute", readAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingCountThresholdReachedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingCountThresholdReachedAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountReachedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingObjectCountReachedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readCountThresholdReachedAttribute(
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readObjectCountReachedAttribute(
               (ChipClusters.BooleanAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readAmbientContextSensingCountThresholdReachedCommandParams
+          readAmbientContextSensingObjectCountReachedCommandParams
         );
-        result.put("readCountThresholdReachedAttribute", readAmbientContextSensingCountThresholdReachedAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingCountThresholdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingCountThresholdAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readCountThresholdAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readAmbientContextSensingCountThresholdCommandParams
-        );
-        result.put("readCountThresholdAttribute", readAmbientContextSensingCountThresholdAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingObjectCountAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readObjectCountAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readAmbientContextSensingObjectCountCommandParams
-        );
-        result.put("readObjectCountAttribute", readAmbientContextSensingObjectCountAttributeInteractionInfo);
+        result.put("readObjectCountReachedAttribute", readAmbientContextSensingObjectCountReachedAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingHoldTimeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16103,17 +16081,6 @@ public class ClusterReadMapping {
           readAmbientContextSensingPredictedActivityCommandParams
         );
         result.put("readPredictedActivityAttribute", readAmbientContextSensingPredictedActivityAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingPrivacyModeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingPrivacyModeEnabledAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readPrivacyModeEnabledAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readAmbientContextSensingPrivacyModeEnabledCommandParams
-        );
-        result.put("readPrivacyModeEnabledAttribute", readAmbientContextSensingPrivacyModeEnabledAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
