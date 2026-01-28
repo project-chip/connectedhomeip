@@ -171,13 +171,13 @@ private:
     // TLV overhead for TransportOptionsStorage: ~40 bytes
     // Serialized size of transportOptions: ~2217 bytes. Pad to 2400
 
-    static constexpr size_t kMaxOneCurrentConnectionSerializedSize = TLV::EstimateStructOverhead(
-        sizeof(uint16_t),                                   // connectionID (2)
-        sizeof(uint8_t),                                    // transportStatus (1)
-        2400,                                               // transportOptions
-        sizeof(uint32_t),                                   // expiryTime (4)
-        sizeof(uint64_t)                                    // fabricIndex (8)
-    ); // Adds ~10 bytes for tags/types = ~2430 bytes
+    static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
+        TLV::EstimateStructOverhead(sizeof(uint16_t), // connectionID (2)
+                                    sizeof(uint8_t),  // transportStatus (1)
+                                    2400,             // transportOptions
+                                    sizeof(uint32_t), // expiryTime (4)
+                                    sizeof(uint64_t)  // fabricIndex (8)
+        );                                            // Adds ~10 bytes for tags/types = ~2430 bytes
 
     // Max size for the TLV-encoded array of CurrentConnection structs
     // Assuming CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS = 4

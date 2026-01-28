@@ -34,9 +34,9 @@ public:
     {}
 
     // Expose protected methods for testing
-    using PushAvStreamTransportServerLogic::StoreCurrentConnections;
     using PushAvStreamTransportServerLogic::LoadCurrentConnections;
     using PushAvStreamTransportServerLogic::mCurrentConnections;
+    using PushAvStreamTransportServerLogic::StoreCurrentConnections;
 
     CHIP_ERROR TestStore() { return StoreCurrentConnections(); }
     CHIP_ERROR TestLoad() { return LoadCurrentConnections(); }
@@ -47,15 +47,9 @@ struct TestContext
     TestPersistence sTestPersistence;
     TestPushAVStreamTransportLogic mLogic{ 1, BitFlags<Feature>() };
 
-    TestContext()
-    {
-        SetAttributePersistenceProvider(&sTestPersistence);
-    }
+    TestContext() { SetAttributePersistenceProvider(&sTestPersistence); }
 
-    ~TestContext()
-    {
-        SetAttributePersistenceProvider(nullptr);
-    }
+    ~TestContext() { SetAttributePersistenceProvider(nullptr); }
 };
 
 TEST_F(TestPushAVStreamTransportLogic, TestStoreCurrentConnections)
@@ -65,12 +59,12 @@ TEST_F(TestPushAVStreamTransportLogic, TestStoreCurrentConnections)
 
     // Add some test connections
     TransportConfigurationStorage conn1;
-    conn1.connectionID = 1;
+    conn1.connectionID    = 1;
     conn1.transportStatus = TransportStatusEnum::kActive;
     logic.mCurrentConnections.push_back(conn1);
 
     TransportConfigurationStorage conn2;
-    conn2.connectionID = 2;
+    conn2.connectionID    = 2;
     conn2.transportStatus = TransportStatusEnum::kInactive;
     logic.mCurrentConnections.push_back(conn2);
 
@@ -141,19 +135,19 @@ TEST_F(TestPushAVStreamTransportLogic, TestLoadCurrentConnectionsWithData)
     REQUIRE(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType) == CHIP_NO_ERROR);
 
     TransportConfigurationStorage conn1;
-    conn1.connectionID = 10;
+    conn1.connectionID    = 10;
     conn1.transportStatus = TransportStatusEnum::kActive;
     REQUIRE(conn1.EncodeForWrite(writer, TLV::AnonymousTag()) == CHIP_NO_ERROR);
 
     TransportConfigurationStorage conn2;
-    conn2.connectionID = 20;
+    conn2.connectionID    = 20;
     conn2.transportStatus = TransportStatusEnum::kInactive;
     REQUIRE(conn2.EncodeForWrite(writer, TLV::AnonymousTag()) == CHIP_NO_ERROR);
 
     REQUIRE(writer.EndContainer(arrayType) == CHIP_NO_ERROR);
 
     size_t len = writer.GetLengthWritten();
-    auto path = ConcreteAttributePath(1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
+    auto path  = ConcreteAttributePath(1, PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
     REQUIRE(testContext.sTestPersistence.WriteValue(path, ByteSpan(buffer, len)) == CHIP_NO_ERROR);
 
     // Load the data

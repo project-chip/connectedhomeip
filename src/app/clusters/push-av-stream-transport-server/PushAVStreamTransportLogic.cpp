@@ -186,8 +186,7 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
 void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
-    ChipLogFailure(LoadCurrentConnections(), Zcl,
-                   "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
+    ChipLogFailure(LoadCurrentConnections(), Zcl, "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
 
     // Signal delegate that all persistent configuration attributes have been loaded.
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
