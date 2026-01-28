@@ -43,4 +43,5 @@ static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxD
 static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
 static constexpr uint16_t kDayEntryDurationLimit            = 1500;
 static constexpr uint8_t kFullWeekMask                      = 0x7f;
+static constexpr uint8_t kFeaturesCount                     = 7;
 } // namespace CommodityTariffConsts
