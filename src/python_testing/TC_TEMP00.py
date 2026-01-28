@@ -9,6 +9,7 @@ from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+
 class TC_TEMP00(MatterBaseTest):
     def get_new_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -32,6 +33,7 @@ class TC_TEMP00(MatterBaseTest):
             passcode=setupPayloadInfo[0].passcode)
         await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
         logger.info("[FRFZ]PASE session opened successfully\n\n\n")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
