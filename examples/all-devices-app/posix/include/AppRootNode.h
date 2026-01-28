@@ -50,10 +50,11 @@ public:
     };
 
     AppRootNode(const RootNodeDevice::Context & context, BitFlags<EnabledFeatures> kFeatures = {}) :
-        mEnabledFeatures(kFeatures), mRootNodeDevice(context),
+        mEnabledFeatures(kFeatures),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        mWiFiRootNodeDevice(context, { .wifiDriver = mWiFiDriver })
+        mWiFiRootNodeDevice(context, { .wifiDriver = mWiFiDriver }),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        mRootNodeDevice(context)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
         mWiFiDriver.Set5gSupport(true);
@@ -73,7 +74,6 @@ public:
 
 private:
     BitFlags<EnabledFeatures> mEnabledFeatures;
-    RootNodeDevice mRootNodeDevice;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -86,6 +86,8 @@ private:
     WifiRootNodeDevice mWiFiRootNodeDevice;
 #else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+    RootNodeDevice mRootNodeDevice;
 };
 
 } // namespace chip::app
