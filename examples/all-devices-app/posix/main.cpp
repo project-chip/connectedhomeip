@@ -89,27 +89,36 @@ public:
     };
 
     CodeDrivenDataModelDevices(const Context & context) :
-        mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence), mRootNode({
-            .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager   = mContext.configurationManager,       //
-                .deviceControlServer    = mContext.deviceControlServer,        //
-                .fabricTable            = mContext.fabricTable,                //
-                .failsafeContext        = mContext.failsafeContext,            //
-                .platformManager        = mContext.platformManager,            //
-                .groupDataProvider      = mContext.groupDataProvider,          //
-                .sessionManager         = mContext.sessionManager,             //
-                .dnssdServer            = mContext.dnssdServer,                //
+        mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
+        mRootNode(
+            {
+                .commissioningWindowManager = mContext.commissioningWindowManager, //
+                    .configurationManager   = mContext.configurationManager,       //
+                    .deviceControlServer    = mContext.deviceControlServer,        //
+                    .fabricTable            = mContext.fabricTable,                //
+                    .failsafeContext        = mContext.failsafeContext,            //
+                    .platformManager        = mContext.platformManager,            //
+                    .groupDataProvider      = mContext.groupDataProvider,          //
+                    .sessionManager         = mContext.sessionManager,             //
+                    .dnssdServer            = mContext.dnssdServer,                //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        })
+            },
+            []() {
+                BitFlags<AppRootNode::EnabledFeatures> features;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::EnableWiFi());
+#endif
+                return features;
+            }())
     {}
 
     CHIP_ERROR Startup()
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
-        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
         mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
         VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
@@ -125,7 +134,7 @@ public:
             mConstructedDevice->UnRegister(mDataModelProvider);
             mConstructedDevice.reset();
         }
-        mRootNode.UnRegister(mDataModelProvider);
+        mRootNode.RootDevice().UnRegister(mDataModelProvider);
     }
 
     chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
