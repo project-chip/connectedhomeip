@@ -231,7 +231,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMax
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    NetworkInterface * ifp = new NetworkInterface();
+    auto ifp = std::make_unique<NetworkInterface>();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
@@ -246,6 +246,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #else
 
     struct netif * netif = deviceInterface_getNetif();
+    if (netif == nullptr)
+    {
+        delete ifp;
+        *netifpp = nullptr;
+        return CHIP_ERROR_NOT_FOUND;
+    }
 
     Platform::CopyString(ifp->Name, netif->name);
     ifp->name          = CharSpan::fromCharString(ifp->Name);
@@ -276,8 +282,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     }
     ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, addr_count);
 #endif
-
-    *netifpp = ifp;
+    
+    *netifpp = ifp.release();
 
     return CHIP_NO_ERROR;
 }
