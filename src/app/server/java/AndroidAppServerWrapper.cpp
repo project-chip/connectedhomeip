@@ -61,6 +61,9 @@ CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate)
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
+    // Enable automatic port retry to handle port conflicts
+    initParams.portRetryCount = 9;
+
     err = chip::Server::GetInstance().Init(initParams);
     SuccessOrExit(err);
 
