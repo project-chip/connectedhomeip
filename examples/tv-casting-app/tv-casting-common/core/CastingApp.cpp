@@ -196,6 +196,7 @@ CHIP_ERROR CastingApp::ShutdownAllSubscriptions()
 
 CHIP_ERROR CastingApp::ClearCache()
 {
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     return support::CastingStore::GetInstance()->DeleteAll();
 }
 

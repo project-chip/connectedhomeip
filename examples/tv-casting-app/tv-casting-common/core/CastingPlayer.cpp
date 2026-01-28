@@ -168,13 +168,14 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             //
                             // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                             support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
-                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance()->Load();
+                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance() -> Load();
                         },
                         [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                             ChipLogError(AppServer,
                                          "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                          "CastingPlayer failed");
                             CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+                            CastingPlayer::GetTargetCastingPlayer()->RemoveFabric();
                             CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
                             if (e != CHIP_NO_ERROR)
                             {
