@@ -16,11 +16,13 @@ static BOOL AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}
     using namespace Clusters::{{asUpperCamelCase name}};
     switch (aAttributeId) {
         {{#zcl_attributes_server}}
+        {{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         case Attributes::{{asUpperCamelCase name}}::Id: {
             return YES;
         }
         {{/if}}
+        {{/unless}}
         {{/zcl_attributes_server}}
         default: {
             // Not a known {{asUpperCamelCase name preserveAcronyms=true}} attribute.
