@@ -16,7 +16,7 @@
  *
  */
 
-#include "valve-configuration-and-control-cluster.h"
+#include "ValveConfigurationAndControlCluster.h"
 
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
