@@ -52,15 +52,15 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager   = mContext.configurationManager,       //
-                .deviceControlServer    = mContext.deviceControlServer,        //
-                .fabricTable            = mContext.fabricTable,                //
-                .failsafeContext        = mContext.failsafeContext,            //
-                .platformManager        = mContext.platformManager,            //
+            .configurationManager       = mContext.configurationManager,       //
+            .deviceControlServer        = mContext.deviceControlServer,        //
+            .fabricTable                = mContext.fabricTable,                //
+            .failsafeContext            = mContext.failsafeContext,            //
+            .platformManager            = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -70,8 +70,11 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
-                                      InteractionModelEngine::GetInstance(), &DeviceLayer::GetDiagnosticDataProvider());
-    mGeneralDiagnosticsCluster.Cluster().SetTestEventTriggerDelegate(Server::GetInstance().GetTestEventTriggerDelegate());
+                                      GeneralDiagnosticsCluster::Context{
+                                          .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,
+                                          .diagnosticDataProvider   = mContext.diagnosticDataProvider,
+                                          .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
+                                      });
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
     mGroupKeyManagementCluster.Create(GroupKeyManagementCluster::Context{

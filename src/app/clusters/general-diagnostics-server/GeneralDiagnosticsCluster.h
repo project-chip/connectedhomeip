@@ -30,156 +30,147 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {
+    namespace Clusters {
 
-struct GeneralDiagnosticsFunctionsConfig
-{
-    bool enablePosixTime : 1;
-    bool enablePayloadSnapshot : 1;
-};
+        struct GeneralDiagnosticsFunctionsConfig {
+            bool enablePosixTime : 1;
+            bool enablePayloadSnapshot : 1;
+        };
 
-class GeneralDiagnosticsCluster : public DefaultServerCluster
-{
-public:
-    using OptionalAttributeSet =
-        chip::app::OptionalAttributeSet<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
-                                        GeneralDiagnostics::Attributes::BootReason::Id,            //
-                                        GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
-                                        GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
-                                        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
-                                        GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
-                                        // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-                                        //       it will be forced as mandatory by the cluster constructor
-                                        >;
+        class GeneralDiagnosticsCluster : public DefaultServerCluster {
+        public:
+            using OptionalAttributeSet = chip::app::OptionalAttributeSet<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
+                GeneralDiagnostics::Attributes::BootReason::Id, //
+                GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id, //
+                GeneralDiagnostics::Attributes::ActiveRadioFaults::Id, //
+                GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id, //
+                GeneralDiagnostics::Attributes::DeviceLoadStatus::Id //
+                // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
+                //       it will be forced as mandatory by the cluster constructor
+                >;
 
-    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
-                              DeviceLoadStatusProvider * deviceLoadStatusProvider,
-                              DeviceLayer::DiagnosticDataProvider * diagnosticDataProvider) :
-        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
-        mFeatureFlags(featureFlags), mDeviceLoadStatusProvider(deviceLoadStatusProvider),
-        mDiagnosticDataProvider(diagnosticDataProvider), mTestEventTriggerDelegate(nullptr),
-        mNodeStartupTimestamp(System::Clock::Microseconds64(0))
-    {}
+            struct Context {
+                DeviceLoadStatusProvider & deviceLoadStatusProvider;
+                DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+                TestEventTriggerDelegate * testEventTriggerDelegate;
+            };
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
+            GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                Context && context)
+                : DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id })
+                , mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
+                , mFeatureFlags(featureFlags)
+                , mDiagnosticsContext(std::move(context))
+                , mNodeStartupTimestamp(System::Clock::Microseconds64(0))
+            {
+            }
 
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
+            CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+            DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                AttributeValueEncoder & encoder) override;
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+            std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                chip::TLV::TLVReader & input_arguments,
+                CommandHandler * handler) override;
 
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+            CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+            CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-    /**
-     * @brief
-     *   Called after the current device is rebooted.
-     */
-    void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
+            CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-    /**
-     * @brief
-     *   Called when the Node detects a hardware fault has been raised.
-     */
-    void OnHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+            /**
+             * @brief
+             *   Called after the current device is rebooted.
+             */
+            void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
-    /**
-     * @brief
-     *   Called when the Node detects a radio fault has been raised.
-     */
-    void OnRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
-    /**
-     * @brief
-     *   Called when the Node detects a network fault has been raised.
-     */
-    void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+            /**
+             * @brief
+             *   Called when the Node detects a hardware fault has been raised.
+             */
+            void OnHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
+                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
-    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
-    {
-        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mDiagnosticDataProvider->GetRebootCount(rebootCount);
-    }
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
-    {
-        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mDiagnosticDataProvider->GetTotalOperationalHours(totalOperationalHours);
-    }
-    CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const
-    {
-        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mDiagnosticDataProvider->GetBootReason(bootReason);
-    }
-    CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
-    {
-        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mDiagnosticDataProvider->GetActiveHardwareFaults(hardwareFaults);
-    }
-    CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
-    {
-        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mDiagnosticDataProvider->GetActiveRadioFaults(radioFaults);
-    }
-    CHIP_ERROR GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
-    {
-        VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mDiagnosticDataProvider->GetActiveNetworkFaults(networkFaults);
-    }
+            /**
+             * @brief
+             *   Called when the Node detects a radio fault has been raised.
+             */
+            void OnRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+            /**
+             * @brief
+             *   Called when the Node detects a network fault has been raised.
+             */
+            void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
-    System::Clock::Microseconds64 TimeSinceNodeStartup() const
-    {
-        return System::SystemClock().GetMonotonicMicroseconds64() - mNodeStartupTimestamp;
-    }
+            CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
+            {
+                return mDiagnosticsContext.diagnosticDataProvider.GetRebootCount(rebootCount);
+            }
+            CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
+            {
+                return mDiagnosticsContext.diagnosticDataProvider.GetTotalOperationalHours(totalOperationalHours);
+            }
+            CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const
+            {
+                return mDiagnosticsContext.diagnosticDataProvider.GetBootReason(bootReason);
+            }
+            CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
+            {
+                return mDiagnosticsContext.diagnosticDataProvider.GetActiveHardwareFaults(hardwareFaults);
+            }
+            CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
+            {
+                return mDiagnosticsContext.diagnosticDataProvider.GetActiveRadioFaults(radioFaults);
+            }
+            CHIP_ERROR GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
+            {
+                return mDiagnosticsContext.diagnosticDataProvider.GetActiveNetworkFaults(networkFaults);
+            }
 
-    TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mTestEventTriggerDelegate; }
+            System::Clock::Microseconds64 TimeSinceNodeStartup() const
+            {
+                return System::SystemClock().GetMonotonicMicroseconds64() - mNodeStartupTimestamp;
+            }
 
-    void SetTestEventTriggerDelegate(TestEventTriggerDelegate * testEventTriggerDelegate)
-    {
-        mTestEventTriggerDelegate = testEventTriggerDelegate;
-    }
+            TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mDiagnosticsContext.testEventTriggerDelegate; }
 
-protected:
-    OptionalAttributeSet mOptionalAttributeSet;
-    CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
-    BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
-    DeviceLoadStatusProvider * mDeviceLoadStatusProvider;
-    DeviceLayer::DiagnosticDataProvider * mDiagnosticDataProvider;
-    TestEventTriggerDelegate * mTestEventTriggerDelegate;
-    System::Clock::Microseconds64 mNodeStartupTimestamp;
-};
+            void SetTestEventTriggerDelegate(TestEventTriggerDelegate * testEventTriggerDelegate)
+            {
+                mDiagnosticsContext.testEventTriggerDelegate = testEventTriggerDelegate;
+            }
 
-class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
-{
-public:
-    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
-                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags,
-                                              DeviceLoadStatusProvider * deviceLoadStatusProvider,
-                                              DeviceLayer::DiagnosticDataProvider * diagnosticDataProvider,
-                                              TestEventTriggerDelegate * testEventTriggerDelegate,
-                                              const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, deviceLoadStatusProvider, diagnosticDataProvider),
-        mFunctionConfig(functionsConfig)
-    {
-        SetTestEventTriggerDelegate(testEventTriggerDelegate);
-    }
+        protected:
+            OptionalAttributeSet mOptionalAttributeSet;
+            CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
+            BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
+            Context mDiagnosticsContext;
+            System::Clock::Microseconds64 mNodeStartupTimestamp;
+        };
 
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+        class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster {
+        public:
+            GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
+                const BitFlags<GeneralDiagnostics::Feature> featureFlags,
+                Context && context,
+                const GeneralDiagnosticsFunctionsConfig & functionsConfig)
+                : GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags, std::move(context))
+                , mFunctionConfig(functionsConfig)
+            {
+            }
 
-private:
-    const GeneralDiagnosticsFunctionsConfig mFunctionConfig;
-};
+            std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                chip::TLV::TLVReader & input_arguments,
+                CommandHandler * handler) override;
 
-} // namespace Clusters
+        private:
+            const GeneralDiagnosticsFunctionsConfig mFunctionConfig;
+        };
+
+    } // namespace Clusters
 } // namespace app
 } // namespace chip

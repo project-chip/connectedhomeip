@@ -234,10 +234,8 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 
     // Calling OnDeviceReboot here to maintain the event generation of the old implementation of the
     // server init callback. We consider startup to be a boot event here.
-    VerifyOrReturnError(mDiagnosticDataProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
     GeneralDiagnostics::BootReasonEnum bootReason;
-    if (mDiagnosticDataProvider->GetBootReason(bootReason) == CHIP_NO_ERROR)
+    if (mDiagnosticsContext.diagnosticDataProvider.GetBootReason(bootReason) == CHIP_NO_ERROR)
     {
         OnDeviceReboot(bootReason);
     }
@@ -293,8 +291,9 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
         static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX,
                       "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
-        const SubscriptionStats subscriptionStats = mDeviceLoadStatusProvider->GetSubscriptionStats(encoder.AccessingFabricIndex());
-        const MessageStats messageStatistics      = mDeviceLoadStatusProvider->GetMessageStats();
+        const SubscriptionStats subscriptionStats =
+            mDiagnosticsContext.deviceLoadStatusProvider.GetSubscriptionStats(encoder.AccessingFabricIndex());
+        const MessageStats messageStatistics = mDiagnosticsContext.deviceLoadStatusProvider.GetMessageStats();
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
             .currentSubscriptions                  = subscriptionStats.numCurrentSubscriptions,
@@ -331,7 +330,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
     case GeneralDiagnostics::Commands::TestEventTrigger::Id: {
         GeneralDiagnostics::Commands::TestEventTrigger::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTestEventTrigger(request_data, mTestEventTriggerDelegate);
+        return HandleTestEventTrigger(request_data, mDiagnosticsContext.testEventTriggerDelegate);
     }
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
@@ -455,7 +454,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
-    if (mDiagnosticDataProvider != nullptr && mDiagnosticDataProvider->GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    if (mDiagnosticsContext.diagnosticDataProvider.GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
@@ -466,7 +465,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
             return CHIP_NO_ERROR;
         });
 
-        mDiagnosticDataProvider->ReleaseNetworkInterfaces(netifs);
+        mDiagnosticsContext.diagnosticDataProvider.ReleaseNetworkInterfaces(netifs);
     }
     else
     {
@@ -485,7 +484,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
     case GeneralDiagnostics::Commands::TestEventTrigger::Id: {
         GeneralDiagnostics::Commands::TestEventTrigger::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTestEventTrigger(request_data, mTestEventTriggerDelegate);
+        return HandleTestEventTrigger(request_data, mDiagnosticsContext.testEventTriggerDelegate);
     }
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
@@ -501,7 +500,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         {
             GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
             ReturnErrorOnFailure(request_data.Decode(input_arguments));
-            return HandlePayloadTestRequest(*handler, request.path, request_data, mTestEventTriggerDelegate);
+            return HandlePayloadTestRequest(*handler, request.path, request_data, mDiagnosticsContext.testEventTriggerDelegate);
         }
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
