@@ -338,7 +338,7 @@ def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) ->
 XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, Optional[ElementTree.Element]]
 
 
-def parse_revision_history(top_level: ElementTree.Element, location: ProblemLocation) -> tuple[dict[uint, str], list[ProblemNotice]]:
+def parse_revision_history(top_level: ElementTree.Element, location: ProblemLocation) -> tuple[dict[int, str], list[ProblemNotice]]:
     revision_desc = {}
     problems = []
     history = top_level.find('revisionHistory')
