@@ -211,6 +211,11 @@ struct SpanCopier
     static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
                            size_t maxCount = std::numeric_limits<size_t>::max())
     {
+        if (!destination.empty())
+        {
+            return CHIP_ERROR_IN_USE;
+        }
+
         if (source.empty())
         {
             destination = DataModel::List<const T>();
@@ -238,26 +243,47 @@ struct SpanCopier<char>
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
-    static CHIP_ERROR Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
-                           size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
     {
+        if (!destination.empty())
+        {
+            return CHIP_ERROR_IN_USE;
+        }
+
         if (source.size() > maxCount)
         {
             return CHIP_ERROR_INVALID_STRING_LENGTH;
         }
 
+        if (!source.empty())
+        {
+            char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
+            if (!buffer)
+                return CHIP_ERROR_NO_MEMORY;
+
+            std::copy(source.begin(), source.end(), buffer);
+            destination = CharSpan(buffer, source.size());
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
+                                     size_t maxCount = std::numeric_limits<size_t>::max())
+    {
         if (source.empty())
         {
             destination.SetNull();
             return CHIP_NO_ERROR;
         }
 
-        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
-        if (!buffer)
-            return CHIP_ERROR_NO_MEMORY;
-
-        std::copy(source.begin(), source.end(), buffer);
-        destination.SetNonNull(CharSpan(buffer, source.size()));
+        CharSpan tempSpan;
+        CHIP_ERROR err = Copy(source, tempSpan, maxCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+        destination.SetNonNull(tempSpan);
         return CHIP_NO_ERROR;
     }
 };
@@ -424,14 +450,14 @@ using ExtractNestedType_t = typename ExtractNestedType<U>::type;
  *   * Manages memory allocation/deallocation
  *   * Provides element-wise copy and cleanup
  * - For struct types:
- *   * Uses type-specific CopyData and CleanupStructValue specializations
+ *   * Uses type-specific CopyData and CleanupStruct specializations
  * - For primitive types:
  *   * Simple value storage with atomic update support
  *
  * @section memory_management Memory Management
  * The class handles automatic cleanup for:
  * - List memory (allocated via Platform::MemoryCalloc)
- * - Nested structs (via CleanupStructValue template)
+ * - Nested structs (via CleanupStruct template)
  * - Nullable state transitions
  *
  * @section usage_patterns Usage Patterns
@@ -486,19 +512,45 @@ public:
     virtual ~CTC_BaseDataClassBase() = default;
 
     // Common interface
-    virtual bool IsValid() const                   = 0;
-    virtual bool HasValue() const                  = 0;
-    virtual bool HasNewValue() const               = 0;
-    virtual CHIP_ERROR MarkAsAssigned()            = 0;
-    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) = 0;
-    virtual bool UpdateFinish(bool aUpdateAllow)   = 0;
-    virtual bool Cleanup()                         = 0;
-    virtual AttributeId GetAttrId() const          = 0;
+    virtual bool IsValid() const { return true; };
+    virtual bool HasValue() const { return false; };
+    virtual bool HasNewValue() const { return false; };
+    virtual CHIP_ERROR MarkAsAssigned() { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR UpdateBegin(void * aUpdCtx) { return CHIP_NO_ERROR; };
+    virtual bool UpdateFinish(bool aUpdateAllow) { return aUpdateAllow; };
+    virtual bool Cleanup() { return false; };
+    virtual AttributeId GetAttrId() const = 0;
 
     // Type-erased methods for generic access
-    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)        = 0;
-    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)     = 0;
-    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) = 0;
+    // Must be overridden in child template classes to provide type-safe access
+    /**
+     * @brief Gets a pointer to the internal current value storage.
+     * @param[out] outValue Set to point to the internal current value object.
+     *                      The pointer remains valid only while this object exists.
+     *                      Cast back to the specific type based on the child class's template specialization.
+     */
+    virtual CHIP_ERROR GetValueAsVoid(void *& outValue)
+    {
+        outValue = nullptr;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    };
+
+    /**
+     * @brief Gets a pointer to the internal pending new value storage during updates.
+     * @param[out] outValue Set to point to the internal pending value object.
+     *                      Cast back to the specific type based on the child class's template specialization.
+     */
+    virtual CHIP_ERROR GetNewValueAsVoid(void *& outValue)
+    {
+        outValue = nullptr;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    };
+
+    /**
+     * @brief Copies data from external source to internal pending storage.
+     * @param[in] value Pointer to external source data of the type matching the child class's template specialization.
+     */
+    virtual CHIP_ERROR SetNewValueFromVoid(const void * value) { return CHIP_ERROR_NOT_IMPLEMENTED; };
 };
 
 template <typename T>
@@ -856,13 +908,13 @@ public:
 
     /**
      * @brief Completes the update process
-     * @param[in] aUpdateAllow Whether to commit the changes
+     * @param[in] aUpdateAllowed Whether to commit the changes
      * @return true if value changed, false otherwise
      *
      * @post Always transitions state to kIdle
      * @note Performs cleanup of unused storage
      */
-    bool UpdateFinish(bool aUpdateAllow) override
+    bool UpdateFinish(bool aUpdateAllowed) override
     {
         bool ret = false;
         /* Skip if the attribute object has no new attached data */
@@ -871,7 +923,7 @@ public:
             return false;
         }
 
-        if (aUpdateAllow && (mUpdateState.load() == UpdateState::kValidated))
+        if (aUpdateAllowed && (mUpdateState.load() == UpdateState::kValidated))
         {
             SwapActiveValueStorage();
 
@@ -879,7 +931,6 @@ public:
         }
 
         CleanupByIdx(1 - mActiveValueIdx.load());
-
         mUpdateState.store(UpdateState::kIdle);
 
         return ret;
@@ -904,30 +955,33 @@ public:
     }
 
     /**
-     * @brief Cleans up an external list entry
-     * @param[in,out] entry The list entry to clean up
-     */
-    void CleanupExtListEntry(ListEntryType & entry) { CleanupStruct(entry); }
-
-    /**
      * @brief Gets the attribute ID
      * @return The attribute ID this instance manages
      */
     AttributeId GetAttrId() const override { return mAttrId; }
 
     // Type-erased implementations
+    /**
+     * @brief Returns a pointer to the current typed value
+     */
     CHIP_ERROR GetValueAsVoid(void *& outValue) override
     {
         outValue = static_cast<void *>(&GetValueRef());
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Returns a pointer to the pending new typed value
+     */
     CHIP_ERROR GetNewValueAsVoid(void *& outValue) override
     {
         outValue = static_cast<void *>(&GetNewValueRef());
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * @brief Sets new value from typed pointer
+     */
     CHIP_ERROR SetNewValueFromVoid(const void * value) override
     {
         if (value == nullptr)
@@ -1154,10 +1208,6 @@ private:
      * @param aValue Struct to clean up
      */
     void CleanupStruct(StructType & aValue);
-
-    //{
-    // CleanupStructValue<StructType>(aValue);
-    //}
 
     void * mAuxData = nullptr; ///< Validation context data
     const AttributeId mAttrId; ///< Managed attribute ID
