@@ -76,6 +76,9 @@
 // Change port to make it easy to run against tv-casting-app
 #define CHIP_PORT 5640
 
+// Enable MDNS fallback for casting clients with flaky mDNS
+#define CHIP_CONFIG_ENABLE_MDNS_FALLBACK 1
+
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
 #ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
