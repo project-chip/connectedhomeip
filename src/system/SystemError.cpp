@@ -58,19 +58,17 @@ namespace Internal {
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, std::source_location location)
 {
-    return (aError == 0 ? CHIP_NO_ERROR
-                        : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), location));
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, aError, location));
 }
 #elif CHIP_CONFIG_ERROR_SOURCE
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, const char * file, unsigned int line)
 {
-    return (aError == 0 ? CHIP_NO_ERROR
-                        : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), file, line));
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, aError, file, line));
 }
 #else
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
+    return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, aError));
 }
 #endif
 } // namespace Internal
@@ -193,8 +191,8 @@ DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
  */
 DLL_EXPORT CHIP_ERROR MapErrorLwIP(err_t aError)
 {
-    static_assert(ChipError::CanEncapsulate(-std::numeric_limits<err_t>::min()), "Can't represent all LWIP errors");
-    return (aError == ERR_OK ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kLwIP, static_cast<unsigned int>(-aError)));
+    static_assert(ChipError::CanEncapsulate(ChipError::Range::kLwIP, err_t{}), "Can't represent all LWIP errors");
+    return (aError == ERR_OK ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kLwIP, static_cast<int>(-aError)));
 }
 
 /**
