@@ -51862,13 +51862,10 @@ public class ChipClusters {
     private static final long AMBIENT_CONTEXT_TYPE_ATTRIBUTE_ID = 3L;
     private static final long AMBIENT_CONTEXT_TYPE_SUPPORTED_ATTRIBUTE_ID = 4L;
     private static final long SIMULTANEOUS_DETECTION_LIMIT_ATTRIBUTE_ID = 5L;
-    private static final long COUNT_THRESHOLD_REACHED_ATTRIBUTE_ID = 6L;
-    private static final long COUNT_THRESHOLD_ATTRIBUTE_ID = 7L;
-    private static final long OBJECT_COUNT_ATTRIBUTE_ID = 8L;
-    private static final long HOLD_TIME_ATTRIBUTE_ID = 9L;
-    private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 10L;
-    private static final long PREDICTED_ACTIVITY_ATTRIBUTE_ID = 11L;
-    private static final long PRIVACY_MODE_ENABLED_ATTRIBUTE_ID = 12L;
+    private static final long OBJECT_COUNT_REACHED_ATTRIBUTE_ID = 6L;
+    private static final long HOLD_TIME_ATTRIBUTE_ID = 7L;
+    private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 8L;
+    private static final long PREDICTED_ACTIVITY_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -52078,9 +52075,9 @@ public class ChipClusters {
         }, SIMULTANEOUS_DETECTION_LIMIT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readCountThresholdReachedAttribute(
+    public void readObjectCountReachedAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COUNT_THRESHOLD_REACHED_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_REACHED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -52088,12 +52085,12 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COUNT_THRESHOLD_REACHED_ATTRIBUTE_ID, true);
+        }, OBJECT_COUNT_REACHED_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeCountThresholdReachedAttribute(
+    public void subscribeObjectCountReachedAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COUNT_THRESHOLD_REACHED_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_REACHED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -52101,68 +52098,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, COUNT_THRESHOLD_REACHED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readCountThresholdAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COUNT_THRESHOLD_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, COUNT_THRESHOLD_ATTRIBUTE_ID, true);
-    }
-
-    public void writeCountThresholdAttribute(DefaultClusterCallback callback, Integer value) {
-      writeCountThresholdAttribute(callback, value, 0);
-    }
-
-    public void writeCountThresholdAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), COUNT_THRESHOLD_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeCountThresholdAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, COUNT_THRESHOLD_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, COUNT_THRESHOLD_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readObjectCountAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OBJECT_COUNT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeObjectCountAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OBJECT_COUNT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, OBJECT_COUNT_REACHED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readHoldTimeAttribute(
@@ -52250,32 +52186,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PREDICTED_ACTIVITY_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPrivacyModeEnabledAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePrivacyModeEnabledAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PRIVACY_MODE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
