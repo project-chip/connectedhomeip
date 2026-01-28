@@ -736,7 +736,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZPositionPersis
     mServer.GetLogic().SetTilt(Optional<int16_t>(testTilt));
     mServer.GetLogic().SetZoom(Optional<uint8_t>(testZoom));
 
-    // Verify that the values in the attribute are the values set 
+    // Verify that the values in the attribute are the values set
     Structs::MPTZStruct::DecodableType mptzPosition;
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
     ASSERT_EQ(mptzPosition.pan.Value(), testPan);
@@ -753,14 +753,14 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZPositionPersis
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
     ASSERT_EQ(mptzPosition.pan.Value(), testPan);
     ASSERT_EQ(mptzPosition.tilt.Value(), testTilt);
-    ASSERT_EQ(mptzPosition.zoom.Value(), testZoom);   
+    ASSERT_EQ(mptzPosition.zoom.Value(), testZoom);
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZPresetsPersistenceTest)
 {
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
-    ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZSavePreset::Id };    
+    ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZSavePreset::Id };
     Commands::MPTZSavePreset::DecodableType commandData;
 
     // Presets attribute should be empty
@@ -823,7 +823,7 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZPresetsPersist
         ASSERT_EQ(it.GetValue().settings.pan.Value(), kDefaultPan);
         ASSERT_EQ(it.GetValue().settings.tilt.Value(), kDefaultTilt);
         ASSERT_EQ(it.GetValue().settings.zoom.Value(), kDefaultZoom);
-    }    
+    }
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZStreamsPersistenceTest)
