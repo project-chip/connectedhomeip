@@ -237,6 +237,16 @@ public:
         }
     };
 
+    CHIP_ERROR SetAnchorRootCA(const ByteSpan & anchorRootCA)
+    {
+        if (anchorRootCA.size() >= sizeof(mAnchorRootCA))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mAnchorRootCALength = anchorRootCA.size();
+        memcpy(mAnchorRootCA, anchorRootCA.data(), mAnchorRootCALength);
+        return CHIP_NO_ERROR;
+    }
     ByteSpan GetAnchorRootCA() const { return ByteSpan(mAnchorRootCA, mAnchorRootCALength); }
 
     CHIP_ERROR SetAnchorNodeId(NodeId anchorNodeId)
@@ -271,6 +281,12 @@ public:
         return mGroupInformationEntries;
     }
 
+    void SetStatus(Clusters::JointFabricDatastore::DatastoreStateEnum state, uint32_t updateTimestamp, uint8_t failureCode)
+    {
+        mDatastoreStatusEntry.state           = state;
+        mDatastoreStatusEntry.updateTimestamp = updateTimestamp;
+        mDatastoreStatusEntry.failureCode     = failureCode;
+    }
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type & GetStatus() { return mDatastoreStatusEntry; }
 
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> & GetEndpointGroupIDList()
