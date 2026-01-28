@@ -49,8 +49,8 @@ public:
 #endif
     };
 
-    AppRootNode(const RootNodeDevice::Context & context, BitFlags<EnabledFeatures> kFeatures = {}) :
-        mEnabledFeatures(kFeatures),
+    AppRootNode(const RootNodeDevice::Context & context, BitFlags<EnabledFeatures> features = {}) :
+        mEnabledFeatures(features),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         mWiFiRootNodeDevice(context, { .wifiDriver = mWiFiDriver }),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
