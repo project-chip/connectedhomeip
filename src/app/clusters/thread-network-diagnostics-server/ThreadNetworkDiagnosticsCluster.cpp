@@ -122,7 +122,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
 {
     AttributeListBuilder listBuilder(builder);
 
-    constexpr DataModel::AttributeEntry fullAttributes[] = {
+    static constexpr DataModel::AttributeEntry fullAttributes[] = {
         // Mandatory Attributes
         Attributes::Channel::kMetadataEntry,          //
         RoutingRole::kMetadataEntry,                  //
@@ -192,6 +192,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
         OverrunCount::kMetadataEntry                       //
     };
 
+    // We only support minimal and full set of attributes because of flash considerations
     if (mClusterType == ClusterType::kMinimal)
     {
         return listBuilder.Append(Span(ThreadNetworkDiagnostics::Attributes::kMandatoryMetadata), {});

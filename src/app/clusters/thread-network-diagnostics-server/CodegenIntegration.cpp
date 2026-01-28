@@ -92,8 +92,10 @@ public:
                                                                 RxErrFcsCount::Id,
                                                                 RxErrOtherCount::Id };
 
+        // We only support minimal and full set of attributes because of flash considerations
         VerifyOrDie(featureMap.Raw() == 0 || featureMap.Raw() == 0xF);
 
+        // For the full set of attributes, every optional attribute needs to be enabled in ember as a precondition
         if (featureMap.Raw() == 0xF)
         {
             for (auto id : optionalAttributeIds)

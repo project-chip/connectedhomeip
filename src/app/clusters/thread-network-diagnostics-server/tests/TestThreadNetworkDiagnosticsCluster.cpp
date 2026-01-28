@@ -78,7 +78,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
             threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
             CHIP_NO_ERROR);
 
-        constexpr DataModel::AttributeEntry fullAttributes[] = {
+        static constexpr DataModel::AttributeEntry fullAttributes[] = {
             // Mandatory Attributes
             Attributes::Channel::kMetadataEntry,          //
             RoutingRole::kMetadataEntry,                  //
