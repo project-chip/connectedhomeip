@@ -146,49 +146,16 @@ private:
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
 
-    // Size calculation for TransportOptionsStorage:
-    // - mUrlBuffer: kMaxUrlLength (2000)
-    // - mTriggerOptionsStorage: ~97 bytes
-    //   - triggerType: 1 byte
-    //   - mTransportZoneOptions: Vector overhead + CHIP_CONFIG_MAX_NUM_ZONES * (~5 bytes/zone) = ~80 bytes
-    //   - motionSensitivity: ~2 bytes
-    //   - motionTimeControl: ~9 bytes
-    //   - maxPreRollLen: ~5 bytes
-    // - mContainerOptionsStorage: ~65 bytes
-    //   - containerType: 1 byte
-    //   - mCMAFContainerStorage: ~64 bytes
-    //     - CMAFInterface: 1 byte
-    //     - segmentDuration: 2 bytes
-    //     - chunkDuration: 2 bytes
-    //     - sessionGroup: ~9 bytes
-    //     - mTrackNameBuffer: 16 bytes
-    //     - mCENCKeyBuffer: 16 bytes
-    //     - mCENCKeyIDBuffer: 16 bytes
-    //     - metadataEnabled: ~2 bytes
-    // - Base TransportOptionsStruct members: ~15 bytes
-    //   - streamUsage: 1 byte
-    //   - videoStreamID: ~3 bytes
-    //   - audioStreamID: ~3 bytes
-    //   - TLSEndpointID: 2 bytes
-    //   - ingestMethod: 1 byte
-    //   - expiryTime: ~5 bytes
-    // Total for TransportOptionsStorage: 2000 + 97 + 65 + 15 = ~2177 bytes
-    // TLV overhead for TransportOptionsStorage: ~40 bytes
-    // Serialized size of transportOptions: ~2217 bytes. Pad to 2400
-
-    static constexpr size_t kMaxOneCurrentConnectionSerializedSize = TLV::EstimateStructOverhead(
-        sizeof(uint16_t),                                   // connectionID (2)
-        sizeof(uint8_t),                                    // transportStatus (1)
-        2400,                                               // transportOptions
-        sizeof(uint32_t),                                   // expiryTime (4)
-        sizeof(uint64_t)                                    // fabricIndex (8)
-    ); // Adds ~10 bytes for tags/types = ~2430 bytes
+    static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
+        TLV::EstimateStructOverhead(sizeof(uint16_t),                                    // connectionID
+                                    sizeof(uint8_t),                                     // transportStatus
+                                    PushAvStreamTransport::kTransportOptionsStorageSize, // estimated transportOptions
+                                    sizeof(uint64_t)                                     // fabricIndex
+        );
 
     // Max size for the TLV-encoded array of CurrentConnection structs
-    // Assuming CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS = 4
-    // Array overhead: ~2 bytes
-    // Total: 2 + (4 * 2430) = 9722 bytes. Rounded up to 10000 for safety.
-    static constexpr size_t kMaxCurrentConnectionsSerializedSize = 10000;
+    static constexpr size_t kMaxCurrentConnectionsSerializedSize =
+        2 /* ArrayTlvOverhead */ + (CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true

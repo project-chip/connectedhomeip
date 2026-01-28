@@ -2059,6 +2059,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
 #define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 4
 #endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_ZONES
+ *
+ * @brief The maximum number of zones
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_ZONES
+#define CHIP_CONFIG_MAX_NUM_ZONES 16
+#endif // CHIP_CONFIG_MAX_NUM_ZONES
 /**
  * @}
  */
