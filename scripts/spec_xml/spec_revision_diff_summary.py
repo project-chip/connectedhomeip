@@ -129,7 +129,7 @@ def diff_device_types(prior_revision: PrebuiltDataModelDirectory, new_revision: 
 
 
 def _get_provisional(items):
-    return set([e.name for e in items if e.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL])
+    return set(e.name for e in items if e.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL)
 
 
 def get_provisional_diff(rev1: PrebuiltDataModelDirectory, rev2: PrebuiltDataModelDirectory):

@@ -1155,8 +1155,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 ret[id].write_access = override.write_access
 
         for attr_id, attribute in ret.items():
-            if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and
-            attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
+            if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
                 location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attr_id)
                 problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                               severity=ProblemSeverity.WARNING, problem=f'Attribute {attribute.name} (ID: {attr_id}) in cluster {cluster_id} has unknown read and write access after combining base and derived values.'))
