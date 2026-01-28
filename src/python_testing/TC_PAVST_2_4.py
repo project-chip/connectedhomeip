@@ -197,7 +197,7 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aTransportOptions.expiryTime = aModifiedTransportOptions
         aTransportOptions.videoStreams = []
         aTransportOptions.audioStreams = []
-       
+
         cmd = pvcluster.Commands.ModifyPushTransport(
             connectionID=aConnectionID,
             transportOptions=aTransportOptions,
