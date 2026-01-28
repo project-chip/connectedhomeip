@@ -27,6 +27,8 @@
 #       --passcode 20202021
 #       --KVS /tmp/chip_kvs_requestor
 #       --autoApplyImage
+#       --secured-device-port 5540
+#       --periodicQueryTimeout 10
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -137,7 +139,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         logger.info(f"TH1 fabric id: {self.th1.fabricId}.")
         logger.info(f"TH2 fabric id: {self.fabric_id_th2}.")
 
-        # Start OTA Provider
+        # Start OTA Provider 1
         logger.info("Starting OTA Provider 1")
 
         extra_arguments = ['--app-pipe', self.fifo_in, '--app-pipe-out', self.fifo_out]
@@ -269,12 +271,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             asserts.assert_equal(location_basic_information, location,
                                  f"Location is {location} and it should be {location_basic_information}")
 
-        # Stop provider
-        await asyncio.sleep(2)
+        # Terminate provider 1
         self.terminate_provider()
-
-        self.th1.ExpireSessions(nodeId=self.p1_node)
-        await asyncio.sleep(2)
 
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P
         self.step(2)
@@ -285,7 +283,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             ota_image_path=self.image,
             setup_pincode=self.p_pass,
             discriminator=self.p2_disc,
-            port=self.provider_port,
+            port=self.provider_port+1,
             kvs_path='/tmp/chip_kvs_provider_2',
             log_file='/tmp/provider_2.log',
             expected_output=""
@@ -295,7 +293,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         logger.info("Setting up TH2.")
         th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=self.vendor_id, fabricId=self.fabric_id_th2)
-        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        th2 = th2_fabric_admin.NewController(nodeId=1002, useTestCommissioner=True)
 
         logger.info("Opening commissioning window on DUT.")
         params = await self.open_commissioning_window(self.th1, self.dut_node_id)
@@ -312,6 +310,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         logger.info(f"TH2 commissioned: {resp}.")
 
+        await asyncio.sleep(2)
+
         # Commissioning Provider-TH2
         logger.info("Commissioning OTA Provider to TH2")
 
@@ -324,12 +324,14 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         logger.info(f"Commissioning response: {resp}.")
 
+        await asyncio.sleep(2)
+
         # ACL permissions are not required
 
-        # Event Handler
+        # Create event Handler
         event_cb = EventSubscriptionHandler(expected_cluster=requestorCluster)
-        await event_cb.start(dev_ctrl=self.th1, node_id=self.requestor_node_id, endpoint=self.endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        await event_cb.start(dev_ctrl=th2, node_id=self.requestor_node_id, endpoint=self.endpoint,
+                             fabric_filtered=False, min_interval_sec=1, max_interval_sec=30)
 
         # Write default OTA providers TH1 with p1_node which does not exist
         await self.set_default_ota_providers_list(self.th1, self.p1_node_invalid, self.requestor_node_id, self.endpoint)
@@ -350,25 +352,15 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kIdle, idle_event.newState,
                              f"New state is {idle_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kIdle}")
 
-        event_cb.reset()
-        event_cb.cancel()
-        await asyncio.sleep(2)
-
-        # Subscribe to events
-        event_cb = EventSubscriptionHandler(expected_cluster=requestorCluster)
-        await event_cb.start(dev_ctrl=th2, node_id=self.requestor_node_id, endpoint=self.endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-
         # Define ACL entry
         await self.create_acl_entry(dev_ctrl=th2, provider_node_id=self.p2_node, requestor_node_id=self.requestor_node_id)
 
         # Write default OTA providers TH2
         await self.set_default_ota_providers_list(th2, self.p2_node, self.requestor_node_id, self.endpoint)
 
-        # Announce after subscription
-        await self.announce_ota_provider(controller=th2, provider_node_id=self.p2_node, requestor_node_id=self.requestor_node_id, vendor_id=self.vendor_id, endpoint=self.endpoint)
+        # Do not announce provider 2
 
-        event_idle_to_querying = event_cb.wait_for_event_report(requestorCluster.Events.StateTransition, 50)
+        event_idle_to_querying = event_cb.wait_for_event_report(requestorCluster.Events.StateTransition, 300)
 
         self.verify_state_transition_event(event_report=event_idle_to_querying,
                                            expected_previous_state=requestorCluster.Enums.UpdateStateEnum.kIdle, expected_new_state=requestorCluster.Enums.UpdateStateEnum.kQuerying)
@@ -378,11 +370,15 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         self.verify_state_transition_event(event_report=event_querying_to_downloading,
                                            expected_previous_state=requestorCluster.Enums.UpdateStateEnum.kQuerying, expected_new_state=requestorCluster.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.target_version)
 
+        # Terminate provider 2
+        self.terminate_provider()
+
         event_cb.reset()
         event_cb.cancel()
 
         await self.clear_ota_providers(controller=th2, requestor_node_id=self.requestor_node_id)
 
+        self.th1.ExpireSessions(nodeId=self.p1_node)
         th2.ExpireSessions(nodeId=self.p2_node)
 
 
