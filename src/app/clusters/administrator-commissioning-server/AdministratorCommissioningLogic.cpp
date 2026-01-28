@@ -105,17 +105,19 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     const AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
-    ChipLogProgress(Zcl, "Received command to close commissioning window");
+    ChipLogProgress(Zcl, "Received RevokeCommissioning command");
 
-    Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+    auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
 
-    if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
+
+    if (!commissionMgr.IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
         return ClusterStatusCode::ClusterSpecificFailure(StatusCode::kWindowNotOpen);
     }
 
-    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    commissionMgr.CloseCommissioningWindow();
     ChipLogProgress(Zcl, "Commissioning window is now closed");
     return Status::Success;
 }

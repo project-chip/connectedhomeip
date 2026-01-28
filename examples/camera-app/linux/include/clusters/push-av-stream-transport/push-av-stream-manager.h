@@ -132,6 +132,8 @@ public:
 
     CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override;
+
     void HandleZoneTrigger(uint16_t zoneId);
 
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
