@@ -93,7 +93,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
-Credentials::GroupDataProviderImpl gGropupDataProvider;
+Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -204,7 +204,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .fabricTable            = Server::GetInstance().GetFabricTable(),                //
                 .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
                 .platformManager        = DeviceLayer::PlatformMgr(),                            //
-                .groupDataProvider      = gGropupDataProvider,                                   //
+                .groupDataProvider      = gGroupDataProvider,                                   //
                 .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
                 .dnssdServer            = DnssdServer::Instance(),                               //
 
