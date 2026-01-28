@@ -23,7 +23,6 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
-#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
 #include <system/SystemClock.h>
