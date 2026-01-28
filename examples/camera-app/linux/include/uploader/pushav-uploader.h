@@ -78,6 +78,5 @@ private:
     std::mutex mQueueMutex;
     std::atomic<bool> mIsRunning;
     std::thread mUploaderThread;
-    std::pair<std::string, std::string> mMPDPath;
     std::vector<std::string> mStreamIdNameMap;
 };

@@ -271,14 +271,15 @@ void PushAVTransport::InitializeRecorder()
 {
     if (mRecorder.get() == nullptr)
     {
-        mClipInfo.mSessionNumber = mSessionNumber++;
+        mSessionStartedTimestamp = std::chrono::system_clock::time_point();
+        mClipInfo.mSessionNumber = mSessionNumber;
         mRecorder                = std::make_unique<PushAVClipRecorder>(mClipInfo, mAudioInfo, mVideoInfo, mUploader.get());
         mRecorder->SetFabricIndex(mFabricIndex);
         mRecorder->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
         mRecorder->SetConnectionInfo(mConnectionID, mTransportTriggerType,
                                      chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>());
         ChipLogProgress(Camera, "PushAVTransport, Initialize Recorder done !!! FabricIdx: %u Session Id: %ld", mFabricIndex,
-                        mSessionNumber - 1);
+                        mClipInfo.mSessionNumber);
     }
     else
     {
@@ -705,6 +706,14 @@ CHIP_ERROR PushAVTransport::ModifyPushTransport(const TransportOptionsStorage & 
         ChipLogError(Camera, "Failed to modify push transport settings for connection %u: %s", mConnectionID, chip::ErrorStr(err));
         return err;
     }
+
+    if (mRecorder)
+    {
+        mStreaming = false;
+        UpdateSendFlags();
+        mRecorder.reset();
+        InitializeRecorder();
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -725,6 +734,7 @@ void PushAVTransport::CheckAndUpdateSession()
     if (mSessionStartedTimestamp == std::chrono::system_clock::time_point())
     {
         mSessionStartedTimestamp = now;
+        mSessionNumber++;
         ChipLogProgress(Camera, "Transport[%u] Session[%lu] SESSION_STARTED: First session initialized for Track=%s", mConnectionID,
                         mSessionNumber, mClipInfo.mTrackName.c_str());
         return;
