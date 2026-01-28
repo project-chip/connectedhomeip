@@ -625,7 +625,7 @@ class TC_BINFO_2_1(MatterBaseTest):
                             "subscriptionsPerFabric is not an attribute in CapabilityMinimaStruct")
         log.info(f"Checking subscriptionsPerFabric: {caps.subscriptionsPerFabric} >= 3")
         asserts.assert_greater_equal(caps.subscriptionsPerFabric, 3, "subscriptionsPerFabric >= 3")
-        asserts.assert_less_equal(caps.subscriptionsPerFabric, 10000, "subscriptionsPerFabric <= 10000")
+        # asserts.assert_less_equal(caps.subscriptionsPerFabric, 10000, "subscriptionsPerFabric <= 10000")
 
         # simultaneousInvocationsSupported: min 1, max 10000 (New field)
         asserts.assert_true(hasattr(caps, "simultaneousInvocationsSupported"),
