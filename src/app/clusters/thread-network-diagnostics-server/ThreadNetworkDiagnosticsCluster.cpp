@@ -45,7 +45,7 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
     case ClusterRevision::Id:
         return encoder.Encode(ThreadNetworkDiagnostics::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode<uint32_t>(mClusterType == ClusterType::kMinimal ? 0 : 0xF);
+        return encoder.Encode<uint32_t>(mClusterType == ClusterType::kMinimal ? 0 : kFeaturesAll);
     default:
         // Since ReadAttribute() is invoked only for valid attributes this is safe
         return WriteThreadNetworkDiagnosticAttributeToTlv(request.path.mAttributeId, encoder);
