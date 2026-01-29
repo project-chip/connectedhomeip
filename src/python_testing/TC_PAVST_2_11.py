@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/pavst_2_11_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${PUSH_AV_SERVER}
@@ -33,6 +33,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/pavst_2_11_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -284,7 +285,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step(10)
         if self.pics_guard(self.check_pics("PAVST.S")):
             aProvisionedEndpoints = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=tlscluster, attribute=tlsattr
+                endpoint=endpoint, cluster=tlscluster, attribute=tlsattr.ProvisionedEndpoints
             )
             log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
 

@@ -92,7 +92,7 @@ jobs:
             - name: "Print Actor"
               run: echo ${{github.actor}}
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Generate
               run: scripts/helpers/doxygen.sh
             - name: Extract branch name
