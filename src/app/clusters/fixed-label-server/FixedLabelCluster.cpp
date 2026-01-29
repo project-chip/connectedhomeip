@@ -46,7 +46,7 @@ private:
     DeviceLayer::DeviceInfoProvider::FixedLabelIterator * mIterator;
 };
 
-CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider * provider)
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider & provider)
 {
     AutoReleaseIterator it(provider, endpoint);
     VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
