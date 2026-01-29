@@ -534,8 +534,8 @@ template("siwx917_sdk") {
 
       config("siwx917_tinycrypt_config") {
         defines = [
-          "MBEDTLS_CONFIG_FILE=<sl_mbedtls_config.h>",
           "SL_MBEDTLS_USE_TINYCRYPT",
+          "MBEDTLS_CONFIG_FILE=<sl_mbedtls_config.h>",
           "MBEDTLS_USER_CONFIG_FILE=<siwx917-chip-mbedtls-config.h>",
         ]
 
