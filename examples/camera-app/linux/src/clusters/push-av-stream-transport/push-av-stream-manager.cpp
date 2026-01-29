@@ -120,30 +120,24 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         return Status::NotFound;
     }
 
-    /*
-    Initialize video, audio stream ids with default invalid value (UINT16_MAX = 65535)
-    This is necessary because the MediaController API expects these values to be set.
-    If any of video/audio stream id is absent in the transport options,UINT16_MAX max is used as default value.
-    */
-    uint16_t videoStreamID = -1;
-    uint16_t audioStreamID = -1;
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
 
-    // TODO: Supporting single video stream and single audio stream. This logic need to be updated for all the streams
-    //  in future for application as part of 1.5.1
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
-        videoStreamID = transportOptions.videoStreamID.Value().Value();
+        videoStreams.push_back(transportOptions.videoStreamID.Value().Value());
     }
 
     if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
     {
-        audioStreamID = transportOptions.audioStreamID.Value().Value();
+        audioStreams.push_back(transportOptions.audioStreamID.Value().Value());
     }
 
-    ChipLogProgress(
-        Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
-        connectionID, videoStreamID, audioStreamID);
-    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreamID, audioStreamID);
+    ChipLogProgress(Camera,
+                    "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreams count: [%u], "
+                    "audioStreams count: [%u]",
+                    connectionID, static_cast<unsigned>(videoStreams.size()), static_cast<unsigned>(audioStreams.size()));
+    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreams, audioStreams);
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
     uint32_t newTransportBandwidthbps = 0;

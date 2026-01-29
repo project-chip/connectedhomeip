@@ -33,8 +33,9 @@ public:
     DefaultMediaController() {}
     virtual ~DefaultMediaController() {}
     // Transports register themselves with the media-controller for receiving
-    // media from stream sources.
-    void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) override;
+    // media from stream sources. Supports multiple video and audio streams per transport.
+    void RegisterTransport(Transport * transport, const std::vector<uint16_t> & videoStreams,
+                           const std::vector<uint16_t> & audioStreams) override;
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
     void UnregisterTransport(Transport * transport) override;

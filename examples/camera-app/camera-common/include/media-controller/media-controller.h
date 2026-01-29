@@ -27,8 +27,8 @@
 struct Connection
 {
     Transport * transport;
-    uint16_t videoStreamID;
-    uint16_t audioStreamID;
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
 };
 
 // Media Controller
@@ -38,8 +38,9 @@ public:
     MediaController() {}
     virtual ~MediaController() {}
     // Transports register themselves with the media-controller for receiving
-    // media from stream sources.
-    virtual void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
+    // media from stream sources. Supports multiple video and audio streams per transport.
+    virtual void RegisterTransport(Transport * transport, const std::vector<uint16_t> & videoStreams,
+                                   const std::vector<uint16_t> & audioStreams) = 0;
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
     virtual void UnregisterTransport(Transport * transport) = 0;
