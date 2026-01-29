@@ -19,7 +19,6 @@
 import asyncio
 import logging
 
-from matter import discovery
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
