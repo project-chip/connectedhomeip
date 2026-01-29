@@ -32,6 +32,7 @@ source_set("root-node") {
     "${chip_root}/src/app/clusters/group-key-mgmt-server",
     "${chip_root}/src/app/clusters/operational-credentials-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server",
+    "${chip_root}/src/app/clusters/user-label-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
