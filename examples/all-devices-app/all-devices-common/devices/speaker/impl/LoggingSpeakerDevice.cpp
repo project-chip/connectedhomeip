@@ -63,11 +63,11 @@ void LoggingSpeakerDevice::OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t>
     }
 }
 
-void LoggingSpeakerDevice::SetOnOff(bool on)
+CHIP_ERROR LoggingSpeakerDevice::SetOnOff(bool on)
 {
     ChipLogProgress(AppServer, "LoggingSpeakerDevice: Request to %s Speaker (Mute/Unmute)", on ? "Unmute" : "Mute");
     // Forward to OnOff Cluster
-    LogErrorOnFailure(OnOffCluster().SetOnOff(on));
+    return OnOffCluster().SetOnOff(on);
 }
 
 bool LoggingSpeakerDevice::GetOnOff()

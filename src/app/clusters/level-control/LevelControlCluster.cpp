@@ -313,7 +313,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
 
     if (IsWithOnOffCommand(commandId))
     {
-        SetOnOff(true);
+        ReturnErrorOnFailure(SetOnOff(true));
     }
     else if (!ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
@@ -330,7 +330,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
         CHIP_ERROR status = SetCurrentLevel(level);
         if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && level == mMinLevel)
         {
-            SetOnOff(false);
+            ReturnErrorOnFailure(SetOnOff(false));
         }
         return status;
     }
@@ -357,7 +357,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
         CHIP_ERROR status = SetCurrentLevel(mTargetLevel);
         if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && mTargetLevel == mMinLevel)
         {
-            SetOnOff(false);
+            ReturnErrorOnFailure(SetOnOff(false));
         }
         return status;
     }
@@ -377,7 +377,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
 
     if (IsWithOnOffCommand(commandId) && moveMode == MoveModeEnum::kUp)
     {
-        SetOnOff(true);
+        ReturnErrorOnFailure(SetOnOff(true));
     }
     else if (!ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
@@ -413,6 +413,10 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     uint8_t currentLevel = mCurrentLevel.value().Value();
     uint8_t difference   = (mIncreasing ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel));
     mTickDurationMs      = 1000 / currentRate;
+    if (mTickDurationMs == 0)
+    {
+        mTickDurationMs = 1;
+    }
 
     StartTransition(mTickDurationMs, difference * mTickDurationMs);
     return Status::Success;
@@ -433,7 +437,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
     // For Step(Up), we might go above MinLevel (if we are at MinLevel).
     if (IsWithOnOffCommand(commandId) && stepMode == StepModeEnum::kUp)
     {
-        SetOnOff(true);
+        ReturnErrorOnFailure(SetOnOff(true));
     }
     // Spec: "Command execution SHALL NOT continue beyond the Options processing if...
     // The OnOff attribute... is FALSE." (Unless ExecuteIfOff is set)
@@ -477,7 +481,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
         // the OnOff attribute... SHALL be set to FALSE"
         if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && mTargetLevel == mMinLevel)
         {
-            SetOnOff(false);
+            ReturnErrorOnFailure(SetOnOff(false));
         }
         return status;
     }
@@ -603,14 +607,15 @@ bool LevelControlCluster::IsValidLevel(uint8_t level)
     return isBelowGlobalMax && validMin && validMax;
 }
 
-void LevelControlCluster::SetOnOff(bool on)
+CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 {
-    VerifyOrReturn(mFeatureMap.Has(Feature::kOnOff) && !(on && mDelegate.GetOnOff()));
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff) && !(on && mDelegate.GetOnOff()), CHIP_NO_ERROR);
 
     // Prevent potential callback loops
     mTemporarilyIgnoreOnOffCallbacks = true;
-    mDelegate.SetOnOff(on);
+    CHIP_ERROR err                   = mDelegate.SetOnOff(on);
     mTemporarilyIgnoreOnOffCallbacks = false;
+    return err;
 }
 
 void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, ReportingMode mode)
@@ -690,7 +695,7 @@ void LevelControlCluster::TimerFired()
         // If reached minimum, turn off OnOff cluster
         if (IsWithOnOffCommand(mCurrentCommandId) && (currentLevel == mMinLevel || currentLevel == 0))
         {
-            SetOnOff(false);
+            LogErrorOnFailure(SetOnOff(false));
         }
         return;
     }

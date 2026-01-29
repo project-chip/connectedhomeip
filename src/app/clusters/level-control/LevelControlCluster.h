@@ -47,13 +47,13 @@ class LevelControlCluster : public DefaultServerCluster, public TimerContext, pu
 {
 public:
     // Helper set for managing optional attributes availability based on configuration.
-    using OptionalAttributes = app::OptionalAttributeSet< //
-        LevelControl::Attributes::MinLevel::Id,           //
-        LevelControl::Attributes::MaxLevel::Id,           //
-        LevelControl::Attributes::OnOffTransitionTime::Id,
-        LevelControl::Attributes::OnTransitionTime::Id, //
-        LevelControl::Attributes::OffTransitionTime::Id,
-        LevelControl::Attributes::DefaultMoveRate::Id //
+    using OptionalAttributes = app::OptionalAttributeSet<  //
+        LevelControl::Attributes::MinLevel::Id,            //
+        LevelControl::Attributes::MaxLevel::Id,            //
+        LevelControl::Attributes::DefaultMoveRate::Id,     //
+        LevelControl::Attributes::OnOffTransitionTime::Id, //
+        LevelControl::Attributes::OnTransitionTime::Id,    //
+        LevelControl::Attributes::OffTransitionTime::Id    //
         >;
 
     constexpr static uint8_t kLightingMinLevel = 1;
@@ -259,7 +259,7 @@ private:
 
     // Helpers
     bool IsValidLevel(uint8_t level);
-    void SetOnOff(bool on);
+    CHIP_ERROR SetOnOff(bool on);
     bool ShouldExecuteIfOff(BitMask<LevelControl::OptionsBitmap> optionsMask, BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
     // Setup and start the transition
