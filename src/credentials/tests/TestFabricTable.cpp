@@ -595,10 +595,10 @@ TEST_F(TestFabricTable, TestSetLastKnownGoodTime)
     }
 }
 
-// This test validates that the ICAC is properly validated per the specification. In particular, an ICAC is identified by its
-// subject DN encoding exactly one matter-icac-id attribute and none of the prohibited attributes (such as matter-rcac-id).
-// Therefore passing a root certificate as the ICAC must be rejected.
-TEST_F(TestFabricTable, ShouldFailAddNocUpdateNocIfIcacIsNotIcac)
+//  This test validates that the ICAC is properly validated per the specification. In particular, an ICAC is identified by its
+//  subject DN encoding exactly one matter-icac-id attribute and none of the prohibited attributes (such as matter-rcac-id).
+//  Therefore passing a root certificate as the ICAC must be rejected.
+TEST_F(TestFabricTable, FailAddNocAndUpdateNocIfIcacSubjectDnIsInvalid)
 {
     chip::TestPersistentStorageDelegate storage;
 
@@ -616,8 +616,9 @@ TEST_F(TestFabricTable, ShouldFailAddNocUpdateNocIfIcacIsNotIcac)
     memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_02_PublicKey.size(),
            TestCerts::sTestCert_Node01_02_PrivateKey.data(), TestCerts::sTestCert_Node01_02_PrivateKey.size());
 
-    // sTestCert_Node01_02_Chip is chained directly to sTestCert_Root01_Chip, with no ICAC in the chain. These tests intentionally
-    // pass the root certificate as the ICAC to verify compliant ICAC validation.
+    // sTestCert_Node01_02_Chip is chained directly to sTestCert_Root01_Chip, with no ICAC in the chain.
+    // These tests intentionally pass RCAC as the ICAC to verify that a certificate whose subject DN encodes matter-rcac-id and not
+    // matter-icac-id is rejected.
     ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip);
     ByteSpan icacSpan(TestCerts::sTestCert_Root01_Chip);
     ByteSpan nocSpan(TestCerts::sTestCert_Node01_02_Chip);
@@ -626,7 +627,8 @@ TEST_F(TestFabricTable, ShouldFailAddNocUpdateNocIfIcacIsNotIcac)
                                               TestCerts::sTestCert_Node01_02_PrivateKey.size()));
     EXPECT_SUCCESS(opKey_Node01_02.Deserialize(opKeysSerialized));
 
-    // Test 1: AddNOC must reject a certificate that does not meet ICAC subject DN requirements.
+    // Test 1: AddNOC must reject a certificate presented as an ICAC whose subject DN encodes matter-rcac-id instead of
+    // matter-icac-id.
     {
         EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
 
@@ -637,9 +639,9 @@ TEST_F(TestFabricTable, ShouldFailAddNocUpdateNocIfIcacIsNotIcac)
         fabricTable.RevertPendingFabricData();
     }
 
-    // Test 2: UpdateNOC must reject a certificate that does not meet ICAC subject DN requirements.
+    // Test 2: UpdateNOC must reject a certificate presented as an ICAC whose subject DN encodes matter-rcac-id instead of
+    // matter-icac-id.
     {
-
         EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
         EXPECT_SUCCESS(fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, ByteSpan{}, VendorId::TestVendor1,
                                                                         &opKey_Node01_02,
@@ -654,6 +656,21 @@ TEST_F(TestFabricTable, ShouldFailAddNocUpdateNocIfIcacIsNotIcac)
         EXPECT_EQ(CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
                   fabricTable.UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan,
                                                                          FabricTable::AdvertiseIdentity::No));
+    }
+
+    // Test 3: Directly validate that the shared VerifyCredentials method used by both AddNOC and UpdateNOC rejects a certificate
+    // presented as an ICAC whose subject DN encodes matter-rcac-id instead of matter-icac-id.
+    {
+        Credentials::ValidationContext validContext;
+        CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
+        NodeId nodeId                         = kUndefinedNodeId;
+        FabricId fabricId                     = kUndefinedFabricId;
+        Crypto::P256PublicKey nocPubKey;
+        Crypto::P256PublicKey rootPublicKey;
+
+        EXPECT_EQ(CHIP_ERROR_WRONG_CERT_DN,
+                  fabricTable.VerifyCredentials(nocSpan, icacSpan, rcacSpan, validContext, compressedFabricId, fabricId, nodeId,
+                                                nocPubKey, &rootPublicKey));
     }
 }
 
