@@ -138,6 +138,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
     # WebRTCTransportProvider is for Camera and is intended to run on devices that are capable of handling these types.
     'src/app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h': {'string', 'vector'},
+    'src/app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.cpp': {'set'},
     # Camera AV Stream Management and Camera AV Settings User Level Management clusters are expected to run on resource-capable devices
     'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h': {'vector'},
     'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp': {'set'},
