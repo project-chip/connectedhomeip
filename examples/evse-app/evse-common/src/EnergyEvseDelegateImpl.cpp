@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <app/reporting/reporting.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -1373,9 +1374,11 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
     GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, mImportedMeterValueAtEnergyTransferStart);
     event.maximumCurrent = mMaximumChargeCurrent;
 
+    Instance * instance = GetInstance();
+    VerifyOrReturnError(instance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
     /* For V2X we may switch between charging and discharging, but we don't
      * keep sending EnergyTransferStarted events */
-    if (GetInstance()->HasFeature(Feature::kV2x))
+    if (instance->HasFeature(Feature::kV2x))
     {
         /* Sample the energy meter for discharging */
         GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, mExportedMeterValueAtEnergyTransferStart);
@@ -1416,7 +1419,10 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
     GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, meterValueNow);
     event.energyTransferred = meterValueNow - mImportedMeterValueAtEnergyTransferStart;
 
-    if (GetInstance()->HasFeature(Feature::kV2x))
+    Instance * instance = GetInstance();
+    VerifyOrReturnError(instance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+
+    if (instance->HasFeature(Feature::kV2x))
     {
         GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, meterValueNow);
         event.energyDischarged.SetValue(mExportedMeterValueAtEnergyTransferStart - meterValueNow);
