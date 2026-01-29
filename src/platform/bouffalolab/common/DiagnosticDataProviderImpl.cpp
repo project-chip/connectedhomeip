@@ -264,7 +264,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMax
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    NetworkInterface * ifp = new NetworkInterface();
+    auto ifp = std::make_unique<NetworkInterface>();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
@@ -273,12 +273,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+    TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, sizeof(ifp->MacAddress));
 #else
 
     struct netif * netif = deviceInterface_getNetif();
+    if (netif == nullptr)
+    {
+        *netifpp = nullptr;
+        return CHIP_ERROR_NOT_FOUND;
+    }
 
     Platform::CopyString(ifp->Name, netif->name);
     ifp->name           = CharSpan::fromCharString(ifp->Name);
@@ -290,31 +294,31 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #endif
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-
     memcpy(ifp->MacAddress, netif->hwaddr, sizeof(netif->hwaddr));
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress, sizeof(netif->hwaddr));
-
-    memcpy(ifp->Ipv4AddressesBuffer[0], netif_ip_addr4(netif), kMaxIPv4AddrSize);
-    ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
-    ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
-
-    int addr_count = 0;
-    for (size_t i = 0; (i < LWIP_IPV6_NUM_ADDRESSES) && (i < kMaxIPv6AddrCount); i++)
-    {
-        if (!ip6_addr_isany(&(netif->ip6_addr[i].u_addr.ip6)))
-        {
-            memcpy(ifp->Ipv6AddressesBuffer[addr_count], &(netif->ip6_addr[i].u_addr.ip6), sizeof(ip6_addr_t));
-            ifp->Ipv6AddressSpans[addr_count] = ByteSpan(ifp->Ipv6AddressesBuffer[addr_count], kMaxIPv6AddrSize);
-            addr_count ++;
-        }
-    }
-    ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, addr_count);
 #endif
 
-    *netifpp = ifp;
+    // IPv6-only support
+    Inet::InterfaceAddressIterator interfAddrIterator;
+    uint8_t ipv6AddressesCount = 0;
+    while (interfAddrIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+    {
+        chip::Inet::IPAddress ipv6Address;
+        if (interfAddrIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+        {
+            memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+            ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+            ipv6AddressesCount++;
+        }
+        interfAddrIterator.Next();
+    }
+    ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+
+    *netifpp = ifp.release();
 
     return CHIP_NO_ERROR;
 }
+
 
 void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
 {
