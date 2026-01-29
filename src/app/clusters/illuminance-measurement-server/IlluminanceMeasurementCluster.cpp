@@ -69,13 +69,16 @@ CHIP_ERROR IlluminanceMeasurementCluster::Attributes(const ConcreteClusterPath &
 CHIP_ERROR IlluminanceMeasurementCluster::SetMeasuredValue(MeasuredValueType measuredValue)
 {
     VerifyOrReturnError(!measuredValue.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-    if (!mConfig.minMeasuredValue.IsNull())
+    if (measuredValue.Value() != 0)
     {
-        VerifyOrReturnError(measuredValue.Value() >= mConfig.minMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    if (!mConfig.maxMeasuredValue.IsNull())
-    {
-        VerifyOrReturnError(measuredValue.Value() <= mConfig.maxMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
+        if (!mConfig.minMeasuredValue.IsNull())
+        {
+            VerifyOrReturnError(measuredValue.Value() >= mConfig.minMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        if (!mConfig.maxMeasuredValue.IsNull())
+        {
+            VerifyOrReturnError(measuredValue.Value() <= mConfig.maxMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
+        }
     }
     SetAttributeValue(mMeasuredValue, measuredValue, MeasuredValue::Id);
     return CHIP_NO_ERROR;

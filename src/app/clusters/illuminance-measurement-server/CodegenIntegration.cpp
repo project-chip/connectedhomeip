@@ -47,11 +47,11 @@ public:
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
-        IlluminanceMeasurementCluster::LightSensorTypeType lightSensorType{};
-        if (optionalAttributeSet.IsSet(LightSensorType::Id))
-        {
-            VerifyOrDie(LightSensorType::Get(endpointId, lightSensorType) == Status::Success);
-        }
+        IlluminanceMeasurementCluster::MinMeasuredValueType minMeasuredValue{};
+        VerifyOrDie(MinMeasuredValue::Get(endpointId, minMeasuredValue) == Status::Success);
+
+        IlluminanceMeasurementCluster::MaxMeasuredValueType maxMeasuredValue{};
+        VerifyOrDie(MaxMeasuredValue::Get(endpointId, maxMeasuredValue) == Status::Success);
 
         IlluminanceMeasurementCluster::ToleranceType tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
@@ -59,11 +59,11 @@ public:
             VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
         }
 
-        IlluminanceMeasurementCluster::MinMeasuredValueType minMeasuredValue{};
-        VerifyOrDie(MinMeasuredValue::Get(endpointId, minMeasuredValue) == Status::Success);
-
-        IlluminanceMeasurementCluster::MaxMeasuredValueType maxMeasuredValue{};
-        VerifyOrDie(MaxMeasuredValue::Get(endpointId, maxMeasuredValue) == Status::Success);
+        IlluminanceMeasurementCluster::LightSensorTypeType lightSensorType{};
+        if (optionalAttributeSet.IsSet(LightSensorType::Id))
+        {
+            VerifyOrDie(LightSensorType::Get(endpointId, lightSensorType) == Status::Success);
+        }
 
         gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,
                                               IlluminanceMeasurementCluster::StartupConfiguration{

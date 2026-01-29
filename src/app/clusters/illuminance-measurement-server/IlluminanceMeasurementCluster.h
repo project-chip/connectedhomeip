@@ -27,8 +27,8 @@ namespace chip::app::Clusters {
 class IlluminanceMeasurementCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet = app::OptionalAttributeSet<IlluminanceMeasurement::Attributes::LightSensorType::Id,
-                                                           IlluminanceMeasurement::Attributes::Tolerance::Id>;
+    using OptionalAttributeSet = app::OptionalAttributeSet<IlluminanceMeasurement::Attributes::Tolerance::Id,
+                                                           IlluminanceMeasurement::Attributes::LightSensorType::Id>;
 
     using LightSensorTypeType  = IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo::Type;
     using ToleranceType        = IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type;

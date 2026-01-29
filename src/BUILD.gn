@@ -74,6 +74,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
       "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/identify-server/tests",
+      "${chip_root}/src/app/clusters/illuminance-measurement-server/tests",
       "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
