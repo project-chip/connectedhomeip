@@ -64,6 +64,10 @@ void MatterSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterThreadNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
