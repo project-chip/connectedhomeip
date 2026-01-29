@@ -25,7 +25,6 @@
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
-#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
@@ -48,8 +47,6 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
-        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
-
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
