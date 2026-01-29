@@ -47,6 +47,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
+
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
