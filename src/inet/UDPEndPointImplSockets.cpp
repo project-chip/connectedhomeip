@@ -688,7 +688,10 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
     }
     else
     {
-        if (OnReceiveError != nullptr && lStatus != CHIP_ERROR_POSIX(EAGAIN))
+        // Suppress transient errors that don't require user notification.
+        // EAGAIN: Resource temporarily unavailable (expected with non-blocking sockets)
+        // ENOTCONN: Socket is not connected (can occur on iOS when device is locked)
+        if (OnReceiveError != nullptr && lStatus != CHIP_ERROR_POSIX(EAGAIN) && lStatus != CHIP_ERROR_POSIX(ENOTCONN))
         {
             OnReceiveError(this, lStatus, nullptr);
         }
