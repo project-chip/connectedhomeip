@@ -208,7 +208,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
                 .dnssdServer            = DnssdServer::Instance(),                               //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         WifiRootNodeDevice::WifiContext{
