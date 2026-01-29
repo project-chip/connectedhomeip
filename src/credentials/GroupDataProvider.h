@@ -44,12 +44,18 @@ public:
         GroupId group_id = kUndefinedGroupId;
         // Lastest group name written for a given GroupId on any Endpoint via the Groups cluster
         char name[kGroupNameMax + 1] = { 0 };
+        bool use_aux_acl             = false;
+        bool use_iana_addr           = false;
+        uint16_t count               = 0;
 
         GroupInfo() { SetName(nullptr); }
+        GroupInfo(const GroupInfo & other) { Copy(other); }
         GroupInfo(const char * groupName) { SetName(groupName); }
         GroupInfo(const CharSpan & groupName) { SetName(groupName); }
-        GroupInfo(GroupId id, const char * groupName) : group_id(id) { SetName(groupName); }
-        GroupInfo(GroupId id, const CharSpan & groupName) : group_id(id) { SetName(groupName); }
+        GroupInfo(GroupId id, const char * groupName, bool aux_acl = false,  bool iana_addr = false) :
+            group_id(id), use_aux_acl(aux_acl), use_iana_addr(iana_addr) { SetName(groupName); }
+        GroupInfo(GroupId id, const CharSpan & groupName, bool aux_acl = false,  bool iana_addr = false) :
+            group_id(id), use_aux_acl(aux_acl), use_iana_addr(iana_addr) { SetName(groupName); }
         void SetName(const char * groupName)
         {
             if (nullptr == groupName)
@@ -72,9 +78,24 @@ public:
                 Platform::CopyString(name, groupName);
             }
         }
+        void Copy(const GroupInfo & other)
+        {
+            if (this != &other)
+            {
+                group_id      = other.group_id;
+                use_aux_acl   = other.use_aux_acl;
+                use_iana_addr = other.use_iana_addr;
+                SetName(other.name);
+            }
+        }
         bool operator==(const GroupInfo & other) const
         {
             return (this->group_id == other.group_id) && !strncmp(this->name, other.name, kGroupNameMax);
+        }
+        GroupInfo & operator=(const GroupInfo & other)
+        {
+            Copy(other);
+            return *this;
         }
     };
 
@@ -236,6 +257,7 @@ public:
     virtual CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)    = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id)                   = 0;
+    virtual CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id)                        = 0;
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
@@ -259,10 +281,12 @@ public:
     // Group-Key map
     //
 
-    virtual CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
-    virtual CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
-    virtual CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index)                     = 0;
-    virtual CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index)                                    = 0;
+    virtual CHIP_ERROR SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id)   = 0;
+    virtual CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info)  = 0;
+    virtual CHIP_ERROR GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id) = 0;
+    virtual CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info)        = 0;
+    virtual CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index)                      = 0;
+    virtual CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index)                                     = 0;
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
