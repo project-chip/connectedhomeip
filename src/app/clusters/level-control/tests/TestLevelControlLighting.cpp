@@ -97,7 +97,11 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(1), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(1, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     // Move to 101 over 100ds (10s).
     Commands::MoveToLevel::Type data;
@@ -150,7 +154,11 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
     chip::Testing::ClusterTester tester(cluster);
     auto & changeListener = context.ChangeListener();
 
-    EXPECT_EQ(cluster.SetCurrentLevel(1), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(1, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     // 1. Short transition (< 1s). Should NOT report.
     // Move to 10 over 5ds (0.5s).

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/level-control/LevelControlDelegate.h>
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/data-model/Nullable.h>
@@ -55,6 +56,9 @@ public:
         LevelControl::Attributes::DefaultMoveRate::Id //
         >;
 
+    constexpr static uint8_t kLightingMinLevel = 1;
+    constexpr static uint8_t kMaxLevel         = 254;
+
     struct Config
     {
         Config(EndpointId endpoint, TimerDelegate & timerDelegate, LevelControlDelegate & delegate) :
@@ -78,12 +82,16 @@ public:
         {
             mMinLevel = min;
             mOptionalAttributes.Set<LevelControl::Attributes::MinLevel::Id>();
+            VerifyOrDie(!mFeatureMap.Has(LevelControl::Feature::kLighting) ||
+                        (mFeatureMap.Has(LevelControl::Feature::kLighting) && mMinLevel == kLightingMinLevel));
             return *this;
         }
         Config & WithMaxLevel(uint8_t max)
         {
             mMaxLevel = max;
             mOptionalAttributes.Set<LevelControl::Attributes::MaxLevel::Id>();
+            VerifyOrDie(!mFeatureMap.Has(LevelControl::Feature::kLighting) ||
+                        (mFeatureMap.Has(LevelControl::Feature::kLighting) && mMaxLevel == kMaxLevel));
             return *this;
         }
         Config & WithDefaultMoveRate(DataModel::Nullable<uint8_t> rate)
@@ -134,10 +142,11 @@ public:
     };
 
     LevelControlCluster(const Config & config);
-    ~LevelControlCluster() override;
+    ~LevelControlCluster() = default;
 
     // ServerClusterInterface Implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -149,17 +158,42 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     // Cluster Public API
-    CHIP_ERROR SetOptions(BitMask<LevelControl::OptionsBitmap> newOptions);
-    CHIP_ERROR SetOnLevel(DataModel::Nullable<uint8_t> newOnLevel);
+    void SetOptions(BitMask<LevelControl::OptionsBitmap> newOptions);
+    void SetOnLevel(DataModel::Nullable<uint8_t> newOnLevel);
     CHIP_ERROR SetDefaultMoveRate(DataModel::Nullable<uint8_t> newDefaultMoveRate);
-    CHIP_ERROR SetCurrentLevel(uint8_t level);
     CHIP_ERROR SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel);
-    CHIP_ERROR SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime);
-    CHIP_ERROR SetOffTransitionTime(DataModel::Nullable<uint16_t> offTransitionTime);
-    CHIP_ERROR SetOnOffTransitionTime(uint16_t onOffTransitionTime);
+    void SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime);
+    void SetOffTransitionTime(DataModel::Nullable<uint16_t> offTransitionTime);
+    void SetOnOffTransitionTime(uint16_t onOffTransitionTime);
+
+    // Command APIs
+    DataModel::ActionReturnStatus MoveToLevel(uint8_t level, DataModel::Nullable<uint16_t> transitionTime,
+                                              BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                              BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus MoveToLevelWithOnOff(uint8_t level, DataModel::Nullable<uint16_t> transitionTime,
+                                                       BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus Move(LevelControl::MoveModeEnum moveMode, DataModel::Nullable<uint8_t> rate,
+                                       BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus MoveWithOnOff(LevelControl::MoveModeEnum moveMode, DataModel::Nullable<uint8_t> rate,
+                                                BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                                BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus Step(LevelControl::StepModeEnum stepMode, uint8_t stepSize,
+                                       DataModel::Nullable<uint16_t> transitionTime,
+                                       BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus StepWithOnOff(LevelControl::StepModeEnum stepMode, uint8_t stepSize,
+                                                DataModel::Nullable<uint16_t> transitionTime,
+                                                BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                                BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus Stop(BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    DataModel::ActionReturnStatus StopWithOnOff(BitMask<LevelControl::OptionsBitmap> optionsMask,
+                                                BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
     // Getters
-    DataModel::Nullable<uint8_t> GetCurrentLevel() const { return mCurrentLevel; }
+    DataModel::Nullable<uint8_t> GetCurrentLevel() const { return mCurrentLevel.value(); }
     uint8_t GetMinLevel() const { return mMinLevel; }
     uint8_t GetMaxLevel() const { return mMaxLevel; }
     DataModel::Nullable<uint8_t> GetDefaultMoveRate() const { return mDefaultMoveRate; }
@@ -167,7 +201,7 @@ public:
     BitMask<LevelControl::OptionsBitmap> GetOptions() const { return mOptions; }
     DataModel::Nullable<uint8_t> GetStartUpCurrentLevel() const { return mStartUpCurrentLevel; }
     BitMask<LevelControl::Feature> GetFeatureMap() const { return mFeatureMap; }
-    uint16_t GetRemainingTime() const { return mRemainingTime; }
+    uint16_t GetRemainingTime() const { return mRemainingTime.value().ValueOr(0); }
     DataModel::Nullable<uint16_t> GetOnTransitionTime() const { return mOnTransitionTime; }
     DataModel::Nullable<uint16_t> GetOffTransitionTime() const { return mOffTransitionTime; }
     uint16_t GetOnOffTransitionTime() const { return mOnOffTransitionTime; }
@@ -188,8 +222,10 @@ public:
     void OnOffChanged(bool isOn);
 
 private:
+    CHIP_ERROR SetCurrentLevel(uint8_t level);
+
     // Attributes
-    DataModel::Nullable<uint8_t> mCurrentLevel;
+    app::QuieterReportingAttribute<uint8_t> mCurrentLevel;
     BitMask<LevelControl::OptionsBitmap> mOptions;
     DataModel::Nullable<uint8_t> mOnLevel;
     uint8_t mMinLevel;
@@ -198,8 +234,7 @@ private:
     DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
 
     // Extended Attributes (Lighting/Transitions)
-    uint16_t mRemainingTime             = 0;
-    uint16_t mLastReportedRemainingTime = 0;
+    app::QuieterReportingAttribute<uint16_t> mRemainingTime;
     DataModel::Nullable<uint16_t> mOnTransitionTime;
     DataModel::Nullable<uint16_t> mOffTransitionTime;
     uint16_t mOnOffTransitionTime = 0;
@@ -213,7 +248,7 @@ private:
     uint8_t mTargetLevel        = 0;
     uint32_t mTransitionTimeMs  = 0;
     uint32_t mElapsedTimeMs     = 0;
-    uint32_t mEventDurationMs   = 0;
+    uint32_t mTickDurationMs    = 0;
     bool mIncreasing            = false;
     CommandId mCurrentCommandId = kInvalidCommandId;
     DataModel::Nullable<uint8_t> mStoredLevel; // Stores the level before turning Off, to restore on On if OnLevel is null.
@@ -221,33 +256,27 @@ private:
     // Used to ignore/prevent reentrance of OnOffChanged callbacks when we are programmatically setting On/Off state
     // during a Level Control command (like MoveToLevelWithOnOff).
     bool mTemporarilyIgnoreOnOffCallbacks = false;
-    uint64_t mLastReportTimeMs            = 0; // Used for Quieter Reporting (Spec mandates at most 1 report per second).
 
     // Helpers
-    void UpdateOnOff(bool on, bool temporarilyIgnoreOnOffCallbacks = false);
-    // Checks "Options" attribute ExecuteIfOff bit and command-specific overrides to determine if command should run.
-    bool ShouldExecuteIfOff(CommandId commandId, BitMask<LevelControl::OptionsBitmap> optionsMask,
-                            BitMask<LevelControl::OptionsBitmap> optionsOverride);
+    bool IsValidLevel(uint8_t level);
+    void SetOnOff(bool on);
+    bool ShouldExecuteIfOff(BitMask<LevelControl::OptionsBitmap> optionsMask, BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
-    // Turns device On if currently Off, handling related level adjustments (e.g. MinLevel).
-    void EnsureOn();
-
-    // Setup and start the transition timer
-    void ScheduleTimer(uint32_t durationMs, uint32_t transitionTimeMs);
+    // Setup and start the transition
+    void StartTransition(uint32_t durationMs, uint32_t transitionTimeMs);
 
     // Helper to set CurrentLevel with specific reporting rules (e.g. forced at end of transition).
-    // Spec 6.2. CurrentLevel Attribute:
-    // "Changes to this attribute SHALL only be marked as reportable in the following cases:
-    //  At most once per second, or
-    //  At the end of the movement/transition, or
-    //  When it changes from null to any other value and vice versa."
-    CHIP_ERROR SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
-    // Helper to update RemainingTime attribute with quiet reporting rules (delta check).
-    void UpdateRemainingTime(uint32_t remainingTimeMs, bool isNewTransition);
-    // Predicate for RemainingTime reporting (since logic is complex).
-    bool ShouldReportRemainingTime(uint16_t remainingTimeDs, bool isNewTransition) const;
-    // Predicate for CurrentLevel reporting (since logic is complex).
-    bool ShouldReportCurrentLevel(DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition) const;
+    CHIP_ERROR SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue);
+
+    // Helper to write CurrentLevel to NVM.
+    void StoreCurrentLevel(DataModel::Nullable<uint8_t> value);
+
+    enum class ReportingMode
+    {
+        kCommand,
+        kTick
+    };
+    void UpdateRemainingTime(uint32_t remainingTimeMs, ReportingMode mode);
 
     void StartTimer(uint32_t delayMs);
     void CancelTimer();
@@ -256,25 +285,13 @@ private:
                                                      DataModel::Nullable<uint16_t> transitionTimeDS,
                                                      BitMask<LevelControl::OptionsBitmap> optionsMask,
                                                      BitMask<LevelControl::OptionsBitmap> optionsOverride);
-    DataModel::ActionReturnStatus MoveToLevelWithOnOffCommand(CommandId commandId, uint8_t level,
-                                                              DataModel::Nullable<uint16_t> transitionTimeDS,
-                                                              BitMask<LevelControl::OptionsBitmap> optionsMask,
-                                                              BitMask<LevelControl::OptionsBitmap> optionsOverride);
     DataModel::ActionReturnStatus MoveCommand(CommandId commandId, LevelControl::MoveModeEnum moveMode,
                                               DataModel::Nullable<uint8_t> rate, BitMask<LevelControl::OptionsBitmap> optionsMask,
                                               BitMask<LevelControl::OptionsBitmap> optionsOverride);
-    DataModel::ActionReturnStatus MoveWithOnOffCommand(CommandId commandId, LevelControl::MoveModeEnum moveMode,
-                                                       DataModel::Nullable<uint8_t> rate,
-                                                       BitMask<LevelControl::OptionsBitmap> optionsMask,
-                                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
     DataModel::ActionReturnStatus StepCommand(CommandId commandId, LevelControl::StepModeEnum stepMode, uint8_t stepSize,
                                               DataModel::Nullable<uint16_t> transitionTime,
                                               BitMask<LevelControl::OptionsBitmap> optionsMask,
                                               BitMask<LevelControl::OptionsBitmap> optionsOverride);
-    DataModel::ActionReturnStatus StepWithOnOffCommand(CommandId commandId, LevelControl::StepModeEnum stepMode, uint8_t stepSize,
-                                                       DataModel::Nullable<uint16_t> transitionTime,
-                                                       BitMask<LevelControl::OptionsBitmap> optionsMask,
-                                                       BitMask<LevelControl::OptionsBitmap> optionsOverride);
     DataModel::ActionReturnStatus StopCommand(CommandId commandId, BitMask<LevelControl::OptionsBitmap> optionsMask,
                                               BitMask<LevelControl::OptionsBitmap> optionsOverride);
 };

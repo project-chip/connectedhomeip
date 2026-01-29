@@ -39,7 +39,11 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOff)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(10), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(10, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
     mockDelegate.mOn = false;
 
     Commands::MoveToLevel::Type data;
@@ -52,6 +56,42 @@ TEST_F(TestLevelControlOnOff, TestExecuteIfOff)
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 10u); // Still 10
+}
+
+TEST_F(TestLevelControlOnOff, TestExecuteIfOff_OverrideOff)
+{
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff() };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(10, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // Set Options to HAVE ExecuteIfOff
+    BitMask<OptionsBitmap> options;
+    options.Set(OptionsBitmap::kExecuteIfOff);
+    EXPECT_TRUE(tester.WriteAttribute(Attributes::Options::Id, options).IsSuccess());
+
+    mockDelegate.mOn = false;
+
+    // Command: MoveToLevel 20.
+    // Mask = ExecuteIfOff (we want to override this bit)
+    // Override = 0 (we want to set it to 0, i.e., Don't Execute)
+    Commands::MoveToLevel::Type data;
+    data.level = 20;
+    data.transitionTime.SetNonNull(0);
+    data.optionsMask.Set(OptionsBitmap::kExecuteIfOff);
+    data.optionsOverride.ClearAll(); // Force bit to 0
+
+    // Expectation: Command succeeds (status success) but DOES NOT CHANGE LEVEL because it was suppressed by override.
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 10u); // Should remain 10
 }
 
 TEST_F(TestLevelControlOnOff, TestWriteOnLevel)
@@ -71,7 +111,11 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     // 1. Move Up to 10 with OnOff. Should Turn On immediately.
     Commands::MoveToLevelWithOnOff::Type data;
@@ -125,7 +169,11 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOff)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
     mockDelegate.mOn             = false;
     mockDelegate.mSetOnOffCalled = false;
 
@@ -148,7 +196,11 @@ TEST_F(TestLevelControlOnOff, TestStepWithOnOff)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
     mockDelegate.mOn             = false;
     mockDelegate.mSetOnOffCalled = false;
 
@@ -208,7 +260,11 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
 
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(200), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(200, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     // 1. Turn OFF
 
@@ -261,7 +317,11 @@ TEST_F(TestLevelControlOnOff, TestOnOffChangedDefaultLevel)
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Initial state: Level 0 (Min)
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     // Turn ON. No OnLevel set. No StoredLevel (as we haven't turned off from a high level).
     // Should default to MaxLevel (254).
@@ -296,11 +356,15 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffReentrancy)
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Initial state: Level 0, Off
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
     reentrantDelegate.mOn = false;
 
     // Command: Move to 254 (Max) with OnOff.
-    // This triggers UpdateOnOff(true) -> OnOffChanged(true).
+    // This triggers SetOnOff(true) -> OnOffChanged(true).
     // OnOffChanged sets level to Min (0) and moves to OnLevel (default 0 as current is 0).
     // This nested move sets mTargetLevel = 0.
     // Without the fix, the outer MoveToLevel uses this 0 as target and stops.
@@ -331,6 +395,73 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffReentrancy)
     EXPECT_EQ(readLevel.Value(), 254u);
 }
 
+TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
+{
+    ReentrantMockDelegate reentrantDelegate;
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, reentrantDelegate).WithOnOff() };
+    reentrantDelegate.mCluster = &cluster;
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // 1. Set Level 200. On.
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(200, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+    reentrantDelegate.mOn = true;
+
+    // Prime mStoredLevel by turning Off and On once
+    // Off -> Stores 200.
+    cluster.OnOffChanged(false);
+    while (mockTimer.IsTimerActive(&cluster))
+        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    EXPECT_FALSE(reentrantDelegate.mOn);
+
+    // On -> Restores 200.
+    cluster.OnOffChanged(true);
+    while (mockTimer.IsTimerActive(&cluster))
+        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    EXPECT_TRUE(reentrantDelegate.mOn);
+
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 200u);
+
+    // 2. MoveToLevelWithOnOff(MinLevel, time=10s).
+    // This should NOT overwrite mStoredLevel (200) with MinLevel (0/1).
+    uint8_t minLevel = cluster.GetMinLevel();
+    Commands::MoveToLevelWithOnOff::Type data;
+    data.level = minLevel;
+    data.transitionTime.SetNonNull(100);
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevelWithOnOff::Id, data).IsSuccess());
+
+    // 3. Advance time to finish.
+    int limit = 200;
+    while (mockTimer.IsTimerActive(&cluster) && limit-- > 0)
+    {
+        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    }
+
+    EXPECT_FALSE(reentrantDelegate.mOn);
+
+    // 4. Turn On (Simulate OnOff Cluster On command)
+    // Should restore 200 (from mStoredLevel) NOT MinLevel (0/1).
+    cluster.OnOffChanged(true);
+
+    while (mockTimer.IsTimerActive(&cluster))
+    {
+        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    }
+
+    // 5. Check Level.
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 200u);
+}
+
 TEST_F(TestLevelControlOnOff, TestImmediateMoveToMinLevelWithOnOff)
 {
     LevelControlCluster cluster{
@@ -340,7 +471,11 @@ TEST_F(TestLevelControlOnOff, TestImmediateMoveToMinLevelWithOnOff)
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Initial state: Level 100, Off
-    EXPECT_EQ(cluster.SetCurrentLevel(100), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
     mockDelegate.mOn             = false;
     mockDelegate.mSetOnOffCalled = false;
 
