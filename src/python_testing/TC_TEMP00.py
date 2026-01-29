@@ -40,7 +40,7 @@ class TC_TEMP00(MatterBaseTest):
         await asyncio.sleep(1)
         pase_node_id = self.dut_node_id + 1
 
-        await self.request_device_factory_reset()
+        await self.request_factory_reset(app_only=False)
 
         # Open a PASE session
         th2 = self.get_new_controller()

@@ -233,21 +233,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
-    if factory_reset or factory_reset_app_only:
-        # Remove native app config
-        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
-            pathlib.Path(path).unlink(missing_ok=True)
-
-        # Remove native app KVS if that was used
-        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
-            log.info("Removing KVS path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
-
-    if factory_reset:
-        # Remove Python test admin storage if provided
-        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
-            log.info("Removing storage path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
+    # Handle app factory reset if requested
+    handle_factory_reset(factory_reset, factory_reset_app_only, app_args, script_args)
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
@@ -270,6 +257,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 app_manager_lock,
                 app,
                 app_args,
+                script_args,
                 app_ready_pattern,
                 stream_output,
                 app_stdin_pipe,
@@ -361,11 +349,32 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
+def handle_factory_reset(factory_reset: bool, factory_reset_app_only: bool, app_args: str, script_args: str):
+    """Handles app factory reset requests by removing configuration and storage files."""
+    if factory_reset or factory_reset_app_only:
+        # Remove native app config
+        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
+            log.info("Removing native app config, path: '%s'...", path)
+            pathlib.Path(path).unlink(missing_ok=True)
+
+        # Remove native app KVS if that was used
+        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
+            log.info("Removing native app KVS, path: '%s'...", match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
+
+    if factory_reset:
+        # Remove Python test admin storage if provided
+        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
+            log.info("Removing Python test admin storage, path: '%s'", match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
+
+
 def monitor_app_restart_requests(
         app_manager_ref,
         app_manager_lock,
         app,
         app_args,
+        script_args,
         app_ready_pattern,
         stream_output,
         app_stdin_pipe,
@@ -379,23 +388,11 @@ def monitor_app_restart_requests(
                     flag_file_content = f.read().strip()
                 os.unlink(restart_flag_file)
                 is_factory_reset = (flag_file_content == "factory reset")
-                log.info("App %s requested by test script", flag_file_content)
+                is_factory_reset_app_only = (flag_file_content == "factory reset app only")
+                log.info("%s requested by test script", flag_file_content.capitalize())
 
-                # If factory reset was requested, delete
-                # the KVS file before restarting the app
-                if is_factory_reset:
-                    if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
-                        kvs_path = match.group("path")
-                        try:
-                            if os.path.exists(kvs_path):
-                                os.unlink(kvs_path)
-                                log.info("Successfully deleted KVS file: '%s'", kvs_path)
-                            else:
-                                log.info("KVS file '%s' does not exist, skipping deletion", kvs_path)
-                        except Exception as e:
-                            log.error("Failed to delete KVS file '%s': %r", kvs_path, e)
-                    else:
-                        log.info("No --KVS argument found in app_args, skipping KVS deletion")
+                # Handle app factory reset if requested
+                handle_factory_reset(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
 
                 # Restart the app
                 new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
