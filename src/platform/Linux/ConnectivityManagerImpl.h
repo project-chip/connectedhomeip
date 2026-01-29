@@ -48,7 +48,6 @@
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
 #include <system/SystemMutex.h>
 
-#include <atomic>
 #include <mutex>
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <wifipaf/WiFiPAFEndPoint.h>
@@ -244,8 +243,8 @@ private:
 
     CHIP_ERROR _StartWiFiManagement();
 
-    bool mAssociationStarted                          = false;
-    std::atomic<unsigned int> mAssociationRetriesLeft = 0;
+    bool mAssociationStarted             = false;
+    unsigned int mAssociationRetriesLeft = 0;
     GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.

@@ -453,10 +453,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
             if (wpa_supplicant_1_interface_get_assoc_status_code(iface) == WLAN_STATUS_AUTH_TIMEOUT)
             {
+                std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
                 /* Handle intermittent association failures */
                 if (mAssociationRetriesLeft > 0)
                 {
-                    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
                     mAssociationRetriesLeft--;
                     ChipLogDetail(DeviceLayer, "wpa_supplicant: Association timeout, %u retries left", mAssociationRetriesLeft);
 
