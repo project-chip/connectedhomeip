@@ -312,6 +312,7 @@ jobs:
                    -DCMAKE_BUILD_TYPE=Debug \
                    -DOTBR_BORDER_ROUTING=ON \
                    -DOTBR_MDNS=openthread \
+                   -DOT_POSIX_SETTINGS_PATH='\"tmp\"' \
                    -DOT_FIREWALL=OFF \
                    -DOT_LOG_LEVEL=INFO \
                    -DOT_TREL=OFF \
