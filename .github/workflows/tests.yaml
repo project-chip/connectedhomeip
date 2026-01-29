@@ -345,6 +345,9 @@ jobs:
                      "
 
             - name: Run BLE-Thread commissioning test
+              # Disabled due to flakyness. See:
+              # https://github.com/project-chip/connectedhomeip/issues/42869
+              if: false
               env:
                 # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
                 # The reason for that is BlueZ and WPA supplicant integration which involves GIO
