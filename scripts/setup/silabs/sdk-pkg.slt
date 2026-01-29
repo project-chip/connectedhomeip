@@ -1,0 +1,8 @@
+# Version defaults to "0" if not defined
+version = "0"
+ 
+ 
+[dependency]
+# Get a specific version of the package
+simplicity-sdk = { version = "2025.12.0", installer ="conan", prerelease=true }
+wiseconnect = { version = "4.0.0", installer ="conan", prerelease=true }
