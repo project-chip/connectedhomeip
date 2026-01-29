@@ -492,9 +492,6 @@ Status WebRTCTransportProviderCluster::ValidateStreamID(const char * commandName
         return Status::Success;
     }
 
-    const char * streamTypeLower   = (streamType == StreamType::kVideo) ? "video" : "audio";
-    const char * streamTypeCapital = (streamType == StreamType::kVideo) ? "Video" : "Audio";
-
     std::vector<uint16_t> streams;
     if (streamID.Value().IsNull())
     {
@@ -503,8 +500,9 @@ Status WebRTCTransportProviderCluster::ValidateStreamID(const char * commandName
             (streamType == StreamType::kVideo) ? mDelegate.HasAllocatedVideoStreams() : mDelegate.HasAllocatedAudioStreams();
         if (!hasAllocatedStreams)
         {
-            ChipLogError(Zcl, "%s: %s requested when there are no Allocated%sStreams", commandName, streamTypeLower,
-                         streamTypeCapital);
+            ChipLogError(Zcl, "%s: %s requested when there are no Allocated%sStreams", commandName,
+                         (streamType == StreamType::kVideo) ? "video" : "audio",
+                         (streamType == StreamType::kVideo) ? "Video" : "Audio");
             return Status::InvalidInState;
         }
         // Empty vector implies auto-select
@@ -516,8 +514,9 @@ Status WebRTCTransportProviderCluster::ValidateStreamID(const char * commandName
                                                             : mDelegate.ValidateAudioStreamID(streamID.Value().Value());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "%s: %sStreamID %u does not match Allocated%sStreams", commandName, streamTypeCapital,
-                         streamID.Value().Value(), streamTypeCapital);
+            ChipLogError(Zcl, "%s: %sStreamID %u does not match Allocated%sStreams", commandName,
+                         (streamType == StreamType::kVideo) ? "Video" : "Audio", streamID.Value().Value(),
+                         (streamType == StreamType::kVideo) ? "Video" : "Audio");
             return Status::DynamicConstraintError;
         }
         streams.push_back(streamID.Value().Value());
@@ -536,8 +535,6 @@ Status WebRTCTransportProviderCluster::ValidateStreams(const char * commandName,
         return Status::Success;
     }
 
-    const char * streamTypeCapital = (streamType == StreamType::kVideo) ? "Video" : "Audio";
-
     std::vector<uint16_t> streams;
     auto iter = inStreams.Value().begin();
     while (iter.Next())
@@ -555,7 +552,7 @@ Status WebRTCTransportProviderCluster::ValidateStreams(const char * commandName,
         (streamType == StreamType::kVideo) ? mDelegate.HasAllocatedVideoStreams() : mDelegate.HasAllocatedAudioStreams();
     if (!hasAllocatedStreams)
     {
-        ChipLogError(Zcl, "%s: Allocated%sStreams is empty", commandName, streamTypeCapital);
+        ChipLogError(Zcl, "%s: Allocated%sStreams is empty", commandName, (streamType == StreamType::kVideo) ? "Video" : "Audio");
         return Status::InvalidInState;
     }
 
@@ -563,7 +560,8 @@ Status WebRTCTransportProviderCluster::ValidateStreams(const char * commandName,
     std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
     if (uniqueStreams.size() != streams.size())
     {
-        ChipLogError(Zcl, "%s: Duplicate entries in %sStreams", commandName, streamTypeCapital);
+        ChipLogError(Zcl, "%s: Duplicate entries in %sStreams", commandName,
+                     (streamType == StreamType::kVideo) ? "Video" : "Audio");
         return Status::AlreadyExists;
     }
 
@@ -572,7 +570,9 @@ Status WebRTCTransportProviderCluster::ValidateStreams(const char * commandName,
         (streamType == StreamType::kVideo) ? mDelegate.ValidateVideoStreams(streams) : mDelegate.ValidateAudioStreams(streams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "%s: %sStreams entry not found in Allocated%sStreams", commandName, streamTypeCapital, streamTypeCapital);
+        ChipLogError(Zcl, "%s: %sStreams entry not found in Allocated%sStreams", commandName,
+                     (streamType == StreamType::kVideo) ? "Video" : "Audio",
+                     (streamType == StreamType::kVideo) ? "Video" : "Audio");
         return Status::DynamicConstraintError;
     }
 
