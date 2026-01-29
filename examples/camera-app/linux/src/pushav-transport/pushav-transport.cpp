@@ -362,7 +362,7 @@ bool PushAVTransport::HandleTriggerDetected()
     else
     {
         // Handle augmentation for ongoing recording
-        ChipLogDetail(Camera, "PushAVTransport HandleTriggerDetected time since last trigger: %" PRId64, elapsedClipDurationS);
+        ChipLogDetail(Camera, "PushAVTransport HandleTriggerDetected time since last trigger: %ld", elapsedClipDurationS);
 
         if (!mHasAugmented || (mHasAugmented && (elapsedClipDurationS >= mClipInfo.mPreviousMotionDetectedDurationS)))
         {
