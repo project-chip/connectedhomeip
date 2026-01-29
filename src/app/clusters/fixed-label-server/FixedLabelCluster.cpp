@@ -17,7 +17,6 @@
 #include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/FixedLabel/Metadata.h>
-#include <platform/DeviceInfoProvider.h>
 
 namespace chip::app::Clusters {
 
@@ -28,8 +27,8 @@ namespace {
 class AutoReleaseIterator
 {
 public:
-    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider, EndpointId endpointId) :
-        mIterator(provider != nullptr ? provider->IterateFixedLabel(endpointId) : nullptr)
+    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider, EndpointId endpointId) :
+        mIterator(provider.IterateFixedLabel(endpointId))
     {}
     ~AutoReleaseIterator()
     {
@@ -64,7 +63,7 @@ CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, D
 
 } // namespace
 
-FixedLabelCluster::FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider * deviceInfoProvider) :
+FixedLabelCluster::FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider & deviceInfoProvider) :
     DefaultServerCluster({ endpoint, FixedLabel::Id }), mDeviceInfoProvider(deviceInfoProvider)
 {}
 

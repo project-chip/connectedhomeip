@@ -21,7 +21,6 @@
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <platform/DeviceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,7 +41,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::GetDeviceInfoProvider());
+        gServers[clusterInstanceIndex].Create(endpointId, &DeviceLayer::GetDeviceInfoProvider());
         return gServers[clusterInstanceIndex].Registration();
     }
 
