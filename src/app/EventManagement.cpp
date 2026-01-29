@@ -875,6 +875,11 @@ void EventManagement::ScheduleUrgentEventDeliverySync(std::optional<FabricIndex>
     mpEventReporter->ScheduleUrgentEventDeliverySync(FromStdOptional(fabricIndex));
 }
 
+System::Clock::Microseconds64 EventManagement::GetMonotonicStartupTime() const
+{
+    return std::chrono::duration_cast<System::Clock::Microseconds64>(mMonotonicStartupTime);
+}
+
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {

@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -57,6 +58,8 @@ public:
     ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&)                  = delete;
     ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&)      = delete;
 
+    DeviceLayer::DiagnosticDataProvider * GetProvider() { return &mProvider; }
+
 private:
     DeviceLayer::DiagnosticDataProvider * mOldProvider;
     T mProvider;
@@ -94,14 +97,20 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+protected:
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
-
+    ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance());
+                                      GeneralDiagnosticsCluster::Context{
+                                          .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
+                                          .diagnosticDataProvider   = *nullProvider.GetProvider(),
+                                          .testEventTriggerDelegate = nullptr,
+                                      });
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
@@ -110,7 +119,13 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     };
 
     GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(
-        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), InteractionModelEngine::GetInstance(), functionsConfig);
+        optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
+        GeneralDiagnosticsCluster::Context{
+            .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
+            .diagnosticDataProvider   = *nullProvider.GetProvider(),
+            .testEventTriggerDelegate = nullptr,
+        },
+        functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -119,12 +134,15 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 {
     {
         // everything returns empty here ..
-        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
 
         // Create cluster without enabling any feature flags
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                          InteractionModelEngine::GetInstance());
+                                          GeneralDiagnosticsCluster::Context{
+                                              .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
+                                              .diagnosticDataProvider   = *nullProvider.GetProvider(),
+                                              .testEventTriggerDelegate = nullptr,
+                                          });
 
         // Check required accepted commands are present
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
@@ -185,7 +203,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
 
         // Enable all the optional attributes
-        const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet =
+        const GeneralDiagnosticsCluster::OptionalAttributeSet allOptionalAttributesSet =
             GeneralDiagnosticsCluster::OptionalAttributeSet()
                 .Set<TotalOperationalHours::Id>()
                 .Set<BootReason::Id>()
@@ -193,11 +211,16 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                 .Set<ActiveRadioFaults::Id>()
                 .Set<ActiveNetworkFaults::Id>();
 
-        ScopedDiagnosticsProvider<AllProvider> nullProvider;
+        ScopedDiagnosticsProvider<AllProvider> allProvider;
 
         // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features, InteractionModelEngine::GetInstance());
+        GeneralDiagnosticsCluster cluster(allOptionalAttributesSet, features,
+                                          GeneralDiagnosticsCluster::Context{
+                                              .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
+                                              .diagnosticDataProvider   = *allProvider.GetProvider(),
+                                              .testEventTriggerDelegate = nullptr,
+                                          });
 
         // Check mandatory commands are present
         ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
@@ -253,10 +276,13 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
 {
     // Create a cluster with no optional attributes enabled
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance());
+                                      GeneralDiagnosticsCluster::Context{
+                                          .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
+                                          .diagnosticDataProvider   = *nullProvider.GetProvider(),
+                                          .testEventTriggerDelegate = nullptr,
+                                      });
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -272,14 +298,18 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
 TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
 {
     // Configure cluster with POSIX time support enabled and no optional attributes enabled
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
         .enablePosixTime       = true,
         .enablePayloadSnapshot = false,
     };
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                                      InteractionModelEngine::GetInstance(), functionsConfig);
+                                                      GeneralDiagnosticsCluster::Context{
+                                                          .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
+                                                          .diagnosticDataProvider   = *nullProvider.GetProvider(),
+                                                          .testEventTriggerDelegate = nullptr,
+                                                      },
+                                                      functionsConfig);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -298,10 +328,13 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
 TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
 {
     // Create a cluster with no optional attributes enabled
-    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0),
-                                      InteractionModelEngine::GetInstance());
+                                      GeneralDiagnosticsCluster::Context{
+                                          .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),
+                                          .diagnosticDataProvider   = *nullProvider.GetProvider(),
+                                          .testEventTriggerDelegate = nullptr,
+                                      });
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

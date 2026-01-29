@@ -244,8 +244,9 @@ void CYW30739MatterConfig::InitApp(void)
      * GenericEventManagementTestEventTriggerHandler, and so creating an instance of it here allows
      * this to work and replace the old global instance call to the cluster
      */
-    const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
-    static Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
+    static Clusters::GeneralDiagnosticsCluster cluster(Clusters::GeneralDiagnosticsCluster::OptionalAttributeSet{},
+                                                       chip::BitFlags<Clusters::GeneralDiagnostics::Feature>{}, nullptr,
+                                                       &DeviceLayer::GetDiagnosticDataProvider());
     sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);
     chip::Server::GetInstance().Init(initParams);
 
