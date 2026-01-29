@@ -72,6 +72,12 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                       InteractionModelEngine::GetInstance());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
+    mUserLabelCluster.Create(endpointId, UserLabelCluster::Context{
+        .deviceInfoProvider = mContext.deviceInfoProvider,
+        .fabricTable       = mContext.fabricTable,
+    });
+    ReturnErrorOnFailure(provider.AddCluster(mUserLabelCluster.Registration()));
+
     mGroupKeyManagementCluster.Create(GroupKeyManagementCluster::Context{
         .fabricTable       = mContext.fabricTable,
         .groupDataProvider = mContext.groupDataProvider,
@@ -120,6 +126,11 @@ void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster()));
         mGeneralDiagnosticsCluster.Destroy();
     }
+    if (mUserLabelCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mUserLabelCluster.Cluster()));
+        mUserLabelCluster.Destroy();
+    }
     if (mGroupKeyManagementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster()));
@@ -140,6 +151,7 @@ void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
         mOperationalCredentialsCluster.Destroy();
     }
+    
 }
 
 } // namespace app

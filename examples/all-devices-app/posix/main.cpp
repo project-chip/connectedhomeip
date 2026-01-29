@@ -82,6 +82,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -179,7 +180,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     initParams.groupDataProvider             = &gGroupDataProvider;
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-    initParams.interfaceId                   = Inet::InterfaceId::Null();
+    initParams.interfaceId                   = Inet:rootNodeDevice:InterfaceId::Null();
 
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");

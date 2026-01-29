@@ -29,6 +29,8 @@
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
+#include <platform/NetworkCommissioning.h>
+#include <src/app/clusters/user-label-server/UserLabelCluster.h>
 
 namespace chip {
 namespace app {
@@ -47,6 +49,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -76,6 +79,8 @@ private:
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
+    LazyRegisteredServerCluster<Clusters::UserLabelCluster> mUserLabelCluster;
+
 };
 
 } // namespace app

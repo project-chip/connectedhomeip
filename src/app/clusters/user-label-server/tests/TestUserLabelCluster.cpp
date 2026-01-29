@@ -27,6 +27,7 @@
 #include <clusters/UserLabel/Metadata.h>
 #include <clusters/UserLabel/Structs.h>
 #include <platform/DeviceInfoProvider.h>
+#include <app/server/Server.h>
 
 namespace {
 
@@ -62,7 +63,6 @@ protected:
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
     CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
 };
-
 struct TestUserLabelCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -71,21 +71,25 @@ struct TestUserLabelCluster : public ::testing::Test
 
     void SetUp() override
     {
-        DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
         ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
     }
 
     void TearDown() override
     {
         userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
-        DeviceLayer::SetDeviceInfoProvider(nullptr);
     }
 
-    TestUserLabelCluster() : userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() : 
+        userLabel(kRootEndpointId, 
+                  UserLabelCluster::Context{ 
+                      .deviceInfoProvider = mDeviceInfoProvider, 
+                      .fabricTable = chip::Server::GetInstance().GetFabricTable() 
+                  }) 
+    {}
 
     TestServerClusterContext testContext;
+    MockDeviceInfoProvider mDeviceInfoProvider; // Must be declared before userLabel so it's initialized first
     UserLabelCluster userLabel;
-    MockDeviceInfoProvider mDeviceInfoProvider;
 };
 
 } // namespace
