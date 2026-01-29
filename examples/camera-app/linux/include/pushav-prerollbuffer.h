@@ -40,6 +40,7 @@ struct PreRollFrame
     std::unique_ptr<uint8_t[]> data;              // raw frame data
     size_t size;                                  // bytes size
     int64_t ptsMs;                                // receive time
+    int64_t receiveTimeMs;                        // system clock time when received
     std::unordered_set<BufferSink *> deliveredTo; // to prevent duplicate sends
 };
 

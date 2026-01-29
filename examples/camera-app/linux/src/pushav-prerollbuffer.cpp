@@ -37,9 +37,10 @@ void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const uint8
     frame->streamKey = streamKey;
     frame->data      = std::make_unique<uint8_t[]>(size);
     memcpy(frame->data.get(), data, size);
-    frame->size  = size;
-    frame->ptsMs = timestampMs;
-    auto & queue = mBuffers[streamKey]; // Get or create the queue for this stream key
+    frame->size          = size;
+    frame->ptsMs         = timestampMs;
+    frame->receiveTimeMs = NowMs();
+    auto & queue         = mBuffers[streamKey]; // Get or create the queue for this stream key
     queue.push_back(frame);
     mContentBufferSize += size; // Track total bytes in buffer for all streams
     mBufferMutex.unlock();
@@ -77,7 +78,7 @@ void PreRollBuffer::PushBufferToTransport()
             }
             for (const auto & frame : it->second)
             {
-                if (frame->ptsMs < minTimeToDeliver)
+                if (frame->receiveTimeMs < minTimeToDeliver)
                 {
                     continue;
                 }
@@ -143,7 +144,7 @@ void PreRollBuffer::TrimBuffer()
             if (!buffer.empty())
             {
                 auto & candidate = buffer.front();
-                if (!oldest || candidate->ptsMs < oldest->ptsMs)
+                if (!oldest || candidate->receiveTimeMs < oldest->receiveTimeMs)
                 {
                     oldest          = candidate;
                     oldestStreamKey = streamKey;
