@@ -8709,13 +8709,15 @@ provisional cluster AmbientContextSensing = 1073 {
     kHumanActivity = 0x1;
     kObjectCounting = 0x2;
     kObjectIdentification = 0x4;
-    kSoundClassification = 0x8;
+    kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
     optional epoch_s detectionStartTime = 1;
+    optional int16u objectCountThreshold = 2;
+    optional int16u objectCount = 3;
   }
 
   struct HoldTimeLimitsStruct {
@@ -8733,19 +8735,20 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
+  info event AmbientContextDetected = 0 {
+    AmbientContextTypeStruct ambientContextType[] = 0;
+  }
+
   readonly attribute optional boolean humanActivityDetected = 0;
   readonly attribute optional boolean objectIdentified = 1;
   readonly attribute optional boolean audioContextDetected = 2;
   readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
   attribute int8u simultaneousDetectionLimit = 5;
-  readonly attribute optional boolean countThresholdReached = 6;
-  attribute optional int16u countThreshold = 7;
-  readonly attribute optional int16u objectCount = 8;
-  attribute access(write: manage) optional int16u holdTime = 9;
-  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 10;
-  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
-  readonly attribute optional boolean privacyModeEnabled = 12;
+  readonly attribute optional boolean objectCountReached = 6;
+  attribute access(write: manage) int16u holdTime = 7;
+  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 8;
+  readonly attribute access(write: manage) optional PredictedActivityStruct predictedActivity[] = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
