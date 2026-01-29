@@ -43,7 +43,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
-        VerifyOrDie(deviceInfoProvider != nullptr); 
+        VerifyOrDie(deviceInfoProvider != nullptr);
 
         gServers[clusterInstanceIndex].Create(endpointId,
                                               UserLabelCluster::Context{
