@@ -17,7 +17,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
-#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
