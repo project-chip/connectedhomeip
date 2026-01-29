@@ -17,22 +17,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${CHIP_LOCK_APP}
-#     factory-reset: true
-#     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --bool-arg pixit_allow_test_in_product_name:True pixit_allow_test_in_vendor_name:True pixit_allow_default_vendor_id:True pixit_allow_fixed_label_default_values:True
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-# === END CI TEST ARGUMENTS ===
+
 
 from mobly import asserts
 from test_testing.DefaultChecker import (FLAG_DEFAULT_CALENDAR_FORMAT, FLAG_FAULT_INJECTION, FLAG_FIXED_LABEL_DEFAULT_VALUES,

@@ -19,61 +19,7 @@
 #
 # TODO: https://github.com/project-chip/connectedhomeip/issues/36884
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_2_2_fifo
-#     script-args: >
-#       --test-case test_TC_SWTCH_2_2
-#       --endpoint 1
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --app-pipe /tmp/switch_2_2_fifo
-#     factory-reset: true
-#     quiet: true
-#   run2:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
-#     script-args: >
-#       --test-case test_TC_SWTCH_2_3
-#       --test-case test_TC_SWTCH_2_4
-#       --test-case test_TC_SWTCH_2_6
-#       --endpoint 3
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --app-pipe /tmp/switch_fifo
-#     factory-reset: true
-#     quiet: true
-#   run3:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
-#     script-args: >
-#       --test-case test_TC_SWTCH_2_3
-#       --test-case test_TC_SWTCH_2_4
-#       --test-case test_TC_SWTCH_2_5
-#       --endpoint 4
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --app-pipe /tmp/switch_fifo
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
 

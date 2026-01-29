@@ -18,20 +18,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${CAMERA_CONTROLLER_APP}
-#     app-args: interactive server
-#     script-args: >
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --storage-path admin_storage.json
-#       --string-arg th_server_app_path:${CAMERA_APP}
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+
 
 import asyncio
 import logging

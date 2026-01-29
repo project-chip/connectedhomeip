@@ -15,26 +15,7 @@
 #    limitations under the License.
 #
 
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#       app: ${TERMS_AND_CONDITIONS_APP}
-#       app-args: >
-#           --tc-min-required-version 1
-#           --tc-required-acknowledgements 1
-#           --custom-flow 2
-#           --capabilities 6
-#       script-args:
-#           --PICS src/app/tests/suites/certification/ci-pics-values
-#           --in-test-commissioning-method on-network
-#           --int-arg PIXIT.CGEN.FailsafeExpiryLengthSeconds:900
-#           --int-arg PIXIT.CGEN.RequiredTCAcknowledgements:1
-#           --int-arg PIXIT.CGEN.TCRevision:1
-#           --qr-code MT:-24J0AFN00KA0648G00
-#           --trace-to json:log
-#       factory-reset: true
-#       quiet: True
-# === END CI TEST ARGUMENTS ===
+
 
 from mobly import asserts
 

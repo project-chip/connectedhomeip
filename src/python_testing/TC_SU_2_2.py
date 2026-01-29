@@ -18,29 +18,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${OTA_REQUESTOR_APP}
-#     app-args: >
-#       --discriminator 1234
-#       --passcode 20202021
-#       --KVS /tmp/chip_kvs_requestor
-#       --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --string-arg provider_app_path:${OTA_PROVIDER_APP}
-#       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
-#       --int-arg ota_provider_port:5541
-#       --timeout 600
-#     factory-reset: true
-#     quiet: false
-# === END CI TEST ARGUMENTS ===
+
 
 import logging
 import os

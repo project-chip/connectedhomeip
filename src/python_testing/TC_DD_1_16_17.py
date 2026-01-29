@@ -18,45 +18,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: >
-#       --discriminator 1234
-#       --KVS kvs1
-#       --custom-flow 1
-#       --app-pipe /tmp/tmp_pipe
-#       --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 500549123365521327696
-#       --qr-code MT:-24J0MH312-10648G00
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --app-pipe /tmp/tmp_pipe
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: >
-#       --discriminator 1234
-#       --KVS kvs1
-#       --custom-flow 0
-#       --app-pipe /tmp/tmp_pipe
-#       --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --qr-code MT:-24J0Q1212-10648G00
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --app-pipe /tmp/tmp_pipe
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+
 #
 # Test runs twice - once with standard flow, once with user-intent flow
 
