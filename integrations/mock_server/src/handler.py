@@ -105,7 +105,11 @@ def createMockServerHandler(config: Configuration) -> Type[http.server.BaseHTTPR
             # Use the static response defined in the configuration
             self._set_headers(route.response.status, route.response.headers)
             if route.response.headers.get("Content-Type") == "application/json":
-                self.wfile.write(json.dumps(route.response.body).encode("utf-8"))
+                # If body is bytes (from $ref), write directly; otherwise serialize dict
+                if isinstance(route.response.body, bytes):
+                    self.wfile.write(route.response.body)
+                else:
+                    self.wfile.write(json.dumps(route.response.body).encode("utf-8"))
             else:
                 self.wfile.write(str(route.response.body).encode("utf-8"))
 

@@ -41,11 +41,18 @@ class DeviceFactory
 public:
     using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
 
+    struct Context
+    {
+        TimerDelegate & timerDelegate;
+    };
+
     static DeviceFactory & GetInstance()
     {
         static DeviceFactory instance;
         return instance;
     }
+
+    void Init(const Context & context) { mContext.emplace(context); }
 
     bool IsValidDevice(const std::string & deviceTypeArg) { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
 
@@ -55,29 +62,41 @@ public:
         {
             return mRegistry.find(deviceTypeArg)->second();
         }
-        else
-        {
-            ChipLogError(
-                Support,
-                "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n",
-                deviceTypeArg.c_str());
-        }
+        ChipLogError(
+            Support,
+            "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.\n",
+            deviceTypeArg.c_str());
         return nullptr;
+    }
+
+    std::vector<std::string> SupportedDeviceTypes() const
+    {
+        std::vector<std::string> result;
+        for (auto & item : mRegistry)
+        {
+            result.push_back(item.first);
+        }
+        return result;
     }
 
 private:
     std::map<std::string, DeviceCreator> mRegistry;
-    DefaultTimerDelegate timer;
+    std::optional<Context> mContext;
 
     DeviceFactory()
     {
+        // NOTE: context is set in `::Init`, so each lambda checks its
+        //       existence separately. `Init` must be called before mRegistry
+        //       factories are usable.
         mRegistry["contact-sensor"] = [this]() {
+            VerifyOrDie(mContext.has_value());
             return std::make_unique<BooleanStateSensorDevice>(
-                &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
+                &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
         };
         mRegistry["water-leak-detector"] = [this]() {
+            VerifyOrDie(mContext.has_value());
             return std::make_unique<BooleanStateSensorDevice>(
-                &timer, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
+                &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
         mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };

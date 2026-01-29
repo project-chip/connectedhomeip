@@ -18,7 +18,6 @@
 
 #include "push-av-stream-manager.h"
 
-#include <algorithm>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -37,7 +36,6 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 {
     // Unregister all transports from Media Controller before deleting them. This will ensure that any ongoing streams are
     // stopped.
-    StopSessionMonitor();
     if (mMediaController != nullptr)
     {
         for (auto & kv : mTransportMap)
@@ -52,7 +50,6 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 void PushAvStreamTransportManager::Init()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
-    StartSessionMonitor();
     return;
 }
 
@@ -98,11 +95,18 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
     mTransportOptionsMap[connectionID] = transportOptions;
 
     ChipLogProgress(Camera, "PushAvStreamTransportManager, Create PushAV Transport for Connection: [%u]", connectionID);
-    mTransportMap[connectionID] =
-        std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
 
+    auto transport = std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
+
+    CHIP_ERROR err = transport->ConfigureRecorderSettings(transportOptions, mAudioStreamParams, mVideoStreamParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to configure recorder settings for Connection: [%u], error: %s",
+                     connectionID, ErrorStr(err));
+        return Status::Failure;
+    }
+    mTransportMap[connectionID] = std::move(transport);
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
-    mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
     mTransportMap[connectionID]->SetFabricIndex(accessingFabricIndex);
 
     if (mMediaController == nullptr)
@@ -112,27 +116,24 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         return Status::NotFound;
     }
 
-    /*
-    Initialize video, audio stream ids with default invalid value (UINT16_MAX = 65535)
-    This is necessary because the MediaController API expects these values to be set.
-    If any of video/audio stream id is absent in the transport options,UINT16_MAX max is used as default value.
-    */
-    uint16_t videoStreamID = -1;
-    uint16_t audioStreamID = -1;
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
 
     if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
     {
-        videoStreamID = transportOptions.videoStreamID.Value().Value();
+        videoStreams.push_back(transportOptions.videoStreamID.Value().Value());
     }
 
     if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
     {
-        audioStreamID = transportOptions.audioStreamID.Value().Value();
+        audioStreams.push_back(transportOptions.audioStreamID.Value().Value());
     }
-    ChipLogProgress(
-        Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
-        connectionID, videoStreamID, audioStreamID);
-    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreamID, audioStreamID);
+
+    ChipLogProgress(Camera,
+                    "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreams count: [%u], "
+                    "audioStreams count: [%u]",
+                    connectionID, static_cast<unsigned>(videoStreams.size()), static_cast<unsigned>(audioStreams.size()));
+    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreams, audioStreams);
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
     uint32_t newTransportBandwidthbps = 0;
@@ -206,6 +207,14 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         return Status::NotFound;
     }
 
+    CHIP_ERROR err = mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to modify Connection :[%u], error: %s", connectionID,
+                     ErrorStr(err));
+        return Status::Failure;
+    }
+
     uint32_t newTransportBandwidthbps = 0;
     GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
@@ -220,7 +229,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
                   connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     mTransportOptionsMap[connectionID] = transportOptions;
-    mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
+
     ChipLogProgress(Camera, "PushAvStreamTransportManager, success to modify Connection :[%u]", connectionID);
 
     return Status::Success;
@@ -422,6 +431,44 @@ bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDurat
     return false;
 }
 
+bool PushAvStreamTransportManager::ValidateMaxPreRollLength(uint16_t maxPreRollLength,
+                                                            const DataModel::Nullable<uint16_t> & videoStreamId)
+{
+    // If the video stream ID is null, log error and return false
+    if (videoStreamId.IsNull())
+    {
+        ChipLogError(Camera, "MaxPreRollLength validation requested with null video stream ID");
+        return false;
+    }
+
+    auto & videoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+
+    if (videoStreams.empty())
+    {
+        ChipLogError(Camera, "Attempt to validate max pre-roll length when no video streams are allocated.");
+        return false;
+    }
+
+    for (const VideoStreamStruct & stream : videoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId.Value())
+        {
+            // If non-zero, Max pre roll length must be greater than or equal to key frame interval
+            if (maxPreRollLength >= stream.keyFrameInterval)
+            {
+                return true;
+            }
+            ChipLogError(Camera,
+                         "Max pre-roll length validation failed for video stream id [%u], max pre-roll length [%u], key frame "
+                         "interval [%u] ",
+                         stream.videoStreamID, maxPreRollLength, stream.keyFrameInterval);
+            break;
+        }
+    }
+
+    return false;
+}
+
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStream(StreamUsageEnum streamUsage,
                                                                                     uint16_t & videoStreamId)
 {
@@ -602,7 +649,7 @@ void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {
-            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10, true);
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10);
         }
     }
 }
@@ -739,82 +786,17 @@ CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
     return CHIP_NO_ERROR;
 }
 
-uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
+bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber)
 {
-    std::lock_guard<std::mutex> lock(mSessionMapMutex);
-    auto sessionKey = CreateSessionKey(fabricIdx, sessionGroup);
-    if (mSessionMap.find(sessionKey) == mSessionMap.end())
+    sessionNumber = 0;
+    // find the transport for the given connection id and return its session number
+    auto transportIt = mTransportMap.find(connectionID);
+    if (transportIt == mTransportMap.end())
     {
-        mSessionMap[sessionKey] = SessionInfo();
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+        return false;
     }
-    auto & sessionInfo = mSessionMap[sessionKey];
-    auto now           = std::chrono::system_clock::now();
-    if (sessionInfo.activeConnectionIDs.size() == 0)
-    {
-        // This case is a new trigger activation.
-        sessionInfo.sessionNumber++;
-        sessionInfo.sessionStartedTimestamp = now;
-    }
-    sessionInfo.activeConnectionIDs.insert(connectionID);
-    return sessionInfo.sessionNumber;
-}
 
-void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
-{
-    std::lock_guard<std::mutex> lock(mSessionMapMutex);
-    auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
-    auto & sessionInfo = mSessionMap[sessionKey];
-    sessionInfo.activeConnectionIDs.erase(connectionID);
-}
-
-void PushAvStreamTransportManager::StartSessionMonitor()
-{
-    mStopMonitoring       = false;
-    mSessionMonitorThread = std::thread(&PushAvStreamTransportManager::SessionMonitor, this);
-}
-
-void PushAvStreamTransportManager::StopSessionMonitor()
-{
-    mStopMonitoring = true;
-    if (mSessionMonitorThread.joinable())
-    {
-        mSessionMonitorThread.join();
-    }
-}
-
-void PushAvStreamTransportManager::SessionMonitor()
-{
-    while (!mStopMonitoring)
-    {
-        std::vector<std::pair<uint16_t, uint64_t>> sessionsToRestart;
-        {
-            std::lock_guard<std::mutex> lock(mSessionMapMutex);
-            for (auto & session : mSessionMap)
-            {
-                auto & sessionInfo = session.second;
-                auto now           = std::chrono::system_clock::now();
-                auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - sessionInfo.sessionStartedTimestamp).count();
-                if (!sessionInfo.activeConnectionIDs.empty() && elapsed >= kMaxSessionDuration)
-                {
-                    sessionInfo.sessionNumber++;
-                    sessionInfo.sessionStartedTimestamp = now;
-                    for (auto connectionID : sessionInfo.activeConnectionIDs)
-                    {
-                        sessionsToRestart.push_back({ connectionID, sessionInfo.sessionNumber });
-                    }
-                }
-            }
-        }
-
-        for (auto & [connectionID, newSessionNumber] : sessionsToRestart)
-        {
-            auto it = mTransportMap.find(connectionID);
-            if (it != mTransportMap.end())
-            {
-                it->second->StartNewSession(newSessionNumber);
-            }
-        }
-
-        std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
-    }
+    sessionNumber = transportIt->second->GetSessionNumber();
+    return true;
 }

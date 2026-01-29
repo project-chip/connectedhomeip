@@ -3963,20 +3963,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AmbientContextTypeSupported";
         case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
             return "SimultaneousDetectionLimit";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThresholdReached::Id:
-            return "CountThresholdReached";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThreshold::Id:
-            return "CountThreshold";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
-            return "ObjectCount";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountReached::Id:
+            return "ObjectCountReached";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTime::Id:
             return "HoldTime";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTimeLimits::Id:
             return "HoldTimeLimits";
         case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
             return "PredictedActivity";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::PrivacyModeEnabled::Id:
-            return "PrivacyModeEnabled";
         case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:
@@ -5662,8 +5656,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LeaveGroup";
         case chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return "UpdateGroupKey";
-        case chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
-            return "ExpireGracePeriod";
         case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return "ConfigureAuxiliaryACL";
         default:

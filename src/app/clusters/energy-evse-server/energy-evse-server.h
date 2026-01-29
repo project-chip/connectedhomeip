@@ -24,6 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/clusters/energy-evse-server/Constants.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
@@ -33,12 +34,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace EnergyEvse {
-
-// Spec-defined constraints
-constexpr int64_t kMinimumChargeCurrentLimit    = 0;
-constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
-constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
-constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the EVSE Management Cluster.

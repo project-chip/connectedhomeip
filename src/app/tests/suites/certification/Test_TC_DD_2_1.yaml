@@ -457,6 +457,8 @@ tests:
           DNS-SD."
       PICS: MCORE.DD.TXT_KEY_PH
       verification: |
+          Bits 8, 10, 12, 15, 17, 19, 20, 21, 22: If the following bits are set to 1 in the PH, verify that the PI key is set with a value N representing a value the PH key needs to indicate action for the user to take (i.e. PH Bit 8: hold reset button for N seconds, PH Bit 12: press reset button N times)
+
           $ ./chip-tool discover commissionables
           Verify in TH as commissioner side:
 

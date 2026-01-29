@@ -47,6 +47,68 @@ way that is understandable, readable, and has the features you need
 
 ## Running integration tests locally
 
+### Application and tool binary path selection in the YAML test framework
+
+The `scripts/tests/run_test_suite.py` script is used to run the YAML tests
+locally. Apart from the YAML files describing particular test cases the script
+also needs information about the locations of the application (for example
+`chip-all-clusters`) and tool (for example `chip-tool`) binaries. This
+information is provided via `--app-path` and `--tool-path` commandline switches.
+As an example:
+
+```shell
+scripts/tests/run_test_suite.py --runner chip_tool_python \
+    run \
+    --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app
+```
+
+The distinction between applications and tools is not merely cosmetic. It is
+used when running tests in Linux network namespaces to place applications and
+tools in separate network namespaces.
+
+In order to help with using the YAML tests for local usage the
+`--discover-paths` flag can be used to automatically discover paths to
+applications and tools. The root directory of the Matter SDK is used as the
+starting path of the search.
+
+You can also list the known keys for applications and tools by using the
+`--help-paths` option:
+
+```shell
+scripts/tests/run_test_suite.py run --help-paths
+…
+---
+# Known application and tool path keys:
+- key: all-clusters
+  kind: app
+- key: all-devices
+  kind: app
+- key: air-purifier
+  kind: app
+- key: bridge
+  kind: app
+- key: camera
+  kind: app
+- key: camera-controller
+  kind: app
+- key: closure
+  kind: app
+- key: energy-gateway
+  kind: app
+- key: evse
+  kind: app
+- key: fabric-bridge
+  kind: app
+- key: fabric-admin
+  kind: app
+- key: fabric-sync
+  kind: app
+…
+```
+
+## Connectivity mocking for local testing
+
 When integration tests are run locally, the test runner (YAML or python) needs
 to mock network connectivity between the controller and the device under test,
 so that all tests can be run without actual hardware. In case of a simple test
@@ -57,6 +119,23 @@ involve multiple devices or other than on-network commissioning (e.g. ble-wifi
 or ble-thread), some additional setup is needed.
 
 ### Running tests in Linux network namespaces
+
+The test suite on Linux uses user namespaces (`unshare --map-root-user`) to
+create these isolated network environments. On some systems, this feature might
+be disabled by default. To enable it, ensure the following lines are present in
+`/etc/sysctl.conf` or a new file under `/etc/sysctl.d/`:
+
+```
+kernel.unprivileged_userns_clone = 1
+```
+
+On systems with AppArmor (like Ubuntu), you also need:
+
+```
+kernel.apparmor_restrict_unprivileged_userns = 0
+```
+
+After adding these lines, apply the changes by running `sudo sysctl --system`.
 
 The simplest way to mock more complex network topologies is to use Linux network
 namespaces. Each device (controller or DUT) is run in its own network namespace,
@@ -71,10 +150,11 @@ test case in them:
 scripts/build/build_examples.py --target linux-x64-chip-tool --target linux-x64-all-clusters build
 # Run the TestOperationalState test case in the Linux network namespaces
 scripts/tests/run_test_suite.py --runner chip_tool_python \
-    --chip-tool out/linux-x64-chip-tool/chip-tool \
     --target TestOperationalState \
     --log-level=debug \
-    run
+    run \
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
+    --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool
 ```
 
 ### Running tests with mocked BLE and Wi-Fi connectivity
@@ -134,14 +214,16 @@ flowchart TD
 ```
 
 In order to run tests with mocked BLE and Wi-Fi connectivity and Linux network
-namespaces use the `--ble-wifi` option to the `run` command of the
-`scripts/tests/run_test_suite.py` script:
+namespaces use the `--commissioning-method ble-wifi` option to the `run` command
+of the `scripts/tests/run_test_suite.py` script:
 
 ```shell
 # Run the TestOperationalState test case with ble-wifi commissioning
 scripts/tests/run_test_suite.py --runner chip_tool_python \
-    --chip-tool out/linux-x64-chip-tool/chip-tool \
     --target TestOperationalState \
     --log-level=debug \
-    run --ble-wifi
+    run \
+    --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
+    --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
+    --commissioning-method ble-wifi
 ```

@@ -27,7 +27,7 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
 if TYPE_CHECKING:
-    from matter.testing.matter_testing import MatterTestConfig
+    from matter.testing.matter_test_config import MatterTestConfig
 
 
 class MatterStackState:

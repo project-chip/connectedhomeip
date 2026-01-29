@@ -4391,9 +4391,8 @@ cluster Groupcast = 101 {
   fabric_scoped struct MembershipStruct {
     group_id groupID = 0;
     endpoint_no endpoints[] = 1;
-    fabric_sensitive int32u keyID = 2;
+    fabric_sensitive int16u keySetID = 2;
     boolean hasAuxiliaryACL = 3;
-    optional fabric_sensitive int32u expiringKeyID = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -4408,10 +4407,10 @@ cluster Groupcast = 101 {
   request struct JoinGroupRequest {
     group_id groupID = 0;
     endpoint_no endpoints[] = 1;
-    int32u keyID = 2;
+    int16u keySetID = 2;
     optional octet_string<16> key = 3;
-    optional epoch_s gracePeriod = 4;
-    optional boolean useAuxiliaryACL = 5;
+    optional boolean useAuxiliaryACL = 4;
+    optional boolean replaceEndpoints = 5;
   }
 
   request struct LeaveGroupRequest {
@@ -4421,19 +4420,13 @@ cluster Groupcast = 101 {
 
   response struct LeaveGroupResponse = 2 {
     group_id groupID = 0;
-    optional endpoint_no endpoints[] = 1;
-    optional boolean listTooLarge = 2;
+    endpoint_no endpoints[] = 1;
   }
 
   request struct UpdateGroupKeyRequest {
     group_id groupID = 0;
-    int32u keyID = 1;
+    int16u keySetID = 1;
     optional octet_string<16> key = 2;
-    optional epoch_s gracePeriod = 3;
-  }
-
-  request struct ExpireGracePeriodRequest {
-    group_id groupID = 0;
   }
 
   request struct ConfigureAuxiliaryACLRequest {
@@ -4445,12 +4438,10 @@ cluster Groupcast = 101 {
   fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
   /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
   fabric command access(invoke: manage) LeaveGroup(LeaveGroupRequest): LeaveGroupResponse = 1;
-  /** This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of. */
+  /** This command SHALL allow a fabric administrator to update the OperationalGroupKey associated with the existing group identified by GroupID, which is already joined. */
   fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
-  /** This command SHALL allow a fabric maintainer to expire the grace period of the previous key for an existing group ID that the server is a member of. */
-  fabric command access(invoke: manage) ExpireGracePeriod(ExpireGracePeriodRequest): DefaultSuccess = 4;
   /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
-  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 5;
+  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 4;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -8718,13 +8709,15 @@ provisional cluster AmbientContextSensing = 1073 {
     kHumanActivity = 0x1;
     kObjectCounting = 0x2;
     kObjectIdentification = 0x4;
-    kSoundClassification = 0x8;
+    kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
     optional epoch_s detectionStartTime = 1;
+    optional int16u objectCountThreshold = 2;
+    optional int16u objectCount = 3;
   }
 
   struct HoldTimeLimitsStruct {
@@ -8742,19 +8735,20 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
+  info event AmbientContextDetected = 0 {
+    AmbientContextTypeStruct ambientContextType[] = 0;
+  }
+
   readonly attribute optional boolean humanActivityDetected = 0;
   readonly attribute optional boolean objectIdentified = 1;
   readonly attribute optional boolean audioContextDetected = 2;
   readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
   attribute int8u simultaneousDetectionLimit = 5;
-  readonly attribute optional boolean countThresholdReached = 6;
-  attribute optional int16u countThreshold = 7;
-  readonly attribute optional int16u objectCount = 8;
-  attribute access(write: manage) optional int16u holdTime = 9;
-  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 10;
-  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
-  readonly attribute optional boolean privacyModeEnabled = 12;
+  readonly attribute optional boolean objectCountReached = 6;
+  attribute access(write: manage) int16u holdTime = 7;
+  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 8;
+  readonly attribute access(write: manage) optional PredictedActivityStruct predictedActivity[] = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -10826,11 +10820,15 @@ cluster PushAvStreamTransport = 1365 {
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 cluster Chime = 1366 {
-  revision 1;
+  revision 2;
 
   struct ChimeSoundStruct {
     int8u chimeID = 0;
     char_string<48> name = 1;
+  }
+
+  info event ChimeStartedPlaying = 0 {
+    int8u chimeID = 0;
   }
 
   readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
@@ -10842,8 +10840,12 @@ cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command will play the currently selected chime. */
-  command PlayChimeSound(): DefaultSuccess = 0;
+  request struct PlayChimeSoundRequest {
+    optional int8u chimeID = 0;
+  }
+
+  /** This command will play the currently selected chime or the chime passed in. */
+  command PlayChimeSound(PlayChimeSoundRequest): DefaultSuccess = 0;
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */

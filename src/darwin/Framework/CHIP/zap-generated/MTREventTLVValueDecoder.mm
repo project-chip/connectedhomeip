@@ -4720,6 +4720,90 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
 {
     using namespace Clusters::AmbientContextSensing;
     switch (aEventId) {
+    case Events::AmbientContextDetected::Id: {
+        Events::AmbientContextDetected::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAmbientContextSensingClusterAmbientContextDetectedEvent new];
+
+        do {
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.ambientContextType.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    MTRAmbientContextSensingClusterAmbientContextTypeStruct * newElement_0;
+                    newElement_0 = [MTRAmbientContextSensingClusterAmbientContextTypeStruct new];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.ambientContextSensed.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            MTRDataTypeSemanticTagStruct * newElement_2;
+                            newElement_2 = [MTRDataTypeSemanticTagStruct new];
+                            if (entry_2.mfgCode.IsNull()) {
+                                newElement_2.mfgCode = nil;
+                            } else {
+                                newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                            }
+                            newElement_2.namespaceID = [NSNumber numberWithUnsignedChar:entry_2.namespaceID];
+                            newElement_2.tag = [NSNumber numberWithUnsignedChar:entry_2.tag];
+                            if (entry_2.label.HasValue()) {
+                                if (entry_2.label.Value().IsNull()) {
+                                    newElement_2.label = nil;
+                                } else {
+                                    newElement_2.label = AsString(entry_2.label.Value().Value());
+                                    if (newElement_2.label == nil) {
+                                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                        *aError = err;
+                                        return nil;
+                                    }
+                                }
+                            } else {
+                                newElement_2.label = nil;
+                            }
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.ambientContextSensed = array_2;
+                    }
+                    if (entry_0.detectionStartTime.HasValue()) {
+                        newElement_0.detectionStartTime = [NSNumber numberWithUnsignedInt:entry_0.detectionStartTime.Value()];
+                    } else {
+                        newElement_0.detectionStartTime = nil;
+                    }
+                    if (entry_0.objectCountThreshold.HasValue()) {
+                        newElement_0.objectCountThreshold = [NSNumber numberWithUnsignedShort:entry_0.objectCountThreshold.Value()];
+                    } else {
+                        newElement_0.objectCountThreshold = nil;
+                    }
+                    if (entry_0.objectCount.HasValue()) {
+                        newElement_0.objectCount = [NSNumber numberWithUnsignedShort:entry_0.objectCount.Value()];
+                    } else {
+                        newElement_0.objectCount = nil;
+                    }
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                memberValue = array_0;
+            }
+            value.ambientContextType = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known AmbientContextSensing event.
         break;
@@ -5316,6 +5400,23 @@ static id _Nullable DecodeEventPayloadForChimeCluster(EventId aEventId, TLV::TLV
 {
     using namespace Clusters::Chime;
     switch (aEventId) {
+    case Events::ChimeStartedPlaying::Id: {
+        Events::ChimeStartedPlaying::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRChimeClusterChimeStartedPlayingEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.chimeID];
+            value.chimeID = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known Chime event.
         break;

@@ -179,41 +179,42 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+
+        // Back up any existing DeviceInstanceInfoProvider and install the mock provider. This is required on platforms that build
+        // all unit tests into a single binary(e.g. Nordic), where global DeviceLayer state persists across test suites.
+        // DeviceInstanceInfoProvider has no universal default and cannot be reliably reset via Init/Shutdown, so without this
+        // backup/restore the mock would leak into subsequent tests.
+        sDeviceInstanceInfoProviderBackup = DeviceLayer::TestOnlyTryGetDeviceInstanceInfoProvider();
         DeviceLayer::SetDeviceInstanceInfoProvider(&gMockDeviceInstanceInfoProvider);
         DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
     }
 
     static void TearDownTestSuite()
     {
-        // For the DeviceInstanceInfoProvider there is no default instance.
-        // No need setting it to nullptr, as it won't do anything. It returns immediately if the input is nullptr.
+        // For the DeviceInstanceInfoProvider there is no default instance. Restore the provider that was installed prior to this
+        // test suite, if any.
+        if (sDeviceInstanceInfoProviderBackup != nullptr)
+        {
+            DeviceLayer::SetDeviceInstanceInfoProvider(sDeviceInstanceInfoProviderBackup);
+        }
         DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         chip::Platform::MemoryShutdown();
     }
 
     TestBasicInformationReadWrite() {}
-
-    void SetUp() override
-    {
-        // Enable optional attributes that are used in tests
-        basicInformationClusterInstance.OptionalAttributes()
-            .Set<Attributes::ManufacturingDate::Id>()
-            .Set<Attributes::LocalConfigDisabled::Id>();
-        ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
-    }
-
-    void TearDown() override { basicInformationClusterInstance.Shutdown(ClusterShutdownType::kClusterShutdown); }
-
     chip::Testing::TestServerClusterContext testContext;
-    static BasicInformationCluster & basicInformationClusterInstance;
-    static chip::Testing::ClusterTester tester;
+    static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup;
 };
 
-BasicInformationCluster & TestBasicInformationReadWrite::basicInformationClusterInstance = BasicInformationCluster::Instance();
-chip::Testing::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
+DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDeviceInstanceInfoProviderBackup = nullptr;
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // 1. GIVEN: A mock storage with a pre-existing "Old Label".
     CharSpan oldLabelSpan = "Old Label"_span;
 
@@ -227,8 +228,8 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
-    basicInformationClusterInstance.Shutdown(ClusterShutdownType::kClusterShutdown);
-    ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
     char readBuffer[32];
@@ -255,11 +256,18 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     Storage::String<32> persistedLabel;
     persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, persistedLabel);
     EXPECT_TRUE(persistedLabel.Content().data_equal(newLabelSpan));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;
+
+    BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.Set<Attributes::ManufacturingDate::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    chip::Testing::ClusterTester tester(cluster);
 
     // VendorName
     {
@@ -366,11 +374,28 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         ASSERT_EQ(tester.ReadAttribute(Attributes::CapabilityMinima::Id, val), CHIP_NO_ERROR);
         EXPECT_GE(val.caseSessionsPerFabric, 3);
         EXPECT_GE(val.subscriptionsPerFabric, 3);
+
+        ASSERT_TRUE(val.simultaneousInvocationsSupported.HasValue());
+        EXPECT_GE(val.simultaneousInvocationsSupported.Value(), CHIP_IM_MAX_NUM_COMMAND_HANDLER);
+
+        ASSERT_TRUE(val.simultaneousWritesSupported.HasValue());
+        EXPECT_GE(val.simultaneousWritesSupported.Value(), CHIP_IM_MAX_NUM_WRITE_HANDLER);
+
+        ASSERT_TRUE(val.readPathsSupported.HasValue());
+        EXPECT_GE(val.readPathsSupported.Value(), CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS);
+
+        ASSERT_TRUE(val.subscribePathsSupported.HasValue());
+        EXPECT_GE(val.subscribePathsSupported.Value(), CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS);
     }
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // 1. ARRANGE: Define a new valid label
     CharSpan newLabel = "My Awesome Hub"_span;
     char readBuffer[32];
@@ -382,10 +407,17 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
     // 3. ASSERT: Read the attribute back and verify it matches the new label
     ASSERT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(newLabel));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // --- Test Case 1: Write a valid 2-character location ---
     {
         CharSpan validLocation = "US"_span;
@@ -406,11 +438,19 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         DataModel::ActionReturnStatus writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 {
     bool readValue{};
+
+    BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.Set<Attributes::LocalConfigDisabled::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, &gMockDeviceInstanceInfoProvider);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
 
     // --- Test Case 1: Write 'true' ---
     {
@@ -433,6 +473,8 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
         ASSERT_EQ(tester.ReadAttribute(Attributes::LocalConfigDisabled::Id, readValue), CHIP_NO_ERROR);
         EXPECT_EQ(readValue, finalValue);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace
