@@ -22,5 +22,8 @@ constexpr int64_t kMinimumChargeCurrentLimit       = 0;
 constexpr uint32_t kMaxRandomizationDelayWindowSec = 86400;
 constexpr uint8_t kEvseTargetsMaxNumberOfDays      = 7;
 constexpr uint8_t kEvseTargetsMaxTargetsPerDay     = 10;
+constexpr uint16_t kMaxMinutesPastMidnight         = 1439; // 24*60 - 1, spec range 0..1439
+constexpr uint8_t kMaxTargetSoCPercent             = 100;
+constexpr uint8_t kDayOfWeekBitmapMask             = 0x7F; // bits 0-6 for 7 days
 
 } // namespace chip::app::Clusters::EnergyEvse

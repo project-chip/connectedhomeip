@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <app/reporting/reporting.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -1373,9 +1374,11 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
     GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, mImportedMeterValueAtEnergyTransferStart);
     event.maximumCurrent = mMaximumChargeCurrent;
 
+    Instance * instance = GetInstance();
+    VerifyOrReturnError(instance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
     /* For V2X we may switch between charging and discharging, but we don't
      * keep sending EnergyTransferStarted events */
-    if (GetInstance()->HasFeature(Feature::kV2x))
+    if (instance->HasFeature(Feature::kV2x))
     {
         /* Sample the energy meter for discharging */
         GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, mExportedMeterValueAtEnergyTransferStart);
@@ -1416,7 +1419,10 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
     GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, meterValueNow);
     event.energyTransferred = meterValueNow - mImportedMeterValueAtEnergyTransferStart;
 
-    if (GetInstance()->HasFeature(Feature::kV2x))
+    Instance * instance = GetInstance();
+    VerifyOrReturnError(instance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+
+    if (instance->HasFeature(Feature::kV2x))
     {
         GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, meterValueNow);
         event.energyDischarged.SetValue(mExportedMeterValueAtEnergyTransferStart - meterValueNow);
@@ -1556,7 +1562,7 @@ CHIP_ERROR EnergyEvseDelegate::SetChargingEnabledUntil(DataModel::Nullable<uint3
 
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mChargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mChargingEnabledUntil);
 
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
     }
@@ -1588,7 +1594,7 @@ CHIP_ERROR EnergyEvseDelegate::SetDischargingEnabledUntil(DataModel::Nullable<ui
         }
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mDischargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mDischargingEnabledUntil);
 
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
     }
@@ -1697,7 +1703,7 @@ CHIP_ERROR EnergyEvseDelegate::SetUserMaximumChargeCurrent(int64_t newValue)
 
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mUserMaximumChargeCurrent);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mUserMaximumChargeCurrent);
 
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
     }
@@ -1727,7 +1733,7 @@ CHIP_ERROR EnergyEvseDelegate::SetRandomizationDelayWindow(uint32_t newValue)
 
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, RandomizationDelayWindow::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mRandomizationDelayWindow);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mRandomizationDelayWindow);
 
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, RandomizationDelayWindow::Id);
     }
@@ -1862,7 +1868,7 @@ CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(DataModel::Nullable<ui
         }
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id);
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mApproximateEVEfficiency);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mApproximateEVEfficiency);
 
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id);
     }
@@ -2003,7 +2009,7 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
 
     // Write values to persistent storage.
     ConcreteAttributePath path = ConcreteAttributePath(endpointId, EnergyEvse::Id, SessionID::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mSessionID);
 
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart

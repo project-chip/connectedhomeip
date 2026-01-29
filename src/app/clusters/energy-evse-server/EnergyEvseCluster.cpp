@@ -14,14 +14,10 @@
  *    limitations under the License.
  */
 
-#include "energy-evse-server.h"
-
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
+#include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/EnergyEvse/Metadata.h>
 
 using namespace chip;
@@ -37,363 +33,247 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
-CHIP_ERROR Instance::Init()
+CHIP_ERROR EnergyEvseCluster::Startup(ServerClusterContext & context)
 {
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-
-    return CHIP_NO_ERROR;
-}
-
-void Instance::Shutdown()
-{
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-}
-
-bool Instance::HasFeature(Feature aFeature) const
-{
-    return mFeature.Has(aFeature);
-}
-
-bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
-{
-    return mOptionalAttrs.Has(aOptionalAttrs);
-}
-
-bool Instance::SupportsOptCmd(OptionalCommands aOptionalCmds) const
-{
-    return mOptionalCmds.Has(aOptionalCmds);
-}
-
-// AttributeAccessInterface
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
+    if (mDelegate.GetEndpointId() != mPath.mEndpointId)
     {
-    case State::Id:
-        return aEncoder.Encode(mDelegate.GetState());
-    case SupplyState::Id:
-        return aEncoder.Encode(mDelegate.GetSupplyState());
-    case FaultState::Id:
-        return aEncoder.Encode(mDelegate.GetFaultState());
-    case ChargingEnabledUntil::Id:
-        return aEncoder.Encode(mDelegate.GetChargingEnabledUntil());
-    case DischargingEnabledUntil::Id:
-        /* V2X */
-        return aEncoder.Encode(mDelegate.GetDischargingEnabledUntil());
-    case CircuitCapacity::Id:
-        return aEncoder.Encode(mDelegate.GetCircuitCapacity());
-    case MinimumChargeCurrent::Id:
-        return aEncoder.Encode(mDelegate.GetMinimumChargeCurrent());
-    case MaximumChargeCurrent::Id:
-        return aEncoder.Encode(mDelegate.GetMaximumChargeCurrent());
-    case MaximumDischargeCurrent::Id:
-        /* V2X */
-        return aEncoder.Encode(mDelegate.GetMaximumDischargeCurrent());
-
-    case UserMaximumChargeCurrent::Id:
-        return aEncoder.Encode(mDelegate.GetUserMaximumChargeCurrent());
-    case RandomizationDelayWindow::Id:
-        /* Optional */
-        return aEncoder.Encode(mDelegate.GetRandomizationDelayWindow());
-    /* PREF - ChargingPreferences attributes */
-    case NextChargeStartTime::Id:
-        return aEncoder.Encode(mDelegate.GetNextChargeStartTime());
-    case NextChargeTargetTime::Id:
-        return aEncoder.Encode(mDelegate.GetNextChargeTargetTime());
-    case NextChargeRequiredEnergy::Id:
-        return aEncoder.Encode(mDelegate.GetNextChargeRequiredEnergy());
-    case NextChargeTargetSoC::Id:
-        return aEncoder.Encode(mDelegate.GetNextChargeTargetSoC());
-    case ApproximateEVEfficiency::Id:
-        return aEncoder.Encode(mDelegate.GetApproximateEVEfficiency());
-    /* SOC attributes */
-    case StateOfCharge::Id:
-        return aEncoder.Encode(mDelegate.GetStateOfCharge());
-    case BatteryCapacity::Id:
-        return aEncoder.Encode(mDelegate.GetBatteryCapacity());
-    /* PNC attributes*/
-    case VehicleID::Id:
-        return aEncoder.Encode(mDelegate.GetVehicleID());
-    /* Session SESS attributes */
-    case SessionID::Id:
-        return aEncoder.Encode(mDelegate.GetSessionID());
-    case SessionDuration::Id:
-        return aEncoder.Encode(mDelegate.GetSessionDuration());
-    case SessionEnergyCharged::Id:
-        return aEncoder.Encode(mDelegate.GetSessionEnergyCharged());
-    case SessionEnergyDischarged::Id:
-        return aEncoder.Encode(mDelegate.GetSessionEnergyDischarged());
-
-    /* FeatureMap - is held locally */
-    case FeatureMap::Id:
-        return aEncoder.Encode(mFeature);
+        ChipLogError(Zcl, "EVSE: EndpointId mismatch - delegate has %d, cluster has %d", mDelegate.GetEndpointId(),
+                     mPath.mEndpointId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    /* Allow all other unhandled attributes to fall through to Ember */
-    return CHIP_NO_ERROR;
+    return DefaultServerCluster::Startup(context);
 }
 
-CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+DataModel::ActionReturnStatus EnergyEvseCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                               AttributeValueEncoder & encoder)
 {
-    switch (aPath.mAttributeId)
+    switch (request.path.mAttributeId)
+    {
+    case FeatureMap::Id:
+        return encoder.Encode(mFeatureFlags);
+    case ClusterRevision::Id:
+        return encoder.Encode(kRevision);
+    case State::Id:
+        return encoder.Encode(mDelegate.GetState());
+    case SupplyState::Id:
+        return encoder.Encode(mDelegate.GetSupplyState());
+    case FaultState::Id:
+        return encoder.Encode(mDelegate.GetFaultState());
+    case ChargingEnabledUntil::Id:
+        return encoder.Encode(mDelegate.GetChargingEnabledUntil());
+    case DischargingEnabledUntil::Id:
+        return encoder.Encode(mDelegate.GetDischargingEnabledUntil());
+    case CircuitCapacity::Id:
+        return encoder.Encode(mDelegate.GetCircuitCapacity());
+    case MinimumChargeCurrent::Id:
+        return encoder.Encode(mDelegate.GetMinimumChargeCurrent());
+    case MaximumChargeCurrent::Id:
+        return encoder.Encode(mDelegate.GetMaximumChargeCurrent());
+    case MaximumDischargeCurrent::Id:
+        return encoder.Encode(mDelegate.GetMaximumDischargeCurrent());
+    case UserMaximumChargeCurrent::Id:
+        return encoder.Encode(mDelegate.GetUserMaximumChargeCurrent());
+    case RandomizationDelayWindow::Id:
+        return encoder.Encode(mDelegate.GetRandomizationDelayWindow());
+    case NextChargeStartTime::Id:
+        return encoder.Encode(mDelegate.GetNextChargeStartTime());
+    case NextChargeTargetTime::Id:
+        return encoder.Encode(mDelegate.GetNextChargeTargetTime());
+    case NextChargeRequiredEnergy::Id:
+        return encoder.Encode(mDelegate.GetNextChargeRequiredEnergy());
+    case NextChargeTargetSoC::Id:
+        return encoder.Encode(mDelegate.GetNextChargeTargetSoC());
+    case ApproximateEVEfficiency::Id:
+        return encoder.Encode(mDelegate.GetApproximateEVEfficiency());
+    case StateOfCharge::Id:
+        return encoder.Encode(mDelegate.GetStateOfCharge());
+    case BatteryCapacity::Id:
+        return encoder.Encode(mDelegate.GetBatteryCapacity());
+    case VehicleID::Id:
+        return encoder.Encode(mDelegate.GetVehicleID());
+    case SessionID::Id:
+        return encoder.Encode(mDelegate.GetSessionID());
+    case SessionDuration::Id:
+        return encoder.Encode(mDelegate.GetSessionDuration());
+    case SessionEnergyCharged::Id:
+        return encoder.Encode(mDelegate.GetSessionEnergyCharged());
+    case SessionEnergyDischarged::Id:
+        return encoder.Encode(mDelegate.GetSessionEnergyDischarged());
+    default:
+        return Status::UnsupportedAttribute;
+    }
+}
+
+DataModel::ActionReturnStatus EnergyEvseCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                AttributeValueDecoder & decoder)
+{
+    switch (request.path.mAttributeId)
     {
     case UserMaximumChargeCurrent::Id: {
-        // Optional Attribute
-        if (!SupportsOptAttr(OptionalAttributes::kSupportsUserMaximumChargingCurrent))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
-
-        int64_t newValue;
-        ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetUserMaximumChargeCurrent(newValue));
-        return CHIP_NO_ERROR;
+        UserMaximumChargeCurrent::TypeInfo::DecodableType value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return mDelegate.SetUserMaximumChargeCurrent(value);
     }
     case RandomizationDelayWindow::Id: {
-        // Optional Attribute
-        if (!SupportsOptAttr(OptionalAttributes::kSupportsRandomizationWindow))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
-        uint32_t newValue;
-        ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetRandomizationDelayWindow(newValue));
-        return CHIP_NO_ERROR;
+        RandomizationDelayWindow::TypeInfo::DecodableType value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return mDelegate.SetRandomizationDelayWindow(value);
     }
     case ApproximateEVEfficiency::Id: {
-        // Optional Attribute if ChargingPreferences is supported
-        if ((!HasFeature(Feature::kChargingPreferences)) ||
-            (!SupportsOptAttr(OptionalAttributes::kSupportsApproximateEvEfficiency)))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
-        uint16_t newValue;
-        ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetApproximateEVEfficiency(MakeNullable(newValue)));
-        return CHIP_NO_ERROR;
+        ApproximateEVEfficiency::TypeInfo::DecodableType value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return mDelegate.SetApproximateEVEfficiency(value);
     }
-
     default:
-        // Unknown attribute; return error.  None of the other attributes for
-        // this cluster are writable, so should not be ending up in this code to
-        // start with.
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return Status::UnsupportedAttribute;
+    }
+}
+std::optional<DataModel::ActionReturnStatus> EnergyEvseCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                              TLV::TLVReader & input_arguments,
+                                                                              CommandHandler * handler)
+{
+    using namespace Commands;
+
+    switch (request.path.mCommandId)
+    {
+    case Disable::Id:
+        return HandleDisable(request, input_arguments, handler);
+    case EnableCharging::Id:
+        return HandleEnableCharging(request, input_arguments, handler);
+    case EnableDischarging::Id:
+        return HandleEnableDischarging(request, input_arguments, handler);
+    case StartDiagnostics::Id:
+        return HandleStartDiagnostics(request, input_arguments, handler);
+    case SetTargets::Id:
+        return HandleSetTargets(request, input_arguments, handler);
+    case GetTargets::Id:
+        return HandleGetTargets(request, input_arguments, handler);
+    case ClearTargets::Id:
+        return HandleClearTargets(request, input_arguments, handler);
+    default:
+        return Status::UnsupportedCommand;
     }
 }
 
-// CommandHandlerInterface
-CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
-                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR EnergyEvseCluster::Attributes(const ConcreteClusterPath & path,
+                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        // V2x feature attributes
+        { mFeatureFlags.Has(Feature::kV2x), DischargingEnabledUntil::kMetadataEntry },
+        { mFeatureFlags.Has(Feature::kV2x), MaximumDischargeCurrent::kMetadataEntry },
+        { mFeatureFlags.Has(Feature::kV2x), SessionEnergyDischarged::kMetadataEntry },
+        // ChargingPreferences feature attributes
+        { mFeatureFlags.Has(Feature::kChargingPreferences), NextChargeStartTime::kMetadataEntry },
+        { mFeatureFlags.Has(Feature::kChargingPreferences), NextChargeTargetTime::kMetadataEntry },
+        { mFeatureFlags.Has(Feature::kChargingPreferences), NextChargeRequiredEnergy::kMetadataEntry },
+        { mFeatureFlags.Has(Feature::kChargingPreferences), NextChargeTargetSoC::kMetadataEntry },
+        { (mFeatureFlags.Has(Feature::kChargingPreferences) &&
+           mOptionalAttrs.Has(OptionalAttributes::kSupportsApproximateEvEfficiency)),
+          ApproximateEVEfficiency::kMetadataEntry },
+        // SoCReporting feature attributes
+        { mFeatureFlags.Has(Feature::kSoCReporting), StateOfCharge::kMetadataEntry },
+        { mFeatureFlags.Has(Feature::kSoCReporting), BatteryCapacity::kMetadataEntry },
+        // PlugAndCharge feature attribute
+        { mFeatureFlags.Has(Feature::kPlugAndCharge), VehicleID::kMetadataEntry },
+        // Optional attributes (not feature-based)
+        { mOptionalAttrs.Has(OptionalAttributes::kSupportsUserMaximumChargingCurrent), UserMaximumChargeCurrent::kMetadataEntry },
+        { mOptionalAttrs.Has(OptionalAttributes::kSupportsRandomizationWindow), RandomizationDelayWindow::kMetadataEntry },
+    };
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalAttributes));
+}
+
+CHIP_ERROR EnergyEvseCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
-
     ReturnErrorOnFailure(builder.AppendElements({ Disable::kMetadataEntry, EnableCharging::kMetadataEntry }));
-
-    if (HasFeature(Feature::kV2x))
+    if (mFeatureFlags.Has(Feature::kV2x))
     {
-        ReturnErrorOnFailure(builder.Append(EnableDischarging::kMetadataEntry));
+        ReturnErrorOnFailure(builder.AppendElements({ EnableDischarging::kMetadataEntry }));
     }
-
-    if (HasFeature(Feature::kChargingPreferences))
+    if (mOptionalCmds.Has(OptionalCommands::kSupportsStartDiagnostics))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ StartDiagnostics::kMetadataEntry }));
+    }
+    if (mFeatureFlags.Has(Feature::kChargingPreferences))
     {
         ReturnErrorOnFailure(
             builder.AppendElements({ SetTargets::kMetadataEntry, GetTargets::kMetadataEntry, ClearTargets::kMetadataEntry }));
     }
 
-    if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
-    {
-        ReturnErrorOnFailure(builder.Append(StartDiagnostics::kMetadataEntry));
-    }
-
     return CHIP_NO_ERROR;
 }
 
-void Instance::InvokeCommand(HandlerContext & handlerContext)
+CHIP_ERROR EnergyEvseCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
     using namespace Commands;
-
-    switch (handlerContext.mRequestPath.mCommandId)
+    if (mFeatureFlags.Has(Feature::kChargingPreferences))
     {
-    case Disable::Id:
-        HandleCommand<Disable::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleDisable(ctx, commandData); });
-        return;
-    case EnableCharging::Id:
-        HandleCommand<EnableCharging::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleEnableCharging(ctx, commandData); });
-        return;
-    case EnableDischarging::Id:
-        if (!HasFeature(Feature::kV2x))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<EnableDischarging::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) {
-                HandleEnableDischarging(ctx, commandData);
-            });
-        }
-        return;
-    case StartDiagnostics::Id:
-        if (!SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<StartDiagnostics::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) {
-                HandleStartDiagnostics(ctx, commandData);
-            });
-        }
-        return;
-    case SetTargets::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<SetTargets::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleSetTargets(ctx, commandData); });
-        }
-        return;
-    case GetTargets::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<GetTargets::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTargets(ctx, commandData); });
-        }
-        return;
-    case ClearTargets::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<ClearTargets::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleClearTargets(ctx, commandData); });
-        }
-        return;
+        ReturnErrorOnFailure(builder.AppendElements({ GetTargetsResponse::Id }));
     }
+    return CHIP_NO_ERROR;
 }
 
-void Instance::HandleDisable(HandlerContext & ctx, const Commands::Disable::DecodableType & commandData)
+DataModel::ActionReturnStatus EnergyEvseCluster::HandleDisable(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
-    // No parameters for this command
-    // Call the delegate
-    Status status = mDelegate.Disable();
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    return mDelegate.Disable();
 }
 
-void Instance::HandleEnableCharging(HandlerContext & ctx, const Commands::EnableCharging::DecodableType & commandData)
+DataModel::ActionReturnStatus EnergyEvseCluster::HandleEnableCharging(const DataModel::InvokeRequest & request,
+                                                                      TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
+    Commands::EnableCharging::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
     auto & chargingEnabledUntil = commandData.chargingEnabledUntil;
     auto & minimumChargeCurrent = commandData.minimumChargeCurrent;
     auto & maximumChargeCurrent = commandData.maximumChargeCurrent;
 
-    if (minimumChargeCurrent < kMinimumChargeCurrentLimit)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
-    }
+    VerifyOrReturnValue(minimumChargeCurrent >= kMinimumChargeCurrentLimit, Status::ConstraintError);
+    VerifyOrReturnValue(maximumChargeCurrent >= kMinimumChargeCurrentLimit, Status::ConstraintError);
+    VerifyOrReturnValue(minimumChargeCurrent <= maximumChargeCurrent, Status::ConstraintError);
 
-    if (maximumChargeCurrent < kMinimumChargeCurrentLimit)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
-    }
-
-    if (minimumChargeCurrent > maximumChargeCurrent)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
-    }
-
-    // Call the delegate
-    Status status = mDelegate.EnableCharging(chargingEnabledUntil, minimumChargeCurrent, maximumChargeCurrent);
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    return mDelegate.EnableCharging(chargingEnabledUntil, minimumChargeCurrent, maximumChargeCurrent);
 }
 
-void Instance::HandleEnableDischarging(HandlerContext & ctx, const Commands::EnableDischarging::DecodableType & commandData)
+DataModel::ActionReturnStatus EnergyEvseCluster::HandleEnableDischarging(const DataModel::InvokeRequest & request,
+                                                                         TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
+    Commands::EnableDischarging::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
     auto & dischargingEnabledUntil = commandData.dischargingEnabledUntil;
     auto & maximumDischargeCurrent = commandData.maximumDischargeCurrent;
 
-    if (maximumDischargeCurrent < kMinimumChargeCurrentLimit)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
-    }
+    VerifyOrReturnValue(maximumDischargeCurrent >= kMinimumChargeCurrentLimit, Status::ConstraintError);
 
-    // Call the delegate
-    Status status = mDelegate.EnableDischarging(dischargingEnabledUntil, maximumDischargeCurrent);
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    return mDelegate.EnableDischarging(dischargingEnabledUntil, maximumDischargeCurrent);
 }
-void Instance::HandleStartDiagnostics(HandlerContext & ctx, const Commands::StartDiagnostics::DecodableType & commandData)
+
+DataModel::ActionReturnStatus EnergyEvseCluster::HandleStartDiagnostics(const DataModel::InvokeRequest & request,
+                                                                        TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
-    // No parameters for this command
-    // Call the delegate
-    Status status = mDelegate.StartDiagnostics();
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    return mDelegate.StartDiagnostics();
 }
 
-void Instance::HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets::DecodableType & commandData)
-{
-    // Call the delegate
-    auto & chargingTargetSchedules = commandData.chargingTargetSchedules;
-
-    Status status = ValidateTargets(chargingTargetSchedules);
-    if (status != Status::Success)
-    {
-        ChipLogError(AppServer, "SetTargets contained invalid data - Rejecting");
-    }
-    else
-    {
-        status = mDelegate.SetTargets(chargingTargetSchedules);
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-Status Instance::ValidateTargets(
+Status EnergyEvseCluster::ValidateTargets(
     const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
 {
-    /* A) check that the targets are valid
-     *  1) each target must be within valid range (TargetTimeMinutesPastMidnight < 1440)
-     *  2) each target must be within valid range (TargetSoC percent 0 - 100)
-     *      If SOC feature not supported then this MUST be 100 or not present
-     *  3) each target must be within valid range (AddedEnergy >= 0)
-     * B) Day of Week is only allowed to be included once
-     */
-
     uint8_t dayOfWeekBitmap = 0;
 
     auto iter = chargingTargetSchedules.begin();
     while (iter.Next())
     {
         auto & entry    = iter.GetValue();
-        uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+        uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kDayOfWeekBitmapMask));
         ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
 
-        if ((dayOfWeekBitmap & bitmask) != 0)
-        {
-            // A bit has already been set - Return ConstraintError
-            ChipLogError(AppServer, "DayOfWeekForSequence has a bit set which has already been set in another entry.");
-            return Status::ConstraintError;
-        }
-        dayOfWeekBitmap |= bitmask; // add this day Of week to the previously seen days
+        VerifyOrReturnValue((dayOfWeekBitmap & bitmask) == 0, Status::ConstraintError,
+                            ChipLogError(AppServer, "DayOfWeekForSequence bit already set"));
+        dayOfWeekBitmap |= bitmask;
 
         auto iterInner   = entry.chargingTargets.begin();
         uint8_t innerIdx = 0;
@@ -404,100 +284,75 @@ Status Instance::ValidateTargets(
             ChipLogProgress(AppServer, "[%d] MinutesPastMidnight : %d", innerIdx,
                             static_cast<short unsigned int>(minutesPastMidnight));
 
-            if (minutesPastMidnight > 1439)
+            VerifyOrReturnValue(minutesPastMidnight <= kMaxMinutesPastMidnight, Status::ConstraintError,
+                                ChipLogError(AppServer, "MinutesPastMidnight invalid: %d", static_cast<int>(minutesPastMidnight)));
+
+            if (mFeatureFlags.Has(Feature::kSoCReporting))
             {
-                ChipLogError(AppServer, "MinutesPastMidnight has invalid value (%d)", static_cast<int>(minutesPastMidnight));
-                return Status::ConstraintError;
+                VerifyOrReturnValue(targetStruct.targetSoC.HasValue(), Status::InvalidCommand,
+                                    ChipLogError(AppServer, "SoCReporting enabled but TargetSoC missing"));
+                VerifyOrReturnValue(
+                    targetStruct.targetSoC.Value() <= kMaxTargetSoCPercent, Status::ConstraintError,
+                    ChipLogError(AppServer, "TargetSoC invalid: %d", static_cast<int>(targetStruct.targetSoC.Value())));
+            }
+            else
+            {
+                VerifyOrReturnValue(!targetStruct.targetSoC.HasValue() || targetStruct.targetSoC.Value() == kMaxTargetSoCPercent,
+                                    Status::ConstraintError,
+                                    ChipLogError(AppServer, "TargetSoC must be 100 if SOC feature not supported"));
             }
 
-            // If SocReporting is supported, targetSoc must have a value in the range [0, 100]
-            if (HasFeature(Feature::kSoCReporting))
-            {
-                if (!targetStruct.targetSoC.HasValue())
-                {
-                    ChipLogError(AppServer, "kSoCReporting is supported but TargetSoC does not have a value");
-                    return Status::InvalidCommand;
-                }
+            VerifyOrReturnValue(targetStruct.targetSoC.HasValue() || targetStruct.addedEnergy.HasValue(), Status::Failure,
+                                ChipLogError(AppServer, "Must have one of AddedEnergy or TargetSoC"));
 
-                if (targetStruct.targetSoC.Value() > 100)
-                {
-                    ChipLogError(AppServer, "TargetSoC has invalid value (%d)", static_cast<int>(targetStruct.targetSoC.Value()));
-                    return Status::ConstraintError;
-                }
-            }
-            else if (targetStruct.targetSoC.HasValue() && targetStruct.targetSoC.Value() != 100)
-            {
-                // If SocReporting is not supported but targetSoc has a value, it must be 100
-                ChipLogError(AppServer, "TargetSoC has can only be 100%% if SOC feature is not supported");
-                return Status::ConstraintError;
-            }
-
-            // One or both of targetSoc and addedEnergy must be specified
-            if (!(targetStruct.targetSoC.HasValue()) && !(targetStruct.addedEnergy.HasValue()))
-            {
-                ChipLogError(AppServer, "Must have one of AddedEnergy or TargetSoC");
-                return Status::Failure;
-            }
-
-            // Validate the value of addedEnergy, if specified is >= 0
-            if (targetStruct.addedEnergy.HasValue() && targetStruct.addedEnergy.Value() < 0)
-            {
-                ChipLogError(AppServer, "AddedEnergy has invalid value (%ld)",
-                             static_cast<signed long int>(targetStruct.addedEnergy.Value()));
-                return Status::ConstraintError;
-            }
+            VerifyOrReturnValue(
+                !targetStruct.addedEnergy.HasValue() || targetStruct.addedEnergy.Value() >= 0, Status::ConstraintError,
+                ChipLogError(AppServer, "AddedEnergy invalid: %ld", static_cast<long>(targetStruct.addedEnergy.Value())));
             innerIdx++;
         }
 
-        if (innerIdx > kEvseTargetsMaxTargetsPerDay)
-        {
-            ChipLogError(AppServer, "Too many targets in a single ChargingTargetScheduleStruct (%d)", innerIdx);
-            return Status::ResourceExhausted;
-        }
-
-        if (iterInner.GetStatus() != CHIP_NO_ERROR)
-        {
-            return Status::InvalidCommand;
-        }
+        VerifyOrReturnValue(innerIdx <= kEvseTargetsMaxTargetsPerDay, Status::ResourceExhausted,
+                            ChipLogError(AppServer, "Too many targets: %d", innerIdx));
+        VerifyOrReturnValue(iterInner.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
     }
 
-    if (iter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return Status::InvalidCommand;
-    }
+    VerifyOrReturnValue(iter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
 
     return Status::Success;
 }
 
-void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData)
+DataModel::ActionReturnStatus EnergyEvseCluster::HandleSetTargets(const DataModel::InvokeRequest & request,
+                                                                  TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
-    Commands::GetTargetsResponse::Type response;
+    Commands::SetTargets::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    Status status = mDelegate.GetTargets(response.chargingTargetSchedules);
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
+    auto & chargingTargetSchedules = commandData.chargingTargetSchedules;
 
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    Status status = ValidateTargets(chargingTargetSchedules);
+    VerifyOrReturnValue(status == Status::Success, status, ChipLogError(AppServer, "SetTargets validation failed"));
+
+    return mDelegate.SetTargets(chargingTargetSchedules);
 }
 
-void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)
+DataModel::ActionReturnStatus EnergyEvseCluster::HandleGetTargets(const DataModel::InvokeRequest & request,
+                                                                  TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
-    // Call the delegate
-    Status status = mDelegate.ClearTargets();
+    Commands::GetTargetsResponse::Type response;
+    Status status = mDelegate.GetTargets(response.chargingTargetSchedules);
+    VerifyOrReturnValue(status == Status::Success, status);
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    handler->AddResponse(request.path, response);
+    return Status::Success;
+}
+
+DataModel::ActionReturnStatus EnergyEvseCluster::HandleClearTargets(const DataModel::InvokeRequest & request,
+                                                                    TLV::TLVReader & input_arguments, CommandHandler * handler)
+{
+    return mDelegate.ClearTargets();
 }
 
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-// -----------------------------------------------------------------------------
-// Plugin initialization
-
-void MatterEnergyEvsePluginServerInitCallback() {}
-void MatterEnergyEvsePluginServerShutdownCallback() {}

@@ -141,6 +141,10 @@ void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId
 
 void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterEnergyEvseClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

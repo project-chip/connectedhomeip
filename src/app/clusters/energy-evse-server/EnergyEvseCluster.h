@@ -18,13 +18,17 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/clusters/energy-evse-server/Constants.h>
 #include <app/clusters/energy-evse-server/EnergyEvseDelegate.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/EnergyEvse/Attributes.h>
+#include <clusters/EnergyEvse/Commands.h>
+#include <clusters/EnergyEvse/Enums.h>
+#include <clusters/EnergyEvse/Events.h>
+#include <clusters/EnergyEvse/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -40,63 +44,95 @@ enum class OptionalAttributes : uint32_t
     kSupportsApproximateEvEfficiency    = 0x4
 };
 
+enum class FeatureAttributes : uint32_t
+{
+    kDischargingEnabledUntil  = 0x1,   // V2x feature
+    kMaximumDischargeCurrent  = 0x2,   // V2x feature
+    kNextChargeStartTime      = 0x4,   // ChargingPreferences feature
+    kNextChargeTargetTime     = 0x8,   // ChargingPreferences feature
+    kNextChargeRequiredEnergy = 0x10,  // ChargingPreferences feature
+    kNextChargeTargetSoC      = 0x20,  // ChargingPreferences feature
+    kApproximateEvEfficiency  = 0x40,  // ChargingPreferences feature & kSupportsApproximateEvEfficiency
+    kStateOfCharge            = 0x80,  // SoCReporting feature
+    kBatteryCapacity          = 0x100, // SoCReporting feature
+    kVehicleID                = 0x200, // PlugAndCharge feature
+    kSessionEnergyDischarged  = 0x400  // V2x feature
+};
+
 enum class OptionalCommands : uint32_t
 {
     kSupportsStartDiagnostics = 0x1
 };
 
-class Instance : public AttributeAccessInterface, public CommandHandlerInterface
+class EnergyEvseCluster : public DefaultServerCluster
 {
+
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
-             OptionalCommands aOptionalCmds) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
+    struct Config
     {
-        /* set the base class delegates endpointId */
-        mDelegate.SetEndpointId(aEndpointId);
-        mDelegate.SetInstance(this);
-    }
-    ~Instance()
+        EndpointId endpointId;
+        EnergyEvse::Delegate & delegate;
+        BitMask<EnergyEvse::Feature> feature;
+        BitMask<EnergyEvse::OptionalCommands> optionalCmds;
+        BitMask<EnergyEvse::OptionalAttributes> optionalAttrs;
+
+        Config(EndpointId aEndpointId, EnergyEvse::Delegate & aDelegate, BitMask<EnergyEvse::Feature> aFeature,
+               BitMask<EnergyEvse::OptionalAttributes> aOptionalAttrs, BitMask<EnergyEvse::OptionalCommands> aOptionalCmds) :
+            endpointId(aEndpointId), delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds),
+            optionalAttrs(aOptionalAttrs)
+        {}
+    };
+    // We don't want to allow the default constructor as this cluster requires a delegate to be set
+    EnergyEvseCluster() = delete;
+
+    EnergyEvseCluster(const Config & config) :
+        DefaultServerCluster({ config.endpointId, EnergyEvse::Id }), mDelegate(config.delegate), mFeatureFlags(config.feature),
+        mOptionalAttrs(config.optionalAttrs), mOptionalCmds(config.optionalCmds)
     {
-        mDelegate.SetInstance(nullptr);
-        Shutdown();
+        mDelegate.SetEndpointId(config.endpointId);
     }
 
-    CHIP_ERROR Init();
-    void Shutdown();
+    const BitFlags<EnergyEvse::Feature> & Features() const { return mFeatureFlags; }
+    const BitMask<EnergyEvse::OptionalAttributes> & OptionalAttrs() const { return mOptionalAttrs; }
+    const BitMask<EnergyEvse::OptionalCommands> & OptionalCmds() const { return mOptionalCmds; }
 
-    bool HasFeature(Feature aFeature) const;
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
-    bool SupportsOptCmd(OptionalCommands aOptionalCmds) const;
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 private:
-    Delegate & mDelegate;
-    BitMask<Feature> mFeature;
-    BitMask<OptionalAttributes> mOptionalAttrs;
-    BitMask<OptionalCommands> mOptionalCmds;
+    DataModel::ActionReturnStatus HandleDisable(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleEnableCharging(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                       CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleEnableDischarging(const DataModel::InvokeRequest & request,
+                                                          TLV::TLVReader & input_arguments, CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleStartDiagnostics(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                         CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleSetTargets(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                   CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleGetTargets(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                   CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleClearTargets(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                     CommandHandler * handler);
 
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & handlerContext) override;
-    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
-                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
-
-    void HandleDisable(HandlerContext & ctx, const Commands::Disable::DecodableType & commandData);
-    void HandleEnableCharging(HandlerContext & ctx, const Commands::EnableCharging::DecodableType & commandData);
-    void HandleEnableDischarging(HandlerContext & ctx, const Commands::EnableDischarging::DecodableType & commandData);
-    void HandleStartDiagnostics(HandlerContext & ctx, const Commands::StartDiagnostics::DecodableType & commandData);
-    void HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets::DecodableType & commandData);
-    void HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData);
-    void HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData);
-
-    // Check that the targets are valid
     Protocols::InteractionModel::Status
     ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+
+    EnergyEvse::Delegate & mDelegate;
+    const BitMask<EnergyEvse::Feature> mFeatureFlags;
+    const BitMask<EnergyEvse::OptionalAttributes> mOptionalAttrs;
+    const BitMask<EnergyEvse::OptionalCommands> mOptionalCmds;
 };
 
 } // namespace EnergyEvse

@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include "app/clusters/energy-evse-server/energy-evse-server.h"
 #include <EVSECallbacks.h>
 #include <EnergyEvseTargetsStore.h>
 #include <EvseTargetsConfig.h>
+#include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
 
 #include <app/util/config.h>
 #include <cstring>
