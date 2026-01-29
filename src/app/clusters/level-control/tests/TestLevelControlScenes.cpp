@@ -35,7 +35,11 @@ TEST_F(TestLevelControlScenes, TestSerializeScene)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(55), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(55, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     uint8_t buffer[128];
     MutableByteSpan serializedBytes(buffer);
@@ -54,13 +58,48 @@ TEST_F(TestLevelControlScenes, TestSerializeScene)
     EXPECT_FALSE(iter.Next());
 }
 
+TEST_F(TestLevelControlScenes, TestSerializeSceneNullLevel)
+{
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // CurrentLevel defaults to Null
+
+    uint8_t buffer[128];
+    MutableByteSpan serializedBytes(buffer);
+
+    EXPECT_EQ(cluster.SerializeSave(kTestEndpointId, LevelControl::Id, serializedBytes), CHIP_NO_ERROR);
+
+    // Decode to verify
+    app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> list;
+    EXPECT_EQ(cluster.DecodeAttributeValueList(serializedBytes, list), CHIP_NO_ERROR);
+
+    auto iter = list.begin();
+    // Expect NO items, or at least NO CurrentLevel item.
+    // If it saves 0, it will have one item with value 0.
+    bool foundCurrentLevel = false;
+    while (iter.Next())
+    {
+        if (iter.GetValue().attributeID == Attributes::CurrentLevel::Id)
+        {
+            foundCurrentLevel = true;
+        }
+    }
+    EXPECT_FALSE(foundCurrentLevel);
+}
+
 TEST_F(TestLevelControlScenes, TestApplyScene)
 {
     LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     // Create serialized scene with level 20
     uint8_t buffer[128];
@@ -101,7 +140,11 @@ TEST_F(TestLevelControlScenes, TestApplySceneImmediate)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
 
     // Scene with level 50
     uint8_t buffer[128];
@@ -130,7 +173,11 @@ TEST_F(TestLevelControlScenes, TestApplySceneWhileOff)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetCurrentLevel(0), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
     mockDelegate.mOn = false; // OFF
 
     // Scene with level 50
