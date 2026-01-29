@@ -41,7 +41,7 @@ public:
     void OnOnLevelChanged(DataModel::Nullable<uint8_t> value) override;
 
     // LevelControl -> OnOff Interaction
-    void SetOnOff(bool on) override;
+    CHIP_ERROR SetOnOff(bool on) override;
     bool GetOnOff() override;
 
     // OnOffDelegate

@@ -40,10 +40,11 @@ public:
     }
 
     // OnOff methods
-    void SetOnOff(bool on) override
+    CHIP_ERROR SetOnOff(bool on) override
     {
         mSetOnOffCalled = true;
         mOn             = on;
+        return CHIP_NO_ERROR;
     }
 
     bool GetOnOff() override { return mOn; }

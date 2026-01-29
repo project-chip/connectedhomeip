@@ -336,13 +336,14 @@ class ReentrantMockDelegate : public MockLevelControlDelegate
 {
 public:
     LevelControlCluster * mCluster = nullptr;
-    void SetOnOff(bool on) override
+    CHIP_ERROR SetOnOff(bool on) override
     {
-        MockLevelControlDelegate::SetOnOff(on);
+        CHIP_ERROR err = MockLevelControlDelegate::SetOnOff(on);
         if (mCluster)
         {
             mCluster->OnOffChanged(on);
         }
+        return err;
     }
 };
 

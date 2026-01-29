@@ -41,7 +41,7 @@ public:
      * @brief Called when the Level Control cluster determines that the OnOff state should change.
      * @param on True to turn On, False to turn Off.
      */
-    virtual void SetOnOff(bool on) {}
+    virtual CHIP_ERROR SetOnOff(bool on) { return CHIP_NO_ERROR; }
 
     /**
      * @brief Retrieve the current OnOff state.
