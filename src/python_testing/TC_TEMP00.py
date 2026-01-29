@@ -39,22 +39,76 @@ class TC_TEMP00(MatterBaseTest):
 
         await asyncio.sleep(1)
         pase_node_id = self.dut_node_id + 1
-
-        await self.request_factory_reset(app_only=False)
-
-        # Open a PASE session
-        th2 = self.get_new_controller()
         setupPayloadInfo = self.get_setup_payload_info()
-        logger.info("\n\n\n\t\t[DEBUGGER] Opening PASE session...")
         setup_params = SetupParameters(
             discriminator=setupPayloadInfo[0].filter_value,
             passcode=setupPayloadInfo[0].passcode
         )
+
+        logger.info("\n\t[RESTEST] factory reset 1\n")
+        await self.request_factory_reset(app_only=True)
+        th2 = self.get_new_controller()
+
+        # Open a PASE session
         await th2.FindOrEstablishPASESession(
             setupCode=setup_params.qr_code,
             nodeId=pase_node_id
         )
-        logger.info("[DEBUGGER] PASE session opened successfully\n\n\n")
+
+        logger.info("\n\t[RESTEST] factory reset 2\n")
+        await asyncio.sleep(1)
+        await self.request_factory_reset()
+        th2 = self.get_new_controller()
+
+        # Open a PASE session
+        await th2.FindOrEstablishPASESession(
+            setupCode=setup_params.qr_code,
+            nodeId=pase_node_id
+        )
+
+        logger.info("\n\t[RESTEST] factory reset 3\n")
+        await asyncio.sleep(1)
+        await self.request_factory_reset(app_only=True)
+        th2 = self.get_new_controller()
+
+        # Open a PASE session
+        await th2.FindOrEstablishPASESession(
+            setupCode=setup_params.qr_code,
+            nodeId=pase_node_id
+        )
+
+        logger.info("\n\t[RESTEST] factory reset 4\n")
+        await asyncio.sleep(1)
+        await self.request_factory_reset(app_only=True)
+        th2 = self.get_new_controller()
+
+        # Open a PASE session
+        await th2.FindOrEstablishPASESession(
+            setupCode=setup_params.qr_code,
+            nodeId=pase_node_id
+        )
+
+        logger.info("\n\t[RESTEST] factory reset 5\n")
+        await asyncio.sleep(1)
+        await self.request_factory_reset()
+        th2 = self.get_new_controller()
+
+        # Open a PASE session
+        await th2.FindOrEstablishPASESession(
+            setupCode=setup_params.qr_code,
+            nodeId=pase_node_id
+        )
+
+        logger.info("\n\t[RESTEST] factory reset 6\n")
+        await asyncio.sleep(1)
+        await self.request_factory_reset()
+        th2 = self.get_new_controller()
+
+        # Open a PASE session
+        await th2.FindOrEstablishPASESession(
+            setupCode=setup_params.qr_code,
+            nodeId=pase_node_id
+        )
 
 
 if __name__ == "__main__":
