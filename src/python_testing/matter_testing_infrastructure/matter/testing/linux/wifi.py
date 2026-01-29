@@ -37,6 +37,7 @@ test_environ = os.environ.copy()
 DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
 DictVariantT = dict[str, tuple[str, DbusAnyT]]
 
+
 class WpaSupplicantMock(threading.Thread):
     """Mock server for WpaSupplicant D-Bus API.
 

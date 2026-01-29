@@ -18,6 +18,7 @@ import os
 import pathlib
 import subprocess
 
+
 class DBusTestSystemBus(subprocess.Popen[bytes]):
     """Run a dbus-daemon in a subprocess as a test system bus."""
 
