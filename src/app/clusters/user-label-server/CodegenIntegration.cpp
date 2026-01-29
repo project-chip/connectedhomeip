@@ -44,10 +44,11 @@ public:
     {
         DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
 
-        gServers[clusterInstanceIndex].Create(endpointId, UserLabelCluster::Context{
-            .deviceInfoProvider = *deviceInfoProvider,
-            .fabricTable       = Server::GetInstance().GetFabricTable(),
-        });
+        gServers[clusterInstanceIndex].Create(endpointId,
+                                              UserLabelCluster::Context{
+                                                  .deviceInfoProvider = *deviceInfoProvider,
+                                                  .fabricTable        = Server::GetInstance().GetFabricTable(),
+                                              });
         return gServers[clusterInstanceIndex].Registration();
     }
 

@@ -31,8 +31,7 @@ public:
     };
 
     UserLabelCluster(EndpointId endpoint, Context && context) :
-        DefaultServerCluster({ endpoint, UserLabel::Id }), mContext(std::move(context))
-    {};
+        DefaultServerCluster({ endpoint, UserLabel::Id }), mContext(std::move(context)){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -49,6 +48,7 @@ public:
     // Constraints for label entries
     static constexpr size_t kMaxLabelSize = 16;
     static constexpr size_t kMaxValueSize = 16;
+    
 private:
     Context mContext;
 };

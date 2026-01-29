@@ -72,9 +72,10 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                       InteractionModelEngine::GetInstance());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
-    mUserLabelCluster.Create(endpointId, UserLabelCluster::Context{
-        .deviceInfoProvider = mContext.deviceInfoProvider,
-        .fabricTable       = mContext.fabricTable,
+    mUserLabelCluster.Create(endpointId,
+                             UserLabelCluster::Context{
+                                 .deviceInfoProvider = mContext.deviceInfoProvider,
+                                 .fabricTable       = mContext.fabricTable,
     });
     ReturnErrorOnFailure(provider.AddCluster(mUserLabelCluster.Registration()));
 
@@ -151,7 +152,6 @@ void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
         mOperationalCredentialsCluster.Destroy();
     }
-    
 }
 
 } // namespace app

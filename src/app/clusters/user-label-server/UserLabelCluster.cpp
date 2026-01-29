@@ -50,7 +50,7 @@ private:
     DeviceLayer::DeviceInfoProvider::UserLabelIterator * mIterator;
 };
 
-CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder,DeviceLayer::DeviceInfoProvider * provider)
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider * provider)
 {
     AutoReleaseIterator it(provider, endpoint);
     VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
@@ -72,7 +72,8 @@ bool IsValidLabelEntry(const Structs::LabelStruct::Type & entry)
     return (entry.label.size() <= UserLabelCluster::kMaxLabelSize) && (entry.value.size() <= UserLabelCluster::kMaxValueSize);
 }
 
-CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder, DeviceLayer::DeviceInfoProvider * provider)
+CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder,
+                          DeviceLayer::DeviceInfoProvider * provider)
 {
     VerifyOrReturnError(provider != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
@@ -119,7 +120,6 @@ CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValue
 }
 
 } // namespace
-
 
 DataModel::ActionReturnStatus UserLabelCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)

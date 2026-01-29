@@ -22,12 +22,12 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Enums.h>
 #include <clusters/UserLabel/Metadata.h>
 #include <clusters/UserLabel/Structs.h>
 #include <platform/DeviceInfoProvider.h>
-#include <app/server/Server.h>
 
 namespace {
 
@@ -74,17 +74,12 @@ struct TestUserLabelCluster : public ::testing::Test
         ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override
-    {
-        userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
+    void TearDown() override { userLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestUserLabelCluster() : 
-        userLabel(kRootEndpointId, 
-                  UserLabelCluster::Context{ 
-                      .deviceInfoProvider = mDeviceInfoProvider, 
-                      .fabricTable = chip::Server::GetInstance().GetFabricTable() 
-                  }) 
+    TestUserLabelCluster() :
+        userLabel(kRootEndpointId,
+                  UserLabelCluster::Context{ .deviceInfoProvider = mDeviceInfoProvider,
+                                             .fabricTable = chip::Server::GetInstance().GetFabricTable() })
     {}
 
     TestServerClusterContext testContext;

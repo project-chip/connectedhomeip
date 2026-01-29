@@ -99,7 +99,7 @@ public:
                 .groupDataProvider      = mContext.groupDataProvider,          //
                 .sessionManager         = mContext.sessionManager,             //
                 .dnssdServer            = mContext.dnssdServer,                //
-                .deviceInfoProvider     = mContext.deviceInfoProvider,       //
+                .deviceInfoProvider     = mContext.deviceInfoProvider,         //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -167,9 +167,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
             .dnssdServer                = DnssdServer::Instance(),                               //
-            .deviceInfoProvider         = gExampleDeviceInfoProvider,
+            .deviceInfoProvider         = gExampleDeviceInfoProvider,                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
