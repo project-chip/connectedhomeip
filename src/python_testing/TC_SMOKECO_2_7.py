@@ -143,7 +143,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         if has_unmounted:
             sub_handler.wait_for_attribute_report(timeout_sec=60)
             asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
-                                [0].value, 1, msg="Received unexpected value for Unmounted")
+                                 [0].value, 1, msg="Received unexpected value for Unmounted")
 
         # Step 8, "TH reads ExpressedState attribute from DUT."
         self.step(8)
@@ -166,7 +166,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         if has_unmounted:
             sub_handler.wait_for_attribute_report(timeout_sec=60)
             asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
-                                [0].value, 0, msg="Received unexpected value for Unmounted")
+                                 [0].value, 0, msg="Received unexpected value for Unmounted")
 
         # Step 11, "TH reads ExpressedState attribute from DUT."
         self.step(11)
