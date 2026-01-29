@@ -37,8 +37,11 @@
 // Added for codesize optimizations
 #define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
-
 #define MBEDTLS_HAVE_ASM
+
+// Added from autogen file for tinycrypt
+#define MBEDTLS_ECDH_C
+#define MBEDTLS_HKDF_C
 
 #if (!(SL_MATTER_ENABLE_AWS) || !defined(SL_MATTER_ENABLE_AWS))
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768
