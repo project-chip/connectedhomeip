@@ -483,89 +483,63 @@ Status WebRTCTransportProviderCluster::CheckTurnsOrStunsRequiresUTCTime(
     return Status::Success;
 }
 
-Status WebRTCTransportProviderCluster::ValidateVideoStreamID(const char * commandName,
-                                                             const Optional<DataModel::Nullable<uint16_t>> & videoStreamID,
-                                                             Optional<std::vector<uint16_t>> & outVideoStreams)
+Status WebRTCTransportProviderCluster::ValidateStreamID(const char * commandName,
+                                                        const Optional<DataModel::Nullable<uint16_t>> & streamID,
+                                                        Optional<std::vector<uint16_t>> & outStreams, StreamType streamType)
 {
-    if (!videoStreamID.HasValue())
+    if (!streamID.HasValue())
     {
         return Status::Success;
     }
 
+    const char * streamTypeLower   = (streamType == StreamType::kVideo) ? "video" : "audio";
+    const char * streamTypeCapital = (streamType == StreamType::kVideo) ? "Video" : "Audio";
+
     std::vector<uint16_t> streams;
-    if (videoStreamID.Value().IsNull())
+    if (streamID.Value().IsNull())
     {
         // Automatic stream assignment - check if there are any allocated streams
-        if (!mDelegate.HasAllocatedVideoStreams())
+        bool hasAllocatedStreams =
+            (streamType == StreamType::kVideo) ? mDelegate.HasAllocatedVideoStreams() : mDelegate.HasAllocatedAudioStreams();
+        if (!hasAllocatedStreams)
         {
-            ChipLogError(Zcl, "%s: video requested when there are no AllocatedVideoStreams", commandName);
+            ChipLogError(Zcl, "%s: %s requested when there are no Allocated%sStreams", commandName, streamTypeLower,
+                         streamTypeCapital);
             return Status::InvalidInState;
         }
         // Empty vector implies auto-select
     }
     else
     {
-        // Validate the specific stream ID against AllocatedVideoStreams
-        if (mDelegate.ValidateVideoStreamID(videoStreamID.Value().Value()) != CHIP_NO_ERROR)
+        // Validate the specific stream ID against allocated streams
+        CHIP_ERROR err = (streamType == StreamType::kVideo) ? mDelegate.ValidateVideoStreamID(streamID.Value().Value())
+                                                            : mDelegate.ValidateAudioStreamID(streamID.Value().Value());
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "%s: VideoStreamID %u does not match AllocatedVideoStreams", commandName,
-                         videoStreamID.Value().Value());
+            ChipLogError(Zcl, "%s: %sStreamID %u does not match Allocated%sStreams", commandName, streamTypeCapital,
+                         streamID.Value().Value(), streamTypeCapital);
             return Status::DynamicConstraintError;
         }
-        streams.push_back(videoStreamID.Value().Value());
+        streams.push_back(streamID.Value().Value());
     }
 
-    outVideoStreams.SetValue(std::move(streams));
+    outStreams.SetValue(std::move(streams));
     return Status::Success;
 }
 
-Status WebRTCTransportProviderCluster::ValidateAudioStreamID(const char * commandName,
-                                                             const Optional<DataModel::Nullable<uint16_t>> & audioStreamID,
-                                                             Optional<std::vector<uint16_t>> & outAudioStreams)
+Status WebRTCTransportProviderCluster::ValidateStreams(const char * commandName,
+                                                       const Optional<DataModel::DecodableList<uint16_t>> & inStreams,
+                                                       Optional<std::vector<uint16_t>> & outStreams, StreamType streamType)
 {
-    if (!audioStreamID.HasValue())
+    if (!inStreams.HasValue())
     {
         return Status::Success;
     }
 
-    std::vector<uint16_t> streams;
-    if (audioStreamID.Value().IsNull())
-    {
-        // Automatic stream assignment - check if there are any allocated streams
-        if (!mDelegate.HasAllocatedAudioStreams())
-        {
-            ChipLogError(Zcl, "%s: audio requested when there are no AllocatedAudioStreams", commandName);
-            return Status::InvalidInState;
-        }
-        // Empty vector implies auto-select
-    }
-    else
-    {
-        // Validate the specific stream ID against AllocatedAudioStreams
-        if (mDelegate.ValidateAudioStreamID(audioStreamID.Value().Value()) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "%s: AudioStreamID %u does not match AllocatedAudioStreams", commandName,
-                         audioStreamID.Value().Value());
-            return Status::DynamicConstraintError;
-        }
-        streams.push_back(audioStreamID.Value().Value());
-    }
-
-    outAudioStreams.SetValue(std::move(streams));
-    return Status::Success;
-}
-
-Status WebRTCTransportProviderCluster::ValidateVideoStreams(const char * commandName,
-                                                            const Optional<DataModel::DecodableList<uint16_t>> & videoStreams,
-                                                            Optional<std::vector<uint16_t>> & outVideoStreams)
-{
-    if (!videoStreams.HasValue())
-    {
-        return Status::Success;
-    }
+    const char * streamTypeCapital = (streamType == StreamType::kVideo) ? "Video" : "Audio";
 
     std::vector<uint16_t> streams;
-    auto iter = videoStreams.Value().begin();
+    auto iter = inStreams.Value().begin();
     while (iter.Next())
     {
         streams.push_back(iter.GetValue());
@@ -576,76 +550,33 @@ Status WebRTCTransportProviderCluster::ValidateVideoStreams(const char * command
         return Status::InvalidCommand;
     }
 
-    // Check if AllocatedVideoStreams is empty
-    if (!mDelegate.HasAllocatedVideoStreams())
+    // Check if allocated streams is empty
+    bool hasAllocatedStreams =
+        (streamType == StreamType::kVideo) ? mDelegate.HasAllocatedVideoStreams() : mDelegate.HasAllocatedAudioStreams();
+    if (!hasAllocatedStreams)
     {
-        ChipLogError(Zcl, "%s: AllocatedVideoStreams is empty", commandName);
+        ChipLogError(Zcl, "%s: Allocated%sStreams is empty", commandName, streamTypeCapital);
         return Status::InvalidInState;
     }
 
-    // Check for duplicate entries in VideoStreams
+    // Check for duplicate entries
     std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
     if (uniqueStreams.size() != streams.size())
     {
-        ChipLogError(Zcl, "%s: Duplicate entries in VideoStreams", commandName);
+        ChipLogError(Zcl, "%s: Duplicate entries in %sStreams", commandName, streamTypeCapital);
         return Status::AlreadyExists;
     }
 
-    // Validate each entry exists in AllocatedVideoStreams
-    if (mDelegate.ValidateVideoStreams(streams) != CHIP_NO_ERROR)
+    // Validate each entry exists in allocated streams
+    CHIP_ERROR err =
+        (streamType == StreamType::kVideo) ? mDelegate.ValidateVideoStreams(streams) : mDelegate.ValidateAudioStreams(streams);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "%s: VideoStreams entry not found in AllocatedVideoStreams", commandName);
+        ChipLogError(Zcl, "%s: %sStreams entry not found in Allocated%sStreams", commandName, streamTypeCapital, streamTypeCapital);
         return Status::DynamicConstraintError;
     }
 
-    outVideoStreams.SetValue(std::move(streams));
-    return Status::Success;
-}
-
-Status WebRTCTransportProviderCluster::ValidateAudioStreams(const char * commandName,
-                                                            const Optional<DataModel::DecodableList<uint16_t>> & audioStreams,
-                                                            Optional<std::vector<uint16_t>> & outAudioStreams)
-{
-    if (!audioStreams.HasValue())
-    {
-        return Status::Success;
-    }
-
-    std::vector<uint16_t> streams;
-    auto iter = audioStreams.Value().begin();
-    while (iter.Next())
-    {
-        streams.push_back(iter.GetValue());
-    }
-
-    if (iter.GetStatus() != CHIP_NO_ERROR)
-    {
-        return Status::InvalidCommand;
-    }
-
-    // Check if AllocatedAudioStreams is empty
-    if (!mDelegate.HasAllocatedAudioStreams())
-    {
-        ChipLogError(Zcl, "%s: AllocatedAudioStreams is empty", commandName);
-        return Status::InvalidInState;
-    }
-
-    // Check for duplicate entries in AudioStreams
-    std::set<uint16_t> uniqueStreams(streams.begin(), streams.end());
-    if (uniqueStreams.size() != streams.size())
-    {
-        ChipLogError(Zcl, "%s: Duplicate entries in AudioStreams", commandName);
-        return Status::AlreadyExists;
-    }
-
-    // Validate each entry exists in AllocatedAudioStreams
-    if (mDelegate.ValidateAudioStreams(streams) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "%s: AudioStreams entry not found in AllocatedAudioStreams", commandName);
-        return Status::DynamicConstraintError;
-    }
-
-    outAudioStreams.SetValue(std::move(streams));
+    outStreams.SetValue(std::move(streams));
     return Status::Success;
 }
 
@@ -742,28 +673,28 @@ WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandl
     Optional<std::vector<uint16_t>> audioStreams;
 
     // Validate deprecated VideoStreamID field
-    status = ValidateVideoStreamID("HandleSolicitOffer", req.videoStreamID, videoStreams);
+    status = ValidateStreamID("HandleSolicitOffer", req.videoStreamID, videoStreams, StreamType::kVideo);
     if (status != Status::Success)
     {
         return status;
     }
 
     // Validate deprecated AudioStreamID field
-    status = ValidateAudioStreamID("HandleSolicitOffer", req.audioStreamID, audioStreams);
+    status = ValidateStreamID("HandleSolicitOffer", req.audioStreamID, audioStreams, StreamType::kAudio);
     if (status != Status::Success)
     {
         return status;
     }
 
     // Validate VideoStreams array if present
-    status = ValidateVideoStreams("HandleSolicitOffer", req.videoStreams, videoStreams);
+    status = ValidateStreams("HandleSolicitOffer", req.videoStreams, videoStreams, StreamType::kVideo);
     if (status != Status::Success)
     {
         return status;
     }
 
     // Validate AudioStreams array if present
-    status = ValidateAudioStreams("HandleSolicitOffer", req.audioStreams, audioStreams);
+    status = ValidateStreams("HandleSolicitOffer", req.audioStreams, audioStreams, StreamType::kAudio);
     if (status != Status::Success)
     {
         return status;
@@ -1047,28 +978,28 @@ WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandl
         }
 
         // Validate deprecated VideoStreamID field
-        status = ValidateVideoStreamID("HandleProvideOffer", req.videoStreamID, videoStreams);
+        status = ValidateStreamID("HandleProvideOffer", req.videoStreamID, videoStreams, StreamType::kVideo);
         if (status != Status::Success)
         {
             return status;
         }
 
         // Validate deprecated AudioStreamID field
-        status = ValidateAudioStreamID("HandleProvideOffer", req.audioStreamID, audioStreams);
+        status = ValidateStreamID("HandleProvideOffer", req.audioStreamID, audioStreams, StreamType::kAudio);
         if (status != Status::Success)
         {
             return status;
         }
 
         // Validate VideoStreams array if present
-        status = ValidateVideoStreams("HandleProvideOffer", req.videoStreams, videoStreams);
+        status = ValidateStreams("HandleProvideOffer", req.videoStreams, videoStreams, StreamType::kVideo);
         if (status != Status::Success)
         {
             return status;
         }
 
         // Validate AudioStreams array if present
-        status = ValidateAudioStreams("HandleProvideOffer", req.audioStreams, audioStreams);
+        status = ValidateStreams("HandleProvideOffer", req.audioStreams, audioStreams, StreamType::kAudio);
         if (status != Status::Success)
         {
             return status;
