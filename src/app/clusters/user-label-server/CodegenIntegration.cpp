@@ -21,7 +21,7 @@
 #include <app/static-cluster-config/UserLabel.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <src/include/platform/DeviceInfoProvider.h>
+#include <platform/DeviceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::app;
