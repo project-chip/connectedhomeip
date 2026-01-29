@@ -4847,6 +4847,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _hasAuxiliaryACL = @(0);
 
+        _mcastAddrPolicy = @(0);
+
         _fabricIndex = @(0);
     }
     return self;
@@ -4860,6 +4862,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.endpoints = self.endpoints;
     other.keySetID = self.keySetID;
     other.hasAuxiliaryACL = self.hasAuxiliaryACL;
+    other.mcastAddrPolicy = self.mcastAddrPolicy;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -4867,7 +4870,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; hasAuxiliaryACL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, _hasAuxiliaryACL, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; hasAuxiliaryACL:%@; mcastAddrPolicy:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, _hasAuxiliaryACL, _mcastAddrPolicy, _fabricIndex];
     return descriptionString;
 }
 

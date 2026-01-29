@@ -24,6 +24,19 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {} // namespace Clusters
+namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(Groupcast::MulticastAddrPolicyEnum val)
+{
+    using EnumType = Groupcast::MulticastAddrPolicyEnum;
+    switch (val)
+    {
+    case EnumType::kIanaAddr:
+    case EnumType::kPerGroup:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+} // namespace Clusters
 } // namespace app
 } // namespace chip

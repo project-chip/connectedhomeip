@@ -20621,6 +20621,8 @@ class Groupcast(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="membership", Tag=0x00000000, Type=typing.List[Groupcast.Structs.MembershipStruct]),
                 ClusterObjectFieldDescriptor(Label="maxMembershipCount", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="maxMcastAddrCount", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="usedMcastAddrCount", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -20630,16 +20632,29 @@ class Groupcast(Cluster):
 
     membership: typing.List[Groupcast.Structs.MembershipStruct] = field(default_factory=lambda: [])
     maxMembershipCount: uint = 0
+    maxMcastAddrCount: uint = 0
+    usedMcastAddrCount: uint = 0
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Enums:
+        class MulticastAddrPolicyEnum(MatterIntEnum):
+            kIanaAddr = 0x00
+            kPerGroup = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
     class Bitmaps:
         class Feature(IntFlag):
             kListener = 0x1
             kSender = 0x2
+            kPerGroup = 0x4
 
     class Structs:
         @dataclass
@@ -20652,6 +20667,7 @@ class Groupcast(Cluster):
                         ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
                         ClusterObjectFieldDescriptor(Label="keySetID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="hasAuxiliaryACL", Tag=3, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="mcastAddrPolicy", Tag=4, Type=Groupcast.Enums.MulticastAddrPolicyEnum),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -20659,6 +20675,7 @@ class Groupcast(Cluster):
             endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
             keySetID: 'uint' = 0
             hasAuxiliaryACL: 'bool' = False
+            mcastAddrPolicy: 'Groupcast.Enums.MulticastAddrPolicyEnum' = 0
             fabricIndex: 'uint' = 0
 
     class Commands:
@@ -20679,6 +20696,7 @@ class Groupcast(Cluster):
                         ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=4, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="replaceEndpoints", Tag=5, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="mcastAddrPolicy", Tag=6, Type=typing.Optional[Groupcast.Enums.MulticastAddrPolicyEnum]),
                     ])
 
             groupID: uint = 0
@@ -20687,6 +20705,7 @@ class Groupcast(Cluster):
             key: typing.Optional[bytes] = None
             useAuxiliaryACL: typing.Optional[bool] = None
             replaceEndpoints: typing.Optional[bool] = None
+            mcastAddrPolicy: typing.Optional[Groupcast.Enums.MulticastAddrPolicyEnum] = None
 
         @dataclass
         class LeaveGroup(ClusterCommand):
@@ -20788,6 +20807,38 @@ class Groupcast(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class MaxMcastAddrCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000065
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class UsedMcastAddrCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000065
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

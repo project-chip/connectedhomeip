@@ -5520,6 +5520,7 @@ class ChipClusters:
                     "key": "bytes",
                     "useAuxiliaryACL": "bool",
                     "replaceEndpoints": "bool",
+                    "mcastAddrPolicy": "int",
                 },
             },
             0x00000001: {
@@ -5558,6 +5559,18 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "MaxMembershipCount",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxMcastAddrCount",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "UsedMcastAddrCount",
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },

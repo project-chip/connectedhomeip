@@ -59,6 +59,8 @@ TEST_F(TestGroupcastCluster, TestAttributes)
                                             {
                                                 Attributes::Membership::kMetadataEntry,
                                                 Attributes::MaxMembershipCount::kMetadataEntry,
+                                                Attributes::MaxMcastAddrCount::kMetadataEntry,
+                                                Attributes::UsedMcastAddrCount::kMetadataEntry,
                                             }));
     }
 

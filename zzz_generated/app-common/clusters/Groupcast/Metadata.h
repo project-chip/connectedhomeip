@@ -30,9 +30,19 @@ namespace MaxMembershipCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMembershipCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxMembershipCount
-constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+namespace MaxMcastAddrCount {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace MaxMcastAddrCount
+namespace UsedMcastAddrCount {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(UsedMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace UsedMcastAddrCount
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     Membership::kMetadataEntry,
     MaxMembershipCount::kMetadataEntry,
+    MaxMcastAddrCount::kMetadataEntry,
+    UsedMcastAddrCount::kMetadataEntry,
 
 };
 

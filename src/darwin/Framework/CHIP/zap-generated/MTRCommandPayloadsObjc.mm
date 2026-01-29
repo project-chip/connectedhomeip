@@ -15599,6 +15599,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _useAuxiliaryACL = nil;
 
         _replaceEndpoints = nil;
+
+        _mcastAddrPolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15615,6 +15617,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.key = self.key;
     other.useAuxiliaryACL = self.useAuxiliaryACL;
     other.replaceEndpoints = self.replaceEndpoints;
+    other.mcastAddrPolicy = self.mcastAddrPolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15623,7 +15626,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; key:%@; useAuxiliaryACL:%@; replaceEndpoints:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, [_key base64EncodedStringWithOptions:0], _useAuxiliaryACL, _replaceEndpoints];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; key:%@; useAuxiliaryACL:%@; replaceEndpoints:%@; mcastAddrPolicy:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, [_key base64EncodedStringWithOptions:0], _useAuxiliaryACL, _replaceEndpoints, _mcastAddrPolicy];
     return descriptionString;
 }
 
@@ -15682,6 +15685,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         if (self.replaceEndpoints != nil) {
             auto & definedValue_0 = encodableStruct.replaceEndpoints.Emplace();
             definedValue_0 = self.replaceEndpoints.boolValue;
+        }
+    }
+    {
+        if (self.mcastAddrPolicy != nil) {
+            auto & definedValue_0 = encodableStruct.mcastAddrPolicy.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mcastAddrPolicy.unsignedCharValue);
         }
     }
 

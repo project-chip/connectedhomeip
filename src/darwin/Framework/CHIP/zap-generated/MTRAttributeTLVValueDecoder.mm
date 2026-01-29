@@ -7385,6 +7385,7 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
                 }
                 newElement_0.keySetID = [NSNumber numberWithUnsignedShort:entry_0.keySetID];
                 newElement_0.hasAuxiliaryACL = [NSNumber numberWithBool:entry_0.hasAuxiliaryACL];
+                newElement_0.mcastAddrPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.mcastAddrPolicy)];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -7399,6 +7400,28 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
     }
     case Attributes::MaxMembershipCount::Id: {
         using TypeInfo = Attributes::MaxMembershipCount::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::MaxMcastAddrCount::Id: {
+        using TypeInfo = Attributes::MaxMcastAddrCount::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::UsedMcastAddrCount::Id: {
+        using TypeInfo = Attributes::UsedMcastAddrCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

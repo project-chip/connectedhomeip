@@ -3778,6 +3778,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxMembershipCount";
             break;
 
+        case MTRAttributeIDTypeClusterGroupcastAttributeMaxMcastAddrCountID:
+            result = @"MaxMcastAddrCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeUsedMcastAddrCountID:
+            result = @"UsedMcastAddrCount";
+            break;
+
         case MTRAttributeIDTypeClusterGroupcastAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

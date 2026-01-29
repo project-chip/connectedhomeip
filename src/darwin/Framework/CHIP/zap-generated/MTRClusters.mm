@@ -8234,6 +8234,16 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeMaxMembershipCountID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxMcastAddrCountWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeMaxMcastAddrCountID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUsedMcastAddrCountWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeUsedMcastAddrCountID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeGeneratedCommandListID) params:params];

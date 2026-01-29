@@ -40,6 +40,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kKey), key);
     encoder.Encode(to_underlying(Fields::kUseAuxiliaryACL), useAuxiliaryACL);
     encoder.Encode(to_underlying(Fields::kReplaceEndpoints), replaceEndpoints);
+    encoder.Encode(to_underlying(Fields::kMcastAddrPolicy), mcastAddrPolicy);
     return encoder.Finalize();
 }
 
@@ -76,6 +77,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         else if (__context_tag == to_underlying(Fields::kReplaceEndpoints))
         {
             err = DataModel::Decode(reader, replaceEndpoints);
+        }
+        else if (__context_tag == to_underlying(Fields::kMcastAddrPolicy))
+        {
+            err = DataModel::Decode(reader, mcastAddrPolicy);
         }
 
         ReturnErrorOnFailure(err);

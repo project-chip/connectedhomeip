@@ -3138,6 +3138,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("MembershipStruct.keySetID", "keySetID", value.isMember("keySetID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MembershipStruct.hasAuxiliaryACL", "hasAuxiliaryACL",
                                                                   value.isMember("hasAuxiliaryACL")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MembershipStruct.mcastAddrPolicy", "mcastAddrPolicy",
+                                                                  value.isMember("mcastAddrPolicy")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupID");
@@ -3156,6 +3158,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hasAuxiliaryACL, value["hasAuxiliaryACL"]));
     valueCopy.removeMember("hasAuxiliaryACL");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mcastAddrPolicy");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mcastAddrPolicy, value["mcastAddrPolicy"]));
+    valueCopy.removeMember("mcastAddrPolicy");
+
     if (value.isMember("fabricIndex"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
@@ -3172,6 +3178,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Groupcast::Structs::Me
     ComplexArgumentParser::Finalize(request.endpoints);
     ComplexArgumentParser::Finalize(request.keySetID);
     ComplexArgumentParser::Finalize(request.hasAuxiliaryACL);
+    ComplexArgumentParser::Finalize(request.mcastAddrPolicy);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 

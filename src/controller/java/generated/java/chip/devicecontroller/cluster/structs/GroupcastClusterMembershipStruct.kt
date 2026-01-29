@@ -28,6 +28,7 @@ class GroupcastClusterMembershipStruct(
   val endpoints: List<UInt>,
   val keySetID: UInt,
   val hasAuxiliaryACL: Boolean,
+  val mcastAddrPolicy: UInt,
   val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
@@ -36,6 +37,7 @@ class GroupcastClusterMembershipStruct(
     append("\tendpoints : $endpoints\n")
     append("\tkeySetID : $keySetID\n")
     append("\thasAuxiliaryACL : $hasAuxiliaryACL\n")
+    append("\tmcastAddrPolicy : $mcastAddrPolicy\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -51,6 +53,7 @@ class GroupcastClusterMembershipStruct(
       endArray()
       put(ContextSpecificTag(TAG_KEY_SET_ID), keySetID)
       put(ContextSpecificTag(TAG_HAS_AUXILIARY_ACL), hasAuxiliaryACL)
+      put(ContextSpecificTag(TAG_MCAST_ADDR_POLICY), mcastAddrPolicy)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -61,6 +64,7 @@ class GroupcastClusterMembershipStruct(
     private const val TAG_ENDPOINTS = 1
     private const val TAG_KEY_SET_ID = 2
     private const val TAG_HAS_AUXILIARY_ACL = 3
+    private const val TAG_MCAST_ADDR_POLICY = 4
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupcastClusterMembershipStruct {
@@ -76,6 +80,7 @@ class GroupcastClusterMembershipStruct(
         }
       val keySetID = tlvReader.getUInt(ContextSpecificTag(TAG_KEY_SET_ID))
       val hasAuxiliaryACL = tlvReader.getBoolean(ContextSpecificTag(TAG_HAS_AUXILIARY_ACL))
+      val mcastAddrPolicy = tlvReader.getUInt(ContextSpecificTag(TAG_MCAST_ADDR_POLICY))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
@@ -85,6 +90,7 @@ class GroupcastClusterMembershipStruct(
         endpoints,
         keySetID,
         hasAuxiliaryACL,
+        mcastAddrPolicy,
         fabricIndex,
       )
     }

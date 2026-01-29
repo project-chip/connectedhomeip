@@ -27,6 +27,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Groupcast::I
             return Membership::kMetadataEntry;
         case MaxMembershipCount::Id:
             return MaxMembershipCount::kMetadataEntry;
+        case MaxMcastAddrCount::Id:
+            return MaxMcastAddrCount::kMetadataEntry;
+        case UsedMcastAddrCount::Id:
+            return UsedMcastAddrCount::kMetadataEntry;
         default:
             return std::nullopt;
         }

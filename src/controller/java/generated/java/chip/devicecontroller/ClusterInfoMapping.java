@@ -26585,6 +26585,9 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo groupcastjoinGroupreplaceEndpointsCommandParameterInfo = new CommandParameterInfo("replaceEndpoints", Optional.class, Boolean.class);
     groupcastjoinGroupCommandParams.put("replaceEndpoints",groupcastjoinGroupreplaceEndpointsCommandParameterInfo);
+
+    CommandParameterInfo groupcastjoinGroupmcastAddrPolicyCommandParameterInfo = new CommandParameterInfo("mcastAddrPolicy", Optional.class, Integer.class);
+    groupcastjoinGroupCommandParams.put("mcastAddrPolicy",groupcastjoinGroupmcastAddrPolicyCommandParameterInfo);
     InteractionInfo groupcastjoinGroupInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.GroupcastCluster) cluster)
@@ -26601,6 +26604,8 @@ public class ClusterInfoMapping {
         commandArguments.get("useAuxiliaryACL")
         , (Optional<Boolean>)
         commandArguments.get("replaceEndpoints")
+        , (Optional<Integer>)
+        commandArguments.get("mcastAddrPolicy")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

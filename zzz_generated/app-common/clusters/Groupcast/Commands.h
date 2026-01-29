@@ -84,6 +84,7 @@ enum class Fields : uint8_t
     kKey              = 3,
     kUseAuxiliaryACL  = 4,
     kReplaceEndpoints = 5,
+    kMcastAddrPolicy  = 6,
 };
 
 struct Type
@@ -99,6 +100,7 @@ public:
     Optional<chip::ByteSpan> key;
     Optional<bool> useAuxiliaryACL;
     Optional<bool> replaceEndpoints;
+    Optional<MulticastAddrPolicyEnum> mcastAddrPolicy;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -120,6 +122,7 @@ public:
     Optional<chip::ByteSpan> key;
     Optional<bool> useAuxiliaryACL;
     Optional<bool> replaceEndpoints;
+    Optional<MulticastAddrPolicyEnum> mcastAddrPolicy;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };

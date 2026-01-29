@@ -8484,6 +8484,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             Membership(0L),
             MaxMembershipCount(1L),
+            MaxMcastAddrCount(2L),
+            UsedMcastAddrCount(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -8550,7 +8552,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeySetID(2),Key(3),UseAuxiliaryACL(4),ReplaceEndpoints(5),;
+        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeySetID(2),Key(3),UseAuxiliaryACL(4),ReplaceEndpoints(5),McastAddrPolicy(6),;
                     private final int id;
                     JoinGroupCommandField(int id) {
                         this.id = id;
