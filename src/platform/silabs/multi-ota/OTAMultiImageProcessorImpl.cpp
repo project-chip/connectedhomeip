@@ -22,7 +22,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
-using namespace chip;
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 

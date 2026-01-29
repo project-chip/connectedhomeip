@@ -30,7 +30,6 @@
 
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::Silabs;
-using namespace ::chip::DeviceLayer::Silabs::MultiOTA;
 
 namespace chip {
 namespace DeviceLayer {
