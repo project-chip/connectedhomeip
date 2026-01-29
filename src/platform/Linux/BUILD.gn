@@ -20,6 +20,7 @@ import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/inet/inet.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 

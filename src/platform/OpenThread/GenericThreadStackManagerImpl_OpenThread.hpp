@@ -37,6 +37,7 @@
 #include <openthread/joiner.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
+#include <openthread/provisional/rendezvous.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
@@ -53,8 +54,10 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
+#include <lib/support/ThreadDiscoveryCode.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
@@ -127,6 +130,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     }
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl()._UpdateNetworkStatus(); });
+}
+
+template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsCommissioning()
+{
+    return otJoinerGetState(mOTInst) == OT_JOINER_STATE_COMMISSIONING;
 }
 
 template <class ImplClass>
@@ -273,6 +282,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnable
         VerifyOrExit(otErr == OT_ERROR_NONE, );
     }
 
+    if (val)
+    {
+        otSrpClientEnableAutoStartMode(mOTInst, &OnSrpClientStateChange, this);
+    }
+
     if (val != isEnabled)
     {
         otErr = otThreadSetEnabled(mOTInst, val);
@@ -360,7 +374,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached()
     curRole = otThreadGetDeviceRole(mOTInst);
     Impl()->UnlockThreadStack();
 
-    return (curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED);
+    return (curRole != OT_DEVICE_ROLE_DISABLED && !_IsCommissioning() && _IsThreadProvisioned());
 }
 
 template <class ImplClass>
@@ -703,7 +717,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     otSrpClientSetCallback(mOTInst, &OnSrpClientNotification, nullptr);
-    otSrpClientEnableAutoStartMode(mOTInst, &OnSrpClientStateChange, nullptr);
     memset(&mSrpClient, 0, sizeof(mSrpClient));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -711,12 +724,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
     // If the Thread stack has been provisioned, but is not currently enabled, enable it now.
     if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(otInst))
     {
-        // Enable the Thread IPv6 interface.
-        otErr = otIp6SetEnabled(otInst, true);
-        VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-        otErr = otThreadSetEnabled(otInst, true);
-        VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+        err = _SetThreadEnabled(true);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to enable Thread: %" CHIP_ERROR_FORMAT, err.Format()));
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");
     }
@@ -839,6 +848,84 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     }
 
     Impl()->UnlockThreadStack();
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnRendezvousComplete(otError aError)
+{
+#if CHIP_PROGRESS_LOGGING
+
+    ChipLogProgress(DeviceLayer, "Join Thread network: %s", otThreadErrorToString(aError));
+
+    if (aError == OT_ERROR_NONE)
+    {
+        CHIP_ERROR err = _SetThreadEnabled(true);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to enable Thread: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        ChipLogProgress(DeviceLayer, "Start Thread network");
+    }
+    else if (aError != OT_ERROR_ABORT)
+    {
+        ChipLogProgress(DeviceLayer, "Restart Rendezvous");
+
+        CHIP_ERROR err = _RendezvousStart();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to restart Rendezvous: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+#endif // CHIP_PROGRESS_LOGGING
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RendezvousStop()
+{
+    otRendezvousStop(mOTInst);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RendezvousStart()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Impl()->LockThreadStack();
+    VerifyOrExit(!otDatasetIsCommissioned(mOTInst) && otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED,
+                 error = MapOpenThreadError(OT_ERROR_INVALID_STATE));
+    VerifyOrExit(otJoinerGetState(mOTInst) == OT_JOINER_STATE_IDLE, error = MapOpenThreadError(OT_ERROR_BUSY));
+
+    if (!otIp6IsEnabled(mOTInst))
+    {
+        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+    }
+
+    {
+        uint16_t discriminator = 0;
+        SuccessOrExit(error = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
+
+        uint32_t pincode = 0;
+        SuccessOrExit(error = GetCommissionableDataProvider()->GetSetupPasscode(pincode));
+
+        Thread::DiscoveryCode code(discriminator, pincode);
+
+        ChipLogProgress(DeviceLayer, "Joiner Discerner: 0x%" PRIx64, code.AsUInt64());
+
+        otRendezvousStart(
+            mOTInst, code.AsUInt64(),
+            [](otError aError, void * aContext) {
+                static_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->OnRendezvousComplete(aError);
+            },
+            this);
+    }
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    ChipLogProgress(DeviceLayer, "Rendezvous start: %s", chip::ErrorStr(error));
+
+    return error;
 }
 
 template <class ImplClass>
@@ -965,7 +1052,7 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange(const otSockAddr * aServerSockAddr,
                                                                                  void * aContext)
 {
-    if (aServerSockAddr)
+    if (aServerSockAddr && static_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->_IsThreadProvisioned())
     {
         ChipLogProgress(DeviceLayer, "SRP Client was started, detected server: %04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x",
                         Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[0]),

@@ -50,6 +50,7 @@ protected:
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
     void _ResetThreadNetworkDiagnosticsCounts(void);
+    void _FinishProvisioning(void);
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
@@ -87,6 +88,10 @@ GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadDeviceType(Connect
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
+
+template <class ImplClass>
+inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_FinishProvisioning()
+{}
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()

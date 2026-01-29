@@ -538,7 +538,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetw
         return CHIP_ERROR_READ_FAILED;
     }
 
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     return ConnectivityUtils::GetEthPHYRate(ConnectivityMgrImpl().GetEthernetIfName(), pHYRate);
+#else
+    return CHIP_ERROR_READ_FAILED;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
@@ -548,7 +552,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
         return CHIP_ERROR_READ_FAILED;
     }
 
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     return ConnectivityUtils::GetEthFullDuplex(ConnectivityMgrImpl().GetEthernetIfName(), fullDuplex);
+#else
+    return CHIP_ERROR_READ_FAILED;
+#endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthTimeSinceReset(uint64_t & timeSinceReset)

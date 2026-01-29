@@ -102,10 +102,13 @@ public:
     bool IsThreadEnabled();
     bool IsThreadProvisioned();
     bool IsThreadAttached();
+    bool IsCommissioning();
     CHIP_ERROR GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetThreadVersion(uint16_t & version);
 
+    CHIP_ERROR RendezvousStart();
+    void RendezvousStop();
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
     CHIP_ERROR AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
@@ -426,6 +429,20 @@ inline CHIP_ERROR ThreadStackManager::GetThreadVersion(uint16_t & version)
     return static_cast<ImplClass *>(this)->_GetThreadVersion(version);
 }
 
+inline CHIP_ERROR ThreadStackManager::RendezvousStart()
+{
+    return static_cast<ImplClass *>(this)->_RendezvousStart();
+}
+
+inline void ThreadStackManager::RendezvousStop()
+{
+    static_cast<ImplClass *>(this)->_RendezvousStop();
+}
+
+inline bool ThreadStackManager::IsCommissioning()
+{
+    return static_cast<ImplClass *>(this)->_IsCommissioning();
+}
 inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
