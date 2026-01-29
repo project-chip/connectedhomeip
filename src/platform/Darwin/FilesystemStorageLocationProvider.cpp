@@ -32,7 +32,7 @@ void SetFilesystemStorageLocationProvider(FilesystemStorageLocationProvider * ne
     }
 }
 
-FilesystemStorageLocationProvider & GetFilesystemStorageLocationProvider(void)
+FilesystemStorageLocationProvider & GetFilesystemStorageLocationProvider()
 {
     if (sInstance != nullptr)
     {
