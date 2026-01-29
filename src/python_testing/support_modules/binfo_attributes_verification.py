@@ -68,10 +68,12 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
                      "Value should be set to a valid Major, Minor, and Dot version with the lower 8 bits set to zero."),
             TestStep(23, "TH reads MaxPathsPerInvoke from the DUT.", "Verify that the value is in the range of 1 to 65535."),
             # IF Devicelocation is null, skip test steps 24-28
-            TestStep(24, "TH reads DeviceLocation from the DUT.", "Verify that the value is a DeviceLocationStruct with the following fields: "+
-                    "LocationName (not null and max 128 characters), FloorNumber (either null or an int16 value), and AreaType (either null or in the range of 0x0000 to 0x005F which corresponds to the tag values defined in the Common Area Namespace specification)."),
-            TestStep(25, "TH writes DeviceLocation to the DUT, with the `LocationName` field set to an empty string, the `FloorNumber` field set to -1, and the `AreaType` field set to null.", "DUT expected to respond with SUCCESS"),
-            TestStep(26, "TH reads DeviceLocation from the DUT.", "Verify that the value is a DeviceLocationStruct with the following fields: LocationName (an empty string), FloorNumber (-1), and AreaType (null)."),
+            TestStep(24, "TH reads DeviceLocation from the DUT.", "Verify that the value is a DeviceLocationStruct with the following fields: " +
+                     "LocationName (not null and max 128 characters), FloorNumber (either null or an int16 value), and AreaType (either null or in the range of 0x0000 to 0x005F which corresponds to the tag values defined in the Common Area Namespace specification)."),
+            TestStep(25, "TH writes DeviceLocation to the DUT, with the `LocationName` field set to an empty string, the `FloorNumber` field set to -1, and the `AreaType` field set to null.",
+                     "DUT expected to respond with SUCCESS"),
+            TestStep(26, "TH reads DeviceLocation from the DUT.",
+                     "Verify that the value is a DeviceLocationStruct with the following fields: LocationName (an empty string), FloorNumber (-1), and AreaType (null)."),
             TestStep(27, "TH writes DeviceLocation to the DUT, with the `LocationName` field set to a string of 128 characters (e.g. 16 concatenations of the word 'location'), the `FloorNumber` field set to 200, and the `AreaType` field set to 0x2", "DUT expected to respond with SUCCESS"),
             TestStep(28, "TH reads DeviceLocation from the DUT.", "Verify that the `LocationName` field of the DeviceLocation struct value matches the string used at the previous step, Verify that the `FloorNumber` field of the DeviceLocation struct value is 200, and Verify that the `AreaType` field of the DeviceLocation struct value is 0x2"),
             TestStep(29, "TH reads ConfigurationVersion from the DUT", "Verify that the value is in the range of 1 to 4294967295"),
@@ -265,17 +267,17 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             cluster_revision = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ClusterRevision)
 
             asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3,
-                                        "CaseSessionsPerFabric should be greater than or equal to 3")
+                                         "CaseSessionsPerFabric should be greater than or equal to 3")
             asserts.assert_greater_equal(capability_minima.subscriptionsPerFabric, 3,
-                                        "SubscriptionsPerFabric should be greater than or equal to 3")
+                                         "SubscriptionsPerFabric should be greater than or equal to 3")
 
             # New constraints: when ClusterRevision >= 6, enforce upper bound of 10000 on all CapabilityMinima fields.
             if cluster_revision >= 6:
                 # Original fields (always present)
                 asserts.assert_less_equal(capability_minima.caseSessionsPerFabric, 10000,
-                                        "CaseSessionsPerFabric should be less than or equal to 10000")
+                                          "CaseSessionsPerFabric should be less than or equal to 10000")
                 asserts.assert_less_equal(capability_minima.subscriptionsPerFabric, 10000,
-                                        "SubscriptionsPerFabric should be less than or equal to 10000")
+                                          "SubscriptionsPerFabric should be less than or equal to 10000")
                 # Additional fields are expected to be present at ClusterRevision >= 6.
                 asserts.assert_is_not_none(capability_minima.simultaneousInvocationsSupported,
                                            "SimultaneousInvocationsSupported should be present when ClusterRevision >= 6")
@@ -342,11 +344,14 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(24)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret24 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(isinstance(ret24, cluster.Structs.DeviceLocationStruct), "DeviceLocation should be a DeviceLocationStruct")
+            asserts.assert_true(isinstance(ret24, cluster.Structs.DeviceLocationStruct),
+                                "DeviceLocation should be a DeviceLocationStruct")
             asserts.assert_is_not_none(ret24.locationName, "LocationName should not be null")
             asserts.assert_less_equal(len(ret24.locationName), 128, "LocationName should have max 128 characters")
-            asserts.assert_true(ret24.floorNumber is None or isinstance(ret24.floorNumber, int), "FloorNumber should be either null or an int16 value")
-            asserts.assert_true(ret24.areaType is None or (ret24.areaType >= 0x0000 and ret24.areaType <= 0x005F), "AreaType should be either null or in the range of 0x0000 to 0x005F")
+            asserts.assert_true(ret24.floorNumber is None or isinstance(ret24.floorNumber, int),
+                                "FloorNumber should be either null or an int16 value")
+            asserts.assert_true(ret24.areaType is None or (ret24.areaType >= 0x0000 and ret24.areaType <= 0x005F),
+                                "AreaType should be either null or in the range of 0x0000 to 0x005F")
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
@@ -361,7 +366,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(26)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret26 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(isinstance(ret26, cluster.Structs.DeviceLocationStruct), "DeviceLocation should be a DeviceLocationStruct")
+            asserts.assert_true(isinstance(ret26, cluster.Structs.DeviceLocationStruct),
+                                "DeviceLocation should be a DeviceLocationStruct")
             asserts.assert_equal(ret26.locationName, "", "LocationName should be an empty string")
             asserts.assert_equal(ret26.floorNumber, -1, "FloorNumber should be -1")
             asserts.assert_equal(ret26.areaType, None, "AreaType should be null")
@@ -379,7 +385,8 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(28)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret28 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(isinstance(ret28, cluster.Structs.DeviceLocationStruct), "DeviceLocation should be a DeviceLocationStruct")
+            asserts.assert_true(isinstance(ret28, cluster.Structs.DeviceLocationStruct),
+                                "DeviceLocation should be a DeviceLocationStruct")
             asserts.assert_equal(ret28.locationName, "location" * 16, "LocationName should be a string of 128 characters")
             asserts.assert_equal(ret28.floorNumber, 200, "FloorNumber should be 200")
             asserts.assert_equal(ret28.areaType, 0x0002, "AreaType should be 0x0002")
