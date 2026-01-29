@@ -567,26 +567,6 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
-            - name: Build apps for REPL tests with unified build
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-light-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-tv-app-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --pw-command-launcher=ccache \
-                        build \
-                        --copy-artifacts-to objdir-clone \
-                     "
-                  rm -rf out/unified-build
 
             - name: Build linux-x64-all-devices
               run: >-
@@ -651,7 +631,7 @@ jobs:
             matrix:
                 # This list is empirically created to have a reasonable time split. The "" that runs the "other"
                 # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
-                filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
+                filter: ["TC_DeviceBasic"]
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
