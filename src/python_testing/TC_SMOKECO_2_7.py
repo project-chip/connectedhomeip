@@ -129,7 +129,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
 
         # Step 6, "TH prompts operator to unmount the device."
         self.step(6)
-        
+
         if has_unmounted:
             if self.is_ci:
                 # CI call to trigger unoccupied.
