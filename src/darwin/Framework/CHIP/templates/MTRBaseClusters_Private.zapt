@@ -1,5 +1,6 @@
 {{> header excludeZapComment=true}}
 
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRDefines.h>
@@ -88,7 +89,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
  * Cluster {{name}}
  *    {{description}}
  */
-@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericBaseCluster
+@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} (PrivateExtensions)
 
 {{#zcl_commands}}
 {{#if manufacturerCode}}
@@ -137,21 +138,6 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 {{/if}}
 {{/if}}
 {{/zcl_attributes_server}}
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} (Availability)
-
-/**
- * For all instance methods (reads, writes, commands) that take a completion,
- * the completion will be called on the provided queue.
- */
-- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
-                              endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue;
 
 @end
 {{/if}}
