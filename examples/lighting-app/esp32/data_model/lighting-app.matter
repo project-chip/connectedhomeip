@@ -714,7 +714,7 @@ cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 3;
+  revision 2;
 
   enum AccessControlAuxiliaryTypeEnum : enum8 {
     kSystem = 0;
@@ -2178,7 +2178,7 @@ cluster UserLabel = 65 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 7;
+  revision 9;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;

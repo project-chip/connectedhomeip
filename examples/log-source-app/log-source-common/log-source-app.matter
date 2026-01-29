@@ -369,7 +369,7 @@ fabric_scoped struct WebRTCSessionStruct {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 3;
+  revision 2;
 
   enum AccessControlAuxiliaryTypeEnum : enum8 {
     kSystem = 0;

@@ -444,7 +444,7 @@ cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 3;
+  revision 2;
 
   enum AccessControlAuxiliaryTypeEnum : enum8 {
     kSystem = 0;
@@ -581,7 +581,7 @@ cluster AccessControl = 31 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 3;
+  revision 2;
 
   enum AccessControlAuxiliaryTypeEnum : enum8 {
     kSystem = 0;

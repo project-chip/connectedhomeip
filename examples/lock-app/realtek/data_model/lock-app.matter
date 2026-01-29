@@ -444,7 +444,7 @@ cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 3;
+  revision 2;
 
   enum AccessControlAuxiliaryTypeEnum : enum8 {
     kSystem = 0;
@@ -1860,7 +1860,7 @@ cluster IcdManagement = 70 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
-  revision 7;
+  revision 10;
 
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
