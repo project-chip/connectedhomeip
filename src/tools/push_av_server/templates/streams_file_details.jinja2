@@ -14,18 +14,29 @@
     <div class="left-bar">
         <h2>Streams</h2>
 
+
         <ul>
-            {% for stream in streams %}
+            {% for stream in sessions %}
             <li> Stream {{stream.id}}
                 <ul>
-                    <li>Error{% if stream.errors|length > 1 %}s{% endif %}: {{stream.errors|length}}</li>
-                    <li>Session{% if stream.sessions|length > 1 %}s{% endif %}: {{stream.sessions|length}}</li>
-                    <li><a href="/ui/streams/{{stream.id}}">Open details</a></li>
+                    {% for file in stream.files %}
+                    <li><a href="/ui/streams/{{stream.id}}/{{file}}">{{file}}</a></li>
+                    {% endfor %}
                 </ul>
             </li>
             {% endfor %}
         </ul>
         <div class="center">
+            {% if type == 'cert' %}
+            <pre><code>{{cert}}</code></pre>
+            {% else %}
+            <div>
+                <video controls src="/streams/{{stream_id}}/{{file_path}}"></video>
+            </div>
+            <div>
+                <pre><code>{{pretty_probe}}</code></pre>
+            </div>
+            {% endif %}
         </div>
 </body>
 
