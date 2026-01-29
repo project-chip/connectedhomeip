@@ -65,15 +65,15 @@ public:
     {
 
         gServer.Create(
-            GeneralCommissioningCluster::Context{
+            GeneralCommissioningCluster::Context {
                 .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable                = Server::GetInstance().GetFabricTable(),                //
-                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager            = DeviceLayer::PlatformMgr(),                            //
+                    .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+                    .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                    .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+                    .failSafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+                    .platformManager        = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+                    .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits));
