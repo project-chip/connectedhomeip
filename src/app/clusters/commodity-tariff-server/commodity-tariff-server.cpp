@@ -535,8 +535,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     const size_t componentCount                          = componentIDs.size();
 
     // Validate component count with VerifyOrReturnError
-    VerifyOrReturnError(componentCount > 0 && componentCount <= kTariffPeriodItemMaxIDs, 
-                    CHIP_ERROR_INVALID_LIST_LENGTH);
+    VerifyOrReturnError(componentCount > 0 && componentCount <= kTariffPeriodItemMaxIDs, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     // Allocate memory for the component array
     VerifyOrReturnError(tempBuffer.Calloc(componentCount), CHIP_ERROR_NO_MEMORY);
@@ -569,9 +568,9 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     ReturnErrorOnFailure(err);
 
     ReturnErrorOnFailure(
-    mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount))));
+        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount))));
 
-    ReturnErrorOnFailure(mgmtObj.UpdateBegin(nullptr)); 
+    ReturnErrorOnFailure(mgmtObj.UpdateBegin(nullptr));
 
     if (mgmtObj.UpdateFinish(true)) // Success path
     {

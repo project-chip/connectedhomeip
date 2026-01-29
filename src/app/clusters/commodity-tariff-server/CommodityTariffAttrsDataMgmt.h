@@ -224,7 +224,7 @@ struct SpanCopier
         if (!source.empty())
         {
             const size_t size = std::min(source.size(), maxCount) * sizeof(T);
-            std::memmove(const_cast<T*>(destination.data()), source.begin(), size);
+            std::memmove(const_cast<T *>(destination.data()), source.begin(), size);
         }
 
         return CHIP_NO_ERROR;
@@ -248,36 +248,43 @@ struct SpanCopier<char>
         // Destination must have pre-allocated memory
         VerifyOrReturnError(!destination.empty(), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(destination.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        
+
         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_STRING_LENGTH);
         VerifyOrReturnError(source.size() <= destination.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-        
+
         if (!source.empty())
         {
             const size_t size = std::min(source.size(), maxCount);
-            std::memmove(const_cast<char*>(destination.data()), source.begin(), size);       
+            std::memmove(const_cast<char *>(destination.data()), source.begin(), size);
         }
-        
+
         return CHIP_NO_ERROR;
     }
 
-    /**
-     * @brief Copies character span to a nullable CharSpan
-     * @param source Input span to copy from
-     * @param destination Output nullable span to populate
-     * @param maxCount Maximum number of characters to copy (default: unlimited)
-     * @return CHIP_NO_ERROR if copy succeeded, error code on failure
-     * @warning This method allocates memory using Platform::MemoryCalloc. 
-     *          The caller is responsible for ensuring this memory is freed 
-     *          using Platform::MemoryFree when no longer needed.
-     */
+    /**  
+     * @brief Copies character span to a nullable CharSpan  
+     * @param source Input span to copy from  
+     * @param destination Output nullable span to populate (will be allocated)  
+     * @param maxCount Maximum number of characters to copy  
+     * @return CHIP_NO_ERROR if copy succeeded  
+     * 
+     * @note Memory Management:  
+     * - Allocates new memory via Platform::MemoryCalloc  
+     * - Previous destination memory (if any) is not reused  
+     * - Memory is automatically freed by CleanupStruct() when:  
+     *   - Attribute value is replaced via UpdateFinish()  
+     *   - CTC_BaseDataClass object is destroyed  
+     *   - Cleanup() is explicitly called  
+     * 
+     * @warning The caller must ensure symmetric CopyData()/CleanupStruct() pairs exist  
+     */  
     static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
                                      size_t maxCount = std::numeric_limits<size_t>::max())
     {
         destination.SetNull();
 
         VerifyOrReturnError(!source.empty(), CHIP_NO_ERROR);
-           
+
         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_STRING_LENGTH);
 
         if (!source.empty())
@@ -290,8 +297,8 @@ struct SpanCopier<char>
             (void) Copy(source, tmpSpan, source.size());
 
             destination.SetNonNull(tmpSpan);
-        }     
-  
+        }
+
         return CHIP_NO_ERROR;
     }
 };

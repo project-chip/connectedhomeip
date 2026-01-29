@@ -262,7 +262,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableStructValueHandling)
 {
     CTC_BaseDataClass<DataModel::Nullable<MockStruct>> data(1);
     constexpr uint32_t sample_field_one = 100;
-    constexpr uint16_t sample_field_two     = 200;
+    constexpr uint16_t sample_field_two = 200;
     MockStruct testStruct               = { sample_field_one, sample_field_two };
     DataModel::Nullable<MockStruct> newValue;
 
