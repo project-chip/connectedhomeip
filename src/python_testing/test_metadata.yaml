@@ -13,6 +13,14 @@ not_automated:
       reason:
           Attribute is not implemented in the bridge app. Same code as
           BINFO-3.1, which is run in the CI
+    - name: TC_CADMIN_1_27.py
+      reason:
+          Flaky, see
+          https://github.com/project-chip/connectedhomeip/issues/41813
+    - name: TC_CADMIN_1_28.py
+      reason:
+          Flaky, see
+          https://github.com/project-chip/connectedhomeip/issues/41813
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
