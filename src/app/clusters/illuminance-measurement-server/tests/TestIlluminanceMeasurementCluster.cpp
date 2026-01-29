@@ -21,10 +21,6 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <clusters/IlluminanceMeasurement/Attributes.h>
-#include <clusters/IlluminanceMeasurement/Enums.h>
-#include <clusters/IlluminanceMeasurement/Metadata.h>
-#include <clusters/IlluminanceMeasurement/Structs.h>
 
 namespace {
 
