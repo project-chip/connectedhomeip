@@ -61,34 +61,27 @@ bool ValidateSdpFields(const std::string & sdp)
         return false;
     }
 
-    // Check for required SDP fields
-    bool hasMediaLine   = (sdp.find("m=") != std::string::npos);
-    bool hasIceUfrag    = (sdp.find("a=ice-ufrag:") != std::string::npos);
-    bool hasIcePwd      = (sdp.find("a=ice-pwd:") != std::string::npos);
-    bool hasFingerprint = (sdp.find("a=fingerprint:") != std::string::npos);
-
-    if (!hasMediaLine)
+    struct SdpRequirement
     {
-        ChipLogError(Camera, "ValidateSdpFields: SDP has no media line (m=)");
-        return false;
-    }
+        const char * substring;
+        const char * description;
+    };
 
-    if (!hasIceUfrag)
-    {
-        ChipLogError(Camera, "ValidateSdpFields: SDP has no ICE user fragment (a=ice-ufrag:)");
-        return false;
-    }
+    // Define the list of required substrings and their corresponding descriptions for error logging.
+    static const SdpRequirement kRequirements[] = {
+        { "m=", "media line" },
+        { "a=ice-ufrag:", "ICE user fragment" },
+        { "a=ice-pwd:", "ICE password" },
+        { "a=fingerprint:", "DTLS fingerprint" },
+    };
 
-    if (!hasIcePwd)
+    for (const auto & req : kRequirements)
     {
-        ChipLogError(Camera, "ValidateSdpFields: SDP has no ICE password (a=ice-pwd:)");
-        return false;
-    }
-
-    if (!hasFingerprint)
-    {
-        ChipLogError(Camera, "ValidateSdpFields: SDP has no DTLS fingerprint (a=fingerprint:)");
-        return false;
+        if (sdp.find(req.substring) == std::string::npos)
+        {
+            ChipLogError(Camera, "ValidateSdpFields: SDP has no %s (%s): %s", req.description, req.substring, sdp.c_str());
+            return false;
+        }
     }
 
     return true;
@@ -321,7 +314,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     if (!ValidateSdpFields(args.sdp))
     {
-        ChipLogError(Camera, "HandleProvideOffer: Invalid SDP offer received");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -449,7 +441,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     if (!ValidateSdpFields(sdpAnswer))
     {
-        ChipLogError(Camera, "HandleProvideAnswer: Invalid SDP answer received for session ID %u", sessionId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
