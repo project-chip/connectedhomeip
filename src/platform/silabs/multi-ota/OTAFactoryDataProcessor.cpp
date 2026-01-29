@@ -20,8 +20,9 @@
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
 
 namespace chip {
-
-using namespace ::chip::DeviceLayer::Silabs;
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 {
@@ -150,4 +151,7 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
     return CHIP_ERROR_NOT_FOUND;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

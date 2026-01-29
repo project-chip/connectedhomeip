@@ -26,6 +26,9 @@ extern "C" {
 }
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
@@ -126,4 +129,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
     return CHIP_NO_ERROR;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

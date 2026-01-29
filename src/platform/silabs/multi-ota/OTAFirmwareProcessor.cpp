@@ -34,6 +34,9 @@ extern "C" {
 #define SL_BOOTLOADER_OK 0L
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 // Define static memebers
 uint8_t OTAFirmwareProcessor::mSlotId                                                  = 0;
@@ -225,4 +228,7 @@ CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
     return err ? CHIP_ERROR_WRITE_FAILED : CHIP_NO_ERROR;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

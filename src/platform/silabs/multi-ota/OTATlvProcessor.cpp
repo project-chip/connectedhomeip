@@ -30,8 +30,12 @@
 
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::Silabs;
+using namespace ::chip::DeviceLayer::Silabs::MultiOTA;
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTATlvProcessor::Init()
 {
@@ -189,4 +193,7 @@ CHIP_ERROR OTATlvProcessor::RemovePadding(MutableByteSpan & block)
     return CHIP_NO_ERROR;
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip
