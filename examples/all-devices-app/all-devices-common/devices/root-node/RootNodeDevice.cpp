@@ -53,7 +53,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mGeneralCommissioningCluster.Create(
         GeneralCommissioningCluster::Context {
             .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager    = mContext.configurationManager,        //
+                .configurationManager   = mContext.configurationManager,       //
                 .deviceControlServer    = mContext.deviceControlServer,        //
                 .fabricTable            = mContext.fabricTable,                //
                 .failsafeContext        = mContext.failsafeContext,            //
