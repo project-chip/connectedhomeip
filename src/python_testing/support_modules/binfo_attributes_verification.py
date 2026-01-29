@@ -59,9 +59,9 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             TestStep(19, "TH reads UniqueID from the DUT.",
                      "Verify it is of type string, and verify that the value is not identical to SerialNumber attribute if SerialNumber attribute is supported"),
             TestStep(20, "TH reads CapabilityMinima attribute from the DUT",
-                     "If cluster revision is less than 6 verify that the CaseSessionsPerFabric is in the range of 3 to 65535, and SubscriptionsPerFabric is in the inclusive range of 3 to 65535." +
-                     "If cluster revision is greater than or equal to 6 verify that the CaseSessionsPerFabric and SubscriptionsPerFabric are in the inclusive range of 3 to 10000," +
-                     "that new struct fields SimultaneousInvocationsSupported and SimultaneousWritesSupported are present and in inclusive range of 1 to 10000," +
+                     "If cluster revision is less than 6 verify that the CaseSessionsPerFabric is in the range of 3 to 65535, and SubscriptionsPerFabric is in the inclusive range of 3 to 65535. " +
+                     "If cluster revision is greater than or equal to 6 verify that the CaseSessionsPerFabric and SubscriptionsPerFabric are in the inclusive range of 3 to 10000, " +
+                     "that new struct fields SimultaneousInvocationsSupported and SimultaneousWritesSupported are present and in inclusive range of 1 to 10000, " +
                      "that new struct fields ReadPathsSupported is present and in inclusive range of 9 to 10000, while SubscribePathsSupported is present and in inclusive range of 3 to 10000."),
             TestStep(21, "TH reads ProductAppearance from the DUT.", "Verify it is of type ProductAppearanceStruct."),
             TestStep(22, "TH reads SpecificationVersion from the DUT.",
@@ -390,6 +390,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(29)
         if hasattr(cluster.Attributes, 'ConfigurationVersion') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ConfigurationVersion):
             ret29 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ConfigurationVersion)
+            asserts.assert_greater_equal(ret29, 1, "ConfigurationVersion should be greater than or equal to 1")
             asserts.assert_less_equal(ret29, 4294967295, "ConfigurationVersion should be less than or equal to 4294967295")
         elif not hasattr(cluster.Attributes, 'ConfigurationVersion'):
             self.mark_current_step_skipped()
