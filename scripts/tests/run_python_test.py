@@ -252,6 +252,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     app_manager_ref = None
     app_manager_lock = threading.Lock()
     restart_monitor_thread = None
+    app_pid = None
     app_exit_code = 0
     stream_output = sys.stdout.buffer
     if quiet:
@@ -262,6 +263,11 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 raise FileNotFoundError(f"{app} not found")
         app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
         app_manager.start()
+
+        # Capture the app PID to make it available to the test runner
+        if app_manager.get_process() and app_manager.get_process().p:
+            app_pid = app_manager.get_process().p.pid
+
         app_manager_ref = [app_manager]
         restart_monitor_thread = threading.Thread(
             target=monitor_app_restart_requests,
@@ -286,6 +292,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         "--fail-on-skipped",
         "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
     ] + shlex.split(script_args)
+
+    # Pass the app PID to the test runner
+    if app_pid is not None:
+        script_command.extend(["--app-pid", str(app_pid)])
 
     if script_gdb:
         #
