@@ -8063,7 +8063,7 @@ endpoint 1 {
     callback attribute targetLevel;
     callback attribute defaultOpenLevel;
     callback attribute valveFault;
-    callback attribute levelStep;
+    ram      attribute levelStep default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
