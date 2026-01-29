@@ -74,7 +74,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
         byteBlock.reduce_size(requestedOtaMaxBlockSize);
     }
 
-    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
+    ReturnErrorOnFailure(OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock));
     if (IsLastBlock())
     {
         // Remove padding from the last block since if the file was padded, last block will contain padding bytes.
