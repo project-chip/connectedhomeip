@@ -139,6 +139,7 @@ CodeDrivenClusters:
     - Identify
     - Localization Configuration
     - OTA Software Update Provider
+    - OTA Software Update Requestor
     - Occupancy Sensing
     - Operational Credentials
     - Power Topology

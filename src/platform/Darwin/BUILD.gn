@@ -142,6 +142,7 @@ static_library("Darwin") {
       "../Linux/OTAImageProcessorImpl.cpp",
       "../Linux/OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_enable_ble) {

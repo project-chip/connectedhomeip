@@ -25,6 +25,7 @@ source_set("commands") {
     "Meta.cpp",
   ]
 
+  deps = []
   public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
 
   if (chip_device_platform != "none") {
@@ -61,6 +62,7 @@ source_set("commands") {
   if (chip_enable_ota_requestor && chip_device_platform != "none" &&
       chip_device_platform != "linux" && chip_device_platform != "darwin") {
     sources += [ "Ota.cpp" ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_system_config_provide_statistics) {
@@ -68,7 +70,7 @@ source_set("commands") {
   }
 
   if (chip_device_platform != "none") {
-    deps = [ "${chip_root}/src/setup_payload:onboarding-codes-utils" ]
+    deps += [ "${chip_root}/src/setup_payload:onboarding-codes-utils" ]
   }
 
   cflags = [ "-Wconversion" ]

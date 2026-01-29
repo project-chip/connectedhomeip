@@ -24,7 +24,8 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemClock.h>
 
