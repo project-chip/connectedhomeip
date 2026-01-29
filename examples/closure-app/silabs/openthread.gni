@@ -20,7 +20,7 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 app_data_model =
     "${chip_root}/examples/closure-app/silabs/data_model:silabs-closure"
-chip_enable_ota_requestor = false
+chip_enable_ota_requestor = true
 chip_enable_openthread = true
 disable_lcd = true
 sl_enable_test_event_trigger = true

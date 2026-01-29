@@ -47,7 +47,7 @@ class PreRollBuffer
 {
 public:
     PreRollBuffer();
-    void PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size);
+    void PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size, int64_t timestampMs);
     void RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys);
     void DeregisterTransportFromBuffer(BufferSink * sink);
     void SetMaxTotalBytes(size_t size);

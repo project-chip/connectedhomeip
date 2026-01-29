@@ -637,6 +637,218 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
     return Status::Success;
 }
 
+std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::ValidateStreamParameters(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions,
+    const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr)
+{
+
+    // Check mutual exclusivity and presence of stream fields
+    auto listHasElements = [](const auto & list) {
+        size_t s = 0;
+        return list.ComputeSize(&s) == CHIP_NO_ERROR && s > 0;
+    };
+    bool hasNewStreamFields =
+        (transportOptions.videoStreams.HasValue() && listHasElements(transportOptions.videoStreams.Value())) ||
+        (transportOptions.audioStreams.HasValue() && listHasElements(transportOptions.audioStreams.Value()));
+    bool hasOldStreamFields = transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue();
+
+    VerifyOrReturnValue(!(hasNewStreamFields && hasOldStreamFields), Status::InvalidCommand,
+                        ChipLogError(Zcl, "Transport Options[ep=%d]: Both new and old stream fields are present", mEndpointId));
+
+    VerifyOrReturnValue(hasNewStreamFields || hasOldStreamFields, Status::InvalidCommand,
+                        ChipLogError(Zcl, "Transport Options[ep=%d]: Missing stream fields", mEndpointId));
+
+    // Validate new multistream fields
+    if (hasNewStreamFields)
+    {
+        std::set<std::string> videoStreamNames;
+
+        // Validate videoStreams
+        uint16_t videoStreamsCount = 0;
+        if (transportOptions.videoStreams.HasValue())
+        {
+            std::set<uint16_t> videoStreamIDs;
+
+            for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
+            {
+                auto & videoStream = iter.GetValue();
+
+                videoStreamsCount++;
+                videoStreamNames.insert(std::string(videoStream.videoStreamName.data(), videoStream.videoStreamName.size()));
+                videoStreamIDs.insert(videoStream.videoStreamID);
+            }
+
+            // Check for duplicates within video streams
+            if ((videoStreamNames.size() != videoStreamsCount) || (videoStreamIDs.size() != videoStreamsCount))
+            {
+                auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate videoStreamName or videoStreamID found",
+                             mEndpointId);
+                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                return std::nullopt;
+            }
+
+            for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
+            {
+                auto & videoStream = iter.GetValue();
+                // Validate videoStreamID
+                auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->SetVideoStream(videoStream.videoStreamID));
+                VerifyOrReturnValue(status.IsSuccess(), Status::InvalidCommand,
+                                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ID", mEndpointId));
+            }
+        }
+
+        // Validate audioStreams
+        uint16_t audioStreamsCount = 0;
+        if (transportOptions.audioStreams.HasValue())
+        {
+            std::set<std::string> audioStreamNames;
+            std::set<uint16_t> audioStreamIDs;
+
+            // Check against video stream names
+            for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
+            {
+                auto & audioStream = iter.GetValue();
+
+                audioStreamsCount++;
+                audioStreamNames.insert(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size()));
+                audioStreamIDs.insert(audioStream.audioStreamID);
+            }
+
+            // Check for duplicates within audio streams
+            if ((audioStreamNames.size() != audioStreamsCount) || (audioStreamIDs.size() != audioStreamsCount))
+            {
+                auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
+                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate audioStreamName or audioStreamID found",
+                             mEndpointId);
+                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                return std::nullopt;
+            }
+
+            for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
+            {
+                auto & audioStream = iter.GetValue();
+                // Check for duplicate with video streams
+                if (videoStreamNames.find(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size())) !=
+                    videoStreamNames.end())
+                {
+                    auto status = to_underlying(StatusCodeEnum::kInvalidStream);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AudioStreamName conflicts with video stream",
+                                 mEndpointId);
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                    return std::nullopt;
+                }
+
+                // Validate audioStreamID
+                auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->SetAudioStream(audioStream.audioStreamID));
+                VerifyOrReturnValue(status.IsSuccess(), Status::InvalidCommand,
+                                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ID", mEndpointId));
+            }
+        }
+
+        // Check if both videoStreams and audioStreams are empty
+        if (videoStreamsCount == 0 && audioStreamsCount == 0)
+        {
+            auto status = to_underlying(StatusCodeEnum::kInvalidStream);
+            ChipLogError(Zcl, "Transport Options[ep=%d]: Both VideoStreams and AudioStreams empty", mEndpointId);
+            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+            return std::nullopt;
+        }
+    }
+
+    // Validate old format single stream fields
+    if (hasOldStreamFields)
+    {
+
+        if (transportOptions.videoStreamID.HasValue())
+        {
+            uint16_t finalVideoStreamID;
+
+            if (transportOptions.videoStreamID.Value().IsNull())
+            {
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SelectVideoStream(transportOptions.streamUsage, finalVideoStreamID));
+                if (!delegateStatus.IsSuccess())
+                {
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedVideoStreamsAttribute is empty", mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidInState);
+                    return std::nullopt;
+                }
+
+                transportOptionsPtr->videoStreamID.SetValue(finalVideoStreamID);
+            }
+            else
+            {
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SetVideoStream(transportOptions.videoStreamID.Value().Value()));
+
+                if (!delegateStatus.IsSuccess())
+                {
+                    auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
+                    return std::nullopt;
+                }
+
+                finalVideoStreamID = transportOptions.videoStreamID.Value().Value();
+            }
+
+            // Create new video stream entry with name 'video' and the provided or selected VideoStreamID i.e; finalVideoStreamID
+            Structs::VideoStreamStruct::Type newVideoStream;
+            newVideoStream.videoStreamName = CharSpan::fromCharString("video");
+            newVideoStream.videoStreamID   = finalVideoStreamID;
+
+            // Add to storage and update the list
+            transportOptionsPtr->AddVideoStream(newVideoStream);
+        }
+
+        if (transportOptions.audioStreamID.HasValue())
+        {
+            uint16_t finalAudioStreamID;
+
+            if (transportOptions.audioStreamID.Value().IsNull())
+            {
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SelectAudioStream(transportOptions.streamUsage, finalAudioStreamID));
+                if (!delegateStatus.IsSuccess())
+                {
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedAudioStreamsAttribute is empty", mEndpointId);
+                    handler.AddStatus(commandPath, Status::InvalidInState);
+                    return std::nullopt;
+                }
+
+                transportOptionsPtr->audioStreamID.SetValue(finalAudioStreamID);
+            }
+            else
+            {
+                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+                    mDelegate->SetAudioStream(transportOptions.audioStreamID.Value().Value()));
+
+                if (!delegateStatus.IsSuccess())
+                {
+                    auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
+                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
+                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
+                    return std::nullopt;
+                }
+
+                finalAudioStreamID = transportOptions.audioStreamID.Value().Value();
+            }
+
+            // Create new audio stream entry with name 'audio' and the provided or selected AudioStreamID i.e; finalAudioStreamID
+            Structs::AudioStreamStruct::Type newAudioStream;
+            newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
+            newAudioStream.audioStreamID   = finalAudioStreamID;
+
+            // Add to storage and update the list
+            transportOptionsPtr->AddAudioStream(newAudioStream);
+        }
+    }
+
+    return Status::Success;
+}
+
 std::optional<DataModel::ActionReturnStatus>
 PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                               const Commands::AllocatePushTransport::DecodableType & commandData)
@@ -840,201 +1052,12 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    // Check mutual exclusivity and presence of stream fields
-    bool hasNewStreamFields = transportOptions.videoStreams.HasValue() || transportOptions.audioStreams.HasValue();
-    bool hasOldStreamFields = transportOptions.videoStreamID.HasValue() || transportOptions.audioStreamID.HasValue();
+    auto validateStreamStatus = ValidateStreamParameters(handler, commandPath, transportOptions, transportOptionsPtr);
 
-    VerifyOrReturnValue(!(hasNewStreamFields && hasOldStreamFields), Status::InvalidCommand,
-                        ChipLogError(Zcl, "Transport Options[ep=%d]: Both new and old stream fields are present", mEndpointId));
-
-    VerifyOrReturnValue(hasNewStreamFields || hasOldStreamFields, Status::InvalidCommand,
-                        ChipLogError(Zcl, "Transport Options[ep=%d]: Missing stream fields", mEndpointId));
-
-    // Validate new multistream fields
-    if (hasNewStreamFields)
+    if (validateStreamStatus != Status::Success)
     {
-        std::set<std::string> videoStreamNames;
-
-        // Validate videoStreams
-        uint16_t videoStreamsCount = 0;
-        if (transportOptions.videoStreams.HasValue())
-        {
-            std::set<uint16_t> videoStreamIDs;
-
-            for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
-            {
-                auto & videoStream = iter.GetValue();
-
-                videoStreamsCount++;
-                videoStreamNames.insert(std::string(videoStream.videoStreamName.data(), videoStream.videoStreamName.size()));
-                videoStreamIDs.insert(videoStream.videoStreamID);
-            }
-
-            // Check for duplicates within video streams
-            if ((videoStreamNames.size() != videoStreamsCount) || (videoStreamIDs.size() != videoStreamsCount))
-            {
-                auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate videoStreamName or videoStreamID found",
-                             mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-                return std::nullopt;
-            }
-
-            for (auto iter = transportOptions.videoStreams.Value().begin(); iter.Next();)
-            {
-                auto & videoStream = iter.GetValue();
-                // Validate videoStreamID
-                auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->SetVideoStream(videoStream.videoStreamID));
-                VerifyOrReturnValue(status.IsSuccess(), Status::InvalidCommand,
-                                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ID", mEndpointId));
-            }
-        }
-
-        // Validate audioStreams
-        uint16_t audioStreamsCount = 0;
-        if (transportOptions.audioStreams.HasValue())
-        {
-            std::set<std::string> audioStreamNames;
-            std::set<uint16_t> audioStreamIDs;
-
-            // Check against video stream names
-            for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
-            {
-                auto & audioStream = iter.GetValue();
-
-                audioStreamsCount++;
-                audioStreamNames.insert(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size()));
-                audioStreamIDs.insert(audioStream.audioStreamID);
-            }
-
-            // Check for duplicates within audio streams
-            if ((audioStreamNames.size() != audioStreamsCount) || (audioStreamIDs.size() != audioStreamsCount))
-            {
-                auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
-                ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate audioStreamName or audioStreamID found",
-                             mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-                return std::nullopt;
-            }
-
-            for (auto iter = transportOptions.audioStreams.Value().begin(); iter.Next();)
-            {
-                auto & audioStream = iter.GetValue();
-                // Check for duplicate with video streams
-                if (videoStreamNames.find(std::string(audioStream.audioStreamName.data(), audioStream.audioStreamName.size())) !=
-                    videoStreamNames.end())
-                {
-                    auto status = to_underlying(StatusCodeEnum::kInvalidStream);
-                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AudioStreamName conflicts with video stream",
-                                 mEndpointId);
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-                    return std::nullopt;
-                }
-
-                // Validate audioStreamID
-                auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate->SetAudioStream(audioStream.audioStreamID));
-                VerifyOrReturnValue(status.IsSuccess(), Status::InvalidCommand,
-                                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ID", mEndpointId));
-            }
-        }
-
-        // Check if both videoStreams and audioStreams are empty
-        if (videoStreamsCount == 0 && audioStreamsCount == 0)
-        {
-            auto status = to_underlying(StatusCodeEnum::kInvalidStream);
-            ChipLogError(Zcl, "Transport Options[ep=%d]: Both VideoStreams and AudioStreams empty", mEndpointId);
-            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
-            return std::nullopt;
-        }
-    }
-
-    // Validate old format single stream fields
-    if (hasOldStreamFields)
-    {
-
-        if (transportOptions.videoStreamID.HasValue())
-        {
-            uint16_t finalVideoStreamID;
-
-            if (transportOptions.videoStreamID.Value().IsNull())
-            {
-                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                    mDelegate->SelectVideoStream(transportOptions.streamUsage, finalVideoStreamID));
-                if (!delegateStatus.IsSuccess())
-                {
-                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedVideoStreamsAttribute is empty", mEndpointId);
-                    handler.AddStatus(commandPath, Status::InvalidInState);
-                    return std::nullopt;
-                }
-
-                transportOptionsPtr->videoStreamID.SetValue(finalVideoStreamID);
-            }
-            else
-            {
-                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                    mDelegate->SetVideoStream(transportOptions.videoStreamID.Value().Value()));
-
-                if (!delegateStatus.IsSuccess())
-                {
-                    auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
-                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mEndpointId);
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
-                    return std::nullopt;
-                }
-
-                finalVideoStreamID = transportOptions.videoStreamID.Value().Value();
-            }
-
-            // Create new video stream entry with name 'video' and the provided or selected VideoStreamID i.e; finalVideoStreamID
-            Structs::VideoStreamStruct::Type newVideoStream;
-            newVideoStream.videoStreamName = CharSpan::fromCharString("video");
-            newVideoStream.videoStreamID   = finalVideoStreamID;
-
-            // Add to storage and update the list
-            transportOptionsPtr->AddVideoStream(newVideoStream);
-        }
-
-        if (transportOptions.audioStreamID.HasValue())
-        {
-            uint16_t finalAudioStreamID;
-
-            if (transportOptions.audioStreamID.Value().IsNull())
-            {
-                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                    mDelegate->SelectAudioStream(transportOptions.streamUsage, finalAudioStreamID));
-                if (!delegateStatus.IsSuccess())
-                {
-                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AllocatedAudioStreamsAttribute is empty", mEndpointId);
-                    handler.AddStatus(commandPath, Status::InvalidInState);
-                    return std::nullopt;
-                }
-
-                transportOptionsPtr->audioStreamID.SetValue(finalAudioStreamID);
-            }
-            else
-            {
-                auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
-                    mDelegate->SetAudioStream(transportOptions.audioStreamID.Value().Value()));
-
-                if (!delegateStatus.IsSuccess())
-                {
-                    auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
-                    ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mEndpointId);
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
-                    return std::nullopt;
-                }
-
-                finalAudioStreamID = transportOptions.audioStreamID.Value().Value();
-            }
-
-            // Create new audio stream entry with name 'audio' and the provided or selected AudioStreamID i.e; finalAudioStreamID
-            Structs::AudioStreamStruct::Type newAudioStream;
-            newAudioStream.audioStreamName = CharSpan::fromCharString("audio");
-            newAudioStream.audioStreamID   = finalAudioStreamID;
-
-            // Add to storage and update the list
-            transportOptionsPtr->AddAudioStream(newAudioStream);
-        }
+        ChipLogError(Camera, "HandleAllocatePushTransport[ep=%d]: Stream validation failed", mEndpointId);
+        return validateStreamStatus;
     }
 
     if (transportOptions.containerOptions.containerType == ContainerFormatEnum::kCmaf &&
@@ -1235,6 +1258,14 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         ChipLogError(Zcl, "HandleModifyPushTransport[ep=%d]: Memory Allocation failed for transportOptions", mEndpointId);
         handler.AddStatus(commandPath, Status::ResourceExhausted);
         return std::nullopt;
+    }
+
+    auto validateStreamStatus = ValidateStreamParameters(handler, commandPath, transportOptions, transportOptionsPtr);
+
+    if (validateStreamStatus != Status::Success)
+    {
+        ChipLogError(Camera, "HandleAllocatePushTransport[ep=%d]: Stream validation failed", mEndpointId);
+        return validateStreamStatus;
     }
 
     // Call the delegate

@@ -14,6 +14,5 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
-  "DeviceEnergyManagementTestEventTriggerHandler.h",
   "device-energy-management-server.h",
 ]

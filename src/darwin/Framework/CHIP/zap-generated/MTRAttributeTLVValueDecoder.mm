@@ -16422,6 +16422,16 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
                 } else {
                     newElement_0.detectionStartTime = nil;
                 }
+                if (entry_0.objectCountThreshold.HasValue()) {
+                    newElement_0.objectCountThreshold = [NSNumber numberWithUnsignedShort:entry_0.objectCountThreshold.Value()];
+                } else {
+                    newElement_0.objectCountThreshold = nil;
+                }
+                if (entry_0.objectCount.HasValue()) {
+                    newElement_0.objectCount = [NSNumber numberWithUnsignedShort:entry_0.objectCount.Value()];
+                } else {
+                    newElement_0.objectCount = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -16491,8 +16501,8 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
-    case Attributes::CountThresholdReached::Id: {
-        using TypeInfo = Attributes::CountThresholdReached::TypeInfo;
+    case Attributes::ObjectCountReached::Id: {
+        using TypeInfo = Attributes::ObjectCountReached::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -16500,28 +16510,6 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
-    case Attributes::CountThreshold::Id: {
-        using TypeInfo = Attributes::CountThreshold::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
-        return value;
-    }
-    case Attributes::ObjectCount::Id: {
-        using TypeInfo = Attributes::ObjectCount::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
     case Attributes::HoldTime::Id: {
@@ -16627,17 +16615,6 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
             }
             value = array_0;
         }
-        return value;
-    }
-    case Attributes::PrivacyModeEnabled::Id: {
-        using TypeInfo = Attributes::PrivacyModeEnabled::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithBool:cppValue];
         return value;
     }
     default: {

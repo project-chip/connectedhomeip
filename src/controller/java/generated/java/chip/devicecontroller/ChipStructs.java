@@ -11478,21 +11478,31 @@ public static class AmbientContextSensingClusterSemanticTagStruct {
 public static class AmbientContextSensingClusterAmbientContextTypeStruct {
   public ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed;
   public Optional<Long> detectionStartTime;
+  public Optional<Integer> objectCountThreshold;
+  public Optional<Integer> objectCount;
   private static final long AMBIENT_CONTEXT_SENSED_ID = 0L;
   private static final long DETECTION_START_TIME_ID = 1L;
+  private static final long OBJECT_COUNT_THRESHOLD_ID = 2L;
+  private static final long OBJECT_COUNT_ID = 3L;
 
   public AmbientContextSensingClusterAmbientContextTypeStruct(
     ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed,
-    Optional<Long> detectionStartTime
+    Optional<Long> detectionStartTime,
+    Optional<Integer> objectCountThreshold,
+    Optional<Integer> objectCount
   ) {
     this.ambientContextSensed = ambientContextSensed;
     this.detectionStartTime = detectionStartTime;
+    this.objectCountThreshold = objectCountThreshold;
+    this.objectCount = objectCount;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(AMBIENT_CONTEXT_SENSED_ID, ArrayType.generateArrayType(ambientContextSensed, (elementambientContextSensed) -> elementambientContextSensed.encodeTlv())));
     values.add(new StructElement(DETECTION_START_TIME_ID, detectionStartTime.<BaseTLVType>map((nonOptionaldetectionStartTime) -> new UIntType(nonOptionaldetectionStartTime)).orElse(new EmptyType())));
+    values.add(new StructElement(OBJECT_COUNT_THRESHOLD_ID, objectCountThreshold.<BaseTLVType>map((nonOptionalobjectCountThreshold) -> new UIntType(nonOptionalobjectCountThreshold)).orElse(new EmptyType())));
+    values.add(new StructElement(OBJECT_COUNT_ID, objectCount.<BaseTLVType>map((nonOptionalobjectCount) -> new UIntType(nonOptionalobjectCount)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -11503,6 +11513,8 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
     }
     ArrayList<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> ambientContextSensed = null;
     Optional<Long> detectionStartTime = Optional.empty();
+    Optional<Integer> objectCountThreshold = Optional.empty();
+    Optional<Integer> objectCount = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == AMBIENT_CONTEXT_SENSED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
@@ -11514,11 +11526,23 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
           UIntType castingValue = element.value(UIntType.class);
           detectionStartTime = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == OBJECT_COUNT_THRESHOLD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          objectCountThreshold = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == OBJECT_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          objectCount = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new AmbientContextSensingClusterAmbientContextTypeStruct(
       ambientContextSensed,
-      detectionStartTime
+      detectionStartTime,
+      objectCountThreshold,
+      objectCount
     );
   }
 
@@ -11531,6 +11555,12 @@ public static class AmbientContextSensingClusterAmbientContextTypeStruct {
     output.append("\n");
     output.append("\tdetectionStartTime: ");
     output.append(detectionStartTime);
+    output.append("\n");
+    output.append("\tobjectCountThreshold: ");
+    output.append(objectCountThreshold);
+    output.append("\n");
+    output.append("\tobjectCount: ");
+    output.append(objectCount);
     output.append("\n");
     output.append("}\n");
     return output.toString();

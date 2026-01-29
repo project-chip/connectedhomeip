@@ -42,6 +42,8 @@ enum class Fields : uint8_t
 {
     kAmbientContextSensed = 0,
     kDetectionStartTime   = 1,
+    kObjectCountThreshold = 2,
+    kObjectCount          = 3,
 };
 
 struct Type
@@ -49,6 +51,8 @@ struct Type
 public:
     DataModel::List<const Globals::Structs::SemanticTagStruct::Type> ambientContextSensed;
     Optional<uint32_t> detectionStartTime;
+    Optional<uint16_t> objectCountThreshold;
+    Optional<uint16_t> objectCount;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -60,6 +64,8 @@ struct DecodableType
 public:
     DataModel::DecodableList<Globals::Structs::SemanticTagStruct::DecodableType> ambientContextSensed;
     Optional<uint32_t> detectionStartTime;
+    Optional<uint16_t> objectCountThreshold;
+    Optional<uint16_t> objectCount;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
