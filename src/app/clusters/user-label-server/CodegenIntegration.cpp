@@ -17,10 +17,10 @@
  */
 
 #include <app/clusters/user-label-server/UserLabelCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/UserLabel.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <app/server/Server.h>
 #include <src/include/platform/DeviceInfoProvider.h>
 
 using namespace chip;
