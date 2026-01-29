@@ -102,67 +102,77 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         # Step 2, "TH reads from the DUT the BatteryAlert attribute."
 
         self.step(2)
-        battery_alert_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.BatteryAlert)
-        asserts.assert_not_equal(battery_alert_dut, 2, "Battery Alert should not be critical (2)")
+        if has_battery_alert:
+            battery_alert_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.BatteryAlert)
+            asserts.assert_not_equal(battery_alert_dut, 2, "Battery Alert should not be critical (2)")
 
         # Step 3, "TH reads from the DUT the HardwareFaultAlert attribute."
         self.step(3)
-        hardware_fault_alert_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.HardwareFaultAlert)
-        asserts.assert_equal(hardware_fault_alert_dut, 0, "No hardware fault expected")
+        if has_hardware_fault_alert:
+            hardware_fault_alert_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.HardwareFaultAlert)
+            asserts.assert_equal(hardware_fault_alert_dut, 0, "No hardware fault expected")
 
         # Step 4, "TH subscribes to Unmounted attribute with  min interval 0s and max interval 30s."
         self.step(4)
-        sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.Unmounted)
-        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint, max_interval_sec=30)
+        if has_unmounted:
+            sub_handler = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.Unmounted)
+            await sub_handler.start(self.default_controller, self.dut_node_id, endpoint, max_interval_sec=30)
 
-        unmounted_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.Unmounted)
-        asserts.assert_equal(unmounted_dut, 0, "Expect not unmounted")
+            unmounted_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.Unmounted)
+            asserts.assert_equal(unmounted_dut, 0, "Expect not unmounted")
 
         # Step 5, "TH reads from the DUT the ExpressedState attribute."
         self.step(5)
-        expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
-        asserts.assert_not_equal(expressed_state_dut, 9, "ExpressedState should not be Inoperative")
+        if has_expressed_state:
+            expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
+            asserts.assert_not_equal(expressed_state_dut, 9, "ExpressedState should not be Inoperative")
 
         # Step 6, "TH prompts operator to unmount the device."
         self.step(6)
-        if self.is_ci:
-            # CI call to trigger unoccupied.
-            self.write_to_app_pipe({"Name": "SetUnmounted", "EndpointId": endpoint, "Unmounted": 1})
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Unmount DUT and press enter")
+        
+        if has_unmounted:
+            if self.is_ci:
+                # CI call to trigger unoccupied.
+                self.write_to_app_pipe({"Name": "SetUnmounted", "EndpointId": endpoint, "Unmounted": 1})
+            else:
+                self.wait_for_user_input(
+                    prompt_msg="Unmount DUT and press enter")
 
         # Step 7, "TH waits for a report of Unmounted attribute from DUT with a timeout of 60 seconds."
         self.step(7)
-        sub_handler.wait_for_attribute_report(timeout_sec=60)
-        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
-                             [0].value, 1, msg="Received unexpected value for Unmounted")
+        if has_unmounted:
+            sub_handler.wait_for_attribute_report(timeout_sec=60)
+            asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
+                                [0].value, 1, msg="Received unexpected value for Unmounted")
 
         # Step 8, "TH reads ExpressedState attribute from DUT."
         self.step(8)
-        if inoperative_when_unmounted_supported:
+        if has_expressed_state and has_unmounted and inoperative_when_unmounted_supported:
             expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
             asserts.assert_equal(expressed_state_dut, 9, "ExpressedState should be Inoperative")
 
         # Step 9, "TH prompts operator to mount the device."
         self.step(9)
-        if self.is_ci:
-            # CI call to trigger unoccupied.
-            self.write_to_app_pipe({"Name": "SetUnmounted", "EndpointId": endpoint, "Unmounted": 0})
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Mount DUT and press enter")
+        if has_unmounted:
+            if self.is_ci:
+                # CI call to trigger unoccupied.
+                self.write_to_app_pipe({"Name": "SetUnmounted", "EndpointId": endpoint, "Unmounted": 0})
+            else:
+                self.wait_for_user_input(
+                    prompt_msg="Mount DUT and press enter")
 
         # Step 10, "TH waits for a report of Unmounted attribute from DUT with a timeout of 60 seconds."
         self.step(10)
-        sub_handler.wait_for_attribute_report(timeout_sec=60)
-        asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
-                             [0].value, 0, msg="Received unexpected value for Unmounted")
+        if has_unmounted:
+            sub_handler.wait_for_attribute_report(timeout_sec=60)
+            asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
+                                [0].value, 0, msg="Received unexpected value for Unmounted")
 
         # Step 11, "TH reads ExpressedState attribute from DUT."
         self.step(11)
-        expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
-        asserts.assert_not_equal(expressed_state_dut, 9, "ExpressedState should not be Inoperative")
+        if has_expressed_state and has_unmounted and inoperative_when_unmounted_supported:
+            expressed_state_dut = await self.read_smokeco_attribute_expect_success(attribute=attributes.ExpressedState)
+            asserts.assert_not_equal(expressed_state_dut, 9, "ExpressedState should not be Inoperative")
 
 
 if __name__ == "__main__":
