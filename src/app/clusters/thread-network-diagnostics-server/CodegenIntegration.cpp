@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,60 +46,15 @@ public:
     {
         const BitFlags<Feature> featureMap(rawFeatureMap);
 
-        static constexpr AttributeId optionalAttributeIds[] = { ActiveTimestamp::Id,
-                                                                PendingTimestamp::Id,
-                                                                Delay::Id,
-                                                                DetachedRoleCount::Id,
-                                                                ChildRoleCount::Id,
-                                                                RouterRoleCount::Id,
-                                                                LeaderRoleCount::Id,
-                                                                AttachAttemptCount::Id,
-                                                                PartitionIdChangeCount::Id,
-                                                                BetterPartitionAttachAttemptCount::Id,
-                                                                ParentChangeCount::Id,
-                                                                TxTotalCount::Id,
-                                                                TxUnicastCount::Id,
-                                                                TxBroadcastCount::Id,
-                                                                TxAckRequestedCount::Id,
-                                                                TxAckedCount::Id,
-                                                                TxNoAckRequestedCount::Id,
-                                                                TxDataCount::Id,
-                                                                TxDataPollCount::Id,
-                                                                TxBeaconCount::Id,
-                                                                TxBeaconRequestCount::Id,
-                                                                TxOtherCount::Id,
-                                                                TxRetryCount::Id,
-                                                                TxDirectMaxRetryExpiryCount::Id,
-                                                                TxIndirectMaxRetryExpiryCount::Id,
-                                                                TxErrCcaCount::Id,
-                                                                TxErrAbortCount::Id,
-                                                                TxErrBusyChannelCount::Id,
-                                                                RxTotalCount::Id,
-                                                                RxUnicastCount::Id,
-                                                                RxBroadcastCount::Id,
-                                                                RxDataCount::Id,
-                                                                RxDataPollCount::Id,
-                                                                RxBeaconCount::Id,
-                                                                RxBeaconRequestCount::Id,
-                                                                RxOtherCount::Id,
-                                                                RxAddressFilteredCount::Id,
-                                                                RxDestAddrFilteredCount::Id,
-                                                                RxDuplicatedCount::Id,
-                                                                RxErrNoFrameCount::Id,
-                                                                RxErrUnknownNeighborCount::Id,
-                                                                RxErrInvalidSrcAddrCount::Id,
-                                                                RxErrSecCount::Id,
-                                                                RxErrFcsCount::Id,
-                                                                RxErrOtherCount::Id };
-
         // We only support minimal and full set of attributes because of flash considerations
-        VerifyOrDie(featureMap.Raw() == 0 || featureMap.Raw() == 0xF);
+        VerifyOrDie(featureMap.Raw() == 0 || featureMap.Raw() == kFeaturesAll);
 
         // For the full set of attributes, every optional attribute needs to be enabled in ember as a precondition
-        if (featureMap.Raw() == 0xF)
+        if (featureMap.Raw() == kFeaturesAll)
         {
-            for (auto id : optionalAttributeIds)
+            for (uint16_t i = kOptionalAttributesBegin; i <= kOptionalAttributesEnd; ++i)
             {
+                auto id = kFullAttributes[i].attributeId;
                 VerifyOrDie(emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id));
             }
         }

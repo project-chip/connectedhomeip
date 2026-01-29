@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,6 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <clusters/ThreadNetworkDiagnostics/Attributes.h>
-#include <clusters/ThreadNetworkDiagnostics/Enums.h>
-#include <clusters/ThreadNetworkDiagnostics/Metadata.h>
-#include <clusters/ThreadNetworkDiagnostics/Structs.h>
 
 namespace {
 
@@ -78,79 +74,9 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
             threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
             CHIP_NO_ERROR);
 
-        static constexpr DataModel::AttributeEntry fullAttributes[] = {
-            // Mandatory Attributes
-            Attributes::Channel::kMetadataEntry,          //
-            RoutingRole::kMetadataEntry,                  //
-            NetworkName::kMetadataEntry,                  //
-            PanId::kMetadataEntry,                        //
-            ExtendedPanId::kMetadataEntry,                //
-            MeshLocalPrefix::kMetadataEntry,              //
-            NeighborTable::kMetadataEntry,                //
-            RouteTable::kMetadataEntry,                   //
-            PartitionId::kMetadataEntry,                  //
-            Weighting::kMetadataEntry,                    //
-            Attributes::DataVersion::kMetadataEntry,      //
-            StableDataVersion::kMetadataEntry,            //
-            LeaderRouterId::kMetadataEntry,               //
-            SecurityPolicy::kMetadataEntry,               //
-            ChannelPage0Mask::kMetadataEntry,             //
-            OperationalDatasetComponents::kMetadataEntry, //
-            ActiveNetworkFaultsList::kMetadataEntry,      //
-            ExtAddress::kMetadataEntry,                   //
-            Rloc16::kMetadataEntry,                       //
-            // Optional Attributes
-            ActiveTimestamp::kMetadataEntry,                   //
-            PendingTimestamp::kMetadataEntry,                  //
-            Delay::kMetadataEntry,                             //
-            DetachedRoleCount::kMetadataEntry,                 //
-            ChildRoleCount::kMetadataEntry,                    //
-            RouterRoleCount::kMetadataEntry,                   //
-            LeaderRoleCount::kMetadataEntry,                   //
-            AttachAttemptCount::kMetadataEntry,                //
-            PartitionIdChangeCount::kMetadataEntry,            //
-            BetterPartitionAttachAttemptCount::kMetadataEntry, //
-            ParentChangeCount::kMetadataEntry,                 //
-            TxTotalCount::kMetadataEntry,                      //
-            TxUnicastCount::kMetadataEntry,                    //
-            TxBroadcastCount::kMetadataEntry,                  //
-            TxAckRequestedCount::kMetadataEntry,               //
-            TxAckedCount::kMetadataEntry,                      //
-            TxNoAckRequestedCount::kMetadataEntry,             //
-            TxDataCount::kMetadataEntry,                       //
-            TxDataPollCount::kMetadataEntry,                   //
-            TxBeaconCount::kMetadataEntry,                     //
-            TxBeaconRequestCount::kMetadataEntry,              //
-            TxOtherCount::kMetadataEntry,                      //
-            TxRetryCount::kMetadataEntry,                      //
-            TxDirectMaxRetryExpiryCount::kMetadataEntry,       //
-            TxIndirectMaxRetryExpiryCount::kMetadataEntry,     //
-            TxErrCcaCount::kMetadataEntry,                     //
-            TxErrAbortCount::kMetadataEntry,                   //
-            TxErrBusyChannelCount::kMetadataEntry,             //
-            RxTotalCount::kMetadataEntry,                      //
-            RxUnicastCount::kMetadataEntry,                    //
-            RxBroadcastCount::kMetadataEntry,                  //
-            RxDataCount::kMetadataEntry,                       //
-            RxDataPollCount::kMetadataEntry,                   //
-            RxBeaconCount::kMetadataEntry,                     //
-            RxBeaconRequestCount::kMetadataEntry,              //
-            RxOtherCount::kMetadataEntry,                      //
-            RxAddressFilteredCount::kMetadataEntry,            //
-            RxDestAddrFilteredCount::kMetadataEntry,           //
-            RxDuplicatedCount::kMetadataEntry,                 //
-            RxErrNoFrameCount::kMetadataEntry,                 //
-            RxErrUnknownNeighborCount::kMetadataEntry,         //
-            RxErrInvalidSrcAddrCount::kMetadataEntry,          //
-            RxErrSecCount::kMetadataEntry,                     //
-            RxErrFcsCount::kMetadataEntry,                     //
-            RxErrOtherCount::kMetadataEntry,                   //
-            OverrunCount::kMetadataEntry                       //
-        };
-
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(fullAttributes), {}), CHIP_NO_ERROR);
+        ASSERT_EQ(listBuilder.Append(Span(kFullAttributes), {}), CHIP_NO_ERROR);
         ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 
         threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);

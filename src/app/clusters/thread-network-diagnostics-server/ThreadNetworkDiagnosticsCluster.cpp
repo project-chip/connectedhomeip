@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,74 +46,9 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
         return encoder.Encode(ThreadNetworkDiagnostics::kRevision);
     case FeatureMap::Id:
         return encoder.Encode<uint32_t>(mClusterType == ClusterType::kMinimal ? 0 : 0xF);
-    case NeighborTable::Id:
-    case RouteTable::Id:
-    case SecurityPolicy::Id:
-    case OperationalDatasetComponents::Id:
-    case ActiveNetworkFaultsList::Id:
-    case Attributes::Channel::Id:
-    case RoutingRole::Id:
-    case NetworkName::Id:
-    case PanId::Id:
-    case ExtendedPanId::Id:
-    case MeshLocalPrefix::Id:
-    case PartitionId::Id:
-    case Weighting::Id:
-    case DataVersion::Id:
-    case StableDataVersion::Id:
-    case LeaderRouterId::Id:
-    case OverrunCount::Id:
-    case DetachedRoleCount::Id:
-    case ChildRoleCount::Id:
-    case RouterRoleCount::Id:
-    case LeaderRoleCount::Id:
-    case AttachAttemptCount::Id:
-    case PartitionIdChangeCount::Id:
-    case BetterPartitionAttachAttemptCount::Id:
-    case ParentChangeCount::Id:
-    case TxTotalCount::Id:
-    case TxUnicastCount::Id:
-    case TxBroadcastCount::Id:
-    case TxAckRequestedCount::Id:
-    case TxAckedCount::Id:
-    case TxNoAckRequestedCount::Id:
-    case TxDataCount::Id:
-    case TxDataPollCount::Id:
-    case TxBeaconCount::Id:
-    case TxBeaconRequestCount::Id:
-    case TxOtherCount::Id:
-    case TxRetryCount::Id:
-    case TxDirectMaxRetryExpiryCount::Id:
-    case TxIndirectMaxRetryExpiryCount::Id:
-    case TxErrCcaCount::Id:
-    case TxErrAbortCount::Id:
-    case TxErrBusyChannelCount::Id:
-    case RxTotalCount::Id:
-    case RxUnicastCount::Id:
-    case RxBroadcastCount::Id:
-    case RxDataCount::Id:
-    case RxDataPollCount::Id:
-    case RxBeaconCount::Id:
-    case RxBeaconRequestCount::Id:
-    case RxOtherCount::Id:
-    case RxAddressFilteredCount::Id:
-    case RxDestAddrFilteredCount::Id:
-    case RxDuplicatedCount::Id:
-    case RxErrNoFrameCount::Id:
-    case RxErrUnknownNeighborCount::Id:
-    case RxErrInvalidSrcAddrCount::Id:
-    case RxErrSecCount::Id:
-    case RxErrFcsCount::Id:
-    case RxErrOtherCount::Id:
-    case ActiveTimestamp::Id:
-    case PendingTimestamp::Id:
-    case Delay::Id:
-    case ChannelPage0Mask::Id:
-    case ExtAddress::Id:
-    case Rloc16::Id:
-        return WriteThreadNetworkDiagnosticAttributeToTlv(request.path.mAttributeId, encoder);
     default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        // Since ReadAttribute() is invoked only for valid attributes this is safe
+        return WriteThreadNetworkDiagnosticAttributeToTlv(request.path.mAttributeId, encoder);
     }
 }
 
@@ -122,82 +57,12 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
 {
     AttributeListBuilder listBuilder(builder);
 
-    static constexpr DataModel::AttributeEntry fullAttributes[] = {
-        // Mandatory Attributes
-        Attributes::Channel::kMetadataEntry,          //
-        RoutingRole::kMetadataEntry,                  //
-        NetworkName::kMetadataEntry,                  //
-        PanId::kMetadataEntry,                        //
-        ExtendedPanId::kMetadataEntry,                //
-        MeshLocalPrefix::kMetadataEntry,              //
-        NeighborTable::kMetadataEntry,                //
-        RouteTable::kMetadataEntry,                   //
-        PartitionId::kMetadataEntry,                  //
-        Weighting::kMetadataEntry,                    //
-        Attributes::DataVersion::kMetadataEntry,      //
-        StableDataVersion::kMetadataEntry,            //
-        LeaderRouterId::kMetadataEntry,               //
-        SecurityPolicy::kMetadataEntry,               //
-        ChannelPage0Mask::kMetadataEntry,             //
-        OperationalDatasetComponents::kMetadataEntry, //
-        ActiveNetworkFaultsList::kMetadataEntry,      //
-        ExtAddress::kMetadataEntry,                   //
-        Rloc16::kMetadataEntry,                       //
-        // Optional Attributes
-        ActiveTimestamp::kMetadataEntry,                   //
-        PendingTimestamp::kMetadataEntry,                  //
-        Delay::kMetadataEntry,                             //
-        DetachedRoleCount::kMetadataEntry,                 //
-        ChildRoleCount::kMetadataEntry,                    //
-        RouterRoleCount::kMetadataEntry,                   //
-        LeaderRoleCount::kMetadataEntry,                   //
-        AttachAttemptCount::kMetadataEntry,                //
-        PartitionIdChangeCount::kMetadataEntry,            //
-        BetterPartitionAttachAttemptCount::kMetadataEntry, //
-        ParentChangeCount::kMetadataEntry,                 //
-        TxTotalCount::kMetadataEntry,                      //
-        TxUnicastCount::kMetadataEntry,                    //
-        TxBroadcastCount::kMetadataEntry,                  //
-        TxAckRequestedCount::kMetadataEntry,               //
-        TxAckedCount::kMetadataEntry,                      //
-        TxNoAckRequestedCount::kMetadataEntry,             //
-        TxDataCount::kMetadataEntry,                       //
-        TxDataPollCount::kMetadataEntry,                   //
-        TxBeaconCount::kMetadataEntry,                     //
-        TxBeaconRequestCount::kMetadataEntry,              //
-        TxOtherCount::kMetadataEntry,                      //
-        TxRetryCount::kMetadataEntry,                      //
-        TxDirectMaxRetryExpiryCount::kMetadataEntry,       //
-        TxIndirectMaxRetryExpiryCount::kMetadataEntry,     //
-        TxErrCcaCount::kMetadataEntry,                     //
-        TxErrAbortCount::kMetadataEntry,                   //
-        TxErrBusyChannelCount::kMetadataEntry,             //
-        RxTotalCount::kMetadataEntry,                      //
-        RxUnicastCount::kMetadataEntry,                    //
-        RxBroadcastCount::kMetadataEntry,                  //
-        RxDataCount::kMetadataEntry,                       //
-        RxDataPollCount::kMetadataEntry,                   //
-        RxBeaconCount::kMetadataEntry,                     //
-        RxBeaconRequestCount::kMetadataEntry,              //
-        RxOtherCount::kMetadataEntry,                      //
-        RxAddressFilteredCount::kMetadataEntry,            //
-        RxDestAddrFilteredCount::kMetadataEntry,           //
-        RxDuplicatedCount::kMetadataEntry,                 //
-        RxErrNoFrameCount::kMetadataEntry,                 //
-        RxErrUnknownNeighborCount::kMetadataEntry,         //
-        RxErrInvalidSrcAddrCount::kMetadataEntry,          //
-        RxErrSecCount::kMetadataEntry,                     //
-        RxErrFcsCount::kMetadataEntry,                     //
-        RxErrOtherCount::kMetadataEntry,                   //
-        OverrunCount::kMetadataEntry                       //
-    };
-
     // We only support minimal and full set of attributes because of flash considerations
     if (mClusterType == ClusterType::kMinimal)
     {
-        return listBuilder.Append(Span(ThreadNetworkDiagnostics::Attributes::kMandatoryMetadata), {});
+        return listBuilder.Append(Span(kMandatoryMetadata), {});
     }
-    return listBuilder.Append(Span(fullAttributes), {});
+    return listBuilder.Append(Span(kFullAttributes), {});
 }
 
 // Notified when the Node’s connection status to a Thread network has changed.
