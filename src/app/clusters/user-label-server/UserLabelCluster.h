@@ -48,7 +48,7 @@ public:
     // Constraints for label entries
     static constexpr size_t kMaxLabelSize = 16;
     static constexpr size_t kMaxValueSize = 16;
-    
+
 private:
     Context mContext;
 };

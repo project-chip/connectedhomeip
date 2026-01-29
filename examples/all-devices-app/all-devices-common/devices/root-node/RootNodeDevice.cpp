@@ -51,15 +51,15 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager   = mContext.configurationManager,       //
-                .deviceControlServer    = mContext.deviceControlServer,        //
-                .fabricTable            = mContext.fabricTable,                //
-                .failsafeContext        = mContext.failsafeContext,            //
-                .platformManager        = mContext.platformManager,            //
+            .configurationManager       = mContext.configurationManager,       //
+            .deviceControlServer        = mContext.deviceControlServer,        //
+            .fabricTable                = mContext.fabricTable,                //
+            .failsafeContext            = mContext.failsafeContext,            //
+            .platformManager            = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -75,8 +75,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mUserLabelCluster.Create(endpointId,
                              UserLabelCluster::Context{
                                  .deviceInfoProvider = mContext.deviceInfoProvider,
-                                 .fabricTable       = mContext.fabricTable,
-    });
+                                 .fabricTable        = mContext.fabricTable,
+                             });
     ReturnErrorOnFailure(provider.AddCluster(mUserLabelCluster.Registration()));
 
     mGroupKeyManagementCluster.Create(GroupKeyManagementCluster::Context{

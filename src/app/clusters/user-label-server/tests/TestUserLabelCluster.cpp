@@ -69,17 +69,14 @@ struct TestUserLabelCluster : public ::testing::Test
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override
-    {
-        ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
-    }
+    void SetUp() override { ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
     void TearDown() override { userLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestUserLabelCluster() :
         userLabel(kRootEndpointId,
                   UserLabelCluster::Context{ .deviceInfoProvider = mDeviceInfoProvider,
-                                             .fabricTable = chip::Server::GetInstance().GetFabricTable() })
+                                             .fabricTable        = chip::Server::GetInstance().GetFabricTable() })
     {}
 
     TestServerClusterContext testContext;
