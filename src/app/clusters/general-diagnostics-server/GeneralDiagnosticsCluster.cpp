@@ -224,14 +224,6 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
     // Get the startup timestamp from the event system via the context
     mNodeStartupTimestamp = context.interactionContext.eventsGenerator.GetMonotonicStartupTime();
 
-    // If the event system hasn't been initialized yet, GetMonotonicStartupTime() returns 0.
-    // In this case, use the current monotonic time as the startup timestamp to ensure
-    // TimeSinceNodeStartup() returns meaningful results (time since cluster startup).
-    if (mNodeStartupTimestamp.count() == 0)
-    {
-        mNodeStartupTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
-    }
-
     // Calling OnDeviceReboot here to maintain the event generation of the old implementation of the
     // server init callback. We consider startup to be a boot event here.
     GeneralDiagnostics::BootReasonEnum bootReason;
