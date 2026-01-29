@@ -85,6 +85,7 @@ struct LinuxDeviceOptions
     const char * command                = nullptr;
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
+    const char * mOtnsArgs              = nullptr;
     const char * app_pipe               = "";
     const char * app_pipe_out           = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();

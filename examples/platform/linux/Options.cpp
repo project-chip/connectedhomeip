@@ -93,6 +93,7 @@ enum
     kDeviceOption_Command,
     kDeviceOption_PICS,
     kDeviceOption_KVS,
+    kDeviceOption_OtnsArgs,
     kDeviceOption_InterfaceId,
     kDeviceOption_AppPipe,
     kDeviceOption_AppPipeOut,
@@ -177,7 +178,11 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#if CHIP_ENABLE_OTNS
+    { "otns-args", kArgumentRequired, kDeviceOption_OtnsArgs },
+#else
     { "thread-node-id", kArgumentRequired, kDeviceOption_ThreadNodeId },
+#endif
 #else
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif
@@ -374,6 +379,9 @@ const char * sDeviceOptionHelp =
     "  --KVS <filepath>\n"
     "       A file to store Key Value Store items.\n"
     "\n"
+    "  --otns-args <args>\n"
+    "       OpenThread Network Simulator arguments.\n"
+    "\n"
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
     "\n"
@@ -568,6 +576,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#if CHIP_ENABLE_OTNS
+    case kDeviceOption_OtnsArgs:
+        LinuxDeviceOptions::GetInstance().mOtnsArgs = aValue;
+        break;
+#else
     case kDeviceOption_ThreadNodeId:
         if (!ParseInt(aValue, LinuxDeviceOptions::GetInstance().mThreadNodeId))
         {
@@ -575,6 +588,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             retval = false;
         }
         break;
+#endif
 #else
     case kDeviceOption_Thread:
         LinuxDeviceOptions::GetInstance().mThread = true;
