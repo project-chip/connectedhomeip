@@ -18,5 +18,7 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/EnergyEvseTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/EnergyEvseCluster.cpp"
+    "${CLUSTER_DIR}/EnergyEvseCluster.h"
+    "${CLUSTER_DIR}/EnergyEvseDelegate.h"
     "${CLUSTER_DIR}/energy-evse-server.h"
 )
