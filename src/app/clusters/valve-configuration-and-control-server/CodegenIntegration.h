@@ -17,7 +17,7 @@
  */
 #pragma once
 
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
+#include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 
 namespace chip::app::Clusters::ValveConfigurationAndControl {
 
