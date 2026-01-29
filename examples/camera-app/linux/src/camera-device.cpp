@@ -175,7 +175,7 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         auto firstPtsIt = self->mAudioStreamFirstPts.find(audioStreamID);
         if (firstPtsIt == self->mAudioStreamFirstPts.end())
         {
-            auto now        = std::chrono::steady_clock::now().time_since_epoch();
+            auto now                                  = std::chrono::steady_clock::now().time_since_epoch();
             int64_t nowMs                             = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
             int64_t rawMs                             = static_cast<int64_t>(rawPts / 1000000);
             self->mAudioStreamFirstPts[audioStreamID] = nowMs - rawMs;
@@ -192,7 +192,8 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         {
             ChipLogError(Camera,
                          "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                         rawPts, self->mAudioStreamFirstPts[audioStreamID], audioStreamID);        }
+                         rawPts, self->mAudioStreamFirstPts[audioStreamID], audioStreamID);
+        }
         gst_buffer_unmap(buffer, &map);
     }
 
