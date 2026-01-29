@@ -140,11 +140,6 @@ public:
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mDiagnosticsContext.testEventTriggerDelegate; }
 
-    void SetTestEventTriggerDelegate(TestEventTriggerDelegate * testEventTriggerDelegate)
-    {
-        mDiagnosticsContext.testEventTriggerDelegate = testEventTriggerDelegate;
-    }
-
 protected:
     OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
