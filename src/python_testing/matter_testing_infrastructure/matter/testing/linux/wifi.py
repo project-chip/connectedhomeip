@@ -23,8 +23,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import pathlib
-import subprocess
 import threading
 from typing import Union
 

@@ -20,22 +20,16 @@ Handles linux-specific functionality for running test cases
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
-import pathlib
-import re
 import shlex
 import subprocess
 import sys
-import threading
 import time
-from typing import IO, Any, Optional, Pattern, Union
+from typing import IO, Any
 
-import sdbus
 
 from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
-from chiptest.test_definition import TEST_THREAD_DATASET
 
 log = logging.getLogger(__name__)
 
