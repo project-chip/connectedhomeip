@@ -20,7 +20,7 @@
 #include <app/static-cluster-config/UserLabel.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <server/Server.h>
+#include <app/server/Server.h>
 #include <src/include/platform/DeviceInfoProvider.h>
 
 using namespace chip;
@@ -43,6 +43,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+        VerifyOrDie(deviceInfoProvider != nullptr); 
 
         gServers[clusterInstanceIndex].Create(endpointId,
                                               UserLabelCluster::Context{

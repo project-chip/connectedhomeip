@@ -18,6 +18,7 @@ source_set("user-label-server") {
   sources = [
     "UserLabelCluster.cpp",
     "UserLabelCluster.h",
+    "CodegenIntegration.cpp",
   ]
 
   public_deps = [
