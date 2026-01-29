@@ -15,16 +15,6 @@ typedef NS_ENUM(uint32_t, MTRPrivateClusterIDType) {
 {{/if}}
 {{/if}}
 {{/zcl_clusters}}
-{{#zcl_clusters}}
-{{#if manufacturerCode}}
-{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
-{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
-{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
-    MTRPrivateClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " cluster will be removed")}} = {{asMEI manufacturerCode code}},
-{{/if}}
-{{/if}}
-{{/if}}
-{{/zcl_clusters}}
 };
 
 #pragma mark - Private Attribute IDs

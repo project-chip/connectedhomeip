@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
-@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericCluster
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} (PrivateExtensions)
 
 {{#zcl_commands}}
 {{#if manufacturerCode}}
@@ -118,28 +118,6 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 {{/if}}
 {{/zcl_attributes_server}}
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} (Availability)
-
-/**
-{{#zcl_commands}}
-{{#first}}
- * For all instance methods that take a completion (i.e. command invocations),
- * the completion will be called on the provided queue.
-{{/first}}
-{{else}}
- * The queue is currently unused, but may be used in the future for calling completions
- * for command invocations if commands are added to this cluster.
-{{/zcl_commands}}
- */
-- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
-                              endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue;
 
 @end
 {{/if}}
