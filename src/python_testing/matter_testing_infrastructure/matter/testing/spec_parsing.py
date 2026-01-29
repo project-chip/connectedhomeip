@@ -18,6 +18,7 @@
 import importlib
 import importlib.resources as pkg_resources
 import logging
+import math
 import os
 import re
 import typing
@@ -27,7 +28,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
 from importlib.abc import Traversable
-from typing import Callable, Optional, Union
+from typing import Optional, Union
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
@@ -36,8 +37,8 @@ from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_
                                         parse_callable_from_xml)
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemNotice,
-                                            ProblemSeverity, UnknownProblemLocation)
+                                            EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemLocation,
+                                            ProblemNotice, ProblemSeverity, UnknownProblemLocation)
 from matter.tlv import uint
 
 LOGGER = logging.getLogger(__name__)
@@ -177,6 +178,7 @@ class XmlCluster:
     bitmaps: dict[str, XmlDataType]
     pics: str
     is_provisional: bool
+    revision_desc: dict[int, str]
 
 
 class ClusterSide(Enum):
@@ -190,12 +192,33 @@ class XmlDeviceTypeClusterRequirements:
     side: ClusterSide
     conformance: ConformanceCallable
     # Feature mask (1 << feature_id) to conformance
-    feature_overrides: dict[uint, Callable] = field(default_factory=dict)
-    attribute_overrides: dict[uint, Callable] = field(default_factory=dict)
-    command_overrides: dict[uint, Callable] = field(default_factory=dict)
+    feature_overrides: dict[uint, ConformanceCallable] = field(default_factory=dict)
+    attribute_overrides: dict[uint, ConformanceCallable] = field(default_factory=dict)
+    command_overrides: dict[uint, ConformanceCallable] = field(default_factory=dict)
+
+    def str_overrides(self):
+        ret = ""
+        if self.feature_overrides:
+            overrides = ""
+            for mask, conformance in self.feature_overrides.items():
+                bit = math.log2(mask)
+                overrides += f'bit {int(bit)}: {str(conformance)} '
+            ret += f'Feature overrides: {overrides}'
+        if self.attribute_overrides:
+            overrides = ""
+            for id, conformance in self.attribute_overrides.items():
+                overrides += f'{id:04X}: {str(conformance)} '
+            ret += f'Attribute overrides: {overrides}'
+        if self.command_overrides:
+            overrides = ""
+            for id, conformance in self.command_overrides.items():
+                overrides += f'{id:04X}: {str(conformance)} '
+            ret += f'Command overrides: {overrides}'
+
+        return ret
 
     def __str__(self):
-        return f'{self.name}: {str(self.conformance)}'
+        return f'{self.name} {self.side}: {str(self.conformance)} {self.str_overrides()}'
 
 
 @dataclass
@@ -232,6 +255,7 @@ class XmlDeviceType:
     # Keeping these as strings for now because the exact definitions are being discussed in DMTT
     classification_class: str
     classification_scope: str
+    revision_desc: dict[int, str]
     superset_of_device_type_name: Optional[str] = None
     superset_of_device_type_id: int = 0
 
@@ -314,6 +338,22 @@ def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) ->
 XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, Optional[ElementTree.Element]]
 
 
+def parse_revision_history(top_level: ElementTree.Element, location: ProblemLocation) -> tuple[dict[int, str], list[ProblemNotice]]:
+    revision_desc = {}
+    problems = []
+    history = top_level.find('revisionHistory')
+    if history:
+        for e in history.iter('revision'):
+            try:
+                rev = int(e.get('revision', 'error'), 0)
+                revision_desc[rev] = e.get('summary', '')
+            except ValueError:
+                problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                              severity=ProblemSeverity.WARNING,
+                                              problem='Revision in revision history is missing or is not an int'))
+    return revision_desc, problems
+
+
 class ClusterParser:
     # Cluster ID is optional to support base clusters that have no ID of their own.
     def __init__(self, cluster: ElementTree.Element, cluster_id: Optional[uint], name: str):
@@ -353,6 +393,11 @@ class ClusterParser:
         self.event_elements = self.get_all_event_elements()
         self.params = ConformanceParseParameters(feature_map=self.create_feature_map(), attribute_map=self.create_attribute_map(),
                                                  command_map=self.create_command_map())
+
+        location = ClusterPathLocation(
+            endpoint_id=0, cluster_id=self._cluster_id if self._cluster_id is not None else 0)
+        self._revision_desc, problems = parse_revision_history(cluster, location)
+        self._problems.extend(problems)
 
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
         element, problem = get_conformance(element, self._cluster_id)
@@ -833,7 +878,8 @@ class ClusterParser:
                           structs=self._parse_data_type(DataTypeEnum.kStruct),
                           enums=self._parse_data_type(DataTypeEnum.kEnum),
                           bitmaps=self._parse_data_type(DataTypeEnum.kBitmap),
-                          pics=self._pics if self._pics is not None else "", is_provisional=self._is_provisional)
+                          pics=self._pics if self._pics is not None else "", is_provisional=self._is_provisional,
+                          revision_desc=self._revision_desc)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
@@ -1109,8 +1155,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 ret[id].write_access = override.write_access
 
         for attr_id, attribute in ret.items():
-            if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and \
-               attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
+            if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
                 location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attr_id)
                 problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                               severity=ProblemSeverity.WARNING, problem=f'Attribute {attribute.name} (ID: {attr_id}) in cluster {cluster_id} has unknown read and write access after combining base and derived values.'))
@@ -1156,12 +1201,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 else:
                     unknown_commands.append(cmd)
             provisional = c.is_provisional or base.is_provisional
+            revision_desc = c.revision_desc
 
             new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
                              feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, structs=structs,
-                             enums=enums, bitmaps=bitmaps, pics=c.pics, is_provisional=provisional)
+                             enums=enums, bitmaps=bitmaps, pics=c.pics, is_provisional=provisional, revision_desc=revision_desc)
             xml_clusters[id] = new
 
 
@@ -1331,6 +1377,8 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
             device_name = DEVICE_TYPE_NAME_FIXES[id]
 
         location = DeviceTypePathLocation(device_type_id=id)
+        revision_desc, rev_problems = parse_revision_history(d, location)
+        problems.extend(rev_problems)
 
         try:
             classification = next(d.iter('classification'))
@@ -1349,7 +1397,8 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
                 return device_types, problems
         device_types[id] = XmlDeviceType(name=device_name, revision=revision, server_clusters={}, client_clusters={},
-                                         classification_class=device_class, classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
+                                         classification_class=device_class, revision_desc=revision_desc,
+                                         classification_scope=scope, superset_of_device_type_name=superset_of_device_type_name)
         try:
             main_endpoint_clusters = next(d.iter('clusters'))
             clusters = main_endpoint_clusters.findall('cluster')
