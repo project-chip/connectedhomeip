@@ -83,7 +83,6 @@ public:
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
         DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
-
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -100,7 +99,7 @@ public:
                 .groupDataProvider      = mContext.groupDataProvider,          //
                 .sessionManager         = mContext.sessionManager,             //
                 .dnssdServer            = mContext.dnssdServer,                //
-
+                .deviceInfoProvider     = mContext.deviceInfoProvider,       //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -168,7 +167,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
             .dnssdServer                = DnssdServer::Instance(),                               //
-
+            .deviceInfoProvider         = gExampleDeviceInfoProvider,
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -180,7 +179,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     initParams.groupDataProvider             = &gGroupDataProvider;
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-    initParams.interfaceId                   = Inet:rootNodeDevice:InterfaceId::Null();
+    initParams.interfaceId                   = Inet::InterfaceId::Null();
 
     chip::CommandLineApp::TracingSetup tracing_setup;
     tracing_setup.EnableTracingFor("json:log");
