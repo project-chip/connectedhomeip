@@ -261,23 +261,23 @@ struct SpanCopier<char>
         return CHIP_NO_ERROR;
     }
 
-    /**  
-     * @brief Copies character span to a nullable CharSpan  
-     * @param source Input span to copy from  
-     * @param destination Output nullable span to populate (will be allocated)  
-     * @param maxCount Maximum number of characters to copy  
-     * @return CHIP_NO_ERROR if copy succeeded  
-     * 
-     * @note Memory Management:  
-     * - Allocates new memory via Platform::MemoryCalloc  
-     * - Previous destination memory (if any) is not reused  
-     * - Memory is automatically freed by CleanupStruct() when:  
-     *   - Attribute value is replaced via UpdateFinish()  
-     *   - CTC_BaseDataClass object is destroyed  
-     *   - Cleanup() is explicitly called  
-     * 
-     * @warning The caller must ensure symmetric CopyData()/CleanupStruct() pairs exist  
-     */  
+    /**
+     * @brief Copies character span to a nullable CharSpan
+     * @param source Input span to copy from
+     * @param destination Output nullable span to populate (will be allocated)
+     * @param maxCount Maximum number of characters to copy
+     * @return CHIP_NO_ERROR if copy succeeded
+     *
+     * @note Memory Management:
+     * - Allocates new memory via Platform::MemoryCalloc
+     * - Previous destination memory (if any) is not reused
+     * - Memory is automatically freed by CleanupStruct() when:
+     *   - Attribute value is replaced via UpdateFinish()
+     *   - CTC_BaseDataClass object is destroyed
+     *   - Cleanup() is explicitly called
+     *
+     * @warning The caller must ensure symmetric CopyData()/CleanupStruct() pairs exist
+     */
     static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
                                      size_t maxCount = std::numeric_limits<size_t>::max())
     {
