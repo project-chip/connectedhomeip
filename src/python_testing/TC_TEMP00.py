@@ -19,6 +19,7 @@
 import asyncio
 import logging
 
+from matter import discovery
 from matter import ChipDeviceCtrl
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
@@ -38,19 +39,23 @@ class TC_TEMP00(MatterBaseTest):
     async def test_TC_TEMP00(self):
 
         await asyncio.sleep(1)
-        th2 = self.get_new_controller()
         pase_node_id = self.dut_node_id + 1
 
         await self.request_device_factory_reset()
 
         # Open a PASE session
-        logger.info("\n\n\n\t\t[FRFZ]Opening PASE session...")
+        th2 = self.get_new_controller()
         setupPayloadInfo = self.get_setup_payload_info()
+        logger.info("\n\n\n\t\t[DEBUGGER] Opening PASE session...")
         setup_params = SetupParameters(
             discriminator=setupPayloadInfo[0].filter_value,
-            passcode=setupPayloadInfo[0].passcode)
-        await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
-        logger.info("[FRFZ]PASE session opened successfully\n\n\n")
+            passcode=setupPayloadInfo[0].passcode
+        )
+        await th2.FindOrEstablishPASESession(
+            setupCode=setup_params.qr_code,
+            nodeId=pase_node_id
+        )
+        logger.info("[DEBUGGER] PASE session opened successfully\n\n\n")
 
 
 if __name__ == "__main__":

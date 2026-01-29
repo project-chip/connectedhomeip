@@ -1545,7 +1545,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
-                    f.write("reset")
+                    f.write("factory reset")
                     LOGGER.info("Created restart flag file to signal app factory reset")
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
