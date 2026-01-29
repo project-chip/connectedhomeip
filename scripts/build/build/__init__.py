@@ -84,7 +84,7 @@ class Context:
                 logging.error(f"Target '{target}' could not be found. Nothing executed for it")
                 continue
 
-            if found_choice.isUnifiedBuild:
+            if found_choice.isUnifiedBuild(found_choice.modifiers):
                 # we want to ensure identical settings across builds. For now ensure that
                 # variants are identical
                 variants = '-'.join([x.name for x in found_choice.modifiers])
