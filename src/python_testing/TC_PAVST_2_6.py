@@ -275,6 +275,8 @@ class TC_PAVST_2_6(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             connectionID=Nullable(),
             transportStatus=Clusters.PushAvStreamTransport.Enums.TransportStatusEnum.kInactive
         )
+        aTransportOptions.videoStreams = []
+        aTransportOptions.audioStreams = []
         status = await self.psvt_set_transport_status(cmd)
         asserts.assert_true(
             status == Status.Success,
