@@ -18,42 +18,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
-#     app-ready-pattern: "Successfully opened pairing window on the device"
-#     app-stdin-pipe: dut-fsa-stdin
-#     script-args: >
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
-#     app: ${FABRIC_SYNC_APP}
-#     app-args: --discriminator=1234
-#     app-stdin-pipe: dut-fsa-stdin
-#     script-args: >
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --bool-arg unified_fabric_sync_app:true
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
-#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+
 
 import asyncio
 import hashlib

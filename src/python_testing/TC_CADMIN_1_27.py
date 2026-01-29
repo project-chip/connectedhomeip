@@ -20,17 +20,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     script-args: >
-#       --string-arg th_server_app:${ALL_CLUSTERS_APP}
-#       --string-arg jfa_server_app:${JF_ADMIN_APP}
-#       --string-arg jfc_server_app:${JF_CONTROL_APP}
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-# === END CI TEST ARGUMENTS ===
+
 
 import base64
 import logging

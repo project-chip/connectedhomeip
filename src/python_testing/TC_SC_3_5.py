@@ -14,18 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     factory-reset: true
-#     quiet: true
-#     script-args: >
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
-#       --storage-path admin_storage.json
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-# === END CI TEST ARGUMENTS ===
+
 
 import asyncio
 import logging

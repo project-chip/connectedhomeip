@@ -18,20 +18,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 2222 --passcode 20202024 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --bool-arg post_cert_test:true
-#       --qr-code MT:-24J0KCZ16N71648G00
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+
 
 # Note that in the CI we are using the post-cert test as we can only start one app from the current script.
 # This should still be fine as this test has unit tests for other conditions. See test_TC_SC_7_1.py

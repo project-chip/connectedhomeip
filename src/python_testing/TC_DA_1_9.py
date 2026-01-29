@@ -28,21 +28,7 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs:
-#   run1:
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg app_path:${ALL_CLUSTERS_APP}
-#       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
-#       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/revocation-sets
-#       --string-arg app_log_path:/tmp/TC_DA_1_9
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-# === END CI TEST ARGUMENTS ===
+
 
 import asyncio
 import os
