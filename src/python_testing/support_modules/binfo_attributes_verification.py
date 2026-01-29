@@ -367,7 +367,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
             asserts.assert_equal(ret26.areaType, None, "AreaType should be null")
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
- 
+
         # Step 27: Write DeviceLocation with location name of 128 characters
         self.step(27)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
