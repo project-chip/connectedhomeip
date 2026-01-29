@@ -472,8 +472,8 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, St
 {
     output.id = input.id;
 
-    EXPECT_EQ(output.fillLabel(input.label), CHIP_NO_ERROR);
-    EXPECT_EQ(output.fillList(input.nestedList), CHIP_NO_ERROR);
+    ReturnErrorOnFailure(output.fillLabel(input.label));
+    ReturnErrorOnFailure(output.fillList(input.nestedList));
 
     return CHIP_NO_ERROR;
 }
