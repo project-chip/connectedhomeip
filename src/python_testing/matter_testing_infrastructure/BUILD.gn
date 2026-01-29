@@ -41,7 +41,6 @@ pw_python_package("matter-testing-module") {
 
   sources = [
     "matter/testing/__init__.py",
-    "matter/testing/apps.py",
     "matter/testing/basic_composition.py",
     "matter/testing/choice_conformance.py",
     "matter/testing/commissioning.py",
@@ -53,6 +52,11 @@ pw_python_package("matter-testing-module") {
     "matter/testing/event_attribute_reporting.py",
     "matter/testing/global_attribute_ids.py",
     "matter/testing/global_stash.py",
+    "matter/testing/linux/__init__.py",
+    "matter/testing/linux/bluetooth.py",
+    "matter/testing/linux/dbus.py",
+    "matter/testing/linux/namespace.py",
+    "matter/testing/linux/wifi.py",
     "matter/testing/matchers.py",
     "matter/testing/matter_asserts.py",
     "matter/testing/matter_stack_state.py",

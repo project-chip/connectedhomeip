@@ -35,9 +35,19 @@ from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
 
-# If running on Linux platform load the Linux specific code.
-if sys.platform == "linux":
-    import chiptest.linux
+if sys.platform == 'linux':
+    from python_path import PythonPath
+
+    with PythonPath('../../src/python_testing/matter_testing_infrastructure/matter/testing', relative_to=__file__):
+        from linux import (
+            IsolatedNetworkNamespace,
+            LinuxNamespacedExecutor,
+            ensure_network_namespace_availability,
+            ensure_private_state,
+            DBusTestSystemBus,
+            BluetoothMock,
+            WpaSupplicantMock,
+        )
 
 if sys.platform == 'darwin':
     import chiptest.darwin
@@ -167,9 +177,9 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     if sys.platform == "linux":
         if not internal_inside_unshare:
             # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
-            chiptest.linux.ensure_network_namespace_availability()
+            ensure_network_namespace_availability()
         else:
-            chiptest.linux.ensure_private_state()
+            ensure_private_state()
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
@@ -480,7 +490,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
+            to_terminate.append(ns := IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                 setup_app_link_up=not wifi_required,
@@ -489,9 +499,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 app_link_name='wlx-app' if wifi_required else 'eth-app'))
 
             if commissioning_method == 'ble-wifi':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                to_terminate.append(DBusTestSystemBus())
+                to_terminate.append(BluetoothMock())
+                to_terminate.append(WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
             elif commissioning_method == 'ble-thread':
@@ -501,7 +511,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 
-            to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
+            to_terminate.append(executor := LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
             to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
         else:
@@ -569,7 +579,7 @@ if sys.platform == 'linux':
         help='Index of Linux network namespace'
     )
     def cmd_shell(ns_index: int) -> None:
-        chiptest.linux.IsolatedNetworkNamespace(ns_index)
+        IsolatedNetworkNamespace(ns_index)
 
         shell = os.environ.get("SHELL", "bash")
         os.execvpe(shell, [shell], os.environ.copy())
