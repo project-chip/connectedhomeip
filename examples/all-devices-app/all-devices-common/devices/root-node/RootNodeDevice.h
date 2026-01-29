@@ -29,7 +29,6 @@
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <platform/NetworkCommissioning.h>
 #include <src/app/clusters/user-label-server/UserLabelCluster.h>
 
 namespace chip {
