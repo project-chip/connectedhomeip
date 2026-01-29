@@ -367,7 +367,7 @@ jobs:
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
-                  ./scripts/run_in_build_env.sh \
+                  ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
@@ -392,7 +392,7 @@ jobs:
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
               run: |
-                  ./scripts/run_in_build_env.sh \
+                  ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
@@ -414,7 +414,7 @@ jobs:
                 # globals (glib internals) that TSAN does not understand...
                 TSAN_OPTIONS: report_bugs=0
               run: |
-                  ./scripts/run_in_build_env.sh \
+                  ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
@@ -612,7 +612,7 @@ jobs:
               # Processes run as root are exempt from these restrictions.
               # For details, see https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy#macOS-considerations
               run: |
-                  sudo ./scripts/run_in_build_env.sh \
+                  sudo ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
@@ -640,7 +640,7 @@ jobs:
               # Use sudo to avoid Local Network Privacy restrictions on macOS 15+.
               # See comment on earlier step about Local Network Privacy and root exemption.
               run: |
-                  sudo ./scripts/run_in_build_env.sh \
+                  sudo ./scripts/run_in_python_env.sh out/venv \
                   "./scripts/tests/run_test_suite.py \
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
