@@ -29,7 +29,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <src/app/clusters/user-label-server/UserLabelCluster.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 
 namespace chip {
 namespace app {
