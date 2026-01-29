@@ -1555,16 +1555,16 @@ class MatterBaseTest(base_test.BaseTestClass):
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
                     f.write(restart_flag_text)
-                    LOGGER.info("Created restart flag file to signal app %s", restart_flag_text)
+                    LOGGER.info("Created restart flag file to signal %s", restart_flag_text)
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
 
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
-                LOGGER.info("App %s completed successfully", restart_flag_text)
+                LOGGER.info("%s completed successfully", restart_flag_text.capitalize())
 
             except Exception as e:
-                err = f"App failed to {restart_flag_text}: {e}"
+                err = f"Failed to {restart_flag_text}: {e}"
                 LOGGER.error(err)
                 asserts.fail(err)
 
