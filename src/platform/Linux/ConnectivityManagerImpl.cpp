@@ -426,8 +426,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
     if (g_strcmp0(state, "associating") == 0)
     {
-        mAssociationStarted     = true;
-        mAssociationRetriesLeft = kWpaAssocMaxRetries;
+        mAssociationStarted = true;
     }
     else if (g_strcmp0(state, "disconnected") == 0)
     {
@@ -1137,6 +1136,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     // the network we are connected and ignore any errors.
     wpa_supplicant_1_interface_call_disconnect_sync(mWpaSupplicant.iface.get(), nullptr, nullptr);
 
+    mAssociationRetriesLeft = kWpaAssocMaxRetries;
     if (!wpa_supplicant_1_interface_call_select_network_sync(mWpaSupplicant.iface.get(), mWpaSupplicant.networkPath.get(), nullptr,
                                                              &err.GetReceiver()))
     {
