@@ -78,7 +78,6 @@ private:
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
-    LazyRegisteredServerCluster<Clusters::UserLabelCluster> mUserLabelCluster;
 };
 
 } // namespace app
