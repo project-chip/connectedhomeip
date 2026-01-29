@@ -37,6 +37,63 @@ namespace {
 // Constants
 constexpr uint16_t kMaxConcurrentWebRTCSessions = 5;
 
+/**
+ * @brief Validates that an SDP contains the minimum required fields for WebRTC.
+ *
+ * This function checks that the SDP has the necessary ICE and DTLS parameters
+ * that are required by the underlying WebRTC library. Without these fields,
+ * the library would throw an exception when trying to set the remote description.
+ *
+ * Required fields:
+ * - At least one media line (m=)
+ * - ICE user fragment (a=ice-ufrag:)
+ * - ICE password (a=ice-pwd:)
+ * - DTLS fingerprint (a=fingerprint:)
+ *
+ * @param sdp The SDP string to validate
+ * @return true if the SDP contains all required fields, false otherwise
+ */
+bool ValidateSdpFields(const std::string & sdp)
+{
+    if (sdp.empty())
+    {
+        ChipLogError(Camera, "ValidateSdpFields: SDP is empty");
+        return false;
+    }
+
+    // Check for required SDP fields
+    bool hasMediaLine   = (sdp.find("m=") != std::string::npos);
+    bool hasIceUfrag    = (sdp.find("a=ice-ufrag:") != std::string::npos);
+    bool hasIcePwd      = (sdp.find("a=ice-pwd:") != std::string::npos);
+    bool hasFingerprint = (sdp.find("a=fingerprint:") != std::string::npos);
+
+    if (!hasMediaLine)
+    {
+        ChipLogError(Camera, "ValidateSdpFields: SDP has no media line (m=)");
+        return false;
+    }
+
+    if (!hasIceUfrag)
+    {
+        ChipLogError(Camera, "ValidateSdpFields: SDP has no ICE user fragment (a=ice-ufrag:)");
+        return false;
+    }
+
+    if (!hasIcePwd)
+    {
+        ChipLogError(Camera, "ValidateSdpFields: SDP has no ICE password (a=ice-pwd:)");
+        return false;
+    }
+
+    if (!hasFingerprint)
+    {
+        ChipLogError(Camera, "ValidateSdpFields: SDP has no DTLS fingerprint (a=fingerprint:)");
+        return false;
+    }
+
+    return true;
+}
+
 } // namespace
 
 void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
@@ -262,6 +319,12 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 {
     ChipLogProgress(Camera, "HandleProvideOffer called");
 
+    if (!ValidateSdpFields(args.sdp))
+    {
+        ChipLogError(Camera, "HandleProvideOffer: Invalid SDP offer received");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     // Initialize a new WebRTC session from the ProvideOfferRequestArgs
     outSession.id             = args.sessionId;
     outSession.peerNodeID     = args.peerNodeId;
@@ -384,9 +447,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (sdpAnswer.empty())
+    if (!ValidateSdpFields(sdpAnswer))
     {
-        ChipLogError(Camera, "Provided SDP Answer is empty for session ID %u", sessionId);
+        ChipLogError(Camera, "HandleProvideAnswer: Invalid SDP answer received for session ID %u", sessionId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

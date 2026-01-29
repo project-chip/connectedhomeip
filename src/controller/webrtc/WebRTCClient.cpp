@@ -30,6 +30,63 @@ int ExtractDynamicPayloadType(const std::string & sdp, const std::string & type,
                               const std::string & codec);
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state);
 
+/**
+ * @brief Validates that an SDP contains the minimum required fields for WebRTC.
+ *
+ * This function checks that the SDP has the necessary ICE and DTLS parameters
+ * that are required by the underlying WebRTC library. Without these fields,
+ * the library would throw an exception when trying to set the remote description.
+ *
+ * Required fields:
+ * - At least one media line (m=)
+ * - ICE user fragment (a=ice-ufrag:)
+ * - ICE password (a=ice-pwd:)
+ * - DTLS fingerprint (a=fingerprint:)
+ *
+ * @param sdp The SDP string to validate
+ * @return true if the SDP contains all required fields, false otherwise
+ */
+bool ValidateSdpFields(const std::string & sdp)
+{
+    if (sdp.empty())
+    {
+        ChipLogError(NotSpecified, "ValidateSdpFields: SDP is empty");
+        return false;
+    }
+
+    // Check for required SDP fields
+    bool hasMediaLine   = (sdp.find("m=") != std::string::npos);
+    bool hasIceUfrag    = (sdp.find("a=ice-ufrag:") != std::string::npos);
+    bool hasIcePwd      = (sdp.find("a=ice-pwd:") != std::string::npos);
+    bool hasFingerprint = (sdp.find("a=fingerprint:") != std::string::npos);
+
+    if (!hasMediaLine)
+    {
+        ChipLogError(NotSpecified, "ValidateSdpFields: SDP has no media line (m=)");
+        return false;
+    }
+
+    if (!hasIceUfrag)
+    {
+        ChipLogError(NotSpecified, "ValidateSdpFields: SDP has no ICE user fragment (a=ice-ufrag:)");
+        return false;
+    }
+
+    if (!hasIcePwd)
+    {
+        ChipLogError(NotSpecified, "ValidateSdpFields: SDP has no ICE password (a=ice-pwd:)");
+        return false;
+    }
+
+    if (!hasFingerprint)
+    {
+        ChipLogError(NotSpecified, "ValidateSdpFields: SDP has no DTLS fingerprint (a=fingerprint:)");
+        return false;
+    }
+
+    return true;
+}
+
 WebRTCClient::WebRTCClient()
 {
     mPeerConnection = nullptr;
@@ -212,6 +269,12 @@ void WebRTCClient::SetRemoteDescription(const std::string & sdp, const std::stri
     if (mPeerConnection == nullptr)
     {
         ChipLogError(NotSpecified, "Peerconnection is null");
+        return;
+    }
+
+    if (!ValidateSdpFields(sdp))
+    {
+        ChipLogError(NotSpecified, "SetRemoteDescription: Invalid SDP received, type=%s", type.c_str());
         return;
     }
 
