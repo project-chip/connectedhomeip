@@ -436,6 +436,20 @@ private:
     CheckTurnsOrStunsRequiresUTCTime(const char * commandName,
                                      const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers);
 
+    // Stream validation helpers
+    Protocols::InteractionModel::Status ValidateVideoStreamID(const char * commandName,
+                                                              const Optional<DataModel::Nullable<uint16_t>> & videoStreamID,
+                                                              Optional<std::vector<uint16_t>> & outVideoStreams);
+    Protocols::InteractionModel::Status ValidateAudioStreamID(const char * commandName,
+                                                              const Optional<DataModel::Nullable<uint16_t>> & audioStreamID,
+                                                              Optional<std::vector<uint16_t>> & outAudioStreams);
+    Protocols::InteractionModel::Status ValidateVideoStreams(const char * commandName,
+                                                             const Optional<DataModel::DecodableList<uint16_t>> & videoStreams,
+                                                             Optional<std::vector<uint16_t>> & outVideoStreams);
+    Protocols::InteractionModel::Status ValidateAudioStreams(const char * commandName,
+                                                             const Optional<DataModel::DecodableList<uint16_t>> & audioStreams,
+                                                             Optional<std::vector<uint16_t>> & outAudioStreams);
+
     // Templated helper to decode and dispatch commands
     template <typename DecodableType, typename HandlerFunc>
     __attribute__((always_inline)) std::optional<DataModel::ActionReturnStatus>
