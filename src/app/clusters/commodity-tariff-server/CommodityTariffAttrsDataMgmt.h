@@ -203,12 +203,14 @@ namespace CommodityTariffAttrsDataMgmt {
 template <typename T>
 struct SpanCopier
 {
-    /// @brief Copies span data to a newly allocated list
-    /// @param source Input span to copy from
-    /// @param destination Output list to populate (must have pre-allocated memory)
-    /// @param maxCount Maximum number of elements to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR if copy succeeded, CHIP_ERROR_BUFFER_TOO_SMALL if destination
-    ///         is too small, CHIP_ERROR_INVALID_ARGUMENT if destination has no memory
+    /**
+     * @brief Copies span data to a newly allocated list
+     * @param source Input span to copy from
+     * @param destination Output list to populate (must have pre-allocated memory)
+     * @param maxCount Maximum number of elements to copy (default: unlimited)
+     * @return CHIP_NO_ERROR if copy succeeded, CHIP_ERROR_BUFFER_TOO_SMALL if destination
+     *         is too small, CHIP_ERROR_INVALID_ARGUMENT if destination has no memory
+     */
     static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
                            size_t maxCount = std::numeric_limits<size_t>::max())
     {
@@ -233,12 +235,14 @@ struct SpanCopier
 template <>
 struct SpanCopier<char>
 {
-    /// @brief Copies character span to a CharSpan
-    /// @param source Input span to copy from
-    /// @param destination Output span to populate (must have pre-allocated memory)
-    /// @param maxCount Maximum number of characters to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR if copy succeeded, CHIP_ERROR_BUFFER_TOO_SMALL if destination
-    ///         is too small, CHIP_ERROR_INVALID_ARGUMENT if destination has no memory
+    /**
+     * @brief Copies character span to a CharSpan
+     * @param source Input span to copy from
+     * @param destination Output span to populate (must have pre-allocated memory)
+     * @param maxCount Maximum number of characters to copy (default: unlimited)
+     * @return CHIP_NO_ERROR if copy succeeded, CHIP_ERROR_BUFFER_TOO_SMALL if destination
+     *         is too small, CHIP_ERROR_INVALID_ARGUMENT if destination has no memory
+     */
     static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
     {
         // Destination must have pre-allocated memory
@@ -257,15 +261,16 @@ struct SpanCopier<char>
         return CHIP_NO_ERROR;
     }
 
-    // Update comment to clearly state memory allocation behavior
-    /// @brief Copies character span to a nullable CharSpan
-    /// @param source Input span to copy from
-    /// @param destination Output nullable span to populate
-    /// @param maxCount Maximum number of characters to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR if copy succeeded, error code on failure
-    /// @warning This method allocates memory using Platform::MemoryCalloc. 
-    ///          The caller is responsible for ensuring this memory is freed 
-    ///          using Platform::MemoryFree when no longer needed.
+    /**
+     * @brief Copies character span to a nullable CharSpan
+     * @param source Input span to copy from
+     * @param destination Output nullable span to populate
+     * @param maxCount Maximum number of characters to copy (default: unlimited)
+     * @return CHIP_NO_ERROR if copy succeeded, error code on failure
+     * @warning This method allocates memory using Platform::MemoryCalloc. 
+     *          The caller is responsible for ensuring this memory is freed 
+     *          using Platform::MemoryFree when no longer needed.
+     */
     static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
                                      size_t maxCount = std::numeric_limits<size_t>::max())
     {
@@ -294,11 +299,13 @@ struct SpanCopier<char>
 /// @brief Helper for string to span conversions
 struct StrToSpan
 {
-    /// @brief Copies std::string to a CharSpan
-    /// @param source Input string to copy from
-    /// @param destination Output span to populate
-    /// @param maxCount Maximum number of characters to copy (default: unlimited)
-    /// @return CHIP_NO_ERROR on success, error code on failure
+    /**
+     * @brief Copies std::string to a CharSpan
+     * @param source Input string to copy from
+     * @param destination Output span to populate
+     * @param maxCount Maximum number of characters to copy (default: unlimited)
+     * @return CHIP_NO_ERROR on success, error code on failure
+     */
     static CHIP_ERROR Copy(const std::string & source, CharSpan & destination,
                            size_t maxCount = CommodityTariffConsts::kDefaultStringValuesMaxBufLength)
     {
