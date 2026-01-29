@@ -952,6 +952,7 @@ class Identify(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class Groups(Cluster):
     id: typing.ClassVar[int] = 0x00000004
@@ -1250,6 +1251,7 @@ class Groups(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -1581,6 +1583,7 @@ class OnOff(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -2156,6 +2159,7 @@ class LevelControl(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class PulseWidthModulation(Cluster):
     id: typing.ClassVar[int] = 0x0000001C
@@ -2257,6 +2261,7 @@ class PulseWidthModulation(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -2488,6 +2493,7 @@ class Descriptor(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class Binding(Cluster):
     id: typing.ClassVar[int] = 0x0000001E
@@ -2627,6 +2633,7 @@ class Binding(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -3164,6 +3171,7 @@ class AccessControl(Cluster):
             fabricIndex: uint = 0
 
 
+
 @dataclass
 class Actions(Cluster):
     id: typing.ClassVar[int] = 0x00000025
@@ -3694,6 +3702,7 @@ class Actions(Cluster):
             invokeID: uint = 0
             newState: Actions.Enums.ActionStateEnum = 0
             error: Actions.Enums.ActionErrorEnum = 0
+
 
 
 @dataclass
@@ -4396,6 +4405,7 @@ class BasicInformation(Cluster):
             reachableNewValue: bool = False
 
 
+
 @dataclass
 class OtaSoftwareUpdateProvider(Cluster):
     id: typing.ClassVar[int] = 0x00000029
@@ -4645,6 +4655,7 @@ class OtaSoftwareUpdateProvider(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -4974,6 +4985,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             platformCode: typing.Union[Nullable, int] = NullValue
 
 
+
 @dataclass
 class LocalizationConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0000002B
@@ -5111,6 +5123,7 @@ class LocalizationConfiguration(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -5305,6 +5318,7 @@ class TimeFormatLocalization(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class UnitLocalization(Cluster):
     id: typing.ClassVar[int] = 0x0000002D
@@ -5459,6 +5473,7 @@ class UnitLocalization(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class PowerSourceConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x0000002E
@@ -5578,6 +5593,7 @@ class PowerSourceConfiguration(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -6589,6 +6605,7 @@ class PowerSource(Cluster):
             previous: typing.List[PowerSource.Enums.BatChargeFaultEnum] = field(default_factory=lambda: [])
 
 
+
 @dataclass
 class GeneralCommissioning(Cluster):
     id: typing.ClassVar[int] = 0x00000030
@@ -7119,6 +7136,7 @@ class GeneralCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -7763,6 +7781,7 @@ class NetworkCommissioning(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class DiagnosticLogs(Cluster):
     id: typing.ClassVar[int] = 0x00000032
@@ -7939,6 +7958,7 @@ class DiagnosticLogs(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -8513,6 +8533,7 @@ class GeneralDiagnostics(Cluster):
             bootReason: GeneralDiagnostics.Enums.BootReasonEnum = 0
 
 
+
 @dataclass
 class SoftwareDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x00000034
@@ -8748,6 +8769,7 @@ class SoftwareDiagnostics(Cluster):
             id: uint = 0
             name: typing.Optional[str] = None
             faultRecording: typing.Optional[bytes] = None
+
 
 
 @dataclass
@@ -10233,6 +10255,7 @@ class ThreadNetworkDiagnostics(Cluster):
             previous: typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum] = field(default_factory=lambda: [])
 
 
+
 @dataclass
 class WiFiNetworkDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x00000036
@@ -10697,6 +10720,7 @@ class WiFiNetworkDiagnostics(Cluster):
             connectionStatus: WiFiNetworkDiagnostics.Enums.ConnectionStatusEnum = 0
 
 
+
 @dataclass
 class EthernetNetworkDiagnostics(Cluster):
     id: typing.ClassVar[int] = 0x00000037
@@ -10997,6 +11021,7 @@ class EthernetNetworkDiagnostics(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -11647,6 +11672,7 @@ class TimeSynchronization(Cluster):
                     ])
 
 
+
 @dataclass
 class BridgedDeviceBasicInformation(Cluster):
     id: typing.ClassVar[int] = 0x00000039
@@ -12243,6 +12269,7 @@ class BridgedDeviceBasicInformation(Cluster):
             promisedActiveDuration: uint = 0
 
 
+
 @dataclass
 class Switch(Cluster):
     id: typing.ClassVar[int] = 0x0000003B
@@ -12547,6 +12574,7 @@ class Switch(Cluster):
             totalNumberOfPressesCounted: uint = 0
 
 
+
 @dataclass
 class AdministratorCommissioning(Cluster):
     id: typing.ClassVar[int] = 0x0000003C
@@ -12793,6 +12821,7 @@ class AdministratorCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -13345,6 +13374,7 @@ class OperationalCredentials(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class GroupKeyManagement(Cluster):
     id: typing.ClassVar[int] = 0x0000003F
@@ -13686,6 +13716,7 @@ class GroupKeyManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class FixedLabel(Cluster):
     id: typing.ClassVar[int] = 0x00000040
@@ -13819,6 +13850,7 @@ class FixedLabel(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -13956,6 +13988,7 @@ class UserLabel(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ProxyConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x00000042
@@ -14057,6 +14090,7 @@ class ProxyConfiguration(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -14162,6 +14196,7 @@ class ProxyDiscovery(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ProxyValid(Cluster):
     id: typing.ClassVar[int] = 0x00000044
@@ -14263,6 +14298,7 @@ class ProxyValid(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -14404,6 +14440,7 @@ class BooleanState(Cluster):
                     ])
 
             stateValue: bool = False
+
 
 
 @dataclass
@@ -14843,6 +14880,7 @@ class IcdManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class Timer(Cluster):
     id: typing.ClassVar[int] = 0x00000047
@@ -15076,6 +15114,7 @@ class Timer(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -15427,6 +15466,7 @@ class OvenCavityOperationalState(Cluster):
             pausedTime: typing.Union[None, Nullable, uint] = None
 
 
+
 @dataclass
 class OvenMode(Cluster):
     id: typing.ClassVar[int] = 0x00000049
@@ -15661,6 +15701,7 @@ class OvenMode(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class LaundryDryerControls(Cluster):
     id: typing.ClassVar[int] = 0x0000004A
@@ -15810,6 +15851,7 @@ class LaundryDryerControls(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -16073,6 +16115,7 @@ class ModeSelect(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class LaundryWasherMode(Cluster):
     id: typing.ClassVar[int] = 0x00000051
@@ -16298,6 +16341,7 @@ class LaundryWasherMode(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
     id: typing.ClassVar[int] = 0x00000052
@@ -16521,6 +16565,7 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class LaundryWasherControls(Cluster):
     id: typing.ClassVar[int] = 0x00000053
@@ -16711,6 +16756,7 @@ class LaundryWasherControls(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -16956,6 +17002,7 @@ class RvcRunMode(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class RvcCleanMode(Cluster):
     id: typing.ClassVar[int] = 0x00000055
@@ -17191,6 +17238,7 @@ class RvcCleanMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -17429,6 +17477,7 @@ class TemperatureControl(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class RefrigeratorAlarm(Cluster):
     id: typing.ClassVar[int] = 0x00000057
@@ -17614,6 +17663,7 @@ class RefrigeratorAlarm(Cluster):
             inactive: uint = 0
             state: uint = 0
             mask: uint = 0
+
 
 
 @dataclass
@@ -17840,6 +17890,7 @@ class DishwasherMode(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class AirQuality(Cluster):
     id: typing.ClassVar[int] = 0x0000005B
@@ -17981,6 +18032,7 @@ class AirQuality(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -18597,6 +18649,7 @@ class SmokeCoAlarm(Cluster):
                     ])
 
 
+
 @dataclass
 class DishwasherAlarm(Cluster):
     id: typing.ClassVar[int] = 0x0000005D
@@ -18843,6 +18896,7 @@ class DishwasherAlarm(Cluster):
             mask: uint = 0
 
 
+
 @dataclass
 class MicrowaveOvenMode(Cluster):
     id: typing.ClassVar[int] = 0x0000005E
@@ -19029,6 +19083,7 @@ class MicrowaveOvenMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -19341,6 +19396,7 @@ class MicrowaveOvenControl(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -19716,6 +19772,7 @@ class OperationalState(Cluster):
             completionErrorCode: uint = 0
             totalOperationalTime: typing.Union[None, Nullable, uint] = None
             pausedTime: typing.Union[None, Nullable, uint] = None
+
 
 
 @dataclass
@@ -20100,6 +20157,7 @@ class RvcOperationalState(Cluster):
             completionErrorCode: uint = 0
             totalOperationalTime: typing.Union[None, Nullable, uint] = None
             pausedTime: typing.Union[None, Nullable, uint] = None
+
 
 
 @dataclass
@@ -20611,6 +20669,7 @@ class ScenesManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class Groupcast(Cluster):
     id: typing.ClassVar[int] = 0x00000065
@@ -20874,6 +20933,7 @@ class Groupcast(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -21153,6 +21213,7 @@ class HepaFilterMonitoring(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ActivatedCarbonFilterMonitoring(Cluster):
     id: typing.ClassVar[int] = 0x00000072
@@ -21430,6 +21491,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class WaterTankLevelMonitoring(Cluster):
     id: typing.ClassVar[int] = 0x00000079
@@ -21705,6 +21767,7 @@ class WaterTankLevelMonitoring(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -22040,6 +22103,7 @@ class BooleanStateConfiguration(Cluster):
                     ])
 
             sensorFault: uint = 0
+
 
 
 @dataclass
@@ -22446,6 +22510,7 @@ class ValveConfigurationAndControl(Cluster):
                     ])
 
             valveFault: uint = 0
+
 
 
 @dataclass
@@ -23045,6 +23110,7 @@ class ElectricalPowerMeasurement(Cluster):
             ranges: typing.List[ElectricalPowerMeasurement.Structs.MeasurementRangeStruct] = field(default_factory=lambda: [])
 
 
+
 @dataclass
 class ElectricalEnergyMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000091
@@ -23418,6 +23484,7 @@ class ElectricalEnergyMeasurement(Cluster):
             energyExported: typing.Optional[ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct] = None
 
 
+
 @dataclass
 class WaterHeaterManagement(Cluster):
     id: typing.ClassVar[int] = 0x00000094
@@ -23739,6 +23806,7 @@ class WaterHeaterManagement(Cluster):
                     ])
 
 
+
 @dataclass
 class CommodityPrice(Cluster):
     id: typing.ClassVar[int] = 0x00000095
@@ -24044,6 +24112,7 @@ class CommodityPrice(Cluster):
                     ])
 
             currentPrice: typing.Union[Nullable, CommodityPrice.Structs.CommodityPriceStruct] = NullValue
+
 
 
 @dataclass
@@ -24367,6 +24436,7 @@ class Messages(Cluster):
             responseID: typing.Union[None, Nullable, uint] = None
             reply: typing.Union[None, Nullable, str] = None
             futureMessagesPreference: typing.Union[Nullable, Messages.Enums.FutureMessagePreferenceEnum] = NullValue
+
 
 
 @dataclass
@@ -25085,6 +25155,7 @@ class DeviceEnergyManagement(Cluster):
                     ])
 
             cause: DeviceEnergyManagement.Enums.CauseEnum = 0
+
 
 
 @dataclass
@@ -26006,6 +26077,7 @@ class EnergyEvse(Cluster):
             uid: bytes = b""
 
 
+
 @dataclass
 class EnergyPreference(Cluster):
     id: typing.ClassVar[int] = 0x0000009B
@@ -26230,6 +26302,7 @@ class EnergyPreference(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class PowerTopology(Cluster):
     id: typing.ClassVar[int] = 0x0000009C
@@ -26411,6 +26484,7 @@ class PowerTopology(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -26642,6 +26716,7 @@ class EnergyEvseMode(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class WaterHeaterMode(Cluster):
     id: typing.ClassVar[int] = 0x0000009E
@@ -26868,6 +26943,7 @@ class WaterHeaterMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -27099,6 +27175,7 @@ class DeviceEnergyManagementMode(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ElectricalGridConditions(Cluster):
     id: typing.ClassVar[int] = 0x000000A0
@@ -27311,6 +27388,7 @@ class ElectricalGridConditions(Cluster):
                     ])
 
             currentConditions: typing.Union[Nullable, ElectricalGridConditions.Structs.ElectricalGridConditionsStruct] = NullValue
+
 
 
 @dataclass
@@ -29375,6 +29453,7 @@ class DoorLock(Cluster):
             dataIndex: typing.Union[Nullable, uint] = NullValue
 
 
+
 @dataclass
 class WindowCovering(Cluster):
     id: typing.ClassVar[int] = 0x00000102
@@ -30071,6 +30150,7 @@ class WindowCovering(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ClosureControl(Cluster):
     id: typing.ClassVar[int] = 0x00000104
@@ -30511,6 +30591,7 @@ class ClosureControl(Cluster):
                     ])
 
             secureValue: bool = False
+
 
 
 @dataclass
@@ -31024,6 +31105,7 @@ class ClosureDimension(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ServiceArea(Cluster):
     id: typing.ClassVar[int] = 0x00000150
@@ -31414,6 +31496,7 @@ class ServiceArea(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -32250,6 +32333,7 @@ class PumpConfigurationAndControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
 
 
 @dataclass
@@ -34256,6 +34340,7 @@ class Thermostat(Cluster):
             currentPresetHandle: typing.Union[Nullable, bytes] = NullValue
 
 
+
 @dataclass
 class FanControl(Cluster):
     id: typing.ClassVar[int] = 0x00000202
@@ -34660,6 +34745,7 @@ class FanControl(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ThermostatUserInterfaceConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x00000204
@@ -34847,6 +34933,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -36444,6 +36531,7 @@ class ColorControl(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class BallastConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x00000301
@@ -36807,6 +36895,7 @@ class BallastConfiguration(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class IlluminanceMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000400
@@ -37010,6 +37099,7 @@ class IlluminanceMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class TemperatureMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000402
@@ -37183,6 +37273,7 @@ class TemperatureMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -37454,6 +37545,7 @@ class PressureMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class FlowMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000404
@@ -37629,6 +37721,7 @@ class FlowMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class RelativeHumidityMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000405
@@ -37802,6 +37895,7 @@ class RelativeHumidityMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -38226,6 +38320,7 @@ class OccupancySensing(Cluster):
             occupancy: uint = 0
 
 
+
 @dataclass
 class CarbonMonoxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0000040C
@@ -38572,6 +38667,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -38922,6 +39018,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class NitrogenDioxideConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000413
@@ -39268,6 +39365,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -39618,6 +39716,7 @@ class OzoneConcentrationMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class Pm25ConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0000042A
@@ -39964,6 +40063,7 @@ class Pm25ConcentrationMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -40314,6 +40414,7 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class Pm1ConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0000042C
@@ -40660,6 +40761,7 @@ class Pm1ConcentrationMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -41010,6 +41112,7 @@ class Pm10ConcentrationMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x0000042E
@@ -41356,6 +41459,7 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -41706,6 +41810,7 @@ class RadonConcentrationMeasurement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class SoilMeasurement(Cluster):
     id: typing.ClassVar[int] = 0x00000430
@@ -41843,6 +41948,7 @@ class SoilMeasurement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -42210,6 +42316,7 @@ class AmbientContextSensing(Cluster):
             ambientContextType: typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct] = field(default_factory=lambda: [])
 
 
+
 @dataclass
 class WiFiNetworkManagement(Cluster):
     id: typing.ClassVar[int] = 0x00000451
@@ -42377,6 +42484,7 @@ class WiFiNetworkManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -42679,6 +42787,7 @@ class ThreadBorderRouterManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class ThreadNetworkDirectory(Cluster):
     id: typing.ClassVar[int] = 0x00000453
@@ -42927,6 +43036,7 @@ class ThreadNetworkDirectory(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class WakeOnLan(Cluster):
     id: typing.ClassVar[int] = 0x00000503
@@ -43064,6 +43174,7 @@ class WakeOnLan(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -43592,6 +43703,7 @@ class Channel(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class TargetNavigator(Cluster):
     id: typing.ClassVar[int] = 0x00000505
@@ -43815,6 +43927,7 @@ class TargetNavigator(Cluster):
             targetList: typing.List[TargetNavigator.Structs.TargetInfoStruct] = field(default_factory=lambda: [])
             currentTarget: uint = 0
             data: bytes = b""
+
 
 
 @dataclass
@@ -44476,6 +44589,7 @@ class MediaPlayback(Cluster):
             audioAdvanceUnmuted: bool = False
 
 
+
 @dataclass
 class MediaInput(Cluster):
     id: typing.ClassVar[int] = 0x00000507
@@ -44718,6 +44832,7 @@ class MediaInput(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class LowPower(Cluster):
     id: typing.ClassVar[int] = 0x00000508
@@ -44833,6 +44948,7 @@ class LowPower(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -45079,6 +45195,7 @@ class KeypadInput(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -45487,6 +45604,7 @@ class ContentLauncher(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class AudioOutput(Cluster):
     id: typing.ClassVar[int] = 0x0000050B
@@ -45693,6 +45811,7 @@ class AudioOutput(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -45946,6 +46065,7 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -46221,6 +46341,7 @@ class ApplicationBasic(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class AccountLogin(Cluster):
     id: typing.ClassVar[int] = 0x0000050E
@@ -46425,6 +46546,7 @@ class AccountLogin(Cluster):
 
             node: typing.Optional[uint] = None
             fabricIndex: uint = 0
+
 
 
 @dataclass
@@ -47153,6 +47275,7 @@ class ContentControl(Cluster):
                     ])
 
 
+
 @dataclass
 class ContentAppObserver(Cluster):
     id: typing.ClassVar[int] = 0x00000510
@@ -47303,6 +47426,7 @@ class ContentAppObserver(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -47804,6 +47928,7 @@ class ZoneManagement(Cluster):
 
             zone: uint = 0
             reason: ZoneManagement.Enums.ZoneEventStoppedReasonEnum = 0
+
 
 
 @dataclass
@@ -49165,6 +49290,7 @@ class CameraAvStreamManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class CameraAvSettingsUserLevelManagement(Cluster):
     id: typing.ClassVar[int] = 0x00000552
@@ -49641,6 +49767,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class WebRTCTransportProvider(Cluster):
     id: typing.ClassVar[int] = 0x00000553
@@ -49951,6 +50078,7 @@ class WebRTCTransportProvider(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class WebRTCTransportRequestor(Cluster):
     id: typing.ClassVar[int] = 0x00000554
@@ -50147,6 +50275,7 @@ class WebRTCTransportRequestor(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -50734,6 +50863,7 @@ class PushAvStreamTransport(Cluster):
             CMAFSessionNumber: typing.Optional[uint] = None
 
 
+
 @dataclass
 class Chime(Cluster):
     id: typing.ClassVar[int] = 0x00000556
@@ -50940,6 +51070,7 @@ class Chime(Cluster):
                     ])
 
             chimeID: uint = 0
+
 
 
 @dataclass
@@ -51692,6 +51823,7 @@ class CommodityTariff(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class EcosystemInformation(Cluster):
     id: typing.ClassVar[int] = 0x00000750
@@ -51885,6 +52017,7 @@ class EcosystemInformation(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -52101,6 +52234,7 @@ class CommissionerControl(Cluster):
             clientNodeID: uint = 0
             statusCode: uint = 0
             fabricIndex: uint = 0
+
 
 
 @dataclass
@@ -53118,6 +53252,7 @@ class JointFabricDatastore(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class JointFabricAdministrator(Cluster):
     id: typing.ClassVar[int] = 0x00000753
@@ -53414,6 +53549,7 @@ class JointFabricAdministrator(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -53877,6 +54013,7 @@ class TlsCertificateManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class TlsClientManagement(Cluster):
     id: typing.ClassVar[int] = 0x00000802
@@ -54142,6 +54279,7 @@ class TlsClientManagement(Cluster):
             value: uint = 0
 
 
+
 @dataclass
 class MeterIdentification(Cluster):
     id: typing.ClassVar[int] = 0x00000B06
@@ -54348,6 +54486,7 @@ class MeterIdentification(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -54562,6 +54701,7 @@ class CommodityMetering(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -57372,6 +57512,7 @@ class UnitTesting(Cluster):
             arg1: uint = 0
 
 
+
 @dataclass
 class FaultInjection(Cluster):
     id: typing.ClassVar[int] = 0xFFF1FC06
@@ -57531,6 +57672,7 @@ class FaultInjection(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
 
 
 @dataclass
@@ -57722,4 +57864,5 @@ class SampleMei(Cluster):
 
             count: uint = 0
             fabricIndex: uint = 0
+
 

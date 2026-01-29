@@ -138,6 +138,7 @@
 #include <clusters/TargetNavigator/CommandIds.h>
 #include <clusters/TemperatureControl/CommandIds.h>
 #include <clusters/TemperatureMeasurement/CommandIds.h>
+#include <clusters/TestHiddenManufacturerSpecific/CommandIds.h>
 #include <clusters/Thermostat/CommandIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/CommandIds.h>
 #include <clusters/ThreadBorderRouterManagement/CommandIds.h>

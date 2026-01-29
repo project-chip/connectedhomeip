@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2025 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!--
+  Test cluster for manufacturer-specific cluster handling validation.
+  
+  This cluster is intentionally NOT included in controller-clusters.matter
+  to simulate a real-world scenario where a device has a vendor-specific 
+  cluster that the controller/test harness has no knowledge of.
+  
+  Used to validate TC_IDM_2_2 and other tests correctly handle unknown manufacturer-specific clusters.
+  
+  Cluster ID: 0xFFF1FC21 (4294048801)
+  - Vendor ID: 0xFFF1 (test vendor)
+  - Cluster suffix: 0xFC21 (within manufacturer-specific range 0xFC00-0xFFFE per spec)
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <cluster apiMaturity="internal">
+    <domain>CHIP</domain>
+    <name>Test Hidden Manufacturer Specific</name>
+    <code>0xFFF1FC21</code>
+    <define>TEST_HIDDEN_MANUFACTURER_SPECIFIC</define>
+    <description>Test cluster for validating manufacturer-specific cluster handling without controller-side implementation</description>
+
+    <attribute side="server" code="0x0000" define="TEST_ATTRIBUTE" type="boolean" writable="false" default="true" optional="false">TestAttribute</attribute>
+  </cluster>
+</configurator>

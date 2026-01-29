@@ -1464,6 +1464,16 @@ void emberAfSampleMeiClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfSampleMeiClusterShutdownCallback(chip::EndpointId endpoint);
 
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTestHiddenManufacturerSpecificClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTestHiddenManufacturerSpecificClusterShutdownCallback(chip::EndpointId endpoint);
+
 // Cluster Server/Client Init Functions
 
 //
@@ -6988,6 +6998,45 @@ MatterSampleMeiClusterServerPreAttributeChangedCallback(const chip::app::Concret
  * @param endpoint  Endpoint that is being served
  */
 void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Test Hidden Manufacturer Specific Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTestHiddenManufacturerSpecificClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTestHiddenManufacturerSpecificClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTestHiddenManufacturerSpecificClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTestHiddenManufacturerSpecificClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTestHiddenManufacturerSpecificClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTestHiddenManufacturerSpecificClusterServerTickCallback(chip::EndpointId endpoint);
 
 // Cluster Commands Callback
 

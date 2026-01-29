@@ -25626,4 +25626,38 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterTestHiddenManufacturerSpecific
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTestAttributeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTestHiddenManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeTestAttributeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTestHiddenManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTestHiddenManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTestHiddenManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTestHiddenManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTestHiddenManufacturerSpecificID) attributeID:@(MTRAttributeIDTypeClusterTestHiddenManufacturerSpecificAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
