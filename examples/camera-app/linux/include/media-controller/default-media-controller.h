@@ -39,8 +39,8 @@ public:
     // getting destroyed.
     void UnregisterTransport(Transport * transport) override;
     // DistributeVideo and DistributeAudio are called when data is ready to be sent out
-    void DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID) override;
-    void DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID) override;
+    void DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID, int64_t timestamp) override;
+    void DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID, int64_t timestamp) override;
     // Sets the desired preroll buffer length in milliseconds for the given transport
     void SetPreRollLength(Transport * transport, uint16_t preRollBufferLength) override;
     void SetCameraDevice(Camera::CameraDevice * device);

@@ -599,7 +599,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:174
+            image: ghcr.io/project-chip/chip-build:182
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
