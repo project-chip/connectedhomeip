@@ -53,6 +53,7 @@ using OnLocalDescriptionCallback = std::function<void(const std::string & sdp, S
 using OnICECandidateCallback     = std::function<void(const ICECandidateInfo & candidateInfo)>;
 using OnConnectionStateCallback  = std::function<void(bool connected)>;
 using OnTrackCallback            = std::function<void(std::shared_ptr<WebRTCTrack> track)>;
+using OnGatheringStateCallback   = std::function<void(bool gatheringComplete)>;
 
 // Abstract track interface
 class WebRTCTrack
@@ -73,7 +74,8 @@ public:
     virtual ~WebRTCPeerConnection() = default;
 
     virtual void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
-                              OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack)              = 0;
+                              OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack,
+                              OnGatheringStateCallback onGatheringState)                                         = 0;
     virtual void Close()                                                                                         = 0;
     virtual void CreateOffer()                                                                                   = 0;
     virtual void CreateAnswer()                                                                                  = 0;

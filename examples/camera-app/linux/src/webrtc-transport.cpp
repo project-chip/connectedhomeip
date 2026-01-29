@@ -51,10 +51,12 @@ WebrtcTransport::~WebrtcTransport()
 }
 
 void WebrtcTransport::SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription,
-                                   OnTransportConnectionStateCallback onConnectionState)
+                                   OnTransportConnectionStateCallback onConnectionState,
+                                   OnTransportGatheringStateCallback onGatheringState)
 {
     mOnLocalDescription = onLocalDescription;
     mOnConnectionState  = onConnectionState;
+    mOnGatheringState   = onGatheringState;
 }
 
 void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
@@ -200,7 +202,13 @@ void WebrtcTransport::Start()
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
                                   [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },
                                   [this](bool connected) { this->OnConnectionStateChanged(connected); },
-                                  [this](std::shared_ptr<WebRTCTrack> track) { this->OnTrack(track); });
+                                  [this](std::shared_ptr<WebRTCTrack> track) { this->OnTrack(track); },
+                                  [this](bool gatheringComplete) {
+                                      if (mOnGatheringState)
+                                      {
+                                          mOnGatheringState(gatheringComplete, mRequestArgs.sessionId);
+                                      }
+                                  });
 }
 
 void WebrtcTransport::Stop()
