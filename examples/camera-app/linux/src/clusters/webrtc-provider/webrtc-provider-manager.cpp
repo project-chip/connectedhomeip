@@ -131,7 +131,10 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [](bool gatheringComplete, const uint16_t sessionId) {
+                // SolicitOffer flow doesn't need gathering state handling - we send offer first
+            });
     }
 
     transport->SetRequestArgs(requestArgs);
@@ -323,7 +326,26 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [this](bool gatheringComplete, const uint16_t sessionId) {
+                // When ICE gathering completes and we're still in SendingAnswer state,
+                // transition to SendingICECandidates. This handles the case where the
+                // controller bundled all ICE candidates in the SDP offer (no trickle).
+                if (gatheringComplete)
+                {
+                    // Marshal to Matter thread for thread safety
+                    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+                        if (WebrtcTransport * t = this->GetTransport(sessionId))
+                        {
+                            if (t->GetState() == WebrtcTransport::State::SendingAnswer)
+                            {
+                                t->MoveToState(WebrtcTransport::State::SendingICECandidates);
+                                this->ScheduleICECandidatesSend(sessionId);
+                            }
+                        }
+                    });
+                }
+            });
     }
 
     // Check resource availability before proceeding

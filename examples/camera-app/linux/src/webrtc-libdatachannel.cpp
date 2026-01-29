@@ -289,7 +289,8 @@ public:
     }
 
     void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
-                      OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack) override
+                      OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack,
+                      OnGatheringStateCallback onGatheringState) override
     {
         mPeerConnection->onLocalDescription([onLocalDescription, onICECandidate](rtc::Description desc) {
             // First, notify about the local description
@@ -339,8 +340,13 @@ public:
             }
         });
 
-        mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+        mPeerConnection->onGatheringStateChange([onGatheringState](rtc::PeerConnection::GatheringState state) {
             ChipLogProgress(Camera, "[PeerConnection Gathering State: %s]", GetGatheringStateStr(state));
+            if (onGatheringState)
+            {
+                bool complete = (state == rtc::PeerConnection::GatheringState::Complete);
+                onGatheringState(complete);
+            }
         });
 
         mPeerConnection->onTrack(

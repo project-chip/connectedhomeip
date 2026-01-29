@@ -27,8 +27,9 @@
 #include <string>
 #include <vector>
 
-using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
-using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
+using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const uint16_t sessionId)>;
+using OnTransportConnectionStateCallback  = std::function<void(bool connected, const uint16_t sessionId)>;
+using OnTransportGatheringStateCallback   = std::function<void(bool gatheringComplete, const uint16_t sessionId)>;
 
 // Derived class for WebRTC transport
 class WebrtcTransport : public Transport
@@ -67,7 +68,8 @@ public:
 
     ~WebrtcTransport();
 
-    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState);
+    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState,
+                      OnTransportGatheringStateCallback onGatheringState);
 
     void MoveToState(const State targetState);
     const char * GetStateStr() const;
@@ -145,6 +147,7 @@ private:
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+    OnTransportGatheringStateCallback mOnGatheringState     = nullptr;
 
     std::mutex mTrackStatusLock;
 };
