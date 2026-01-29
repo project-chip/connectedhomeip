@@ -88,7 +88,8 @@ class Context:
             if parts and found_choice.isUnifiedBuild(parts):
                 # we want to ensure identical settings across builds. For now ensure that
                 # variants are identical
-                variants = '-'.join([x.name for x in found_choice.modifiers])
+                actual_modifiers = {x.name for x in found_choice.modifiers}
+                variants = '-'.join([x.name for x in parts if x.name in actual_modifiers])
                 if unified_variants is None:
                     unified_variants = variants
                 elif unified_variants != variants:
