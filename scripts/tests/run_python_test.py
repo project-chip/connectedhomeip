@@ -373,10 +373,31 @@ def monitor_app_restart_requests(
     while True:
         try:
             if os.path.exists(restart_flag_file):
-                log.info("App restart requested by test script")
-                # Remove the flag file immediately to prevent multiple restarts
+                # Read the restart flag file to determine requested
+                # action, then remove it to prevent multiple restarts
+                with open(restart_flag_file, 'r') as f:
+                    flag_file_content = f.read().strip()
                 os.unlink(restart_flag_file)
+                is_factory_reset = (flag_file_content == "factory reset")
+                log.info("App %s requested by test script", flag_file_content)
 
+                # If factory reset was requested, delete
+                # the KVS file before restarting the app
+                if is_factory_reset:
+                    if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
+                        kvs_path = match.group("path")
+                        try:
+                            if os.path.exists(kvs_path):
+                                os.unlink(kvs_path)
+                                log.info("Successfully deleted KVS file: '%s'", kvs_path)
+                            else:
+                                log.info("KVS file '%s' does not exist, skipping deletion", kvs_path)
+                        except Exception as e:
+                            log.error("Failed to delete KVS file '%s': %r", kvs_path, e)
+                    else:
+                        log.info("No --KVS argument found in app_args, skipping KVS deletion")
+
+                # Restart the app
                 new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
                 new_app_manager.start()
                 with app_manager_lock:
@@ -384,7 +405,7 @@ def monitor_app_restart_requests(
                     app_manager_ref[0] = new_app_manager
 
                 # After restart is complete, we can exit the monitor thread
-                log.info("App restart completed, monitor thread exiting")
+                log.info("App %s completed, monitor thread exiting", flag_file_content)
                 break
             time.sleep(0.5)
         except Exception as e:
