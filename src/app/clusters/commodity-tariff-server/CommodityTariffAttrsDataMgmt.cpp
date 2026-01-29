@@ -256,52 +256,147 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffComponent
 
     return CHIP_NO_ERROR;
 }
-
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>::CopyData(const StructType & input,
-                                                                                                       StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStruct::Type>>>::CopyData(
+    const StructType & input, StructType & output)
 {
+    // Initialize output fields
     output.label.SetNull();
+    
+    // Handle label (nullable CharSpan) - NEEDS MEMORY ALLOCATION
     if (!input.label.IsNull())
     {
-        ReturnErrorOnFailure(SpanCopier<char>::CopyToNullable(input.label.Value(), output.label, input.label.Value().size()));
+        // Allocate memory for the label
+        char* labelBuffer = static_cast<char*>(chip::Platform::MemoryCalloc(1, input.label.Value().size()));
+        VerifyOrReturnError(labelBuffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        
+        // Create a span with the allocated memory
+        chip::CharSpan tmpLabel(labelBuffer, input.label.Value().size());
+        
+        // Copy using SpanCopier::Copy (requires pre-allocated memory)
+        ReturnErrorOnFailure(SpanCopier<char>::Copy(
+            input.label.Value(), 
+            tmpLabel, 
+            input.label.Value().size()));
+        
+        // Set the output
+        output.label.SetNonNull(tmpLabel);
     }
 
-    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, output.dayEntryIDs, input.dayEntryIDs.size()));
+    // Handle dayEntryIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayEntryIDs.empty())
+    {
+        // Allocate memory for dayEntryIDs
+        uint32_t* buffer = static_cast<uint32_t*>(
+            chip::Platform::MemoryCalloc(input.dayEntryIDs.size(), sizeof(uint32_t)));
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        
+        // Create a span with the allocated memory
+        output.dayEntryIDs = DataModel::List<const uint32_t>(buffer, input.dayEntryIDs.size());
+        
+        // Copy using SpanCopier::Copy
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(
+            input.dayEntryIDs, 
+            output.dayEntryIDs, 
+            input.dayEntryIDs.size()));
+    }
+    else
+    {
+        output.dayEntryIDs = DataModel::List<uint32_t>();
+    }
 
-    ReturnErrorOnFailure(
-        SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()),
-                                   output.tariffComponentIDs, input.tariffComponentIDs.size()));
+    // Handle tariffComponentIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.tariffComponentIDs.empty())
+    {
+        // Allocate memory for tariffComponentIDs
+        uint32_t* buffer = static_cast<uint32_t*>(
+            chip::Platform::MemoryCalloc(input.tariffComponentIDs.size(), sizeof(uint32_t)));
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        
+        // Create a span with the allocated memory
+        output.tariffComponentIDs = DataModel::List<const uint32_t>(buffer, input.tariffComponentIDs.size());
+        
+        // Copy using SpanCopier::Copy
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(
+            chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()),
+            output.tariffComponentIDs, 
+            input.tariffComponentIDs.size()));
+    }
+    else
+    {
+        output.tariffComponentIDs = DataModel::List<uint32_t>();
+    }
 
     return CHIP_NO_ERROR;
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::CopyData(const StructType & input,
-                                                                                                     StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruct::Type>>>::CopyData(
+    const StructType & input, StructType & output)
 {
     output.dayPatternID = input.dayPatternID;
     output.daysOfWeek   = input.daysOfWeek;
 
-    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, output.dayEntryIDs, input.dayEntryIDs.size()));
+    // Handle dayEntryIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayEntryIDs.empty())
+    {
+        // Allocate memory for dayEntryIDs
+        uint32_t* buffer = static_cast<uint32_t*>(
+            chip::Platform::MemoryCalloc(input.dayEntryIDs.size(), sizeof(uint32_t)));
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        
+        // Create a span with the allocated memory
+        output.dayEntryIDs = DataModel::List<const uint32_t>(buffer, input.dayEntryIDs.size());
+        
+        // Copy using SpanCopier::Copy
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(
+            input.dayEntryIDs, 
+            output.dayEntryIDs, 
+            input.dayEntryIDs.size()));
+    }
+    else
+    {
+        output.dayEntryIDs = DataModel::List<uint32_t>();
+    }
+    
     return CHIP_NO_ERROR;
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type>>>::CopyData(const StructType & input,
-                                                                                              StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type>>>::CopyData(
+    const StructType & input, StructType & output)
 {
     output.date    = input.date;
     output.dayType = input.dayType;
 
-    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, output.dayEntryIDs, input.dayEntryIDs.size()));
+    // Handle dayEntryIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayEntryIDs.empty())
+    {
+        // Allocate memory for dayEntryIDs
+        uint32_t* buffer = static_cast<uint32_t*>(
+            chip::Platform::MemoryCalloc(input.dayEntryIDs.size(), sizeof(uint32_t)));
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        
+        // Create a span with the allocated memory
+        output.dayEntryIDs = DataModel::List<const uint32_t>(buffer, input.dayEntryIDs.size());
+        
+        // Copy using SpanCopier::Copy
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(
+            input.dayEntryIDs, 
+            output.dayEntryIDs, 
+            input.dayEntryIDs.size()));
+    }
+    else
+    {
+        output.dayEntryIDs = DataModel::List<uint32_t>();
+    }
 
     return CHIP_NO_ERROR;
 }
 
 template <>
-CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>::CopyData(const StructType & input,
-                                                                                                         StructType & output)
+CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodStruct::Type>>>::CopyData(
+    const StructType & input, StructType & output)
 {
     output.startDate.SetNull();
     if (!input.startDate.IsNull())
@@ -309,7 +404,30 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         output.startDate.SetNonNull(input.startDate.Value());
     }
 
-    ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayPatternIDs, output.dayPatternIDs, input.dayPatternIDs.size()));
+    // Handle dayPatternIDs (non-nullable list) - NEEDS MEMORY ALLOCATION
+    if (!input.dayPatternIDs.empty())
+    {
+        // Allocate memory for dayPatternIDs
+        uint32_t* buffer = static_cast<uint32_t*>(
+            chip::Platform::MemoryCalloc(input.dayPatternIDs.size(), sizeof(uint32_t)));
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        
+        // Create a span with the allocated memory
+        DataModel::List<const uint32_t> tmpList(buffer, input.dayPatternIDs.size());
+        
+        // Copy using SpanCopier::Copy
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(
+            input.dayPatternIDs, 
+            tmpList, 
+            input.dayPatternIDs.size()));
+        
+        // Set the output
+        output.dayPatternIDs = tmpList;
+    }
+    else
+    {
+        output.dayPatternIDs = DataModel::List<uint32_t>();
+    }
 
     return CHIP_NO_ERROR;
 }

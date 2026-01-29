@@ -534,17 +534,12 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
     const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
     const size_t componentCount                          = componentIDs.size();
 
-    // Validate component count
-    if (componentCount == 0 || componentCount > kTariffPeriodItemMaxIDs)
-    {
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
+    // Validate component count with VerifyOrReturnError
+    VerifyOrReturnError(componentCount > 0 && componentCount <= kTariffPeriodItemMaxIDs, 
+                    CHIP_ERROR_INVALID_LIST_LENGTH);
 
     // Allocate memory for the component array
-    if (!tempBuffer.Calloc(componentCount))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    VerifyOrReturnError(tempBuffer.Calloc(componentCount), CHIP_ERROR_NO_MEMORY);
 
     for (size_t i = 0; i < componentIDs.size(); i++)
     {
@@ -571,22 +566,19 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(Instance * aInstance, CurrentT
         }
         tempBuffer[i] = entry;
     }
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(err);
 
-    err =
-        mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount)));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(
+    mgmtObj.SetNewValue(MakeNullable(DataModel::List<Structs::TariffComponentStruct::Type>(tempBuffer.Get(), componentCount))));
 
-    err = mgmtObj.UpdateBegin(nullptr);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mgmtObj.UpdateBegin(nullptr)); 
 
-    if (mgmtObj.UpdateFinish(err == CHIP_NO_ERROR)) // Success path
+    if (mgmtObj.UpdateFinish(true)) // Success path
     {
         aInstance->AttributeUpdCb(mgmtObj.GetAttrId());
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 } // namespace Utils
 
