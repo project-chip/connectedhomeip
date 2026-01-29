@@ -16,9 +16,9 @@ import("//build_overrides/chip.gni")
 
 source_set("user-label-server") {
   sources = [
+    "CodegenIntegration.cpp",
     "UserLabelCluster.cpp",
     "UserLabelCluster.h",
-    "CodegenIntegration.cpp",
   ]
 
   public_deps = [
