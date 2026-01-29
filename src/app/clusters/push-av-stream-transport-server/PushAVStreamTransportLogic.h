@@ -8,6 +8,8 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
 #include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
@@ -144,6 +146,50 @@ private:
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
 
+    // Size calculation for TransportOptionsStorage:
+    // - mUrlBuffer: kMaxUrlLength (2000)
+    // - mTriggerOptionsStorage: ~97 bytes
+    //   - triggerType: 1 byte
+    //   - mTransportZoneOptions: Vector overhead + CHIP_CONFIG_MAX_NUM_ZONES * (~5 bytes/zone) = ~80 bytes
+    //   - motionSensitivity: ~2 bytes
+    //   - motionTimeControl: ~9 bytes
+    //   - maxPreRollLen: ~5 bytes
+    // - mContainerOptionsStorage: ~65 bytes
+    //   - containerType: 1 byte
+    //   - mCMAFContainerStorage: ~64 bytes
+    //     - CMAFInterface: 1 byte
+    //     - segmentDuration: 2 bytes
+    //     - chunkDuration: 2 bytes
+    //     - sessionGroup: ~9 bytes
+    //     - mTrackNameBuffer: 16 bytes
+    //     - mCENCKeyBuffer: 16 bytes
+    //     - mCENCKeyIDBuffer: 16 bytes
+    //     - metadataEnabled: ~2 bytes
+    // - Base TransportOptionsStruct members: ~15 bytes
+    //   - streamUsage: 1 byte
+    //   - videoStreamID: ~3 bytes
+    //   - audioStreamID: ~3 bytes
+    //   - TLSEndpointID: 2 bytes
+    //   - ingestMethod: 1 byte
+    //   - expiryTime: ~5 bytes
+    // Total for TransportOptionsStorage: 2000 + 97 + 65 + 15 = ~2177 bytes
+    // TLV overhead for TransportOptionsStorage: ~40 bytes
+    // Serialized size of transportOptions: ~2217 bytes. Pad to 2400
+
+    static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
+        TLV::EstimateStructOverhead(sizeof(uint16_t), // connectionID (2)
+                                    sizeof(uint8_t),  // transportStatus (1)
+                                    2400,             // transportOptions
+                                    sizeof(uint32_t), // expiryTime (4)
+                                    sizeof(uint64_t)  // fabricIndex (8)
+        );                                            // Adds ~10 bytes for tags/types = ~2430 bytes
+
+    // Max size for the TLV-encoded array of CurrentConnection structs
+    // Assuming CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS = 4
+    // Array overhead: ~2 bytes
+    // Total: 2 + (4 * 2430) = 9722 bytes. Rounded up to 10000 for safety.
+    static constexpr size_t kMaxCurrentConnectionsSerializedSize = 10000;
+
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
@@ -189,6 +235,11 @@ private:
      * @return true if URL is valid, false otherwise
      */
     bool ValidateUrl(const std::string & url);
+
+    // Helpers to store and load CurrentConnections list
+    CHIP_ERROR StoreCurrentConnections();
+    CHIP_ERROR LoadCurrentConnections();
+    CHIP_ERROR PersistAndNotify();
 };
 
 } // namespace Clusters
