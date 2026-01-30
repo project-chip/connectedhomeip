@@ -51,6 +51,7 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::Startup(ServerClusterCont
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
+    mLogic.SetCluster(this);
     return mLogic.Startup();
 }
 /**

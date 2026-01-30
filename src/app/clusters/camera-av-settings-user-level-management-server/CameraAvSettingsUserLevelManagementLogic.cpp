@@ -22,7 +22,6 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
-#include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
 #include <clusters/CameraAvSettingsUserLevelManagement/Metadata.h>
@@ -135,7 +134,10 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Attributes(ReadOnlyBufferBu
 
 void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeId)
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, CameraAvSettingsUserLevelManagement::Id, aAttributeId);
+    if (mCluster != nullptr)
+    {
+        mCluster->MarkAttributeDirty(aAttributeId);
+    }
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(

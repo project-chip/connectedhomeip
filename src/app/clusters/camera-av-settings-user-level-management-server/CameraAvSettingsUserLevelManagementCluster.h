@@ -213,6 +213,8 @@ public:
 
     CameraAvSettingsUserLevelMgmtServerLogic & GetLogic() { return mLogic; }
 
+    void MarkAttributeDirty(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
+
     void SetDelegate(CameraAvSettingsUserLevelManagementDelegate * delegate)
     {
         mLogic.SetDelegate(delegate);
