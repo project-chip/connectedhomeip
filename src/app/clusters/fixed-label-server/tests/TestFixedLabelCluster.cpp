@@ -40,26 +40,51 @@ using chip::Testing::IsAttributesListEqualTo;
 namespace {
 
 // Mock DeviceInfoProvider for testing
+class MockFixedLabelIterator : public DeviceLayer::DeviceInfoProvider::FixedLabelIterator
+{
+public:
+    MockFixedLabelIterator()
+    {
+        mLabels[0].label = chip::CharSpan::fromCharString("test_label1");
+        mLabels[0].value = chip::CharSpan::fromCharString("test_value1");
+    }
+
+    size_t Count() override { return 1; }
+
+    bool Next(DeviceLayer::DeviceInfoProvider::FixedLabelType & output) override
+    {
+        if (mIndex < Count())
+        {
+            output = mLabels[mIndex++];
+            return true;
+        }
+        return false;
+    }
+
+    void Release() override { delete this; }
+
+private:
+    size_t mIndex = 0;
+    DeviceLayer::DeviceInfoProvider::FixedLabelType mLabels[1];
+};
+
+// In MockDeviceInfoProvider:
 class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
 {
 public:
-    MockDeviceInfoProvider()           = default;
-    ~MockDeviceInfoProvider() override = default;
-
-    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; }
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return new MockFixedLabelIterator(); }
     UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
-    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
     SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; }
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
 
 protected:
-    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override
     {
-        val = 0;
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 struct TestFixedLabelCluster : public ::testing::Test
@@ -102,8 +127,9 @@ TEST_F(TestFixedLabelCluster, ReadAttributeTest)
     DataModel::DecodableList<Structs::LabelStruct::DecodableType> labelList;
     ASSERT_EQ(tester.ReadAttribute(LabelList::Id, labelList), CHIP_NO_ERROR);
     auto it = labelList.begin();
-    while (it.Next())
-    {
-        ASSERT_GT(it.GetValue().label.size(), 0u);
-    }
+    ASSERT_TRUE(it.Next());
+    auto label = it.GetValue();
+    ASSERT_TRUE(label.label.data_equal(chip::CharSpan::fromCharString("test_label1")));
+    ASSERT_TRUE(label.value.data_equal(chip::CharSpan::fromCharString("test_value1")));
+    ASSERT_FALSE(it.Next());
 }
