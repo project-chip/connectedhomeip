@@ -21,6 +21,7 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/ThreadNetworkDiagnostics/Metadata.h>
 
 namespace {
@@ -51,36 +52,102 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
 {
     {
         ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(
-            threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
-            CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
+        EXPECT_TRUE(IsAttributesListEqualTo(threadNetworkDiagnostics,
+                                            {
+                                                Attributes::Channel::kMetadataEntry,
+                                                Attributes::RoutingRole::kMetadataEntry,
+                                                Attributes::NetworkName::kMetadataEntry,
+                                                Attributes::PanId::kMetadataEntry,
+                                                Attributes::ExtendedPanId::kMetadataEntry,
+                                                Attributes::MeshLocalPrefix::kMetadataEntry,
+                                                Attributes::NeighborTable::kMetadataEntry,
+                                                Attributes::RouteTable::kMetadataEntry,
+                                                Attributes::PartitionId::kMetadataEntry,
+                                                Attributes::Weighting::kMetadataEntry,
+                                                Attributes::DataVersion::kMetadataEntry,
+                                                Attributes::StableDataVersion::kMetadataEntry,
+                                                Attributes::LeaderRouterId::kMetadataEntry,
+                                                Attributes::SecurityPolicy::kMetadataEntry,
+                                                Attributes::ChannelPage0Mask::kMetadataEntry,
+                                                Attributes::OperationalDatasetComponents::kMetadataEntry,
+                                                Attributes::ActiveNetworkFaultsList::kMetadataEntry,
+                                                Attributes::ExtAddress::kMetadataEntry,
+                                                Attributes::Rloc16::kMetadataEntry,
+                                            }));
     }
 
     {
         ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
-        ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(
-            threadNetworkDiagnostics.Attributes(ConcreteClusterPath(kRootEndpointId, ThreadNetworkDiagnostics::Id), attributes),
-            CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kFullAttributes), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
+        EXPECT_TRUE(IsAttributesListEqualTo(threadNetworkDiagnostics,
+                                            {
+                                                Attributes::Channel::kMetadataEntry,
+                                                Attributes::RoutingRole::kMetadataEntry,
+                                                Attributes::NetworkName::kMetadataEntry,
+                                                Attributes::PanId::kMetadataEntry,
+                                                Attributes::ExtendedPanId::kMetadataEntry,
+                                                Attributes::MeshLocalPrefix::kMetadataEntry,
+                                                Attributes::OverrunCount::kMetadataEntry,
+                                                Attributes::NeighborTable::kMetadataEntry,
+                                                Attributes::RouteTable::kMetadataEntry,
+                                                Attributes::PartitionId::kMetadataEntry,
+                                                Attributes::Weighting::kMetadataEntry,
+                                                Attributes::DataVersion::kMetadataEntry,
+                                                Attributes::StableDataVersion::kMetadataEntry,
+                                                Attributes::LeaderRouterId::kMetadataEntry,
+                                                Attributes::DetachedRoleCount::kMetadataEntry,
+                                                Attributes::ChildRoleCount::kMetadataEntry,
+                                                Attributes::RouterRoleCount::kMetadataEntry,
+                                                Attributes::LeaderRoleCount::kMetadataEntry,
+                                                Attributes::AttachAttemptCount::kMetadataEntry,
+                                                Attributes::PartitionIdChangeCount::kMetadataEntry,
+                                                Attributes::BetterPartitionAttachAttemptCount::kMetadataEntry,
+                                                Attributes::ParentChangeCount::kMetadataEntry,
+                                                Attributes::TxTotalCount::kMetadataEntry,
+                                                Attributes::TxUnicastCount::kMetadataEntry,
+                                                Attributes::TxBroadcastCount::kMetadataEntry,
+                                                Attributes::TxAckRequestedCount::kMetadataEntry,
+                                                Attributes::TxAckedCount::kMetadataEntry,
+                                                Attributes::TxNoAckRequestedCount::kMetadataEntry,
+                                                Attributes::TxDataCount::kMetadataEntry,
+                                                Attributes::TxDataPollCount::kMetadataEntry,
+                                                Attributes::TxBeaconCount::kMetadataEntry,
+                                                Attributes::TxBeaconRequestCount::kMetadataEntry,
+                                                Attributes::TxOtherCount::kMetadataEntry,
+                                                Attributes::TxRetryCount::kMetadataEntry,
+                                                Attributes::TxDirectMaxRetryExpiryCount::kMetadataEntry,
+                                                Attributes::TxIndirectMaxRetryExpiryCount::kMetadataEntry,
+                                                Attributes::TxErrCcaCount::kMetadataEntry,
+                                                Attributes::TxErrAbortCount::kMetadataEntry,
+                                                Attributes::TxErrBusyChannelCount::kMetadataEntry,
+                                                Attributes::RxTotalCount::kMetadataEntry,
+                                                Attributes::RxUnicastCount::kMetadataEntry,
+                                                Attributes::RxBroadcastCount::kMetadataEntry,
+                                                Attributes::RxDataCount::kMetadataEntry,
+                                                Attributes::RxDataPollCount::kMetadataEntry,
+                                                Attributes::RxBeaconCount::kMetadataEntry,
+                                                Attributes::RxBeaconRequestCount::kMetadataEntry,
+                                                Attributes::RxOtherCount::kMetadataEntry,
+                                                Attributes::RxAddressFilteredCount::kMetadataEntry,
+                                                Attributes::RxDestAddrFilteredCount::kMetadataEntry,
+                                                Attributes::RxDuplicatedCount::kMetadataEntry,
+                                                Attributes::RxErrNoFrameCount::kMetadataEntry,
+                                                Attributes::RxErrUnknownNeighborCount::kMetadataEntry,
+                                                Attributes::RxErrInvalidSrcAddrCount::kMetadataEntry,
+                                                Attributes::RxErrSecCount::kMetadataEntry,
+                                                Attributes::RxErrFcsCount::kMetadataEntry,
+                                                Attributes::RxErrOtherCount::kMetadataEntry,
+                                                Attributes::ActiveTimestamp::kMetadataEntry,
+                                                Attributes::PendingTimestamp::kMetadataEntry,
+                                                Attributes::Delay::kMetadataEntry,
+                                                Attributes::SecurityPolicy::kMetadataEntry,
+                                                Attributes::ChannelPage0Mask::kMetadataEntry,
+                                                Attributes::OperationalDatasetComponents::kMetadataEntry,
+                                                Attributes::ActiveNetworkFaultsList::kMetadataEntry,
+                                                Attributes::ExtAddress::kMetadataEntry,
+                                                Attributes::Rloc16::kMetadataEntry,
+                                            }));
     }
 }
 

@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "lib/support/BitFlags.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -23,19 +24,19 @@ namespace chip::app::Clusters {
 
 namespace ThreadNetworkDiagnostics {
 
-constexpr uint32_t kFeaturesAll = static_cast<uint32_t>(Feature::kErrorCounts) | static_cast<uint32_t>(Feature::kPacketCounts) |
-    static_cast<uint32_t>(Feature::kMACCounts) | static_cast<uint32_t>(Feature::kMLECounts);
-
-constexpr uint16_t kOptionalAttributesBegin = 19;
-constexpr uint16_t kOptionalAttributesEnd   = 65;
-extern const DataModel::AttributeEntry kFullAttributes[kOptionalAttributesEnd];
+constexpr BitFlags<Feature> kFeaturesAll{
+    Feature::kErrorCounts,  //
+    Feature::kPacketCounts, //
+    Feature::kMACCounts,    //
+    Feature::kMLECounts     //
+};
 
 } // namespace ThreadNetworkDiagnostics
 
 class ThreadNetworkDiagnosticsCluster : public DefaultServerCluster, public DeviceLayer::ThreadDiagnosticsDelegate
 {
 public:
-    enum class ClusterType
+    enum class ClusterType : uint8_t
     {
         kMinimal,
         kFull

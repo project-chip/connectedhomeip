@@ -44,24 +44,19 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t rawFeatureMap) override
     {
-        const BitFlags<Feature> featureMap(rawFeatureMap);
-
         // We only support minimal and full set of attributes because of flash considerations
-        VerifyOrDie(featureMap.Raw() == 0 || featureMap.Raw() == kFeaturesAll);
+        VerifyOrDie(rawFeatureMap == 0 || rawFeatureMap == kFeaturesAll.Raw());
 
-        // For the full set of attributes, every optional attribute needs to be enabled in ember as a precondition
-        if (featureMap.Raw() == kFeaturesAll)
-        {
-            for (uint16_t i = kOptionalAttributesBegin; i < kOptionalAttributesEnd; ++i)
-            {
-                auto id = kFullAttributes[i].attributeId;
-                VerifyOrDie(emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id));
-            }
-        }
+        // NOTE: we do NOT validate what selection ZAP made here and assume that full diagnostics enable
+        //       ALL features. This is to save flash and since even if we would validate, all we would do is force
+        //       people to select all attributes as enabled in zap.
+        //
+        //       This also technically means that zap could reduce flash by not including metdata (only featuremap has to be
+        //       set and all attributes can be deselected ... it will make not difference here).
 
-        using ClusterType       = ThreadNetworkDiagnosticsCluster::ClusterType;
-        ClusterType clusterType = (featureMap.Raw() == 0 ? ClusterType::kMinimal : ClusterType::kFull);
-        gServers[clusterInstanceIndex].Create(endpointId, clusterType);
+        gServers[clusterInstanceIndex].Create(endpointId,
+                                              rawFeatureMap == 0 ? ThreadNetworkDiagnosticsCluster::ClusterType::kMinimal
+                                                                 : ThreadNetworkDiagnosticsCluster::ClusterType::kFull);
         return gServers[clusterInstanceIndex].Registration();
     }
 
