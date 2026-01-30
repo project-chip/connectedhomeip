@@ -23,12 +23,14 @@ from __future__ import annotations
 import logging
 import os
 import shlex
+import pathlib
 import subprocess
 import sys
 import time
 from typing import IO, Any
 
-from .runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
+
+from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 
