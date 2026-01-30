@@ -90,10 +90,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
         self.step(2)
         feature_map = await self._read_switch_feature_map(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
-        asserts.assert_equal(
-            feature_map.value,
-            self._SWITCH_TRIPLE_PRESS_FEATURE_MAP
-        )
+        asserts.assert_equal(feature_map, self._SWITCH_TRIPLE_PRESS_FEATURE_MAP)
 
 
 if __name__ == "__main__":
