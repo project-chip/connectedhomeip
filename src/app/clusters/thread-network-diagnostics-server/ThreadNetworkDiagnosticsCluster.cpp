@@ -33,6 +33,80 @@ namespace chip::app::Clusters {
 using namespace ThreadNetworkDiagnostics;
 using namespace ThreadNetworkDiagnostics::Attributes;
 
+namespace ThreadNetworkDiagnostics {
+
+const DataModel::AttributeEntry kFullAttributes[] = {
+    // Mandatory Attributes
+    Attributes::Channel::kMetadataEntry,          //
+    RoutingRole::kMetadataEntry,                  //
+    NetworkName::kMetadataEntry,                  //
+    PanId::kMetadataEntry,                        //
+    ExtendedPanId::kMetadataEntry,                //
+    MeshLocalPrefix::kMetadataEntry,              //
+    NeighborTable::kMetadataEntry,                //
+    RouteTable::kMetadataEntry,                   //
+    PartitionId::kMetadataEntry,                  //
+    Weighting::kMetadataEntry,                    //
+    DataVersion::kMetadataEntry,                  //
+    StableDataVersion::kMetadataEntry,            //
+    LeaderRouterId::kMetadataEntry,               //
+    SecurityPolicy::kMetadataEntry,               //
+    ChannelPage0Mask::kMetadataEntry,             //
+    OperationalDatasetComponents::kMetadataEntry, //
+    ActiveNetworkFaultsList::kMetadataEntry,      //
+    ExtAddress::kMetadataEntry,                   //
+    Rloc16::kMetadataEntry,                       //
+    // Optional Attributes
+    ActiveTimestamp::kMetadataEntry,                   //
+    PendingTimestamp::kMetadataEntry,                  //
+    Delay::kMetadataEntry,                             //
+    DetachedRoleCount::kMetadataEntry,                 //
+    ChildRoleCount::kMetadataEntry,                    //
+    RouterRoleCount::kMetadataEntry,                   //
+    LeaderRoleCount::kMetadataEntry,                   //
+    AttachAttemptCount::kMetadataEntry,                //
+    PartitionIdChangeCount::kMetadataEntry,            //
+    BetterPartitionAttachAttemptCount::kMetadataEntry, //
+    ParentChangeCount::kMetadataEntry,                 //
+    TxTotalCount::kMetadataEntry,                      //
+    TxUnicastCount::kMetadataEntry,                    //
+    TxBroadcastCount::kMetadataEntry,                  //
+    TxAckRequestedCount::kMetadataEntry,               //
+    TxAckedCount::kMetadataEntry,                      //
+    TxNoAckRequestedCount::kMetadataEntry,             //
+    TxDataCount::kMetadataEntry,                       //
+    TxDataPollCount::kMetadataEntry,                   //
+    TxBeaconCount::kMetadataEntry,                     //
+    TxBeaconRequestCount::kMetadataEntry,              //
+    TxOtherCount::kMetadataEntry,                      //
+    TxRetryCount::kMetadataEntry,                      //
+    TxDirectMaxRetryExpiryCount::kMetadataEntry,       //
+    TxIndirectMaxRetryExpiryCount::kMetadataEntry,     //
+    TxErrCcaCount::kMetadataEntry,                     //
+    TxErrAbortCount::kMetadataEntry,                   //
+    TxErrBusyChannelCount::kMetadataEntry,             //
+    RxTotalCount::kMetadataEntry,                      //
+    RxUnicastCount::kMetadataEntry,                    //
+    RxBroadcastCount::kMetadataEntry,                  //
+    RxDataCount::kMetadataEntry,                       //
+    RxDataPollCount::kMetadataEntry,                   //
+    RxBeaconCount::kMetadataEntry,                     //
+    RxBeaconRequestCount::kMetadataEntry,              //
+    RxOtherCount::kMetadataEntry,                      //
+    RxAddressFilteredCount::kMetadataEntry,            //
+    RxDestAddrFilteredCount::kMetadataEntry,           //
+    RxDuplicatedCount::kMetadataEntry,                 //
+    RxErrNoFrameCount::kMetadataEntry,                 //
+    RxErrUnknownNeighborCount::kMetadataEntry,         //
+    RxErrInvalidSrcAddrCount::kMetadataEntry,          //
+    RxErrSecCount::kMetadataEntry,                     //
+    RxErrFcsCount::kMetadataEntry,                     //
+    RxErrOtherCount::kMetadataEntry,                   //
+    OverrunCount::kMetadataEntry                       //
+};
+
+}
+
 ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType) :
     DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mClusterType(clusterType)
 {}

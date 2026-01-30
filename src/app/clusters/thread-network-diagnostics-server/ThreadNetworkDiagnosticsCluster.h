@@ -27,78 +27,9 @@ namespace ThreadNetworkDiagnostics {
 constexpr uint32_t kFeaturesAll = static_cast<uint32_t>(Feature::kErrorCounts) | static_cast<uint32_t>(Feature::kPacketCounts) |
     static_cast<uint32_t>(Feature::kMACCounts) | static_cast<uint32_t>(Feature::kMLECounts);
 
-static constexpr DataModel::AttributeEntry kFullAttributes[] = {
-    // Mandatory Attributes
-    Attributes::Channel::kMetadataEntry,                      //
-    Attributes::RoutingRole::kMetadataEntry,                  //
-    Attributes::NetworkName::kMetadataEntry,                  //
-    Attributes::PanId::kMetadataEntry,                        //
-    Attributes::ExtendedPanId::kMetadataEntry,                //
-    Attributes::MeshLocalPrefix::kMetadataEntry,              //
-    Attributes::NeighborTable::kMetadataEntry,                //
-    Attributes::RouteTable::kMetadataEntry,                   //
-    Attributes::PartitionId::kMetadataEntry,                  //
-    Attributes::Weighting::kMetadataEntry,                    //
-    Attributes::DataVersion::kMetadataEntry,                  //
-    Attributes::StableDataVersion::kMetadataEntry,            //
-    Attributes::LeaderRouterId::kMetadataEntry,               //
-    Attributes::SecurityPolicy::kMetadataEntry,               //
-    Attributes::ChannelPage0Mask::kMetadataEntry,             //
-    Attributes::OperationalDatasetComponents::kMetadataEntry, //
-    Attributes::ActiveNetworkFaultsList::kMetadataEntry,      //
-    Attributes::ExtAddress::kMetadataEntry,                   //
-    Attributes::Rloc16::kMetadataEntry,                       //
-    // Optional Attributes
-    Attributes::ActiveTimestamp::kMetadataEntry,                   //
-    Attributes::PendingTimestamp::kMetadataEntry,                  //
-    Attributes::Delay::kMetadataEntry,                             //
-    Attributes::DetachedRoleCount::kMetadataEntry,                 //
-    Attributes::ChildRoleCount::kMetadataEntry,                    //
-    Attributes::RouterRoleCount::kMetadataEntry,                   //
-    Attributes::LeaderRoleCount::kMetadataEntry,                   //
-    Attributes::AttachAttemptCount::kMetadataEntry,                //
-    Attributes::PartitionIdChangeCount::kMetadataEntry,            //
-    Attributes::BetterPartitionAttachAttemptCount::kMetadataEntry, //
-    Attributes::ParentChangeCount::kMetadataEntry,                 //
-    Attributes::TxTotalCount::kMetadataEntry,                      //
-    Attributes::TxUnicastCount::kMetadataEntry,                    //
-    Attributes::TxBroadcastCount::kMetadataEntry,                  //
-    Attributes::TxAckRequestedCount::kMetadataEntry,               //
-    Attributes::TxAckedCount::kMetadataEntry,                      //
-    Attributes::TxNoAckRequestedCount::kMetadataEntry,             //
-    Attributes::TxDataCount::kMetadataEntry,                       //
-    Attributes::TxDataPollCount::kMetadataEntry,                   //
-    Attributes::TxBeaconCount::kMetadataEntry,                     //
-    Attributes::TxBeaconRequestCount::kMetadataEntry,              //
-    Attributes::TxOtherCount::kMetadataEntry,                      //
-    Attributes::TxRetryCount::kMetadataEntry,                      //
-    Attributes::TxDirectMaxRetryExpiryCount::kMetadataEntry,       //
-    Attributes::TxIndirectMaxRetryExpiryCount::kMetadataEntry,     //
-    Attributes::TxErrCcaCount::kMetadataEntry,                     //
-    Attributes::TxErrAbortCount::kMetadataEntry,                   //
-    Attributes::TxErrBusyChannelCount::kMetadataEntry,             //
-    Attributes::RxTotalCount::kMetadataEntry,                      //
-    Attributes::RxUnicastCount::kMetadataEntry,                    //
-    Attributes::RxBroadcastCount::kMetadataEntry,                  //
-    Attributes::RxDataCount::kMetadataEntry,                       //
-    Attributes::RxDataPollCount::kMetadataEntry,                   //
-    Attributes::RxBeaconCount::kMetadataEntry,                     //
-    Attributes::RxBeaconRequestCount::kMetadataEntry,              //
-    Attributes::RxOtherCount::kMetadataEntry,                      //
-    Attributes::RxAddressFilteredCount::kMetadataEntry,            //
-    Attributes::RxDestAddrFilteredCount::kMetadataEntry,           //
-    Attributes::RxDuplicatedCount::kMetadataEntry,                 //
-    Attributes::RxErrNoFrameCount::kMetadataEntry,                 //
-    Attributes::RxErrUnknownNeighborCount::kMetadataEntry,         //
-    Attributes::RxErrInvalidSrcAddrCount::kMetadataEntry,          //
-    Attributes::RxErrSecCount::kMetadataEntry,                     //
-    Attributes::RxErrFcsCount::kMetadataEntry,                     //
-    Attributes::RxErrOtherCount::kMetadataEntry,                   //
-    Attributes::OverrunCount::kMetadataEntry                       //
-};
-
 constexpr uint16_t kOptionalAttributesBegin = 19;
-constexpr uint16_t kOptionalAttributesEnd   = 64;
+constexpr uint16_t kOptionalAttributesEnd   = 65;
+extern const DataModel::AttributeEntry kFullAttributes[kOptionalAttributesEnd];
 
 } // namespace ThreadNetworkDiagnostics
 

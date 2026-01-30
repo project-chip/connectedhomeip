@@ -52,7 +52,7 @@ public:
         // For the full set of attributes, every optional attribute needs to be enabled in ember as a precondition
         if (featureMap.Raw() == kFeaturesAll)
         {
-            for (uint16_t i = kOptionalAttributesBegin; i <= kOptionalAttributesEnd; ++i)
+            for (uint16_t i = kOptionalAttributesBegin; i < kOptionalAttributesEnd; ++i)
             {
                 auto id = kFullAttributes[i].attributeId;
                 VerifyOrDie(emberAfContainsAttribute(endpointId, ThreadNetworkDiagnostics::Id, id));
