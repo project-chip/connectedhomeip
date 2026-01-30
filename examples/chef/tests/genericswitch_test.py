@@ -37,8 +37,10 @@ class TC_GENERICSWITCH(MatterBaseTest):
     _SWITCH_TRIPLE_PRESS_ENDPOINT = 1
     _SWITCH_TRIPLE_PRESS_FEATURE_MAP = 30
     _SWITCH_TRIPLE_PRESS_TAG_LIST = [
-        Clusters.Objects.Globals.Structs.SemanticTagStruct(mfgCode=Null, namespaceID=8, tag=2, label=None),
-        Clusters.Objects.Globals.Structs.SemanticTagStruct(mfgCode=Null, namespaceID=7, tag=1, label=None)
+        Clusters.Objects.Globals.Structs.SemanticTagStruct(
+            mfgCode=Clusters.Types.NullValue, namespaceID=8, tag=2, label=None),
+        Clusters.Objects.Globals.Structs.SemanticTagStruct(
+            mfgCode=Clusters.Types.NullValue, namespaceID=7, tag=1, label=None)
     ]
 
     # Switch endpoint that supports single press only
