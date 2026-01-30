@@ -541,7 +541,11 @@ struct ChipDeviceEvent final
         {
             InterfaceIpChangeType Type;
         } InterfaceIpAddressChanged;
-
+        struct
+        {
+            bool opened;
+            bool enhanced;
+        } CommissioningWindowChanged;
         struct
         {
             uint64_t nodeId;
