@@ -47,6 +47,7 @@ static_library("Beken") {
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",

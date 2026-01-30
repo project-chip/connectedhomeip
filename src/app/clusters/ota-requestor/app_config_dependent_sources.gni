@@ -14,6 +14,7 @@
 app_config_dependent_sources = [
   "BDXDownloader.cpp",
   "BDXDownloader.h",
+  "CodegenIntegration.cpp",
   "DefaultOTARequestor.cpp",
   "DefaultOTARequestor.h",
   "DefaultOTARequestorDriver.cpp",
@@ -23,10 +24,6 @@ app_config_dependent_sources = [
   "DefaultOTARequestorUserConsent.h",
   "ExtendedOTARequestorDriver.cpp",
   "ExtendedOTARequestorDriver.h",
-  "OTARequestorCluster.cpp",
-  "OTARequestorDriver.h",
-  "OTARequestorStorage.h",
   "OTATestEventTriggerHandler.cpp",
   "OTATestEventTriggerHandler.h",
-  "ota-requestor-server.h",
 ]

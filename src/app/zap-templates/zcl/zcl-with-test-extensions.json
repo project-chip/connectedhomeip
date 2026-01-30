@@ -399,6 +399,13 @@
             "FeatureMap",
             "ClusterRevision"
         ],
+        "OTA Software Update Requestor": [
+            "UpdatePossible",
+            "UpdateState",
+            "UpdateStateProgress",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Scenes Management": ["ClusterRevision"],
         "Software Diagnostics": [
             "ClusterRevision",

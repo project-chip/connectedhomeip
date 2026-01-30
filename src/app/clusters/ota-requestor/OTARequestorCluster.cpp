@@ -16,116 +16,134 @@
  *    limitations under the License.
  */
 
-/* This file contains the glue code for passing the incoming OTA Requestor cluster commands
- * to the OTA Requestor object that handles them
- */
+#include <app/clusters/ota-requestor/OTARequestorCluster.h>
 
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/EventLogging.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <app/clusters/ota-requestor/ota-requestor-server.h>
-#include <app/util/attribute-storage.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
+#include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Events.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor;
-using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
-using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs;
-using Protocols::InteractionModel::Status;
-
+namespace chip::app::Clusters {
 namespace {
 
 constexpr size_t kMaxMetadataLen = 512; // The maximum length of Metadata in any OTA Requestor command
 
-class OtaSoftwareUpdateRequestorAttrAccess : public AttributeAccessInterface
-{
-public:
-    // Register for the OTA Requestor Cluster on all endpoints.
-    OtaSoftwareUpdateRequestorAttrAccess() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), OtaSoftwareUpdateRequestor::Id)
-    {}
-
-    // TODO: Implement Read/Write for OtaSoftwareUpdateRequestorAttrAccess
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-private:
-    CHIP_ERROR ReadDefaultOtaProviders(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::kMetadataEntry,
 };
 
-OtaSoftwareUpdateRequestorAttrAccess gAttrAccess;
+} // namespace
 
-CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor) :
+    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaRequestor(otaRequestor)
+{}
+
+CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::DefaultOTAProviders::Id:
-        return ReadDefaultOtaProviders(aEncoder);
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
+    return DefaultServerCluster::Startup(context);
 }
 
-CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                 AttributeValueEncoder & encoder)
 {
-    switch (aPath.mAttributeId)
+    switch (request.path.mAttributeId)
     {
-    case Attributes::DefaultOTAProviders::Id: {
-        return WriteDefaultOtaProviders(aPath, aDecoder);
+    case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+            ProviderLocationList::Iterator providerIterator = mOtaRequestor.GetDefaultOTAProviderListIterator();
+            CHIP_ERROR error                                = CHIP_NO_ERROR;
+            while (error == CHIP_NO_ERROR && providerIterator.Next())
+            {
+                error = listEncoder.Encode(providerIterator.GetValue());
+            }
+            return error;
+        });
     }
+    case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
+        return encoder.Encode(mUpdatePossible);
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
+        return encoder.Encode(mOtaRequestor.GetCurrentUpdateState());
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id: {
+        DataModel::Nullable<uint8_t> progress;
+        ReturnErrorOnFailure(mOtaRequestor.GetUpdateStateProgressAttribute(mPath.mEndpointId, progress));
+        return encoder.Encode(progress);
+    }
+    case Globals::Attributes::FeatureMap::Id:
+        return encoder.Encode<uint32_t>(0);
+    case Globals::Attributes::ClusterRevision::Id:
+        return encoder.Encode(OtaSoftwareUpdateRequestor::kRevision);
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::ReadDefaultOtaProviders(AttributeValueEncoder & aEncoder)
+DataModel::ActionReturnStatus OTARequestorCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                  AttributeValueDecoder & decoder)
 {
-    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor == nullptr)
+    switch (request.path.mAttributeId)
     {
-        return aEncoder.EncodeEmptyList();
+    case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
+        return NotifyAttributeChangedIfSuccess(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
+                                               WriteDefaultOtaProviders(request.path, decoder));
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
+}
 
-    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        auto iterator = requestor->GetDefaultOTAProviderListIterator();
-        while (iterator.Next())
+CHIP_ERROR OTARequestorCluster::Attributes(const ConcreteClusterPath & path,
+                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(OtaSoftwareUpdateRequestor::Attributes::kMandatoryMetadata), {});
+}
+
+std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                chip::TLV::TLVReader & input_arguments,
+                                                                                CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id: {
+        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+
+        auto & metadataForNode = data.metadataForNode;
+        if (metadataForNode.HasValue() && metadataForNode.Value().size() > kMaxMetadataLen)
         {
-            ProviderLocation::Type pl = iterator.GetValue();
-            ReturnErrorOnFailure(encoder.Encode(pl));
+            ChipLogError(Zcl, "Metadata size %u exceeds max %u", static_cast<unsigned>(metadataForNode.Value().size()),
+                         static_cast<unsigned>(kMaxMetadataLen));
+            return Protocols::InteractionModel::Status::InvalidCommand;
         }
-
-        return CHIP_NO_ERROR;
-    });
+        mOtaRequestor.HandleAnnounceOTAProvider(handler, request.path, data);
+        return std::nullopt;
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 }
 
-CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
-                                                                          AttributeValueDecoder & aDecoder)
+CHIP_ERROR OTARequestorCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor == nullptr)
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
+    return builder.ReferenceExisting(kAcceptedCommands);
+}
 
+CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
     if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
         DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        ReturnErrorOnFailure(requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
+        ReturnErrorOnFailure(mOtaRequestor.ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
 
         auto iter = list.begin();
         while (iter.Next())
         {
-            ReturnErrorOnFailure(requestor->AddDefaultOtaProvider(iter.GetValue()));
+            ReturnErrorOnFailure(mOtaRequestor.AddDefaultOtaProvider(iter.GetValue()));
         }
 
         return iter.GetStatus();
@@ -140,7 +158,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
     case ConcreteDataAttributePath::ListOperation::AppendItem: {
         OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
-        return requestor->AddDefaultOtaProvider(item);
+        return mOtaRequestor.AddDefaultOtaProvider(item);
     }
     default:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -149,156 +167,4 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
     return CHIP_NO_ERROR;
 }
 
-} // namespace
-
-// -----------------------------------------------------------------------------
-// Global functions
-Status OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
-{
-    Status status = Status::Success;
-
-    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
-    {
-        OTAUpdateStateEnum currentValue;
-        status = Attributes::UpdateState::Get(endpoint, &currentValue);
-        VerifyOrDie(Status::Success == status);
-
-        if (currentValue != value)
-        {
-            status = Attributes::UpdateState::Set(endpoint, value);
-            VerifyOrDie(Status::Success == status);
-        }
-    }
-
-    return status;
-}
-
-Status OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAUpdateStateEnum & value)
-{
-    return Attributes::UpdateState::Get(endpointId, &value);
-}
-
-Status OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
-{
-    Status status = Status::Success;
-
-    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
-    {
-        app::DataModel::Nullable<uint8_t> currentValue;
-        status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
-        VerifyOrDie(Status::Success == status);
-
-        if (currentValue != value)
-        {
-            status = Attributes::UpdateStateProgress::Set(endpoint, value);
-            VerifyOrDie(Status::Success == status);
-        }
-    }
-
-    return status;
-}
-
-Status OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
-{
-    return Attributes::UpdateStateProgress::Get(endpointId, value);
-}
-
-void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
-                                         DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
-{
-    if (previousState == newState)
-    {
-        ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
-        return;
-    }
-
-    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
-    {
-        Events::StateTransition::Type event{ previousState, newState, reason, targetSoftwareVersion };
-        EventNumber eventNumber;
-
-        CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(Zcl, "Failed to record StateTransition event: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
-}
-
-void OtaRequestorServerOnVersionApplied(uint32_t softwareVersion, uint16_t productId)
-{
-    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
-    {
-        Events::VersionApplied::Type event{ softwareVersion, productId };
-        EventNumber eventNumber;
-
-        CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(Zcl, "Failed to record VersionApplied event: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
-}
-
-void OtaRequestorServerOnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                                       DataModel::Nullable<uint8_t> progressPercent, DataModel::Nullable<int64_t> platformCode)
-{
-    // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
-    {
-        Events::DownloadError::Type event{ softwareVersion, bytesDownloaded, progressPercent, platformCode };
-        EventNumber eventNumber;
-
-        CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
-        if (CHIP_NO_ERROR != err)
-        {
-            ChipLogError(Zcl, "Failed to record DownloadError event: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
-}
-
-// -----------------------------------------------------------------------------
-// Callbacks implementation
-
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData)
-{
-    auto & metadataForNode = commandData.metadataForNode;
-
-    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor == nullptr)
-    {
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
-        return true;
-    }
-
-    if (metadataForNode.HasValue() && metadataForNode.Value().size() > kMaxMetadataLen)
-    {
-        ChipLogError(Zcl, "Metadata size %u exceeds max %u", static_cast<unsigned>(metadataForNode.Value().size()),
-                     static_cast<unsigned>(kMaxMetadataLen));
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
-
-    requestor->HandleAnnounceOTAProvider(commandObj, commandPath, commandData);
-
-    return true;
-}
-
-// -----------------------------------------------------------------------------
-// Plugin initialization
-
-void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-}
-
-void MatterOtaSoftwareUpdateRequestorPluginServerShutdownCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
-}
+} // namespace chip::app::Clusters

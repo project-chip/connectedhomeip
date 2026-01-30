@@ -53,6 +53,7 @@ static_library("qpg") {
 
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
   ]

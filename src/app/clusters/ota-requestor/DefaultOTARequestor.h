@@ -206,11 +206,6 @@ private:
     };
 
     /**
-     * Callback to initialize states and server attributes in the CHIP context
-     */
-    static void InitState(intptr_t context);
-
-    /**
      * Map a CHIP_ERROR to an IdleStateReason enum type
      */
     IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
@@ -336,7 +331,8 @@ private:
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
-    Server * mServer                       = nullptr;
+    app::DataModel::Nullable<uint8_t> mCurrentUpdateStateProgress;
+    Server * mServer = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
     // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism

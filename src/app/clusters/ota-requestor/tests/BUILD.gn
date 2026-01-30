@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_system_project_config_include = "<SystemProjectConfig.h>"
+chip_test_suite("tests") {
+  output_name = "TestOTARequestorCluster"
 
-chip_enable_ota_requestor = true
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/lock-app/linux/include" ]
-chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
-matter_enable_tracing_support = true
+  test_sources = [ "TestOTARequestorCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/ota-requestor",
+    "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/support",
+  ]
+}

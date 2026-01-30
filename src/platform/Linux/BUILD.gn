@@ -140,6 +140,8 @@ static_library("Linux") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_system_config_use_openthread_inet_endpoints) {

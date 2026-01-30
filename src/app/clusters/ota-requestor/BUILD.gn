@@ -15,11 +15,29 @@ import("//build_overrides/chip.gni")
 
 # transitional dependencies so that chip_data_model sets
 # the right dependencies
-group("ota-requestor") {
+source_set("ota-requestor") {
+  sources = [
+    "OTARequestorCluster.cpp",
+    "OTARequestorCluster.h",
+  ]
+
   # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
   # Maybe DefaultOTARequestor and related code should have its own source set.
   public_deps = [
+    ":interface",
+    "${chip_root}/src/app:user-consent",
     "${chip_root}/src/app/clusters/basic-information",
     "${chip_root}/src/controller:interactions",
+  ]
+}
+
+# The public interfaces that the OTA requestor uses and the app may implement.
+source_set("interface") {
+  sources = [
+    "OTADownloader.h",
+    "OTARequestorDriver.h",
+    "OTARequestorInterface.h",
+    "OTARequestorStorage.h",
+    "OTARequestorUserConsentDelegate.h",
   ]
 }
