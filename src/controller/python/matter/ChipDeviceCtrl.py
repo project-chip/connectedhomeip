@@ -95,10 +95,21 @@ _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32, c_char_p, c_char_p, PyChipError)
+
+DevicePairingDelegate_OnCommissioningStatusUpdateFunct: typing.TypeAlias = typing.Callable[
+    [int, int, PyChipError],
+    None,
+]
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
     None, c_uint64, c_uint8, PyChipError)
+
+DevicePairingDelegate_OnCommissioningStageStartFunct: typing.TypeAlias = typing.Callable[
+    [int, bytes],
+    None,
+]
 _DevicePairingDelegate_OnCommissioningStageStartFunct = CFUNCTYPE(
     None, c_uint64, c_char_p)
+
 _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
     None, c_uint64)
 # void (*)(Device *, CHIP_ERROR).
@@ -638,12 +649,21 @@ class ChipDeviceControllerBase():
     def isActive(self) -> bool:
         return self._isActive
 
-    def setCommissioningStatusUpdateCallback(self, commissioning_status_callback: _DevicePairingDelegate_OnCommissioningStatusUpdateFunct):
+    def setCommissioningStatusUpdateCallback(
+        self,
+        commissioning_status_callback: DevicePairingDelegate_OnCommissioningStatusUpdateFunct,
+    ) -> None:
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
-            self.pairingDelegate, commissioning_status_callback)
+            self.pairingDelegate, commissioning_status_callback
+        )
 
-    def setCommissioningStageStartCallback(self, callback: _DevicePairingDelegate_OnCommissioningStageStartFunct):
-        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(self.pairingDelegate, callback)
+    def setCommissioningStageStartCallback(
+        self,
+        callback: DevicePairingDelegate_OnCommissioningStageStartFunct,
+    ) -> None:
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(
+            self.pairingDelegate, callback
+        )
 
     def Shutdown(self):
         '''
