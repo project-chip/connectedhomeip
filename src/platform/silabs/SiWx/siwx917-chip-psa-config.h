@@ -27,3 +27,6 @@
 #define PSA_WANT_ALG_SOME_PAKE
 #define PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
 #endif // SL_MATTER_ENABLE_AWS
+
+// SLC GENERATED
+#include "psa_crypto_config.h"
