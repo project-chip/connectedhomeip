@@ -303,7 +303,6 @@ RUN case ${TARGETPLATFORM} in \
     "linux/amd64" | "linux/arm64") \
     set -x \
     && cd out \
-    && ls -lh chip-ota-requestor-app \
     && ../src/app/ota_image_tool.py create \
        -v 0xDEAD \
        -p 0xBEEF \
@@ -312,8 +311,6 @@ RUN case ${TARGETPLATFORM} in \
        -da sha256 \
        chip-ota-requestor-app \
        ota-requestor-app.ota \
-    && echo "OTA image generated successfully for ${TARGETPLATFORM##*/}" \
-    && ls -lh ota-requestor-app.ota \
     ;; \
     *) ;; \
     esac
