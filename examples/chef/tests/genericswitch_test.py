@@ -42,6 +42,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
         Clusters.Objects.Globals.Structs.SemanticTagStruct(
             mfgCode=Clusters.Types.NullValue, namespaceID=7, tag=1, label=None)
     ]
+    _SWITCH_TRIPLE_PRESS_NUMBER_OF_POSITIONS = 2
 
     # Switch endpoint that supports single press only
     _SWITCH_SINGLE_PRESS_ENDPOINT = 2
@@ -86,6 +87,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
             TestStep(1, "[TC_GENERICSWITCH] Commissioning already done.", is_commissioning=True),
             TestStep(2, "[TC_GENERICSWITCH] Triple press endpoint feature map."),
             TestStep(3, "[TC_GENERICSWITCH] Triple press endpoint tag list."),
+            TestStep(4, "[TC_GENERICSWITCH] Triple press endpoint number of positions."),
         ]
 
     @async_test_body
@@ -102,6 +104,13 @@ class TC_GENERICSWITCH(MatterBaseTest):
         self.step(3)
         tag_list = await self._read_descriptor_semantic_tags(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
         asserts.assert_equal(tag_list, self._SWITCH_TRIPLE_PRESS_TAG_LIST)
+
+        self.step(4)
+        number_of_positions = await self._read_switch_number_of_positions(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
+        asserts.assert_equal(
+            number_of_positions,
+            self._SWITCH_TRIPLE_PRESS_NUMBER_OF_POSITIONS
+        )
 
 
 if __name__ == "__main__":
