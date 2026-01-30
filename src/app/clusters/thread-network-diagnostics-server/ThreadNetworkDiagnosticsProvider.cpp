@@ -722,57 +722,10 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     case Attributes::Rloc16::Id:
         err = encoder.EncodeNull();
         break;
-    case Attributes::OverrunCount::Id:
-        err = encoder.Encode<uint64_t>(0);
-        break;
-    case Attributes::DetachedRoleCount::Id:
-    case Attributes::ChildRoleCount::Id:
-    case Attributes::RouterRoleCount::Id:
-    case Attributes::LeaderRoleCount::Id:
-    case Attributes::AttachAttemptCount::Id:
-    case Attributes::PartitionIdChangeCount::Id:
-    case Attributes::BetterPartitionAttachAttemptCount::Id:
-    case Attributes::ParentChangeCount::Id:
-        err = encoder.Encode<uint16_t>(0);
-        break;
-    case Attributes::TxTotalCount::Id:
-    case Attributes::TxUnicastCount::Id:
-    case Attributes::TxBroadcastCount::Id:
-    case Attributes::TxAckRequestedCount::Id:
-    case Attributes::TxAckedCount::Id:
-    case Attributes::TxNoAckRequestedCount::Id:
-    case Attributes::TxDataCount::Id:
-    case Attributes::TxDataPollCount::Id:
-    case Attributes::TxBeaconCount::Id:
-    case Attributes::TxBeaconRequestCount::Id:
-    case Attributes::TxOtherCount::Id:
-    case Attributes::TxRetryCount::Id:
-    case Attributes::TxDirectMaxRetryExpiryCount::Id:
-    case Attributes::TxIndirectMaxRetryExpiryCount::Id:
-    case Attributes::TxErrCcaCount::Id:
-    case Attributes::TxErrAbortCount::Id:
-    case Attributes::TxErrBusyChannelCount::Id:
-    case Attributes::RxTotalCount::Id:
-    case Attributes::RxUnicastCount::Id:
-    case Attributes::RxBroadcastCount::Id:
-    case Attributes::RxDataCount::Id:
-    case Attributes::RxDataPollCount::Id:
-    case Attributes::RxBeaconCount::Id:
-    case Attributes::RxBeaconRequestCount::Id:
-    case Attributes::RxOtherCount::Id:
-    case Attributes::RxAddressFilteredCount::Id:
-    case Attributes::RxDestAddrFilteredCount::Id:
-    case Attributes::RxDuplicatedCount::Id:
-    case Attributes::RxErrNoFrameCount::Id:
-    case Attributes::RxErrUnknownNeighborCount::Id:
-    case Attributes::RxErrInvalidSrcAddrCount::Id:
-    case Attributes::RxErrSecCount::Id:
-    case Attributes::RxErrFcsCount::Id:
-    case Attributes::RxErrOtherCount::Id:
-        err = encoder.Encode<uint32_t>(0);
-        break;
     default:
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        // The remaining attributes are generally unsigned integers.
+        // We rely here on TLV encoding 0 of any type to a the same numeric 0
+        err = encoder.Encode(0u);
         break;
     }
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)

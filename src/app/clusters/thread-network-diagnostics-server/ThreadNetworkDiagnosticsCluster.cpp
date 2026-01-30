@@ -148,7 +148,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
 // Notified when the Node’s connection status to a Thread network has changed.
 void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus)
 {
-    ChipLogProgress(Zcl, "ThreadNetworkDiagnosticsCluster: OnConnectionStatusChanged");
+    ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged");
 
     VerifyOrReturn(mContext != nullptr);
     Events::ConnectionStatus::Type event{ newConnectionStatus };
@@ -159,7 +159,7 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
                                                             const GeneralFaults<kMaxNetworkFaults> & current)
 {
-    ChipLogProgress(Zcl, "ThreadNetworkDiagnosticsCluster: OnNetworkFaultChanged");
+    ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged");
 
     /* Verify that the data size matches the expected one. */
     static_assert(sizeof(*current.data()) == sizeof(NetworkFaultEnum));
