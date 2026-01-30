@@ -19,11 +19,11 @@ import logging
 from mobly import asserts
 
 import matter.testing.nfc
-from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
+from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 
 log = logging.getLogger(__name__)
 
@@ -43,14 +43,6 @@ class TC_DD_3_24(MatterBaseTest):
     def setup_test(self):
         super().setup_test()
 
-        log.info("setup_test called")
-
-        log.info(
-            "default_controller in setup_test: %s (id=%s)",
-            getattr(self, "default_controller", None),
-            hex(id(self.default_controller)) if hasattr(self, "default_controller") else "N/A",
-        )
-
         # Booleans to detect some commissioner stages
         self.unpowered_phase_complete_seen: bool = False
         self.send_complete_seen: bool = False
@@ -58,7 +50,6 @@ class TC_DD_3_24(MatterBaseTest):
         # Filled at runtime
         self.commissionee_node_id = 0
 
-        # Instance-aware wrapper that can access self
         def _stage_start_listener(node_id: int, stage):
             # Normalize stage to string
             if isinstance(stage, bytes):
@@ -77,6 +68,7 @@ class TC_DD_3_24(MatterBaseTest):
             if stage == "SendComplete":
                 log.info("Detected 'SendComplete' commissioning stage")
                 self.send_complete_seen = True
+
 
         self._commissioning_stage_start_callback = _DevicePairingDelegate_OnCommissioningStageStartFunct(
             _stage_start_listener
@@ -139,7 +131,6 @@ class TC_DD_3_24(MatterBaseTest):
         )
 
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
-
 
 if __name__ == "__main__":
     default_matter_test_main()
