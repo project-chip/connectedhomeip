@@ -24,6 +24,8 @@ source_set("user-label-server") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
+    "${chip_root}/src/platform",
     "${chip_root}/zzz_generated/app-common/clusters/UserLabel",
   ]
 }

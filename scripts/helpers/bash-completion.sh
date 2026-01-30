@@ -214,7 +214,7 @@ complete -F _chip_app chip-all-clusters-app
 complete -F _chip_app chip-bridge-app
 complete -F _chip_app chip-dishwasher-app
 complete -F _chip_app chip-energy-gateway-app
-complete -F _chip_app chip-energy-management-app
+complete -F _chip_app chip-evse-app
 complete -F _chip_app chip-lighting-app
 complete -F _chip_app chip-lock-app
 complete -F _chip_app chip-log-source-app

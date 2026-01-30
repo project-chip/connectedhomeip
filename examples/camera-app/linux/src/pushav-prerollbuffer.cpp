@@ -29,7 +29,7 @@ void PreRollBuffer::SetMaxTotalBytes(size_t size)
     mMaxTotalBytes = size;
     TrimBuffer();
 }
-void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size)
+void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size, int64_t timestampMs)
 {
     TrimBuffer();
     std::lock_guard<std::mutex> lock(mBufferMutex);
@@ -38,7 +38,7 @@ void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const uint8
     frame->data      = std::make_unique<uint8_t[]>(size);
     memcpy(frame->data.get(), data, size);
     frame->size  = size;
-    frame->ptsMs = NowMs();
+    frame->ptsMs = timestampMs;
     auto & queue = mBuffers[streamKey]; // Get or create the queue for this stream key
     queue.push_back(frame);
     mContentBufferSize += size; // Track total bytes in buffer for all streams

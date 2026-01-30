@@ -32,6 +32,9 @@ using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTATlvProcessor::Init()
 {
@@ -140,13 +143,13 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-    Provision::Manager::GetInstance().GetStorage().DecryptUsingOtaTlvEncryptionKey(block, mIVOffset);
+    ReturnErrorOnFailure(Provision::Manager::GetInstance().GetStorage().DecryptUsingOtaTlvEncryptionKey(block, mIVOffset));
 #else  // MBEDTLS_USE_PSA_CRYPTO
     uint32_t keyId;
-    Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKeyId(keyId);
+    ReturnErrorOnFailure(Provision::Manager::GetInstance().GetStorage().GetOtaTlvEncryptionKeyId(keyId));
     chip::DeviceLayer::Silabs::OtaTlvEncryptionKey key(keyId);
 
-    key.Decrypt(block, mIVOffset);
+    ReturnErrorOnFailure(key.Decrypt(block, mIVOffset));
 #endif // SL_MBEDTLS_USE_TINYCRYPT
 
     return CHIP_NO_ERROR;
@@ -189,4 +192,7 @@ CHIP_ERROR OTATlvProcessor::RemovePadding(MutableByteSpan & block)
     return CHIP_NO_ERROR;
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

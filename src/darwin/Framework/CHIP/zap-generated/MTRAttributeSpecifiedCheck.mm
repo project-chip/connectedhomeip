@@ -5359,13 +5359,7 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::SimultaneousDetectionLimit::Id: {
         return YES;
     }
-    case Attributes::CountThresholdReached::Id: {
-        return YES;
-    }
-    case Attributes::CountThreshold::Id: {
-        return YES;
-    }
-    case Attributes::ObjectCount::Id: {
+    case Attributes::ObjectCountReached::Id: {
         return YES;
     }
     case Attributes::HoldTime::Id: {
@@ -5375,9 +5369,6 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
         return YES;
     }
     case Attributes::PredictedActivity::Id: {
-        return YES;
-    }
-    case Attributes::PrivacyModeEnabled::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
