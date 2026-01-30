@@ -300,7 +300,7 @@ RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true --
 # Generate OTA image from the built OTA requestor app
 # This creates ota-requestor-app.ota for OTA testing
 RUN case ${TARGETPLATFORM} in \
-    "linux/amd64") \
+    "linux/amd64" | "linux/arm64") \
     set -x \
     && cd out \
     && ls -lh chip-ota-requestor-app \
@@ -312,22 +312,7 @@ RUN case ${TARGETPLATFORM} in \
        -da sha256 \
        chip-ota-requestor-app \
        ota-requestor-app.ota \
-    && echo "OTA image generated successfully for amd64" \
-    && ls -lh ota-requestor-app.ota \
-    ;; \
-    "linux/arm64") \
-    set -x \
-    && cd out \
-    && ls -lh chip-ota-requestor-app \
-    && ../src/app/ota_image_tool.py create \
-       -v 0xDEAD \
-       -p 0xBEEF \
-       -vn 2 \
-       -vs "2.0" \
-       -da sha256 \
-       chip-ota-requestor-app \
-       ota-requestor-app.ota \
-    && echo "OTA image generated successfully for arm64" \
+    && echo "OTA image generated successfully for ${TARGETPLATFORM##*/}" \
     && ls -lh ota-requestor-app.ota \
     ;; \
     *) ;; \
