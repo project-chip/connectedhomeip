@@ -85,6 +85,10 @@ typedef NS_ENUM(NSInteger, CdError) {
 @property (nonatomic, readonly) BOOL cancelPasscode;
 /** Feature: Commissioner-Generated Passcode - length of passcode displayed. */
 @property (nonatomic, readonly) NSInteger passcodeLength;
+/**
+ * Feature: UDC request - custom instance name
+ */
+@property (nonatomic, readonly) NSString * instanceName;
 
 - (instancetype)initWithOptions:(NSInteger)errorCode
                   needsPasscode:(BOOL)needsPasscode
@@ -93,7 +97,8 @@ typedef NS_ENUM(NSInteger, CdError) {
            commissionerPasscode:(BOOL)commissionerPasscode
                 qRCodeDisplayed:(BOOL)qRCodeDisplayed
                  cancelPasscode:(BOOL)cancelPasscode
-                 passcodeLength:(NSInteger)passcodeLength;
+                 passcodeLength:(NSInteger)passcodeLength
+                   instanceName:(NSString *)instanceName;
 
 /**
  * Function to return the error code as a string.

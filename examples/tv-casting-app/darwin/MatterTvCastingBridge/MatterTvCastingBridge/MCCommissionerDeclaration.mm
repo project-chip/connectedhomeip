@@ -38,6 +38,9 @@
         _qRCodeDisplayed = cppCommissionerDeclaration->GetQRCodeDisplayed();
         _cancelPasscode = cppCommissionerDeclaration->GetCancelPasscode();
         _passcodeLength = cppCommissionerDeclaration->GetPasscodeLength();
+
+        const char * instanceNameCharArr = cppCommissionerDeclaration->GetInstanceName();
+        _instanceName = instanceNameCharArr ? [NSString stringWithUTF8String:instanceNameCharArr] : nil;
     }
     return self;
 }
@@ -50,6 +53,7 @@
                 qRCodeDisplayed:(BOOL)qRCodeDisplayed
                  cancelPasscode:(BOOL)cancelPasscode
                  passcodeLength:(NSInteger)passcodeLength
+                   instanceName:(NSString *)instanceName
 {
     self = [super init];
     if (self) {
@@ -67,7 +71,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"MCCommissionerDeclaration::errorCode:               %@\nMCCommissionerDeclaration::needsPasscode:           %d\nMCCommissionerDeclaration::noAppsFound:             %d\nMCCommissionerDeclaration::passcodeDialogDisplayed: %d\nMCCommissionerDeclaration::commissionerPasscode:    %d\nMCCommissionerDeclaration::qRCodeDisplayed:         %d\nMCCommissionerDeclaration::cancelPasscode:          %d\nMCCommissionerDeclaration::passcodeLength: %d",
+    return [NSString stringWithFormat:@"MCCommissionerDeclaration::errorCode:               %@\nMCCommissionerDeclaration::needsPasscode:           %d\nMCCommissionerDeclaration::noAppsFound:             %d\nMCCommissionerDeclaration::passcodeDialogDisplayed: %d\nMCCommissionerDeclaration::commissionerPasscode:    %d\nMCCommissionerDeclaration::qRCodeDisplayed:         %d\nMCCommissionerDeclaration::cancelPasscode:          %d\nMCCommissionerDeclaration::passcodeLength: %d\nMCCommissionerDeclaration::instanceName: %@",
                      [self stringForErrorCode:self.errorCode],
                      self.needsPasscode,
                      self.noAppsFound,
@@ -75,7 +79,8 @@
                      self.commissionerPasscode,
                      self.qRCodeDisplayed,
                      self.cancelPasscode,
-                     self.passcodeLength];
+                     self.passcodeLength,
+                     self.instanceName];
 }
 
 - (NSString *)getErrorCodeString
