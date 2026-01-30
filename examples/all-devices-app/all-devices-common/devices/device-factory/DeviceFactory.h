@@ -21,6 +21,7 @@
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <devices/chime/impl/LoggingChimeDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
+#include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
@@ -100,6 +101,7 @@ private:
         };
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
         mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };
+        mRegistry["speaker"]          = [this]() { return std::make_unique<LoggingSpeakerDevice>(timer); };
     }
 };
 
