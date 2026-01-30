@@ -152,13 +152,13 @@ public:
     void OnGroupAdded(chip::FabricIndex fabric, const GroupInfo & new_group) override
     {
         fabric_index = fabric;
-        latest       = new_group;
+        latest.Copy(new_group);
         added_count++;
     }
     void OnGroupRemoved(chip::FabricIndex fabric, const GroupInfo & old_group) override
     {
         fabric_index = fabric;
-        latest       = old_group;
+        latest.Copy(old_group);
         removed_count++;
     }
 };

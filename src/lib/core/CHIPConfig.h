@@ -1113,15 +1113,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
- *
- * @brief Defines the max number of groupcast memberships per fabric
- */
-#ifndef CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
-#define CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT 8
-#endif
-
-/**
  * @def CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC
  *
  * @brief Defines the number of binding entries per fabric.
