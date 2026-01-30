@@ -33,7 +33,7 @@ public:
 
     TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features,
                                   TimeFormatLocalization::HourFormatEnum defaultHourFormat,
-                                  TimeFormatLocalization::CalendarTypeEnum defaultCalendarType, 
+                                  TimeFormatLocalization::CalendarTypeEnum defaultCalendarType,
                                   Context context);
 
     CHIP_ERROR Startup(ServerClusterContext & serverContext) override;
