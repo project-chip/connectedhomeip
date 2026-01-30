@@ -56,7 +56,7 @@ constexpr size_t kEmptyValueSize = sizeof(kEmptyValue);
 CHIP_ERROR MakeFullKey(char (&fullKey)[SETTINGS_MAX_NAME_LEN + 1], const char * key)
 {
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    strcpy(fullKey, CHIP_DEVICE_CONFIG_SETTINGS_KEY "/");
+    strncpy(fullKey, CHIP_DEVICE_CONFIG_SETTINGS_KEY "/", SETTINGS_MAX_NAME_LEN + 1);
 
     char * dest    = fullKey + strlen(CHIP_DEVICE_CONFIG_SETTINGS_KEY "/");
     char * destEnd = fullKey + SETTINGS_MAX_NAME_LEN;
