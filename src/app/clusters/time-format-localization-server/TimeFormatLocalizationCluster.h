@@ -27,14 +27,14 @@ namespace Clusters {
 class TimeFormatLocalizationCluster : public DefaultServerCluster
 {
 public:
-    struct Context {
+    struct Context
+    {
         DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
     };
 
     TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features,
                                   TimeFormatLocalization::HourFormatEnum defaultHourFormat,
-                                  TimeFormatLocalization::CalendarTypeEnum defaultCalendarType,
-                                  Context context);
+                                  TimeFormatLocalization::CalendarTypeEnum defaultCalendarType, Context context);
 
     CHIP_ERROR Startup(ServerClusterContext & serverContext) override;
 
