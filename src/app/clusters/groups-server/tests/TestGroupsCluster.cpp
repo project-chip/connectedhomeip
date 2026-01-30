@@ -636,7 +636,8 @@ TEST_F(TestGroupsCluster, TestAddGroupIfIdentifying_ResourceExhausted)
         MapGroupToKeyset(kFabricIndex1, kGroupId, kKeysetId, i);
         StringBuilder<16> groupName;
         groupName.AddFormat("Group %d", i);
-        EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId, groupName.c_str()).response->status), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId, groupName.c_str()).response->status),
+                  Protocols::InteractionModel::Status::Success);
     }
 
     // Now GroupInfo table is full. GroupKey table is also full.
@@ -668,8 +669,8 @@ TEST_F(TestGroupsCluster, TestRemoveAllGroups_NoGroups)
 // Spec: "All commands defined in this cluster SHALL only affect groups scoped to the accessing fabric."
 TEST_F(TestGroupsCluster, TestFabricScoping)
 {
-    constexpr GroupId kGroupId1 = 1;
-    constexpr GroupId kGroupId2 = 2;
+    constexpr GroupId kGroupId1   = 1;
+    constexpr GroupId kGroupId2   = 2;
     constexpr KeysetId kKeysetId1 = 123;
     constexpr KeysetId kKeysetId2 = 456;
 
