@@ -24,6 +24,7 @@
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
 
+// Derived class for WebRTC transport
 class WebrtcTransport
 {
 public:
@@ -48,8 +49,8 @@ public:
     struct RequestArgs
     {
         uint16_t sessionId;
-        uint16_t videoStreamId;
-        uint16_t audioStreamId;
+        std::vector<uint16_t> videoStreams;
+        std::vector<uint16_t> audioStreams;
         chip::NodeId peerNodeId;
         chip::FabricIndex fabricIndex;
         chip::EndpointId originatingEndpointId;
@@ -108,6 +109,11 @@ public:
 
     void SetRequestArgs(const RequestArgs & args);
     RequestArgs & GetRequestArgs();
+
+    // SFrame End-to-End Encryption configuration (optional)
+    // For transport types that support SFrame (e.g., WebRTC), this will contain the encryption config.
+    // For transport types that don't support SFrame (e.g., PushAV), this will remain empty (!HasValue()).
+    chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type> sFrameConfig;
 
 private:
     CommandType mCommandType = CommandType::kUndefined;

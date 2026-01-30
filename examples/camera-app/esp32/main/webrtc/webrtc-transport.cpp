@@ -15,14 +15,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app-common/zap-generated/cluster-objects.h>
 #include "webrtc-abstract.h"
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/core/Optional.h>
 #include <webrtc-transport.h>
 
 WebrtcTransport::WebrtcTransport()
 {
     ChipLogProgress(Camera, "WebrtcTransport created");
-    mRequestArgs = { 0, 0, 0, 0, 0, 0 }; // Initialize request arguments to zero
+    mRequestArgs = {}; // Default initialize request arguments
 }
 
 WebrtcTransport::~WebrtcTransport()
@@ -169,15 +171,7 @@ void WebrtcTransport::OnConnectionStateChanged(bool connected)
 
 void WebrtcTransport::OnTrack(std::shared_ptr<WebRTCTrack> track)
 {
-    ChipLogProgress(Camera, "Track received for sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
-    if (track->GetType() == "video")
-    {
-        ChipLogProgress(Camera, "Video track updated from remote peer");
-        SetVideoTrack(track);
-    }
-    else if (track->GetType() == "audio")
-    {
-        ChipLogProgress(Camera, "audio track updated from remote peer");
-        SetAudioTrack(track);
-    }
+    // Only logging the track addition here as it's not used in the current implementation. In future, we can add functionality to
+    // handle
+    ChipLogProgress(Camera, "Remote track added for the sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
 }

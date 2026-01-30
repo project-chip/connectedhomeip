@@ -73,43 +73,35 @@ WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCS
     outSession.peerEndpointID = args.originatingEndpointId;
     outSession.streamUsage    = args.streamUsage;
     outSession.fabricIndex    = args.fabricIndex;
-    uint16_t videoStreamID    = 0;
-    uint16_t audioStreamID    = 0;
 
-    // Resolve or allocate a VIDEO stream
-    if (args.videoStreamId.HasValue())
+    // Extract video and audio streams from args
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
+
+    if (args.videoStreams.HasValue())
     {
-        if (args.videoStreamId.Value().IsNull())
-        {
-            // TODO: Automatically select the closest matching video stream for the
-            // StreamUsage requested by looking at the and the server MAY allocate a
-            // new video stream if there are available resources.
-        }
-        else
-        {
-            outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = args.videoStreamId.Value().Value();
-        }
+        videoStreams = args.videoStreams.Value();
+    }
+
+    if (args.audioStreams.HasValue())
+    {
+        audioStreams = args.audioStreams.Value();
+    }
+
+    // Set deprecated single-stream fields for backward compatibility
+    // Use the first stream from the arrays if available
+    if (!videoStreams.empty())
+    {
+        outSession.videoStreamID.SetNonNull(videoStreams[0]);
     }
     else
     {
         outSession.videoStreamID.SetNull();
     }
 
-    // Resolve or allocate an AUDIO stream
-    if (args.audioStreamId.HasValue())
+    if (!audioStreams.empty())
     {
-        if (args.audioStreamId.Value().IsNull())
-        {
-            // TODO: Automatically select the closest matching audio stream for the
-            // StreamUsage requested and the server MAY allocate a new audio stream if
-            // there are available resources.
-        }
-        else
-        {
-            outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = args.audioStreamId.Value().Value();
-        }
+        outSession.audioStreamID.SetNonNull(audioStreams[0]);
     }
     else
     {
@@ -126,8 +118,8 @@ WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCS
     requestArgs.fabricIndex           = args.fabricIndex;
     requestArgs.peerNodeId            = args.peerNodeId;
     requestArgs.originatingEndpointId = args.originatingEndpointId;
-    requestArgs.videoStreamId         = videoStreamID;
-    requestArgs.audioStreamId         = audioStreamID;
+    requestArgs.videoStreams          = videoStreams;
+    requestArgs.audioStreams          = audioStreams;
     requestArgs.peerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
 
     if (transport == nullptr)
@@ -144,9 +136,15 @@ WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCS
 
     transport->SetRequestArgs(requestArgs);
 
+    // Store SFrameConfig in Transport base class if provided for later use in frame encryption
+    if (args.sFrameConfig.HasValue())
+    {
+        transport->sFrameConfig = args.sFrameConfig;
+        ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
     // Check resource availability before proceeding
-    // If we cannot allocate resources, send End command with OutOfResources
-    // reason
+    // If we cannot allocate resources, send End command with OutOfResources reason
     if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
     {
         ChipLogProgress(Camera, "Resource exhaustion detected: maximum WebRTC sessions (%u)", kMaxConcurrentWebRTCSessions);
@@ -154,9 +152,8 @@ WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCS
         transport->SetCommandType(WebrtcTransport::CommandType::kEnd);
         transport->MoveToState(WebrtcTransport::State::SendingEnd);
 
-        // The resource exhaustion happens internally in the DUT, but it still
-        // creates a session and then sends an End command with OutOfResources
-        // reason.
+        // The resource exhaustion happens internally in the DUT, but it still creates a session
+        // and then sends an End command with OutOfResources reason.
         ScheduleEndSend(args.sessionId);
 
         return CHIP_NO_ERROR;
@@ -220,56 +217,49 @@ WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, 
     outSession.peerEndpointID = args.originatingEndpointId;
     outSession.streamUsage    = args.streamUsage;
     outSession.fabricIndex    = args.fabricIndex;
-    uint16_t videoStreamID    = 0;
-    uint16_t audioStreamID    = 0;
 
-    // Resolve or allocate a VIDEO stream
-    if (args.videoStreamId.HasValue())
+    // Extract video and audio streams from args
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
+
+    if (args.videoStreams.HasValue())
     {
-        if (args.videoStreamId.Value().IsNull())
-        {
-            // TODO: Automatically select the closest matching video stream for the
-            // StreamUsage requested.
-        }
-        else
-        {
-            outSession.videoStreamID = args.videoStreamId.Value();
-            videoStreamID            = args.videoStreamId.Value().Value();
-        }
+        videoStreams = args.videoStreams.Value();
+    }
+
+    if (args.audioStreams.HasValue())
+    {
+        audioStreams = args.audioStreams.Value();
+    }
+
+    // Set deprecated single-stream fields for backward compatibility
+    // Use the first stream from the arrays if available
+    if (!videoStreams.empty())
+    {
+        outSession.videoStreamID.SetNonNull(videoStreams[0]);
     }
     else
     {
         outSession.videoStreamID.SetNull();
     }
 
-    // Resolve or allocate an AUDIO stream
-    if (args.audioStreamId.HasValue())
+    if (!audioStreams.empty())
     {
-        if (args.audioStreamId.Value().IsNull())
-        {
-            // TODO: Automatically select the closest matching audio stream for the
-            // StreamUsage requested
-        }
-        else
-        {
-            outSession.audioStreamID = args.audioStreamId.Value();
-            audioStreamID            = args.audioStreamId.Value().Value();
-        }
+        outSession.audioStreamID.SetNonNull(audioStreams[0]);
     }
     else
     {
         outSession.audioStreamID.SetNull();
     }
 
-    // Process the SDP Offer, begin the ICE Candidate gathering phase, create the
-    // SDP Answer, and invoke Answer.
+    // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
     WebrtcTransport::RequestArgs requestArgs;
     requestArgs.sessionId             = args.sessionId;
     requestArgs.fabricIndex           = args.fabricIndex;
     requestArgs.peerNodeId            = args.peerNodeId;
     requestArgs.originatingEndpointId = args.originatingEndpointId;
-    requestArgs.videoStreamId         = videoStreamID;
-    requestArgs.audioStreamId         = audioStreamID;
+    requestArgs.videoStreams          = videoStreams;
+    requestArgs.audioStreams          = audioStreams;
     requestArgs.peerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
 
     WebrtcTransport * transport = GetTransport(args.sessionId);
@@ -298,6 +288,14 @@ WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, 
     }
 
     transport->SetRequestArgs(requestArgs);
+
+        // Store SFrameConfig in Transport base class if provided for later use in frame encryption
+    if (args.sFrameConfig.HasValue())
+    {
+        transport->sFrameConfig = args.sFrameConfig;
+        ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
     transport->Start();
     transport->AddTracks();
 
@@ -342,6 +340,15 @@ WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const std::string
                      "session ID %u",
                      sessionId);
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    // Check if we already received an SDP answer (duplicate answer scenario)
+    // If we're already in SendingICECandidates or later state, we've already processed an answer
+    if (transport->GetState() != WebrtcTransport::State::SendingOffer && transport->GetState() != WebrtcTransport::State::Idle)
+    {
+        ChipLogProgress(Camera, "Ignoring duplicate SDP answer for session ID %u (current state: %s)", sessionId,
+                        transport->GetStateStr());
+        return CHIP_NO_ERROR;
     }
 
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
@@ -396,9 +403,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                                   DataModel::Nullable<uint16_t> videoStreamID,
-                                                   DataModel::Nullable<uint16_t> audioStreamID)
+CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode)
 {
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
@@ -430,8 +435,8 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
 }
 
 CHIP_ERROR
-WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
+                                           Optional<std::vector<uint16_t>> & audioStreams)
 {
     if (mCameraDevice == nullptr)
     {
@@ -441,7 +446,10 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage, Optional
 
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmController.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
+    // The deprecated single-stream fields (videoStreamId/audioStreamId) have already been
+    // converted to the array format by the cluster implementation before calling this delegate.
+    // We only need to validate the array-based streams.
+    return avsmController.ValidateStreamUsage(streamUsage, videoStreams, audioStreams);
 }
 
 CHIP_ERROR
@@ -470,6 +478,32 @@ WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
     return avsmController.ValidateAudioStreamID(audioStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateVideoStreams(const std::vector<uint16_t> & videoStreams)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.ValidateVideoStreams(videoStreams);
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateAudioStreams(const std::vector<uint16_t> & audioStreams)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.ValidateAudioStreams(audioStreams);
 }
 
 CHIP_ERROR
@@ -567,9 +601,9 @@ bool WebRTCProviderManager::HasAllocatedAudioStreams()
 CHIP_ERROR WebRTCProviderManager::ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength)
 {
     // Define supported cipher suites and their expected key lengths
-    // Based on SFrame RFC:
-    // https://datatracker.ietf.org/doc/html/draft-ietf-sframe-enc 0x0001:
-    // AES-128-GCM-SHA256 (16 byte key) 0x0002: AES-256-GCM-SHA512 (32 byte key)
+    // Based on SFrame RFC: https://datatracker.ietf.org/doc/html/draft-ietf-sframe-enc
+    // 0x0001: AES-128-GCM-SHA256 (16 byte key)
+    // 0x0002: AES-256-GCM-SHA512 (32 byte key)
     constexpr uint16_t kCipherSuite_AES_128_GCM = 0x0001;
     constexpr uint16_t kCipherSuite_AES_256_GCM = 0x0002;
     constexpr size_t kAES_128_KeyLength         = 16;
@@ -594,9 +628,7 @@ CHIP_ERROR WebRTCProviderManager::ValidateSFrameConfig(uint16_t cipherSuite, siz
     // Validate base key length matches the expected length for the cipher suite
     if (baseKeyLength != expectedKeyLength)
     {
-        ChipLogError(Camera,
-                     "SFrame base key length mismatch - expected %u bytes for "
-                     "cipher suite 0x%04X, got %u bytes",
+        ChipLogError(Camera, "SFrame base key length mismatch - expected %u bytes for cipher suite 0x%04X, got %u bytes",
                      static_cast<unsigned int>(expectedKeyLength), cipherSuite, static_cast<unsigned int>(baseKeyLength));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -890,7 +922,7 @@ void WebRTCProviderManager::OnLocalDescription(const std::string & sdp, SDPType 
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
-        ChipLogError(Camera, "SendOfferCommand failed, WebTransport not found for sessionId: %u", sessionId);
+        ChipLogError(Camera, "OnLocalDescription: WebTransport not found for sessionId: %u", sessionId);
         return;
     }
 
@@ -985,7 +1017,7 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
-        ChipLogError(Camera, "SendOfferCommand failed, WebTransport not found for sessionId: %u", sessionId);
+        ChipLogError(Camera, "Answer command failed, WebTransport not found for sessionId: %u", sessionId);
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -1091,8 +1123,9 @@ CHIP_ERROR WebRTCProviderManager::AcquireAudioVideoStreams(uint16_t sessionId)
     }
 
     WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportAcquireAudioVideoStreams(args.audioStreamId,
-                                                                                              args.videoStreamId);
+
+    return mCameraDevice->GetCameraAVStreamMgmtController().OnTransportAcquireAudioVideoStreams(args.audioStreams,
+                                                                                                args.videoStreams);
 }
 
 CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams(uint16_t sessionId)
@@ -1105,7 +1138,7 @@ CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams(uint16_t sessionId)
     }
 
     WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-    // TODO: Use passed in audio/video stream ids corresponding to a sessionId.
-    return mCameraDevice->GetCameraAVStreamMgmtDelegate().OnTransportReleaseAudioVideoStreams(args.audioStreamId,
-                                                                                              args.videoStreamId);
+
+    return mCameraDevice->GetCameraAVStreamMgmtController().OnTransportReleaseAudioVideoStreams(args.audioStreams,
+                                                                                                args.videoStreams);
 }
