@@ -21,6 +21,7 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <clusters/ThreadNetworkDiagnostics/Metadata.h>
 
 namespace {
 

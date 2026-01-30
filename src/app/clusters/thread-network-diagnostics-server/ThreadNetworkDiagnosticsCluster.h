@@ -17,7 +17,6 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/ThreadNetworkDiagnostics/Metadata.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app::Clusters {
