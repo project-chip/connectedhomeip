@@ -98,13 +98,13 @@ class EventSubscriptionHandler:
         LOGGER.info(f"[EventSubscriptionHandler] Received event: {header}")
         self._q.put(event_result)
 
-    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+    async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30, keepSubscriptions: bool = True, autoResubscribe: bool = False) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         urgent = True
         self._subscription = await dev_ctrl.ReadEvent(node_id,
                                                       events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
                                                           min_interval_sec, max_interval_sec),
-                                                      fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
+                                                      fabricFiltered=fabric_filtered, keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe)
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
