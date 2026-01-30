@@ -5334,7 +5334,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
-  revision 5;
+  revision 8;
 
   enum EndProductType : enum8 {
     kRollerShade = 0;
@@ -8784,22 +8784,22 @@ endpoint 1 {
   server cluster ValveConfigurationAndControl {
     emits event ValveStateChanged;
     emits event ValveFault;
-    ram      attribute openDuration;
+    callback attribute openDuration;
     persist  attribute defaultOpenDuration;
-    ram      attribute autoCloseTime;
+    callback attribute autoCloseTime;
     callback attribute remainingDuration;
-    ram      attribute currentState;
-    ram      attribute targetState;
-    ram      attribute currentLevel;
-    ram      attribute targetLevel;
+    callback attribute currentState;
+    callback attribute targetState;
+    callback attribute currentLevel;
+    callback attribute targetLevel;
     persist  attribute defaultOpenLevel default = 100;
-    ram      attribute valveFault default = 0;
+    callback attribute valveFault;
     ram      attribute levelStep default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Open;
     handle command Close;

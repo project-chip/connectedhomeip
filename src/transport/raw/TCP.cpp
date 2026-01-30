@@ -98,7 +98,8 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
 
     if (params.IsServerListenEnabled())
     {
-        err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), /* reuseAddr = */ true);
+        err = mListenSocket->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(),
+                                  params.GetInterfaceId().IsPresent());
         SuccessOrExit(err);
 
         mListenSocket->mAppState            = reinterpret_cast<void *>(this);

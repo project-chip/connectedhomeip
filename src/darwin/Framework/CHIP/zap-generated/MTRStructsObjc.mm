@@ -8483,6 +8483,10 @@ NS_ASSUME_NONNULL_BEGIN
         _ambientContextSensed = [NSArray array];
 
         _detectionStartTime = nil;
+
+        _objectCountThreshold = nil;
+
+        _objectCount = nil;
     }
     return self;
 }
@@ -8493,13 +8497,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.ambientContextSensed = self.ambientContextSensed;
     other.detectionStartTime = self.detectionStartTime;
+    other.objectCountThreshold = self.objectCountThreshold;
+    other.objectCount = self.objectCount;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; objectCountThreshold:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime, _objectCountThreshold, _objectCount];
     return descriptionString;
 }
 
@@ -8575,6 +8581,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTimestamp:%@; endTimestamp:%@; ambientContextType:%@; crowdDetected:%@; crowdCount:%@; confidence:%@; >", NSStringFromClass([self class]), _startTimestamp, _endTimestamp, _ambientContextType, _crowdDetected, _crowdCount, _confidence];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterAmbientContextDetectedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ambientContextType = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectedEvent alloc] init];
+
+    other.ambientContextType = self.ambientContextType;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; >", NSStringFromClass([self class]), _ambientContextType];
     return descriptionString;
 }
 

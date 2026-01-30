@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -312,6 +312,7 @@ jobs:
                    -DCMAKE_BUILD_TYPE=Debug \
                    -DOTBR_BORDER_ROUTING=ON \
                    -DOTBR_MDNS=openthread \
+                   -DOT_POSIX_SETTINGS_PATH='\"tmp\"' \
                    -DOT_FIREWALL=OFF \
                    -DOT_LOG_LEVEL=INFO \
                    -DOT_TREL=OFF \
@@ -345,6 +346,9 @@ jobs:
                      "
 
             - name: Run BLE-Thread commissioning test
+              # Disabled due to flakyness. See:
+              # https://github.com/project-chip/connectedhomeip/issues/42869
+              if: false
               env:
                 # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
                 # The reason for that is BlueZ and WPA supplicant integration which involves GIO
@@ -542,7 +546,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -728,7 +732,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -971,7 +975,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:182
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -990,7 +994,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
@@ -1121,7 +1125,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils

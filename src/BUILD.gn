@@ -94,6 +94,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/tls-client-management-server/tests",
       "${chip_root}/src/app/clusters/unit-localization-server/tests",
       "${chip_root}/src/app/clusters/user-label-server/tests",
+      "${chip_root}/src/app/clusters/valve-configuration-and-control-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
