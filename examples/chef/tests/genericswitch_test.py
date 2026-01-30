@@ -45,7 +45,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
     _SWITCH_TRIPLE_PRESS_NUMBER_OF_POSITIONS = 2
 
     # Switch endpoint that supports single press only
-    _SWITCH_SINGLE_PRESS_ENDPOINT = 1
+    _SWITCH_SINGLE_PRESS_ENDPOINT = 2
     _SWITCH_SINGLE_PRESS_FEATURE_MAP = 2
     _SWITCH_SINGLE_PRESS_TAG_LIST = [
         Clusters.Objects.Globals.Structs.SemanticTagStruct(
