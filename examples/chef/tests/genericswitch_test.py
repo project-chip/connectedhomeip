@@ -26,6 +26,8 @@ import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +81,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
             attribute=Clusters.Objects.Descriptor.Attributes.TagList
         )
 
-    async def _inject_switch_events(self, endpoint, actions: list):
+    def _inject_switch_events(self, device, endpoint, actions: list):
         result = device.rpcs.chip.rpc.Actions.Set(
             endpoint_id=endpoint,
             cluster_id=Clusters.Objects.Switch.id,
@@ -99,6 +101,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
             TestStep(5, "[TC_GENERICSWITCH] Single press endpoint feature map."),
             TestStep(6, "[TC_GENERICSWITCH] Single press endpoint tag list."),
             TestStep(7, "[TC_GENERICSWITCH] Single press endpoint number of positions."),
+            TestStep(8, "[TC_GENERICSWITCH] Test switch press events via RPC injection.")
         ]
 
     @async_test_body
@@ -137,6 +140,43 @@ class TC_GENERICSWITCH(MatterBaseTest):
             number_of_positions,
             self._SWITCH_SINGLE_PRESS_NUMBER_OF_POSITIONS
         )
+
+        self.step(8)
+        device_connection = create_device_serial_or_socket_connection(
+            device="",
+            baudrate=self._PW_RPC_BAUD_RATE,
+            token_databases=[],
+            socket_addr=self._PW_RPC_SOCKET_ADDR,
+            compiled_protos=[actions_service_pb2],
+            rpc_logging=True,
+            channel_id=rpc.DEFAULT_CHANNEL_ID,
+            hdlc_encoding=True,
+            device_tracing=False,
+        )
+
+        with device_connection as device:
+            logger.info("Started Pw socket connection.")
+            logger.info("Testing events on Endpoint %d", self._SWITCH_TRIPLE_PRESS_ENDPOINT)
+            events_callback_1 = EventSubscriptionHandler(expected_cluster=Clusters.Objects.Switch)
+            await events_callback_1.start(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=self._SWITCH_TRIPLE_PRESS_ENDPOINT,
+            )
+            self._inject_switch_events(
+                device,
+                self._SWITCH_TRIPLE_PRESS_ENDPOINT,
+                actions=[
+                    actions_service_pb2.Action(
+                        type=actions_service_pb2.ActionType.EMIT_EVENT,
+                        delayMs=0,
+                        actionId=1,  # Initial press
+                        arg1=1,  # Position = 1
+                    ),
+                ]
+            )
+            logger.info("Injected initial press event.")
+            events_callback_1.cancel()
 
 
 if __name__ == "__main__":
