@@ -25,6 +25,7 @@
 #pragma once
 #include <stdint.h>
 
+#include <clusters/AdministratorCommissioning/Enums.h>
 #include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -541,7 +542,10 @@ struct ChipDeviceEvent final
         {
             InterfaceIpChangeType Type;
         } InterfaceIpAddressChanged;
-
+        struct
+        {
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum status;
+        } CommissioningWindowStatusChanged;
         struct
         {
             uint64_t nodeId;
