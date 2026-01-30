@@ -39,6 +39,8 @@ bool KeyExists(GroupDataProvider & provider, FabricIndex fabricIndex, GroupId gr
     GroupDataProvider::GroupKey entry;
 
     auto it    = provider.IterateGroupKeys(fabricIndex);
+    VerifyOrReturnValue(it != nullptr, false);
+
     bool found = false;
     while (!found && it->Next(entry))
     {
