@@ -28,7 +28,6 @@ import sys
 import time
 from typing import IO, Any
 
-
 from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
