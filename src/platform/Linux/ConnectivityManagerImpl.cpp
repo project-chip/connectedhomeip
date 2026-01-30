@@ -94,7 +94,13 @@ static constexpr char kWpaSupplicantBlobUnknown[] = "fi.w1.wpa_supplicant1.BlobU
 
 } // namespace
 
-ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
+// MARK: Singleton
+
+ConnectivityManagerImpl & ConnectivityManagerImpl::GetDefaultInstance()
+{
+    static ConnectivityManagerImpl sInstance;
+    return sInstance;
+}
 
 void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
 {
@@ -2287,6 +2293,11 @@ CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+ConnectivityManagerImpl & ConnectivityMgrImpl(void)
+{
+    return ConnectivityManagerImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip
