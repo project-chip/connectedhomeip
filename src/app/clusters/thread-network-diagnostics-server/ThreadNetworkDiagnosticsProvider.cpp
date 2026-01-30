@@ -725,7 +725,7 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     default:
         // The remaining attributes are generally unsigned integers.
         // We rely here on TLV encoding 0 of any type to a the same numeric 0
-        err = encoder.Encode(0u);
+        err = encoder.Encode<uint32_t>(0u);
         break;
     }
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
