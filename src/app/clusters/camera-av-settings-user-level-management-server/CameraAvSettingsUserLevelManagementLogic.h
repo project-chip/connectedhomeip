@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
-#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -35,6 +34,7 @@ namespace app {
 namespace Clusters {
 
 class CameraAvSettingsUserLevelManagementDelegate;
+class CameraAvSettingsUserLevelManagementCluster;
 
 class CameraAvSettingsUserLevelMgmtServerLogic : public CameraAvSettingsUserLevelManagement::PhysicalPTZCallback
 {
@@ -59,6 +59,8 @@ public:
             ChipLogError(Zcl, "CameraAVSettingsUserLevelManagement: Trying to set delegate to null");
         }
     }
+
+    void SetCluster(CameraAvSettingsUserLevelManagementCluster * cluster) { mCluster = cluster; }
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
@@ -205,6 +207,7 @@ public:
 
 private:
     CameraAvSettingsUserLevelManagementDelegate * mDelegate = nullptr;
+    CameraAvSettingsUserLevelManagementCluster * mCluster   = nullptr;
 
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;
