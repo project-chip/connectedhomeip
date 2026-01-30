@@ -358,6 +358,7 @@ template("siwx917_sdk") {
 
   if (chip_crypto == "platform") {
     if (sl_si91x_crypto_flavor == "psa") {
+      assert(chip_crypto_keystore == "psa", "chip_crypto_keystore must be set to psa")
       _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
 
       sl_si91x_psa_crypto_path =
