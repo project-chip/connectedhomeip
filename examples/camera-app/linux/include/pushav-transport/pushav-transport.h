@@ -37,31 +37,23 @@
 #include <thread>
 #include <vector>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace PushAvStreamTransport {
-class PushAvStreamTransportManager; // Forward declaration
-} // namespace PushAvStreamTransport
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-static constexpr int kInvalidZoneId      = -1;
-static constexpr int kDefaultSensitivity = 5;
+static constexpr int kInvalidZoneId             = -1; // Invalid zone id value for trigger detection
+static constexpr int kDefaultSensitivity        = 5;  // Default motion sensitivity level
+static constexpr int kMaxSessionDurationMinutes = 5;  // Maximum session duration in minutes
 
 class PushAVTransport : public Transport
 {
 public:
     PushAVTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
                     const uint16_t connectionID, AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
+
     ~PushAVTransport() override;
 
     // Send video data for a given stream ID
-    void SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID) override;
+    void SendVideo(const chip::ByteSpan & data, int64_t timestampMs, uint16_t videoStreamID) override;
 
     // Send audio data for a given stream ID
-    void SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID) override;
+    void SendAudio(const chip::ByteSpan & data, int64_t timestampMs, uint16_t audioStreamID) override;
 
     // Send synchronized audio/video data for given audio and video stream IDs
     void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) override;
@@ -72,8 +64,11 @@ public:
     // Indicates that the transport is ready to send audio data
     bool CanSendAudio() override;
 
-    // Dummy implementation to indicate whether the transport is streaming or not
-    bool IsStreaming();
+    // Update send flags based on current streaming state
+    void UpdateSendFlags();
+
+    // Indicates whether the transport is streaming or not
+    bool IsStreaming() const;
 
     bool GetBusyStatus();
 
@@ -83,17 +78,18 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
-                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity, bool isZoneBasedTrigger = false);
+                          int zoneId = kInvalidZoneId, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
         return (mTransportStatus == chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum::kInactive);
     } // 0:Active 1:Inactive
 
-    void ConfigureRecorderSettings(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
-                                   AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
+    CHIP_ERROR
+    ConfigureRecorderSettings(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStruct & transportOptions,
+                              AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams);
 
-    void ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage & transportOptions);
+    CHIP_ERROR ModifyPushTransport(const chip::app::Clusters::PushAvStreamTransport::TransportOptionsStorage & transportOptions);
 
     bool HandleTriggerDetected();
 
@@ -126,27 +122,32 @@ public:
         mPushAvStreamTransportServer = server;
     }
 
-    void SetPushAvStreamTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
-    {
-        mPushAvStreamTransportManager = manager;
-    }
-
     void ConfigureRecorderTimeSetting(
         const chip::app::Clusters::PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::DecodableType &
             timeControl);
 
     void SetFabricIndex(chip::FabricIndex accessingFabricIndex) { mFabricIndex = accessingFabricIndex; }
 
-    void StartNewSession(uint64_t newSessionID);
+    uint64_t GetSessionNumber() const { return mSessionNumber; }
 
 private:
-    bool mHasAugmented                                                                                       = false;
-    bool mStreaming                                                                                          = false;
-    std::unique_ptr<PushAVClipRecorder> mRecorder                                                            = nullptr;
-    std::unique_ptr<PushAVUploader> mUploader                                                                = nullptr;
-    chip::FabricIndex mFabricIndex                                                                           = 0;
-    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer                          = nullptr;
-    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * mPushAvStreamTransportManager = nullptr;
+    void CheckAndUpdateSession();
+    void GeneratePushTransportBeginEvent();
+    void StartRecordingAndStreaming();
+    bool ValidateZoneAndSensitivity(
+        const std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> & zoneSensitivityList, int zoneId,
+        int sensitivity);
+
+    bool mHasAugmented                                                              = false;
+    bool mStreaming                                                                 = false;
+    uint64_t mSessionNumber                                                         = 1;
+    std::unique_ptr<PushAVClipRecorder> mRecorder                                   = nullptr;
+    std::unique_ptr<PushAVUploader> mUploader                                       = nullptr;
+    chip::FabricIndex mFabricIndex                                                  = 0;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
+    chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> mActivationReason =
+        chip::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum>();
+    std::chrono::system_clock::time_point mSessionStartedTimestamp;
     std::chrono::steady_clock::time_point mBlindStartTime;
     PushAVClipRecorder::ClipInfoStruct mClipInfo;
     PushAVClipRecorder::AudioInfoStruct mAudioInfo;
@@ -168,7 +169,7 @@ private:
     chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum mTransportStatus;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
-    uint32_t mCurrentlyUsedBandwidthbps    = 0;
-    bool mActivationTimeSetByManualTrigger = false;
-    bool mIsZoneBasedTrigger               = false;
+    uint32_t mCurrentlyUsedBandwidthbps     = 0;
+    bool mCurrentActivationByManualTrigger  = false;
+    bool mPreviousActivationByManualTrigger = false;
 };

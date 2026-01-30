@@ -376,6 +376,7 @@ DCMAKE
 DCONF
 DCONFIG
 deallocate
+deallocated
 deallocation
 debianutils
 debugText

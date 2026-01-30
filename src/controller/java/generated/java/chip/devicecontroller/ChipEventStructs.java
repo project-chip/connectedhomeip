@@ -6512,6 +6512,52 @@ public static class OccupancySensingClusterOccupancyChangedEvent {
     return output.toString();
   }
 }
+public static class AmbientContextSensingClusterAmbientContextDetectedEvent {
+  public ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextType;
+  private static final long AMBIENT_CONTEXT_TYPE_ID = 0L;
+
+  public AmbientContextSensingClusterAmbientContextDetectedEvent(
+    ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextType
+  ) {
+    this.ambientContextType = ambientContextType;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AMBIENT_CONTEXT_TYPE_ID, ArrayType.generateArrayType(ambientContextType, (elementambientContextType) -> elementambientContextType.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterAmbientContextDetectedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextType = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AMBIENT_CONTEXT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          ambientContextType = castingValue.map((elementcastingValue) -> ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new AmbientContextSensingClusterAmbientContextDetectedEvent(
+      ambientContextType
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterAmbientContextDetectedEvent {\n");
+    output.append("\tambientContextType: ");
+    output.append(ambientContextType);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TargetNavigatorClusterTargetUpdatedEvent {
   public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
   public Integer currentTarget;
@@ -6997,18 +7043,26 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
   public Integer connectionID;
   public Integer triggerType;
   public Optional<Integer> activationReason;
+  public Integer containerType;
+  public Optional<Long> CMAFSessionNumber;
   private static final long CONNECTION_ID_ID = 0L;
   private static final long TRIGGER_TYPE_ID = 1L;
   private static final long ACTIVATION_REASON_ID = 2L;
+  private static final long CONTAINER_TYPE_ID = 3L;
+  private static final long CMAF_SESSION_NUMBER_ID = 4L;
 
   public PushAvStreamTransportClusterPushTransportBeginEvent(
     Integer connectionID,
     Integer triggerType,
-    Optional<Integer> activationReason
+    Optional<Integer> activationReason,
+    Integer containerType,
+    Optional<Long> CMAFSessionNumber
   ) {
     this.connectionID = connectionID;
     this.triggerType = triggerType;
     this.activationReason = activationReason;
+    this.containerType = containerType;
+    this.CMAFSessionNumber = CMAFSessionNumber;
   }
 
   public StructType encodeTlv() {
@@ -7016,6 +7070,8 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
     values.add(new StructElement(TRIGGER_TYPE_ID, new UIntType(triggerType)));
     values.add(new StructElement(ACTIVATION_REASON_ID, activationReason.<BaseTLVType>map((nonOptionalactivationReason) -> new UIntType(nonOptionalactivationReason)).orElse(new EmptyType())));
+    values.add(new StructElement(CONTAINER_TYPE_ID, new UIntType(containerType)));
+    values.add(new StructElement(CMAF_SESSION_NUMBER_ID, CMAFSessionNumber.<BaseTLVType>map((nonOptionalCMAFSessionNumber) -> new UIntType(nonOptionalCMAFSessionNumber)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7027,6 +7083,8 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
     Integer connectionID = null;
     Integer triggerType = null;
     Optional<Integer> activationReason = Optional.empty();
+    Integer containerType = null;
+    Optional<Long> CMAFSessionNumber = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7043,12 +7101,24 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
           UIntType castingValue = element.value(UIntType.class);
           activationReason = Optional.of(castingValue.value(Integer.class));
         }
+      } else if (element.contextTagNum() == CONTAINER_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          containerType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CMAF_SESSION_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          CMAFSessionNumber = Optional.of(castingValue.value(Long.class));
+        }
       }
     }
     return new PushAvStreamTransportClusterPushTransportBeginEvent(
       connectionID,
       triggerType,
-      activationReason
+      activationReason,
+      containerType,
+      CMAFSessionNumber
     );
   }
 
@@ -7065,23 +7135,39 @@ public static class PushAvStreamTransportClusterPushTransportBeginEvent {
     output.append("\tactivationReason: ");
     output.append(activationReason);
     output.append("\n");
+    output.append("\tcontainerType: ");
+    output.append(containerType);
+    output.append("\n");
+    output.append("\tCMAFSessionNumber: ");
+    output.append(CMAFSessionNumber);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
 }
 public static class PushAvStreamTransportClusterPushTransportEndEvent {
   public Integer connectionID;
+  public Integer containerType;
+  public Optional<Long> CMAFSessionNumber;
   private static final long CONNECTION_ID_ID = 0L;
+  private static final long CONTAINER_TYPE_ID = 1L;
+  private static final long CMAF_SESSION_NUMBER_ID = 2L;
 
   public PushAvStreamTransportClusterPushTransportEndEvent(
-    Integer connectionID
+    Integer connectionID,
+    Integer containerType,
+    Optional<Long> CMAFSessionNumber
   ) {
     this.connectionID = connectionID;
+    this.containerType = containerType;
+    this.CMAFSessionNumber = CMAFSessionNumber;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CONNECTION_ID_ID, new UIntType(connectionID)));
+    values.add(new StructElement(CONTAINER_TYPE_ID, new UIntType(containerType)));
+    values.add(new StructElement(CMAF_SESSION_NUMBER_ID, CMAFSessionNumber.<BaseTLVType>map((nonOptionalCMAFSessionNumber) -> new UIntType(nonOptionalCMAFSessionNumber)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -7091,16 +7177,30 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
       return null;
     }
     Integer connectionID = null;
+    Integer containerType = null;
+    Optional<Long> CMAFSessionNumber = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CONNECTION_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           connectionID = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == CONTAINER_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          containerType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CMAF_SESSION_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          CMAFSessionNumber = Optional.of(castingValue.value(Long.class));
+        }
       }
     }
     return new PushAvStreamTransportClusterPushTransportEndEvent(
-      connectionID
+      connectionID,
+      containerType,
+      CMAFSessionNumber
     );
   }
 
@@ -7110,6 +7210,58 @@ public static class PushAvStreamTransportClusterPushTransportEndEvent {
     output.append("PushAvStreamTransportClusterPushTransportEndEvent {\n");
     output.append("\tconnectionID: ");
     output.append(connectionID);
+    output.append("\n");
+    output.append("\tcontainerType: ");
+    output.append(containerType);
+    output.append("\n");
+    output.append("\tCMAFSessionNumber: ");
+    output.append(CMAFSessionNumber);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChimeClusterChimeStartedPlayingEvent {
+  public Integer chimeID;
+  private static final long CHIME_ID_ID = 0L;
+
+  public ChimeClusterChimeStartedPlayingEvent(
+    Integer chimeID
+  ) {
+    this.chimeID = chimeID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CHIME_ID_ID, new UIntType(chimeID)));
+
+    return new StructType(values);
+  }
+
+  public static ChimeClusterChimeStartedPlayingEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer chimeID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CHIME_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          chimeID = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ChimeClusterChimeStartedPlayingEvent(
+      chimeID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChimeClusterChimeStartedPlayingEvent {\n");
+    output.append("\tchimeID: ");
+    output.append(chimeID);
     output.append("\n");
     output.append("}\n");
     return output.toString();

@@ -50,7 +50,9 @@ from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status as StatusEnum
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 from matter.utils import CommissioningBuildingBlocks
 
 log = logging.getLogger(__name__)
@@ -328,7 +330,7 @@ class TC_RR_1_1(MatterBaseTest):
             client = client_by_name[client_name]
 
             # Send the UpdateLabel command
-            label = ("%d" % fabric.fabricIndex) * 32
+            label = (("%d." % fabric.fabricIndex) * 16)[:32]
             log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s" %
                      (fabric.fabricIndex, label, client_name))
             await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))

@@ -21,6 +21,8 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Enums.h>
 #include <clusters/UserLabel/Metadata.h>
@@ -35,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
 using namespace chip::Testing;
+using chip::Testing::IsAttributesListEqualTo;
 
 // Mock DeviceInfoProvider for testing
 class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
@@ -60,43 +63,35 @@ protected:
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
     CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
 };
-
 struct TestUserLabelCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override
-    {
-        DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
-        ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
-    }
+    void SetUp() override { ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override
-    {
-        userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
-        DeviceLayer::SetDeviceInfoProvider(nullptr);
-    }
+    void TearDown() override { userLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestUserLabelCluster() : userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() :
+        userLabel(kRootEndpointId,
+                  UserLabelCluster::Context{ .deviceInfoProvider = mDeviceInfoProvider,
+                                             .fabricTable        = chip::Server::GetInstance().GetFabricTable() })
+    {}
 
     TestServerClusterContext testContext;
+    MockDeviceInfoProvider mDeviceInfoProvider; // Must be declared before userLabel so it's initialized first
     UserLabelCluster userLabel;
-    MockDeviceInfoProvider mDeviceInfoProvider;
 };
 
 } // namespace
 
 TEST_F(TestUserLabelCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(userLabel.Attributes(ConcreteClusterPath(kRootEndpointId, UserLabel::Id), attributes), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(UserLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(userLabel,
+                                        {
+                                            UserLabel::Attributes::LabelList::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestUserLabelCluster, ReadAttributeTest)

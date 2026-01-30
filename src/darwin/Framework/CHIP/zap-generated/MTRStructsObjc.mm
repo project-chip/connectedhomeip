@@ -455,6 +455,10 @@ NS_ASSUME_NONNULL_BEGIN
 
         _metadataEnabled = @(0);
 
+        _videoStreams = nil;
+
+        _audioStreams = nil;
+
         _fabricIndex = @(0);
     }
     return self;
@@ -471,6 +475,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.metadataEnabled = self.metadataEnabled;
+    other.videoStreams = self.videoStreams;
+    other.audioStreams = self.audioStreams;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -478,7 +484,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataEnabled:%@; videoStreams:%@; audioStreams:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataEnabled, _videoStreams, _audioStreams, _fabricIndex];
     return descriptionString;
 }
 
@@ -4837,11 +4843,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _endpoints = [NSArray array];
 
-        _keyID = @(0);
+        _keySetID = @(0);
 
         _hasAuxiliaryACL = @(0);
-
-        _expiringKeyID = nil;
 
         _fabricIndex = @(0);
     }
@@ -4854,9 +4858,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.keyID = self.keyID;
+    other.keySetID = self.keySetID;
     other.hasAuxiliaryACL = self.hasAuxiliaryACL;
-    other.expiringKeyID = self.expiringKeyID;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -4864,7 +4867,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; hasAuxiliaryACL:%@; expiringKeyID:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, _hasAuxiliaryACL, _expiringKeyID, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; hasAuxiliaryACL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, _hasAuxiliaryACL, _fabricIndex];
     return descriptionString;
 }
 
@@ -8480,6 +8483,10 @@ NS_ASSUME_NONNULL_BEGIN
         _ambientContextSensed = [NSArray array];
 
         _detectionStartTime = nil;
+
+        _objectCountThreshold = nil;
+
+        _objectCount = nil;
     }
     return self;
 }
@@ -8490,13 +8497,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.ambientContextSensed = self.ambientContextSensed;
     other.detectionStartTime = self.detectionStartTime;
+    other.objectCountThreshold = self.objectCountThreshold;
+    other.objectCount = self.objectCount;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; objectCountThreshold:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime, _objectCountThreshold, _objectCount];
     return descriptionString;
 }
 
@@ -8572,6 +8581,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTimestamp:%@; endTimestamp:%@; ambientContextType:%@; crowdDetected:%@; crowdCount:%@; confidence:%@; >", NSStringFromClass([self class]), _startTimestamp, _endTimestamp, _ambientContextType, _crowdDetected, _crowdCount, _confidence];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterAmbientContextDetectedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ambientContextType = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectedEvent alloc] init];
+
+    other.ambientContextType = self.ambientContextType;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; >", NSStringFromClass([self class]), _ambientContextType];
     return descriptionString;
 }
 
@@ -10701,6 +10737,66 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRPushAVStreamTransportClusterAudioStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _audioStreamName = @"";
+
+        _audioStreamID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterAudioStreamStruct alloc] init];
+
+    other.audioStreamName = self.audioStreamName;
+    other.audioStreamID = self.audioStreamID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: audioStreamName:%@; audioStreamID:%@; >", NSStringFromClass([self class]), _audioStreamName, _audioStreamID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPushAVStreamTransportClusterVideoStreamStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _videoStreamName = @"";
+
+        _videoStreamID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPushAVStreamTransportClusterVideoStreamStruct alloc] init];
+
+    other.videoStreamName = self.videoStreamName;
+    other.videoStreamID = self.videoStreamID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamName:%@; videoStreamID:%@; >", NSStringFromClass([self class]), _videoStreamName, _videoStreamID];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRPushAVStreamTransportClusterTransportTriggerOptionsStruct
 - (instancetype)init
 {
@@ -10840,6 +10936,10 @@ NS_ASSUME_NONNULL_BEGIN
         _containerOptions = [MTRPushAVStreamTransportClusterContainerOptionsStruct new];
 
         _expiryTime = nil;
+
+        _videoStreams = nil;
+
+        _audioStreams = nil;
     }
     return self;
 }
@@ -10857,13 +10957,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.ingestMethod = self.ingestMethod;
     other.containerOptions = self.containerOptions;
     other.expiryTime = self.expiryTime;
+    other.videoStreams = self.videoStreams;
+    other.audioStreams = self.audioStreams;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; tlsEndpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _tlsEndpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; tlsEndpointID:%@; url:%@; triggerOptions:%@; ingestMethod:%@; containerOptions:%@; expiryTime:%@; videoStreams:%@; audioStreams:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _tlsEndpointID, _url, _triggerOptions, _ingestMethod, _containerOptions, _expiryTime, _videoStreams, _audioStreams];
     return descriptionString;
 }
 
@@ -10945,6 +11047,10 @@ NS_ASSUME_NONNULL_BEGIN
         _triggerType = @(0);
 
         _activationReason = nil;
+
+        _containerType = @(0);
+
+        _cmafSessionNumber = nil;
     }
     return self;
 }
@@ -10956,13 +11062,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.connectionID = self.connectionID;
     other.triggerType = self.triggerType;
     other.activationReason = self.activationReason;
+    other.containerType = self.containerType;
+    other.cmafSessionNumber = self.cmafSessionNumber;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerType:%@; activationReason:%@; >", NSStringFromClass([self class]), _connectionID, _triggerType, _activationReason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; triggerType:%@; activationReason:%@; containerType:%@; cmafSessionNumber:%@; >", NSStringFromClass([self class]), _connectionID, _triggerType, _activationReason, _containerType, _cmafSessionNumber];
     return descriptionString;
 }
 
@@ -10974,6 +11082,10 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _connectionID = @(0);
+
+        _containerType = @(0);
+
+        _cmafSessionNumber = nil;
     }
     return self;
 }
@@ -10983,13 +11095,15 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRPushAVStreamTransportClusterPushTransportEndEvent alloc] init];
 
     other.connectionID = self.connectionID;
+    other.containerType = self.containerType;
+    other.cmafSessionNumber = self.cmafSessionNumber;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; >", NSStringFromClass([self class]), _connectionID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; containerType:%@; cmafSessionNumber:%@; >", NSStringFromClass([self class]), _connectionID, _containerType, _cmafSessionNumber];
     return descriptionString;
 }
 
@@ -11020,6 +11134,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; name:%@; >", NSStringFromClass([self class]), _chimeID, _name];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRChimeClusterChimeStartedPlayingEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _chimeID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRChimeClusterChimeStartedPlayingEvent alloc] init];
+
+    other.chimeID = self.chimeID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; >", NSStringFromClass([self class]), _chimeID];
     return descriptionString;
 }
 

@@ -1,0 +1,80 @@
+{{> header excludeZapComment=true}}
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRClusterConstants.h>
+#import <stdint.h>
+
+#pragma mark - Private Cluster IDs
+
+typedef NS_ENUM(uint32_t, MTRPrivateClusterIDType) {
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+    MTRPrivateClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " cluster will be removed")}} = {{asMEI manufacturerCode code}},
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}
+};
+
+#pragma mark - Private Attribute IDs
+
+typedef NS_ENUM(uint32_t, MTRPrivateAttributeIDType) {
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#*inline "attributeIDs"}}
+{{#zcl_attributes_server}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
+           (or clusterRef
+               (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)))}}
+    MTRPrivateAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase label preserveAcronyms=true) " attribute will be removed")}} = {{#if clusterRef}}{{asMEI manufacturerCode code}}{{else}}MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID{{/if}},
+{{/if}}
+{{/zcl_attributes_server}}
+{{/inline}}
+
+{{> attributeIDs clusterName=label}}
+{{/if}}
+{{/zcl_clusters}}
+};
+
+#pragma mark - Private Command IDs
+
+typedef NS_ENUM(uint32_t, MTRPrivateCommandIDType) {
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#*inline "commandIDs"}}
+{{#zcl_commands}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForIds=true)}}
+    MTRPrivateCommandIDTypeCluster{{>cluster}}Command{{>command}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " (asUpperCamelCase name preserveAcronyms=true) " command will be removed")}} = {{asMEI manufacturerCode code}},
+{{/if}}
+{{/zcl_commands}}
+{{/inline}}
+
+{{> commandIDs clusterName=label}}
+{{/if}}
+{{/zcl_clusters}}
+};
+
+#pragma mark - Private Event IDs
+
+typedef NS_ENUM(uint32_t, MTRPrivateEventIDType) {
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#*inline "eventIDs"}}
+{{#zcl_events}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "event"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true) isForIds=true)}}
+    MTRPrivateEventIDTypeCluster{{>cluster}}Event{{>event}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true}} = {{asMEI manufacturerCode code}},
+{{/if}}
+{{/zcl_events}}
+{{/inline}}
+
+{{> eventIDs clusterName=label}}
+{{/if}}
+{{/zcl_clusters}}
+};

@@ -49,6 +49,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::UnitLocalization::Id:
+        MatterUnitLocalizationClusterInitCallback(endpoint);
+        break;
     case app::Clusters::GeneralCommissioning::Id:
         MatterGeneralCommissioningClusterInitCallback(endpoint);
         break;
@@ -88,6 +91,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ScenesManagement::Id:
+        MatterScenesManagementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::HepaFilterMonitoring::Id:
         MatterHepaFilterMonitoringClusterInitCallback(endpoint);
         break;
@@ -96,6 +102,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::ValveConfigurationAndControl::Id:
+        MatterValveConfigurationAndControlClusterInitCallback(endpoint);
         break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         MatterElectricalPowerMeasurementClusterInitCallback(endpoint);
@@ -111,6 +120,12 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::Chime::Id:
         MatterChimeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::TlsCertificateManagement::Id:
+        MatterTlsCertificateManagementClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::TlsClientManagement::Id:
+        MatterTlsClientManagementClusterInitCallback(endpoint);
         break;
     }
 }
@@ -139,6 +154,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::UnitLocalization::Id:
+        MatterUnitLocalizationClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::GeneralCommissioning::Id:
         MatterGeneralCommissioningClusterShutdownCallback(endpoint, shutdownType);
@@ -179,6 +197,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::ScenesManagement::Id:
+        MatterScenesManagementClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::HepaFilterMonitoring::Id:
         MatterHepaFilterMonitoringClusterShutdownCallback(endpoint, shutdownType);
         break;
@@ -187,6 +208,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::ValveConfigurationAndControl::Id:
+        MatterValveConfigurationAndControlClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         MatterElectricalPowerMeasurementClusterShutdownCallback(endpoint, shutdownType);
@@ -202,6 +226,12 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::Chime::Id:
         MatterChimeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::TlsCertificateManagement::Id:
+        MatterTlsCertificateManagementClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::TlsClientManagement::Id:
+        MatterTlsClientManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
     }
 }

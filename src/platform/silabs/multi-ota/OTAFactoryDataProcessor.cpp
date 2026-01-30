@@ -20,8 +20,9 @@
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
 
 namespace chip {
-
-using namespace ::chip::DeviceLayer::Silabs;
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 {
@@ -30,23 +31,22 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
+    ReturnErrorOnFailure(OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock));
 #endif
     error = DecodeTlv();
 
-    if (error != CHIP_NO_ERROR)
+    // The factory data payload can contain a variable number of fields
+    // to be updated. CHIP_END_OF_TLV is returned if no more fields are
+    // found.
+    if (error == CHIP_END_OF_TLV)
     {
-        // The factory data payload can contain a variable number of fields
-        // to be updated. CHIP_END_OF_TLV is returned if no more fields are
-        // found.
-        if (error == CHIP_END_OF_TLV)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        Clear();
+        return CHIP_NO_ERROR;
     }
 
+    if (error != CHIP_NO_ERROR)
+    {
+        TEMPORARY_RETURN_IGNORED Clear();
+    }
     return error;
 }
 
@@ -151,4 +151,7 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
     return CHIP_ERROR_NOT_FOUND;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

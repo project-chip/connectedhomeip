@@ -6256,8 +6256,7 @@ private:
 | * JoinGroup                                                         |   0x00 |
 | * LeaveGroup                                                        |   0x01 |
 | * UpdateGroupKey                                                    |   0x03 |
-| * ExpireGracePeriod                                                 |   0x04 |
-| * ConfigureAuxiliaryACL                                             |   0x05 |
+| * ConfigureAuxiliaryACL                                             |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Membership                                                        | 0x0000 |
@@ -6282,10 +6281,10 @@ public:
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("Endpoints", &mComplex_Endpoints);
-        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("KeySetID", 0, UINT16_MAX, &mRequest.keySetID);
         AddArgument("Key", &mRequest.key);
-        AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         AddArgument("UseAuxiliaryACL", 0, 1, &mRequest.useAuxiliaryACL);
+        AddArgument("ReplaceEndpoints", 0, 1, &mRequest.replaceEndpoints);
         ClusterCommand::AddArguments();
     }
 
@@ -6364,9 +6363,8 @@ public:
     GroupcastUpdateGroupKey(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("update-group-key", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
-        AddArgument("KeyID", 0, UINT32_MAX, &mRequest.keyID);
+        AddArgument("KeySetID", 0, UINT16_MAX, &mRequest.keySetID);
         AddArgument("Key", &mRequest.key);
-        AddArgument("GracePeriod", 0, UINT32_MAX, &mRequest.gracePeriod);
         ClusterCommand::AddArguments();
     }
 
@@ -6393,44 +6391,6 @@ public:
 
 private:
     chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::Type mRequest;
-};
-
-/*
- * Command ExpireGracePeriod
- */
-class GroupcastExpireGracePeriod : public ClusterCommand
-{
-public:
-    GroupcastExpireGracePeriod(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("expire-grace-period", credsIssuerConfig)
-    {
-        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::Groupcast::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Type mRequest;
 };
 
 /*
@@ -11580,13 +11540,10 @@ private:
 | * AmbientContextType                                                | 0x0003 |
 | * AmbientContextTypeSupported                                       | 0x0004 |
 | * SimultaneousDetectionLimit                                        | 0x0005 |
-| * CountThresholdReached                                             | 0x0006 |
-| * CountThreshold                                                    | 0x0007 |
-| * ObjectCount                                                       | 0x0008 |
-| * HoldTime                                                          | 0x0009 |
-| * HoldTimeLimits                                                    | 0x000A |
-| * PredictedActivity                                                 | 0x000B |
-| * PrivacyModeEnabled                                                | 0x000C |
+| * ObjectCountReached                                                | 0x0006 |
+| * HoldTime                                                          | 0x0007 |
+| * HoldTimeLimits                                                    | 0x0008 |
+| * PredictedActivity                                                 | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -11594,6 +11551,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * AmbientContextDetected                                            | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -15412,7 +15370,8 @@ class WebRTCTransportProviderSolicitOffer : public ClusterCommand
 public:
     WebRTCTransportProviderSolicitOffer(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
-        mComplex_SFrameConfig(&mRequest.SFrameConfig)
+        mComplex_SFrameConfig(&mRequest.SFrameConfig), mComplex_VideoStreams(&mRequest.videoStreams),
+        mComplex_AudioStreams(&mRequest.audioStreams)
     {
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
         AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
@@ -15422,6 +15381,8 @@ public:
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
         AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
+        AddArgument("VideoStreams", &mComplex_VideoStreams, "", Argument::kOptional);
+        AddArgument("AudioStreams", &mComplex_AudioStreams, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -15453,6 +15414,8 @@ private:
         mComplex_ICEServers;
     TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
         mComplex_SFrameConfig;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_VideoStreams;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_AudioStreams;
 };
 
 /*
@@ -15463,7 +15426,8 @@ class WebRTCTransportProviderProvideOffer : public ClusterCommand
 public:
     WebRTCTransportProviderProvideOffer(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("provide-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers),
-        mComplex_SFrameConfig(&mRequest.SFrameConfig)
+        mComplex_SFrameConfig(&mRequest.SFrameConfig), mComplex_VideoStreams(&mRequest.videoStreams),
+        mComplex_AudioStreams(&mRequest.audioStreams)
     {
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
@@ -15475,6 +15439,8 @@ public:
         AddArgument("ICETransportPolicy", &mRequest.ICETransportPolicy);
         AddArgument("MetadataEnabled", 0, 1, &mRequest.metadataEnabled);
         AddArgument("SFrameConfig", &mComplex_SFrameConfig, "", Argument::kOptional);
+        AddArgument("VideoStreams", &mComplex_VideoStreams, "", Argument::kOptional);
+        AddArgument("AudioStreams", &mComplex_AudioStreams, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -15506,6 +15472,8 @@ private:
         mComplex_ICEServers;
     TypedComplexArgument<chip::Optional<chip::app::Clusters::WebRTCTransportProvider::Structs::SFrameStruct::Type>>
         mComplex_SFrameConfig;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_VideoStreams;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint16_t>>> mComplex_AudioStreams;
 };
 
 /*
@@ -16090,6 +16058,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * ChimeStartedPlaying                                               | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -16100,6 +16069,7 @@ class ChimePlayChimeSound : public ClusterCommand
 public:
     ChimePlayChimeSound(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("play-chime-sound", credsIssuerConfig)
     {
+        AddArgument("ChimeID", 0, UINT8_MAX, &mRequest.chimeID);
         ClusterCommand::AddArguments();
     }
 
@@ -24209,7 +24179,6 @@ void registerClusterGroupcast(Commands & commands, CredentialIssuerCommands * cr
         make_unique<GroupcastJoinGroup>(credsIssuerConfig),             //
         make_unique<GroupcastLeaveGroup>(credsIssuerConfig),            //
         make_unique<GroupcastUpdateGroupKey>(credsIssuerConfig),        //
-        make_unique<GroupcastExpireGracePeriod>(credsIssuerConfig),     //
         make_unique<GroupcastConfigureAuxiliaryACL>(credsIssuerConfig), //
         //
         // Attributes
@@ -29369,20 +29338,17 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
         make_unique<ReadAttribute>(Id, "ambient-context-type-supported", Attributes::AmbientContextTypeSupported::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "simultaneous-detection-limit", Attributes::SimultaneousDetectionLimit::Id,
-                                   credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "count-threshold-reached", Attributes::CountThresholdReached::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "count-threshold", Attributes::CountThreshold::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "object-count", Attributes::ObjectCount::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                            //
-        make_unique<ReadAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "privacy-mode-enabled", Attributes::PrivacyModeEnabled::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "object-count-reached", Attributes::ObjectCountReached::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<bool>>(Id, "human-activity-detected", 0, 1, Attributes::HumanActivityDetected::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "object-identified", 0, 1, Attributes::ObjectIdentified::Id,
@@ -29399,12 +29365,8 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
         make_unique<WriteAttribute<uint8_t>>(Id, "simultaneous-detection-limit", 0, UINT8_MAX,
                                              Attributes::SimultaneousDetectionLimit::Id, WriteCommandType::kWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "count-threshold-reached", 0, 1, Attributes::CountThresholdReached::Id,
+        make_unique<WriteAttribute<bool>>(Id, "object-count-reached", 0, 1, Attributes::ObjectCountReached::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "count-threshold", 0, UINT16_MAX, Attributes::CountThreshold::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "object-count", 0, UINT16_MAX, Attributes::ObjectCount::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "hold-time", 0, UINT16_MAX, Attributes::HoldTime::Id, WriteCommandType::kWrite,
                                               credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type>>(
@@ -29412,8 +29374,6 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::Type>>>(
             Id, "predicted-activity", Attributes::PredictedActivity::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "privacy-mode-enabled", 0, 1, Attributes::PrivacyModeEnabled::Id,
-                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29433,24 +29393,23 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
         make_unique<SubscribeAttribute>(Id, "ambient-context-type-supported", Attributes::AmbientContextTypeSupported::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "simultaneous-detection-limit", Attributes::SimultaneousDetectionLimit::Id,
-                                        credsIssuerConfig),                                                                       //
-        make_unique<SubscribeAttribute>(Id, "count-threshold-reached", Attributes::CountThresholdReached::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "count-threshold", Attributes::CountThreshold::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "object-count", Attributes::ObjectCount::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),          //
-        make_unique<SubscribeAttribute>(Id, "privacy-mode-enabled", Attributes::PrivacyModeEnabled::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "object-count-reached", Attributes::ObjectCountReached::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "hold-time", Attributes::HoldTime::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "hold-time-limits", Attributes::HoldTimeLimits::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "predicted-activity", Attributes::PredictedActivity::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadEvent>(Id, "ambient-context-detected", Events::AmbientContextDetected::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeEvent>(Id, "ambient-context-detected", Events::AmbientContextDetected::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -31266,8 +31225,10 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                //
+        make_unique<ReadEvent>(Id, "chime-started-playing", Events::ChimeStartedPlaying::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeEvent>(Id, "chime-started-playing", Events::ChimeStartedPlaying::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

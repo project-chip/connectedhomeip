@@ -47,8 +47,6 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Groupc
             return LeaveGroup::kMetadataEntry;
         case UpdateGroupKey::Id:
             return UpdateGroupKey::kMetadataEntry;
-        case ExpireGracePeriod::Id:
-            return ExpireGracePeriod::kMetadataEntry;
         case ConfigureAuxiliaryACL::Id:
             return ConfigureAuxiliaryACL::kMetadataEntry;
 

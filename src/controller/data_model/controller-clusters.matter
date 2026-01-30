@@ -359,6 +359,8 @@ fabric_scoped struct WebRTCSessionStruct {
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
   fabric_idx fabricIndex = 254;
 }
 
@@ -4389,9 +4391,8 @@ cluster Groupcast = 101 {
   fabric_scoped struct MembershipStruct {
     group_id groupID = 0;
     endpoint_no endpoints[] = 1;
-    fabric_sensitive int32u keyID = 2;
+    fabric_sensitive int16u keySetID = 2;
     boolean hasAuxiliaryACL = 3;
-    optional fabric_sensitive int32u expiringKeyID = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -4406,10 +4407,10 @@ cluster Groupcast = 101 {
   request struct JoinGroupRequest {
     group_id groupID = 0;
     endpoint_no endpoints[] = 1;
-    int32u keyID = 2;
+    int16u keySetID = 2;
     optional octet_string<16> key = 3;
-    optional epoch_s gracePeriod = 4;
-    optional boolean useAuxiliaryACL = 5;
+    optional boolean useAuxiliaryACL = 4;
+    optional boolean replaceEndpoints = 5;
   }
 
   request struct LeaveGroupRequest {
@@ -4419,19 +4420,13 @@ cluster Groupcast = 101 {
 
   response struct LeaveGroupResponse = 2 {
     group_id groupID = 0;
-    optional endpoint_no endpoints[] = 1;
-    optional boolean listTooLarge = 2;
+    endpoint_no endpoints[] = 1;
   }
 
   request struct UpdateGroupKeyRequest {
     group_id groupID = 0;
-    int32u keyID = 1;
+    int16u keySetID = 1;
     optional octet_string<16> key = 2;
-    optional epoch_s gracePeriod = 3;
-  }
-
-  request struct ExpireGracePeriodRequest {
-    group_id groupID = 0;
   }
 
   request struct ConfigureAuxiliaryACLRequest {
@@ -4443,12 +4438,10 @@ cluster Groupcast = 101 {
   fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
   /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
   fabric command access(invoke: manage) LeaveGroup(LeaveGroupRequest): LeaveGroupResponse = 1;
-  /** This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of. */
+  /** This command SHALL allow a fabric administrator to update the OperationalGroupKey associated with the existing group identified by GroupID, which is already joined. */
   fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
-  /** This command SHALL allow a fabric maintainer to expire the grace period of the previous key for an existing group ID that the server is a member of. */
-  fabric command access(invoke: manage) ExpireGracePeriod(ExpireGracePeriodRequest): DefaultSuccess = 4;
   /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
-  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 5;
+  fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 4;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -6460,7 +6453,7 @@ cluster DoorLock = 257 {
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
-  revision 5;
+  revision 8;
 
   enum EndProductType : enum8 {
     kRollerShade = 0;
@@ -8716,13 +8709,15 @@ provisional cluster AmbientContextSensing = 1073 {
     kHumanActivity = 0x1;
     kObjectCounting = 0x2;
     kObjectIdentification = 0x4;
-    kSoundClassification = 0x8;
+    kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
     optional epoch_s detectionStartTime = 1;
+    optional int16u objectCountThreshold = 2;
+    optional int16u objectCount = 3;
   }
 
   struct HoldTimeLimitsStruct {
@@ -8740,19 +8735,20 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
+  info event AmbientContextDetected = 0 {
+    AmbientContextTypeStruct ambientContextType[] = 0;
+  }
+
   readonly attribute optional boolean humanActivityDetected = 0;
   readonly attribute optional boolean objectIdentified = 1;
   readonly attribute optional boolean audioContextDetected = 2;
   readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
   attribute int8u simultaneousDetectionLimit = 5;
-  readonly attribute optional boolean countThresholdReached = 6;
-  attribute optional int16u countThreshold = 7;
-  readonly attribute optional int16u objectCount = 8;
-  attribute access(write: manage) optional int16u holdTime = 9;
-  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 10;
-  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
-  readonly attribute optional boolean privacyModeEnabled = 12;
+  readonly attribute optional boolean objectCountReached = 6;
+  attribute access(write: manage) int16u holdTime = 7;
+  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 8;
+  readonly attribute access(write: manage) optional PredictedActivityStruct predictedActivity[] = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -10123,6 +10119,7 @@ cluster CameraAvStreamManagement = 1361 {
 
   enum ImageCodecEnum : enum8 {
     kJPEG = 0 [spec_name = "JPEG"];
+    kHEIC = 1 [spec_name = "HEIC"];
   }
 
   enum TriStateAutoEnum : enum8 {
@@ -10490,7 +10487,7 @@ cluster CameraAvSettingsUserLevelManagement = 1362 {
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
 cluster WebRTCTransportProvider = 1363 {
-  revision 1;
+  revision 2;
 
   bitmap Feature : bitmap32 {
     kMetadata = 0x1;
@@ -10518,6 +10515,8 @@ cluster WebRTCTransportProvider = 1363 {
     optional char_string<16> ICETransportPolicy = 5;
     optional boolean metadataEnabled = 6;
     optional SFrameStruct SFrameConfig = 7;
+    optional int16u videoStreams[] = 8;
+    optional int16u audioStreams[] = 9;
   }
 
   response struct SolicitOfferResponse = 1 {
@@ -10538,6 +10537,8 @@ cluster WebRTCTransportProvider = 1363 {
     optional char_string<16> ICETransportPolicy = 7;
     optional boolean metadataEnabled = 8;
     optional SFrameStruct SFrameConfig = 9;
+    optional int16u videoStreams[] = 10;
+    optional int16u audioStreams[] = 11;
   }
 
   response struct ProvideOfferResponse = 3 {
@@ -10575,7 +10576,7 @@ cluster WebRTCTransportProvider = 1363 {
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
 cluster WebRTCTransportRequestor = 1364 {
-  revision 1;
+  revision 2;
 
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -10618,7 +10619,7 @@ cluster WebRTCTransportRequestor = 1364 {
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
 cluster PushAvStreamTransport = 1365 {
-  revision 1;
+  revision 2;
 
   enum CMAFInterfaceEnum : enum8 {
     kInterface1 = 0;
@@ -10645,6 +10646,8 @@ cluster PushAvStreamTransport = 1365 {
     kInvalidOptions = 9;
     kInvalidStreamUsage = 10;
     kInvalidTime = 11;
+    kInvalidPreRollLength = 12;
+    kDuplicateStreamValues = 13;
   }
 
   enum TransportStatusEnum : enum8 {
@@ -10662,6 +10665,7 @@ cluster PushAvStreamTransport = 1365 {
     kUserInitiated = 0;
     kAutomation = 1;
     kEmergency = 2;
+    kDoorbellPressed = 3;
   }
 
   bitmap Feature : bitmap32 {
@@ -10679,6 +10683,16 @@ cluster PushAvStreamTransport = 1365 {
   struct TransportZoneOptionsStruct {
     nullable int16u zone = 0;
     optional int8u sensitivity = 1;
+  }
+
+  struct AudioStreamStruct {
+    char_string<16> audioStreamName = 0;
+    int16u audioStreamID = 1;
+  }
+
+  struct VideoStreamStruct {
+    char_string<16> videoStreamName = 0;
+    int16u videoStreamID = 1;
   }
 
   struct TransportTriggerOptionsStruct {
@@ -10715,6 +10729,8 @@ cluster PushAvStreamTransport = 1365 {
     IngestMethodsEnum ingestMethod = 6;
     ContainerOptionsStruct containerOptions = 7;
     optional epoch_s expiryTime = 8;
+    optional VideoStreamStruct videoStreams[] = 9;
+    optional AudioStreamStruct audioStreams[] = 10;
   }
 
   fabric_scoped struct TransportConfigurationStruct {
@@ -10733,10 +10749,14 @@ cluster PushAvStreamTransport = 1365 {
     int16u connectionID = 0;
     TransportTriggerTypeEnum triggerType = 1;
     optional TriggerActivationReasonEnum activationReason = 2;
+    ContainerFormatEnum containerType = 3;
+    optional int64u CMAFSessionNumber = 4;
   }
 
   info event PushTransportEnd = 1 {
     int16u connectionID = 0;
+    ContainerFormatEnum containerType = 1;
+    optional int64u CMAFSessionNumber = 2;
   }
 
   readonly attribute SupportedFormatStruct supportedFormats[] = 0;
@@ -10800,11 +10820,15 @@ cluster PushAvStreamTransport = 1365 {
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 cluster Chime = 1366 {
-  revision 1;
+  revision 2;
 
   struct ChimeSoundStruct {
     int8u chimeID = 0;
     char_string<48> name = 1;
+  }
+
+  info event ChimeStartedPlaying = 0 {
+    int8u chimeID = 0;
   }
 
   readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
@@ -10816,8 +10840,12 @@ cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command will play the currently selected chime. */
-  command PlayChimeSound(): DefaultSuccess = 0;
+  request struct PlayChimeSoundRequest {
+    optional int8u chimeID = 0;
+  }
+
+  /** This command will play the currently selected chime or the chime passed in. */
+  command PlayChimeSound(PlayChimeSoundRequest): DefaultSuccess = 0;
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
