@@ -54,7 +54,7 @@ constexpr DeviceTypeId kContactSensorDeviceTypeId  = 0x00000015;
 constexpr uint8_t kContactSensorDeviceTypeRevision = 2;
 
 constexpr DeviceTypeId kRootNodeDeviceTypeId  = 0x00000016;
-constexpr uint8_t kRootNodeDeviceTypeRevision = 3;
+constexpr uint8_t kRootNodeDeviceTypeRevision = 4;
 
 constexpr DeviceTypeId kSolarPowerDeviceTypeId  = 0x00000017;
 constexpr uint8_t kSolarPowerDeviceTypeRevision = 1;

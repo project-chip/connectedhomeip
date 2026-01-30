@@ -4736,6 +4736,22 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("ObjectCountThreshold", indent + 1, value.objectCountThreshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ObjectCountThreshold'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ObjectCount", indent + 1, value.objectCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ObjectCount'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -11363,6 +11379,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Occupancy'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AmbientContextSensing::Events::AmbientContextDetected::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("AmbientContextType", indent + 1, value.ambientContextType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AmbientContextType'");
             return err;
         }
     }
@@ -20911,20 +20943,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SimultaneousDetectionLimit", 1, value);
         }
-        case AmbientContextSensing::Attributes::CountThresholdReached::Id: {
+        case AmbientContextSensing::Attributes::ObjectCountReached::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CountThresholdReached", 1, value);
-        }
-        case AmbientContextSensing::Attributes::CountThreshold::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CountThreshold", 1, value);
-        }
-        case AmbientContextSensing::Attributes::ObjectCount::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ObjectCount", 1, value);
+            return DataModelLogger::LogValue("ObjectCountReached", 1, value);
         }
         case AmbientContextSensing::Attributes::HoldTime::Id: {
             uint16_t value;
@@ -20942,11 +20964,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PredictedActivity", 1, value);
-        }
-        case AmbientContextSensing::Attributes::PrivacyModeEnabled::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PrivacyModeEnabled", 1, value);
         }
         case AmbientContextSensing::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -25248,6 +25265,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupancyChanged", 1, value);
+        }
+        }
+        break;
+    }
+    case AmbientContextSensing::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case AmbientContextSensing::Events::AmbientContextDetected::Id: {
+            chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetected::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AmbientContextDetected", 1, value);
         }
         }
         break;

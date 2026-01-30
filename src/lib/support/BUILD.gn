@@ -198,6 +198,10 @@ source_set("span") {
   ]
 }
 
+source_set("fixedbuffer") {
+  sources = [ "FixedBuffer.h" ]
+}
+
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
@@ -343,6 +347,7 @@ static_library("support") {
   public_deps = [
     ":attributes",
     ":chip_version_header",
+    ":fixedbuffer",
     ":logging_constants",
     ":memory",
     ":safeint",
