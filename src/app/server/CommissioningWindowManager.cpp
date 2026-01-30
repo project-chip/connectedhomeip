@@ -637,6 +637,8 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
             app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(request);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+        LogErrorOnFailure(DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCommissioningWindowChangedEvent(mWindowStatus));
     }
 
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
