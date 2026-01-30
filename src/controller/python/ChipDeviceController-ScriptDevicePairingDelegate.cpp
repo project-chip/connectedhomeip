@@ -78,8 +78,7 @@ void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
     mOnCommissioningStatusUpdateCallback = callback;
 }
 
-void ScriptDevicePairingDelegate::SetCommissioningStageStartCallback(
-    DevicePairingDelegate_OnCommissioningStageStartFunct callback)
+void ScriptDevicePairingDelegate::SetCommissioningStageStartCallback(DevicePairingDelegate_OnCommissioningStageStartFunct callback)
 {
     mOnCommissioningStageStartCallback = callback;
 }

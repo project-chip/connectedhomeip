@@ -47,8 +47,7 @@ typedef void (*DevicePairingDelegate_OnCommissioningFailureFunct)(
 typedef void (*DevicePairingDelegate_OnCommissioningStatusUpdateFunct)(PeerId peerId,
                                                                        chip::Controller::CommissioningStage stageCompleted,
                                                                        CHIP_ERROR err);
-typedef void (*DevicePairingDelegate_OnCommissioningStageStartFunct)(NodeId nodeId,
-                                                                     const char * stage);
+typedef void (*DevicePairingDelegate_OnCommissioningStageStartFunct)(NodeId nodeId, const char * stage);
 typedef void (*DevicePairingDelegate_OnFabricCheckFunct)(NodeId nodeId);
 }
 
