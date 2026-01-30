@@ -396,6 +396,7 @@ public:
     CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                              EventNumber & generatedEventNumber) override;
     void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override;
+    System::Clock::Microseconds64 GetMonotonicStartupTime() const override;
 
 private:
     static EventManagement sInstance;

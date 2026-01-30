@@ -36,6 +36,7 @@
 #ifdef BOARD_ENABLE_I2C
 #include "wiced_hal_i2c.h"
 #endif
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
@@ -244,8 +245,13 @@ void CYW30739MatterConfig::InitApp(void)
      * GenericEventManagementTestEventTriggerHandler, and so creating an instance of it here allows
      * this to work and replace the old global instance call to the cluster
      */
-    const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
-    static Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
+    static Clusters::GeneralDiagnosticsCluster cluster(
+        Clusters::GeneralDiagnosticsCluster::OptionalAttributeSet{}, chip::BitFlags<Clusters::GeneralDiagnostics::Feature>{},
+        Clusters::GeneralDiagnosticsCluster::Context{
+            .deviceLoadStatusProvider = *chip::app::InteractionModelEngine::GetInstance(),
+            .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+            .testEventTriggerDelegate = &sTestEventTriggerDelegate,
+        });
     sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);
     chip::Server::GetInstance().Init(initParams);
 
