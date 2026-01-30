@@ -78,7 +78,7 @@ class TC_TLSCLIENT_3_10(TC_TLSCLIENT_Base):
             TestStep(16, "CR2 sends FindEndpoint command with EndpointID set to myEndpoint.",
                      test_plan_support.verify_status(Status.NotFound)),
             TestStep(
-                17, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint[0].", test_plan_support.verify_success()),
+                17, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint.", test_plan_support.verify_success()),
             TestStep(18, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
