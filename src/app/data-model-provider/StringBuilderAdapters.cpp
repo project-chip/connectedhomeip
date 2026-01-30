@@ -57,7 +57,7 @@ void PrintTo(const chip::Protocols::InteractionModel::Status & status, std::ostr
 #if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
         << chip::Protocols::InteractionModel::StatusName(status) << "/"
 #endif
-        << static_cast<int>(status)) << ">";
+        << static_cast<int>(status) << ">";
 }
 
 } // namespace chip
