@@ -43,10 +43,6 @@ OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInte
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
-#if !CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    ChipLogError(SoftwareUpdate, "Initializing OTA requestor on endpoint %u with flag 'chip_enable_ota_requestor' disabled",
-                 mPath.mEndpointId);
-#endif
     return DefaultServerCluster::Startup(context);
 }
 
