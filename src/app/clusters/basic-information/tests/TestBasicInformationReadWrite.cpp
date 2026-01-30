@@ -190,10 +190,10 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     {
         // For the DeviceInstanceInfoProvider there is no default instance. Restore the provider that was installed prior to this
         // test suite, if any.
-        if (sDeviceInstanceInfoProviderBackup != nullptr)
-        {
-            DeviceLayer::SetDeviceInstanceInfoProvider(sDeviceInstanceInfoProviderBackup);
-        }
+        // if (mDelegate.mDeviceInfoProvider.GetDeviceInstanceInfoProvider() != nullptr)
+        // {
+        // DeviceLayer::SetDeviceInstanceInfoProvider(sDeviceInstanceInfoProviderBackup);
+        // }
         DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         chip::Platform::MemoryShutdown();
     }
