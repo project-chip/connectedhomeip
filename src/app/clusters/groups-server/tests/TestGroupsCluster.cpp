@@ -182,7 +182,9 @@ TEST_F(TestGroupsCluster, TestAddGroup)
     auto result = InvokeAddGroup(kGroupId, "Test Group");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->groupID, kGroupId);
 
     // Verify the group was added
@@ -196,6 +198,7 @@ TEST_F(TestGroupsCluster, TestAddGroupInvalidId)
     auto result = InvokeAddGroup(0, "Invalid Group");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::ConstraintError);
 }
 
@@ -206,6 +209,7 @@ TEST_F(TestGroupsCluster, TestAddGroupLongName)
     auto result = InvokeAddGroup(2, "This Group Name Is Way Too Long");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::ConstraintError);
 }
 
@@ -231,6 +235,7 @@ TEST_F(TestGroupsCluster, TestAddGroupMaxGroups)
         auto result = InvokeAddGroup(kGroupId, groupName.c_str());
         EXPECT_TRUE(result.IsSuccess());
         ASSERT_TRUE(result.response.has_value());
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
     }
 
@@ -240,6 +245,7 @@ TEST_F(TestGroupsCluster, TestAddGroupMaxGroups)
     auto result          = InvokeAddGroup(extraGroupId, "Max Group");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::UnsupportedAccess);
 }
 
@@ -255,7 +261,9 @@ TEST_F(TestGroupsCluster, TestAddGroup_UnsupportedAccess)
     auto result = InvokeAddGroup(kGroupId, "Test Group");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::UnsupportedAccess);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->groupID, kGroupId);
 
     // Verify the group was not added
@@ -275,6 +283,7 @@ TEST_F(TestGroupsCluster, TestViewGroup)
     auto result = InvokeViewGroup(kGroupId);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::NotFound);
 
     // 2. Add the group
@@ -283,20 +292,25 @@ TEST_F(TestGroupsCluster, TestViewGroup)
     auto addResult = InvokeAddGroup(kGroupId, kGroupName);
     ASSERT_TRUE(addResult.IsSuccess());
     ASSERT_TRUE(addResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(addResult.response->status), Protocols::InteractionModel::Status::Success);
 
     // 3. Test Success
     result = InvokeViewGroup(kGroupId);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->groupID, kGroupId);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(result.response->groupName.data_equal(CharSpan::fromCharString(kGroupName)));
 
     // 4. Test Invalid ID
     result = InvokeViewGroup(0);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::ConstraintError);
 }
 
@@ -315,6 +329,7 @@ TEST_F(TestGroupsCluster, TestRemoveGroup)
     auto addResult = InvokeAddGroup(kGroupId, "RemoveTest");
     ASSERT_TRUE(addResult.IsSuccess());
     ASSERT_TRUE(addResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(addResult.response->status), Protocols::InteractionModel::Status::Success);
 
     // 2. Test NotFound on a different GroupId
@@ -323,6 +338,7 @@ TEST_F(TestGroupsCluster, TestRemoveGroup)
     auto result           = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(removeRequest);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::NotFound);
 
     // 3. Test Success on the added group
@@ -330,13 +346,16 @@ TEST_F(TestGroupsCluster, TestRemoveGroup)
     result                = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(removeRequest);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->groupID, kGroupId);
 
     // Verify group is removed
     auto viewResult = InvokeViewGroup(kGroupId);
     EXPECT_TRUE(viewResult.IsSuccess());
     ASSERT_TRUE(viewResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::NotFound);
 
     // 4. Test Invalid ID
@@ -344,6 +363,7 @@ TEST_F(TestGroupsCluster, TestRemoveGroup)
     result                = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(removeRequest);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::ConstraintError);
 }
 
@@ -365,8 +385,11 @@ TEST_F(TestGroupsCluster, TestGetGroupMembership)
     MapGroupToKeyset(kFabricIndex4, kGroupId2, kKeysetId, 1);
     MapGroupToKeyset(kFabricIndex4, kGroupId3, kKeysetId, 2);
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId1, "G1").response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId2, "G2").response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId3, "G3").response->status), Protocols::InteractionModel::Status::Success);
 
     // Test cases
@@ -378,7 +401,9 @@ TEST_F(TestGroupsCluster, TestGetGroupMembership)
     auto result       = mClusterTester->Invoke<Groups::Commands::GetGroupMembership::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    ASSERT_TRUE(result.response->capacity.IsNull()); // Capacity is allowed to be null
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    EXPECT_TRUE(result.response->capacity.IsNull()); // Capacity is allowed to be null
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto iter = result.response->groupList.begin();
     EXPECT_TRUE(iter.Next());
     EXPECT_EQ(iter.GetValue(), kGroupId1);
@@ -394,6 +419,7 @@ TEST_F(TestGroupsCluster, TestGetGroupMembership)
     result                     = mClusterTester->Invoke<Groups::Commands::GetGroupMembership::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     iter = result.response->groupList.begin();
     EXPECT_FALSE(iter.Next());
 
@@ -403,6 +429,7 @@ TEST_F(TestGroupsCluster, TestGetGroupMembership)
     result                     = mClusterTester->Invoke<Groups::Commands::GetGroupMembership::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     iter = result.response->groupList.begin();
     ASSERT_TRUE(iter.Next());
     EXPECT_EQ(iter.GetValue(), kGroupId1);
@@ -416,6 +443,7 @@ TEST_F(TestGroupsCluster, TestGetGroupMembership)
     result                     = mClusterTester->Invoke<Groups::Commands::GetGroupMembership::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     iter = result.response->groupList.begin();
     ASSERT_TRUE(iter.Next());
     EXPECT_EQ(iter.GetValue(), kGroupId1);
@@ -440,7 +468,9 @@ TEST_F(TestGroupsCluster, TestRemoveAllGroups)
     MapGroupToKeyset(kFabricIndex5, kGroupId1, kKeysetId, 0);
     MapGroupToKeyset(kFabricIndex5, kGroupId2, kKeysetId, 1);
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId1, "G1").response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId2, "G2").response->status), Protocols::InteractionModel::Status::Success);
 
     // Call RemoveAllGroups
@@ -487,7 +517,9 @@ TEST_F(TestGroupsCluster, TestAddGroupIfIdentifying)
     auto viewResult = InvokeViewGroup(kGroupId);
     EXPECT_TRUE(viewResult.IsSuccess());
     ASSERT_TRUE(viewResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(viewResult.response->groupID, kGroupId);
 
     // 4. Stop identifying
@@ -515,19 +547,23 @@ TEST_F(TestGroupsCluster, TestAddGroupUpdateName)
     auto result = InvokeAddGroup(kGroupId, "Original Name");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
 
     // Update the group name
     result = InvokeAddGroup(kGroupId, "Updated Name");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
 
     // Verify the group name was updated
     auto viewResult = InvokeViewGroup(kGroupId);
     EXPECT_TRUE(viewResult.IsSuccess());
     ASSERT_TRUE(viewResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(viewResult.response->groupName.data_equal("Updated Name"_span));
 }
 
@@ -543,13 +579,16 @@ TEST_F(TestGroupsCluster, TestAddGroupEmptyName)
     auto result = InvokeAddGroup(kGroupId, "");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
 
     // Verify the group name is empty
     auto viewResult = InvokeViewGroup(kGroupId);
     EXPECT_TRUE(viewResult.IsSuccess());
     ASSERT_TRUE(viewResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(viewResult.response->groupName.empty());
 }
 
@@ -565,13 +604,16 @@ TEST_F(TestGroupsCluster, TestAddGroupMaxLengthName)
     auto result = InvokeAddGroup(kGroupId, "1234567890123456"); // 16 characters
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
 
     // Verify the group name
     auto viewResult = InvokeViewGroup(kGroupId);
     EXPECT_TRUE(viewResult.IsSuccess());
     ASSERT_TRUE(viewResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(viewResult.response->groupName.data_equal("1234567890123456"_span));
 }
 
@@ -636,6 +678,7 @@ TEST_F(TestGroupsCluster, TestAddGroupIfIdentifying_ResourceExhausted)
         MapGroupToKeyset(kFabricIndex1, kGroupId, kKeysetId, i);
         StringBuilder<16> groupName;
         groupName.AddFormat("Group %d", i);
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId, groupName.c_str()).response->status),
                   Protocols::InteractionModel::Status::Success);
     }
@@ -678,12 +721,14 @@ TEST_F(TestGroupsCluster, TestFabricScoping)
     mClusterTester->SetFabricIndex(kFabricIndex1);
     SetupKeySet(kFabricIndex1, kKeysetId1);
     MapGroupToKeyset(kFabricIndex1, kGroupId1, kKeysetId1);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId1, "Fabric1Group").response->status), Protocols::InteractionModel::Status::Success);
 
     // Fabric 2 setup
     mClusterTester->SetFabricIndex(kFabricIndex2);
     SetupKeySet(kFabricIndex2, kKeysetId2);
     MapGroupToKeyset(kFabricIndex2, kGroupId2, kKeysetId2);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(InvokeAddGroup(kGroupId2, "Fabric2Group").response->status), Protocols::InteractionModel::Status::Success);
 
     // Check isolation
@@ -692,6 +737,7 @@ TEST_F(TestGroupsCluster, TestFabricScoping)
     auto viewResult = InvokeViewGroup(kGroupId1);
     EXPECT_TRUE(viewResult.IsSuccess());
     ASSERT_TRUE(viewResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::NotFound);
 
     // Group2 should not be in Fabric 1
@@ -699,6 +745,7 @@ TEST_F(TestGroupsCluster, TestFabricScoping)
     viewResult = InvokeViewGroup(kGroupId2);
     EXPECT_TRUE(viewResult.IsSuccess());
     ASSERT_TRUE(viewResult.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::NotFound);
 
     // GetGroupMembership for Fabric 1 - Should only contain GroupId1
@@ -708,6 +755,7 @@ TEST_F(TestGroupsCluster, TestFabricScoping)
     auto result       = mClusterTester->Invoke<Groups::Commands::GetGroupMembership::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto iter = result.response->groupList.begin();
     EXPECT_TRUE(iter.Next());
     EXPECT_EQ(iter.GetValue(), kGroupId1);
@@ -718,6 +766,7 @@ TEST_F(TestGroupsCluster, TestFabricScoping)
     result = mClusterTester->Invoke<Groups::Commands::GetGroupMembership::Type>(request);
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     iter = result.response->groupList.begin();
     EXPECT_TRUE(iter.Next());
     EXPECT_EQ(iter.GetValue(), kGroupId2);
