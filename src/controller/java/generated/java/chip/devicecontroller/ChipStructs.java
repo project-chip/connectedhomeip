@@ -5867,36 +5867,41 @@ public static class ScenesManagementClusterSceneInfoStruct {
 }
 public static class GroupcastClusterMembershipStruct {
   public Integer groupID;
-  public ArrayList<Integer> endpoints;
+  public Optional<ArrayList<Integer>> endpoints;
   public Integer keySetID;
-  public Boolean hasAuxiliaryACL;
+  public Optional<Boolean> hasAuxiliaryACL;
+  public Integer mcastAddrPolicy;
   public Integer fabricIndex;
   private static final long GROUP_ID_ID = 0L;
   private static final long ENDPOINTS_ID = 1L;
   private static final long KEY_SET_ID_ID = 2L;
   private static final long HAS_AUXILIARY_ACL_ID = 3L;
+  private static final long MCAST_ADDR_POLICY_ID = 4L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public GroupcastClusterMembershipStruct(
     Integer groupID,
-    ArrayList<Integer> endpoints,
+    Optional<ArrayList<Integer>> endpoints,
     Integer keySetID,
-    Boolean hasAuxiliaryACL,
+    Optional<Boolean> hasAuxiliaryACL,
+    Integer mcastAddrPolicy,
     Integer fabricIndex
   ) {
     this.groupID = groupID;
     this.endpoints = endpoints;
     this.keySetID = keySetID;
     this.hasAuxiliaryACL = hasAuxiliaryACL;
+    this.mcastAddrPolicy = mcastAddrPolicy;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(GROUP_ID_ID, new UIntType(groupID)));
-    values.add(new StructElement(ENDPOINTS_ID, ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints))));
+    values.add(new StructElement(ENDPOINTS_ID, endpoints.<BaseTLVType>map((nonOptionalendpoints) -> ArrayType.generateArrayType(nonOptionalendpoints, (elementnonOptionalendpoints) -> new UIntType(elementnonOptionalendpoints))).orElse(new EmptyType())));
     values.add(new StructElement(KEY_SET_ID_ID, new UIntType(keySetID)));
-    values.add(new StructElement(HAS_AUXILIARY_ACL_ID, new BooleanType(hasAuxiliaryACL)));
+    values.add(new StructElement(HAS_AUXILIARY_ACL_ID, hasAuxiliaryACL.<BaseTLVType>map((nonOptionalhasAuxiliaryACL) -> new BooleanType(nonOptionalhasAuxiliaryACL)).orElse(new EmptyType())));
+    values.add(new StructElement(MCAST_ADDR_POLICY_ID, new UIntType(mcastAddrPolicy)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -5907,9 +5912,10 @@ public static class GroupcastClusterMembershipStruct {
       return null;
     }
     Integer groupID = null;
-    ArrayList<Integer> endpoints = null;
+    Optional<ArrayList<Integer>> endpoints = Optional.empty();
     Integer keySetID = null;
-    Boolean hasAuxiliaryACL = null;
+    Optional<Boolean> hasAuxiliaryACL = Optional.empty();
+    Integer mcastAddrPolicy = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_ID_ID) {
@@ -5920,7 +5926,7 @@ public static class GroupcastClusterMembershipStruct {
       } else if (element.contextTagNum() == ENDPOINTS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          endpoints = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+          endpoints = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
         }
       } else if (element.contextTagNum() == KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5930,7 +5936,12 @@ public static class GroupcastClusterMembershipStruct {
       } else if (element.contextTagNum() == HAS_AUXILIARY_ACL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          hasAuxiliaryACL = castingValue.value(Boolean.class);
+          hasAuxiliaryACL = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == MCAST_ADDR_POLICY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mcastAddrPolicy = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5944,6 +5955,7 @@ public static class GroupcastClusterMembershipStruct {
       endpoints,
       keySetID,
       hasAuxiliaryACL,
+      mcastAddrPolicy,
       fabricIndex
     );
   }
@@ -5963,6 +5975,9 @@ public static class GroupcastClusterMembershipStruct {
     output.append("\n");
     output.append("\thasAuxiliaryACL: ");
     output.append(hasAuxiliaryACL);
+    output.append("\n");
+    output.append("\tmcastAddrPolicy: ");
+    output.append(mcastAddrPolicy);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);

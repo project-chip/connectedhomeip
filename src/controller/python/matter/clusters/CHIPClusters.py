@@ -5520,6 +5520,7 @@ class ChipClusters:
                     "key": "bytes",
                     "useAuxiliaryACL": "bool",
                     "replaceEndpoints": "bool",
+                    "mcastAddrPolicy": "int",
                 },
             },
             0x00000001: {
@@ -5547,6 +5548,14 @@ class ChipClusters:
                     "useAuxiliaryACL": "bool",
                 },
             },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "GroupcastTesting",
+                "args": {
+                    "testOperation": "int",
+                    "durationSeconds": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -5558,6 +5567,24 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "MaxMembershipCount",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxMcastAddrCount",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "UsedMcastAddrCount",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "FabricUnderTest",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },

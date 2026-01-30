@@ -28,11 +28,53 @@ namespace app {
 namespace Clusters {
 namespace Groupcast {
 
+// Enum for GroupcastTestResultEnum
+enum class GroupcastTestResultEnum : uint8_t
+{
+    kSuccess        = 0x00,
+    kGeneralError   = 0x01,
+    kMessageReplay  = 0x02,
+    kFailedAuth     = 0x03,
+    kNoAvailableKey = 0x04,
+    kSendFailure    = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+
+// Enum for GroupcastTestingEnum
+enum class GroupcastTestingEnum : uint8_t
+{
+    kDisableTesting        = 0x00,
+    kEnableListenerTesting = 0x01,
+    kEnableSenderTesting   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MulticastAddrPolicyEnum
+enum class MulticastAddrPolicyEnum : uint8_t
+{
+    kIanaAddr = 0x00,
+    kPerGroup = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
     kListener = 0x1,
     kSender   = 0x2,
+    kPerGroup = 0x4,
 };
 } // namespace Groupcast
 } // namespace Clusters

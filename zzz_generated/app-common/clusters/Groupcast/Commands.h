@@ -72,6 +72,11 @@ struct Type;
 struct DecodableType;
 } // namespace ConfigureAuxiliaryACL
 
+namespace GroupcastTesting {
+struct Type;
+struct DecodableType;
+} // namespace GroupcastTesting
+
 } // namespace Commands
 
 namespace Commands {
@@ -84,6 +89,7 @@ enum class Fields : uint8_t
     kKey              = 3,
     kUseAuxiliaryACL  = 4,
     kReplaceEndpoints = 5,
+    kMcastAddrPolicy  = 6,
 };
 
 struct Type
@@ -99,6 +105,7 @@ public:
     Optional<chip::ByteSpan> key;
     Optional<bool> useAuxiliaryACL;
     Optional<bool> replaceEndpoints;
+    Optional<MulticastAddrPolicyEnum> mcastAddrPolicy;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -120,6 +127,7 @@ public:
     Optional<chip::ByteSpan> key;
     Optional<bool> useAuxiliaryACL;
     Optional<bool> replaceEndpoints;
+    Optional<MulticastAddrPolicyEnum> mcastAddrPolicy;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
@@ -274,6 +282,43 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ConfigureAuxiliaryACL
+namespace GroupcastTesting {
+enum class Fields : uint8_t
+{
+    kTestOperation   = 0,
+    kDurationSeconds = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GroupcastTesting::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
+
+    GroupcastTestingEnum testOperation = static_cast<GroupcastTestingEnum>(0);
+    Optional<uint16_t> durationSeconds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GroupcastTesting::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    GroupcastTestingEnum testOperation = static_cast<GroupcastTestingEnum>(0);
+    Optional<uint16_t> durationSeconds;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+};
+}; // namespace GroupcastTesting
 } // namespace Commands
 } // namespace Groupcast
 } // namespace Clusters

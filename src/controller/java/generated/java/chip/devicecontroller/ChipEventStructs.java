@@ -3441,6 +3441,172 @@ public static class RvcOperationalStateClusterOperationCompletionEvent {
     return output.toString();
   }
 }
+public static class GroupcastClusterGroupcastTestingEvent {
+  public Optional<byte[]> sourceIpAddress;
+  public Optional<byte[]> destinationIpAddress;
+  public Optional<Integer> groupID;
+  public Optional<Integer> endpointID;
+  public Optional<Long> clusterID;
+  public Optional<Long> elementID;
+  public Optional<Boolean> accessAllowed;
+  public Integer groupcastTestResult;
+  public Integer fabricIndex;
+  private static final long SOURCE_IP_ADDRESS_ID = 0L;
+  private static final long DESTINATION_IP_ADDRESS_ID = 1L;
+  private static final long GROUP_ID_ID = 2L;
+  private static final long ENDPOINT_ID_ID = 3L;
+  private static final long CLUSTER_ID_ID = 4L;
+  private static final long ELEMENT_ID_ID = 5L;
+  private static final long ACCESS_ALLOWED_ID = 6L;
+  private static final long GROUPCAST_TEST_RESULT_ID = 7L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public GroupcastClusterGroupcastTestingEvent(
+    Optional<byte[]> sourceIpAddress,
+    Optional<byte[]> destinationIpAddress,
+    Optional<Integer> groupID,
+    Optional<Integer> endpointID,
+    Optional<Long> clusterID,
+    Optional<Long> elementID,
+    Optional<Boolean> accessAllowed,
+    Integer groupcastTestResult,
+    Integer fabricIndex
+  ) {
+    this.sourceIpAddress = sourceIpAddress;
+    this.destinationIpAddress = destinationIpAddress;
+    this.groupID = groupID;
+    this.endpointID = endpointID;
+    this.clusterID = clusterID;
+    this.elementID = elementID;
+    this.accessAllowed = accessAllowed;
+    this.groupcastTestResult = groupcastTestResult;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SOURCE_IP_ADDRESS_ID, sourceIpAddress.<BaseTLVType>map((nonOptionalsourceIpAddress) -> new ByteArrayType(nonOptionalsourceIpAddress)).orElse(new EmptyType())));
+    values.add(new StructElement(DESTINATION_IP_ADDRESS_ID, destinationIpAddress.<BaseTLVType>map((nonOptionaldestinationIpAddress) -> new ByteArrayType(nonOptionaldestinationIpAddress)).orElse(new EmptyType())));
+    values.add(new StructElement(GROUP_ID_ID, groupID.<BaseTLVType>map((nonOptionalgroupID) -> new UIntType(nonOptionalgroupID)).orElse(new EmptyType())));
+    values.add(new StructElement(ENDPOINT_ID_ID, endpointID.<BaseTLVType>map((nonOptionalendpointID) -> new UIntType(nonOptionalendpointID)).orElse(new EmptyType())));
+    values.add(new StructElement(CLUSTER_ID_ID, clusterID.<BaseTLVType>map((nonOptionalclusterID) -> new UIntType(nonOptionalclusterID)).orElse(new EmptyType())));
+    values.add(new StructElement(ELEMENT_ID_ID, elementID.<BaseTLVType>map((nonOptionalelementID) -> new UIntType(nonOptionalelementID)).orElse(new EmptyType())));
+    values.add(new StructElement(ACCESS_ALLOWED_ID, accessAllowed.<BaseTLVType>map((nonOptionalaccessAllowed) -> new BooleanType(nonOptionalaccessAllowed)).orElse(new EmptyType())));
+    values.add(new StructElement(GROUPCAST_TEST_RESULT_ID, new UIntType(groupcastTestResult)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static GroupcastClusterGroupcastTestingEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<byte[]> sourceIpAddress = Optional.empty();
+    Optional<byte[]> destinationIpAddress = Optional.empty();
+    Optional<Integer> groupID = Optional.empty();
+    Optional<Integer> endpointID = Optional.empty();
+    Optional<Long> clusterID = Optional.empty();
+    Optional<Long> elementID = Optional.empty();
+    Optional<Boolean> accessAllowed = Optional.empty();
+    Integer groupcastTestResult = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SOURCE_IP_ADDRESS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          sourceIpAddress = Optional.of(castingValue.value(byte[].class));
+        }
+      } else if (element.contextTagNum() == DESTINATION_IP_ADDRESS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          destinationIpAddress = Optional.of(castingValue.value(byte[].class));
+        }
+      } else if (element.contextTagNum() == GROUP_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          groupID = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == CLUSTER_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clusterID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ELEMENT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          elementID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == ACCESS_ALLOWED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          accessAllowed = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == GROUPCAST_TEST_RESULT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          groupcastTestResult = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new GroupcastClusterGroupcastTestingEvent(
+      sourceIpAddress,
+      destinationIpAddress,
+      groupID,
+      endpointID,
+      clusterID,
+      elementID,
+      accessAllowed,
+      groupcastTestResult,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GroupcastClusterGroupcastTestingEvent {\n");
+    output.append("\tsourceIpAddress: ");
+    output.append(sourceIpAddress.isPresent() ? Arrays.toString(sourceIpAddress.get()) : "");
+    output.append("\n");
+    output.append("\tdestinationIpAddress: ");
+    output.append(destinationIpAddress.isPresent() ? Arrays.toString(destinationIpAddress.get()) : "");
+    output.append("\n");
+    output.append("\tgroupID: ");
+    output.append(groupID);
+    output.append("\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
+    output.append("\tclusterID: ");
+    output.append(clusterID);
+    output.append("\n");
+    output.append("\telementID: ");
+    output.append(elementID);
+    output.append("\n");
+    output.append("\taccessAllowed: ");
+    output.append(accessAllowed);
+    output.append("\n");
+    output.append("\tgroupcastTestResult: ");
+    output.append(groupcastTestResult);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class BooleanStateConfigurationClusterAlarmsStateChangedEvent {
   public Integer alarmsActive;
   public Optional<Integer> alarmsSuppressed;

@@ -288,6 +288,7 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/GeneralDiagnosticsClusterHardwareFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/GeneralDiagnosticsClusterNetworkFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/GeneralDiagnosticsClusterRadioFaultChangeEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/GroupcastClusterGroupcastTestingEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MediaPlaybackClusterStateChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessageCompleteEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/MessagesClusterMessagePresentedEvent.kt",
