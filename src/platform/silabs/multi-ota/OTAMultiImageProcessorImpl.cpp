@@ -25,7 +25,7 @@
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
-static chip::OTAMultiImageProcessorImpl gImageProcessor;
+static chip::DeviceLayer::Silabs::MultiOTA::OTAMultiImageProcessorImpl gImageProcessor;
 
 extern "C" {
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -39,6 +39,9 @@ extern "C" {
 }
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTAMultiImageProcessorImpl::Init(OTADownloader * downloader)
 {
@@ -381,7 +384,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandleApply: started");
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
 
     if (imageProcessor == nullptr)
     {
@@ -423,7 +426,7 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     VerifyOrReturn(SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true) == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "WriteConfigValue failed"));
 #ifdef SLI_SI91X_MCU_INTERFACE // 917 SoC reboot
-    chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
+    DeviceLayer::Silabs::GetPlatform().SoftwareReset();
 #else // EFR reboot
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif
@@ -457,4 +460,7 @@ OTAMultiImageProcessorImpl & OTAMultiImageProcessorImpl::GetDefaultInstance()
     return gImageProcessor;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

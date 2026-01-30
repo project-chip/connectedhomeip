@@ -2293,7 +2293,7 @@ cluster IcdManagement = 70 {
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
-  revision 5;
+  revision 8;
 
   enum EndProductType : enum8 {
     kRollerShade = 0;
@@ -2444,7 +2444,7 @@ cluster WindowCovering = 258 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 4;
   device type ma_powersource = 17, version 1;
   device type ma_otarequestor = 18, version 1;
 
@@ -2793,7 +2793,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_windowcovering = 514, version 2;
+  device type ma_windowcovering = 514, version 5;
 
 
   server cluster Identify {
@@ -2876,7 +2876,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_windowcovering = 514, version 2;
+  device type ma_windowcovering = 514, version 5;
 
 
   server cluster Identify {

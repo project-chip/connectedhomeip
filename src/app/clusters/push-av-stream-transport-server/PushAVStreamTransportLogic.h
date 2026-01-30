@@ -103,6 +103,11 @@ public:
         const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions);
 
     std::optional<DataModel::ActionReturnStatus>
+    ValidateStreamParameters(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                             const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions,
+                             const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr);
+
+    std::optional<DataModel::ActionReturnStatus>
     HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
 
@@ -129,7 +134,9 @@ public:
     // Send Push AV Stream Transport events
     Protocols::InteractionModel::Status
     GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason,
+                                    const PushAvStreamTransport::ContainerFormatEnum containerType,
+                                    const Optional<uint64_t> cmafSessionNumber = Optional<uint64_t>());
     Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
