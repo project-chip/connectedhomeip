@@ -170,12 +170,13 @@ class TC_GENERICSWITCH(MatterBaseTest):
                     actions_service_pb2.Action(
                         type=actions_service_pb2.ActionType.EMIT_EVENT,
                         delayMs=0,
-                        actionId=1,  # Initial press
+                        actionId=Clusters.Objects.Switch.Events.InitialPress.event_id,
                         arg1=1,  # Position = 1
                     ),
                 ]
             )
             logger.info("Injected initial press event.")
+            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.InitialPress)
             events_callback_1.cancel()
 
 
