@@ -24,7 +24,14 @@ namespace chip::app::Clusters {
 class UserLabelCluster : public DefaultServerCluster, public chip::FabricTable::Delegate
 {
 public:
-    UserLabelCluster(EndpointId endpoint);
+    struct Context
+    {
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
+        chip::FabricTable & fabricTable;
+    };
+
+    UserLabelCluster(EndpointId endpoint, Context && context) :
+        DefaultServerCluster({ endpoint, UserLabel::Id }), mContext(std::move(context)){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
@@ -41,6 +48,9 @@ public:
     // Constraints for label entries
     static constexpr size_t kMaxLabelSize = 16;
     static constexpr size_t kMaxValueSize = 16;
+
+private:
+    Context mContext;
 };
 
 } // namespace chip::app::Clusters

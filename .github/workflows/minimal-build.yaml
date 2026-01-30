@@ -38,7 +38,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
 
             - name: Checkout submodules # but don't bootstrap!
               uses: ./.github/actions/checkout-submodules
@@ -60,7 +60,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
 
             - name: Checkout submodules # but don't bootstrap!
               uses: ./.github/actions/checkout-submodules

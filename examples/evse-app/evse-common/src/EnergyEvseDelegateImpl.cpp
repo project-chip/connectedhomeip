@@ -21,6 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
