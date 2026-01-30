@@ -32,8 +32,12 @@ template <>
 StatusWithSize ToString<chip::Protocols::InteractionModel::Status>(const chip::Protocols::InteractionModel::Status & status,
                                                                    pw::span<char> buffer)
 {
+#if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
     return pw::string::Format(buffer, "Status<%s/%d>", chip::Protocols::InteractionModel::StatusName(status),
                               static_cast<int>(status));
+#else
+    return pw::string::Format(buffer, "Status<%d>", static_cast<int>(status));
+#endif
 }
 
 } // namespace pw
@@ -49,7 +53,11 @@ void PrintTo(const chip::app::DataModel::ActionReturnStatus & status, std::ostre
 
 void PrintTo(const chip::Protocols::InteractionModel::Status & status, std::ostream * os)
 {
-    *os << "Status<" << chip::Protocols::InteractionModel::StatusName(status) << "/" << static_cast<int>(status)) << ">";
+    *os << "Status<"
+#if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+        << chip::Protocols::InteractionModel::StatusName(status) << "/"
+#endif
+        << static_cast<int>(status)) << ">";
 }
 
 } // namespace chip
