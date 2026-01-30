@@ -34,7 +34,7 @@ limitations under the License.
         <typeName>Root Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0016</deviceId>
-        <revision editable="false">3</revision>
+        <revision editable="false">4</revision>
         <class>Node</class>
         <scope>Node</scope>
         <clusters lockOthers="true">

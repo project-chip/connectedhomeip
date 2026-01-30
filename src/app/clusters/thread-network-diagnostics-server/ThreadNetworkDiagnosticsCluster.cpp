@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +15,16 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/EventLogging.h>
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsCluster.h>
 #include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
-#include <app/util/attribute-storage.h>
+#include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/ThreadNetworkDiagnostics/AttributeIds.h>
 #include <clusters/ThreadNetworkDiagnostics/Metadata.h>
-#include <lib/core/CHIPEncoding.h>
-#include <lib/core/Optional.h>
-#include <lib/core/TLVTypes.h>
-#include <lib/support/CHIPPlatformMemory.h>
+#include <cstdint>
+#include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/DiagnosticDataProvider.h>
-#include <tracing/macros.h>
-#include <tracing/metric_event.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,180 +32,186 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics::Attributes;
 using namespace chip::DeviceLayer;
-using chip::Protocols::InteractionModel::Status;
 
-namespace {
+namespace chip::app::Clusters {
 
-class ThreadDiagnosticsAttrAccess : public AttributeAccessInterface
+using namespace ThreadNetworkDiagnostics;
+using namespace ThreadNetworkDiagnostics::Attributes;
+
+namespace ThreadNetworkDiagnostics {
+
+// This cluster has a LOT of attributes, however what we have is:
+//   - all are sequential 0x0000 == Channel to 0x0040 == Rloc16
+//   - All have RV permissions (No quality flags, privilege view, no write privilege), except lists which have a list privilege
+//
+// If we use kMetadataEntry we pay 8 bytes for metadata, but really we need 1 byte per attribute
+// AND we only really need some ranges and "is list" checks.
+//
+// We do all this to save flash (about 600 bytes) and rely on unit tests to validate
+// that the resulting attributes are actually correct.
+
+struct AttributeIdRange
 {
-public:
-    // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
-    ThreadDiagnosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    uint8_t startInclusive;
+    uint8_t endInclusive;
 };
 
-ThreadDiagnosticsAttrAccess gAttrAccess;
+// we will rely on unit tests to validate that we actually cover everything correctly
+constexpr AttributeIdRange kFullAttributeRange{
+    .startInclusive = Attributes::Channel::Id, //
+    .endInclusive   = Attributes::Rloc16::Id,  //
+};
 
-CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    if (aPath.mClusterId != ThreadNetworkDiagnostics::Id)
+// mandatory attributes are in a few ranges, added here
+constexpr AttributeIdRange kMandatoryAttributeRanges[] = {
     {
-        // We shouldn't have been called at all.
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        .startInclusive = Attributes::Channel::Id,
+        .endInclusive   = Attributes::MeshLocalPrefix::Id,
+    },
+    {
+        .startInclusive = Attributes::NeighborTable::Id,
+        .endInclusive   = Attributes::LeaderRouterId::Id,
+    },
+    {
+        .startInclusive = Attributes::SecurityPolicy::Id,
+        .endInclusive   = Attributes::Rloc16::Id,
+    },
+};
+
+CHIP_ERROR AppendAllInRange(const AttributeIdRange range, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    for (uint8_t id = range.startInclusive; id <= range.endInclusive; id++)
+    {
+        bool isList = (                                     //
+            (id == Attributes::NeighborTable::Id) ||        //
+            (id == Attributes::RouteTable::Id) ||           //
+            (id == Attributes::ActiveNetworkFaultsList::Id) //
+        );
+
+        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry{
+            id,
+            isList ? BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute)
+                   : BitFlags<DataModel::AttributeQualityFlags>(),
+            Access::Privilege::kView, std::nullopt }));
+    }
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ThreadNetworkDiagnostics
+
+ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType) :
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mClusterType(clusterType)
+{}
+
+DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                             AttributeValueEncoder & encoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case ClusterRevision::Id:
+        return encoder.Encode(ThreadNetworkDiagnostics::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(mClusterType == ClusterType::kMinimal ? BitFlags<Feature>() : kFeaturesAll);
+    default:
+        // Since ReadAttribute() is invoked only for valid attributes this is safe
+        return WriteThreadNetworkDiagnosticAttributeToTlv(request.path.mAttributeId, encoder);
+    }
+}
+
+CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath & path,
+                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    // pre-allocate for all
+    ReturnErrorOnFailure(
+        builder.EnsureAppendCapacity(kFullAttributeRange.endInclusive + DefaultServerCluster::GlobalAttributes().size()));
+
+    // We only support minimal and full set of attributes because of flash considerations
+    if (mClusterType == ClusterType::kMinimal)
+    {
+        for (const auto & range : kMandatoryAttributeRanges)
+        {
+            ReturnErrorOnFailure(AppendAllInRange(range, builder));
+        }
+    }
+    else
+    {
+        ReturnErrorOnFailure(AppendAllInRange(kFullAttributeRange, builder));
     }
 
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::ClusterRevision::Id:
-        return aEncoder.Encode(ThreadNetworkDiagnostics::kRevision);
+    // NOTE: ReferenceExisting will APPEND data (and use heap) when some data already
+    //       exists in the builder.
+    return builder.ReferenceExisting(DefaultServerCluster::GlobalAttributes());
+}
 
-    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
-    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
-    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
-    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
-    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
-    case ThreadNetworkDiagnostics::Attributes::Channel::Id:
-    case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id:
-    case ThreadNetworkDiagnostics::Attributes::NetworkName::Id:
-    case ThreadNetworkDiagnostics::Attributes::PanId::Id:
-    case ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id:
-    case ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id:
-    case ThreadNetworkDiagnostics::Attributes::PartitionId::Id:
-    case ThreadNetworkDiagnostics::Attributes::Weighting::Id:
-    case ThreadNetworkDiagnostics::Attributes::DataVersion::Id:
-    case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id:
-    case ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id:
-    case ThreadNetworkDiagnostics::Attributes::OverrunCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxDataCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxDataCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id:
-    case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id:
-    case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
-    case ThreadNetworkDiagnostics::Attributes::Delay::Id:
-    case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
-    case ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
-    case ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
-        return WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
+// Notified when the Node’s connection status to a Thread network has changed.
+void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus)
+{
+    ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged");
+
+    VerifyOrReturn(mContext != nullptr);
+    Events::ConnectionStatus::Type event{ newConnectionStatus };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
+// Notified when the Node’s faults related to a Thread network have changed.
+void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
+                                                            const GeneralFaults<kMaxNetworkFaults> & current)
+{
+    ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged");
+
+    /* Verify that the data size matches the expected one. */
+    static_assert(sizeof(*current.data()) == sizeof(NetworkFaultEnum));
+
+    DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()), current.size());
+    DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
+                                                         previous.size());
+
+    VerifyOrReturn(mContext != nullptr);
+    Events::NetworkFaultChange::Type event{ currentList, previousList };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
+CHIP_ERROR ThreadNetworkDiagnosticsCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(this);
+    return CHIP_NO_ERROR;
+}
+
+void ThreadNetworkDiagnosticsCluster::Shutdown(ClusterShutdownType type)
+{
+    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(nullptr);
+    DefaultServerCluster::Shutdown(type);
+}
+
+std::optional<DataModel::ActionReturnStatus>
+ThreadNetworkDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                               CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case Commands::ResetCounts::Id: {
+        ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
+        return Protocols::InteractionModel::Status::Success;
+    }
     default:
-        break;
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+CHIP_ERROR ThreadNetworkDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                             ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    if (mClusterType == ClusterType::kFull)
+    {
+        ReturnErrorOnFailure(builder.AppendElements({
+            Commands::ResetCounts::kMetadataEntry,
+        }));
     }
 
     return CHIP_NO_ERROR;
 }
 
-class ThreadDiagnosticsDelegate : public DeviceLayer::ThreadDiagnosticsDelegate
-{
-    // Notified when the Node’s connection status to a Thread network has changed.
-    void OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus) override
-    {
-        ChipLogProgress(Zcl, "ThreadDiagnosticsDelegate: OnConnectionStatusChanged");
-
-        Events::ConnectionStatus::Type event{ newConnectionStatus };
-
-        // TODO: ThreadNetworkDiagnostics cluster can exist on other endpoints (SNI or NIM/TBR device types)
-        if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
-        {
-            // If Thread Network Diagnostics cluster is implemented on this endpoint
-            EventNumber eventNumber;
-
-            if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
-            {
-                ChipLogError(Zcl, "ThreadDiagnosticsDelegate: Failed to record ConnectionStatus event");
-            }
-        }
-    }
-
-    // Notified when the Node’s faults related to a Thread network have changed.
-    void OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
-                               const GeneralFaults<kMaxNetworkFaults> & current) override
-    {
-        ChipLogProgress(Zcl, "ThreadDiagnosticsDelegate: OnNetworkFaultChanged");
-
-        /* Verify that the data size matches the expected one. */
-        static_assert(sizeof(*current.data()) == sizeof(NetworkFaultEnum));
-
-        DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
-                                                            current.size());
-        DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
-                                                             previous.size());
-
-        Events::NetworkFaultChange::Type event{ currentList, previousList };
-
-        // TODO: ThreadNetworkDiagnostics cluster can exist on other endpoints (SNI or NIM/TBR device types)
-        if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
-        {
-            // If Thread Network Diagnostics cluster is implemented on this endpoint
-            EventNumber eventNumber;
-
-            if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
-            {
-                ChipLogError(Zcl, "ThreadDiagnosticsDelegate: Failed to record NetworkFaultChange event");
-            }
-        }
-    }
-};
-
-ThreadDiagnosticsDelegate gDiagnosticDelegate;
-
-} // anonymous namespace
-
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                               const app::ConcreteCommandPath & commandPath,
-                                                               const Commands::ResetCounts::DecodableType & commandData)
-{
-    ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
-    commandObj->AddStatus(commandPath, Status::Success);
-    return true;
-}
-
-void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(&gDiagnosticDelegate);
-}
-
-void MatterThreadNetworkDiagnosticsPluginServerShutdownCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
-    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(nullptr);
-}
+} // namespace chip::app::Clusters
