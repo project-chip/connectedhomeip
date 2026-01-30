@@ -94,7 +94,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
         asserts.assert_equal(feature_map, self._SWITCH_TRIPLE_PRESS_FEATURE_MAP)
 
         self.step(3)
-        tag_list = await self._read_descriptor_semantic_tags()
+        tag_list = await self._read_descriptor_semantic_tags(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
         print(tag_list)
 
 
