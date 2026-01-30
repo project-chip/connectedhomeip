@@ -31,28 +31,43 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip::app::Clusters {
 namespace {
 
+class AutoReleaseIterator
+{
+public:
+    AutoReleaseIterator(GroupDataProvider & provider, FabricIndex fabricIndex) : mIterator(provider.IterateGroupKeys(fabricIndex))
+    {}
+    ~AutoReleaseIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+    bool Valid() const { return mIterator != nullptr; }
+    GroupDataProvider::GroupKeyIterator * operator->() { return mIterator; }
+
+private:
+    GroupDataProvider::GroupKeyIterator * mIterator;
+};
+
 /**
  * @brief Checks if there are key set associated with the given GroupId
  */
 bool KeyExists(GroupDataProvider & provider, FabricIndex fabricIndex, GroupId groupId)
 {
-    GroupDataProvider::GroupKey entry;
+    AutoReleaseIterator it(provider, fabricIndex);
+    VerifyOrReturnValue(it.Valid(), false);
 
-    auto it = provider.IterateGroupKeys(fabricIndex);
-    VerifyOrReturnValue(it != nullptr, false);
-
-    bool found = false;
-    while (!found && it->Next(entry))
+    GroupDataProvider::GroupKey key;
+    while (it->Next(key))
     {
-        if (entry.group_id == groupId)
+        if (key.group_id == groupId)
         {
-            GroupDataProvider::KeySet keys;
-            found = (CHIP_NO_ERROR == provider.GetKeySet(fabricIndex, entry.keyset_id, keys));
+            return true;
         }
     }
-    it->Release();
 
-    return found;
+    return false;
 }
 
 struct GroupMembershipResponse
