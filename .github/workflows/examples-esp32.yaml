@@ -146,6 +146,13 @@ jobs:
                 scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
 
+            - name: Build example All Clusters App (Target:ESP32P4)
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target esp32-p4functionev-all-clusters \
+                        build \
+                     "
 
             - name: Build example Lighting App (external platform)
               run: |
