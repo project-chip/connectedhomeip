@@ -24,5 +24,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/clusters/groups-server",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/crypto",
   ]
 }
