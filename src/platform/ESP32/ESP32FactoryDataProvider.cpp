@@ -29,6 +29,22 @@ using namespace chip::DeviceLayer::Internal;
 namespace {
 static constexpr uint32_t kDACPrivateKeySize = 32;
 static constexpr uint32_t kDACPublicKeySize  = 65;
+
+// Helper function to remove dashes from a string in-place
+// Returns the new length after removing dashes
+inline size_t RemoveDashesInPlace(char * str, size_t length)
+{
+    size_t writePos = 0;
+    for (size_t readPos = 0; readPos < length; readPos++)
+    {
+        if (str[readPos] != '-')
+        {
+            str[writePos++] = str[readPos];
+        }
+    }
+    str[writePos] = '\0';
+    return writePos;
+}
 } // namespace
 
 CHIP_ERROR ESP32FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
@@ -234,7 +250,68 @@ CHIP_ERROR ESP32FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 
 CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    constexpr size_t kMaxManufacturingDateLength = 16; // YYYY-MM-DD<vendor info> or YYYYMMDD<vendor info>
+    constexpr size_t kMaxDateLength              = 8;  // YYYYMMDD
+    char dateStr[kMaxManufacturingDateLength + 1];
+    size_t dateLen;
+    err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
+    SuccessOrExit(err);
+    VerifyOrExit(dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    dateLen = RemoveDashesInPlace(dateStr, dateLen);
+
+    VerifyOrExit(dateLen >= kMaxDateLength && dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    char yearStr[5]  = { dateStr[0], dateStr[1], dateStr[2], dateStr[3], '\0' };
+    char monthStr[3] = { dateStr[4], dateStr[5], '\0' };
+    char dayStr[3]   = { dateStr[6], dateStr[7], '\0' };
+
+    year  = static_cast<uint16_t>(atoi(yearStr));
+    month = static_cast<uint8_t>(atoi(monthStr));
+    day   = static_cast<uint8_t>(atoi(dayStr));
+
+    VerifyOrExit(year >= 1000 && year <= 9999, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(month >= 1 && month <= 12, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(day >= 1 && day <= 31, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+exit:
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
+    }
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDateSuffix(MutableCharSpan & vendorInfoSpan)
+{
+    VerifyOrReturnError(!vendorInfoSpan.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    constexpr size_t kMaxManufacturingDateLength = 16; // YYYY-MM-DD<vendor info> or YYYYMMDD<vendor info>
+    constexpr size_t kMaxDateLength              = 8;  // YYYYMMDD
+    constexpr size_t kMaxVendorInfoLength        = kMaxManufacturingDateLength - kMaxDateLength;
+    char dateStr[kMaxManufacturingDateLength + 1];
+    size_t dateLen;
+    size_t vendorInfoLen;
+    err = ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ManufacturingDate, dateStr, sizeof(dateStr), dateLen);
+    SuccessOrExit(err);
+    VerifyOrExit(dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    dateLen = RemoveDashesInPlace(dateStr, dateLen);
+
+    VerifyOrExit(dateLen >= kMaxDateLength && dateLen <= kMaxManufacturingDateLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    vendorInfoLen = dateLen - kMaxDateLength;
+    VerifyOrExit(vendorInfoLen <= kMaxVendorInfoLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(vendorInfoSpan.size() >= vendorInfoLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(vendorInfoSpan.data(), dateStr + kMaxDateLength, vendorInfoLen);
+    vendorInfoSpan.reduce_size(vendorInfoLen);
+
+exit:
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
+    }
+    return err;
 }
 
 CHIP_ERROR ESP32FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
