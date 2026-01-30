@@ -31,9 +31,6 @@
 #include <system/SystemClock.h>
 
 namespace chip {
-namespace app {
-class FailSafeContext;
-}
 
 enum class CommissioningWindowAdvertisement
 {

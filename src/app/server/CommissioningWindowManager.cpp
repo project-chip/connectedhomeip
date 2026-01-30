@@ -705,9 +705,4 @@ void CommissioningWindowManager::OnExchangeCreationFailed(Messaging::ExchangeDel
                                                                                                     this);
 }
 
-app::FailSafeContext & CommissioningWindowManager::GetFailSafeContext() const
-{
-    return mServer->GetFailSafeContext();
-}
-
 } // namespace chip

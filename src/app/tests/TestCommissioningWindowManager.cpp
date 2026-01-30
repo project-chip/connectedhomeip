@@ -236,7 +236,7 @@ Clusters::AdministratorCommissioningLogic::Context CreateContext()
     return Clusters::AdministratorCommissioningLogic::Context{
         .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
         .fabricTable                = Server::GetInstance().GetFabricTable(),
-        .failSafeContext            = Server::GetInstance().GetCommissioningWindowManager().GetFailSafeContext(),
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
     };
 }
 
