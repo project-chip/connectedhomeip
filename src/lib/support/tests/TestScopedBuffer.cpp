@@ -125,15 +125,15 @@ TEST_F(TestScopedBuffer, TestRelease)
 
 TEST_F(TestScopedBuffer, TestCopyFromSpanWithDifferentTypes)
 {
-    const uint32_t source[] = {0x1234, 0x5678, 0x9ABC, 0xDEF0};
+    const uint32_t source[] = { 0x1234, 0x5678, 0x9ABC, 0xDEF0 };
     chip::Span<const uint32_t> sourceSpan(source, 4);
-    
+
     chip::Platform::ScopedMemoryBufferWithSize<uint32_t> buffer;
     buffer.CopyFromSpan(sourceSpan);
-    
+
     EXPECT_EQ(buffer.AllocatedSize(), static_cast<size_t>(4));
     EXPECT_NE(buffer.Get(), nullptr);
-    
+
     // Verify each element
     for (size_t i = 0; i < 4; i++)
     {
