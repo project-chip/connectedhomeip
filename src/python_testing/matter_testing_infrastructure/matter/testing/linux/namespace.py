@@ -23,7 +23,6 @@ from __future__ import annotations
 import logging
 import os
 import shlex
-import pathlib
 import subprocess
 import sys
 import time
