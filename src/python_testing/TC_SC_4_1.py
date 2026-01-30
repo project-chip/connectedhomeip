@@ -827,7 +827,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 18 ***
         # Verify commissionable subtype advertisements
         self.step(18)
-        await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
+        await self._verify_commissionable_subtypes(long_discriminator_subtype, long_discriminator_ptr_instance_name)
 
         # *** STEP 19 ***
         # Verify SRV record advertisements
@@ -863,7 +863,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 24 ***
             # Verify commissionable subtype advertisements
             self.step(24)
-            await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name, extended_discovery_mode)
+            await self._verify_commissionable_subtypes(long_discriminator_subtype, long_discriminator_ptr_instance_name, extended_discovery_mode)
 
             # *** STEP 25 ***
             # Verify SRV record advertisements
