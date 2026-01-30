@@ -206,7 +206,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
                         type=actions_service_pb2.ActionType.EMIT_EVENT,
                         delayMs=100,
                         actionId=Clusters.Objects.Switch.Events.MultiPressComplete.event_id,
-                        arg1=1,  # Prrevious Position = 1
+                        arg1=1,  # Previous Position = 1
                         arg2=2,  # number of presses
                     ),
                 ]
