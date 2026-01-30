@@ -116,7 +116,7 @@ class TC_TLSCERT_2_9(TC_TLSCERT_Base):
             cr1_cmd.assert_valid_ccdid(response.ccdid)
             my_ccdid[i] = response.ccdid
             my_csr[i] = cr1_cmd.assert_valid_csr(response, my_nonce[i])
-            if i > 1:
+            if i > 0:
                 asserts.assert_not_equal(my_ccdid[i-1], my_ccdid[i], "CCDID should be unique")
 
         self.step(4)

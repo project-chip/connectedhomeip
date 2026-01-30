@@ -93,7 +93,7 @@ class TC_TLSCERT_Base(MatterBaseTest):
         cr2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         cr2_fabric_admin = cr2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=cr1.fabricId + 1)
         cr2 = cr2_fabric_admin.NewController(nodeId=cr1.nodeId + 1)
-        cr2_dut_node_id = self.dut_node_id+1
+        cr2_dut_node_id = self.dut_node_id + 1
 
         self.step(f'{step_prefix}.3')
         _, noc_resp, _ = await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(

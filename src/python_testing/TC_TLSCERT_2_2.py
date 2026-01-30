@@ -93,7 +93,7 @@ class TC_TLSCERT_2_2(TC_TLSCERT_Base):
                      "Verify result is a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[0] and Certificate equal to myRootCert[1]"),
             TestStep(20, "CR2 sends FindRootCertificate command with null CAID",
                      "Verify result is a list of TLSCertStruct with one entry. The entry should have CAID equal to myCaid[1] and Certificate equal to myRootCert[2]"),
-            TestStep(21, "CR1 sends RemoveRootCertificate command with CAID set to my_caid[0]",
+            TestStep(21, "CR1 sends RemoveRootCertificate command with CAID set to myCaid[0]",
                      test_plan_support.verify_success()),
             TestStep(22, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]

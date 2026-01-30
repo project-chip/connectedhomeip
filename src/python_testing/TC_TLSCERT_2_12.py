@@ -76,7 +76,7 @@ class TC_TLSCERT_2_12(TC_TLSCERT_Base):
                      test_plan_support.verify_status(Status.NotFound)),
             TestStep(13, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid[i] and ClientCertificate set to myClientCert[i], for each i in [0..1].",
                      test_plan_support.verify_success()),
-            TestStep(14, "CR2 sends ProvisionClientCertificate command with CCDID set to myCcdid[2] and ClientCertificateDetails set to myClientCert[2].",
+            TestStep(14, "CR2 sends ProvisionClientCertificate command with CCDID set to myCcdid[2] and ClientCertificate set to myClientCert[2].",
                      test_plan_support.verify_success()),
             TestStep(15, "CR1 sends LookupClientCertificate command with Fingerprint set to myClientCertFingerprint[0].",
                      "DUT replies with a TLSCCDID value equal to myCcdid[0]."),

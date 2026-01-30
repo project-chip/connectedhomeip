@@ -61,7 +61,7 @@ class TC_TLSCERT_2_13(TC_TLSCERT_Base):
             TestStep(5, "CR1 sends ClientCSR command with Nonce set to myNonce.",
                      "DUT replies with CCDID, CSR and Nonce. Store TLSCCDID in myCcdid."),
             TestStep(6, "Populate myClientCert with a valid, self-signed, DER-encoded x509 certificate using the public key from the CSR."),
-            TestStep(7, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificateDetails set to myClientCert.",
+            TestStep(7, "CR1 sends ProvisionClientCertificate command with CCDID set to myCcdid and ClientCertificate set to myClientCert.",
                      test_plan_support.verify_success()),
             TestStep(8, "CR2 sends RemoveClientCertificate command with CCDID set to myCcdid.",
                      test_plan_support.verify_status(Status.NotFound)),
