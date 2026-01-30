@@ -179,7 +179,7 @@ template <class AdvertisingParams>
 void DnssdServer::AddTCPKeyToAdvertisement(AdvertisingParams & advParams)
 {
     advParams.SetTCPSupportModes(mTCPServerEnabled ? chip::Dnssd::TCPModeAdvertise::kTCPClientServer
-                                                    : chip::Dnssd::TCPModeAdvertise::kTCPClient);
+                                                   : chip::Dnssd::TCPModeAdvertise::kTCPClient);
 }
 #endif
 
