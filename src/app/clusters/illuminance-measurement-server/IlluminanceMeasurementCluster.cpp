@@ -25,8 +25,7 @@ using namespace IlluminanceMeasurement::Attributes;
 IlluminanceMeasurementCluster::IlluminanceMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
+    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
 {}
 
 DataModel::ActionReturnStatus IlluminanceMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -66,19 +65,15 @@ CHIP_ERROR IlluminanceMeasurementCluster::Attributes(const ConcreteClusterPath &
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), mOptionalAttributeSet);
 }
 
-CHIP_ERROR IlluminanceMeasurementCluster::SetMeasuredValue(MeasuredValueType measuredValue)
+CHIP_ERROR IlluminanceMeasurementCluster::SetMeasuredValue(DataModel::Nullable<uint16_t> measuredValue)
 {
-    VerifyOrReturnError(!measuredValue.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-    if (measuredValue.Value() != 0)
+    if (measuredValue.ValueOr(0) != 0)
     {
-        if (!mConfig.minMeasuredValue.IsNull())
-        {
-            VerifyOrReturnError(measuredValue.Value() >= mConfig.minMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
-        }
-        if (!mConfig.maxMeasuredValue.IsNull())
-        {
-            VerifyOrReturnError(measuredValue.Value() <= mConfig.maxMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
-        }
+        // According to the spec, absolute minimum value is 1
+        VerifyOrReturnError(measuredValue.Value() >= mConfig.minMeasuredValue.ValueOr(1), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // According to the spec, absolute maximum value is 0xFFFE / 65534
+        VerifyOrReturnError(measuredValue.Value() <= mConfig.maxMeasuredValue.ValueOr(0xFFFE), CHIP_ERROR_INVALID_ARGUMENT);
     }
     SetAttributeValue(mMeasuredValue, measuredValue, MeasuredValue::Id);
     return CHIP_NO_ERROR;

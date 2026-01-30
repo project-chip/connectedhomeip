@@ -47,19 +47,19 @@ public:
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
-        IlluminanceMeasurementCluster::MinMeasuredValueType minMeasuredValue{};
+        DataModel::Nullable<uint16_t> minMeasuredValue{};
         VerifyOrDie(MinMeasuredValue::Get(endpointId, minMeasuredValue) == Status::Success);
 
-        IlluminanceMeasurementCluster::MaxMeasuredValueType maxMeasuredValue{};
+        DataModel::Nullable<uint16_t> maxMeasuredValue{};
         VerifyOrDie(MaxMeasuredValue::Get(endpointId, maxMeasuredValue) == Status::Success);
 
-        IlluminanceMeasurementCluster::ToleranceType tolerance{};
+        uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
             VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
         }
 
-        IlluminanceMeasurementCluster::LightSensorTypeType lightSensorType{};
+        DataModel::Nullable<LightSensorTypeEnum> lightSensorType{};
         if (optionalAttributeSet.IsSet(LightSensorType::Id))
         {
             VerifyOrDie(LightSensorType::Get(endpointId, lightSensorType) == Status::Success);

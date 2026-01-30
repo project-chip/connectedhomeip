@@ -30,18 +30,12 @@ public:
     using OptionalAttributeSet = app::OptionalAttributeSet<IlluminanceMeasurement::Attributes::Tolerance::Id,
                                                            IlluminanceMeasurement::Attributes::LightSensorType::Id>;
 
-    using LightSensorTypeType  = IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo::Type;
-    using ToleranceType        = IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type;
-    using MeasuredValueType    = IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type;
-    using MinMeasuredValueType = IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type;
-    using MaxMeasuredValueType = IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type;
-
     struct StartupConfiguration
     {
-        MinMeasuredValueType minMeasuredValue{};
-        MaxMeasuredValueType maxMeasuredValue{};
-        ToleranceType tolerance{};
-        LightSensorTypeType lightSensorType{};
+        DataModel::Nullable<uint16_t> minMeasuredValue{};
+        DataModel::Nullable<uint16_t> maxMeasuredValue{};
+        uint16_t tolerance{};
+        DataModel::Nullable<IlluminanceMeasurement::LightSensorTypeEnum> lightSensorType{};
     };
 
     IlluminanceMeasurementCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
@@ -52,11 +46,11 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    CHIP_ERROR SetMeasuredValue(MeasuredValueType measuredValue);
-    MeasuredValueType GetMeasuredValue() const { return mMeasuredValue; }
+    CHIP_ERROR SetMeasuredValue(DataModel::Nullable<uint16_t> measuredValue);
+    DataModel::Nullable<uint16_t> GetMeasuredValue() const { return mMeasuredValue; }
 
 protected:
-    MeasuredValueType mMeasuredValue{};
+    DataModel::Nullable<uint16_t> mMeasuredValue{};
     const OptionalAttributeSet mOptionalAttributeSet;
     const StartupConfiguration mConfig;
 };

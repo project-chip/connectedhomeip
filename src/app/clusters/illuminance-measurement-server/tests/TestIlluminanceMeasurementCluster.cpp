@@ -91,13 +91,13 @@ void TestMandatoryAttributes(ClusterTester & tester)
     uint32_t featureMap{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-    MeasuredValue::TypeInfo::Type measuredValue{};
+    DataModel::Nullable<uint16_t> measuredValue{};
     ASSERT_EQ(tester.ReadAttribute(MeasuredValue::Id, measuredValue), CHIP_NO_ERROR);
 
-    MinMeasuredValue::TypeInfo::Type minMeasuredValue{};
+    DataModel::Nullable<uint16_t> minMeasuredValue{};
     ASSERT_EQ(tester.ReadAttribute(MinMeasuredValue::Id, minMeasuredValue), CHIP_NO_ERROR);
 
-    MaxMeasuredValue::TypeInfo::Type maxMeasuredValue{};
+    DataModel::Nullable<uint16_t> maxMeasuredValue{};
     ASSERT_EQ(tester.ReadAttribute(MaxMeasuredValue::Id, maxMeasuredValue), CHIP_NO_ERROR);
 }
 
@@ -127,10 +127,10 @@ TEST_F(TestIlluminanceMeasurementCluster, ReadAttributeTest)
 
         TestMandatoryAttributes(tester);
 
-        Tolerance::TypeInfo::Type tolerance{};
+        uint16_t tolerance{};
         ASSERT_EQ(tester.ReadAttribute(Tolerance::Id, tolerance), CHIP_NO_ERROR);
 
-        LightSensorType::TypeInfo::Type lightSensorType{};
+        DataModel::Nullable<LightSensorTypeEnum> lightSensorType{};
         ASSERT_EQ(tester.ReadAttribute(LightSensorType::Id, lightSensorType), CHIP_NO_ERROR);
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -142,17 +142,15 @@ TEST_F(TestIlluminanceMeasurementCluster, MeasuredValue)
     {
         IlluminanceMeasurementCluster cluster(kRootEndpointId, IlluminanceMeasurementCluster::OptionalAttributeSet(),
                                               IlluminanceMeasurementCluster::StartupConfiguration{
-                                                  .minMeasuredValue = 1,
-                                                  .maxMeasuredValue = 3,
+                                                  .minMeasuredValue = DataModel::Nullable<uint16_t>(1),
+                                                  .maxMeasuredValue = DataModel::Nullable<uint16_t>(3),
                                               });
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        MeasuredValue::TypeInfo::Type measuredValue;
-        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
-
+        DataModel::Nullable<uint16_t> measuredValue{};
         measuredValue.SetNonNull(0);
         EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-        MeasuredValue::TypeInfo::Type measuredVal = cluster.GetMeasuredValue();
+        DataModel::Nullable<uint16_t> measuredVal = cluster.GetMeasuredValue();
         EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
 
         measuredValue.SetNonNull(1);
@@ -172,6 +170,11 @@ TEST_F(TestIlluminanceMeasurementCluster, MeasuredValue)
 
         measuredValue.SetNonNull(4);
         EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+        measuredValue.SetNull();
+        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+        measuredVal = cluster.GetMeasuredValue();
+        EXPECT_EQ(measuredVal, measuredValue);
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
