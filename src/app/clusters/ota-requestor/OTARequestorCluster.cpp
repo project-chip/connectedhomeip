@@ -81,13 +81,13 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                                  AttributeValueDecoder & decoder)
+                                                                  AttributeValueDecoder & aDecoder)
 {
     switch (request.path.mAttributeId)
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
         return NotifyAttributeChangedIfSuccess(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
-                                               WriteDefaultOtaProviders(request.path, decoder));
+                                               WriteDefaultOtaProviders(request.path, aDecoder));
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -98,31 +98,6 @@ CHIP_ERROR OTARequestorCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(OtaSoftwareUpdateRequestor::Attributes::kMandatoryMetadata), {});
-}
-
-std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                chip::TLV::TLVReader & input_arguments,
-                                                                                CommandHandler * handler)
-{
-    switch (request.path.mCommandId)
-    {
-    case OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id: {
-        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(input_arguments));
-
-        auto & metadataForNode = data.metadataForNode;
-        if (metadataForNode.HasValue() && metadataForNode.Value().size() > kMaxMetadataLen)
-        {
-            ChipLogError(Zcl, "Metadata size %u exceeds max %u", static_cast<unsigned>(metadataForNode.Value().size()),
-                         static_cast<unsigned>(kMaxMetadataLen));
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        mOtaRequestor.HandleAnnounceOTAProvider(handler, request.path, data);
-        return std::nullopt;
-    }
-    default:
-        return Protocols::InteractionModel::Status::UnsupportedCommand;
-    }
 }
 
 CHIP_ERROR OTARequestorCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -165,6 +140,31 @@ CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttri
     }
 
     return CHIP_NO_ERROR;
+}
+
+std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                chip::TLV::TLVReader & input_arguments,
+                                                                                CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id: {
+        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+
+        auto & metadataForNode = data.metadataForNode;
+        if (metadataForNode.HasValue() && metadataForNode.Value().size() > kMaxMetadataLen)
+        {
+            ChipLogError(Zcl, "Metadata size %u exceeds max %u", static_cast<unsigned>(metadataForNode.Value().size()),
+                         static_cast<unsigned>(kMaxMetadataLen));
+            return Protocols::InteractionModel::Status::InvalidCommand;
+        }
+        mOtaRequestor.HandleAnnounceOTAProvider(handler, request.path, data);
+        return std::nullopt;
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
 }
 
 } // namespace chip::app::Clusters
