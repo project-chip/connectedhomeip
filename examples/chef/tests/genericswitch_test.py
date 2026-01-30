@@ -45,7 +45,15 @@ class TC_GENERICSWITCH(MatterBaseTest):
     _SWITCH_TRIPLE_PRESS_NUMBER_OF_POSITIONS = 2
 
     # Switch endpoint that supports single press only
-    _SWITCH_SINGLE_PRESS_ENDPOINT = 2
+    _SWITCH_SINGLE_PRESS_ENDPOINT = 1
+    _SWITCH_SINGLE_PRESS_FEATURE_MAP = 2
+    _SWITCH_SINGLE_PRESS_TAG_LIST = [
+        Clusters.Objects.Globals.Structs.SemanticTagStruct(
+            mfgCode=Clusters.Types.NullValue, namespaceID=8, tag=3, label=None),
+        Clusters.Objects.Globals.Structs.SemanticTagStruct(
+            mfgCode=Clusters.Types.NullValue, namespaceID=7, tag=2, label=None)
+    ]
+    _SWITCH_SINGLE_PRESS_NUMBER_OF_POSITIONS = 2
 
     _PW_RPC_SOCKET_ADDR = "0.0.0.0:33000"
     _PW_RPC_BAUD_RATE = 115200
@@ -88,6 +96,9 @@ class TC_GENERICSWITCH(MatterBaseTest):
             TestStep(2, "[TC_GENERICSWITCH] Triple press endpoint feature map."),
             TestStep(3, "[TC_GENERICSWITCH] Triple press endpoint tag list."),
             TestStep(4, "[TC_GENERICSWITCH] Triple press endpoint number of positions."),
+            TestStep(5, "[TC_GENERICSWITCH] Single press endpoint feature map."),
+            TestStep(6, "[TC_GENERICSWITCH] Single press endpoint tag list."),
+            TestStep(7, "[TC_GENERICSWITCH] Single press endpoint number of positions."),
         ]
 
     @async_test_body
@@ -110,6 +121,21 @@ class TC_GENERICSWITCH(MatterBaseTest):
         asserts.assert_equal(
             number_of_positions,
             self._SWITCH_TRIPLE_PRESS_NUMBER_OF_POSITIONS
+        )
+
+        self.step(5)
+        feature_map = await self._read_switch_feature_map(self._SWITCH_SINGLE_PRESS_ENDPOINT)
+        asserts.assert_equal(feature_map, self._SWITCH_SINGLE_PRESS_FEATURE_MAP)
+
+        self.step(6)
+        tag_list = await self._read_descriptor_semantic_tags(self._SWITCH_SINGLE_PRESS_ENDPOINT)
+        asserts.assert_equal(tag_list, self._SWITCH_SINGLE_PRESS_TAG_LIST)
+
+        self.step(7)
+        number_of_positions = await self._read_switch_number_of_positions(self._SWITCH_SINGLE_PRESS_ENDPOINT)
+        asserts.assert_equal(
+            number_of_positions,
+            self._SWITCH_SINGLE_PRESS_NUMBER_OF_POSITIONS
         )
 
 
