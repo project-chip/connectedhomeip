@@ -177,9 +177,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
         statusText_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
@@ -232,9 +230,7 @@ class ServiceAreaCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
         statusText_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()

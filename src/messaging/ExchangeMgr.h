@@ -168,20 +168,26 @@ public:
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
+     *  @param[out]   outHandler   If non-null, receives the handler that was unregistered. If no
+     *                             handler matched, *outHandler is set to nullptr. Callers may pass
+     *                             nullptr if they do not need this information.
+     *
      *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType);
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
+                                                          Messaging::UnsolicitedMessageHandler ** outHandler = nullptr);
 
     /**
      * A strongly-message-typed version of UnregisterUnsolicitedMessageHandlerForType.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(MessageType msgType)
+    CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(MessageType msgType,
+                                                          Messaging::UnsolicitedMessageHandler ** outHandler = nullptr)
     {
         return UnregisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
-                                                          to_underlying(msgType));
+                                                          to_underlying(msgType), outHandler);
     }
 
     /**
@@ -244,14 +250,17 @@ private:
     UnsolicitedMessageHandlerSlot UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
 
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, UnsolicitedMessageHandler * handler);
-    CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
+    CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType,
+                             Messaging::UnsolicitedMessageHandler ** outHandler = nullptr);
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
                            DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override;
     void SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    const SessionHandle & session, MessageFlags msgFlags, System::PacketBufferHandle && msgBuf);
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void OnTCPConnectionClosed(const SessionHandle & session, CHIP_ERROR conErr) override;
+    void OnTCPConnectionClosed(const Transport::ActiveTCPConnectionState & conn, const SessionHandle & session,
+                               CHIP_ERROR conErr) override;
+    bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 

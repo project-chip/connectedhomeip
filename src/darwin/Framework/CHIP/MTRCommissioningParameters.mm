@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
     other.acceptedTermsAndConditions = self.acceptedTermsAndConditions;
     other.acceptedTermsAndConditionsVersion = self.acceptedTermsAndConditionsVersion;
     other.extraAttributesToRead = self.extraAttributesToRead;
+    other.forceWiFiScan = self.forceWiFiScan;
+    other.forceThreadScan = self.forceThreadScan;
+
     other.preventNetworkScans = self.preventNetworkScans;
 
     return other;

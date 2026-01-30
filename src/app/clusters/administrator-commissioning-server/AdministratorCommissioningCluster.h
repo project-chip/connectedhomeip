@@ -28,8 +28,9 @@ namespace Clusters {
 class AdministratorCommissioningCluster : public DefaultServerCluster
 {
 public:
-    AdministratorCommissioningCluster(EndpointId endpointId, BitFlags<AdministratorCommissioning::Feature> _unused_features) :
-        DefaultServerCluster({ endpointId, AdministratorCommissioning::Id })
+    constexpr AdministratorCommissioningCluster(EndpointId endpointId,
+                                                BitFlags<AdministratorCommissioning::Feature> _unused_features) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id))
     {}
 
     // Server cluster implementation

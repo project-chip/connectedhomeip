@@ -101,7 +101,7 @@ static_library("jfc-utils") {
 
   deps = [
     "${chip_root}/src/app:events",
-    "${chip_root}/src/controller:jcm",
+    "${chip_root}/src/controller/jcm:jcm",
   ]
 
   if (config_use_interactive_mode) {
@@ -170,7 +170,7 @@ executable("jfc-app") {
 
   deps = [
     ":jfc-utils",
-    "${chip_root}/src/controller:jcm",
+    "${chip_root}/src/controller/jcm:jcm",
     "${chip_root}/src/platform/logging:stdio",
   ]
 

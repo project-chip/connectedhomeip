@@ -423,9 +423,10 @@ CHIP_ERROR EncodeNetworkIdentityTBSCert(const P256PublicKey & pubkey, ASN1Writer
         {
             ASN1_START_SEQUENCE
             {
-                EncodeIsCAExtension(kNotCACert, writer);
-                EncodeKeyUsageExtension(KeyUsageFlags::kDigitalSignature, writer);
-                EncodeExtKeyUsageExtension({ kOID_KeyPurpose_ClientAuth, kOID_KeyPurpose_ServerAuth }, writer);
+                TEMPORARY_RETURN_IGNORED EncodeIsCAExtension(kNotCACert, writer);
+                TEMPORARY_RETURN_IGNORED EncodeKeyUsageExtension(KeyUsageFlags::kDigitalSignature, writer);
+                TEMPORARY_RETURN_IGNORED EncodeExtKeyUsageExtension({ kOID_KeyPurpose_ClientAuth, kOID_KeyPurpose_ServerAuth },
+                                                                    writer);
             }
             ASN1_END_SEQUENCE;
         }

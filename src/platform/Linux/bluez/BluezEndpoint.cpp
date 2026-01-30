@@ -311,7 +311,7 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
         // immediately, because the BLE layer might still use it. Instead, we will also
         // schedule the deletion of the connection object, so it will happen after the
         // BLE layer has processed the disconnection event.
-        DeviceLayer::SystemLayer().ScheduleLambda([conn] {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([conn] {
             ChipLogDetail(DeviceLayer, "Freeing BLE connection: conn=%p", conn);
             chip::Platform::Delete(conn);
         });
@@ -575,7 +575,7 @@ void BluezEndpoint::Shutdown()
     // cleanup function releases the D-Bus manager client object, which handles D-Bus
     // signals. Otherwise, we will face race condition when the D-Bus signal is in
     // the middle of being processed when the cleanup function is called.
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) {
             self->mAdapter.reset();
             self->mRoot.reset();

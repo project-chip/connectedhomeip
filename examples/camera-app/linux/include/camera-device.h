@@ -32,14 +32,11 @@
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
-// TODO: Define a configuration flag and enable/disable during the build. Configure this after the controller/TH side UI is ready.
-// Enable to use test src instead of hardware source for testing purposes.
-// #define AV_STREAM_GST_USE_TEST_SRC
 
 // Camera Constraints set to typical values.
 // TODO: Look into ways to fetch from hardware, if required/possible.
 static constexpr uint32_t kMaxContentBufferSizeBytes = 4096;
-static constexpr uint32_t kMaxNetworkBandwidthMbps   = 128;
+static constexpr uint32_t kMaxNetworkBandwidthbps    = 128000000; // 128 Mbps
 static constexpr uint8_t kMaxConcurrentEncoders      = 1;
 static constexpr uint8_t kSpeakerMinLevel            = 1;
 static constexpr uint8_t kSpeakerMaxLevel            = 254;       // Spec constraint
@@ -48,12 +45,15 @@ static constexpr uint32_t kMaxEncodedPixelRate       = 248832000; // 1080p at 12
 static constexpr uint8_t kMicrophoneMinLevel         = 1;
 static constexpr uint8_t kMicrophoneMaxLevel         = 254;  // Spec constraint
 static constexpr uint8_t kMicrophoneMaxChannelCount  = 8;    // Spec Constraint in AudioStreamAllocate
-static constexpr uint16_t kMinResolutionWidth        = 640;  // Low SD resolution
-static constexpr uint16_t kMinResolutionHeight       = 360;  // Low SD resolution
+static constexpr uint16_t kMinResolutionWidth        = 640;  // Low VGA resolution
+static constexpr uint16_t kMinResolutionHeight       = 480;  // Low VGA resolution
+static constexpr uint16_t k720pResolutionWidth       = 1280; // 720p resolution
+static constexpr uint16_t k720pResolutionHeight      = 720;  // 720p resolution
 static constexpr uint16_t kMaxResolutionWidth        = 1920; // 1080p resolution
 static constexpr uint16_t kMaxResolutionHeight       = 1080; // 1080p resolution
 static constexpr uint16_t kSnapshotStreamFrameRate   = 30;
 static constexpr uint16_t kMaxVideoFrameRate         = 120;
+static constexpr uint16_t k60fpsVideoFrameRate       = 60;
 static constexpr uint16_t kMinVideoFrameRate         = 30;
 static constexpr uint32_t kMinBitRateBps             = 10000;   // 10 kbps
 static constexpr uint32_t kMaxBitRateBps             = 2000000; // 2 mbps
@@ -66,6 +66,9 @@ static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
 static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
 
+// StreamIDs typically start from 0 and monotonically increase. Setting
+// Invalid value to a large and practically unused value.
+static constexpr uint16_t kInvalidStreamID = 65500;
 #define INVALID_SPKR_LEVEL (0)
 
 namespace Camera {
@@ -84,9 +87,11 @@ class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface:
 public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
+    void
+    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
@@ -117,6 +122,11 @@ public:
 
     // Stop audio stream
     CameraError StopAudioStream(uint16_t streamID) override;
+
+    // Allocate snapshot stream
+    CameraError AllocateSnapshotStream(
+        const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
+        uint16_t & outStreamID) override;
 
     // Start snapshot stream
     CameraError StartSnapshotStream(uint16_t streamID) override;
@@ -163,6 +173,7 @@ public:
     CameraError SetHDRMode(bool hdrMode) override;
     bool GetHDRMode() override { return mHDREnabled; }
 
+    CameraError SetHardPrivacyMode(bool hardPrivacyMode) override;
     bool GetHardPrivacyMode() override { return mHardPrivacyModeOn; }
 
     CameraError SetNightVision(chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum nightVision) override;
@@ -276,13 +287,17 @@ public:
 
     uint8_t GetDetectionSensitivity() override { return mDetectionSensitivity; }
 
+    size_t GetPreRollBufferSize();
+
+    int64_t GetMinKeyframeIntervalMs();
+
     CameraError SetDetectionSensitivity(uint8_t aSensitivity) override;
 
     CameraError CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
     CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
 
-    CameraError RemoveZoneTrigger(uint16_t zoneID) override;
+    CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
@@ -297,9 +312,19 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
-    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneID);
+    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneId);
 
-    void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
+    void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
+
+    // Audio playback pipeline methods
+    CameraError StartAudioPlaybackStream();
+    CameraError StopAudioPlaybackStream();
+
+    // Timestamp handling for video and audio streams
+    std::map<uint16_t, int64_t> mVideoStreamStartEpochs;
+    std::map<uint16_t, GstClockTime> mVideoStreamFirstPts;
+    std::map<uint16_t, int64_t> mAudioStreamStartEpochs;
+    std::map<uint16_t, GstClockTime> mAudioStreamFirstPts;
 
 private:
     int videoDeviceFd            = -1;
@@ -312,11 +337,20 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
+    bool AddSnapshotStream(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager::SnapshotStreamAllocateArgs &
+                               snapshotStreamAllocateArgs,
+                           uint16_t & outStreamID);
+
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
-    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error);
+    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
+    GstElement * CreateAudioPlaybackPipeline(CameraError & error);
+
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
+
+    bool MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & outResolution,
+                                    chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum & outCodec);
 
     // Various cluster server delegates
     chip::app::Clusters::ChimeManager mChimeManager;
@@ -357,6 +391,9 @@ private:
     uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+
+    // Audio playback pipeline specific members
+    GstElement * mAudioPlaybackPipeline = nullptr;
 };
 
 } // namespace Camera

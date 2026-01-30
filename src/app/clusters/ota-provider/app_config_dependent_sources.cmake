@@ -24,7 +24,7 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ota-provider-cluster.cpp"
-    "${CLUSTER_DIR}/ota-provider-cluster.h"
+    "${CLUSTER_DIR}/OTAProviderCluster.cpp"
+    "${CLUSTER_DIR}/OTAProviderCluster.h"
     "${CLUSTER_DIR}/ota-provider-delegate.h"
 )

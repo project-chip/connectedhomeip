@@ -34,11 +34,13 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/TestOnlyLocalCertificateAuthority.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <platform/ConfigurationManager.h>
 
@@ -224,7 +226,7 @@ CHIP_ERROR VerifySignatureWithNocPublicKey(FabricTable & fabricTable, FabricInde
     VerifyOrReturnError(signatureBytes.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
     Crypto::P256ECDSASignature signature;
     memcpy(signature.Bytes(), signatureBytes.data(), signature.Capacity());
-    signature.SetLength(signature.Capacity());
+    EXPECT_SUCCESS(signature.SetLength(signature.Capacity()));
 
     return nocPublicKey.ECDSA_validate_msg_signature(message.data(), message.size(), signature);
 }
@@ -252,7 +254,7 @@ struct TestFabricTable : public ::testing::Test
 
         uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
-        VerifyOrDie(fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan) == CHIP_NO_ERROR);
+        SuccessOrDie(fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
         VerifyOrDie(fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, kNodeId, csrSpan).GetStatus() ==
                     CHIP_NO_ERROR);
@@ -260,10 +262,10 @@ struct TestFabricTable : public ::testing::Test
         ByteSpan icac = fabricCertAuthority.GetIcac();
         ByteSpan noc  = fabricCertAuthority.GetNoc();
 
-        VerifyOrDie(fabricTable.AddNewPendingTrustedRootCert(rcac) == CHIP_NO_ERROR);
+        SuccessOrDie(fabricTable.AddNewPendingTrustedRootCert(rcac));
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
-        VerifyOrDie(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, vendorId, &newFabricIndex) == CHIP_NO_ERROR);
-        VerifyOrDie(fabricTable.CommitPendingFabricData() == CHIP_NO_ERROR);
+        SuccessOrDie(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, vendorId, &newFabricIndex));
+        SuccessOrDie(fabricTable.CommitPendingFabricData());
 
         // Validate contents
         const auto * fabricInfo = fabricTable.FindFabricWithIndex(newFabricIndex);
@@ -590,6 +592,85 @@ TEST_F(TestFabricTable, TestSetLastKnownGoodTime)
             EXPECT_EQ(fabricTable.GetLastKnownGoodChipEpochTime(lastKnownGoodTime), CHIP_NO_ERROR);
             EXPECT_EQ(lastKnownGoodTime, newTime);
         }
+    }
+}
+
+//  This test validates that the ICAC is properly validated per the specification. In particular, an ICAC is identified by its
+//  subject DN encoding exactly one matter-icac-id attribute and none of the prohibited attributes (such as matter-rcac-id).
+//  Therefore passing a root certificate as the ICAC must be rejected.
+TEST_F(TestFabricTable, FailAddNocAndUpdateNocIfIcacSubjectDnIsInvalid)
+{
+    chip::TestPersistentStorageDelegate storage;
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&storage), CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    Crypto::P256SerializedKeypair opKeysSerialized;
+    FabricIndex fabricIndex;
+    static Crypto::P256Keypair opKey_Node01_02;
+
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_02_PublicKey.data(),
+           TestCerts::sTestCert_Node01_02_PublicKey.size());
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_02_PublicKey.size(),
+           TestCerts::sTestCert_Node01_02_PrivateKey.data(), TestCerts::sTestCert_Node01_02_PrivateKey.size());
+
+    // sTestCert_Node01_02_Chip is chained directly to sTestCert_Root01_Chip, with no ICAC in the chain.
+    // These tests intentionally pass RCAC as the ICAC to verify that a certificate whose subject DN encodes matter-rcac-id and not
+    // matter-icac-id is rejected.
+    ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip);
+    ByteSpan icacSpan(TestCerts::sTestCert_Root01_Chip);
+    ByteSpan nocSpan(TestCerts::sTestCert_Node01_02_Chip);
+
+    EXPECT_SUCCESS(opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_02_PublicKey.size() +
+                                              TestCerts::sTestCert_Node01_02_PrivateKey.size()));
+    EXPECT_SUCCESS(opKey_Node01_02.Deserialize(opKeysSerialized));
+
+    // Test 1: AddNOC must reject a certificate presented as an ICAC whose subject DN encodes matter-rcac-id instead of
+    // matter-icac-id.
+    {
+        EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
+
+        EXPECT_EQ(CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
+                  fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, VendorId::TestVendor1, &opKey_Node01_02,
+                                                                   /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex));
+        // Clean up pending state
+        fabricTable.RevertPendingFabricData();
+    }
+
+    // Test 2: UpdateNOC must reject a certificate presented as an ICAC whose subject DN encodes matter-rcac-id instead of
+    // matter-icac-id.
+    {
+        EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
+        EXPECT_SUCCESS(fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, ByteSpan{}, VendorId::TestVendor1,
+                                                                        &opKey_Node01_02,
+                                                                        /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex));
+        EXPECT_SUCCESS(fabricTable.CommitPendingFabricData());
+
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
+        MutableByteSpan csrSpan{ csrBuf };
+        EXPECT_SUCCESS(
+            fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(fabricIndex)), csrSpan));
+
+        EXPECT_EQ(CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
+                  fabricTable.UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan,
+                                                                         FabricTable::AdvertiseIdentity::No));
+    }
+
+    // Test 3: Directly validate that the shared VerifyCredentials method used by both AddNOC and UpdateNOC rejects a certificate
+    // presented as an ICAC whose subject DN encodes matter-rcac-id instead of matter-icac-id.
+    {
+        Credentials::ValidationContext validContext;
+        CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
+        NodeId nodeId                         = kUndefinedNodeId;
+        FabricId fabricId                     = kUndefinedFabricId;
+        Crypto::P256PublicKey nocPubKey;
+        Crypto::P256PublicKey rootPublicKey;
+
+        EXPECT_EQ(CHIP_ERROR_WRONG_CERT_DN,
+                  fabricTable.VerifyCredentials(nocSpan, icacSpan, rcacSpan, validContext, compressedFabricId, fabricId, nodeId,
+                                                nocPubKey, &rootPublicKey));
     }
 }
 
@@ -1218,7 +1299,7 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(), CHIP_NO_ERROR);
         ByteSpan rcac = fabricCertAuthority.GetRcac();
         // Keep a copy for second scope check
-        CopySpanToMutableSpan(rcac, rcac1Span);
+        EXPECT_SUCCESS(CopySpanToMutableSpan(rcac, rcac1Span));
 
         ByteSpan icac = fabricCertAuthority.GetIcac();
         ByteSpan noc  = fabricCertAuthority.GetNoc();
@@ -1342,7 +1423,7 @@ TEST_F(TestFabricTable, TestAddMultipleSameFabricIdDifferentRoot)
         EXPECT_EQ(fabricCertAuthority1.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(), CHIP_NO_ERROR);
         ByteSpan rcac = fabricCertAuthority1.GetRcac();
         // Keep a copy for second scope check
-        CopySpanToMutableSpan(rcac, rcac1Span);
+        EXPECT_SUCCESS(CopySpanToMutableSpan(rcac, rcac1Span));
 
         ByteSpan icac = fabricCertAuthority1.GetIcac();
         ByteSpan noc  = fabricCertAuthority1.GetNoc();
@@ -3148,7 +3229,7 @@ TEST_F(TestFabricTable, DeleteFabricCallsDelegate)
     ByteSpan icac = fabricCertAuthority.GetIcac();
     ByteSpan noc  = fabricCertAuthority.GetNoc();
 
-    fabricTable.AddNewPendingTrustedRootCert(rcac);
+    EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcac));
 
     constexpr uint16_t kVendorId = 0xFFF1u;
     FabricIndex newFabricIndex   = kUndefinedFabricIndex;
@@ -3158,10 +3239,10 @@ TEST_F(TestFabricTable, DeleteFabricCallsDelegate)
     EXPECT_EQ(fabricTableHolder.ReinitFabricTable(&storage), CHIP_NO_ERROR);
 
     TestFabricTableDelegate fabricDelegate;
-    fabricTable.AddFabricDelegate(&fabricDelegate);
+    EXPECT_SUCCESS(fabricTable.AddFabricDelegate(&fabricDelegate));
 
     // Check if calling Delete invokes OnFabricRemoved on delegates
-    fabricTable.Delete(newFabricIndex);
+    EXPECT_EQ(fabricTable.Delete(newFabricIndex), CHIP_ERROR_NOT_FOUND);
     EXPECT_TRUE(fabricDelegate.willBeRemovedCalled);
     EXPECT_TRUE(fabricDelegate.onRemovedCalled);
 
@@ -3193,7 +3274,7 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
         memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(), kTestCert_Root02_PublicKey.size());
         memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(), kTestCert_Root02_PrivateKey.data(),
                kTestCert_Root02_PrivateKey.size());
-        rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity());
+        EXPECT_SUCCESS(rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity()));
     }
 
     // Initialize a fabric table.
@@ -3296,6 +3377,73 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
 
         EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex2, ByteSpan{ kExpectedUnderlyingTbs2 },
                                                   responseData2.signature.Span()),
+                  CHIP_NO_ERROR);
+    }
+}
+
+TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
+{
+    chip::TestPersistentStorageDelegate storage;
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&storage), CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    EXPECT_EQ(fabricTable.FabricCount(), 0);
+
+    FabricIndex kFabricIndex = kUndefinedFabricIndex;
+    EXPECT_SUCCESS(fabricTable.AddNewFabricForTestIgnoringCollisions(
+        TestCerts::GetJFBRootCertAsset().mCert, TestCerts::GetJFBIACertAsset().mCert, TestCerts::GetJFBNodeCertAsset().mCert,
+        TestCerts::GetJFBNodeCertAsset().mKey, &kFabricIndex));
+
+    EXPECT_EQ(fabricTable.FabricCount(), 1);
+
+    const FabricInfo * fabricInfo = fabricTable.FindFabricWithIndex(kFabricIndex);
+    VendorId kVendorId            = fabricInfo->GetVendorId();
+
+    FabricTable::SignVIDVerificationResponseData responseData;
+    {
+        const uint8_t kAttestationChallenge[16] = {
+            0x14, 0x5f, 0x2e, 0xf3, 0x9e, 0x3e, 0x4f, 0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8, 0xe4,
+        };
+        ByteSpan kAttestationChallengeSpan{ kAttestationChallenge };
+
+        const uint8_t kClientChallenge[32] = {
+            0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0,
+            0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0,
+        };
+        ByteSpan kClientChallengeSpan{ kClientChallenge };
+
+        uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
+        MutableByteSpan rcacSpan{ rcacBuf };
+        ASSERT_EQ(fabricTable.FetchRootCert(kFabricIndex, rcacSpan), CHIP_NO_ERROR);
+        Credentials::P256PublicKeySpan kTrustedCAPublicKeySpan;
+        ASSERT_EQ(Credentials::ExtractPublicKeyFromChipCert(rcacSpan, kTrustedCAPublicKeySpan), CHIP_NO_ERROR);
+
+        uint8_t kVendorFabricBindingMessageBuffer[Crypto::kVendorFabricBindingMessageV1Size];
+        MutableByteSpan kVendorFabricBindingMessageSpan{ kVendorFabricBindingMessageBuffer };
+        ASSERT_EQ(Crypto::GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, kTrustedCAPublicKeySpan,
+                                                             kFabricIndex, kVendorId, kVendorFabricBindingMessageSpan),
+                  CHIP_NO_ERROR);
+
+        ByteSpan kVidVerificationStatementSpan;
+        uint8_t kExpectedUnderlyingTbsBuffer[Crypto::kVendorIdVerificationTbsV1MaxSize];
+        MutableByteSpan kExpectedUnderlyingTbs{ kExpectedUnderlyingTbsBuffer };
+        ASSERT_EQ(Crypto::GenerateVendorIdVerificationToBeSigned(kFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan,
+                                                                 kVendorFabricBindingMessageSpan, kVidVerificationStatementSpan,
+                                                                 kExpectedUnderlyingTbs),
+                  CHIP_NO_ERROR);
+
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan, responseData),
+            CHIP_NO_ERROR);
+
+        EXPECT_EQ(responseData.fabricBindingVersion, to_underlying(Crypto::FabricBindingVersion::kVersion1));
+        EXPECT_EQ(responseData.fabricIndex, kFabricIndex);
+
+        EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex, ByteSpan{ kExpectedUnderlyingTbs },
+                                                  responseData.signature.Span()),
                   CHIP_NO_ERROR);
     }
 }
@@ -3762,7 +3910,7 @@ TEST_F(TestFabricTable, VidVerificationSigningFailsOnBadInput)
         memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(), kTestCert_Root02_PublicKey.size());
         memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(), kTestCert_Root02_PrivateKey.data(),
                kTestCert_Root02_PrivateKey.size());
-        rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity());
+        EXPECT_SUCCESS(rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity()));
     }
 
     // Initialize a fabric table.

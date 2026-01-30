@@ -29,3 +29,6 @@ chip_with_nlfaultinjection = true
 
 matter_enable_tracing_support = true
 matter_enable_camera_server = true
+
+# Disable IPv4 to force IPv6 usage for TCP connections
+chip_inet_config_enable_ipv4 = false

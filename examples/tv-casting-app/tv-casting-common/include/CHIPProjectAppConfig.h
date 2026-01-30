@@ -83,8 +83,9 @@
  * For casting, we need to allow for more binding table entries because the Casting App can connect to many Matter Casting Players,
  * each with many Content Apps. Each Casting Player will set 1 binding per endpoint on it. A Casting Player will have 1 endpoint for
  * every Matter Content App installed on it + 1 endpoint representing the Casting Player + 1 endpoint representing a speaker.
+ * We define CHIP_CONFIG_MAX_FABRICS to 16 by default, so the maximum binding table is 64.
  */
-#define MATTER_BINDING_TABLE_SIZE 64
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 4
 
 // Enable some test-only interaction model APIs.
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
@@ -109,8 +110,11 @@
 
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
+#ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
+// Increase memory pools for better attribute reading performance
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 500 // Default is 15
+
 // Include the CHIPProjectConfig from config/standalone
 // Add this at the end so that we can hit our #defines first
-#ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <CHIPProjectConfig.h>
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN

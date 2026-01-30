@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "ServerClusterInterface.h"
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 namespace chip {
@@ -117,7 +118,8 @@ public:
     ClustersList ClustersOnEndpoint(EndpointId endpointId);
 
     /// Unregister all registrations for the given endpoint.
-    void UnregisterAllFromEndpoint(EndpointId endpointId);
+    void UnregisterAllFromEndpoint(EndpointId endpointId,
+                                   ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
 };
 
 } // namespace app

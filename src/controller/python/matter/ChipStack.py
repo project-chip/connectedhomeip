@@ -110,7 +110,7 @@ class AsyncioCallableHandle:
 
     def __init__(self, callback):
         self._callback = callback
-        self._loop = asyncio.get_event_loop()
+        self._loop = asyncio.get_running_loop()
         self._future = self._loop.create_future()
         self._result = None
         self._exception = None
@@ -120,6 +120,11 @@ class AsyncioCallableHandle:
         return self._future
 
     def _done(self):
+        if self._future.cancelled():
+            # If this helper is used with the asyncio.wait_for(), it might
+            # happen that the future will be cancelled before the callback
+            # is called. Do not raise an exception in this case.
+            return
         if self._exception:
             self._future.set_exception(self._exception)
         else:
@@ -192,6 +197,9 @@ class ChipStack(object):
         # invalidated. Hence, we need to create a local copy of the values before iterating.
         for subscription in tuple(self._subscriptions.values()):
             subscription.Shutdown()
+
+        # Shut down the BDX server.
+        Bdx.Shutdown()
 
         # Terminate Matter thread and shutdown the stack.
         self._ChipStackLib.pychip_DeviceController_StackShutdown()

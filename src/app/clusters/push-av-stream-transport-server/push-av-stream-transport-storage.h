@@ -165,7 +165,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         {
             MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
             // ValidateIncomingTransportOptions() function already checked the CENCKey length
-            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
+            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
             CENCKey.SetValue(CENCKeyBuffer);
         }
         else
@@ -179,7 +179,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         {
             MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
             // ValidateIncomingTransportOptions() function already checked the CENCKeyID length
-            CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
+            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
             CENCKeyID.SetValue(CENCKeyIDBuffer);
         }
         else
@@ -267,7 +267,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = aTransportOptionsStorage.streamUsage;
         videoStreamID = aTransportOptionsStorage.videoStreamID;
         audioStreamID = aTransportOptionsStorage.audioStreamID;
-        endpointID    = aTransportOptionsStorage.endpointID;
+        TLSEndpointID = aTransportOptionsStorage.TLSEndpointID;
 
         // Deep copy the URL buffer
         std::memcpy(mUrlBuffer, aTransportOptionsStorage.mUrlBuffer, kMaxUrlLength);
@@ -284,6 +284,30 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = aTransportOptionsStorage.expiryTime;
 
+        // Copy video streams storage
+        mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
+        if (!mVideoStreamsStorage.empty())
+        {
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            videoStreams.ClearValue();
+        }
+
+        // Copy audio streams storage
+        mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
+        if (!mAudioStreamsStorage.empty())
+        {
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            audioStreams.ClearValue();
+        }
+
         return *this;
     }
 
@@ -292,7 +316,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
         audioStreamID = transportOptions.audioStreamID;
-        endpointID    = transportOptions.endpointID;
+        TLSEndpointID = transportOptions.TLSEndpointID;
 
         MutableCharSpan urlBuffer(mUrlBuffer);
         // ValidateIncomingTransportOptions() function already checked the url length
@@ -309,15 +333,109 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = transportOptions.expiryTime;
 
+        // Handle videoStreams from decodable type
+        if (transportOptions.videoStreams.HasValue())
+        {
+            mVideoStreamsStorage.clear();
+            auto iter = transportOptions.videoStreams.Value().begin();
+            while (iter.Next())
+            {
+                auto & videoStream = iter.GetValue();
+                mVideoStreamsStorage.push_back(videoStream);
+            }
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            mVideoStreamsStorage.clear();
+            videoStreams.ClearValue();
+        }
+
+        // Handle audioStreams from decodable type
+        if (transportOptions.audioStreams.HasValue())
+        {
+            mAudioStreamsStorage.clear();
+            auto iter = transportOptions.audioStreams.Value().begin();
+            while (iter.Next())
+            {
+                auto & audioStream = iter.GetValue();
+                mAudioStreamsStorage.push_back(audioStream);
+            }
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            mAudioStreamsStorage.clear();
+            audioStreams.ClearValue();
+        }
+
         return *this;
     }
 
     TransportOptionsStorage(const Structs::TransportOptionsStruct::DecodableType & transportOptions) { *this = transportOptions; }
 
+    // Public methods to manage video streams without exposing internal storage
+    void ClearVideoStreams()
+    {
+        mVideoStreamsStorage.clear();
+        videoStreams.ClearValue();
+    }
+
+    void AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
+    {
+        mVideoStreamsStorage.push_back(videoStream);
+        videoStreams.SetValue(
+            DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+    }
+
+    void UpdateVideoStreamsList()
+    {
+        if (!mVideoStreamsStorage.empty())
+        {
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            videoStreams.ClearValue();
+        }
+    }
+
+    // Public methods to manage audio streams without exposing internal storage
+    void ClearAudioStreams()
+    {
+        mAudioStreamsStorage.clear();
+        audioStreams.ClearValue();
+    }
+
+    void AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
+    {
+        mAudioStreamsStorage.push_back(audioStream);
+        audioStreams.SetValue(
+            DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+    }
+
+    void UpdateAudioStreamsList()
+    {
+        if (!mAudioStreamsStorage.empty())
+        {
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            audioStreams.ClearValue();
+        }
+    }
+
 private:
     char mUrlBuffer[kMaxUrlLength];
     TransportTriggerOptionsStorage mTriggerOptionsStorage;
     ContainerOptionsStorage mContainerOptionsStorage;
+    std::vector<Structs::VideoStreamStruct::Type> mVideoStreamsStorage;
+    std::vector<Structs::AudioStreamStruct::Type> mAudioStreamsStorage;
 };
 
 /**

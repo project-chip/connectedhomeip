@@ -57,13 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="All Hubs changes"/>
     <revision revision="3" summary="New data model format and notation, added additional events"/>
     <revision revision="4" summary="Added feature map"/>
-    <revision revision="5" summary="Added Q quality for Capacity, Speed and Power"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0200" name="Pump Configuration and Control"/>
@@ -343,12 +342,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="Capacity" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true" quieterReporting="true"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0014" name="Speed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" quieterReporting="true"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="LifetimeRunningHours" type="uint24" default="0">
@@ -358,7 +357,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0016" name="Power" type="uint24" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true" quieterReporting="true"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0017" name="LifetimeEnergyConsumed" type="uint32" default="0">

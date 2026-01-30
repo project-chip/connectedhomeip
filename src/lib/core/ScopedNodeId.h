@@ -35,6 +35,12 @@ public:
     bool IsOperational() const { return mFabricIndex != kUndefinedFabricIndex && IsOperationalNodeId(mNodeId); }
     bool operator==(const ScopedNodeId & that) const { return (mNodeId == that.mNodeId) && (mFabricIndex == that.mFabricIndex); }
     bool operator!=(const ScopedNodeId & that) const { return !(*this == that); }
+    bool operator<(const ScopedNodeId & that) const
+    {
+        if (mFabricIndex != that.mFabricIndex)
+            return mFabricIndex < that.mFabricIndex;
+        return mNodeId < that.mNodeId;
+    }
 
 private:
     NodeId mNodeId;

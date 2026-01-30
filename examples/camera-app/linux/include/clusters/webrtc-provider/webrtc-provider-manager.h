@@ -22,11 +22,11 @@
 #include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <media-controller.h>
 #include <webrtc-transport.h>
 
-#include <unordered_map>
+#include <map>
 
 namespace chip {
 namespace app {
@@ -54,23 +54,21 @@ public:
 
     void SetMediaController(MediaController * mediaController);
 
+    void SetWebRTCTransportProvider(WebRTCTransportProviderCluster * webRTCTransportProvider);
+
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
 
-    CHIP_ERROR
-    HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
+    CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
     CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                chip::app::DataModel::Nullable<uint16_t> videoStreamID,
-                                chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override;
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, chip::Optional<std::vector<uint16_t>> & videoStreams,
+                                   chip::Optional<std::vector<uint16_t>> & audioStreams) override;
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
@@ -78,20 +76,42 @@ public:
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
+
+    CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override;
+
+    CHIP_ERROR IsStreamUsageSupported(StreamUsageEnum streamUsage) override;
+
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
     bool HasAllocatedVideoStreams() override;
 
     bool HasAllocatedAudioStreams() override;
 
+    CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) override;
+
+    CHIP_ERROR IsUTCTimeNull(bool & isNull) override;
+
+    void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
+
 private:
+    std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType);
+
     void ScheduleOfferSend(uint16_t sessionId);
 
     void ScheduleICECandidatesSend(uint16_t sessionId);
 
     void ScheduleAnswerSend(uint16_t sessionId);
 
+    void ScheduleEndSend(uint16_t sessionId);
+
     void RegisterWebrtcTransport(uint16_t sessionId);
+
+    void UnregisterWebrtcTransport(uint16_t sessionId);
 
     CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
                                 uint16_t sessionId);
@@ -101,6 +121,9 @@ private:
 
     CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
                                         uint16_t sessionId);
+
+    CHIP_ERROR SendEndCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                              uint16_t sessionId, WebRTCEndReasonEnum endReason);
 
     CHIP_ERROR AcquireAudioVideoStreams(uint16_t sessionId);
 
@@ -121,14 +144,18 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
-    // This is to retrieve the sessionIds for a given NodeId
-    std::unordered_map<NodeId, uint16_t> mSessionIdMap;
+    // This is to retrieve the sessionIds for a given ScopedNodeId (NodeId + FabricIndex)
+    std::map<ScopedNodeId, uint16_t> mSessionIdMap;
 
     MediaController * mMediaController = nullptr;
+
+    WebRTCTransportProviderCluster * mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.
     CameraDeviceInterface * mCameraDevice = nullptr;
+
+    bool mSoftLiveStreamPrivacyEnabled = false;
 };
 
 } // namespace WebRTCTransportProvider

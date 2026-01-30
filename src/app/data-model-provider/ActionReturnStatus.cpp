@@ -104,6 +104,14 @@ CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
                                 : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
     }
 
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
+    {
+        if (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp)
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
     chipDie();
 }
 
@@ -117,6 +125,14 @@ ClusterStatusCode ActionReturnStatus::GetStatusCode() const
     if (const CHIP_ERROR * err = std::get_if<CHIP_ERROR>(&mReturnStatus))
     {
         return ClusterStatusCode(*err);
+    }
+
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
+    {
+        if (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp)
+        {
+            return ClusterStatusCode(CHIP_NO_ERROR);
+        }
     }
 
     // all std::variant cases exhausted
@@ -135,8 +151,25 @@ bool ActionReturnStatus::IsSuccess() const
         return status->IsSuccess();
     }
 
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
+    {
+        return (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+    }
+
     // all std::variant cases exhausted
     chipDie();
+}
+
+bool ActionReturnStatus::IsNoOpSuccess() const
+{
+    if (const ActionReturnStatus::FixedStatus * status = std::get_if<ActionReturnStatus::FixedStatus>(&mReturnStatus))
+    {
+        return (*status == ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+    }
+
+    // NoOp Success only works with FixedStatus, any other type should return false since it is not
+    // supported specifically by the type.
+    return false;
 }
 
 bool ActionReturnStatus::IsOutOfSpaceEncodingResponse() const

@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
@@ -19,10 +18,14 @@
 
 #pragma once
 
+#include "pushav-prerollbuffer.h"
 #include <media-controller.h>
 #include <mutex>
 #include <vector>
 
+namespace Camera {
+class CameraDevice; // forward declaration
+}
 // Default Media Controller
 class DefaultMediaController : public MediaController
 {
@@ -30,17 +33,26 @@ public:
     DefaultMediaController() {}
     virtual ~DefaultMediaController() {}
     // Transports register themselves with the media-controller for receiving
-    // media from stream sources.
-    void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) override;
+    // media from stream sources. Supports multiple video and audio streams per transport.
+    void RegisterTransport(Transport * transport, const std::vector<uint16_t> & videoStreams,
+                           const std::vector<uint16_t> & audioStreams) override;
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
     void UnregisterTransport(Transport * transport) override;
-    // Media controller goes through registered transports and dispatches media
-    // if the transport is ready.
-    void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID) override;
-    void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID) override;
+    // DistributeVideo and DistributeAudio are called when data is ready to be sent out
+    void DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID, int64_t timestamp) override;
+    void DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID, int64_t timestamp) override;
+    // Sets the desired preroll buffer length in milliseconds for the given transport
+    void SetPreRollLength(Transport * transport, uint16_t preRollBufferLength) override;
+    void SetCameraDevice(Camera::CameraDevice * device);
+    // Get transport registered for a specific stream ID
+    Transport * GetTransportForVideoStream(uint16_t videoStreamID) override;
+    Transport * GetTransportForAudioStream(uint16_t audioStreamID) override;
 
 private:
+    PreRollBuffer mPreRollBuffer;
     std::vector<Connection> mConnections;
     std::mutex mConnectionsMutex;
+    std::unordered_map<Transport *, BufferSink *> mSinkMap; // map of transport to sink
+    Camera::CameraDevice * mCameraDevice = nullptr;         // pointer to parent camera device
 };

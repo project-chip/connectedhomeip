@@ -195,11 +195,17 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeScenesManagementID:
         result = @"ScenesManagement";
         break;
+    case MTRClusterIDTypeGroupcastID:
+        result = @"Groupcast";
+        break;
     case MTRClusterIDTypeHEPAFilterMonitoringID:
         result = @"HEPAFilterMonitoring";
         break;
     case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
         result = @"ActivatedCarbonFilterMonitoring";
+        break;
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
+        result = @"WaterTankLevelMonitoring";
         break;
     case MTRClusterIDTypeBooleanStateConfigurationID:
         result = @"BooleanStateConfiguration";
@@ -329,6 +335,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeSoilMeasurementID:
         result = @"SoilMeasurement";
+        break;
+    case MTRClusterIDTypeAmbientContextSensingID:
+        result = @"AmbientContextSensing";
         break;
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
@@ -823,6 +832,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAccessControlAttributeARLID:
             result = @"ARL";
+            break;
+
+        case MTRAttributeIDTypeClusterAccessControlAttributeAuxiliaryACLID:
+            result = @"AuxiliaryACL";
             break;
 
         case MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID:
@@ -1655,6 +1668,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID:
             result = @"TestEventTriggersEnabled";
+            break;
+
+        case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeDeviceLoadStatusID:
+            result = @"DeviceLoadStatus";
             break;
 
         case MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID:
@@ -3748,6 +3765,46 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeGroupcastID:
+
+        switch (attributeID) {
+
+            // Cluster Groupcast attributes
+        case MTRAttributeIDTypeClusterGroupcastAttributeMembershipID:
+            result = @"Membership";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeMaxMembershipCountID:
+            result = @"MaxMembershipCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known Groupcast attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (attributeID) {
@@ -3855,6 +3912,62 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ActivatedCarbonFilterMonitoring attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
+
+        switch (attributeID) {
+
+            // Cluster WaterTankLevelMonitoring attributes
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeConditionID:
+            result = @"Condition";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeDegradationDirectionID:
+            result = @"DegradationDirection";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeChangeIndicationID:
+            result = @"ChangeIndication";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeInPlaceIndicatorID:
+            result = @"InPlaceIndicator";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeLastChangedTimeID:
+            result = @"LastChangedTime";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeReplacementProductListID:
+            result = @"ReplacementProductList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known WaterTankLevelMonitoring attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -4559,6 +4672,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterPowerTopologyAttributeActiveEndpointsID:
             result = @"ActiveEndpoints";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeElectricalCircuitNodesID:
+            result = @"ElectricalCircuitNodes";
             break;
 
         case MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID:
@@ -7292,6 +7409,78 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeAmbientContextSensingID:
+
+        switch (attributeID) {
+
+            // Cluster AmbientContextSensing attributes
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeHumanActivityDetectedID:
+            result = @"HumanActivityDetected";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectIdentifiedID:
+            result = @"ObjectIdentified";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeAudioContextDetectedID:
+            result = @"AudioContextDetected";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeAmbientContextTypeID:
+            result = @"AmbientContextType";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeAmbientContextTypeSupportedID:
+            result = @"AmbientContextTypeSupported";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID:
+            result = @"SimultaneousDetectionLimit";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID:
+            result = @"ObjectCountReached";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeID:
+            result = @"HoldTime";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeLimitsID:
+            result = @"HoldTimeLimits";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributePredictedActivityID:
+            result = @"PredictedActivity";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AmbientContextSensing attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (attributeID) {
@@ -7987,6 +8176,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterContentControlAttributeBlockUnratedID:
             result = @"BlockUnrated";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockChannelListID:
+            result = @"BlockChannelList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockApplicationListID:
+            result = @"BlockApplicationList";
+            break;
+
+        case MTRAttributeIDTypeClusterContentControlAttributeBlockContentTimeWindowID:
+            result = @"BlockContentTimeWindow";
             break;
 
         case MTRAttributeIDTypeClusterContentControlAttributeGeneratedCommandListID:
@@ -10508,6 +10709,32 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeGroupcastID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterGroupcastCommandJoinGroupID:
+            result = @"JoinGroup";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandLeaveGroupID:
+            result = @"LeaveGroup";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandUpdateGroupKeyID:
+            result = @"UpdateGroupKey";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandConfigureAuxiliaryACLID:
+            result = @"ConfigureAuxiliaryACL";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (commandID) {
@@ -10527,6 +10754,20 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         switch (commandID) {
 
         case MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID:
+            result = @"ResetCondition";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterWaterTankLevelMonitoringCommandResetConditionID:
             result = @"ResetCondition";
             break;
 
@@ -11334,6 +11575,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeAmbientContextSensingID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -11706,6 +11957,30 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterContentControlCommandSetScheduledContentRatingThresholdID:
             result = @"SetScheduledContentRatingThreshold";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockChannelsID:
+            result = @"AddBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockChannelsID:
+            result = @"RemoveBlockChannels";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandAddBlockApplicationsID:
+            result = @"AddBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockApplicationsID:
+            result = @"RemoveBlockApplications";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandSetBlockContentTimeWindowID:
+            result = @"SetBlockContentTimeWindow";
+            break;
+
+        case MTRCommandIDTypeClusterContentControlCommandRemoveBlockContentTimeWindowID:
+            result = @"RemoveBlockContentTimeWindow";
             break;
 
         default:
@@ -12140,8 +12415,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"RemoveRootCertificate";
             break;
 
-        case MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRID:
-            result = @"TLSClientCSR";
+        case MTRCommandIDTypeClusterTLSCertificateManagementCommandClientCSRID:
+            result = @"ClientCSR";
             break;
 
         case MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateID:
@@ -13098,6 +13373,20 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeGroupcastID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterGroupcastCommandLeaveGroupResponseID:
+            result = @"LeaveGroupResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (commandID) {
@@ -13109,6 +13398,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         break;
 
     case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
 
         switch (commandID) {
 
@@ -13616,6 +13915,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeAmbientContextSensingID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -14034,8 +14343,8 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"LookupRootCertificateResponse";
             break;
 
-        case MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRResponseID:
-            result = @"TLSClientCSRResponse";
+        case MTRCommandIDTypeClusterTLSCertificateManagementCommandClientCSRResponseID:
+            result = @"ClientCSRResponse";
             break;
 
         case MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateResponseID:
@@ -14279,6 +14588,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         case MTREventIDTypeClusterAccessControlEventFabricRestrictionReviewUpdateID:
             result = @"FabricRestrictionReviewUpdate";
+            break;
+
+        case MTREventIDTypeClusterAccessControlEventAuxiliaryAccessUpdatedID:
+            result = @"AuxiliaryAccessUpdated";
             break;
 
         default:
@@ -15021,6 +15334,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeGroupcastID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeHEPAFilterMonitoringID:
 
         switch (eventID) {
@@ -15032,6 +15355,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
 
         switch (eventID) {
 
@@ -15722,6 +16055,21 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeAmbientContextSensingID:
+
+        switch (eventID) {
+
+            // Cluster AmbientContextSensing events
+        case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectedID:
+            result = @"AmbientContextDetected";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (eventID) {
@@ -15896,6 +16244,10 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
             result = @"RemainingScreenTimeExpired";
             break;
 
+        case MTREventIDTypeClusterContentControlEventEnteringBlockContentTimeWindowID:
+            result = @"EnteringBlockContentTimeWindow";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;
@@ -15993,6 +16345,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeChimeID:
 
         switch (eventID) {
+
+            // Cluster Chime events
+        case MTREventIDTypeClusterChimeEventChimeStartedPlayingID:
+            result = @"ChimeStartedPlaying";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

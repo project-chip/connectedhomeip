@@ -36,6 +36,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, availableEndpoints);
     case Attributes::ActiveEndpoints::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, activeEndpoints);
+    case Attributes::ElectricalCircuitNodes::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, electricalCircuitNodes);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

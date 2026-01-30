@@ -19,6 +19,8 @@ from typing import Dict, List, Optional
 
 import yaml
 
+LOGGER = logging.getLogger(__name__)
+
 
 @dataclass
 class Metadata:
@@ -75,7 +77,7 @@ def extract_runs_args(py_script_path: str) -> Dict[str, Dict[str, str]]:
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
         except yaml.YAMLError as e:
-            logging.error(f"Failed to parse CI arguments YAML: {e}")
+            LOGGER.error(f"Failed to parse CI arguments YAML: {e}")
 
     return runs_arg_lines
 

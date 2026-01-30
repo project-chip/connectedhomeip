@@ -30,7 +30,7 @@ chip_test_suite("tests") {
     test_sources += [ "TestCommissionableNodeController.cpp" ]
   }
 
-  if (chip_device_platform != "mbed" && chip_device_platform != "esp32") {
+  if (chip_device_platform != "esp32") {
     test_sources += [
       "TestEventCaching.cpp",
       "TestEventChunking.cpp",
@@ -60,9 +60,7 @@ chip_test_suite("tests") {
     test_sources += [ "TestAutoCommissioner.cpp" ]
   }
 
-  if (chip_device_config_enable_joint_fabric) {
-    test_sources += [ "TestJCMCommissioner.cpp" ]
-  }
+  test_sources += [ "TestCommissioningDelegate.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
@@ -73,6 +71,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/controller",
+    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
@@ -80,14 +79,10 @@ chip_test_suite("tests") {
     "${chip_root}/src/transport/raw/tests:helpers",
   ]
 
-  if (chip_device_platform != "mbed") {
-    public_deps += [ "${chip_root}/src/controller/data_model" ]
-  }
-
   if (chip_device_config_enable_joint_fabric) {
     public_deps += [
-      "${chip_root}/src/app/server:joint_fabric",
-      "${chip_root}/src/controller:jcm",
+      "${chip_root}/src/controller/data_model",
+      "${chip_root}/src/controller/jcm",
     ]
   }
 }

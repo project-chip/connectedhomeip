@@ -161,7 +161,7 @@ public:
      * @param[in]    buf   A pointer to a fully initialized TLVCircularBuffer
      *
      */
-    void Init(TLVCircularBuffer & buf) { TLVReader::Init(buf, buf.DataLength()); }
+    void Init(TLVCircularBuffer & buf) { TEMPORARY_RETURN_IGNORED TLVReader::Init(buf, buf.DataLength()); }
 };
 
 class DLL_EXPORT CircularTLVWriter : public TLVWriter
@@ -182,7 +182,7 @@ public:
      * @param[in]    buf   A pointer to a fully initialized TLVCircularBuffer
      *
      */
-    void Init(TLVCircularBuffer & buf) { TLVWriter::Init(buf, UINT32_MAX); }
+    void Init(TLVCircularBuffer & buf) { TEMPORARY_RETURN_IGNORED TLVWriter::Init(buf, UINT32_MAX); }
 };
 
 } // namespace TLV

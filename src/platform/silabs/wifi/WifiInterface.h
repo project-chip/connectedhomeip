@@ -90,7 +90,7 @@ typedef struct wfx_wifi_scan_ext
     uint32_t overrun_count;
 } wfx_wifi_scan_ext_t;
 
-#ifdef RS911X_WIFI
+#ifdef SL_MATTER_SIWX_WIFI_ENABLE
 /*
  * This Sh%t is here to support WFXUtils - and the Matter stuff that uses it
  * We took it from the SDK (for WF200)
@@ -353,6 +353,11 @@ public:
         return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
     }
 
+    /**
+     * @brief Function resets reconnection attempt interval back to the minimum value
+     */
+    void ResetConnectionRetryInterval();
+
 protected:
     /**
      * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.
@@ -433,8 +438,6 @@ typedef struct wfx_rsi_s
     uint16_t ap_chan; /* The chan our STA is using	*/
     chip::DeviceLayer::Silabs::WifiInterface::WifiCredentials credentials;
     ScanCallback scan_cb;
-    uint8_t * scan_ssid; /* Which one are we scanning for */
-    size_t scan_ssid_length;
 #ifdef SL_WFX_CONFIG_SOFTAP
     chip::DeviceLayer::Silabs::WifiInterface::MacAddress softap_mac;
 #endif

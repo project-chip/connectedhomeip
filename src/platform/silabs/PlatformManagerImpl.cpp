@@ -31,9 +31,13 @@
 #include <platform/internal/GenericPlatformManagerImpl_CMSISOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
+#include <lib/core/ErrorStr.h>
+#include <platform/PlatformError.h>
+#include <sl_status.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/silabs/wifi/WifiInterface.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+#include <platform/silabs/wifi/WifiInterface.h> // nogncheck
+#endif                                          // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
 #include "tinycrypt/ecc.h"
@@ -111,8 +115,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
+    // Register the Silabs platform error formatter
+    RegisterSilabsPlatformErrorFormatter();
+
     // Start timer to increment TotalOperationalHours every hour
-    SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
 
 exit:
     return err;
@@ -124,19 +131,54 @@ void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, vo
 
     if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
     {
-        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + 1);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + 1);
     }
     else
     {
         ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
     }
 
-    SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
+    TEMPORARY_RETURN_IGNORED SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
 }
 
 void PlatformManagerImpl::_Shutdown()
 {
     Internal::GenericPlatformManagerImpl_CMSISOS<PlatformManagerImpl>::_Shutdown();
+}
+
+bool PlatformManagerImpl::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
+{
+    if (!err.IsRange(ChipError::Range::kPlatform))
+    {
+        return false;
+    }
+
+    const char * desc = nullptr;
+
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    // Use thread-safe buffer for error description
+#if CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+    static thread_local char errDescBuf[128];
+#else
+    static char errDescBuf[128];
+#endif
+    sl_status_t slStatus = static_cast<sl_status_t>(err.GetValue());
+    if (sl_status_get_string_n(slStatus, errDescBuf, sizeof(errDescBuf)) > 0)
+    {
+        desc = errDescBuf;
+    }
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
+    chip::FormatError(buf, bufSize, "Silabs", err, desc);
+
+    return true;
+}
+
+void PlatformManagerImpl::RegisterSilabsPlatformErrorFormatter()
+{
+    static ErrorFormatter sErrorFormatter = { PlatformManagerImpl::FormatError, nullptr };
+
+    RegisterErrorFormatter(&sErrorFormatter);
 }
 
 } // namespace DeviceLayer

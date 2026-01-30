@@ -48,6 +48,7 @@ public:
 
     CHIP_ERROR Init() override;
     void Finish() override;
+    bool IsInitialized() { return (mStorage != nullptr); }
 
     //
     // Group Info
@@ -161,11 +162,11 @@ protected:
             mProvider(provider)
 
         {
-            Initialize(encryptionKey, hash, privacyKey);
+            TEMPORARY_RETURN_IGNORED Initialize(encryptionKey, hash, privacyKey);
         }
 
-        void Initialize(const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
-                        const Crypto::Symmetric128BitsKeyByteArray & privacyKey)
+        CHIP_ERROR Initialize(const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
+                              const Crypto::Symmetric128BitsKeyByteArray & privacyKey)
         {
             ReleaseKeys();
             mKeyHash = hash;
@@ -176,8 +177,8 @@ protected:
             // like more work, so let's use the transitional code below for now.
 
             Crypto::SessionKeystore * keystore = mProvider.GetSessionKeystore();
-            keystore->CreateKey(encryptionKey, mEncryptionKey);
-            keystore->CreateKey(privacyKey, mPrivacyKey);
+            ReturnErrorOnFailure(keystore->CreateKey(encryptionKey, mEncryptionKey));
+            return keystore->CreateKey(privacyKey, mPrivacyKey);
         }
 
         void ReleaseKeys()
@@ -243,9 +244,8 @@ protected:
         bool mFirstMap           = true;
         GroupKeyContext mGroupKeyContext;
     };
-    bool IsInitialized() { return (mStorage != nullptr); }
-    CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
+    CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
     PersistentStorageDelegate * mStorage       = nullptr;
     Crypto::SessionKeystore * mSessionKeystore = nullptr;
     ObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;

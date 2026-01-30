@@ -15,7 +15,7 @@ DEFAULT_TARGETS = [
     "linux-x64-bridge-no-ble-clang-boringssl",
     "linux-x64-contact-sensor-no-ble",
     "linux-x64-dishwasher-no-ble",
-    "linux-x64-energy-management-no-ble-clang-boringssl",
+    "linux-x64-evse-no-ble-clang-boringssl",
     "linux-x64-light-data-model-no-unique-id-no-ble",
     "linux-x64-light-no-ble",
     "linux-x64-lit-icd-no-ble",
@@ -85,7 +85,7 @@ def parse_test_logs(test_log_paths):
       test_log_paths: A list of paths to test output files.
 
     Returns:
-      A dictionary where keys are test names and values are lists of results. 
+      A dictionary where keys are test names and values are lists of results.
       Each result is a list: [app_target_name, test_pass_fail, error_count, test_cmd, error_summary].
     """
 
@@ -297,7 +297,7 @@ def csv_to_html_report(csv_file_paths, html_page_title, html_out_dir, sha):
     </head>
     <h1>{html_page_title}</h1>
     <hr>
-    <h4>Generated on {now}<br>SHA: {sha}</h4> 
+    <h4>Generated on {now}<br>SHA: {sha}</h4>
     <hr>
     <body>
     """

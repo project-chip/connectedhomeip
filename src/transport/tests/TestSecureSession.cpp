@@ -30,6 +30,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/CryptoContext.h>
 
 using namespace chip;
@@ -81,7 +82,7 @@ TEST(TestSecureSession, SecureChannelEncryptTest)
     EXPECT_EQ(packetHeader.MICTagLength(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     CryptoContext::NonceStorage nonce;
-    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
+    EXPECT_SUCCESS(CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0));
 
     P256Keypair keypair;
     EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
@@ -122,7 +123,7 @@ TEST(TestSecureSession, SecureChannelDecryptTest)
     EXPECT_EQ(packetHeader.MICTagLength(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     CryptoContext::NonceStorage nonce;
-    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
+    EXPECT_SUCCESS(CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0));
 
     const char * salt = "Test Salt";
 

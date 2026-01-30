@@ -433,7 +433,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     std::string url                   = "rtsp://192.168.1.100:554/stream";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
@@ -448,7 +448,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
     EXPECT_EQ(transportOptionsStorage.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(transportOptionsStorage.videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportOptionsStorage.audioStreamID.Value(), (uint16_t) 2);
-    EXPECT_EQ(transportOptionsStorage.endpointID, 1);
+    EXPECT_EQ(transportOptionsStorage.TLSEndpointID, 1);
 
     std::string transportOptionsUrlStr(transportOptionsStorage.url.data(), transportOptionsStorage.url.size());
     EXPECT_EQ(transportOptionsUrlStr, "rtsp://192.168.1.100:554/stream");
@@ -458,7 +458,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
     EXPECT_EQ(transportOptionsStorageCopy.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(transportOptionsStorageCopy.videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportOptionsStorageCopy.audioStreamID.Value(), (uint16_t) 2);
-    EXPECT_EQ(transportOptionsStorageCopy.endpointID, 1);
+    EXPECT_EQ(transportOptionsStorageCopy.TLSEndpointID, 1);
 
     std::string transportOptionsUrlStrCopy(transportOptionsStorageCopy.url.data(), transportOptionsStorageCopy.url.size());
     EXPECT_EQ(transportOptionsUrlStrCopy, "rtsp://192.168.1.100:554/stream");
@@ -470,7 +470,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
     EXPECT_EQ(BaseTransportOptions.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(BaseTransportOptions.videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(BaseTransportOptions.audioStreamID.Value(), (uint16_t) 2);
-    EXPECT_EQ(BaseTransportOptions.endpointID, 1);
+    EXPECT_EQ(BaseTransportOptions.TLSEndpointID, 1);
 
     std::string transportOptionsUrlStrBase(BaseTransportOptions.url.data(), BaseTransportOptions.url.size());
     EXPECT_EQ(transportOptionsUrlStrBase, "rtsp://192.168.1.100:554/stream");
@@ -565,7 +565,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
     transportOptions.videoStreamID.SetValue(1);
     transportOptions.audioStreamID.SetValue(2);
-    transportOptions.endpointID       = 1;
+    transportOptions.TLSEndpointID    = 1;
     std::string url                   = "rtsp://192.168.1.100:554/stream";
     transportOptions.url              = Span(url.data(), url.size());
     transportOptions.triggerOptions   = triggerOptions;
@@ -586,7 +586,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().audioStreamID.Value(), (uint16_t) 2);
-    EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().endpointID, 1);
+    EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().TLSEndpointID, 1);
 
     std::string transportOptionsUrlStrConfiguration(transportConfigurationStorage.transportOptions.Value().url.data(),
                                                     transportConfigurationStorage.transportOptions.Value().url.size());
@@ -599,7 +599,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().audioStreamID.Value(), (uint16_t) 2);
-    EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().endpointID, 1);
+    EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().TLSEndpointID, 1);
 
     std::string transportOptionsUrlStrConfigurationCopy(transportConfigurationStorageCopy.transportOptions.Value().url.data(),
                                                         transportConfigurationStorageCopy.transportOptions.Value().url.size());
@@ -615,7 +615,7 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().audioStreamID.Value(), (uint16_t) 2);
-    EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().endpointID, 1);
+    EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().TLSEndpointID, 1);
 
     std::string transportOptionsUrlStrConfigurationBase(BaseTransportConfiguration.transportOptions.Value().url.data(),
                                                         BaseTransportConfiguration.transportOptions.Value().url.size());

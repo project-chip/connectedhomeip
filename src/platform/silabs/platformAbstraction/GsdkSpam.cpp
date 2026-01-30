@@ -33,10 +33,34 @@
 #include "sl_system_kernel.h"
 #endif
 
+#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
+#include "sl_clock_manager.h"
+#include "sl_hal_wdog.h"
+#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
+
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+#include "sl_simple_rgb_pwm_led.h"
+#include "sl_simple_rgb_pwm_led_instances.h"
+#define SL_SIMPLE_LED_INSTANCE(x) (&sl_simple_rgb_pwm_led_rgb_led0)
+#define SL_SIMPLE_LED_COUNT 1
+#define SL_LED_INIT_INTANCES() sl_simple_rgb_pwm_led_init_instances();
+#define SL_LED_GET_STATE(x) sl_led_get_state(&(x->led_common))
+#define SL_LED_TURN_ON(x) sl_led_turn_on(&(x->led_common))
+#define SL_LED_TURN_OFF(x) sl_led_turn_off(&(x->led_common))
+#define SL_LED_TOGGLE(x) sl_led_toggle(&(x->led_common))
+#else
 #include "sl_simple_led_instances.h"
+#define SL_LED_INIT_INTANCES() sl_simple_led_init_instances();
+#define SL_LED_GET_STATE(x) sl_simple_led_get_state(const_cast<sl_led_t *>(x))
+#define SL_LED_TURN_ON(x) sl_simple_led_turn_on(const_cast<sl_led_t *>(x))
+#define SL_LED_TURN_OFF(x) sl_simple_led_turn_off(const_cast<sl_led_t *>(x))
+#define SL_LED_TOGGLE(x) sl_simple_led_toggle(const_cast<sl_led_t *>(x))
+
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 }
+
 #endif
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
@@ -96,6 +120,7 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
+    TEMPORARY_RETURN_IGNORED NvmInit();
 #ifdef _SILICON_LABS_32B_SERIES_2
     // Read the cause of last reset.
     mRebootCause = RMU_ResetCauseGet();
@@ -192,7 +217,7 @@ CHIP_ERROR SilabsPlatform::FlashWritePage(uint32_t addr, const uint8_t * data, s
 #ifdef ENABLE_WSTK_LEDS
 void SilabsPlatform::InitLed(void)
 {
-    sl_simple_led_init_instances();
+    SL_LED_INIT_INTANCES();
 }
 
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
@@ -202,7 +227,7 @@ CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    (state) ? sl_led_turn_on(SL_SIMPLE_LED_INSTANCE(led)) : sl_led_turn_off(SL_SIMPLE_LED_INSTANCE(led));
+    (state) ? SL_LED_TURN_ON(SL_SIMPLE_LED_INSTANCE(led)) : SL_LED_TURN_OFF(SL_SIMPLE_LED_INSTANCE(led));
     return CHIP_NO_ERROR;
 }
 
@@ -212,8 +237,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
     {
         return false;
     }
-
-    return sl_led_get_state(SL_SIMPLE_LED_INSTANCE(led));
+    return SL_LED_GET_STATE(SL_SIMPLE_LED_INSTANCE(led));
 }
 
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
@@ -222,7 +246,7 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    sl_led_toggle(SL_SIMPLE_LED_INSTANCE(led));
+    SL_LED_TOGGLE(SL_SIMPLE_LED_INSTANCE(led));
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
@@ -234,6 +258,23 @@ void SilabsPlatform::StartScheduler()
     sl_system_kernel_start();
 }
 #endif
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+bool SilabsPlatform::GetRGBLedState(uint8_t led)
+{
+    return SL_LED_GET_STATE(SL_SIMPLE_LED_INSTANCE(led));
+}
+CHIP_ERROR SilabsPlatform::SetLedColor(uint8_t led, uint8_t red, uint8_t green, uint8_t blue)
+{
+    sl_led_set_rgb_color(SL_SIMPLE_LED_INSTANCE(led), red, green, blue);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, uint16_t & b)
+{
+    sl_led_get_rgb_color(SL_SIMPLE_LED_INSTANCE(led), &r, &g, &b);
+    return CHIP_NO_ERROR;
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(const sl_button_t * handle)
@@ -265,6 +306,46 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     return 0;
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
+#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
+void SilabsPlatform::WatchdogInit()
+{
+    // Initialize WDOG with default configuration
+    sl_hal_wdog_init_t wdogInit = SL_HAL_WDOG_INIT_DEFAULT;
+    wdogInit.reset_disable      = true;                // For debug, do not trigger a system reset on timeout
+    wdogInit.period_select      = SL_WDOG_PERIOD_128k; // Set timeout period. 4s with our default LF clock at 32.768kHz
+
+    //  Initialize WDOG with our configuration
+    sl_clock_manager_enable_bus_clock(SL_BUS_CLOCK_WDOG0);
+    sl_hal_wdog_init(WDOG0, &wdogInit);
+
+    // Enable Watchdog Timeout interrupt
+    sl_hal_wdog_clear_interrupts(WDOG0, WDOG_IF_TOUT);
+    sl_hal_wdog_enable_interrupts(WDOG0, WDOG_IF_TOUT);
+
+    WatchdogEnable();
+}
+
+void SilabsPlatform::WatchdogFeed()
+{
+    sl_hal_wdog_feed(WDOG0);
+}
+
+void SilabsPlatform::WatchdogEnable()
+{
+    // Enable NVIC interrupt for WDOG
+    sl_interrupt_manager_clear_irq_pending(WDOG0_IRQn);
+    sl_interrupt_manager_enable_irq(WDOG0_IRQn);
+
+    sl_hal_wdog_enable(WDOG0);
+}
+
+void SilabsPlatform::WatchdogDisable()
+{
+    sl_hal_wdog_disable(WDOG0);
+    sl_interrupt_manager_disable_irq(WDOG0_IRQn);
+}
+#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
 
 } // namespace Silabs
 } // namespace DeviceLayer

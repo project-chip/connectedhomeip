@@ -486,7 +486,7 @@ void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appSta
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -506,7 +506,7 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -539,7 +539,7 @@ void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -576,7 +576,7 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 
@@ -604,13 +604,13 @@ void SubscribeRequestTimerHandler(chip::System::Layer * systemLayer, void * appS
     else
     {
         // Complete all tests.
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
     }
 }
 } // namespace

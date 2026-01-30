@@ -11,5 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("commodity-tariff-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("commodity-tariff-server") {
+  sources = [
+    "CommodityTariffAttrsDataMgmt.cpp",
+    "CommodityTariffAttrsDataMgmt.h",
+    "CommodityTariffConsts.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/third_party/pigweed/repo/pw_containers:algorithm",
+    "${chip_root}/third_party/pigweed/repo/pw_containers:vector",
+    "${chip_root}/zzz_generated/app-common/clusters/CommodityTariff",
+  ]
 }

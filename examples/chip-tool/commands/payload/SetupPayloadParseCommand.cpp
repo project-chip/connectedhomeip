@@ -52,25 +52,34 @@ const char * CustomFlowString(CommissioningFlow flow)
 CHIP_ERROR SetupPayloadParseCommand::Run()
 {
     std::string codeString(mCode);
-    SetupPayload payload;
+    std::vector<SetupPayload> payloads;
 
-    ReturnErrorOnFailure(Parse(codeString, payload));
-    ReturnErrorOnFailure(Print(payload));
+    ReturnErrorOnFailure(Parse(codeString, payloads));
+    bool firstTime = true;
+    for (auto & payload : payloads)
+    {
+        if (!firstTime)
+        {
+            ChipLogProgress(SetupPayload, "----------");
+        }
+        ReturnErrorOnFailure(Print(payload));
+        firstTime = false;
+    }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPayload & payload)
+CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, std::vector<SetupPayload> & payloads)
 {
     bool isQRCode = IsQRCode(codeString);
 
     ChipLogDetail(SetupPayload, "Parsing %sRepresentation: %s", isQRCode ? "base38" : "decimal", codeString.c_str());
 
-    return isQRCode ? QRCodeSetupPayloadParser(codeString).populatePayload(payload)
-                    : ManualSetupPayloadParser(codeString).populatePayload(payload);
+    return isQRCode ? QRCodeSetupPayloadParser(codeString).populatePayloads(payloads)
+                    : ManualSetupPayloadParser(codeString).populatePayload(payloads.emplace_back());
 }
 
-CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
+CHIP_ERROR SetupPayloadParseCommand::Print(const SetupPayload & payload)
 {
     ChipLogProgress(SetupPayload, "Version:             %u", payload.version);
     ChipLogProgress(SetupPayload, "VendorID:            %u", payload.vendorID);

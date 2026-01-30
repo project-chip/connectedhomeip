@@ -22,25 +22,28 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.clusters.Types import Nullable
 from matter.interaction_model import InteractionModelError, Status
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class PAVSTTestBase:
+    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 100  # 100 seconds
+
     async def read_pavst_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.PushAvStreamTransport
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def allocate_one_audio_stream(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
 
         # First verify that ADO is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         adoSupport = aFeatureMap & cluster.Bitmaps.Feature.kAudio
         asserts.assert_equal(adoSupport, cluster.Bitmaps.Feature.kAudio, "Audio Feature is not supported.")
 
@@ -48,7 +51,7 @@ class PAVSTTestBase:
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         if len(aAllocatedAudioStreams) > 0:
             return aAllocatedAudioStreams[0].audioStreamID
 
@@ -56,11 +59,11 @@ class PAVSTTestBase:
         aMicrophoneCapabilities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
         )
-        logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
+        log.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        log.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
         try:
@@ -73,7 +76,7 @@ class PAVSTTestBase:
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
-            logger.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
+            log.info(f"Rx'd AudioStreamAllocateResponse: {audioStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 audioStreamAllocateResponse.audioStreamID, "AudioStreamAllocateResponse does not contain StreamID"
             )
@@ -81,17 +84,16 @@ class PAVSTTestBase:
             return [audioStreamAllocateResponse.audioStreamID]
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
     async def allocate_one_video_stream(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
 
         # First verify that VDO is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
@@ -99,7 +101,7 @@ class PAVSTTestBase:
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         if len(aAllocatedVideoStreams) > 0:
             return aAllocatedVideoStreams[0].videoStreamID
 
@@ -107,23 +109,23 @@ class PAVSTTestBase:
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        log.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
-        logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
+        log.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
         aMinViewport = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        logger.info(f"Rx'd MinViewport: {aMinViewport}")
+        log.info(f"Rx'd MinViewport: {aMinViewport}")
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
-        logger.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
+        log.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
         aMaxEncodedPixelRate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
         )
-        logger.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
+        log.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
 
         # Check for Watermark and OSD features
         watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
@@ -148,7 +150,7 @@ class PAVSTTestBase:
                 OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
@@ -156,10 +158,9 @@ class PAVSTTestBase:
             return [videoStreamAllocateResponse.videoStreamID]
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
     async def validate_allocated_video_stream(self, videoStreamID):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
 
@@ -172,7 +173,7 @@ class PAVSTTestBase:
             asserts.fail(f"Video Stream with ID {videoStreamID} not found as expected")
 
     async def validate_allocated_audio_stream(self, audioStreamID):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
 
@@ -185,29 +186,58 @@ class PAVSTTestBase:
             asserts.fail(f"Audio Stream with ID {audioStreamID} not found as expected")
 
     async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
-                                            trigger_Options=None):
-        endpoint = self.get_endpoint(default=1)
+                                            trigger_Options=None, ingestMethod=Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
+                                            url="https://localhost:1234/streams/1/", stream_Usage=None, container_Options=None,
+                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC):
+        endpoint = self.get_endpoint()
         cluster = Clusters.PushAvStreamTransport
 
         # First verify that ADO is supported
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         adoSupport = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio
         asserts.assert_equal(adoSupport, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio,
                              "Audio Feature is not supported.")
 
         # Check if audio stream has already been allocated
         aAllocatedAudioStream = await self.allocate_one_audio_stream()
-        logger.info(f"Rx'd AllocatedAudioStream: {aAllocatedAudioStream}")
+        log.info(f"Rx'd AllocatedAudioStream: {aAllocatedAudioStream}")
 
         # Check if video stream has already been allocated
         aAllocatedVideoStream = await self.allocate_one_video_stream()
-        logger.info(f"Rx'd AllocatedVideoStream: {aAllocatedVideoStream}")
+        log.info(f"Rx'd AllocatedVideoStream: {aAllocatedVideoStream}")
 
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.StreamUsagePriorities
         )
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+
+        streamUsage = aStreamUsagePriorities[0]
+        if (stream_Usage is not None):
+            streamUsage = stream_Usage
+
+        videoStreamID = aAllocatedVideoStream
+        if (videoStream_ID is not None):
+            if (videoStream_ID == Nullable()):
+                videoStreamID = videoStream_ID
+            else:
+                videoStreamID = aAllocatedVideoStream + 1
+
+        audioStreamID = aAllocatedAudioStream
+        if (audioStream_ID is not None):
+            if (audioStream_ID == Nullable()):
+                audioStreamID = audioStream_ID
+            else:
+                audioStreamID = aAllocatedAudioStream + 1
+
+        containerOptions = {
+            "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
+            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
+                                     "sessionGroup": 3, "trackName": "media"},
+        }
+
+        if (container_Options is not None):
+            containerOptions = container_Options
 
         triggerOptions = {"triggerType": triggerType}
         if (trigger_Options is not None):
@@ -217,19 +247,15 @@ class PAVSTTestBase:
             await self.send_single_cmd(
                 cmd=cluster.Commands.AllocatePushTransport(
                     {
-                        "streamUsage": aStreamUsagePriorities[0],
-                        "videoStreamID": aAllocatedVideoStream,
-                        "audioStreamID": aAllocatedAudioStream,
-                        "endpointID": endpoint,
-                        "url": "https://localhost:1234/streams/1",
+                        "streamUsage": streamUsage,
+                        "videoStreamID": videoStreamID,
+                        "audioStreamID": audioStreamID,
+                        "TLSEndpointID": tlsEndPoint,
+                        "url": url,
                         "triggerOptions": triggerOptions,
-                        "ingestMethod": cluster.Enums.IngestMethodsEnum.kCMAFIngest,
-                        "containerOptions": {
-                            "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
-                            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
-                                                     "sessionGroup": 3, "trackName": ""},
-                        },
-                        "expiryTime": 5,
+                        "ingestMethod": ingestMethod,
+                        "containerOptions": containerOptions,
+                        "expiryTime": expiryTime,
                     }
                 ),
                 endpoint=endpoint,
@@ -237,7 +263,15 @@ class PAVSTTestBase:
             return Status.Success
         except InteractionModelError as e:
             asserts.assert_not_equal(e.status, Status.Success, "Unexpected error returned")
-        pass
+            if (expected_cluster_status is not None):
+                asserts.assert_true(
+                    e.clusterStatus == expected_cluster_status, "Unexpected error returned"
+                )
+                return e.clusterStatus
+            if (e.status == Status.ResourceExhausted):
+                asserts.fail("RESOURCE_EXHAUSTED")
+            return e.status
+        return None
 
     async def check_and_delete_all_push_av_transports(self, endpoint, attribute):
         pvcluster = Clusters.PushAvStreamTransport
@@ -260,12 +294,11 @@ class PAVSTTestBase:
                     asserts.assert_true(
                         e.status == Status.Success, "Unexpected error returned"
                     )
-                pass
 
         return Status.Success
 
     async def psvt_modify_push_transport(self, cmd, devCtrl=None):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
             dev_ctrl = devCtrl
@@ -273,14 +306,17 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
+            if (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
+            else:
+                asserts.assert_true(
+                    e.status == Status.NotFound, "Unexpected error returned"
+                )
             return e.status
-        pass
+        return None
 
     async def psvt_deallocate_push_transport(self, cmd, devCtrl=None):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
             dev_ctrl = devCtrl
@@ -288,14 +324,17 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
+            if (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
+            else:
+                asserts.assert_true(
+                    e.status == Status.NotFound, "Unexpected error returned"
+                )
             return e.status
-        pass
+        return None
 
-    async def psvt_set_transport_status(self, cmd, devCtrl=None):
-        endpoint = self.get_endpoint(default=1)
+    async def psvt_set_transport_status(self, cmd, expected_status=None, devCtrl=None):
+        endpoint = self.get_endpoint()
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
             dev_ctrl = devCtrl
@@ -303,14 +342,15 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
+            if (expected_status is not None):
+                asserts.assert_true(e.status, expected_status, "Unexpected error returned")
+            else:
+                asserts.assert_true(e.status == Status.NotFound, "Unexpected error returned")
             return e.status
-        pass
+        return None
 
     async def psvt_find_transport(self, cmd, expected_connectionID=None, devCtrl=None):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
             dev_ctrl = devCtrl
@@ -325,10 +365,10 @@ class PAVSTTestBase:
                 e.status == Status.NotFound, "Unexpected error returned"
             )
             return e.status
-        pass
+        return None
 
-    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, devCtrl=None):
-        endpoint = self.get_endpoint(default=1)
+    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, expected_status=None, devCtrl=None):
+        endpoint = self.get_endpoint()
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
             dev_ctrl = devCtrl
@@ -341,18 +381,25 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
+            if (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
             else:
+                if (expected_status is not None):
+                    asserts.assert_true(
+                        e.status == expected_status, "Unexpected error returned"
+                    )
+                    return e.status
                 asserts.assert_true(
                     e.status == Status.NotFound, "Unexpected error returned"
                 )
                 return e.status
-        pass
+        return None
 
     async def psvt_create_test_harness_controller(self):
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
         th2_certificate_authority = (
             self.certificate_authority_manager.NewCertificateAuthority()
@@ -375,13 +422,9 @@ class PAVSTTestBase:
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def psvt_remove_current_fabric(self, devCtrl):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        resp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
-        return resp
-        asserts.assert_equal(
-            resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")
+        return await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)

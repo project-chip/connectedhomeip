@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -40,51 +40,65 @@ LazyRegisteredServerCluster<PushAvStreamTransportServer> gServers[kPushAvStreamT
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, emberEndpointIndex);
-        gServers[emberEndpointIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
-        return gServers[emberEndpointIndex].Registration();
+        ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, clusterInstanceIndex);
+        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(featureMap));
+        return gServers[clusterInstanceIndex].Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        return gServers[emberEndpointIndex].Cluster();
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
     }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServers[emberEndpointIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
+PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+    return static_cast<PushAvStreamTransportServer *>(CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = PushAvStreamTransport::Id,
+            .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
+            .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
+        },
+        integrationDelegate));
+}
+
 } // namespace
-void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
 {
 
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = PushAvStreamTransport::Id,
-            .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
-            .maxEndpointCount                = kPushAvStreamTransportMaxClusterCount,
-            .fetchFeatureMap                 = true,
-            .fetchOptionalAttributes         = false,
+            .endpointId                = endpointId,
+            .clusterId                 = PushAvStreamTransport::Id,
+            .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
+            .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }
 
-void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = PushAvStreamTransport::Id,
-            .fixedClusterServerEndpointCount = kPushAvStreamTransportFixedClusterCount,
-            .maxEndpointCount                = kPushAvStreamTransportMaxClusterCount,
+            .endpointId                = endpointId,
+            .clusterId                 = PushAvStreamTransport::Id,
+            .fixedClusterInstanceCount = kPushAvStreamTransportFixedClusterCount,
+            .maxClusterInstanceCount   = kPushAvStreamTransportMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterPushAvStreamTransportPluginServerInitCallback() {}
@@ -99,26 +113,26 @@ namespace PushAvStreamTransport {
 void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting Push AV Stream Transport delegate on endpoint %u", endpointId);
-    uint16_t arrayIndex =
-        emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
-    if (arrayIndex >= kPushAvStreamTransportMaxClusterCount)
-    {
-        return;
-    }
 
-    if (!gServers[arrayIndex].IsConstructed())
+    if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
     {
-        ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set delegate");
-        return;
+        cluster->SetDelegate(delegate);
+        TEMPORARY_RETURN_IGNORED cluster->Init();
     }
-
-    gServers[arrayIndex].Cluster().SetDelegate(delegate);
-    gServers[arrayIndex].Cluster().Init();
 }
 
-void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDelegate * delegate)
+void SetTLSClientManagementDelegate(EndpointId endpointId, TLSClientManagementDelegate * delegate)
 {
     ChipLogProgress(AppServer, "Setting TLS Client Management delegate on endpoint %u", endpointId);
+    if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
+    {
+        cluster->SetTLSClientManagementDelegate(delegate);
+    }
+}
+
+void SetTLSCertificateManagementDelegate(EndpointId endpointId, TLSCertificateManagementDelegate * delegate)
+{
+    ChipLogProgress(AppServer, "Setting TLS Certificate Management delegate on endpoint %u", endpointId);
     uint16_t arrayIndex =
         emberAfGetClusterServerEndpointIndex(endpointId, PushAvStreamTransport::Id, kPushAvStreamTransportFixedClusterCount);
     if (arrayIndex >= kPushAvStreamTransportMaxClusterCount)
@@ -128,12 +142,11 @@ void SetTLSClientManagementDelegate(EndpointId endpointId, TlsClientManagementDe
 
     if (!gServers[arrayIndex].IsConstructed())
     {
-        ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set TLS Client Management delegate");
+        ChipLogError(AppServer, "Push AV Stream transport is NOT yet constructed. Cannot set TLS Certificate Management delegate");
         return;
     }
-    gServers[arrayIndex].Cluster().SetTLSClientManagementDelegate(delegate);
+    gServers[arrayIndex].Cluster().SetTLSCertificateManagementDelegate(delegate);
 }
-
 } // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app

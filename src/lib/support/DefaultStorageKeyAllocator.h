@@ -310,6 +310,30 @@ public:
     {
         return StorageKeyName::Formatted("g/tlsr/g/%x", endpoint);
     }
+
+    // Number of tls endpoints stored in table for a given endpoint, across all fabrics.
+    static StorageKeyName TlsClientEndpointCountKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlse/e/%x", endpoint);
+    }
+
+    // Stores information about TLS endpoints for the given fabric & endpoint
+    static StorageKeyName TlsClientEndpointFabricDataKey(FabricIndex fabric, EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlse", fabric, endpoint);
+    }
+
+    // Stores the root cert payload for the given fabric & endpoint
+    static StorageKeyName TlsClientEndpointEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlse/%x", fabric, endpoint, idx);
+    }
+
+    // Stores global data about TLS endpoints, across all fabrics, used by TLS Client Management cluster
+    static StorageKeyName TlsClientEndpointGlobalDataKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlse/g/%x", endpoint);
+    }
 };
 
 } // namespace chip

@@ -31,7 +31,7 @@ from .storage import PersistentStorage
 LOGGER = logging.getLogger(__name__)
 
 # By default, let's set certificate validity to 10 years.
-CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10*365).total_seconds())
+CERTIFICATE_VALIDITY_PERIOD_SEC = int(timedelta(days=10 * 365).total_seconds())
 
 
 class CertificateAuthority:
@@ -200,14 +200,6 @@ class CertificateAuthority:
     def maximizeCertChains(self) -> bool:
         return self._maximizeCertChains
 
-    @property
-    def alwaysOmitIcac(self) -> bool:
-        return self._alwaysOmitIcac
-
-    @property
-    def certificateValidityPeriodSec(self) -> int:
-        return self._certificateValidityPeriodSec
-
     @maximizeCertChains.setter
     def maximizeCertChains(self, enabled: bool):
         self._chipStack.Call(
@@ -216,6 +208,10 @@ class CertificateAuthority:
 
         self._maximizeCertChains = enabled
 
+    @property
+    def alwaysOmitIcac(self) -> bool:
+        return self._alwaysOmitIcac
+
     @alwaysOmitIcac.setter
     def alwaysOmitIcac(self, enabled: bool):
         self._chipStack.Call(
@@ -223,6 +219,10 @@ class CertificateAuthority:
         ).raise_on_error()
 
         self._alwaysOmitIcac = enabled
+
+    @property
+    def certificateValidityPeriodSec(self) -> int:
+        return self._certificateValidityPeriodSec
 
     @certificateValidityPeriodSec.setter
     def certificateValidityPeriodSec(self, validity: int):
@@ -256,7 +256,8 @@ class CertificateAuthorityManager:
             chipStack:          Reference to a matter.ChipStack object that is used to initialize
                                 CertificateAuthority instances.
 
-            persistentStorage:  If provided, over-rides the default instance in the provided chipStack
+            persistentStorage:  An optional reference to persistentStorage, if provided,
+                                over-rides the default instance in the provided chipStack
                                 when initializing CertificateAuthority instances.
         '''
         self._chipStack = chipStack

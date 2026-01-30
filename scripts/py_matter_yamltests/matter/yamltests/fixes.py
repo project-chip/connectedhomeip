@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 import binascii
+import contextlib
 import re
 
 '''Fixes certain value formats known to exist in YAML tests
@@ -58,10 +59,8 @@ def try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value):
     and we would fail at runtime.
     '''
     if type(value) is str:
-        try:
+        with contextlib.suppress(ValueError):
             value = int(value)
-        except ValueError:
-            pass
     return value
 
 
@@ -96,7 +95,7 @@ def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
     #   * Any character greater than 0xFF has the upper bytes chopped off.
     as_bytes = [ord(c) for c in s]
 
-    if any([value > 0x200 for value in as_bytes]):
+    if any(value > 0x200 for value in as_bytes):
         raise ValueError('Unsupported char in octet string %r' % as_bytes)
     accumulated_hex = ''.join([f"{(v & 0xFF):02x}" for v in as_bytes])
     return binascii.unhexlify(accumulated_hex)
@@ -145,7 +144,7 @@ def add_yaml_support_for_scientific_notation_without_dot(loader):
 def try_update_yaml_node_id_test_runner_state(tests, config):
     default_identity = 'alpha'
     identities = {
-        default_identity: None if 'nodeId' not in config else config['nodeId']}
+        default_identity: config.get('nodeId', None)}
 
     for test in tests:
         if not test.is_enabled:

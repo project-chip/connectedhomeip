@@ -146,13 +146,12 @@ def create_device_type_list_for_root(direct_children: Set[int], endpoint_dict: D
     return device_types
 
 
-def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.Descriptor.Structs.SemanticTagStruct):
+def cmp_tag_list(a: Clusters.Globals.Structs.SemanticTagStruct, b: Clusters.Globals.Structs.SemanticTagStruct):
     if type(a.mfgCode) != type(b.mfgCode):
         return -1 if type(a.mfgCode) is Nullable else 1
     if a.mfgCode != b.mfgCode:
         # Adding type ignore for the comparison between potentially incompatible types
-        result = -1 if a.mfgCode < b.mfgCode else 1  # type: ignore
-        return result
+        return -1 if a.mfgCode < b.mfgCode else 1  # type: ignore
     if a.namespaceID != b.namespaceID:
         return -1 if a.namespaceID < b.namespaceID else 1
     if a.tag != b.tag:
@@ -161,8 +160,7 @@ def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.D
         return -1 if type(a.label) is Nullable or a.label is None else 1
     if a.label != b.label:
         # Adding type ignore for the comparison between potentially incompatible types
-        result = -1 if a.label < b.label else 1  # type: ignore
-        return result
+        return -1 if a.label < b.label else 1  # type: ignore
     return 0
 
 

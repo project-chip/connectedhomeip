@@ -27,6 +27,7 @@
 #include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
@@ -40,10 +41,6 @@
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/StringBuilder.h>
 
-// Enable detailed mDNS logging for received queries
-#undef DETAIL_LOGGING
-// #define DETAIL_LOGGING
-
 namespace chip {
 namespace Dnssd {
 namespace {
@@ -51,7 +48,7 @@ namespace {
 using chip::Platform::UniquePtr;
 using namespace mdns::Minimal;
 
-#ifdef DETAIL_LOGGING
+#if CHIP_MINMDNS_HIGH_VERBOSITY
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -100,7 +97,7 @@ void LogQuery(const QueryData & data)
 }
 #else
 void LogQuery(const QueryData & data) {}
-#endif
+#endif // CHIP_MINMDNS_HIGH_VERBOSITY
 
 // Max number of records for operational = PTR, SRV, TXT, A, AAAA, I subtype.
 constexpr size_t kMaxOperationalRecords = 6;
@@ -327,7 +324,7 @@ private:
 
 void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
-#ifdef DETAIL_LOGGING
+#if CHIP_MINMDNS_HIGH_VERBOSITY
     char srcAddressString[chip::Inet::IPAddress::kMaxStringLength];
     VerifyOrDie(info->SrcAddress.ToString(srcAddressString) != nullptr);
     ChipLogDetail(Discovery, "Received an mDNS query from %s", srcAddressString);
@@ -337,6 +334,10 @@ void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::In
     if (!ParsePacket(data, this))
     {
         ChipLogError(Discovery, "Failed to parse mDNS query");
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+        ChipLogDetail(Discovery, "Invalid packet content:");
+        ChipLogByteSpan(Discovery, data.AsByteSpan());
+#endif // CHIP_MINMDNS_HIGH_VERBOSITY
     }
     mCurrentSource = nullptr;
 }
@@ -369,7 +370,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
     if (!mIsInitialized)
     {
-        UpdateCommissionableInstanceName();
+        TEMPORARY_RETURN_IGNORED UpdateCommissionableInstanceName();
     }
 
     // Re-set the server in the response sender in case this has been swapped in the
@@ -554,8 +555,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
             return CHIP_ERROR_NO_MEMORY;
         }
     }
-    MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                       DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
+    TEMPORARY_RETURN_IGNORED MakeServiceSubtype(
+        nameBuffer, sizeof(nameBuffer),
+        DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
     FullQName compressedFabricIdSubtype = operationalAllocator->AllocateQName(
         nameBuffer, kSubtypeServiceNamePart, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
     VerifyOrReturnError(compressedFabricIdSubtype.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -573,6 +575,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
+    // This message is used as a marker for when the application process has started.
+    // It is watched for by the YAML test toolkit. See: scripts/tests/chiptest/test_definition.py
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
                     StringOrNullMarker(instanceName.names[2]));
 
@@ -673,7 +677,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (const auto & vendorId = params.GetVendorId(); vendorId.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
+        TEMPORARY_RETURN_IGNORED MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                                                    DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -690,7 +695,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (const auto & deviceType = params.GetDeviceType(); deviceType.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
+        TEMPORARY_RETURN_IGNORED MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                                                    DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -709,8 +715,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kShortDiscriminator, params.GetShortDiscriminator()));
+            TEMPORARY_RETURN_IGNORED MakeServiceSubtype(
+                nameBuffer, sizeof(nameBuffer),
+                DiscoveryFilter(DiscoveryFilterType::kShortDiscriminator, params.GetShortDiscriminator()));
             FullQName shortServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             VerifyOrReturnError(shortServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -726,8 +733,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
 
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kLongDiscriminator, params.GetLongDiscriminator()));
+            TEMPORARY_RETURN_IGNORED MakeServiceSubtype(
+                nameBuffer, sizeof(nameBuffer),
+                DiscoveryFilter(DiscoveryFilterType::kLongDiscriminator, params.GetLongDiscriminator()));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -743,7 +751,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
         if (params.GetCommissioningMode() != CommissioningMode::kDisabled)
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
+            TEMPORARY_RETURN_IGNORED MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                                                        DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -779,6 +788,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
+    // This message is used as a marker for when the application process has started.
+    // It is watched for by the YAML test toolkit. See: scripts/tests/chiptest/test_definition.py
     ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
                     StringOrNullMarker(instanceName.names[2]));
 
@@ -792,7 +803,7 @@ FullQName AdvertiserMinMdns::GetOperationalTxtEntries(OperationalQueryAllocator:
     size_t numTxtFields = 0;
 
     struct CommonTxtEntryStorage commonStorage;
-    AddCommonTxtEntries<OperationalAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
+    TEMPORARY_RETURN_IGNORED AddCommonTxtEntries<OperationalAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
     if (numTxtFields == 0)
     {
         return allocator->AllocateQNameFromArray(mEmptyTextEntries, 1);
@@ -840,7 +851,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         txtFields[numTxtFields++] = txtDeviceName;
     }
     CommonTxtEntryStorage commonStorage;
-    AddCommonTxtEntries<CommissionAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
+    TEMPORARY_RETURN_IGNORED AddCommonTxtEntries<CommissionAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
 
     // the following sub types only apply to commissionable node advertisements
     char txtDiscriminator[chip::Dnssd::kKeyLongDiscriminatorMaxLength + 3];

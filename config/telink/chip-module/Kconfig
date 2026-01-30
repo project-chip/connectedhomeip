@@ -18,23 +18,24 @@ rsource "../../zephyr/Kconfig"
 
 if CHIP
 
+config CHIP_TELINK_PLATFORM
+	bool
+	default y
+	help
+	  States that the configuration uses Matter Telink platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for Telink platform related purposes.
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
+# See config/common/cmake/Kconfig for full definition
 config CHIP_NFC_ONBOARDING_PAYLOAD
-	bool "Share onboarding payload in NFC tag"
 	default n
 	imply I2C
 	imply ST25DVXXKC
-	imply NFC		
-	imply NFC_NDEF
-	imply NFC_NDEF_MSG
-	imply NFC_NDEF_RECORD
-	imply NFC_NDEF_URI_REC
-	imply NFC_NDEF_URI_MSG
-	help
-	  Enables sharing the onboarding payload in the NFC tag.
+	imply NFC
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
@@ -48,24 +49,6 @@ config BOOTLOADER_MCUBOOT
 	select STREAM_FLASH_ERASE
 	select TELINK_W91_N22_MATTER_OTA_LAYOUT if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
 
-config CHIP_OTA_REQUESTOR_BUFFER_SIZE
-	int "OTA Requestor image buffer size"
-	default 256
-	depends on CHIP_OTA_REQUESTOR
-	help
-	  Configures the size of the buffer used by OTA Requestor when downloading
-	  and writing a new firmware image to flash.
-
-config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
-	bool "Auto-reboot when firmware update is applied"
-	default y
-	depends on CHIP_OTA_REQUESTOR
-	imply REBOOT
-	help
-	  Reboots the device automatically after downloading a new firmware update
-	  to swap the old and the new firmware images. The reboot happens only when
-	  a user consents to apply the firmware update.
-
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_IMAGE_BUILD
 	bool
@@ -75,7 +58,7 @@ config SIGNED_OTA_IMAGE_FILE_NAME
 	string "Zephyr signed image file name"
 	default "zephyr.signed.lzma.signed.bin" if COMPRESS_LZMA
 	default "zephyr.signed.bin"
-	depends on CHIP_OTA_REQUESTOR
+	depends on BOOTLOADER_MCUBOOT
 	help
 	  Provides the file name of the generated Zephyr signed image.
 
@@ -86,6 +69,29 @@ config TELINK_OTA_BUTTON_TEST
 	help
 	  Merge the signed binary with the same version as the main into slot-1 of merged.hex.
 	  Pressing the button initiates a forced image update.
+
+config CHIP_DFU_OVER_BT_SMP
+	bool "Enable DFU over Bluetooth LE SMP feature set"
+	select BOOTLOADER_MCUBOOT
+	select MCUMGR
+	select MCUMGR_TRANSPORT_BT
+	select ZCBOR
+	select MCUMGR_GRP_IMG
+	select MCUMGR_GRP_OS
+	select MCUMGR_GRP_ZBASIC
+	select MCUMGR_GRP_ZBASIC_STORAGE_ERASE
+	select MCUMGR_TRANSPORT_BT_REASSEMBLY
+	select MCUMGR_MGMT_NOTIFICATION_HOOKS
+	select MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
+	select MCUMGR_GRP_IMG_STATUS_HOOKS
+	help
+	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
+	  the set of options related to that feature.
+
+config CHIP_DFU_OVER_BT_SMP_BUILD
+	bool "Enable DFU over BT SMP image building"
+	depends on CHIP_DFU_OVER_BT_SMP
+	default n
 
 config TELINK_OTA_PARTITION_ADDR
 	hex "image-1 partition address"
@@ -99,10 +105,6 @@ config CHIP_ROTATING_DEVICE_ID
 	  Enables the rotating device identifier that provides a non-trackable
 	  identifier. The identifier is unique per device and rotates at pre-defined
 	  moments.
-
-config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
-	bool "Include default device information provider build"
-	default y
 
 config CHIP_FACTORY_DATA
 	bool "Enable Factory Data support"
@@ -188,23 +190,6 @@ config CHIP_FACTORY_RESET_ERASE_SETTINGS
 
 endif
 
-config CHIP_LOG_SIZE_OPTIMIZATION
-	bool "Disable some detailed logs to decrease flash usage"
-	help
-	  Disables some log levels for specific Matter log modules that provide
-	  information that is too detailed to be used in most cases. You can find
-	  full configuration enabled by this option in the
-	  platform/telink/CHIPPlatformConfig.h file.
-
-config CHIP_IPV4
-	bool "IPv4 support for Matter"
-	default n
-	depends on NET_IPV4
-	help
-	  If disabled, it allows to build Telink SDK application
-	  with IPv4 support independently of the Matter stack still
-	  running over IPv6.
-
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
 	default y if BOARD_TLSR9118BDK40D
@@ -221,6 +206,7 @@ config CHIP_ENABLE_APPLICATION_STATUS_LED
 
 config CHIP_ENABLE_PM_DURING_BLE
 	bool "Enable PM during BLE operation"
+	default n if SOC_RISCV_TELINK_W91
 	default PM
 	help
 	  Enable PM during BLE operation.
@@ -238,14 +224,56 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 
 config CHIP_TASK_STACK_SIZE
 	int
-	default 6192 if SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
-	default 5480 if PM
+	default 6328 if PM && !SOC_RISCV_TELINK_W91
 	default 8448
 
 config CHIP_USE_MARS_SENSOR
 	bool "Use Mars board sensor"
 	depends on SOC_RISCV_TELINK_B9X && (BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_RETENTION)
 	default n
+
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default n if BOARD_TL3218X_RETENTION
+	default y
+	# selecting experimental for this feature since there is an issue with multiple controllers.
+	select EXPERIMENTAL
+
+if CHIP_PERSISTENT_SUBSCRIPTIONS
+
+config CHIP_MAX_FABRICS
+	int "Maximum number of Matter fabrics"
+	default 5
+	help
+	  The maximum number of Matter fabrics that device can be joined to.
+
+config CHIP_MAX_ACTIVE_CASE_CLIENTS
+	int "Maximum number of outgoing CASE sessions"
+	default CHIP_MAX_FABRICS
+	help
+	  The maximum number of outgoing CASE sessions that can be simultaneously handled by the end device.
+
+config CHIP_MAX_ACTIVE_DEVICES
+	int "Maximum number of simultaneous connections over CASE"
+	default CHIP_MAX_FABRICS
+	help
+	  The maximum number of devices to which the Server implementers will be able to
+	  concurrently connect over CASE and interact with.
+
+config CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL
+	int "Minimum subscription resumption interval in seconds"
+	default 20
+	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	help
+	  The minimum interval in seconds before resuming a subscription that timed out.
+
+config CHIP_SUBSCRIPTION_RESUMPTION_RETRY_MULTIPLIER
+	int "The multiplier for subscription resumption retry in seconds"
+	default 40
+	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	help
+	  The multiplier per subscription resumption retry attempt that is multiplied by the index of Fibonacci sequence
+	  and added to CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL to obtain final wait time for next retry.
+endif
 
 config TFLM_FEATURE
 	bool "Enable the TFLM micro speech feature"

@@ -27,8 +27,13 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#include <openthread/error.h>
+#include <openthread/udp.h>
+
 namespace chip {
 namespace Inet {
+
+using DeviceLayer::Internal::MapOpenThreadError;
 
 otInstance * globalOtInstance;
 
@@ -39,8 +44,8 @@ namespace {
 // might move it backward by up to kPacketInfoAlignmentBytes, so we need to make
 // sure we allocate enough reserved space that this will still be within our
 // buffer.
-constexpr uint16_t kPacketInfoAlignmentBytes = sizeof(uint32_t) - 1;
-constexpr uint16_t kPacketInfoReservedSize   = sizeof(IPPacketInfo) + kPacketInfoAlignmentBytes;
+constexpr size_t kPacketInfoAlignmentBytes = sizeof(uint32_t) - 1;
+constexpr size_t kPacketInfoReservedSize   = sizeof(IPPacketInfo) + kPacketInfoAlignmentBytes;
 } // namespace
 
 void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo)
@@ -103,19 +108,25 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
 
     // TODO: add thread-safe reference counting for UDP endpoints
     auto * buf = std::move(payload).UnsafeRelease();
-    CHIP_ERROR err =
-        ep->GetSystemLayer().ScheduleLambda([ep, buf] { ep->HandleDataReceived(System::PacketBufferHandle::Adopt(buf)); });
+
+    ep->Ref();
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, buf] {
+        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(buf));
+        ep->Unref();
+    });
+
     if (err != CHIP_NO_ERROR)
     {
+        ep->Unref();
         // Make sure we properly clean up buf and ep, since our lambda will not
         // run.
         payload = System::PacketBufferHandle::Adopt(buf);
     }
 }
 
-CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & address, uint16_t port, InterfaceId interface)
+CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & address, uint16_t port,
+                                       [[maybe_unused]] InterfaceId interface)
 {
-    (void) interface;
     otError err = OT_ERROR_NONE;
     otSockAddr listenSockAddr;
 
@@ -126,15 +137,26 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
     listenSockAddr.mAddress = address.ToIPv6();
 
     LockOpenThread();
-    otUdpOpen(mOTInstance, &socket, handleUdpReceive, this);
+    err = otUdpOpen(mOTInstance, &socket, handleUdpReceive, this);
+    VerifyOrExit(err == OT_ERROR_NONE, );
 #if OPENTHREAD_API_VERSION >= 465
-    otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD_INTERNAL);
+    err = otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD_INTERNAL);
 #else
-    otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD);
+    err = otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD);
 #endif
+    if (err != OT_ERROR_NONE)
+    {
+        auto closeErr = otUdpClose(mOTInstance, &socket);
+        if (closeErr != OT_ERROR_NONE)
+        {
+            ChipLogError(Inet, "Failed to close socket: %s", chip::ErrorStr(MapOpenThreadError(closeErr)));
+        }
+    }
+
+exit:
     UnlockOpenThread();
 
-    return chip::DeviceLayer::Internal::MapOpenThreadError(err);
+    return MapOpenThreadError(err);
 }
 
 CHIP_ERROR UDPEndPointImplOT::BindImpl(IPAddressType addressType, const IPAddress & addr, uint16_t port, InterfaceId interface)
@@ -256,7 +278,7 @@ exit:
 
     UnlockOpenThread();
 
-    return chip::DeviceLayer::Internal::MapOpenThreadError(error);
+    return MapOpenThreadError(error);
 }
 
 void UDPEndPointImplOT::CloseImpl()
@@ -264,28 +286,13 @@ void UDPEndPointImplOT::CloseImpl()
     LockOpenThread();
     if (otUdpIsOpen(mOTInstance, &mSocket))
     {
-        otUdpClose(mOTInstance, &mSocket);
-
-        // In case that there is a UDPEndPointImplOT::handleUdpReceive event
-        // pending in the event queue (SystemLayer::ScheduleLambda), we
-        // schedule a release call to the end of the queue, to ensure that the
-        // queued pointer to UDPEndPointImplOT is not dangling.
-        Retain();
-        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
-        if (err != CHIP_NO_ERROR)
+        auto err = otUdpClose(mOTInstance, &mSocket);
+        if (err != OT_ERROR_NONE)
         {
-            ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
-            // There is nothing we can do here, accept the chance of racing
-            Release();
+            ChipLogError(Inet, "Failed to close socket: %s", chip::ErrorStr(MapOpenThreadError(err)));
         }
     }
     UnlockOpenThread();
-}
-
-void UDPEndPointImplOT::Free()
-{
-    Close();
-    Release();
 }
 
 CHIP_ERROR UDPEndPointImplOT::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
@@ -305,7 +312,7 @@ CHIP_ERROR UDPEndPointImplOT::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInter
 
     UnlockOpenThread();
 
-    return chip::DeviceLayer::Internal::MapOpenThreadError(err);
+    return MapOpenThreadError(err);
 }
 
 IPPacketInfo * UDPEndPointImplOT::GetPacketInfo(const System::PacketBufferHandle & aBuffer)

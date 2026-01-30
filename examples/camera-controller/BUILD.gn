@@ -111,7 +111,6 @@ static_library("camera-controller-utils") {
 
   public_deps = [
     "${chip_root}/examples/common/tracing:commandline",
-    "${chip_root}/src/app:required-privileges",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/controller/data_model",

@@ -32,7 +32,7 @@ menu "CHIP Core"
             default 8
             help
                 The maximum number of simultaneously active CHIP exchange contexts.
-                                           
+
                 An exchange context object is used to track the state of an ongoing CHIP message
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
@@ -231,10 +231,12 @@ menu "CHIP Core"
 
         config ENABLE_ROUTE_HOOK
             bool "Enable route hook"
-            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
+            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT && !LWIP_IPV6_ND6_ROUTE_INFO_OPTION_SUPPORT
             default y
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+                This option is unavailable if LWIP_IPV6_ND6_ROUTE_INFO_OPTION_SUPPORT is enabled.
+                In that case, RIO is handled directly by LwIP.
 
         config ENABLE_ENDPOINT_QUEUE_FILTER
             bool "Enable UDP Endpoint queue filter for mDNS Broadcast packets"
@@ -254,6 +256,14 @@ menu "CHIP Core"
                 Otherwise CHIP SDK will post LwIP APIs to TCPIP task to ensure thread safety.
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
+
+        config USE_LWIP_PBUF_RAM_PACKETBUFFER
+            bool "Use lwIP PBUF_RAM type for CHIP packet buffer"
+            default n
+            help
+                Enable this option to use lwIP PBUF_RAM type for CHIP packet buffer. Configure via
+                MAX_LARGE_BUFFER_SIZE_BYTES to support larger packets exceeding IPv6 MTU.
+                If not enabled, CHIP will use lwIP PBUF_POOL type for packet buffer.
 
     endmenu # "Networking Options"
 
@@ -283,8 +293,8 @@ menu "CHIP Core"
             depends on ENABLE_OTA_REQUESTOR
             default n
             help
-                Enable this option for delta OTA image updates. 
-                Delta OTA updates allow for smaller, more efficient updates by only 
+                Enable this option for delta OTA image updates.
+                Delta OTA updates allow for smaller, more efficient updates by only
                 sending the changes between the current and new firmware versions.
 
         config OTA_AUTO_REBOOT_ON_APPLY
@@ -445,12 +455,22 @@ menu "CHIP Device Layer"
             bool "Enable Long Idle Time ICD"
             depends on ENABLE_ICD_SERVER
             default n
+            select ENABLE_ICD_CIP
+            select ENABLE_ICD_USER_ACTIVE_MODE_TRIGGER
             help
                 Enables or Disables LIT ICD
 
+        config ENABLE_ICD_DSLS
+            bool "Enable Dynamic SIT LIT Support"
+            depends on ENABLE_ICD_LIT
+            default y
+            help
+                Enables or Disables dynamic switching from SIT to LIT operating modes.
+
+
         config ENABLE_ICD_CIP
             bool "Enable Check-in protocol"
-            depends on ENABLE_ICD_LIT
+            depends on ENABLE_ICD_SERVER
             default y
             help
                 Enables or Disables ICD Check-in protocol
@@ -478,12 +498,12 @@ menu "CHIP Device Layer"
 
         config ENABLE_ICD_USER_ACTIVE_MODE_TRIGGER
             bool "Enable User Active Mode Trigger feature"
-            depends on ENABLE_ICD_LIT
+            depends on ENABLE_ICD_SERVER
             default y
             help
                 Enables or Disables ICD User Active Mode Trigger feature
 
-        config ENABLE_BG_EVENT_PROCESSING
+        menuconfig ENABLE_BG_EVENT_PROCESSING
             bool "Enable Background event processing"
             default n
             help
@@ -854,13 +874,6 @@ menu "CHIP Device Layer"
                 NVS namespace. If this option is enabled, the application can use an API to set a CD,
                 the configured CD will be used for subsequent CD reads.
 
-        config ENABLE_ESP_DIAGNOSTICS_TRACE
-            bool "Enable ESP Platform Diagnostics for Matter"
-            default n
-            help
-                Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
-                This feature helps monitor system health and performance by providing insights through diagnostics logs.
-
        config ENABLE_ESP_INSIGHTS_TRACE
            bool "Enable Matter ESP Insights"
            depends on ESP_INSIGHTS_ENABLED
@@ -880,14 +893,35 @@ menu "CHIP Device Layer"
         config MAX_PERMIT_LIST_SIZE
             int "Set permit list size for Insights traces"
             range 5 30
-            depends on ESP_INSIGHTS_ENABLED || ENABLE_ESP_DIAGNOSTICS_TRACE
+            depends on ESP_INSIGHTS_ENABLED
             default 20
             help
                 Set the maximum number of group entries that can be included in the permit list for reporting
-                traces to Insights or diagnostics. This ensures proper management of trace reporting capacity.
+                traces to Insights. This ensures proper management of trace reporting capacity.
     endmenu
 
+    menu "Diagnostics Options"
+        config ENABLE_ESP_DIAGNOSTICS
+            bool "Enable ESP Platform Diagnostics for Matter"
+            default n
+            help
+                Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
+                This feature helps monitor system health and performance by providing insights through diagnostics logs.
 
+        config ENABLE_ESP_DIAGNOSTIC_TRACES
+            bool "Enable Traces"
+            default y
+            depends on ENABLE_ESP_DIAGNOSTICS
+            help
+                Enable Traces for the ESP Platform Diagnostics for Matter.
+
+        config ENABLE_ESP_DIAGNOSTIC_METRICS
+            bool "Enable Metrics"
+            default y
+            depends on ENABLE_ESP_DIAGNOSTICS
+            help
+                Enable Metrics for the ESP Platform Diagnostics for Matter.
+    endmenu
 
     menu "Testing Options"
 
@@ -1145,7 +1179,7 @@ menu "CHIP Device Layer"
             int "MRP local active retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the active state.
 
@@ -1161,7 +1195,7 @@ menu "CHIP Device Layer"
             int "MRP local idle retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the idle state.
 
@@ -1177,7 +1211,7 @@ menu "CHIP Device Layer"
             int "MRP retransmission delta timeout for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 500
+            default 1500
             help
                 A constant value added to the calculated retransmission timeout.
 
@@ -1195,6 +1229,23 @@ menu "CHIP Device Layer"
             default 4
             help
                 The maximum number of retransmissions before giving up.
+
+    endmenu
+
+    menu "Matter TCP transport options"
+        config ENABLE_TCP_TRANSPORT
+            bool "Enable TCP transport"
+            select USE_LWIP_PBUF_RAM_PACKETBUFFER
+            default n
+            help
+                Enable TCP transport. If enabled, USE_LWIP_PBUF_RAM_PACKETBUFFER must be configured.
+
+        config MAX_LARGE_BUFFER_SIZE_BYTES
+            int "Max buffer size for TCP payloads"
+            depends on ENABLE_TCP_TRANSPORT
+            default 1530
+            help
+                Max TCP payload buffer size.
 
     endmenu
 

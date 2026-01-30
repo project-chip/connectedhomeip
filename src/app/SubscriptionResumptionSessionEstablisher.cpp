@@ -118,7 +118,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
     if (subscriptionResumptionStorage)
     {
-        subscriptionResumptionStorage->Save(subscriptionInfo);
+        TEMPORARY_RETURN_IGNORED subscriptionResumptionStorage->Save(subscriptionInfo);
     }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 }
@@ -148,7 +148,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
     {
         InteractionModelEngine::GetInstance()->TryToResumeSubscriptions();
         subscriptionInfo.mResumptionRetries++;
-        subscriptionResumptionStorage->Save(subscriptionInfo);
+        TEMPORARY_RETURN_IGNORED subscriptionResumptionStorage->Save(subscriptionInfo);
     }
     else
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -156,8 +156,8 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
         // If the device fails to establish the session several times, the subscriber might be offline and its subscription
         // read client will be deleted when the device reconnects to the subscriber. This subscription will be never used again.
         // Clean up the persistent subscription information storage.
-        subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
-                                              subscriptionInfo.mSubscriptionId);
+        TEMPORARY_RETURN_IGNORED subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
+                                                                       subscriptionInfo.mSubscriptionId);
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         imEngine->ResetNumSubscriptionsRetries();
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION

@@ -3,6 +3,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <algorithm>
 #include <array>
@@ -12,6 +13,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 
 namespace {
 
@@ -35,7 +37,8 @@ TEST(TestEndpointInterfaceRegistry, CreateAndDestroy)
     EndpointInterface * endpoint_ptr = endpoint.get(); // Save raw pointer for comparison
 
     // Register it
-    EndpointInterfaceRegistration registration(*endpoint, { .id = kTestEndpointId1 });
+    EndpointInterfaceRegistration registration(*endpoint,
+                                               { .id = kTestEndpointId1, .compositionPattern = EndpointCompositionPattern(0) });
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
     // Check if it can be retrieved
@@ -63,8 +66,10 @@ TEST(TestEndpointInterfaceRegistry, RegisterMultipleProviders)
     ASSERT_NE(endpoint1, nullptr);
     ASSERT_NE(endpoint2, nullptr);
 
-    EndpointInterfaceRegistration registration1(*endpoint1, { .id = kTestEndpointId1 });
-    EndpointInterfaceRegistration registration2(*endpoint2, { .id = kTestEndpointId2 });
+    EndpointInterfaceRegistration registration1(*endpoint1,
+                                                { .id = kTestEndpointId1, .compositionPattern = EndpointCompositionPattern(0) });
+    EndpointInterfaceRegistration registration2(*endpoint2,
+                                                { .id = kTestEndpointId2, .compositionPattern = EndpointCompositionPattern(0) });
 
     ASSERT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
     ASSERT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
@@ -91,8 +96,10 @@ TEST(TestEndpointInterfaceRegistry, RegisterDuplicateProviderId)
     ASSERT_NE(endpoint1a, nullptr);
     ASSERT_NE(endpoint1b, nullptr);
 
-    EndpointInterfaceRegistration registration1a(*endpoint1a, { .id = kTestEndpointId1 });
-    EndpointInterfaceRegistration registration1b(*endpoint1b, { .id = kTestEndpointId1 });
+    EndpointInterfaceRegistration registration1a(*endpoint1a,
+                                                 { .id = kTestEndpointId1, .compositionPattern = EndpointCompositionPattern(0) });
+    EndpointInterfaceRegistration registration1b(*endpoint1b,
+                                                 { .id = kTestEndpointId1, .compositionPattern = EndpointCompositionPattern(0) });
 
     ASSERT_EQ(registry.Register(registration1a), CHIP_NO_ERROR);
     ASSERT_EQ(registry.Get(kTestEndpointId1), endpoint1a.get());
@@ -108,7 +115,8 @@ TEST(TestEndpointInterfaceRegistry, RegisterSameRegistrationObject)
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     ASSERT_NE(endpoint, nullptr);
 
-    EndpointInterfaceRegistration registration(*endpoint, { .id = kTestEndpointId1 });
+    EndpointInterfaceRegistration registration(*endpoint,
+                                               { .id = kTestEndpointId1, .compositionPattern = EndpointCompositionPattern(0) });
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
     // Attempt to register the exact same registration object again
@@ -135,11 +143,13 @@ TEST(TestEndpointInterfaceRegistry, IteratorTest)
 
     auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
-    EndpointInterfaceRegistration registration1(*endpoint1, { .id = kTestEndpointId1 });
-    EndpointInterfaceRegistration registration2(*endpoint2, { .id = kTestEndpointId2 });
+    EndpointInterfaceRegistration registration1(*endpoint1,
+                                                { .id = kTestEndpointId1, .compositionPattern = EndpointCompositionPattern(0) });
+    EndpointInterfaceRegistration registration2(*endpoint2,
+                                                { .id = kTestEndpointId2, .compositionPattern = EndpointCompositionPattern(0) });
 
-    registry.Register(registration1);
-    registry.Register(registration2); // Registry stores in LIFO order for simple list prepend
+    EXPECT_SUCCESS(registry.Register(registration1));
+    EXPECT_SUCCESS(registry.Register(registration2)); // Registry stores in LIFO order for simple list prepend
 
     size_t count = 0;
     bool found1  = false;
@@ -173,7 +183,8 @@ TEST(TestEndpointInterfaceRegistry, RegisterInvalidArgs)
     ASSERT_NE(endpointValid, nullptr);
 
     // Case 2: EndpointInterface returns kInvalidEndpointId
-    EndpointInterfaceRegistration registrationInvalidId(*endpointValid, { .id = kInvalidEndpointId });
+    EndpointInterfaceRegistration registrationInvalidId(
+        *endpointValid, { .id = kInvalidEndpointId, .compositionPattern = EndpointCompositionPattern(0) });
     ASSERT_EQ(registry.Register(registrationInvalidId), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Case 3: EndpointInterfaceRegistration already part of a list (entry.next != nullptr)
@@ -181,8 +192,10 @@ TEST(TestEndpointInterfaceRegistry, RegisterInvalidArgs)
     auto endpointForList1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
     auto endpointForList2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
-    EndpointInterfaceRegistration registrationInList1(*endpointForList1, { .id = kListId1ForArgsTest });
-    EndpointInterfaceRegistration registrationInList2(*endpointForList2, { .id = kListId2ForArgsTest });
+    EndpointInterfaceRegistration registrationInList1(
+        *endpointForList1, { .id = kListId1ForArgsTest, .compositionPattern = EndpointCompositionPattern(0) });
+    EndpointInterfaceRegistration registrationInList2(
+        *endpointForList2, { .id = kListId2ForArgsTest, .compositionPattern = EndpointCompositionPattern(0) });
 
     // Manually link to simulate it being in another list
     // This simulates registrationInList2 being part of a list where registrationInList1 is its successor.
@@ -191,7 +204,8 @@ TEST(TestEndpointInterfaceRegistry, RegisterInvalidArgs)
     registrationInList2.next = nullptr; // Reset for other tests or cleanup
 
     // Test that registering a valid endpoint after these failures still works
-    EndpointInterfaceRegistration registrationValid(*endpointValid, { .id = kValidIdForArgsTest });
+    EndpointInterfaceRegistration registrationValid(
+        *endpointValid, { .id = kValidIdForArgsTest, .compositionPattern = EndpointCompositionPattern(0) });
     EXPECT_EQ(registry.Register(registrationValid), CHIP_NO_ERROR);
     EXPECT_EQ(registry.Get(kValidIdForArgsTest), endpointValid.get());
 }
@@ -210,7 +224,8 @@ TEST(TestEndpointInterfaceRegistry, StressTestRegistration)
         EndpointId id = static_cast<EndpointId>(i + 1);
         endpoints_storage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
         ids.push_back(id);
-        registrations.emplace_back(*endpoints_storage.back(), DataModel::EndpointEntry{ .id = id });
+        registrations.emplace_back(*endpoints_storage.back(),
+                                   DataModel::EndpointEntry{ .id = id, .compositionPattern = EndpointCompositionPattern(0) });
     }
 
     // Register all

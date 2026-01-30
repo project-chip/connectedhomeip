@@ -39,7 +39,13 @@ namespace app {
 class DefaultServerCluster : public ServerClusterInterface
 {
 public:
-    DefaultServerCluster(const ConcreteClusterPath & path);
+    DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path) {}
+
+    constexpr DefaultServerCluster(ConcreteClusterPath && path) :
+        mPath(std::move(path)),
+        mDataVersion(0) // data version will be initialized in startup, however constexpr requires initialization
+    {}
+
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
@@ -50,7 +56,7 @@ public:
     ///
     /// Call Shutdown to de-initialize the object.
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType) override;
 
     [[nodiscard]] Span<const ConcreteClusterPath> GetPaths() const override { return { &mPath, 1 }; }
 
@@ -108,6 +114,19 @@ protected:
     /// This increases cluster data version and if a cluster context is available it will
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
+
+    /// Apply the very common pattern of:
+    ///   - if a variable value needs changing, update and NotifyAttributeChanged
+    ///
+    /// Returns true if the value has been updated to a new value.
+    template <typename T>
+    bool SetAttributeValue(T & dest, const T & value, AttributeId attributeId)
+    {
+        VerifyOrReturnValue(dest != value, false);
+        dest = value;
+        NotifyAttributeChanged(attributeId);
+        return true;
+    }
 
     /// Marks that a specific attribute has changed value, if `status` is success.
     ///

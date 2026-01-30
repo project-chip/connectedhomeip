@@ -30,8 +30,7 @@ namespace app {
 struct ConcreteClusterPath
 {
     ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
-
-    ConcreteClusterPath() {}
+    ConcreteClusterPath() = default;
 
     ConcreteClusterPath(const ConcreteClusterPath & aOther)             = default;
     ConcreteClusterPath & operator=(const ConcreteClusterPath & aOther) = default;
@@ -54,6 +53,23 @@ struct ConcreteClusterPath
     // increases codesize for the non-consumers.
     bool mExpanded; // NOTE: in between larger members, NOT initialized (see above)
     ClusterId mClusterId = 0;
+
+    /// Creates a concrete cluster path as a constexpr. This is a workaround for C++ before C++20 requiring all members
+    /// to be initialized for constexpr constructors.
+    constexpr static ConcreteClusterPath ConstExpr(EndpointId aEndpointId, ClusterId aClusterId)
+    {
+        return { aEndpointId, aClusterId, false };
+    }
+
+private:
+    // Setting this as private since as of C++20 we would be allowed to have constructors
+    // that do not initialize all members. Until then though, we require one that
+    // initializes everything and this is that constructor. Readibility of a `bool` is poor though
+    // so we route this throgh the `ConstExpr()` factory instead for readability and eventual
+    // removal.
+    constexpr ConcreteClusterPath(EndpointId aEndpointId, ClusterId aClusterId, bool expanded) :
+        mEndpointId(aEndpointId), mExpanded(expanded), mClusterId(aClusterId)
+    {}
 };
 
 } // namespace app

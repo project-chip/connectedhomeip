@@ -1,0 +1,17 @@
+{{> header}}
+// This file is generated from codedriven-callback.h.zapt
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <app/util/basic-types.h>
+#include <app/util/generic-callbacks.h>
+
+{{#all_user_clusters side='server'}}
+{{#if (isInConfigList name "CodeDrivenClusters")}}
+
+void Matter{{asUpperCamelCase name}}ClusterInitCallback(chip::EndpointId endpointId);
+
+void Matter{{asUpperCamelCase name}}ClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+{{/if}}
+{{/all_user_clusters}}

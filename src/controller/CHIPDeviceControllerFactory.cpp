@@ -26,7 +26,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/core/ErrorStr.h>
@@ -35,6 +34,7 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #endif
 
 #include <app/server/Dnssd.h>
@@ -62,12 +62,14 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     // Save our initialization state that we can't recover later from a
     // created-but-shut-down system state.
     mListenPort                = params.listenPort;
+    mInterfaceId               = params.interfaceId;
     mFabricIndependentStorage  = params.fabricIndependentStorage;
     mOperationalKeystore       = params.operationalKeystore;
     mOpCertStore               = params.opCertStore;
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mDataModelProvider         = params.dataModelProvider;
 
     // Initialize the system state. Note that it is left in a somewhat
     // special state where it is initialized, but has a ref count of 0.
@@ -91,6 +93,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.bleLayer = mSystemState->BleLayer();
 #endif
     params.listenPort                = mListenPort;
+    params.interfaceId               = mInterfaceId;
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
@@ -100,10 +103,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
-
-    // re-initialization keeps any previously initialized values. The only place where
-    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
-    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    params.dataModelProvider         = mDataModelProvider;
 
     return InitSystemState(params);
 }
@@ -192,9 +192,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
                                                         tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                                                        ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                            .SetListenPort(params.listenPort)
+                                                            .SetServerListenEnabled(false)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                        ,
+                                                            ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
@@ -291,6 +298,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
             stateParams.transportMgr->GetTransport().GetImplAtIndex<1>().GetBoundPort());
 #endif // INET_CONFIG_ENABLE_IPV4
 
+        if (params.interfaceId)
+        {
+            app::DnssdServer::Instance().SetInterfaceId(*params.interfaceId);
+        }
+
         //
         // TODO: This is a hack to workaround the fact that we have a bi-polar stack that has controller and server modalities that
         // are mutually exclusive in terms of initialization of key stack singletons. Consequently, DnssdServer accesses
@@ -319,7 +331,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .groupDataProvider         = stateParams.groupDataProvider,
         // Don't provide an MRP local config, so each CASE initiation will use
         // the then-current value.
-        .mrpLocalConfig = NullOptional,
+        .mrpLocalConfig            = NullOptional,
+        .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
@@ -466,6 +479,7 @@ void DeviceControllerFactory::Shutdown()
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
     mSessionResumptionStorage  = nullptr;
+    mDataModelProvider         = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -548,6 +562,7 @@ void DeviceControllerSystemState::Shutdown()
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
 
     // Shut down the TransportMgr. This holds Inet::UDPEndPoints so it must be shut down
     // before PlatformMgr().Shutdown() shuts down Inet.

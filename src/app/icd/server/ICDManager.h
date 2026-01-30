@@ -181,6 +181,13 @@ public:
         return ICDConfigurationData::GetInstance().SetModeDurations(activeModeDuration, idleModeDuration);
     };
 
+    CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> activeModeDuration,
+                                std::optional<System::Clock::Seconds32> idleModeDuration,
+                                std::optional<System::Clock::Seconds32> shortIdleModeDuration)
+    {
+        return ICDConfigurationData::GetInstance().SetModeDurations(activeModeDuration, idleModeDuration, shortIdleModeDuration);
+    };
+
     ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
 
     OperationalState GetOperaionalState() { return mOperationalState; };
@@ -255,6 +262,10 @@ public:
 
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
     void OnSubscriptionReport() override;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    void OnSendCheckIn(const Access::SubjectDescriptor & subject) override;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
 private:
     // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
@@ -341,7 +352,9 @@ private:
      *       ShouldCheckInMsgsBeSentAtActiveModeFunction. If we should, we allocate an ICDCheckInSender which tries to send a
      *       Check-In message to the registered client.
      */
-    void SendCheckInMsgs();
+    void SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSubject = Optional<Access::SubjectDescriptor>());
+    bool ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry,
+                                                    const Access::SubjectDescriptor & specificSubject);
 
     /**
      * @brief See function implementation in .cpp for details on this function.

@@ -129,7 +129,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     log_i("%s:%s:%d\r\n", "BLEManagerImpl", __func__, __LINE__);
     if (mFlags.Has(Flags::kFlag_StackInitialized))
     {
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 exit:
     log_i("%s:%s:%d err=%s\r\n", "BLEManagerImpl", __func__, __LINE__, ErrorStr(err));
@@ -150,7 +150,7 @@ void BLEManagerImpl::HandleFastAdvertisementTimer()
     {
         mFlags.Set(Flags::kFlag_FastAdvertisingEnabled, 0);
         mFlags.Set(Flags::kFlag_AdvertisingRestarted, 1);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
@@ -175,7 +175,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     {
         mFlags.Set(Flags::kFlag_AdvertisingEnabled, val);
         mFlags.Set(Flags::kFlag_FastAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 exit:
     return err;
@@ -208,7 +208,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     {
         mFlags.Set(Flags::kFlag_AdvertisingRestarted);
     }
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -520,14 +520,14 @@ void BLEManagerImpl::SetAdvEndFlag(void)
     }
     if (mFlags.Has(Flags::kFlag_AdvertisingRestarted))
     {
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
 void BLEManagerImpl::SetStackInit(void)
 {
     mFlags.Set(Flags::kFlag_StackInitialized, true);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 bool BLEManagerImpl::HandleRXCharWrite(uint8_t connection_id, uint16_t length, uint8_t * value)

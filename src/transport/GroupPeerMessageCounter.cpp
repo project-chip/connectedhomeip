@@ -259,7 +259,7 @@ void GroupPeerTable::RemoveAndCompactFabric(uint32_t tableIndex)
 
 GroupOutgoingCounters::GroupOutgoingCounters(chip::PersistentStorageDelegate * storage_delegate)
 {
-    Init(storage_delegate);
+    TEMPORARY_RETURN_IGNORED Init(storage_delegate);
 }
 
 CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage_delegate)

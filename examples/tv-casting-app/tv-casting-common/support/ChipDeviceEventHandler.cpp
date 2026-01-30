@@ -89,7 +89,7 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
                 // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                 EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
                 ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() calling EndpointListLoader::GetInstance()->Load()");
-                EndpointListLoader::GetInstance()->Load();
+                TEMPORARY_RETURN_IGNORED EndpointListLoader::GetInstance()->Load();
             },
             [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                 ChipLogError(AppServer, "ChipDeviceEventHandler::Handle(): Connection to CastingPlayer failed");
@@ -114,18 +114,13 @@ void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
     {
         ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() when sUdcInProgress: %d, returning early",
                         sUdcInProgress);
-        sUdcInProgress                                            = false;
-        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_TIMEOUT, nullptr);
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted = nullptr;
-        CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer.reset();
         return;
     }
 
     // if UDC was NOT in progress (when the Fail-Safe timer expired), start UDC
     ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() when sUdcInProgress: %d, starting UDC",
                     sUdcInProgress);
-    chip::DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(1),
         [](chip::System::Layer * aSystemLayer, void * aAppState) {
             ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() running OpenBasicCommissioningWindow");
@@ -184,7 +179,7 @@ void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceL
 
         // find targetNodeId from binding table by matching the binding's fabricIndex with the accessing fabricIndex
         // received in BindingsChanged event
-        for (const auto & binding : chip::BindingTable::GetInstance())
+        for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
         {
             ChipLogProgress(AppServer,
                             "ChipDeviceEventHandler::HandleBindingsChangedViaCluster() Read cached binding type=%d fabrixIndex=%d "
@@ -192,7 +187,8 @@ void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceL
                             " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                             binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                             binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-            if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+            if (binding.type == chip::app::Clusters::Binding::MATTER_UNICAST_BINDING &&
+                event->BindingsChanged.fabricIndex == binding.fabricIndex)
             {
                 ChipLogProgress(AppServer,
                                 "ChipDeviceEventHandler::HandleBindingsChangedViaCluster() Matched accessingFabricIndex with "

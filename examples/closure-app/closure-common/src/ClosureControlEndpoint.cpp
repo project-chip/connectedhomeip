@@ -221,19 +221,19 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
         MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
     DataModel::Nullable<GenericOverallTargetState> overallTargetState = DataModel::NullNullable;
 
-    mLogic.SetMainState(MainStateEnum::kStopped);
-    mLogic.SetOverallCurrentState(overallCurrentState);
-    mLogic.SetOverallTargetState(overallTargetState);
-    mLogic.SetCountdownTimeFromDelegate(0);
-    mLogic.GenerateMovementCompletedEvent();
+    TEMPORARY_RETURN_IGNORED mLogic.SetMainState(MainStateEnum::kStopped);
+    TEMPORARY_RETURN_IGNORED mLogic.SetOverallCurrentState(overallCurrentState);
+    TEMPORARY_RETURN_IGNORED mLogic.SetOverallTargetState(overallTargetState);
+    TEMPORARY_RETURN_IGNORED mLogic.SetCountdownTimeFromDelegate(0);
+    TEMPORARY_RETURN_IGNORED mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::OnMoveToActionComplete()
 {
     UpdateCurrentStateFromTargetState();
-    mLogic.SetMainState(MainStateEnum::kStopped);
-    mLogic.SetCountdownTimeFromDelegate(0);
-    mLogic.GenerateMovementCompletedEvent();
+    TEMPORARY_RETURN_IGNORED mLogic.SetMainState(MainStateEnum::kStopped);
+    TEMPORARY_RETURN_IGNORED mLogic.SetCountdownTimeFromDelegate(0);
+    TEMPORARY_RETURN_IGNORED mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
@@ -286,7 +286,7 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
 
     overallCurrentState.Value().secureState.SetNonNull(isClosureInSecureState);
 
-    mLogic.SetOverallCurrentState(overallCurrentState);
+    TEMPORARY_RETURN_IGNORED mLogic.SetOverallCurrentState(overallCurrentState);
 }
 
 CurrentPositionEnum ClosureControlEndpoint::MapTargetPositionToCurrentPositioning(TargetPositionEnum value)
@@ -310,7 +310,7 @@ CurrentPositionEnum ClosureControlEndpoint::MapTargetPositionToCurrentPositionin
 
 void ClosureControlEndpoint::OnPanelMotionActionComplete()
 {
-    mLogic.SetMainState(MainStateEnum::kStopped);
+    TEMPORARY_RETURN_IGNORED mLogic.SetMainState(MainStateEnum::kStopped);
 
     // Set the OverallState position to PartiallyOpened as motion has been stopped
     auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
@@ -347,8 +347,8 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
             overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
         }
     }
-    mLogic.SetOverallCurrentState(overallCurrentState);
+    TEMPORARY_RETURN_IGNORED mLogic.SetOverallCurrentState(overallCurrentState);
 
-    mLogic.SetCountdownTimeFromDelegate(0);
-    mLogic.GenerateMovementCompletedEvent();
+    TEMPORARY_RETURN_IGNORED mLogic.SetCountdownTimeFromDelegate(0);
+    TEMPORARY_RETURN_IGNORED mLogic.GenerateMovementCompletedEvent();
 }

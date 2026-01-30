@@ -31,6 +31,8 @@ from typing import Generator, Optional
 from clang_format import getClangFormatBinary
 from zap_execution import ZapTool
 
+log = logging.getLogger(__name__)
+
 # TODO: Can we share this constant definition with zap_regen_all.py?
 DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
 
@@ -95,7 +97,8 @@ def detectZclFile(zapFile):
     path = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
     if zapFile:
-        data = json.load(open(zapFile))
+        with open(zapFile) as f:
+            data = json.load(f)
         for package in data["package"]:
             if package["type"] != "zcl-properties":
                 continue
@@ -300,7 +303,7 @@ def runClangPrettifier(templates_file, output_dir):
             print('Formatted %d files using %s (%s)' %
                   (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
-                logging.debug("Formatted: %s", outputName)
+                log.debug("Formatted: '%s'", outputName)
     except subprocess.CalledProcessError as err:
         print('clang-format error: %s', err)
 
@@ -355,7 +358,7 @@ def main():
         # `zap-cli` may extract things into a temporary directory. ensure extraction
         # does not conflict.
         with tempfile.TemporaryDirectory(prefix='zap') as temp_dir:
-            old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
+            old_temp = os.environ.get("TEMP")
             os.environ['TEMP'] = temp_dir
 
             runGeneration(cmdLineArgs)

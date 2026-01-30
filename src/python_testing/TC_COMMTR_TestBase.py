@@ -15,7 +15,6 @@
 #    limitations under the License.
 
 
-import logging
 from typing import List, Optional
 
 from mobly import asserts
@@ -25,8 +24,6 @@ from matter.clusters import ClusterObjects, Globals
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
-
-logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityMetering
 
@@ -52,9 +49,10 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         """
 
         matter_asserts.assert_list(struct.tariffComponentIDs,
-                                   "TariffComponentIDs field of MeteredQuantityStruct must return a list", max_length=128)
-        matter_asserts.assert_list_element_type(
-            struct.tariffComponentIDs, int, "TariffComponentIDs field of MeteredQuantityStruct must contain int elements")
+                                   "TariffComponentIDs field of MeteredQuantityStruct must return a list with max length 128.", max_length=128)
+        for tariffComponentID in struct.tariffComponentIDs:
+            matter_asserts.assert_valid_uint32(
+                tariffComponentID, 'TariffComponentID field of MeteredQuantityStruct must have uint32 type.')
         matter_asserts.assert_valid_int64(struct.quantity, 'Quantity field of MeteredQuantityStruct must be int64')
 
     async def check_maximum_metered_quantities_attribute(self, endpoint: int, attribute_value: Optional[int] = None) -> None:
@@ -153,7 +151,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
-                                     f"""Reported '{attribute_name}' value should be different from saved value. 
+                                     f"""Reported '{attribute_name}' value should be different from saved value.
                                      Subscriptions should only report when values have changed.""")
         except (KeyError, IndexError) as err:
             asserts.fail(f"There are no reports for attribute {attribute_name}:\n{err}")
@@ -161,37 +159,25 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
     @staticmethod
     def _metered_quantity_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeteredQuantity:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeteredQuantity
         return AttributeMatcher.from_callable(description="MeteredQuantity", matcher=predicate)
 
     @staticmethod
     def _maximum_metered_quantities_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MaximumMeteredQuantities:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MaximumMeteredQuantities
         return AttributeMatcher.from_callable(description="MaximumMeteredQuantities", matcher=predicate)
 
     @staticmethod
     def _metered_quantity_timestamp_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeteredQuantityTimestamp:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeteredQuantityTimestamp
         return AttributeMatcher.from_callable(description="MeteredQuantityTimestamp", matcher=predicate)
 
     @staticmethod
     def _tariff_unit_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.TariffUnit:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.TariffUnit
         return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:

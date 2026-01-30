@@ -43,30 +43,48 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
                    BasicInformation::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "Basic Information cluster MUST be on endpoint 0");
 
-ServerClusterRegistration gRegistration(BasicInformationCluster::Instance());
+LazyRegisteredServerCluster<BasicInformationCluster> gServer;
+
+void LegacyOnlyDisableUniqueIdAttr(BasicInformationCluster::OptionalAttributesSet & attributeSet)
+{
+    attributeSet.Set<BasicInformation::Attributes::UniqueID::Id>(false);
+}
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
 
-        BasicInformationCluster::Instance().OptionalAttributes() =
-            BasicInformationCluster::OptionalAttributesSet(optionalAttributeBits);
+        BasicInformationCluster::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
 
-        return gRegistration;
+        gServer.Create(optionalAttributeSet);
+
+        // This disabling of the unique id attribute is here only for test purposes. The uniqe id attribute
+        // is mandatory, but was optional in previous versions. It is forced to be enabled in the basic information
+        // constructor, but for apps following an old spec version, it is possible for it to be disabled. This is needed
+        // for the lighting-app-data-mode-no-unique-id example app with the MCORE_FS_1_3 test.
+        if (!optionalAttributeSet.IsSet(BasicInformation::Attributes::UniqueID::Id))
+        {
+            LegacyOnlyDisableUniqueIdAttr(gServer.Cluster().OptionalAttributes());
+        }
+
+        return gServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return BasicInformationCluster::Instance(); }
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
 
-    // Nothing to destroy: separate singleton class without constructor/destructor is used
-    void ReleaseRegistration(unsigned emberEndpointIndex) override {}
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
 
-void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
+void MatterBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -75,17 +93,17 @@ void emberAfBasicInformationClusterServerInitCallback(EndpointId endpointId)
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = BasicInformation::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
 
-void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
+void MatterBasicInformationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -93,12 +111,12 @@ void MatterBasicInformationClusterServerShutdownCallback(EndpointId endpointId)
 
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = BasicInformation::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterBasicInformationPluginServerInitCallback() {}

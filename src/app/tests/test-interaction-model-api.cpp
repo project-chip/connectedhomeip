@@ -30,8 +30,8 @@
 using namespace chip::app::DataModel;
 
 namespace chip {
-uint8_t Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-size_t Test::attributeDataTLVLen = 0;
+uint8_t Testing::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+size_t Testing::attributeDataTLVLen = 0;
 
 namespace app {
 
@@ -70,12 +70,12 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
                                         const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                         AttributeEncodeState * apEncoderState)
 {
-    if (aPath.mClusterId >= Test::kMockEndpointMin)
+    if (aPath.mClusterId >= Testing::kMockEndpointMin)
     {
-        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+        return Testing::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
-    if (!(aPath.mClusterId == Test::kTestClusterId && aPath.mEndpointId == Test::kTestEndpointId))
+    if (!(aPath.mClusterId == Testing::kTestClusterId && aPath.mEndpointId == Testing::kTestEndpointId))
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -86,7 +86,10 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
         ReturnErrorOnFailure(attributeStatus.GetError());
 
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
         ReturnErrorOnFailure(attributeStatus.GetError());
@@ -96,7 +99,8 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         return attributeReport.EndOfAttributeReportIB();
     }
 
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(Test::kTestFieldValue1);
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */)
+        .Encode(Testing::kTestFieldValue1);
 }
 
 TestImCustomDataModel & TestImCustomDataModel::Instance()
@@ -131,9 +135,9 @@ ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeReq
     decodeAccess.SetTriedDecode(true);
 
     TLV::TLVWriter writer;
-    writer.Init(chip::Test::attributeDataTLV);
-    writer.CopyElement(TLV::AnonymousTag(), decodeAccess.GetTlvReader());
-    chip::Test::attributeDataTLVLen = writer.GetLengthWritten();
+    writer.Init(chip::Testing::attributeDataTLV);
+    TEMPORARY_RETURN_IGNORED writer.CopyElement(TLV::AnonymousTag(), decodeAccess.GetTlvReader());
+    chip::Testing::attributeDataTLVLen = writer.GetLengthWritten();
 
     return CHIP_NO_ERROR;
 }

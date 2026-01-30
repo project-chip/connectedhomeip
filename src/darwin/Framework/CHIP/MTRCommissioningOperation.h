@@ -21,7 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2))
 @interface MTRCommissioningOperation : NSObject
 /**
  * Initialized via initWithParameters:setupPayload:delegate:queue:
@@ -68,6 +68,14 @@ MTR_PROVISIONALLY_AVAILABLE
  * delegate callbacks for the end of the commissioning.
  */
 - (BOOL)stop;
+
+/**
+ * If not nil, the payload (from possibly multiple payloads represented by the
+ * provided setupPayload) that represents the commissionee we successfully
+ * established PASE with.  This will only be non-nil after successful PASE
+ * establishment.
+ */
+@property (nonatomic, readonly, strong, nullable) MTRSetupPayload * matchedPayload;
 
 @end
 

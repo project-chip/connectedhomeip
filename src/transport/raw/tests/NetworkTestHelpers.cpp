@@ -25,7 +25,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 CHIP_ERROR IOContext::Init()
 {
@@ -75,5 +75,5 @@ void IOContext::DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(
     }
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

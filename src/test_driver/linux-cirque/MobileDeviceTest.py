@@ -73,8 +73,6 @@ class TestPythonController(CHIPVirtualHome):
         self.run_controller_test()
 
     def run_controller_test(self):
-        ethernet_ip = [device['description']['ipv6_addr'] for device in self.non_ap_devices
-                       if device['type'] == 'CHIPEndDevice'][0]
         server_ids = [device['id'] for device in self.non_ap_devices
                       if device['type'] == 'CHIPEndDevice']
         req_ids = [device['id'] for device in self.non_ap_devices
@@ -94,14 +92,14 @@ class TestPythonController(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_clusters-1.0.0-py3-none-any.whl")))
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
-            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp37-abi3-linux_x86_64.whl")))
+            CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_core-1.0.0-cp311-abi3-linux_x86_64.whl")))
         self.execute_device_cmd(req_device_id, "pip3 install --break-system-packages {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/matter_repl-1.0.0-py3-none-any.whl")))
 
         command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
-                   "--args python3 {} -t 300 -a {} --paa-trust-store-path {}").format(
+                   "--args python3 {} -t 300 --paa-trust-store-path {}").format(
             os.path.join(
-                CHIP_REPO, "src/controller/python/tests/scripts/mobile-device-test.py"), ethernet_ip,
+                CHIP_REPO, "src/controller/python/tests/scripts/mobile-device-test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
         ret = self.execute_device_cmd(req_device_id, command)
 

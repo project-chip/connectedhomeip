@@ -16,12 +16,13 @@ import("//build_overrides/chip.gni")
 
 source_set("general-diagnostics-server") {
   sources = [
-    "general-diagnostics-cluster.cpp",
-    "general-diagnostics-cluster.h",
+    "GeneralDiagnosticsCluster.cpp",
+    "GeneralDiagnosticsCluster.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/server",

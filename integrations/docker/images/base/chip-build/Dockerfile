@@ -49,6 +49,8 @@ RUN set -x \
     git-lfs \
     gperf \
     gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-ugly \
     gstreamer1.0-tools \
     iproute2 \
     iwyu \
@@ -65,6 +67,7 @@ RUN set -x \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
+    libevent-dev \
     libgif-dev \
     libgirepository-1.0-1 \
     libglib2.0-dev \
@@ -82,6 +85,7 @@ RUN set -x \
     libpango1.0-dev \
     libpcsclite-dev \
     libpixman-1-dev \
+    libprotobuf-dev \
     libreadline-dev \
     libsdl2-dev \
     libsdl-pango-dev \
@@ -98,6 +102,7 @@ RUN set -x \
     nodejs \
     patch \
     pkg-config \
+    protobuf-compiler \
     python3 \
     python3-click \
     python3-coloredlogs \
@@ -200,8 +205,3 @@ RUN set -x \
     libgirepository1.0-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
-
-
-# Some things that save space
-# Protoc goes from 108M to 4.6M
-RUN strip /usr/local/bin/protoc*

@@ -45,7 +45,7 @@ void BLEBase::ClearState()
 {
     if (mBleLayer)
     {
-        mBleLayer->CancelBleIncompleteConnection();
+        TEMPORARY_RETURN_IGNORED mBleLayer->CancelBleIncompleteConnection();
         mBleLayer->mBleTransport = nullptr;
         mBleLayer                = nullptr;
     }

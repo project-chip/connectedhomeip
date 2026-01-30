@@ -75,7 +75,7 @@ CHIP_ERROR WifiSleepManager::HandlePowerEvent(PowerEvent event)
         mIsCommissioningInProgress = false;
 
         // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
-        WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+        TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
         break;
 
     case PowerEvent::kConnectivityChange:

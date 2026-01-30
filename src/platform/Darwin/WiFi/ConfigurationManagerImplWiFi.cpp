@@ -47,8 +47,8 @@ CHIP_ERROR ConfigurationManagerImpl::ClearWiFiNetworkInformations()
 {
 #if !CHIP_DISABLE_PLATFORM_KVS
     auto & kvs = PersistedStorage::KeyValueStoreMgr();
-    kvs.Delete(kWiFiSSIDKeyName);
-    kvs.Delete(kWiFiCredentialsKeyName);
+    TEMPORARY_RETURN_IGNORED kvs.Delete(kWiFiSSIDKeyName);
+    TEMPORARY_RETURN_IGNORED kvs.Delete(kWiFiCredentialsKeyName);
     return CHIP_NO_ERROR;
 #endif
     return CHIP_ERROR_NOT_IMPLEMENTED;

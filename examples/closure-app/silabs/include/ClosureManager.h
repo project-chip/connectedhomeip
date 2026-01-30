@@ -31,6 +31,10 @@
 #include <AppEvent.h>
 #include <lib/core/DataModelTypes.h>
 
+#ifdef DISPLAY_ENABLED
+#include "ClosureUI.h"
+#endif
+
 class ClosureManager
 {
 public:
@@ -156,6 +160,33 @@ public:
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
+#ifdef DISPLAY_ENABLED
+    /**
+     * @brief Gets closure data specifically for UI display.
+     *
+     * @return ClosureUIData structure containing main state and overall current state
+     */
+    ClosureUIData GetClosureUIData();
+
+#endif // DISPLAY_ENABLED
+
+    /**
+     * @brief Checks if a MoveTo action is currently in progress.
+     *
+     * @return true if a MoveTo action is in progress, false otherwise.
+     */
+    bool IsClosureControlMotionInProgress() const;
+
+    /**
+     * @brief Gets the ClosureControlEndpoint logic for direct access.
+     *
+     * This allows direct access to the cluster logic methods (e.g., HandleMoveTo)
+     * when called from chip task context (e.g., via ScheduleWork).
+     *
+     * @return Reference to the ClosureControlEndpoint logic.
+     */
+    chip::app::Clusters::ClosureControl::ClusterLogic & GetClosureControlLogic() { return mClosureEndpoint1.GetLogic(); }
+
     /**
      * @brief Sets the initial state for the ClosureControlEndpoint.
      *
@@ -188,10 +219,10 @@ private:
     // make them thread-safe using mutex or other synchronization mechanisms. Presently, we use
     // DeviceLayer::PlatformMgr().LockChipStack() and DeviceLayer::PlatformMgr().UnlockChipStack()
     // to ensure that these variables are set in thread safe manner in chip task context.
-    bool isCalibrationInProgress = false;
-    bool isMoveToInProgress      = false;
-    bool isSetTargetInProgress   = false;
-    bool isStepActionInProgress  = false;
+    bool mIsCalibrationInProgress = false;
+    bool mIsMoveToInProgress      = false;
+    bool mIsSetTargetInProgress   = false;
+    bool mIsStepActionInProgress  = false;
 
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;

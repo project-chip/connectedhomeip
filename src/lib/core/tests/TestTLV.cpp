@@ -40,6 +40,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -1603,7 +1604,7 @@ TEST_F(TestTLV, TestIntMinMax)
     err = writer.OpenContainer(ProfileTag(TestProfile_3, 1), kTLVType_Array, writer1);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    WriteIntMinMax(writer1);
+    EXPECT_SUCCESS(WriteIntMinMax(writer1));
 
     err = writer.CloseContainer(writer1);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -1665,7 +1666,7 @@ TEST_F(TestTLV, CheckPrettyPrinter)
 
     reader.Init(buf, encodedLen);
     reader.ImplicitProfileId = TestProfile_2;
-    chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, SimpleDumpWriter));
 }
 
 static char gStringDumpWriterBuf[128]        = { 0 };
@@ -1712,7 +1713,7 @@ TEST_F(TestTLV, CheckOctetStringPrettyPrinter)
     TLVReader reader;
     reader.Init(encodedBuf, writer.GetLengthWritten());
 
-    chip::TLV::Debug::Dump(reader, StringDumpWriter);
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, StringDumpWriter));
 
     EXPECT_STREQ(expectedPrint, gStringDumpWriterBuf);
 }
@@ -1829,7 +1830,7 @@ TEST_F(TestTLV, CheckTLVUtilities)
         reader1.ImplicitProfileId = TestProfile_2;
 
         // position the reader on the first element
-        reader1.Next();
+        EXPECT_SUCCESS(reader1.Next());
         Tag tag = ProfileTag(TestProfile_1, 1);
         err     = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
         EXPECT_EQ(err, CHIP_ERROR_TLV_TAG_NOT_FOUND);
@@ -1841,7 +1842,7 @@ TEST_F(TestTLV, CheckTLVUtilities)
         EXPECT_EQ(tagReader.GetTag(), ProfileTag(TestProfile_1, 1));
 
         // Position the reader on the second element
-        reader1.Next();
+        EXPECT_SUCCESS(reader1.Next());
         err = chip::TLV::Utilities::Find(reader1, FindContainerWithElement, &tag, tagReader, false);
         EXPECT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(tagReader.GetType(), kTLVType_Structure);
@@ -1852,7 +1853,7 @@ TEST_F(TestTLV, CheckTLVUtilities)
     size_t count;
     const size_t expectedCount = 18;
     reader1.Init(reader);
-    reader1.Next();
+    EXPECT_SUCCESS(reader1.Next());
 
     err = chip::TLV::Utilities::Count(reader, count);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -2307,7 +2308,7 @@ TEST_F(TestTLV, CheckCircularTLVBufferSimple)
     buffer.mProcessEvictedElement = CountEvictedMembers;
     buffer.mAppData               = &TestTLV::ctx;
 
-    writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
+    EXPECT_SUCCESS(writer.PutBoolean(ProfileTag(TestProfile_1, 2), true));
 
     WriteEncoding3(writer);
 
@@ -2357,7 +2358,7 @@ TEST_F(TestTLV, CheckCircularTLVBufferStartMidway)
     buffer.mProcessEvictedElement = CountEvictedMembers;
     buffer.mAppData               = &TestTLV::ctx;
 
-    writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
+    EXPECT_SUCCESS(writer.PutBoolean(ProfileTag(TestProfile_1, 2), true));
 
     WriteEncoding3(writer);
 
@@ -2408,7 +2409,7 @@ TEST_F(TestTLV, CheckCircularTLVBufferEvictStraddlingEvent)
     buffer.mProcessEvictedElement = CountEvictedMembers;
     buffer.mAppData               = &TestTLV::ctx;
 
-    writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
+    EXPECT_SUCCESS(writer.PutBoolean(ProfileTag(TestProfile_1, 2), true));
 
     WriteEncoding3(writer);
 
@@ -2520,7 +2521,7 @@ TEST_F(TestTLV, CheckCircularTLVBufferEdge)
         TEST_GET_NOERROR(reader, kTLVType_Boolean, ProfileTag(TestProfile_1, 2), true);
         TestEnd<TLVReader>(reader);
 
-        buffer1.EvictHead();
+        EXPECT_SUCCESS(buffer1.EvictHead());
 
         reader.Init(buffer1);
         reader.ImplicitProfileId = TestProfile_2;
@@ -2559,7 +2560,7 @@ TEST_F(TestTLV, CheckCircularTLVBufferEdge)
 
     // Check that the eviction works as expected
 
-    buffer1.EvictHead();
+    EXPECT_SUCCESS(buffer1.EvictHead());
 
     // At this point the buffer should contain only the second boolean
     reader.Init(buffer1);
@@ -2597,8 +2598,8 @@ TEST_F(TestTLV, CheckCircularTLVBufferEdge)
     // Evict the elements from the buffer, verfiy that we have an
     // empty reader on our hands
 
-    buffer1.EvictHead();
-    buffer1.EvictHead();
+    EXPECT_SUCCESS(buffer1.EvictHead());
+    EXPECT_SUCCESS(buffer1.EvictHead());
 
     reader.Init(buffer1);
     reader.ImplicitProfileId = TestProfile_2;
@@ -4031,6 +4032,7 @@ TEST_F(TestTLV, CheckCHIPUpdater)
 class OptimisticTLVWriter : public TLVWriter
 {
 public:
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void Init(uint8_t * buf, size_t maxLen);
 };
 
@@ -4471,19 +4473,19 @@ TEST_F(TestTLV, CheckGetStringView)
         // First check that basic read from entire buffer works.
         ContiguousBufferTLVReader reader;
         reader.Init(buf);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCanReadString(reader, testString);
 
         // Now check that read from a buffer bounded by the number of bytes
         // written works.
         reader.Init(buf, writer.GetLengthWritten());
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCanReadString(reader, testString);
 
         // Now check that read from a buffer bounded by fewer than the number of
         // bytes written fails.
         reader.Init(buf, writer.GetLengthWritten() - 1);
-        reader.Next();
+        EXPECT_EQ(reader.Next(), CHIP_ERROR_TLV_UNDERRUN);
         AssertCannotReadString(reader);
     }
 
@@ -4496,7 +4498,7 @@ TEST_F(TestTLV, CheckGetStringView)
 
         ContiguousBufferTLVReader reader;
         reader.Init(buf);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCannotReadString(reader);
     }
 
@@ -4510,7 +4512,7 @@ TEST_F(TestTLV, CheckGetStringView)
 
         ContiguousBufferTLVReader reader;
         reader.Init(buf);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCannotReadString(reader);
     }
 
@@ -4519,7 +4521,7 @@ TEST_F(TestTLV, CheckGetStringView)
         const uint8_t shortString[] = { CHIP_TLV_UTF8_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 2, 'a', 'b') };
         ContiguousBufferTLVReader reader;
         reader.Init(shortString);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCanReadString(reader, "ab");
     }
 
@@ -4528,7 +4530,7 @@ TEST_F(TestTLV, CheckGetStringView)
         const uint8_t shortString[] = { CHIP_TLV_UTF8_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 3, 'a', 'b') };
         ContiguousBufferTLVReader reader;
         reader.Init(shortString);
-        reader.Next();
+        EXPECT_EQ(reader.Next(), CHIP_ERROR_TLV_UNDERRUN);
         AssertCannotReadString(reader);
     }
 }
@@ -4561,19 +4563,19 @@ TEST_F(TestTLV, CheckGetByteView)
         // First check that basic read from entire buffer works.
         ContiguousBufferTLVReader reader;
         reader.Init(buf);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCanReadBytes(reader, ByteSpan(testBytes));
 
         // Now check that read from a buffer bounded by the number of bytes
         // written works.
         reader.Init(buf, writer.GetLengthWritten());
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCanReadBytes(reader, ByteSpan(testBytes));
 
         // Now check that read from a buffer bounded by fewer than the number of
         // bytes written fails.
         reader.Init(buf, writer.GetLengthWritten() - 1);
-        reader.Next();
+        EXPECT_EQ(reader.Next(), CHIP_ERROR_TLV_UNDERRUN);
         AssertCannotReadBytes(reader);
     }
 
@@ -4586,7 +4588,7 @@ TEST_F(TestTLV, CheckGetByteView)
 
         ContiguousBufferTLVReader reader;
         reader.Init(buf);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCannotReadBytes(reader);
     }
 
@@ -4599,7 +4601,7 @@ TEST_F(TestTLV, CheckGetByteView)
 
         ContiguousBufferTLVReader reader;
         reader.Init(buf);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         AssertCannotReadBytes(reader);
     }
 
@@ -4608,7 +4610,7 @@ TEST_F(TestTLV, CheckGetByteView)
         const uint8_t shortBytes[] = { CHIP_TLV_BYTE_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 2, 1, 2) };
         ContiguousBufferTLVReader reader;
         reader.Init(shortBytes);
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         const uint8_t expectedBytes[] = { 1, 2 };
         AssertCanReadBytes(reader, ByteSpan(expectedBytes));
     }
@@ -4619,7 +4621,7 @@ TEST_F(TestTLV, CheckGetByteView)
         const uint8_t shortBytes[] = { CHIP_TLV_BYTE_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 3, 1, 2) };
         ContiguousBufferTLVReader reader;
         reader.Init(shortBytes);
-        reader.Next();
+        EXPECT_EQ(reader.Next(), CHIP_ERROR_TLV_UNDERRUN);
         AssertCannotReadBytes(reader);
     }
 }

@@ -66,8 +66,6 @@ class DLL_EXPORT BLEEndPoint
     friend class BleEndPointPool;
 
 public:
-    typedef uint64_t AlignT;
-
     // Public data members:
     enum
     {

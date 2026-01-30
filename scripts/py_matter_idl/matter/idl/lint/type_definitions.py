@@ -364,7 +364,7 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
             if cluster.code not in self._mandatory_commands:
                 continue  # no known mandatory commands
 
-            defined_commands = set([c.code for c in cluster.commands])
+            defined_commands = {c.code for c in cluster.commands}
 
             for requirement in self._mandatory_commands[cluster.code]:
                 if requirement.command_code in defined_commands:

@@ -123,11 +123,11 @@ DataModel::ActionReturnStatus CodeDrivenDataModelProvider::WriteAttribute(const 
 }
 
 void CodeDrivenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & path,
-                                                                 DataModel::ListWriteOperation opType)
+                                                                 DataModel::ListWriteOperation opType, FabricIndex accessingFabric)
 {
     ServerClusterInterface * serverCluster = GetServerClusterInterface(path);
     VerifyOrReturn(serverCluster != nullptr);
-    serverCluster->ListAttributeWriteNotification(path, opType);
+    serverCluster->ListAttributeWriteNotification(path, opType, accessingFabric);
 }
 
 std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -155,15 +155,6 @@ CHIP_ERROR CodeDrivenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataMode
         ReturnErrorOnFailure(out.Append(registration.GetEndpointEntry()));
     }
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CodeDrivenDataModelProvider::SemanticTags(EndpointId endpointId,
-                                          ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out)
-{
-    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
-    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
-    return endpoint->SemanticTags(out);
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out)
@@ -243,6 +234,16 @@ CHIP_ERROR CodeDrivenDataModelProvider::EventInfo(const ConcreteEventPath & path
     return serverCluster->EventInfo(path, eventInfo);
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR CodeDrivenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId)
+{
+    EndpointInterface * endpoint = GetEndpointInterface(endpointId);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    CharSpan uniqueId = endpoint->EndpointUniqueID();
+    return CopyCharSpanToMutableCharSpan(uniqueId, EndpointUniqueId);
+}
+#endif
+
 void CodeDrivenDataModelProvider::Temporary_ReportAttributeChanged(const AttributePathParams & path)
 {
     if (!mInteractionModelContext)
@@ -298,7 +299,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
+CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, ClusterShutdownType shutdownType)
 {
     if (mServerClusterContext.has_value())
     {
@@ -324,7 +325,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId)
             if (clusterIsOnEndpoint && registeredEndpointCount == 1)
             {
                 // This is the last registered endpoint for this cluster. Shut it down.
-                cluster->Shutdown();
+                cluster->Shutdown(shutdownType);
             }
         }
     }
@@ -352,7 +353,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & e
     return mServerClusterRegistry.Register(entry);
 }
 
-CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * cluster)
+CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * cluster, ClusterShutdownType shutdownType)
 {
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -367,7 +368,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveCluster(ServerClusterInterface * c
         }
     }
 
-    return mServerClusterRegistry.Unregister(cluster);
+    return mServerClusterRegistry.Unregister(cluster, shutdownType);
 }
 
 EndpointInterface * CodeDrivenDataModelProvider::GetEndpointInterface(EndpointId endpointId)

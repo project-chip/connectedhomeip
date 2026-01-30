@@ -126,7 +126,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
 
   {%- for e in cluster.events %}
   {##}  {##}{% if e.qualities %}{{e.qualities | idltxt}} {% endif -%}
-  {{e.priority | idltxt}} event {{e | event_access}}{{e.name}} = {{e.code}} {
+  {{e.api_maturity|idltxt}}{{e.priority | idltxt}} event {{e | event_access}}{{e.name}} = {{e.code}} {
     {% for field in e.fields %}
     {{render_field(field)}}
     {% endfor %}

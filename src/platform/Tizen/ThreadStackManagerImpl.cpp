@@ -305,8 +305,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
                  ChipLogError(DeviceLayer, "FAIL: Thread get active dataset TLVs: %s", get_error_message(threadErr)));
 
     ChipLogProgress(DeviceLayer, "Thread get active dataset TLVs size [%u]", tlvsLen);
-    mDataset.Init(ByteSpan(tlvsData, tlvsLen));
-    dataset.Init(mDataset.AsByteSpan());
+    TEMPORARY_RETURN_IGNORED mDataset.Init(ByteSpan(tlvsData, tlvsLen));
+    TEMPORARY_RETURN_IGNORED dataset.Init(mDataset.AsByteSpan());
 
     return CHIP_NO_ERROR;
 
@@ -354,7 +354,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     if (val && !isEnabled)
     {
         threadErr = thread_network_attach(mThreadInstance);
-        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
             if (this->mpConnectCallback != nullptr && threadErr != THREAD_ERROR_NONE)
             {
                 this->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
@@ -365,7 +365,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
                      ChipLogError(DeviceLayer, "FAIL: Attach Thread network: %s", get_error_message(threadErr)));
 
         threadErr = thread_start(mThreadInstance);
-        DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([&, threadErr]() {
             if (this->mpConnectCallback != nullptr)
             {
                 this->mpConnectCallback->OnResult(threadErr == THREAD_ERROR_NONE ? NetworkCommissioning::Status::kSuccess
@@ -472,29 +472,6 @@ exit:
     return CHIP_ERROR_INTERNAL;
 }
 
-bool ThreadStackManagerImpl::_HaveMeshConnectivity()
-{
-    return false;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyMinimal()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
@@ -512,12 +489,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
@@ -531,12 +502,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)

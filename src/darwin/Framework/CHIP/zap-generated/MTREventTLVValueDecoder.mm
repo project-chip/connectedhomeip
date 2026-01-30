@@ -224,6 +224,11 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                         memberValue.targets = array_3;
                     }
                 }
+                if (cppValue.latestValue.Value().auxiliaryType.HasValue()) {
+                    memberValue.auxiliaryType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().auxiliaryType.Value())];
+                } else {
+                    memberValue.auxiliaryType = nil;
+                }
                 memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
             }
             value.latestValue = memberValue;
@@ -328,6 +333,32 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                 memberValue = nil;
             }
             value.arlRequestFlowUrl = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::AuxiliaryAccessUpdated::Id: {
+        Events::AuxiliaryAccessUpdated::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccessControlClusterAuxiliaryAccessUpdatedEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.adminNodeID.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.adminNodeID.Value()];
+            }
+            value.adminNodeID = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -2441,6 +2472,19 @@ static id _Nullable DecodeEventPayloadForScenesManagementCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForGroupcastCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Groupcast;
+    switch (aEventId) {
+    default: {
+        // Not a known Groupcast event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -2460,6 +2504,19 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     switch (aEventId) {
     default: {
         // Not a known ActivatedCarbonFilterMonitoring event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForWaterTankLevelMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WaterTankLevelMonitoring;
+    switch (aEventId) {
+    default: {
+        // Not a known WaterTankLevelMonitoring event.
         break;
     }
     }
@@ -4659,6 +4716,103 @@ static id _Nullable DecodeEventPayloadForSoilMeasurementCluster(EventId aEventId
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::AmbientContextSensing;
+    switch (aEventId) {
+    case Events::AmbientContextDetected::Id: {
+        Events::AmbientContextDetected::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAmbientContextSensingClusterAmbientContextDetectedEvent new];
+
+        do {
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.ambientContextType.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    MTRAmbientContextSensingClusterAmbientContextTypeStruct * newElement_0;
+                    newElement_0 = [MTRAmbientContextSensingClusterAmbientContextTypeStruct new];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.ambientContextSensed.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            MTRDataTypeSemanticTagStruct * newElement_2;
+                            newElement_2 = [MTRDataTypeSemanticTagStruct new];
+                            if (entry_2.mfgCode.IsNull()) {
+                                newElement_2.mfgCode = nil;
+                            } else {
+                                newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                            }
+                            newElement_2.namespaceID = [NSNumber numberWithUnsignedChar:entry_2.namespaceID];
+                            newElement_2.tag = [NSNumber numberWithUnsignedChar:entry_2.tag];
+                            if (entry_2.label.HasValue()) {
+                                if (entry_2.label.Value().IsNull()) {
+                                    newElement_2.label = nil;
+                                } else {
+                                    newElement_2.label = AsString(entry_2.label.Value().Value());
+                                    if (newElement_2.label == nil) {
+                                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                        *aError = err;
+                                        return nil;
+                                    }
+                                }
+                            } else {
+                                newElement_2.label = nil;
+                            }
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.ambientContextSensed = array_2;
+                    }
+                    if (entry_0.detectionStartTime.HasValue()) {
+                        newElement_0.detectionStartTime = [NSNumber numberWithUnsignedInt:entry_0.detectionStartTime.Value()];
+                    } else {
+                        newElement_0.detectionStartTime = nil;
+                    }
+                    if (entry_0.objectCountThreshold.HasValue()) {
+                        newElement_0.objectCountThreshold = [NSNumber numberWithUnsignedShort:entry_0.objectCountThreshold.Value()];
+                    } else {
+                        newElement_0.objectCountThreshold = nil;
+                    }
+                    if (entry_0.objectCount.HasValue()) {
+                        newElement_0.objectCount = [NSNumber numberWithUnsignedShort:entry_0.objectCount.Value()];
+                    } else {
+                        newElement_0.objectCount = nil;
+                    }
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                memberValue = array_0;
+            }
+            value.ambientContextType = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known AmbientContextSensing event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForWiFiNetworkManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -5011,6 +5165,17 @@ static id _Nullable DecodeEventPayloadForContentControlCluster(EventId aEventId,
 
         return value;
     }
+    case Events::EnteringBlockContentTimeWindow::Id: {
+        Events::EnteringBlockContentTimeWindow::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRContentControlClusterEnteringBlockContentTimeWindowEvent new];
+
+        return value;
+    }
     default: {
         // Not a known ContentControl event.
         break;
@@ -5174,6 +5339,20 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
             }
             value.activationReason = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            value.containerType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.CMAFSessionNumber.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.CMAFSessionNumber.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.cmafSessionNumber = memberValue;
+        } while (0);
 
         return value;
     }
@@ -5193,17 +5372,17 @@ static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aE
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.triggerType)];
-            value.triggerType = memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.containerType)];
+            value.containerType = memberValue;
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.activationReason.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.activationReason.Value())];
+            if (cppValue.CMAFSessionNumber.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.CMAFSessionNumber.Value()];
             } else {
                 memberValue = nil;
             }
-            value.activationReason = memberValue;
+            value.cmafSessionNumber = memberValue;
         } while (0);
 
         return value;
@@ -5221,6 +5400,23 @@ static id _Nullable DecodeEventPayloadForChimeCluster(EventId aEventId, TLV::TLV
 {
     using namespace Clusters::Chime;
     switch (aEventId) {
+    case Events::ChimeStartedPlaying::Id: {
+        Events::ChimeStartedPlaying::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRChimeClusterChimeStartedPlayingEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.chimeID];
+            value.chimeID = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known Chime event.
         break;
@@ -5741,11 +5937,17 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ScenesManagement::Id: {
         return DecodeEventPayloadForScenesManagementCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::Groupcast::Id: {
+        return DecodeEventPayloadForGroupcastCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
+        return DecodeEventPayloadForWaterTankLevelMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::BooleanStateConfiguration::Id: {
         return DecodeEventPayloadForBooleanStateConfigurationCluster(aPath.mEventId, aReader, aError);
@@ -5875,6 +6077,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::SoilMeasurement::Id: {
         return DecodeEventPayloadForSoilMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::AmbientContextSensing::Id: {
+        return DecodeEventPayloadForAmbientContextSensingCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeEventPayloadForWiFiNetworkManagementCluster(aPath.mEventId, aReader, aError);

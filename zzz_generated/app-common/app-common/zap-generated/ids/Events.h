@@ -26,6 +26,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/EventIds.h>
 #include <clusters/AdministratorCommissioning/EventIds.h>
 #include <clusters/AirQuality/EventIds.h>
+#include <clusters/AmbientContextSensing/EventIds.h>
 #include <clusters/ApplicationBasic/EventIds.h>
 #include <clusters/ApplicationLauncher/EventIds.h>
 #include <clusters/AudioOutput/EventIds.h>
@@ -74,6 +75,7 @@
 #include <clusters/GeneralCommissioning/EventIds.h>
 #include <clusters/GeneralDiagnostics/EventIds.h>
 #include <clusters/GroupKeyManagement/EventIds.h>
+#include <clusters/Groupcast/EventIds.h>
 #include <clusters/Groups/EventIds.h>
 #include <clusters/HepaFilterMonitoring/EventIds.h>
 #include <clusters/IcdManagement/EventIds.h>
@@ -154,6 +156,7 @@
 #include <clusters/WakeOnLan/EventIds.h>
 #include <clusters/WaterHeaterManagement/EventIds.h>
 #include <clusters/WaterHeaterMode/EventIds.h>
+#include <clusters/WaterTankLevelMonitoring/EventIds.h>
 #include <clusters/WebRTCTransportProvider/EventIds.h>
 #include <clusters/WebRTCTransportRequestor/EventIds.h>
 #include <clusters/WiFiNetworkDiagnostics/EventIds.h>

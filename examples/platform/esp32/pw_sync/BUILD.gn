@@ -1,0 +1,65 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/pigweed.gni")
+
+import("$dir_pw_build/target_types.gni")
+
+config("public_include_path") {
+  include_dirs = [ "public" ]
+  visibility = [ ":*" ]
+}
+
+config("backend_config") {
+  include_dirs = [ "public_overrides" ]
+  visibility = [ ":*" ]
+}
+
+# This target provides the backend for pw::sync::Mutex.
+pw_source_set("mutex") {
+  public_configs = [
+    ":public_include_path",
+    ":backend_config",
+  ]
+  public = [
+    "public/pw_sync_esp32/mutex_inline.h",
+    "public/pw_sync_esp32/mutex_native.h",
+    "public_overrides/pw_sync_backend/mutex_inline.h",
+    "public_overrides/pw_sync_backend/mutex_native.h",
+  ]
+  public_deps = [
+    "$dir_pw_assert",
+    "$dir_pw_interrupt:context",
+    "$dir_pw_sync:mutex.facade",
+  ]
+}
+
+# This target provides the backend for pw::sync::InterruptSpinLock.
+pw_source_set("esp32_interrupt_spin_lock") {
+  public_configs = [
+    ":public_include_path",
+    ":backend_config",
+  ]
+  public = [
+    "public/pw_sync_esp32/interrupt_spin_lock_inline.h",
+    "public/pw_sync_esp32/interrupt_spin_lock_native.h",
+    "public_overrides/pw_sync_backend/interrupt_spin_lock_inline.h",
+    "public_overrides/pw_sync_backend/interrupt_spin_lock_native.h",
+  ]
+  public_deps = [
+    "$dir_pw_assert",
+    "$dir_pw_sync:interrupt_spin_lock.facade",
+    "$dir_pw_sync:yield_core",
+  ]
+}

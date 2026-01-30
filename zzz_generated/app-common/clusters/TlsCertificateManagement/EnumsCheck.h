@@ -24,19 +24,6 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {
-static auto __attribute__((unused)) EnsureKnownEnumValue(TlsCertificateManagement::StatusCodeEnum val)
-{
-    using EnumType = TlsCertificateManagement::StatusCodeEnum;
-    switch (val)
-    {
-    case EnumType::kCertificateAlreadyInstalled:
-    case EnumType::kDuplicateKey:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-} // namespace Clusters
+namespace Clusters {} // namespace Clusters
 } // namespace app
 } // namespace chip

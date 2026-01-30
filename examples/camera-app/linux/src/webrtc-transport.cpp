@@ -41,7 +41,7 @@ SDPType RtcTypeToSDPType(rtc::Description::Type type)
 WebrtcTransport::WebrtcTransport()
 {
     ChipLogProgress(Camera, "WebrtcTransport created");
-    mRequestArgs = { 0, 0, 0, 0, 0, 0 }; // Initialize request arguments to zero
+    mRequestArgs = {}; // Default initialize request arguments
 }
 
 WebrtcTransport::~WebrtcTransport()
@@ -67,25 +67,77 @@ WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
     return mRequestArgs;
 }
 
-void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
+void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
 {
-    if (mVideoTrack)
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
+    if (mLocalVideoTrack)
     {
-        mVideoTrack->SendData(data, size);
+        // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
+        // Current state: data contains raw H.264 encoded frames from GStreamer
+        //
+        // SFrame encryption should happen here because:
+        // 1. Each transport may have different sFrameConfig (different keys, cipher suites)
+        // 2. Multiple transports can share the same video stream
+        // 3. Encryption must be per-client, not per-stream
+        //
+        // Implementation steps:
+        // if (sFrameConfig.HasValue())
+        // {
+        //     auto& config = sFrameConfig.Value();
+        //     // 1. Encrypt H.264 payload using config.baseKey and config.cipherSuite:
+        //     //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+        //     //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+        //     // 2. Build SFrame header with config.kid and frame counter
+        //     // 3. Prepend SFrame header to encrypted payload
+        //     // 4. Pass encrypted data to RTP packetization
+        //     //    Result: [RTP Header | SFrame Header | Encrypted(H.264)]
+        // }
+        // else
+        // {
+        //     // No encryption - pass raw H.264 to RTP packetization
+        // }
+
+        mLocalVideoTrack->SendFrame(data, timestamp);
     }
 }
 
 // Implementation of SendAudio method
-void WebrtcTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
+void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
-    if (mAudioTrack)
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
+    if (mLocalAudioTrack)
     {
-        mAudioTrack->SendData(data, size);
+        // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
+        // Current state: data contains raw Opus encoded frames from GStreamer
+        //
+        // SFrame encryption should happen here because:
+        // 1. Each transport may have different sFrameConfig (different keys, cipher suites)
+        // 2. Multiple transports can share the same audio stream
+        // 3. Encryption must be per-client, not per-stream
+        //
+        // Implementation steps:
+        // if (sFrameConfig.HasValue())
+        // {
+        //     auto& config = sFrameConfig.Value();
+        //     // 1. Encrypt Opus payload using config.baseKey and config.cipherSuite:
+        //     //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+        //     //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+        //     // 2. Build SFrame header with config.kid and frame counter
+        //     // 3. Prepend SFrame header to encrypted payload
+        //     // 4. Pass encrypted data to RTP packetization
+        //     //    Result: [RTP Header | SFrame Header | Encrypted(Opus)]
+        // }
+        // else
+        // {
+        //     // No encryption - pass raw Opus to RTP packetization
+        // }
+
+        mLocalAudioTrack->SendFrame(data, timestamp);
     }
 }
 
 // Implementation of SendAudioVideo method
-void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID)
+void WebrtcTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     // Placeholder for actual WebRTC implementation to send synchronized audio/video data
 }
@@ -93,13 +145,13 @@ void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t vi
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mVideoTrack != nullptr;
+    return mLocalVideoTrack != nullptr;
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mAudioTrack != nullptr;
+    return mLocalAudioTrack != nullptr;
 }
 
 const char * WebrtcTransport::GetStateStr() const
@@ -117,6 +169,9 @@ const char * WebrtcTransport::GetStateStr() const
 
     case State::SendingICECandidates:
         return "SendingICECandidates";
+
+    case State::SendingEnd:
+        return "SendingEnd";
     }
     return "N/A";
 }
@@ -143,42 +198,39 @@ void WebrtcTransport::Start()
     mPeerConnection = CreateWebRTCPeerConnection();
 
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
-                                  [this](const std::string & candidate) { this->OnICECandidate(candidate); },
+                                  [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },
                                   [this](bool connected) { this->OnConnectionStateChanged(connected); },
                                   [this](std::shared_ptr<WebRTCTrack> track) { this->OnTrack(track); });
 }
 
 void WebrtcTransport::Stop()
 {
-    mVideoTrack = nullptr;
-    mAudioTrack = nullptr;
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mPeerConnection != nullptr)
     {
         mPeerConnection->Close();
     }
+
+    mLocalVideoTrack = nullptr;
+    mLocalAudioTrack = nullptr;
 }
 
-void WebrtcTransport::AddTracks()
+void WebrtcTransport::AddVideoTrack(const std::string & videoMid, int payloadType)
 {
     if (mPeerConnection != nullptr)
     {
-        mVideoTrack = mPeerConnection->AddTrack(MediaType::Video);
-        mAudioTrack = mPeerConnection->AddTrack(MediaType::Audio);
+        // Adding local tracks to send video data to remote peer
+        mLocalVideoTrack = mPeerConnection->AddTrack(MediaType::Video, videoMid, payloadType);
     }
 }
 
-// Implementation of SetVideoTrack method
-void WebrtcTransport::SetVideoTrack(std::shared_ptr<WebRTCTrack> videoTrack)
+void WebrtcTransport::AddAudioTrack(const std::string & audioMid, int payloadType)
 {
-    ChipLogProgress(Camera, "Setting video track for sessionID: %u", mRequestArgs.sessionId);
-    mVideoTrack = videoTrack;
-}
-
-// Implementation of SetAudioTrack method
-void WebrtcTransport::SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack)
-{
-    ChipLogProgress(Camera, "Setting audio track for sessionID: %u", mRequestArgs.sessionId);
-    mAudioTrack = audioTrack;
+    if (mPeerConnection != nullptr)
+    {
+        // Adding local tracks to send audio data to remote peer
+        mLocalAudioTrack = mPeerConnection->AddTrack(MediaType::Audio, audioMid, payloadType);
+    }
 }
 
 void WebrtcTransport::AddRemoteCandidate(const std::string & candidate, const std::string & mid)
@@ -199,6 +251,7 @@ void WebrtcTransport::OnLocalDescription(const std::string & sdp, SDPType type)
 
 bool WebrtcTransport::ClosePeerConnection()
 {
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mPeerConnection == nullptr)
     {
         return false;
@@ -209,12 +262,13 @@ bool WebrtcTransport::ClosePeerConnection()
     return true;
 }
 
-void WebrtcTransport::OnICECandidate(const std::string & candidate)
+void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
 {
     ChipLogProgress(Camera, "ICE Candidate received for sessionID: %u", mRequestArgs.sessionId);
-    mLocalCandidates.push_back(candidate);
+    mLocalCandidates.push_back(candidateInfo);
     ChipLogProgress(Camera, "Local Candidate:");
-    ChipLogProgress(Camera, "%s", candidate.c_str());
+    ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
+    ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
 }
 
 void WebrtcTransport::OnConnectionStateChanged(bool connected)
@@ -226,15 +280,7 @@ void WebrtcTransport::OnConnectionStateChanged(bool connected)
 
 void WebrtcTransport::OnTrack(std::shared_ptr<WebRTCTrack> track)
 {
-    ChipLogProgress(Camera, "Track received for sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
-    if (track->GetType() == "video")
-    {
-        ChipLogProgress(Camera, "Video track updated from remote peer");
-        SetVideoTrack(track);
-    }
-    else if (track->GetType() == "audio")
-    {
-        ChipLogProgress(Camera, "audio track updated from remote peer");
-        SetAudioTrack(track);
-    }
+    // Only logging the track addition here as it's not used in the current implementation. In future, we can add functionality to
+    // handle
+    ChipLogProgress(Camera, "Remote track added for the sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
 }

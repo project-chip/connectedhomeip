@@ -67,8 +67,7 @@ void PairingSession::Finish()
     {
         // Fetch the connection for the unauthenticated session used to set up
         // the secure session.
-        Transport::ActiveTCPConnectionState * conn =
-            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
+        auto conn = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
 
         // Associate the connection with the secure session being activated.
         mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn);
@@ -302,7 +301,7 @@ void PairingSession::OnSessionReleased()
         return;
     }
 
-    mSessionManager->SystemLayer()->ScheduleWork(
+    TEMPORARY_RETURN_IGNORED mSessionManager->SystemLayer()->ScheduleWork(
         [](auto * systemLayer, auto * appState) -> void {
             ChipLogError(Inet, "ASYNC CASE Session establishment failed");
             auto * _this = static_cast<PairingSession *>(appState);

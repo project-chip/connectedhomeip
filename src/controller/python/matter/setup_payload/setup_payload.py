@@ -180,3 +180,7 @@ class SetupPayload:
     @property
     def supports_on_network_commissioning(self) -> bool:
         return (self.rendezvous_information & 0b100) != 0
+
+    @property
+    def supports_nfc_commissioning(self) -> bool:
+        return (self.rendezvous_information & 0b10000) != 0
