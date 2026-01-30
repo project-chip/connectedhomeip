@@ -73,7 +73,10 @@ public:
         const BitFlags<TimeFormatLocalization::Feature> featureMap(rawFeatureMap);
         FetchDefaults(featureMap, defaultHourFormat, defaultCalendarType);
 
-        gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType);
+        gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType,
+                       TimeFormatLocalizationCluster::Context{
+                           .deviceInfoProvider = *DeviceLayer::GetDeviceInfoProvider(),
+                       });
 
         return gServer.Registration();
     }
