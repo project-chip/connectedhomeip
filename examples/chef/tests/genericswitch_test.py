@@ -78,7 +78,8 @@ class TC_GENERICSWITCH(MatterBaseTest):
     def steps_TC_GENERICSWITCH(self):
         return [
             TestStep(1, "[TC_GENERICSWITCH] Commissioning already done.", is_commissioning=True),
-            TestStep(2, "[TC_GENERICSWITCH] Triple press endpoint feature map.")
+            TestStep(2, "[TC_GENERICSWITCH] Triple press endpoint feature map."),
+            TestStep(3, "[TC_GENERICSWITCH] Triple press endpoint tag list."),
         ]
 
     @async_test_body
@@ -91,6 +92,10 @@ class TC_GENERICSWITCH(MatterBaseTest):
         self.step(2)
         feature_map = await self._read_switch_feature_map(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
         asserts.assert_equal(feature_map, self._SWITCH_TRIPLE_PRESS_FEATURE_MAP)
+
+        self.step(3)
+        tag_list = await self._read_descriptor_semantic_tags()
+        print(tag_list)
 
 
 if __name__ == "__main__":
