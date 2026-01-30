@@ -294,7 +294,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         return None
 
-    async def _verify_discriminator_subtype_advertisements(self, subtypes: list[str], discriminator_ptr_instance_name) -> None:
+    async def _verify_discriminator_subtype_advertisements(self, subtypes: list[str], discriminator_subtype: str, discriminator_ptr_instance_name: str) -> None:
         # Determine discriminator type (Long or Short) to verify
         is_qr_code = self.setup_code_type == SetupCodeType.QR_CODE
         size_txt = "Long" if is_qr_code else "Short"
@@ -304,16 +304,17 @@ class TC_SC_4_1(MatterBaseTest):
         )
 
         # Verify that the Discriminator subtype is present
-        other_discriminator_subtype = next((s for s in subtypes if s.startswith(discriminator_prefix)), None)
-        asserts.assert_is_not_none(other_discriminator_subtype, f"'{size_txt} Discriminator Subtype' must be present.")
+        discriminator_subtypes_list = [s for s in subtypes if s.startswith(discriminator_prefix)]
+        asserts.assert_in(discriminator_subtype, discriminator_subtypes_list,
+                          f"'{size_txt} Discriminator Subtype' must be present.")
 
         # Verify that it contains a valid 12-bit (Long) or 4 bit (Short) variable
         # length decimal number in ASCII text, omitting any leading zeros value
-        assert_valid_discriminator_subtype(other_discriminator_subtype)
+        assert_valid_discriminator_subtype(discriminator_subtype)
 
         # TH performs a PTR record query against the Discriminator subtype (Long or Short)
         ptr_records = await MdnsDiscovery().get_ptr_records(
-            service_types=[other_discriminator_subtype],
+            service_types=[discriminator_subtype],
             log_output=True
         )
 
@@ -325,7 +326,7 @@ class TC_SC_4_1(MatterBaseTest):
         asserts.assert_equal(other_discriminator_ptr.instance_name, discriminator_ptr_instance_name,
                              "Short and Long Discriminator Subtype PTR record's instance names must be equal.")
 
-    async def _verify_commissionable_subtypes(self, discriminator_ptr_instance_name: str, extended_discovery: bool = False) -> None:
+    async def _verify_commissionable_subtypes(self, discriminator_subtype: str, discriminator_ptr_instance_name: str, extended_discovery: bool = False) -> None:
         # Construct CM subtype
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
@@ -333,7 +334,7 @@ class TC_SC_4_1(MatterBaseTest):
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
         # *** LONG/SHORT DISCRIMINATOR SUBTYPE ***
-        await self._verify_discriminator_subtype_advertisements(subtypes, discriminator_ptr_instance_name)
+        await self._verify_discriminator_subtype_advertisements(subtypes, discriminator_subtype, discriminator_ptr_instance_name)
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify the expected presence of the 'In Commissioning Mode Subtype' _CM
@@ -777,7 +778,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 10 ***
             # Verify commissionable subtype advertisements
             self.step(10)
-            await self._verify_commissionable_subtypes(discriminator_ptr_instance_name)
+            await self._verify_commissionable_subtypes(discriminator_subtype, discriminator_ptr_instance_name)
 
             # *** STEP 11 ***
             # Verify SRV record advertisements
