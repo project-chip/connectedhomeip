@@ -40,13 +40,13 @@ cd connectedhomeip
 git config --global --add safe.directory "*"
 python scripts/checkout_submodules.py --shallow --recursive --platform linux
 source ./scripts/bootstrap.sh
-scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env'
+scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env -pw true'
 ```
 
 4. Build chef app -
 
 ```
-./examples/chef/chef.py -b -d {app_name} -t linux
+./examples/chef/chef.py -br -d {app_name} -t linux
 ```
 
 5. Run test file (fill in `app_name` and `test_file`) -
@@ -57,13 +57,13 @@ scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py 
 
 ## Libraries
 
--   [cluster objects](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
--   [matter_testing_infrastructure](https://github.com/project-chip/connectedhomeip/tree/master/src/python_testing/matter_testing_infrastructure)
-    Python test utilities
-    -   [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py)
-        MatterBaseTest base class for tests.
--   [Python Matter controller libraries](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/matter)
-    -   [Matter Device Controller interface](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/ChipDeviceCtrl.py)
--   PwRPC:
-    -   [Protos](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/protos)
-    -   [Device connection utils](https://github.com/google/pigweed/tree/1baea6bc0ee4afe955a834d17177d7be5418900a/pw_system/py/pw_system)
+- [cluster objects](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
+- [matter_testing_infrastructure](https://github.com/project-chip/connectedhomeip/tree/master/src/python_testing/matter_testing_infrastructure)
+  Python test utilities
+    - [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py)
+      MatterBaseTest base class for tests.
+- [Python Matter controller libraries](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python/matter)
+    - [Matter Device Controller interface](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/ChipDeviceCtrl.py)
+- PwRPC:
+    - [Protos](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/protos)
+    - [Device connection utils](https://github.com/google/pigweed/tree/1baea6bc0ee4afe955a834d17177d7be5418900a/pw_system/py/pw_system)

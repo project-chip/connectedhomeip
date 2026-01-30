@@ -1,0 +1,89 @@
+#
+#    Copyright (c) 2026 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+import logging
+
+from actions_service import actions_service_pb2
+from mobly import asserts
+from pw_hdlc import rpc
+from pw_system.device_connection import create_device_serial_or_socket_connection
+
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
+
+logger = logging.getLogger(__name__)
+
+
+class TC_GENERICSWITCH(MatterBaseTest):
+    """Tests for chef rootnode_genericswitch_9866e35d0b device."""
+
+    # Switch endpoint that supports triple press
+    _SWITCH_TRIPLE_PRESS_ENDPOINT = 1
+
+    # Switch endpoint that supports single press only
+    _SWITCH_SINGLE_PRESS_ENDPOINT = 2
+
+    _PW_RPC_SOCKET_ADDR = "0.0.0.0:33000"
+    _PW_RPC_BAUD_RATE = 115200
+
+    async def _read_switch_feature_map(endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=Clusters.Objects.Switch,
+            attribute=Clusters.Objects.Switch.Attributes.FeatureMap
+        )
+
+    async def _read_switch_number_of_positions(endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=Clusters.Objects.Switch,
+            attribute=Clusters.Objects.Switch.Attributes.NumberOfPositions
+        )
+
+    async def _read_descriptor_semantic_tags(endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=Clusters.Objects.Descriptor,
+            attribute=Clusters.Objects.Descriptor.Attributes.TagList
+        )
+
+    async def _inject_switch_events(endpoint, actions: list):
+        result = device.rpcs.chip.rpc.Actions.Set(
+            endpoint_id=endpoint,
+            cluster_id=Clusters.Objects.Switch.id,
+            actions=actions,
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+
+    def desc_TC_GENERICSWITCH(self) -> str:
+        return "[TC_GENERICSWITCH] chef genericswitch functionality test."
+
+    def steps_TC_GENERICSWITCH(self):
+        return [TestStep(1, "[TC_GENERICSWITCH] Commissioning already done.", is_commissioning=True)]
+
+    @async_test_body
+    async def test_TC_GENERICSWITCH(self):
+        """Run all steps."""
+
+        self.step(1)
+        # Commissioning already done.
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
