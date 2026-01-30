@@ -242,7 +242,7 @@ TEST_F(TestGroupsCluster, TestAddGroupMaxGroups)
     // Now GroupInfo table is full. GroupKey table is also full.
     // Try to add the extra group. This will fail KeyExists check because we cannot add a GroupKey entry.
     auto extraGroupId = static_cast<GroupId>(max_groups + 1);
-    auto result          = InvokeAddGroup(extraGroupId, "Max Group");
+    auto result       = InvokeAddGroup(extraGroupId, "Max Group");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
