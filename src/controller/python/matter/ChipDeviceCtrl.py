@@ -639,7 +639,8 @@ class ChipDeviceControllerBase():
         return self._isActive
 
     def setCommissioningStatusUpdateCallback(self, commissioning_status_callback: _DevicePairingDelegate_OnCommissioningStatusUpdateFunct):
-        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(self.pairingDelegate, commissioning_status_callback)
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+            self.pairingDelegate, commissioning_status_callback)
 
     def setCommissioningStageStartCallback(self, callback: _DevicePairingDelegate_OnCommissioningStageStartFunct):
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(self.pairingDelegate, callback)

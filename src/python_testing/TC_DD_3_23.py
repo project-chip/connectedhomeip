@@ -55,8 +55,8 @@ class TC_DD_3_23(MatterBaseTest):
                 stage = stage.decode("utf-8", errors="replace")
 
             log.info(
-                    f"[_stage_start_listener] node=0x{node_id:X}, stage={stage}"
-                )
+                f"[_stage_start_listener] node=0x{node_id:X}, stage={stage}"
+            )
 
             self.commissionee_node_id = node_id
 
@@ -67,7 +67,6 @@ class TC_DD_3_23(MatterBaseTest):
             if stage == "SendComplete":
                 log.info("Detected 'SendComplete' commissioning stage")
                 self.send_complete_seen = True
-
 
         self._commissioning_stage_start_callback = _DevicePairingDelegate_OnCommissioningStageStartFunct(
             _stage_start_listener
