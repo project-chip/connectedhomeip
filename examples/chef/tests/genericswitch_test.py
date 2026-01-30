@@ -35,6 +35,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
     # Switch endpoint that supports triple press
     _SWITCH_TRIPLE_PRESS_ENDPOINT = 1
+    _SWITCH_TRIPLE_PRESS_FEATURE_MAP = 30
 
     # Switch endpoint that supports single press only
     _SWITCH_SINGLE_PRESS_ENDPOINT = 2
@@ -75,7 +76,10 @@ class TC_GENERICSWITCH(MatterBaseTest):
         return "[TC_GENERICSWITCH] chef genericswitch functionality test."
 
     def steps_TC_GENERICSWITCH(self):
-        return [TestStep(1, "[TC_GENERICSWITCH] Commissioning already done.", is_commissioning=True)]
+        return [
+            TestStep(1, "[TC_GENERICSWITCH] Commissioning already done.", is_commissioning=True),
+            TestStep(2, "[TC_GENERICSWITCH] Triple press endpoint feature map.")
+        ]
 
     @async_test_body
     async def test_TC_GENERICSWITCH(self):
@@ -83,6 +87,12 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
         self.step(1)
         # Commissioning already done.
+
+        self.step(2)
+        asserts.assert_equal(
+            self._read_switch_feature_map(self._SWITCH_TRIPLE_PRESS_ENDPOINT),
+            _SWITCH_TRIPLE_PRESS_FEATURE_MAP
+        )
 
 
 if __name__ == "__main__":
