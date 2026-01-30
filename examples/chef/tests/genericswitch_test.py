@@ -94,14 +94,20 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
     def steps_TC_GENERICSWITCH(self):
         return [
-            TestStep(1, "[TC_GENERICSWITCH] Commissioning already done.", is_commissioning=True),
-            TestStep(2, "[TC_GENERICSWITCH] Triple press endpoint feature map."),
+            TestStep(
+                1, "[TC_GENERICSWITCH] Commissioning already done.", is_commissioning=True),
+            TestStep(
+                2, "[TC_GENERICSWITCH] Triple press endpoint feature map."),
             TestStep(3, "[TC_GENERICSWITCH] Triple press endpoint tag list."),
-            TestStep(4, "[TC_GENERICSWITCH] Triple press endpoint number of positions."),
-            TestStep(5, "[TC_GENERICSWITCH] Single press endpoint feature map."),
+            TestStep(
+                4, "[TC_GENERICSWITCH] Triple press endpoint number of positions."),
+            TestStep(
+                5, "[TC_GENERICSWITCH] Single press endpoint feature map."),
             TestStep(6, "[TC_GENERICSWITCH] Single press endpoint tag list."),
-            TestStep(7, "[TC_GENERICSWITCH] Single press endpoint number of positions."),
-            TestStep(8, "[TC_GENERICSWITCH] Test switch press events via RPC injection.")
+            TestStep(
+                7, "[TC_GENERICSWITCH] Single press endpoint number of positions."),
+            TestStep(
+                8, "[TC_GENERICSWITCH] Test switch press events via RPC injection.")
         ]
 
     @async_test_body
@@ -113,7 +119,8 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
         self.step(2)
         feature_map = await self._read_switch_feature_map(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
-        asserts.assert_equal(feature_map, self._SWITCH_TRIPLE_PRESS_FEATURE_MAP)
+        asserts.assert_equal(
+            feature_map, self._SWITCH_TRIPLE_PRESS_FEATURE_MAP)
 
         self.step(3)
         tag_list = await self._read_descriptor_semantic_tags(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
@@ -128,7 +135,8 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
         self.step(5)
         feature_map = await self._read_switch_feature_map(self._SWITCH_SINGLE_PRESS_ENDPOINT)
-        asserts.assert_equal(feature_map, self._SWITCH_SINGLE_PRESS_FEATURE_MAP)
+        asserts.assert_equal(
+            feature_map, self._SWITCH_SINGLE_PRESS_FEATURE_MAP)
 
         self.step(6)
         tag_list = await self._read_descriptor_semantic_tags(self._SWITCH_SINGLE_PRESS_ENDPOINT)
@@ -157,8 +165,10 @@ class TC_GENERICSWITCH(MatterBaseTest):
         with device_connection as device:
             logger.info("Started Pw socket connection.")
 
-            logger.info("Testing events on Endpoint %d", self._SWITCH_TRIPLE_PRESS_ENDPOINT)
-            events_callback_1 = EventSubscriptionHandler(expected_cluster=Clusters.Objects.Switch)
+            logger.info("Testing events on Endpoint %d",
+                        self._SWITCH_TRIPLE_PRESS_ENDPOINT)
+            events_callback_1 = EventSubscriptionHandler(
+                expected_cluster=Clusters.Objects.Switch)
             await events_callback_1.start(
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
@@ -203,17 +213,24 @@ class TC_GENERICSWITCH(MatterBaseTest):
                 ]
             )
             logger.info("Injected multi press events.")
-            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.InitialPress)
-            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.ShortRelease)
-            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressOngoing)
-            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.ShortRelease)
-            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressComplete)
+            events_callback_1.wait_for_event_report(
+                Clusters.Objects.Switch.Events.InitialPress)
+            events_callback_1.wait_for_event_report(
+                Clusters.Objects.Switch.Events.ShortRelease)
+            events_callback_1.wait_for_event_report(
+                Clusters.Objects.Switch.Events.MultiPressOngoing)
+            events_callback_1.wait_for_event_report(
+                Clusters.Objects.Switch.Events.ShortRelease)
+            events_callback_1.wait_for_event_report(
+                Clusters.Objects.Switch.Events.MultiPressComplete)
             logger.info("Multi press events verified.")
             events_callback_1.reset()
             events_callback_1.cancel()
 
-            logger.info("Testing events on Endpoint %d", self._SWITCH_SINGLE_PRESS_ENDPOINT)
-            events_callback_2 = EventSubscriptionHandler(expected_cluster=Clusters.Objects.Switch)
+            logger.info("Testing events on Endpoint %d",
+                        self._SWITCH_SINGLE_PRESS_ENDPOINT)
+            events_callback_2 = EventSubscriptionHandler(
+                expected_cluster=Clusters.Objects.Switch)
             await events_callback_2.start(
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
@@ -232,7 +249,8 @@ class TC_GENERICSWITCH(MatterBaseTest):
                 ]
             )
             logger.info("Injected initial press.")
-            events_callback_2.wait_for_event_report(Clusters.Objects.Switch.Events.InitialPress)
+            events_callback_2.wait_for_event_report(
+                Clusters.Objects.Switch.Events.InitialPress)
             logger.info("Initial press events verified.")
             events_callback_2.reset()
             events_callback_2.cancel()
