@@ -619,10 +619,14 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
     CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
     if (mWindowStatus != aNewStatus)
     {
+        const bool open     = (aNewStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
+        const bool enhanced = (open ? (aNewStatus == CommissioningWindowStatusEnum::kEnhancedWindowOpen)
+                                    : (mWindowStatus == CommissioningWindowStatusEnum::kEnhancedWindowOpen));
+
         mWindowStatus = aNewStatus;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlag::kCommissioningWindowOpen;
-        if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
+        if (open)
         {
             app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(request);
         }
@@ -631,6 +635,9 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
             app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(request);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+        TEMPORARY_RETURN_IGNORED DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCommissioningWindowChangedEvent(open,
+                                                                                                                          enhanced);
     }
 
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
