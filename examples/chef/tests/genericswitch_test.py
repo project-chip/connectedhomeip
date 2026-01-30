@@ -163,7 +163,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
                 node_id=self.dut_node_id,
                 endpoint=self._SWITCH_TRIPLE_PRESS_ENDPOINT,
             )
-            self._inject_switch_events(
+            self._inject_switch_events(  # A sequence of events simulating double press.
                 device,
                 self._SWITCH_TRIPLE_PRESS_ENDPOINT,
                 actions=[
@@ -207,6 +207,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
             events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressOngoing)
             events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.ShortRelease)
             events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressComplete)
+            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.LongRelease)
             events_callback_1.cancel()
 
 
