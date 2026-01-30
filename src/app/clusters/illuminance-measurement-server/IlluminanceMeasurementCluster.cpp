@@ -25,7 +25,8 @@ using namespace IlluminanceMeasurement::Attributes;
 IlluminanceMeasurementCluster::IlluminanceMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
+    DefaultServerCluster({ endpointId, IlluminanceMeasurement::Id }),
+    mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
 {}
 
 DataModel::ActionReturnStatus IlluminanceMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
