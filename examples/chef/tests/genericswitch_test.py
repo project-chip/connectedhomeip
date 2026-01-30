@@ -171,12 +171,42 @@ class TC_GENERICSWITCH(MatterBaseTest):
                         type=actions_service_pb2.ActionType.EMIT_EVENT,
                         delayMs=0,
                         actionId=Clusters.Objects.Switch.Events.InitialPress.event_id,
-                        arg1=1,  # Position = 1
+                        arg1=1,  # New Position = 1
+                    ),
+                    actions_service_pb2.Action(
+                        type=actions_service_pb2.ActionType.EMIT_EVENT,
+                        delayMs=10,
+                        actionId=Clusters.Objects.Switch.Events.ShortRelease.event_id,
+                        arg1=1,  # Previous Position = 1
+                    ),
+                    actions_service_pb2.Action(
+                        type=actions_service_pb2.ActionType.EMIT_EVENT,
+                        delayMs=10,
+                        actionId=Clusters.Objects.Switch.Events.MultiPressOngoing.event_id,
+                        arg1=1,  # New Position = 1
+                        arg2=2,  # number of presses
+                    ),
+                    actions_service_pb2.Action(
+                        type=actions_service_pb2.ActionType.EMIT_EVENT,
+                        delayMs=10,
+                        actionId=Clusters.Objects.Switch.Events.ShortRelease.event_id,
+                        arg1=1,  # Previous Position = 1
+                    ),
+                    actions_service_pb2.Action(
+                        type=actions_service_pb2.ActionType.EMIT_EVENT,
+                        delayMs=100,
+                        actionId=Clusters.Objects.Switch.Events.MultiPressComplete.event_id,
+                        arg1=1,  # Prrevious Position = 1
+                        arg2=2,  # number of presses
                     ),
                 ]
             )
-            logger.info("Injected initial press event.")
+            logger.info("Injected multi press events.")
             events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.InitialPress)
+            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.ShortRelease)
+            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressOngoing)
+            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.ShortRelease)
+            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressComplete)
             events_callback_1.cancel()
 
 
