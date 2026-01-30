@@ -305,6 +305,11 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     AddICDKeyToAdvertisement(advertiseParameters);
 #endif
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    advertiseParameters.SetTCPSupportModes(mTCPServerEnabled ? chip::Dnssd::TCPModeAdvertise::kTCPClientServer
+                                                               : chip::Dnssd::TCPModeAdvertise::kTCPClient);
+#endif
+
     if (commissionableNode)
     {
         uint16_t discriminator = 0;
