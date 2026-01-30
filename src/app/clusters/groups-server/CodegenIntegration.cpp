@@ -21,11 +21,11 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/CodegenIntegration.h>
+#include <app/clusters/scenes-server/CodegenIntegration.h> // nogncheck
 #endif
 
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
-#include <app/clusters/identify-server/CodegenIntegration.h>
+#include <app/clusters/identify-server/CodegenIntegration.h> // nogncheck
 #endif
 
 using namespace chip;
