@@ -48,6 +48,7 @@ if sys.platform == 'darwin':
 
 log = logging.getLogger(__name__)
 
+
 class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
     SKIP = enum.auto()
