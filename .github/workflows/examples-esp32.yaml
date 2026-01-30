@@ -126,6 +126,10 @@ jobs:
                     - 'src/app/clusters/electrical-power-measurement-server/**'
                     - 'src/app/clusters/energy-evse-server/**'
                     - 'src/app/clusters/power-topology-server/**'
+                  camera:
+                    - 'examples/camera-app/**'
+                    - 'src/app/clusters/camera-av-stream-management-server/**'
+                    - 'src/app/clusters/webrtc-transport-provider-server/**'
 
             - name: Build example All Clusters App(Target:ESP32, pigweed RPC, IPv6 Only)
               if: steps.changed_paths.outputs.pigweed == 'true'
@@ -146,6 +150,11 @@ jobs:
                 scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
 
+            - name: Build example Camera App
+              if: steps.changed_paths.outputs.camera == 'true'
+              run: |
+                scripts/examples/esp_example.sh camera-app sdkconfig.defaults esp32c6
+                rm -rf examples/camera-app/esp32/{build,managed_components}
 
             - name: Build example Lighting App (external platform)
               run: |
@@ -192,6 +201,9 @@ jobs:
 
             - name: Build example Bridge App
               run: scripts/examples/esp_example.sh bridge-app
+
+            - name: Build example Camera App
+              run: scripts/examples/esp_example.sh camera-app sdkconfig.defaults esp32c6
 
             - name: Build example Persistent Storage App
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
