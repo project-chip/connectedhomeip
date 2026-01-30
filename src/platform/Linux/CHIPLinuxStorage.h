@@ -37,27 +37,9 @@
 #include <platform/Linux/CHIPLinuxStorageIni.h>
 #include <string>
 
-#ifndef FATCONFDIR
-#define FATCONFDIR "/tmp"
-#endif
-
-#ifndef SYSCONFDIR
-#define SYSCONFDIR "/tmp"
-#endif
-
-#ifndef LOCALSTATEDIR
-#define LOCALSTATEDIR "/tmp"
-#endif
-
-#define CHIP_DEFAULT_FACTORY_PATH                                                                                                  \
-    FATCONFDIR "/"                                                                                                                 \
-               "chip_factory.ini"
-#define CHIP_DEFAULT_CONFIG_PATH                                                                                                   \
-    SYSCONFDIR "/"                                                                                                                 \
-               "chip_config.ini"
-#define CHIP_DEFAULT_DATA_PATH                                                                                                     \
-    LOCALSTATEDIR "/"                                                                                                              \
-                  "chip_counters.ini"
+#define CHIP_DEFAULT_FACTORY_FILE_NAME "chip_factory.ini"
+#define CHIP_DEFAULT_CONFIG_FILE_NAME "chip_config.ini"
+#define CHIP_DEFAULT_DATA_FILE_NAME "chip_counters.ini"
 
 namespace chip {
 namespace DeviceLayer {
