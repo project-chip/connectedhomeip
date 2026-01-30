@@ -130,7 +130,7 @@ class TC_TLSCLIENT_3_1(TC_TLSCLIENT_Base):
         response = await cr2_cmd.send_csr_command(nonce=my_nonce[1])
         cr2_cmd.assert_valid_ccdid(response.ccdid)
         my_ccdid[1] = response.ccdid
-        my_csr[1] = cr1_cmd.assert_valid_csr(response, my_nonce[1])
+        my_csr[1] = cr2_cmd.assert_valid_csr(response, my_nonce[1])
 
         self.step(12)
         my_client_cert = [None, None]
