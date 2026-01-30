@@ -43,28 +43,28 @@ class TC_GENERICSWITCH(MatterBaseTest):
     _PW_RPC_SOCKET_ADDR = "0.0.0.0:33000"
     _PW_RPC_BAUD_RATE = 115200
 
-    async def _read_switch_feature_map(endpoint):
+    async def _read_switch_feature_map(self, endpoint):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.Objects.Switch,
             attribute=Clusters.Objects.Switch.Attributes.FeatureMap
         )
 
-    async def _read_switch_number_of_positions(endpoint):
+    async def _read_switch_number_of_positions(self, endpoint):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.Objects.Switch,
             attribute=Clusters.Objects.Switch.Attributes.NumberOfPositions
         )
 
-    async def _read_descriptor_semantic_tags(endpoint):
+    async def _read_descriptor_semantic_tags(self, endpoint):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.Objects.Descriptor,
             attribute=Clusters.Objects.Descriptor.Attributes.TagList
         )
 
-    async def _inject_switch_events(endpoint, actions: list):
+    async def _inject_switch_events(self, endpoint, actions: list):
         result = device.rpcs.chip.rpc.Actions.Set(
             endpoint_id=endpoint,
             cluster_id=Clusters.Objects.Switch.id,
