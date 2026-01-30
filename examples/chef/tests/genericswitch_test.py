@@ -36,6 +36,10 @@ class TC_GENERICSWITCH(MatterBaseTest):
     # Switch endpoint that supports triple press
     _SWITCH_TRIPLE_PRESS_ENDPOINT = 1
     _SWITCH_TRIPLE_PRESS_FEATURE_MAP = 30
+    _SWITCH_TRIPLE_PRESS_TAG_LIST = [
+        Clusters.Objects.Globals.Structs.SemanticTagStruct(mfgCode=Null, namespaceID=8, tag=2, label=None),
+        Clusters.Objects.Globals.Structs.SemanticTagStruct(mfgCode=Null, namespaceID=7, tag=1, label=None)
+    ]
 
     # Switch endpoint that supports single press only
     _SWITCH_SINGLE_PRESS_ENDPOINT = 2
@@ -95,7 +99,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
         self.step(3)
         tag_list = await self._read_descriptor_semantic_tags(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
-        print(tag_list)
+        asserts.assert_equal(tag_list, self._SWITCH_TRIPLE_PRESS_TAG_LIST)
 
 
 if __name__ == "__main__":
