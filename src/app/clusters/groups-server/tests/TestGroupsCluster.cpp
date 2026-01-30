@@ -145,13 +145,6 @@ protected:
     std::unique_ptr<ClusterTester> mClusterTester;
 };
 
-// Test to ensure the basic test harness and cluster instantiation works.
-TEST_F(TestGroupsCluster, TestTrivial)
-{
-    GroupsCluster cluster(kTestEndpointId, { .groupDataProvider = mGroupDataProvider });
-    ASSERT_TRUE(true);
-}
-
 // Tests reading the mandatory attributes of the Groups cluster.
 // Verifies FeatureMap (must support GroupNames), NameSupport (bit 7 must be 1),
 // and ClusterRevision attributes are present and correct.

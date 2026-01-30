@@ -159,13 +159,13 @@ CHIP_ERROR LoggingOnOffLightDevice::Register(chip::EndpointId endpoint, CodeDriv
     mOnOffCluster.Cluster().AddDelegate(&mOnOffDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOnOffCluster.Registration()));
 
-    mGropupsCluster.Create(endpoint,
-                           GroupsCluster::Context{
-                               .groupDataProvider   = mContext.groupDataProvider,
-                               .scenesIntegration   = &mScenesManagementCluster.Cluster(),
-                               .identifyIntegration = &mIdentifyCluster.Cluster(),
-                           });
-    ReturnErrorOnFailure(provider.AddCluster(mGropupsCluster.Registration()));
+    mGroupsCluster.Create(endpoint,
+                          GroupsCluster::Context{
+                              .groupDataProvider   = mContext.groupDataProvider,
+                              .scenesIntegration   = &mScenesManagementCluster.Cluster(),
+                              .identifyIntegration = &mIdentifyCluster.Cluster(),
+                          });
+    ReturnErrorOnFailure(provider.AddCluster(mGroupsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
 }
@@ -174,10 +174,10 @@ void LoggingOnOffLightDevice::UnRegister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
 
-    if (mGropupsCluster.IsConstructed())
+    if (mGroupsCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mGropupsCluster.Cluster()));
-        mGropupsCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupsCluster.Cluster()));
+        mGroupsCluster.Destroy();
     }
 
     if (mOnOffCluster.IsConstructed())

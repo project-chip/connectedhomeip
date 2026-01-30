@@ -78,7 +78,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
-    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGropupsCluster;
+    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGroupsCluster;
 };
 
 } // namespace chip::app
