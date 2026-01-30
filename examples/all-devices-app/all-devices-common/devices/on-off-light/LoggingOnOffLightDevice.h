@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <app/clusters/groups-server/GroupsCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/on-off-server/OnOffLightingCluster.h>
@@ -27,34 +28,32 @@
 
 namespace chip::app {
 
-class LoggingOnOffLightDevice : public SingleEndpointDevice
-{
+class LoggingOnOffLightDevice : public SingleEndpointDevice {
 public:
-    struct Context
-    {
+    struct Context {
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
     };
 
-    LoggingOnOffLightDevice(const Context & context) :
-        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1)), mContext(context)
-    {}
+    LoggingOnOffLightDevice(const Context & context)
+        : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1))
+        , mContext(context)
+    {
+    }
     ~LoggingOnOffLightDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+        EndpointId parentId = kInvalidEndpointId) override;
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    class OnOffDelegate : public Clusters::OnOffDelegate
-    {
+    class OnOffDelegate : public Clusters::OnOffDelegate {
         void OnOffStartup(bool on) override;
         void OnOnOffChanged(bool on) override;
     };
 
-    class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
-    {
+    class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider {
     public:
         Clusters::ScenesManagementSceneTable * Take() override
         {
@@ -77,6 +76,7 @@ private:
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OnOffLightingCluster> mOnOffCluster;
     LazyRegisteredServerCluster<Clusters::ScenesManagementCluster> mScenesManagementCluster;
+    LazyRegisteredServerCluster<Clusters::GroupsCluster> mGropupsCluster;
 };
 
 } // namespace chip::app
