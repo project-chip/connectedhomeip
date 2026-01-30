@@ -20,7 +20,7 @@
 
 #include <Options.h>
 #include <lib/core/DataModelTypes.h>
-#include <string>
+#include <platform/CHIPDeviceConfig.h>
 
 class AppOptions
 {
@@ -31,10 +31,13 @@ public:
 
     static chip::EndpointId GetDeviceEndpoint() { return mDeviceEndpoint; }
 
+    static bool EnableWiFi() { return mEnableWiFi; }
+
 private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
     static const char * mDeviceTypeName;
     static chip::EndpointId mDeviceEndpoint;
+    static bool mEnableWiFi;
 };
