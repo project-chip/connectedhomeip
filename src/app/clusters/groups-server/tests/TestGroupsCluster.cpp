@@ -226,7 +226,7 @@ TEST_F(TestGroupsCluster, TestAddGroupMaxGroups)
     // Fill up the group table and group key map up to max_groups
     for (uint16_t i = 0; i < max_groups; ++i)
     {
-        GroupId kGroupId = static_cast<GroupId>(i + 1);
+        auto kGroupId = static_cast<GroupId>(i + 1);
 
         MapGroupToKeyset(kFabricIndex1, kGroupId, kKeysetId, i);
 
@@ -241,7 +241,7 @@ TEST_F(TestGroupsCluster, TestAddGroupMaxGroups)
 
     // Now GroupInfo table is full. GroupKey table is also full.
     // Try to add the extra group. This will fail KeyExists check because we cannot add a GroupKey entry.
-    GroupId extraGroupId = static_cast<GroupId>(max_groups + 1);
+    auto extraGroupId = static_cast<GroupId>(max_groups + 1);
     auto result          = InvokeAddGroup(extraGroupId, "Max Group");
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
@@ -674,7 +674,7 @@ TEST_F(TestGroupsCluster, TestAddGroupIfIdentifying_ResourceExhausted)
     // Fill up the group table and group key map up to max_groups
     for (uint16_t i = 0; i < max_groups; ++i)
     {
-        GroupId kGroupId = static_cast<GroupId>(i + 1);
+        auto kGroupId = static_cast<GroupId>(i + 1);
         MapGroupToKeyset(kFabricIndex1, kGroupId, kKeysetId, i);
         StringBuilder<16> groupName;
         groupName.AddFormat("Group %d", i);
@@ -686,8 +686,9 @@ TEST_F(TestGroupsCluster, TestAddGroupIfIdentifying_ResourceExhausted)
     // Now GroupInfo table is full. GroupKey table is also full.
     // Try to add the extra group while identifying.
     mIdentifyDelegate.SetIsIdentifying(true);
-    GroupId extraGroupId = static_cast<GroupId>(max_groups + 1);
-    MapGroupToKeyset(kFabricIndex1, extraGroupId, kKeysetId, 0); // Map the key for the extra group
+    auto extraGroupId = static_cast<GroupId>(max_groups + 1);
+    // Map key - this overwrites the group index 0, but is required to make it seem like the group is valid
+    MapGroupToKeyset(kFabricIndex1, extraGroupId, kKeysetId, 0);
     Groups::Commands::AddGroupIfIdentifying::Type request;
     request.groupID   = extraGroupId;
     request.groupName = "Max Group"_span;
