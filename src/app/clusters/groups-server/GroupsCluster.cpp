@@ -258,11 +258,8 @@ std::optional<DataModel::ActionReturnStatus> GroupsCluster::InvokeCommand(const 
         AddGroupIfIdentifying::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments, request.GetAccessingFabricIndex()));
 
-        if ((mIdentifyIntegration == nullptr) || !mIdentifyIntegration->IsIdentifying())
-        {
-            // skip with success if we are not identifying
-            return Status::Success;
-        }
+        // skip with success if we are not identifying
+        VerifyOrReturnValue((mIdentifyIntegration != nullptr) && mIdentifyIntegration->IsIdentifying(), Status::Success);
 
         // AddGroupIfIdentifying is response `Y` in the spec: we return the status (not a structure, as opposed to AddGroup)
         return AddGroup(request_data.groupID, request_data.groupName, request.GetAccessingFabricIndex());
