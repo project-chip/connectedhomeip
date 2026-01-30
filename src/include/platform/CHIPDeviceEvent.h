@@ -202,6 +202,11 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
+     *  Indicates that there has been a change in the commissioning window status.
+     */
+    kCommissioningWindowStatusChanged,
+
+    /**
      * Commissioning has completed by a call to the general commissioning cluster command.
      */
     kCommissioningComplete,
