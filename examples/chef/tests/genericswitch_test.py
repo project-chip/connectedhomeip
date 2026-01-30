@@ -89,8 +89,9 @@ class TC_GENERICSWITCH(MatterBaseTest):
         # Commissioning already done.
 
         self.step(2)
+        feature_map = await self._read_switch_feature_map(self._SWITCH_TRIPLE_PRESS_ENDPOINT)
         asserts.assert_equal(
-            self._read_switch_feature_map(self._SWITCH_TRIPLE_PRESS_ENDPOINT).value,
+            feature_map.value,
             self._SWITCH_TRIPLE_PRESS_FEATURE_MAP
         )
 
