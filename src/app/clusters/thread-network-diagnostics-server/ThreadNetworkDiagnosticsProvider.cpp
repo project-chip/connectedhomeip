@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,10 +33,7 @@
 
 using namespace chip::DeviceLayer;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ThreadNetworkDiagnostics {
+namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
@@ -725,144 +722,14 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     case Attributes::Rloc16::Id:
         err = encoder.EncodeNull();
         break;
-    case Attributes::OverrunCount::Id:
-        err = encoder.Encode(static_cast<uint64_t>(0));
-        break;
-    case Attributes::DetachedRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::ChildRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::RouterRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::LeaderRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::AttachAttemptCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::PartitionIdChangeCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::BetterPartitionAttachAttemptCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::ParentChangeCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case Attributes::TxTotalCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxUnicastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxBroadcastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxAckRequestedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxAckedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxNoAckRequestedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxDataCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxDataPollCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxBeaconCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxBeaconRequestCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxOtherCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxRetryCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxDirectMaxRetryExpiryCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxIndirectMaxRetryExpiryCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxErrCcaCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxErrAbortCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::TxErrBusyChannelCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxTotalCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxUnicastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxBroadcastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxDataCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxDataPollCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxBeaconCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxBeaconRequestCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxOtherCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxAddressFilteredCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxDestAddrFilteredCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxDuplicatedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxErrNoFrameCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxErrUnknownNeighborCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxErrInvalidSrcAddrCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxErrSecCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxErrFcsCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case Attributes::RxErrOtherCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
     default:
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        // The remaining attributes are generally unsigned integers.
+        // We rely here on TLV encoding 0 of any type to a the same numeric 0
+        err = encoder.Encode<uint32_t>(0u);
         break;
     }
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     return err;
 }
 
-} // namespace ThreadNetworkDiagnostics
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ThreadNetworkDiagnostics
