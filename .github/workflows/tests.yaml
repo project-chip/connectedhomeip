@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -297,6 +297,7 @@ jobs:
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-${BUILD_VARIANT} \
                         --target linux-x64-evse-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
@@ -312,6 +313,7 @@ jobs:
                    -DCMAKE_BUILD_TYPE=Debug \
                    -DOTBR_BORDER_ROUTING=ON \
                    -DOTBR_MDNS=openthread \
+                   -DOT_POSIX_SETTINGS_PATH='\"tmp\"' \
                    -DOT_FIREWALL=OFF \
                    -DOT_LOG_LEVEL=INFO \
                    -DOT_TREL=OFF \
@@ -345,6 +347,9 @@ jobs:
                      "
 
             - name: Run BLE-Thread commissioning test
+              # Disabled due to flakyness. See:
+              # https://github.com/project-chip/connectedhomeip/issues/42869
+              if: false
               env:
                 # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
                 # The reason for that is BlueZ and WPA supplicant integration which involves GIO
@@ -377,6 +382,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -446,6 +452,7 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -470,6 +477,7 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -542,7 +550,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -596,6 +604,7 @@ jobs:
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-evse-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -623,6 +632,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -728,7 +738,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -778,7 +788,7 @@ jobs:
             - name: Build linux-x64-all-devices
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-all-devices-tsan-clang-test
+                  --target linux-x64-all-devices-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-all-devices-tsan-clang-test"
 
@@ -971,7 +981,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:182
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -990,7 +1000,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
@@ -1010,7 +1020,7 @@ jobs:
                   # keep-sorted: start
                   echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
-                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-tsan-clang-test/all-devices-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-tsan-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
@@ -1121,7 +1131,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils

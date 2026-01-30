@@ -14,9 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "groups-server.h"
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
