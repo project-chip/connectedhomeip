@@ -56,8 +56,7 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
         BitFlags<TimeFormatLocalization::Feature> features{ 0 };
 
         TimeFormatLocalizationCluster onlyMandatory(kRootEndpointId, features, TimeFormatLocalization::HourFormatEnum::k12hr,
-                                                    TimeFormatLocalization::CalendarTypeEnum::kBuddhist,
-                                                    clusterContext);
+                                                    TimeFormatLocalization::CalendarTypeEnum::kBuddhist, clusterContext);
 
         // Test attributes listing with no features enabled
         ASSERT_TRUE(IsAttributesListEqualTo(onlyMandatory,

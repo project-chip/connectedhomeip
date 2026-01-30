@@ -31,8 +31,7 @@ class AutoReleaseIterator
 public:
     using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
 
-    explicit AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider) :
-        mIterator(provider.IterateSupportedCalendarTypes())
+    explicit AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider) : mIterator(provider.IterateSupportedCalendarTypes())
     {}
     ~AutoReleaseIterator()
     {
@@ -53,8 +52,8 @@ private:
     Iterator * mIterator;
 };
 
-bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar,
-                             DeviceLayer::DeviceInfoProvider & provider, TimeFormatLocalization::CalendarTypeEnum * aValidCalendar = nullptr)
+bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, DeviceLayer::DeviceInfoProvider & provider,
+                             TimeFormatLocalization::CalendarTypeEnum * aValidCalendar = nullptr)
 {
     AutoReleaseIterator it(provider);
     VerifyOrReturnValue(it.IsValid(), false);
@@ -170,8 +169,8 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const Dat
 
         // Using WriteValue directly so we can check that the decoded value is in the supported list
         // before storing it.
-        return DefaultServerCluster::mContext->attributeStorage.WriteValue(request.path,
-                                                     { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
+        return DefaultServerCluster::mContext->attributeStorage.WriteValue(
+            request.path, { reinterpret_cast<const uint8_t *>(&mCalendarType), sizeof(mCalendarType) });
     }
 
     return Protocols::InteractionModel::Status::UnsupportedWrite;
@@ -189,7 +188,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
         return encoder.Encode(mCalendarType);
 
     case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id:
-        return GetSupportedCalendarTypes(encoder,mContext.deviceInfoProvider);
+        return GetSupportedCalendarTypes(encoder, mContext.deviceInfoProvider);
 
     case TimeFormatLocalization::Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);
