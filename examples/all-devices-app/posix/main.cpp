@@ -93,17 +93,17 @@ public:
         mRootNode(
             {
                 .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager       = mContext.configurationManager,       //
-                .deviceControlServer        = mContext.deviceControlServer,        //
-                .fabricTable                = mContext.fabricTable,                //
-                .failSafeContext            = mContext.failSafeContext,            //
-                .platformManager            = mContext.platformManager,            //
-                .groupDataProvider          = mContext.groupDataProvider,          //
-                .sessionManager             = mContext.sessionManager,             //
-                .dnssdServer                = mContext.dnssdServer,                //
+                    .configurationManager   = mContext.configurationManager,       //
+                    .deviceControlServer    = mContext.deviceControlServer,        //
+                    .fabricTable            = mContext.fabricTable,                //
+                    .failSafeContext        = mContext.failSafeContext,            //
+                    .platformManager        = mContext.platformManager,            //
+                    .groupDataProvider      = mContext.groupDataProvider,          //
+                    .sessionManager         = mContext.sessionManager,             //
+                    .dnssdServer            = mContext.dnssdServer,                //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             []() {
@@ -169,19 +169,19 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     static CodeDrivenDataModelDevices devices({
-        .storageDelegate            = *initParams.persistentStorageDelegate,                 //
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-        .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
-        .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-        .fabricTable                = Server::GetInstance().GetFabricTable(),                //
-        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
-        .platformManager            = DeviceLayer::PlatformMgr(),                            //
-        .groupDataProvider          = gGroupDataProvider,                                    //
-        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
-        .dnssdServer                = DnssdServer::Instance(),                               //
+        .storageDelegate                = *initParams.persistentStorageDelegate,                 //
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
+            .groupDataProvider          = gGroupDataProvider,                                    //
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+            .dnssdServer                = DnssdServer::Instance(),                               //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
