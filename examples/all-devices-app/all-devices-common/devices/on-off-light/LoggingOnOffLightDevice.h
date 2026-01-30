@@ -28,32 +28,34 @@
 
 namespace chip::app {
 
-class LoggingOnOffLightDevice : public SingleEndpointDevice {
+class LoggingOnOffLightDevice : public SingleEndpointDevice
+{
 public:
-    struct Context {
+    struct Context
+    {
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
     };
 
-    LoggingOnOffLightDevice(const Context & context)
-        : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1))
-        , mContext(context)
-    {
-    }
+    LoggingOnOffLightDevice(const Context & context) :
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffLight, 1)), mContext(context)
+    {}
     ~LoggingOnOffLightDevice() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointId parentId = kInvalidEndpointId) override;
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    class OnOffDelegate : public Clusters::OnOffDelegate {
+    class OnOffDelegate : public Clusters::OnOffDelegate
+    {
         void OnOffStartup(bool on) override;
         void OnOnOffChanged(bool on) override;
     };
 
-    class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider {
+    class DefaultScenesManagementTableProvider : public Clusters::ScenesManagementTableProvider
+    {
     public:
         Clusters::ScenesManagementSceneTable * Take() override
         {

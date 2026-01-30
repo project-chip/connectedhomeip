@@ -174,7 +174,8 @@ void LoggingOnOffLightDevice::UnRegister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
 
-    if (mGropupsCluster.IsConstructed()) {
+    if (mGropupsCluster.IsConstructed())
+    {
         LogErrorOnFailure(provider.RemoveCluster(&mGropupsCluster.Cluster()));
         mGropupsCluster.Destroy();
     }
