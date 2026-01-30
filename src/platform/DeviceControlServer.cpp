@@ -34,6 +34,30 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
+/**
+ *  @brief
+ *    Post an event that there was a change in the commissioning
+ *    window state.
+ *
+ *  @param[in]  opened
+ *    A Boolean indicating whether the commissioning window opened.
+ *
+ *  @param[in]  enhanced
+ *    A Boolean indicating whether the commissioning window is
+ *    (opened) / was (closed) enhanced.
+ *
+ *  @returns
+ *    CHIP_NO_ERROR on success; otherwise a specific error code.
+ *
+ */
+CHIP_ERROR DeviceControlServer::PostCommissioningWindowChangedEvent(bool opened, bool enhanced)
+{
+    const ChipDeviceEvent event{ .Type                       = DeviceEventType::kCommissioningWindowChanged,
+                                 .CommissioningWindowChanged = { .opened = opened, .enhanced = enhanced } };
+
+    return PlatformMgr().PostEvent(&event);
+}
+
 CHIP_ERROR DeviceControlServer::PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex)
 {
     ChipDeviceEvent event{
