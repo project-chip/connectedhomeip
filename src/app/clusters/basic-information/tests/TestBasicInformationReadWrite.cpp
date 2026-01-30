@@ -145,10 +145,14 @@ private:
 static constexpr size_t kCountryCodeLength = 2;
 static constexpr const char * kUniqueId    = "TEST_UNIQUE_ID_12345";
 // Mock ConfigurationManager for testing
-class MockConfigurationManager : public chip::DeviceLayer::ConfigurationManagerImpl
+class MockConfigurationManager : public chip::DeviceLayer::ConfigurationManager
 {
 public:
+    // ========================================================================
+    // Methods used by the Test Logic
+    // ========================================================================
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override { return SafeCopyString(buf, bufSize, kUniqueId); }
+
     CHIP_ERROR StoreCountryCode(const char * countryCode, size_t countryCodeLen) override
     {
         VerifyOrReturnError(countryCodeLen == kCountryCodeLength, CHIP_ERROR_INVALID_ARGUMENT);
@@ -164,13 +168,106 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    // The following methods does not have implementation on Linux, so we provide
-    // a stub that returns success.
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
+
+    // ========================================================================
+    // Stubs required to satisfy the ConfigurationManager Interface
+    // ========================================================================
+
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+
+    // --- Missing Stubs (Fixes "abstract class" errors) ---
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    void RunUnitTests() override {}
+    bool IsFullyProvisioned() override { return false; }
+    void LogDeviceConfig() override {}
+
+    bool IsCommissionableDeviceTypeEnabled() override { return false; }
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    bool IsCommissionableDeviceNameEnabled() override { return false; }
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetRebootCount(uint32_t & v) override
+    {
+        v = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreRebootCount(uint32_t) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & v) override
+    {
+        v = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetBootReason(uint32_t & v) override
+    {
+        v = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreBootReason(uint32_t) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetRegulatoryLocation(uint8_t & loc) override
+    {
+        loc = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetLocationCapability(uint8_t & cap) override
+    {
+        cap = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetConfigurationVersion(uint32_t & v) override
+    {
+        v = 1;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreConfigurationVersion(uint32_t) override { return CHIP_NO_ERROR; }
+    bool CanFactoryReset() override { return false; }
+    void InitiateFactoryReset() override {}
 
 private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
 };
+
+static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup = nullptr;
 
 class MockDelegate : public BasicInformationCluster::Delegate
 {
@@ -184,13 +281,19 @@ public:
 };
 struct TestBasicInformationReadWrite : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        sDeviceInstanceInfoProviderBackup = DeviceLayer::TestOnlyTryGetDeviceInstanceInfoProvider();
+#endif
+    }
 
     static void TearDownTestSuite()
     {
         // For the DeviceInstanceInfoProvider there is no default instance. Restore the provider that was installed prior to this
         // test suite, if any.
-        if (sDeviceInstanceInfoProviderBackup != nullptr)
+        if (sDeviceInstanceInfoProviderBackup)
         {
             DeviceLayer::SetDeviceInstanceInfoProvider(sDeviceInstanceInfoProviderBackup);
         }
