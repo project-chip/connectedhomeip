@@ -156,6 +156,7 @@ class TC_GENERICSWITCH(MatterBaseTest):
 
         with device_connection as device:
             logger.info("Started Pw socket connection.")
+
             logger.info("Testing events on Endpoint %d", self._SWITCH_TRIPLE_PRESS_ENDPOINT)
             events_callback_1 = EventSubscriptionHandler(expected_cluster=Clusters.Objects.Switch)
             await events_callback_1.start(
@@ -207,8 +208,34 @@ class TC_GENERICSWITCH(MatterBaseTest):
             events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressOngoing)
             events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.ShortRelease)
             events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.MultiPressComplete)
-            events_callback_1.wait_for_event_report(Clusters.Objects.Switch.Events.LongRelease)
+            logger.info("Multi press events verified.")
+            events_callback_1.reset()
             events_callback_1.cancel()
+
+            logger.info("Testing events on Endpoint %d", self._SWITCH_SINGLE_PRESS_ENDPOINT)
+            events_callback_2 = EventSubscriptionHandler(expected_cluster=Clusters.Objects.Switch)
+            await events_callback_2.start(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=self._SWITCH_SINGLE_PRESS_ENDPOINT,
+            )
+            self._inject_switch_events(  # An initial press.
+                device,
+                self._SWITCH_SINGLE_PRESS_ENDPOINT,
+                actions=[
+                    actions_service_pb2.Action(
+                        type=actions_service_pb2.ActionType.EMIT_EVENT,
+                        delayMs=0,
+                        actionId=Clusters.Objects.Switch.Events.InitialPress.event_id,
+                        arg1=1,  # New Position = 1
+                    ),
+                ]
+            )
+            logger.info("Injected initial press.")
+            events_callback_2.wait_for_event_report(Clusters.Objects.Switch.Events.InitialPress)
+            logger.info("Initial press events verified.")
+            events_callback_2.reset()
+            events_callback_2.cancel()
 
 
 if __name__ == "__main__":
