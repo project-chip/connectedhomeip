@@ -167,7 +167,7 @@ not_automated:
     - name: TC_TLSCERT_Base.py
       reason: Shared code for TC_TLSCERT, not a standalone test
     - name: TC_TLSCLIENT_Base.py
-      reason: Shared code for TC_TLSCLIENT, not a standalone test      
+      reason: Shared code for TC_TLSCLIENT, not a standalone test
     - name: TC_DD_1_5.py
       reason:
           No existing app corresponding to the test content (NFC-based
