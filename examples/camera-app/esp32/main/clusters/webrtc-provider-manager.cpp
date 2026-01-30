@@ -289,7 +289,7 @@ WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, 
 
     transport->SetRequestArgs(requestArgs);
 
-        // Store SFrameConfig in Transport base class if provided for later use in frame encryption
+    // Store SFrameConfig in Transport base class if provided for later use in frame encryption
     if (args.sFrameConfig.HasValue())
     {
         transport->sFrameConfig = args.sFrameConfig;

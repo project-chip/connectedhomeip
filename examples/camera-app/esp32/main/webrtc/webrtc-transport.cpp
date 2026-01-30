@@ -15,10 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app-common/zap-generated/cluster-objects.h>
 #include "webrtc-abstract.h"
-#include <lib/support/logging/CHIPLogging.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/Optional.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <webrtc-transport.h>
 
 WebrtcTransport::WebrtcTransport()

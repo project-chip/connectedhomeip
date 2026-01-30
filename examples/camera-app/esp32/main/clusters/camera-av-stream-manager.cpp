@@ -812,7 +812,6 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
 
             ChipLogProgress(Camera, "HAL Snapshot Stream ID %u marked as allocated from persisted state.",
                             halStream.snapshotStreamParams.snapshotStreamID);
-
         }
     }
 
