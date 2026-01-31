@@ -202,6 +202,11 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
+     *  Indicates that there has been a change in the commissioning window state.
+     */
+    kCommissioningWindowChanged,
+
+    /**
      * Commissioning has completed by a call to the general commissioning cluster command.
      */
     kCommissioningComplete,
@@ -536,7 +541,11 @@ struct ChipDeviceEvent final
         {
             InterfaceIpChangeType Type;
         } InterfaceIpAddressChanged;
-
+        struct
+        {
+            bool opened;
+            bool enhanced;
+        } CommissioningWindowChanged;
         struct
         {
             uint64_t nodeId;
