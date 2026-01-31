@@ -12,7 +12,7 @@ NSString * MTRPrivateClusterNameForID(MTRClusterIDType clusterID)
 {
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType)clusterID) {
+    switch ((MTRClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -40,7 +40,7 @@ NSString * MTRPrivateAttributeNameForID(MTRClusterIDType clusterID, MTRAttribute
 {
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType)clusterID) {
+    switch ((MTRClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -84,6 +84,48 @@ NSString * MTRPrivateAttributeNameForID(MTRClusterIDType clusterID, MTRAttribute
 {{/if}}
 {{/if}}
 {{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+        case MTRClusterIDType{{>cluster}}ID:
+
+            switch ((MTRPrivateAttributeIDType)attributeID) {
+
+{{#*inline "attributeIDs"}}
+{{#zcl_attributes_server}}
+{{#if manufacturerCode}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#first}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) isForIds=true)}}
+// Cluster {{> cluster}} attributes
+{{/if}}
+{{/first}}
+{{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
+           (or clusterRef
+               (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)))}}
+            case MTRPrivateAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID:
+                result = @"{{>attribute}}";
+                break;
+
+{{/if}}
+{{/if}}
+{{/zcl_attributes_server}}
+{{/inline}}
+
+{{> attributeIDs clusterName=label}}
+
+            default:
+                // Not a known {{asUpperCamelCase name preserveAcronyms=true}} attribute.
+                result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+                break;
+        }
+        break;
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}
         default:
            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
            break;
@@ -98,7 +140,7 @@ NSString * MTRPrivateAttributeNameForID(MTRClusterIDType clusterID, MTRAttribute
 {{~#*inline "commandIDOutput"}}
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType)clusterID) {
+    switch ((MTRClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -118,6 +160,41 @@ NSString * MTRPrivateAttributeNameForID(MTRClusterIDType clusterID, MTRAttribute
                 result = @"{{>command}}";
                 break;
 
+{{/if}}
+{{/zcl_commands}}
+{{/inline}}
+
+{{> commandIDs clusterName=label}}
+
+            default:
+                result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+                break;
+        }
+        break;
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+        case MTRClusterIDType{{>cluster}}ID:
+
+            switch ((MTRPrivateCommandIDType)commandID) {
+
+{{#*inline "commandIDs"}}
+{{#zcl_commands}}
+{{#if manufacturerCode}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
+           (isStrEqual source ../../../source))}}
+            case MTRPrivateCommandIDTypeCluster{{>cluster}}Command{{>command}}ID:
+                result = @"{{>command}}";
+                break;
+
+{{/if}}
 {{/if}}
 {{/zcl_commands}}
 {{/inline}}
@@ -156,7 +233,7 @@ NSString * MTRPrivateEventNameForID(MTRClusterIDType clusterID, MTREventIDType e
 {
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType)clusterID) {
+    switch ((MTRClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -189,6 +266,45 @@ NSString * MTRPrivateEventNameForID(MTRClusterIDType clusterID, MTREventIDType e
 {{> eventIDs clusterName=label}}
 
 {{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+            default:
+                result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+                break;
+        }
+        break;
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+        case MTRClusterIDType{{>cluster}}ID:
+
+            switch ((MTRPrivateEventIDType)eventID) {
+
+{{#*inline "eventIDs"}}
+{{#zcl_events}}
+{{#if manufacturerCode}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "event"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+{{#first}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) isForIds=true)}}
+// Cluster {{> cluster}} events
+{{/if}}
+{{/first}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true) isForIds=true)}}
+            case MTRPrivateEventIDTypeCluster{{>cluster}}Event{{>event}}ID:
+                result = @"{{>event}}";
+                break;
+
+{{/if}}
+{{/if}}
+{{/zcl_events}}
+{{/inline}}
+
+{{> eventIDs clusterName=label}}
+
             default:
                 result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
                 break;

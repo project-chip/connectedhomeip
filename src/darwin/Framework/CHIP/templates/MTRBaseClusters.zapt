@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericBaseCluster
 
 {{#zcl_commands}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
@@ -52,9 +53,11 @@ NS_ASSUME_NONNULL_BEGIN
 {{> commandDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/if}}
+{{/unless}}
 {{/zcl_commands}}
 
 {{#zcl_attributes_server removeKeys='isOptional'}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
@@ -75,6 +78,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 + (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage="This attribute is deprecated"}};
 {{/if}}
 {{/if}}
+{{/unless}}
 {{/zcl_attributes_server}}
 
 - (instancetype)init NS_UNAVAILABLE;

@@ -10,11 +10,13 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_clusters}}
 {{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#zcl_commands}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
 
 {{> command_internal_methods_decl categoryName="InternalMethods"}}
 
 {{/if}}
+{{/unless}}
 {{/zcl_commands}}
 {{/unless}}
 {{/zcl_clusters}}
