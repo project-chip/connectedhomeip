@@ -44,8 +44,23 @@ constexpr int16_t kDefaultPan  = 0;
 constexpr int16_t kDefaultTilt = 0;
 constexpr uint8_t kDefaultZoom = 1;
 
+// 1 control byte + end-of-array marker
+constexpr size_t kArrayTlvOverhead = 2;
+
+// Max size for an MPTZStruct
 constexpr size_t kMptzPositionStructMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
+
+// Max size for an MPTZPresetStruct
+constexpr size_t kMaxMPTZPresetStructSerializedSize = TLV::EstimateStructOverhead(
+    sizeof(uint8_t), static_cast<size_t>(32) /* max preset name length */, kMptzPositionStructMaxSerializedSize);
+
+// Max size for a TLV encoded array of DPTZStruct
+constexpr size_t kViewportStructMaxSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t));
+constexpr size_t kMaxDPTZStructSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t), kViewportStructMaxSerializedSize);
+constexpr size_t kMaxDPTZStreamsSerializedSize =
+    kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS * kMaxDPTZStructSerializedSize);
 
 class PhysicalPTZCallback
 {
