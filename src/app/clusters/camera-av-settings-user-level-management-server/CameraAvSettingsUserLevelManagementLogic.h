@@ -21,11 +21,14 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -34,7 +37,9 @@ namespace app {
 namespace Clusters {
 
 class CameraAvSettingsUserLevelManagementDelegate;
-class CameraAvSettingsUserLevelManagementCluster;
+
+// Callback type for notifying attribute changes
+using MarkDirtyCallback = std::function<void(AttributeId)>;
 
 class CameraAvSettingsUserLevelMgmtServerLogic : public CameraAvSettingsUserLevelManagement::PhysicalPTZCallback
 {
@@ -60,7 +65,7 @@ public:
         }
     }
 
-    void SetCluster(CameraAvSettingsUserLevelManagementCluster * cluster) { mCluster = cluster; }
+    void SetMarkDirtyCallback(MarkDirtyCallback callback) { mMarkDirtyCallback = std::move(callback); }
 
     EndpointId mEndpointId = kInvalidEndpointId;
 
@@ -207,7 +212,7 @@ public:
 
 private:
     CameraAvSettingsUserLevelManagementDelegate * mDelegate = nullptr;
-    CameraAvSettingsUserLevelManagementCluster * mCluster   = nullptr;
+    MarkDirtyCallback mMarkDirtyCallback;
 
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;
