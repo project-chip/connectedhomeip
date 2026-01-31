@@ -283,7 +283,7 @@ public:
 
         if (AllocatedSize() > 0)
         {
-            memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize());
+            memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize() * sizeof(U));
         }
 
         return *this;

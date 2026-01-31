@@ -184,7 +184,7 @@ public:
 
     void AttributeUpdCb(AttributeId aAttrId)
     {
-        ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %" PRIu32 ") updated", aAttrId);
+        ChipLogProgress(AppServer, "EGW-CTC: The value for attribute (Id %" PRIu32 ") updated", aAttrId);
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, aAttrId);
     }
 
