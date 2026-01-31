@@ -18,6 +18,7 @@
 
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/TimeFormatLocalization/ClusterId.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace chip {
 namespace app {
@@ -26,11 +27,16 @@ namespace Clusters {
 class TimeFormatLocalizationCluster : public DefaultServerCluster
 {
 public:
+    struct Context
+    {
+        DeviceLayer::DeviceInfoProvider & deviceInfoProvider;
+    };
+
     TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features,
                                   TimeFormatLocalization::HourFormatEnum defaultHourFormat,
-                                  TimeFormatLocalization::CalendarTypeEnum defaultCalendarType);
+                                  TimeFormatLocalization::CalendarTypeEnum defaultCalendarType, Context context);
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    CHIP_ERROR Startup(ServerClusterContext & serverContext) override;
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -44,6 +50,7 @@ private:
     const BitFlags<TimeFormatLocalization::Feature> mFeatures;
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
+    Context mContext;
 };
 
 } // namespace Clusters
