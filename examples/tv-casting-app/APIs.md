@@ -1194,7 +1194,7 @@ CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
 
 // Step 3: Set up callbacks to handle the CommissionerDeclaration response
 matter::casting::core::ConnectionCallbacks connectionCallbacks;
-connectionCallbacks.mCommissionerDeclarationCallback = [&instanceName](
+connectionCallbacks.mCommissionerDeclarationCallback = [&instanceName, &targetCastingPlayer](
     const chip::Transport::PeerAddress & source,
     chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) {
     
@@ -1212,14 +1212,13 @@ connectionCallbacks.mCommissionerDeclarationCallback = [&instanceName](
     cancelOptions.mCancelPasscode = true;
     cancelOptions.mInstanceName = instanceName.c_str();
     
-    // Send the cancel message (implementation depends on your setup)
-    targetCastingPlayer->StopConnecting();
+    matter::casting::core::ConnectionCallbacks cancelCallbacks;
+    // Send the cancel message using SendUDC
+    targetCastingPlayer->SendUDC(cancelCallbacks, cancelOptions);
 };
 
-// Send the initial IdentificationDeclaration
-targetCastingPlayer->VerifyOrEstablishConnection(connectionCallbacks,
-                                                  matter::casting::core::kCommissioningWindowTimeoutSec,
-                                                  idOptions);
+// Send the initial IdentificationDeclaration using SendUDC
+targetCastingPlayer->SendUDC(connectionCallbacks, idOptions);
 ```
 
 On Android, you can detect app presence as follows:
@@ -1281,21 +1280,36 @@ ConnectionCallbacks connectionCallbacks = new ConnectionCallbacks(
             );
             cancelOptions.setInstanceName(instanceName);
             
-            // Send the cancel message
-            MatterError err = targetCastingPlayer.stopConnecting();
+            // Send the cancel message using sendUDC
+            ConnectionCallbacks cancelCallbacks = new ConnectionCallbacks(
+                new MatterCallback<Void>() {
+                    @Override
+                    public void handle(Void v) {
+                        Log.d(TAG, "UDC session cancelled successfully");
+                    }
+                },
+                new MatterCallback<MatterError>() {
+                    @Override
+                    public void handle(MatterError err) {
+                        Log.e(TAG, "Failed to cancel UDC session: " + err);
+                    }
+                },
+                null  // No CommissionerDeclaration callback needed for cancel
+            );
+            
+            MatterError err = targetCastingPlayer.sendUDC(cancelCallbacks, cancelOptions);
             if (err.hasError()) {
-                Log.e(TAG, "Failed to cancel UDC session: " + err);
+                Log.e(TAG, "Failed to send cancel UDC message: " + err);
             }
         }
     }
 );
 
-// Send the initial IdentificationDeclaration
-MatterError err = targetCastingPlayer.verifyOrEstablishConnection(
-    connectionCallbacks,
-    MIN_CONNECTION_TIMEOUT_SEC,
-    idOptions
-);
+// Send the initial IdentificationDeclaration using sendUDC
+MatterError err = targetCastingPlayer.sendUDC(connectionCallbacks, idOptions);
+if (err.hasError()) {
+    Log.e(TAG, "Failed to send app detection request: " + err);
+}
 ```
 
 On iOS, you can detect app presence as follows:
@@ -1328,10 +1342,21 @@ let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { cd 
     let cancelOptions = MCIdentificationDeclarationOptions(cancelPasscodeOnly: true)
     cancelOptions.setInstanceName(instanceName)
     
-    // Send the cancel message
-    let err = selectedCastingPlayer?.stopConnecting()
+    let cancelCallbacks = MCConnectionCallbacks(
+        callbacks: { err in
+            if err == nil {
+                self.Log.info("UDC session cancelled successfully")
+            } else {
+                self.Log.error("Failed to cancel UDC session: \(String(describing: err))")
+            }
+        },
+        commissionerDeclarationCallback: nil  // No CommissionerDeclaration callback needed for cancel
+    )
+    
+    // Send the cancel message using sendUDCWithCallbacks
+    let err = selectedCastingPlayer?.sendUDCWithCallbacks(cancelCallbacks, identificationDeclarationOptions: cancelOptions)
     if err != nil {
-        self.Log.error("Failed to cancel UDC session: \(String(describing: err))")
+        self.Log.error("Failed to send cancel UDC message: \(String(describing: err))")
     }
 }
 
@@ -1342,11 +1367,8 @@ let connectionCallbacks = MCConnectionCallbacks(
     commissionerDeclarationCallback: commissionerDeclarationCallback
 )
 
-// Send the initial IdentificationDeclaration
-let err = selectedCastingPlayer?.verifyOrEstablishConnection(
-    with: connectionCallbacks,
-    identificationDeclarationOptions: idOptions
-)
+// Send the initial IdentificationDeclaration using sendUDCWithCallbacks
+let err = selectedCastingPlayer?.sendUDCWithCallbacks(connectionCallbacks, identificationDeclarationOptions: idOptions)
 if err != nil {
     self.Log.error("Failed to send app detection request: \(String(describing: err))")
 }
@@ -1356,13 +1378,18 @@ if err != nil {
 
 -   The `instanceName` must be unique for each app detection session and should
     be randomly generated.
+-   Use the `sendUDC` API (Android), `SendUDC` API (Linux), or
+    `sendUDCWithCallbacks` API (iOS) for app detection. These APIs directly send
+    UDC messages without initiating a full commissioning session.
 -   Always send the `CancelPasscode` message after receiving the
     CommissionerDeclaration response to free up the UDC session on the
-    `CastingPlayer`.
+    `CastingPlayer`. Use the same `sendUDC` / `SendUDC` / `sendUDCWithCallbacks`
+    API with `CancelPasscode` set to `true`.
 -   This is a lightweight check that doesn't establish a full commissioning
     session. If you want to proceed with commissioning after detecting the app,
-    you'll need to call `VerifyOrEstablishConnection` again with appropriate
-    commissioning parameters.
+    you'll need to call `VerifyOrEstablishConnection` (or
+    `verifyOrEstablishConnection`) separately with appropriate commissioning
+    parameters.
 -   Some apps may not support guest mode or multiple simultaneous accounts. In
     such cases, you can use this feature to detect if the app is present with a
     different account and prompt the user to switch accounts before proceeding.
