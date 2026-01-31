@@ -135,6 +135,7 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
     {
         mCurrentConnections.push_back(transportConfiguration);
         result = UpsertResultEnum::kInserted;
+        LogErrorOnFailure(StoreCurrentConnections());
     }
 
     MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
@@ -157,6 +158,8 @@ void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uin
     // If a connection was removed, the size will be smaller.
     if (mCurrentConnections.size() < originalSize)
     {
+        LogErrorOnFailure(StoreCurrentConnections());
+
         // Notify the stack that the CurrentConnections attribute has changed.
         MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
                                                PushAvStreamTransport::Attributes::CurrentConnections::Id);
@@ -183,8 +186,7 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
 void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
-    ChipLogFailure(mDelegate->LoadCurrentConnections(mCurrentConnections), Zcl,
-                   "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
+    ChipLogFailure(LoadCurrentConnections(), Zcl, "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
 
     // Signal delegate that all persistent configuration attributes have been loaded.
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
@@ -1728,6 +1730,87 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 
     // Generate the PushTransportEnd event
     return GeneratePushTransportEndEvent(connectionID);
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
+{
+    uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+
+    for (const auto & connection : mCurrentConnections)
+    {
+        ReturnErrorOnFailure(connection.EncodeForWrite(writer, TLV::AnonymousTag()));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    size_t len = writer.GetLengthWritten();
+
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
+
+    ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
+{
+    uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
+    MutableByteSpan span(buffer);
+
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        mCurrentConnections.clear();
+        ChipLogProgress(Zcl, "No persisted CurrentConnections found.");
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(span);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    mCurrentConnections.clear();
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        // Decode into a temporary DecodableType first.
+        Structs::TransportConfigurationStruct::DecodableType decodedTransportConfig;
+        ReturnErrorOnFailure(decodedTransportConfig.Decode(reader));
+
+        // Now, create the storage version which will perform a deep copy of the data.
+        std::shared_ptr<TransportOptionsStorage> transportOptionsStorage;
+        if (decodedTransportConfig.transportOptions.HasValue())
+        {
+            transportOptionsStorage = std::make_shared<TransportOptionsStorage>(decodedTransportConfig.transportOptions.Value());
+            if (!transportOptionsStorage)
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        TransportConfigurationStorage connection(decodedTransportConfig.connectionID, transportOptionsStorage);
+        connection.transportStatus = decodedTransportConfig.transportStatus;
+        connection.fabricIndex     = decodedTransportConfig.fabricIndex;
+        mCurrentConnections.push_back(connection);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    ChipLogProgress(Zcl, "Loaded %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
+
+    return reader.VerifyEndOfContainer();
 }
 
 } // namespace Clusters

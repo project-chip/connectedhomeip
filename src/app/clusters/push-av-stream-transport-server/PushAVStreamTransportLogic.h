@@ -8,6 +8,8 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
 #include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
@@ -144,6 +146,17 @@ private:
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
 
+    static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
+        TLV::EstimateStructOverhead(sizeof(uint16_t),                                    // connectionID
+                                    sizeof(uint8_t),                                     // transportStatus
+                                    PushAvStreamTransport::kTransportOptionsStorageSize, // estimated transportOptions
+                                    sizeof(uint64_t)                                     // fabricIndex
+        );
+
+    // Max size for the TLV-encoded array of CurrentConnection structs
+    static constexpr size_t kMaxCurrentConnectionsSerializedSize =
+        2 /* ArrayTlvOverhead */ + (CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
+
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
@@ -189,6 +202,10 @@ private:
      * @return true if URL is valid, false otherwise
      */
     bool ValidateUrl(const std::string & url);
+
+    // Helpers to store and load CurrentConnections list
+    CHIP_ERROR StoreCurrentConnections();
+    CHIP_ERROR LoadCurrentConnections();
 };
 
 } // namespace Clusters
