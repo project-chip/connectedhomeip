@@ -318,7 +318,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
         // If the current level is undefined (null), we cannot calculate a transition duration
         // because we don't know the starting point. The spec says "move from its current level".
         // In this case, we treat it as an immediate transition to the target level.
-        CHIP_ERROR status = SetCurrentLevel(level);
+        CHIP_ERROR status = SetCurrentLevel(level, ReportingMode::kForceReport);
         if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && level == mMinLevel)
         {
             ReturnErrorOnFailure(SetOnOff(false));
@@ -345,7 +345,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
     // Immediate move
     if (transitionTimeMs == 0 || totalSteps == 0 || mTickDurationMs == 0)
     {
-        CHIP_ERROR status = SetCurrentLevel(mTargetLevel);
+        CHIP_ERROR status = SetCurrentLevel(mTargetLevel, ReportingMode::kForceReport);
         if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && mTargetLevel == mMinLevel)
         {
             ReturnErrorOnFailure(SetOnOff(false));
@@ -467,7 +467,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
     // Check if immediate transition is needed (0 time or 0 duration calculated)
     if (transitionTimeMs == 0 || totalSteps == 0 || (transitionTimeMs / totalSteps) == 0)
     {
-        CHIP_ERROR status = SetCurrentLevel(mTargetLevel);
+        CHIP_ERROR status = SetCurrentLevel(mTargetLevel, ReportingMode::kForceReport);
 
         // Spec: "If any command that has the effect of setting the CurrentLevel attribute to the minimum level...
         // the OnOff attribute... SHALL be set to FALSE"
@@ -490,12 +490,12 @@ DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId command
     // The command is one of the ‘without On/Off’ commands: ... Stop."
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     CancelTimer();
-    UpdateRemainingTime(0, ReportingMode::kCommand);
+    UpdateRemainingTime(0, ReportingMode::kForceReport);
     // mCurrentLevel is guaranteed to have a value here.
     // - If we were transitioning, it had a value.
     // - If we weren't transitioning, it maintains its last state.
     // - Startup ensures it has a value (either from NVM or defaults).
-    return SetCurrentLevel(mCurrentLevel.value().Value());
+    return SetCurrentLevel(mCurrentLevel.value().Value(), ReportingMode::kForceReport);
 }
 
 void LevelControlCluster::SetOptions(BitMask<OptionsBitmap> newOptions)
@@ -520,15 +520,25 @@ CHIP_ERROR LevelControlCluster::SetDefaultMoveRate(DataModel::Nullable<uint8_t> 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level)
+CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode reportingMode)
 {
     VerifyOrReturnError(IsValidLevel(level), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mCurrentLevel.value().IsNull() || mCurrentLevel.value().Value() != level, CHIP_NO_ERROR); // No change
 
-    // Force report even if it violates the quieter reporting policy (e.g. within 1s of last report),
-    // because this is a state change that must be reported (e.g. end of transition).
-    AttributeDirtyState dirtyState = mCurrentLevel.SetValue(
-        DataModel::MakeNullable(level), System::SystemClock().GetMonotonicMilliseconds64(), [](const auto &) { return true; });
+    auto now = System::SystemClock().GetMonotonicMilliseconds64();
+    AttributeDirtyState dirtyState;
+
+    if (reportingMode == ReportingMode::kForceReport)
+    {
+        dirtyState = mCurrentLevel.SetValue(DataModel::MakeNullable(level), now, [](const auto &) { return true; });
+    }
+    else
+    {
+        dirtyState = mCurrentLevel.SetValue(
+            DataModel::MakeNullable(level), now,
+            QuieterReportingAttribute<uint8_t>::GetPredicateForSufficientTimeSinceLastDirty(chip::System::Clock::Milliseconds64(1000)));
+    }
+
     if (dirtyState == AttributeDirtyState::kMustReport)
     {
         NotifyAttributeChanged(Attributes::CurrentLevel::Id);
@@ -553,25 +563,7 @@ void LevelControlCluster::StoreCurrentLevel(DataModel::Nullable<uint8_t> value)
                    ChipLogError(AppServer, "LevelControlCluster: Failed to store CurrentLevel: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
-CHIP_ERROR LevelControlCluster::SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue)
-{
-    VerifyOrReturnError(mCurrentLevel.value() != newValue, CHIP_NO_ERROR);
 
-    auto now = System::SystemClock().GetMonotonicMilliseconds64();
-
-    // Spec: "At most once per second"
-    AttributeDirtyState dirtyState = mCurrentLevel.SetValue(
-        newValue, now,
-        QuieterReportingAttribute<uint8_t>::GetPredicateForSufficientTimeSinceLastDirty(chip::System::Clock::Milliseconds64(1000)));
-
-    StoreCurrentLevel(mCurrentLevel.value());
-
-    if (dirtyState == AttributeDirtyState::kMustReport)
-    {
-        NotifyAttributeChanged(Attributes::CurrentLevel::Id);
-    }
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
 {
@@ -635,7 +627,7 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
     // - When it changes to 0."
     if (mRemainingTime.SetValue(DataModel::MakeNullable(remainingTimeDs), now, [this, mode](const auto & candidate) {
             // "As this attribute is not being reported during a regular countdown..."
-            if (mode == ReportingMode::kTick)
+            if (mode == ReportingMode::kQuietReport)
             {
                 return candidate.newValue.ValueOr(0) == 0 && candidate.lastDirtyValue.ValueOr(0) != 0;
             }
@@ -674,7 +666,7 @@ void LevelControlCluster::TimerFired()
     {
         remainingTimeMs = static_cast<uint16_t>(mTransitionTimeMs - mElapsedTimeMs);
     }
-    UpdateRemainingTime(remainingTimeMs, ReportingMode::kTick);
+    UpdateRemainingTime(remainingTimeMs, ReportingMode::kQuietReport);
 
     // Calculate new level
     uint8_t currentLevel = mCurrentLevel.value().Value();
@@ -692,9 +684,9 @@ void LevelControlCluster::TimerFired()
     {
         // Safe to ignore error: mTargetLevel was validated when starting the transition.
         // SetCurrentLevel calls mDelegate.OnLevelChanged(currentLevel), so the delegate is updated.
-        RETURN_SAFELY_IGNORED SetCurrentLevel(currentLevel);
+        RETURN_SAFELY_IGNORED SetCurrentLevel(currentLevel, ReportingMode::kForceReport);
 
-        UpdateRemainingTime(0, ReportingMode::kCommand); // Transition complete, ensure RemainingTime is 0
+        UpdateRemainingTime(0, ReportingMode::kForceReport); // Transition complete, ensure RemainingTime is 0
 
         // If reached minimum, turn off OnOff cluster
         if (IsWithOnOffCommand(mCurrentCommandId) && (currentLevel == mMinLevel || currentLevel == 0))
@@ -704,9 +696,8 @@ void LevelControlCluster::TimerFired()
         return;
     }
 
-    mDelegate.OnLevelChanged(currentLevel);
     // Ignore error as this is a background tick.
-    RETURN_SAFELY_IGNORED SetCurrentLevelQuietReport(DataModel::MakeNullable(currentLevel));
+    RETURN_SAFELY_IGNORED SetCurrentLevel(currentLevel, ReportingMode::kQuietReport);
 
     StartTimer(mTickDurationMs);
 }
@@ -723,7 +714,7 @@ void LevelControlCluster::OnOffChanged(bool isOn)
 
         // 1. Set to MinLevel
         // Ignore error as we are internally forcing a valid level (MinLevel) to start the transition.
-        RETURN_SAFELY_IGNORED SetCurrentLevel(mMinLevel);
+        RETURN_SAFELY_IGNORED SetCurrentLevel(mMinLevel, ReportingMode::kForceReport);
 
         // 3. Determine Transition Time
         DataModel::Nullable<uint16_t> transitionTime;
@@ -770,7 +761,7 @@ void LevelControlCluster::StartTransition(uint32_t tickDurationMs, uint32_t tran
     mTickDurationMs   = tickDurationMs;
 
     // Command invoked: Set RemainingTime using full reporting rules
-    UpdateRemainingTime(mTransitionTimeMs, ReportingMode::kCommand);
+    UpdateRemainingTime(mTransitionTimeMs, ReportingMode::kForceReport);
     StartTimer(mTickDurationMs);
 }
 

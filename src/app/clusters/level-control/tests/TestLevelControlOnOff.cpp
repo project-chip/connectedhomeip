@@ -229,21 +229,10 @@ TEST_F(TestLevelControlOnOff, TestOnOffAttributes)
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-                                        {
-
-                                            Attributes::CurrentLevel::kMetadataEntry,
-
-                                            Attributes::Options::kMetadataEntry,
-
-                                            Attributes::OnLevel::kMetadataEntry,
-
-                                            Attributes::OnTransitionTime::kMetadataEntry,
-
-                                            Attributes::OffTransitionTime::kMetadataEntry,
-
-                                            Attributes::OnOffTransitionTime::kMetadataEntry
-
-                                        }));
+                                        { Attributes::CurrentLevel::kMetadataEntry, Attributes::Options::kMetadataEntry,
+                                          Attributes::OnLevel::kMetadataEntry, Attributes::OnTransitionTime::kMetadataEntry,
+                                          Attributes::OffTransitionTime::kMetadataEntry,
+                                          Attributes::OnOffTransitionTime::kMetadataEntry }));
 }
 
 TEST_F(TestLevelControlOnOff, TestOnOffChanged)
@@ -412,7 +401,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
                     .IsSuccess());
     reentrantDelegate.mOn = true;
 
-    // Prime mStoredLevel by turning Off and On once
+    // Prime mLevelBeforeTurnedOff by turning Off and On once
     // Off -> Stores 200.
     cluster.OnOffChanged(false);
     while (mockTimer.IsTimerActive(&cluster))
@@ -430,7 +419,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     EXPECT_EQ(readLevel.Value(), 200u);
 
     // 2. MoveToLevelWithOnOff(MinLevel, time=10s).
-    // This should NOT overwrite mStoredLevel (200) with MinLevel (0/1).
+    // This should NOT overwrite mLevelBeforeTurnedOff (200) with MinLevel (0/1).
     uint8_t minLevel = cluster.GetMinLevel();
     Commands::MoveToLevelWithOnOff::Type data;
     data.level = minLevel;
@@ -450,7 +439,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     EXPECT_FALSE(reentrantDelegate.mOn);
 
     // 4. Turn On (Simulate OnOff Cluster On command)
-    // Should restore 200 (from mStoredLevel) NOT MinLevel (0/1).
+    // Should restore 200 (from mLevelBeforeTurnedOff) NOT MinLevel (0/1).
     cluster.OnOffChanged(true);
 
     while (mockTimer.IsTimerActive(&cluster))

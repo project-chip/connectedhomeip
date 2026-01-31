@@ -252,3 +252,64 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
     }
     EXPECT_TRUE(reported);
 }
+
+TEST_F(TestLevelControlLighting, TestReportingAtTransitionEnd)
+{
+    // Regression test for issue where the final level report was suppressed
+    // if the transition finished within the quieter reporting interval.
+
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate) };
+    chip::Testing::TestServerClusterContext context;
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    chip::Testing::ClusterTester tester(cluster);
+    auto & changeListener = context.ChangeListener();
+
+    // 1. Initialize to a known level (e.g., 200).
+    // This should trigger an initial report.
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(200, DataModel::MakeNullable<uint16_t>(0u),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+
+    // Verify init reported
+    bool initReported = false;
+    for (auto & id : changeListener.DirtyList())
+    {
+        if (id.mAttributeId == Attributes::CurrentLevel::Id)
+            initReported = true;
+    }
+    EXPECT_TRUE(initReported);
+    changeListener.DirtyList().clear();
+
+    // 2. Start a transition that will land on 201 shortly.
+    // We want the transition to end *within* 1 second of the last report (which was just now).
+    // Let's say we move to 201 in 500ms.
+    // 500ms = 5 ds.
+    Commands::MoveToLevel::Type data;
+    data.level = 201;
+    data.transitionTime.SetNonNull(5); // 0.5 seconds
+    data.optionsMask.ClearAll();
+    data.optionsOverride.ClearAll();
+
+    EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
+
+    // 3. Advance time by 500ms to complete the transition.
+    // This calls TimerFired -> SetCurrentLevel(201).
+    mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
+    mockTimer.AdvanceClock(System::Clock::Milliseconds64(500));
+
+    // 4. Verify that the transition completed.
+    EXPECT_EQ(cluster.GetCurrentLevel().Value(), 201u);
+    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+
+    // 5. Verify that a report was generated for the final level (201).
+    bool reported = false;
+    for (auto & id : changeListener.DirtyList())
+    {
+        if (id.mAttributeId == Attributes::CurrentLevel::Id)
+            reported = true;
+    }
+    EXPECT_TRUE(reported) << "CurrentLevel should be reported at the end of transition, even if < 1s from last report";
+}

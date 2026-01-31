@@ -129,7 +129,7 @@ public:
         TimerDelegate & mTimerDelegate;
 
         uint8_t mMinLevel = 0;
-        uint8_t mMaxLevel = 0;
+        uint8_t mMaxLevel = kMaxLevel;
         DataModel::Nullable<uint8_t> mDefaultMoveRate;
         DataModel::Nullable<uint8_t> mStartUpCurrentLevel;
         DataModel::Nullable<uint8_t> mInitialCurrentLevel;
@@ -222,7 +222,13 @@ public:
     void OnOffChanged(bool isOn);
 
 private:
-    CHIP_ERROR SetCurrentLevel(uint8_t level);
+    enum class ReportingMode
+    {
+        kForceReport,
+        kQuietReport
+    };
+
+    CHIP_ERROR SetCurrentLevel(uint8_t level, ReportingMode reportingMode);
 
     // Attributes
     app::QuieterReportingAttribute<uint8_t> mCurrentLevel;
@@ -245,13 +251,14 @@ private:
     TimerDelegate & mTimerDelegate;
 
     // Transition Logic State
-    uint8_t mTargetLevel        = 0;
-    uint32_t mTransitionTimeMs  = 0;
-    uint32_t mElapsedTimeMs     = 0;
-    uint32_t mTickDurationMs    = 0;
+    uint8_t mTargetLevel       = 0;
+    uint32_t mTransitionTimeMs = 0;
+    uint32_t mElapsedTimeMs    = 0;
+    uint32_t mTickDurationMs   = 0;
+    // Tracks the direction of the transition (increase vs decrease) across repeated TimerFired calls.
     bool mIncreasing            = false;
     CommandId mCurrentCommandId = kInvalidCommandId;
-    DataModel::Nullable<uint8_t> mStoredLevel; // Stores the level before turning Off, to restore on On if OnLevel is null.
+    DataModel::Nullable<uint8_t> mLevelBeforeTurnedOff; // Stores the level before turning Off, to restore on On if OnLevel is null.
 
     // Used to ignore/prevent reentrance of OnOffChanged callbacks when we are programmatically setting On/Off state
     // during a Level Control command (like MoveToLevelWithOnOff).
@@ -265,17 +272,9 @@ private:
     // Setup and start the transition
     void StartTransition(uint32_t durationMs, uint32_t transitionTimeMs);
 
-    // Helper to set CurrentLevel with specific reporting rules (e.g. forced at end of transition).
-    CHIP_ERROR SetCurrentLevelQuietReport(DataModel::Nullable<uint8_t> newValue);
-
     // Helper to write CurrentLevel to NVM.
     void StoreCurrentLevel(DataModel::Nullable<uint8_t> value);
 
-    enum class ReportingMode
-    {
-        kCommand,
-        kTick
-    };
     void UpdateRemainingTime(uint32_t remainingTimeMs, ReportingMode mode);
 
     void StartTimer(uint32_t delayMs);
