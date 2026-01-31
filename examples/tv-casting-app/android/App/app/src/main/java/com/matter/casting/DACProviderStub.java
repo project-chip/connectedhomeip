@@ -93,7 +93,7 @@ public class DACProviderStub implements DACProvider {
         // Create a fresh KeyFactory instance for SEC1 format attempt.
         // This avoids any potential state issues from the failed PKCS#8 attempt.
         keyFactory = KeyFactory.getInstance("EC");
-        
+
         // Fallback to SEC1 format.
         AlgorithmParameters algorithmParameters = AlgorithmParameters.getInstance("EC");
         algorithmParameters.init(new ECGenParameterSpec("secp256r1"));

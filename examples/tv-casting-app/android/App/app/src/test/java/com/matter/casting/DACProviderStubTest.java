@@ -18,12 +18,7 @@ package com.matter.casting;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import android.util.Base64;
-import java.security.KeyFactory;
-import java.security.Signature;
-import java.security.spec.PKCS8EncodedKeySpec;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,10 +59,9 @@ public class DACProviderStubTest {
     assertTrue("Signature should have non-zero length", signature.length > 0);
 
     // Verify signature is valid (ECDSA signatures are typically 70-72 bytes for secp256r1)
-    // assertTrue(
-    //     "Signature length should be reasonable for ECDSA", signature.length >= 64 && signature.length <= 75);
     assertTrue(
-        "Signature length should be reasonable for ECDSA", signature.length >= 64 && signature.length > 75);
+        "Signature length should be reasonable for ECDSA",
+        signature.length >= 64 && signature.length <= 75);
   }
 
   /**
@@ -86,7 +80,7 @@ public class DACProviderStubTest {
     assertNotNull("Second signature should not be null", signature2);
     assertNotNull("Third signature should not be null", signature3);
 
-    assertTrue("All signatures should have non-zero length", 
+    assertTrue("All signatures should have non-zero length",
         signature1.length > 0 && signature2.length > 0 && signature3.length > 0);
   }
 
@@ -124,9 +118,7 @@ public class DACProviderStubTest {
     assertTrue("Signatures for different messages should be different", signaturesAreDifferent);
   }
 
-  /**
-   * Test that GetDeviceAttestationCert returns a valid certificate.
-   */
+  /** Test that GetDeviceAttestationCert returns a valid certificate. */
   @Test
   public void testGetDeviceAttestationCert_ReturnsValidCertificate() {
     // Act
@@ -137,9 +129,7 @@ public class DACProviderStubTest {
     assertTrue("Certificate should have non-zero length", cert.length > 0);
   }
 
-  /**
-   * Test that GetProductAttestationIntermediateCert returns a valid certificate.
-   */
+  /** Test that GetProductAttestationIntermediateCert returns a valid certificate. */
   @Test
   public void testGetProductAttestationIntermediateCert_ReturnsValidCertificate() {
     // Act
@@ -150,9 +140,7 @@ public class DACProviderStubTest {
     assertTrue("PAI Certificate should have non-zero length", cert.length > 0);
   }
 
-  /**
-   * Test that GetCertificationDeclaration returns a valid declaration.
-   */
+  /** Test that GetCertificationDeclaration returns a valid declaration. */
   @Test
   public void testGetCertificationDeclaration_ReturnsValidDeclaration() {
     // Act
@@ -163,9 +151,7 @@ public class DACProviderStubTest {
     assertTrue("Certification declaration should have non-zero length", declaration.length > 0);
   }
 
-  /**
-   * Test that GetFirmwareInformation returns an empty array (as per current implementation).
-   */
+  /** Test that GetFirmwareInformation returns an empty array (as per current implementation). */
   @Test
   public void testGetFirmwareInformation_ReturnsEmptyArray() {
     // Act
@@ -195,9 +181,7 @@ public class DACProviderStubTest {
     assertTrue("Signature should have non-zero length after fallback", signature.length > 0);
   }
 
-  /**
-   * Test that signing with an empty message doesn't crash and produces a valid signature.
-   */
+  /** Test that signing with an empty message doesn't crash and produces a valid signature. */
   @Test
   public void testSignWithDeviceAttestationKey_EmptyMessage_Success() {
     // Arrange
@@ -211,9 +195,7 @@ public class DACProviderStubTest {
     assertTrue("Signature for empty message should have non-zero length", signature.length > 0);
   }
 
-  /**
-   * Test that signing with a large message works correctly.
-   */
+  /** Test that signing with a large message works correctly. */
   @Test
   public void testSignWithDeviceAttestationKey_LargeMessage_Success() {
     // Arrange - Create a 10KB message
