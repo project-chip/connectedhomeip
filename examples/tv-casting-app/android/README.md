@@ -13,20 +13,20 @@ to build the Matter “Casting Client” into your consumer-facing mobile app.
 
 <hr>
 
-- [Matter TV Casting Android App Example](#matter-tv-casting-android-app-example)
-  - [Requirements for building](#requirements-for-building)
-    - [ABIs and TARGET\_CPU](#abis-and-target_cpu)
-    - [Gradle \& JDK Version](#gradle--jdk-version)
-  - [Preparing for build](#preparing-for-build)
-  - [Building \& Installing the app](#building--installing-the-app)
-  - [Common build environment issues](#common-build-environment-issues)
-  - [Running the app](#running-the-app)
-  - [Running Unit Tests](#running-unit-tests)
-    - [Running All Tests](#running-all-tests)
-    - [Running Specific Test Suites](#running-specific-test-suites)
-    - [Viewing Test Results](#viewing-test-results)
-    - [Test Coverage](#test-coverage)
-    - [Troubleshooting Tests](#troubleshooting-tests)
+-   [Matter TV Casting Android App Example](#matter-tv-casting-android-app-example)
+    -   [Requirements for building](#requirements-for-building)
+        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        -   [Gradle \& JDK Version](#gradle--jdk-version)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building \& Installing the app](#building--installing-the-app)
+    -   [Common build environment issues](#common-build-environment-issues)
+    -   [Running the app](#running-the-app)
+    -   [Running Unit Tests](#running-unit-tests)
+        -   [Running All Tests](#running-all-tests)
+        -   [Running Specific Test Suites](#running-specific-test-suites)
+        -   [Viewing Test Results](#viewing-test-results)
+        -   [Test Coverage](#test-coverage)
+        -   [Troubleshooting Tests](#troubleshooting-tests)
 
 <hr>
 
@@ -211,6 +211,8 @@ covering:
 
 **Issue**: Gradle version compatibility errors
 
--   **Solution**: Verify you're using JDK 11 (not JDK 17) as per the build requirements above
+-   **Solution**: Verify you're using JDK 11 (not JDK 17) as per the build
+    requirements above
 
-For more details on the test implementation, see the [test documentation](tv-casting-common/core/tests/README.md).
+For more details on the test implementation, see the
+[test documentation](tv-casting-common/core/tests/README.md).

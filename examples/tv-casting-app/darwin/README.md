@@ -22,12 +22,14 @@ to build the Matter "Casting Client" into your consumer-facing mobile app.
 ### Using Xcode
 
 1. Open the workspace:
+
     ```bash
     cd examples/tv-casting-app/darwin
     open TvCastingDarwin.xcworkspace
     ```
 
 2. Select the appropriate scheme:
+
     - `TvCasting` - Main iOS app
     - `MatterTvCastingBridge` - Framework/library
 
@@ -58,12 +60,14 @@ The test files have been created but require one-time setup in Xcode to add them
 to the project:
 
 1. **Open the project in Xcode**:
+
     ```bash
     cd examples/tv-casting-app/darwin
     open MatterTvCastingBridge/MatterTvCastingBridge.xcodeproj
     ```
 
 2. **Add a test target** (if not already present):
+
     - File → New → Target
     - Choose "Unit Testing Bundle" under iOS
     - Name it `MatterTvCastingBridgeTests`
@@ -71,17 +75,21 @@ to the project:
     - Click Finish
 
 3. **Add the test file to the test target**:
-    - In the Project Navigator, right-click on `MatterTvCastingBridgeTests` folder
+
+    - In the Project Navigator, right-click on `MatterTvCastingBridgeTests`
+      folder
     - Choose "Add Files to MatterTvCastingBridge..."
     - Navigate to `MatterTvCastingBridgeTests/MCCastingPlayerSendUDCTests.m`
     - Ensure it's added to the `MatterTvCastingBridgeTests` target
     - Click Add
 
 4. **Add OCMock dependency**:
+
     - Select the project in Project Navigator
     - Select the `MatterTvCastingBridgeTests` target
     - Go to "Build Phases" → "Link Binary With Libraries"
-    - Add OCMock framework (install via CocoaPods or Swift Package Manager if needed)
+    - Add OCMock framework (install via CocoaPods or Swift Package Manager if
+      needed)
 
 ### Running Tests in Xcode
 
@@ -137,15 +145,18 @@ OCMock for mocking dependencies.
 
 **Issue**: "Scheme is not currently configured for the test action"
 
--   **Solution**: The test target needs to be added to the Xcode project (see Prerequisites above)
+-   **Solution**: The test target needs to be added to the Xcode project (see
+    Prerequisites above)
 
 **Issue**: Build errors when running tests
 
--   **Solution**: Ensure all dependencies are properly linked and the project builds successfully before running tests
+-   **Solution**: Ensure all dependencies are properly linked and the project
+    builds successfully before running tests
 
 **Issue**: OCMock not found
 
--   **Solution**: Install OCMock via CocoaPods or Swift Package Manager and link it to the test target
+-   **Solution**: Install OCMock via CocoaPods or Swift Package Manager and link
+    it to the test target
 
 For more details on the test implementation, see the
 [test documentation](../tv-casting-common/core/tests/README.md).
