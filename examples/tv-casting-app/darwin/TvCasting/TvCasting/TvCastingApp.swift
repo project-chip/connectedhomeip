@@ -68,34 +68,46 @@ struct TvCastingApp: App {
                     }
                 })
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-                    self.Log.info("TvCastingApp: UIApplication.willResignActiveNotification")
+                    self.Log.info("TvCastingApp: UIApplication.willResignActiveNotification - stopping Matter server to clean up UDP sockets")
                     if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
                     {
                         if let castingApp = MCCastingApp.getSharedInstance()
                         {
+                            // Stop the app completely to clean up all resources including UDP sockets
                             castingApp.stop(completionBlock: { (err : Error?) -> () in
                                 if err != nil
                                 {
                                     self.Log.error("MCCastingApp stop failed \(err)")
+                                }
+                                else
+                                {
+                                    self.Log.info("MCCastingApp stopped successfully, UDP sockets cleaned up")
                                 }
                             })
                         }
                     }
                     else if let castingServerBridge = CastingServerBridge.getSharedInstance()
                     {
+                        // Stop the Matter server to clean up UDP sockets before backgrounding
                         castingServerBridge.stopMatterServer()
+                        self.Log.info("Matter server stopped, UDP sockets should be cleaned up")
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                    self.Log.info("TvCastingApp: UIApplication.didBecomeActiveNotification")
+                    self.Log.info("TvCastingApp: UIApplication.didBecomeActiveNotification - restarting Matter server with fresh UDP sockets")
                     if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
                     {
                         if let castingApp = MCCastingApp.getSharedInstance()
                         {
+                            // Restart the app - this will reinitialize all UDP endpoints with fresh sockets
                             castingApp.start(completionBlock: { (err : Error?) -> () in
                                 if err != nil
                                 {
-                                    self.Log.error("MCCastingApp start failed \(err)")
+                                    self.Log.error("MCCastingApp start failed after foregrounding: \(err)")
+                                }
+                                else
+                                {
+                                    self.Log.info("MCCastingApp restarted successfully after foregrounding, UDP sockets recreated")
                                 }
                             })
                         }
@@ -106,12 +118,24 @@ struct TvCastingApp: App {
                         {
                             if let castingServerBridge = CastingServerBridge.getSharedInstance()
                             {
+                                // Restart the Matter server - this should reinitialize UDP endpoints with fresh sockets
+                                self.Log.info("Restarting Matter server to recreate UDP sockets after foregrounding")
                                 castingServerBridge.startMatterServer(DispatchQueue.main, startMatterServerCompletionCallback: { (error: MatterError) -> () in
                                     DispatchQueue.main.async {
-                                        self.Log.info("TvCastingApp.startMatterServerCompletionCallback called with \(error)")
+                                        if error.code == 0 {
+                                            self.Log.info("Matter server restarted successfully after foregrounding, UDP sockets should be fresh")
+                                        }
+                                        else
+                                        {
+                                            self.Log.error("Matter server restart failed after foregrounding with error: \(error)")
+                                        }
                                     }
                                 })
                             }
+                        }
+                        else
+                        {
+                            self.Log.info("First app activation, skipping Matter server restart")
                         }
                         firstAppActivation = false
                     }
