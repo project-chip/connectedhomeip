@@ -80,7 +80,8 @@ public class DACProviderStubTest {
     assertNotNull("Second signature should not be null", signature2);
     assertNotNull("Third signature should not be null", signature3);
 
-    assertTrue("All signatures should have non-zero length",
+    assertTrue(
+        "All signatures should have non-zero length",
         signature1.length > 0 && signature2.length > 0 && signature3.length > 0);
   }
 
