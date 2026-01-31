@@ -158,7 +158,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             TestStep("3", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
                      "DUT respond with ArmFailSafeResponse Command."),
             TestStep("4", "TH sends ICACCSRRequest command to DUT.",
-                     "DUT response contains an ICACCSR."),
+                     "DUT response contains status code VIDNotVerified."),
             TestStep("5", "Wait for ArmFailSafe to expire."),
             TestStep("6", "TH sends AddICAC command to DUT using icac1 as parameter.",
                      "DUT response contains status code FAILSAFE_REQUIRED."),
@@ -203,12 +203,17 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=10, breadcrumb=1))
 
         self.step("4")
-        response = await self.send_single_cmd(
-            dev_ctrl=devCtrlEcoA,
-            node_id=1,
-            endpoint=1,
-            cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
-        asserts.assert_not_equal(response.icaccsr, b'', "No ICACSR was returned!")
+        try:
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
+        except InteractionModelError as e:
+            asserts.assert_in('Failure (0x1, clusterStatus: 5)', str(e),
+                              f'Expected VIDNotVerified error, but got {str(e)}')
+        else:
+            asserts.assert_true(False, 'Expected InteractionModelError with VIDNotVerified, but no exception occurred.')
 
         self.step("5")
         # Wait for ArmFailSafe timer to expire
@@ -255,6 +260,8 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
+        _certAuthorityManagerA.Shutdown()
+        _fabric_a_persistent_storage.Shutdown()
 
 
 if __name__ == "__main__":
