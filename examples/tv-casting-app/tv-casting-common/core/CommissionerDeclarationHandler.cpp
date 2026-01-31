@@ -57,6 +57,12 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
+    if (cd.GetNeedsPasscode() && !cd.GetPasscodeDialogDisplayed())
+    {
+        ChipLogProgress(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() needs passcode");
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+    }
+
     // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
     if (cd.GetCancelPasscode())
     {

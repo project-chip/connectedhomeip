@@ -474,6 +474,7 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     jfieldID cancelPasscodeField            = env->GetFieldID(idOptionsClass, "cancelPasscode", "Z");
     jfieldID targetAppInfosField            = env->GetFieldID(idOptionsClass, "targetAppInfos", "Ljava/util/List;");
     jfieldID passcodeLengthField            = env->GetFieldID(idOptionsClass, "passcodeLength", "I");
+    jfieldID instanceNameField              = env->GetFieldID(idOptionsClass, "instanceName", "Ljava/lang/String;");
     VerifyOrReturnValue(
         noPasscodeField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() noPasscodeField not found!"));
@@ -496,6 +497,9 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     VerifyOrReturnValue(
         passcodeLengthField != nullptr, nullptr,
         ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() passcodeLengthField not found!"));
+    VerifyOrReturnValue(
+        instanceNameField != nullptr, nullptr,
+        ChipLogError(AppServer, "convertIdentificationDeclarationOptionsFromJavaToCpp() instanceNameField not found!"));
 
     matter::casting::core::IdentificationDeclarationOptions * cppIdOptions =
         new matter::casting::core::IdentificationDeclarationOptions();
@@ -506,6 +510,15 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     cppIdOptions->mCommissionerPasscodeReady = env->GetBooleanField(jIdOptions, commissionerPasscodeReadyField);
     cppIdOptions->mCancelPasscode            = env->GetBooleanField(jIdOptions, cancelPasscodeField);
     cppIdOptions->mPasscodeLength            = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
+
+    jstring jInstanceName = (jstring) env->GetObjectField(jIdOptions, instanceNameField);
+    if (jInstanceName != nullptr)
+    {
+        const char * instanceNameCStr = env->GetStringUTFChars(jInstanceName, nullptr);
+        strncpy(cppIdOptions->mCommissioneeInstanceName, instanceNameCStr, sizeof(cppIdOptions->mCommissioneeInstanceName) - 1);
+        cppIdOptions->mCommissioneeInstanceName[sizeof(cppIdOptions->mCommissioneeInstanceName) - 1] = '\0';
+        env->ReleaseStringUTFChars(jInstanceName, instanceNameCStr);
+    }
 
     jobject targetAppInfosList = env->GetObjectField(jIdOptions, targetAppInfosField);
     VerifyOrReturnValue(

@@ -29,6 +29,42 @@ namespace core {
 
 memory::Weak<CastingPlayer> CastingPlayer::mTargetCastingPlayer;
 
+void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions)
+{
+    ChipLogProgress(AppServer, "CastingPlayer::SendUDC() called");
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    mOnCompleted         = connectionCallbacks.mOnConnectionComplete;
+    mTargetCastingPlayer = weak_from_this();
+    mIdOptions           = idOptions;
+
+    mIdOptions.LogDetail();
+
+    if (connectionCallbacks.mCommissionerDeclarationCallback != nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::SendUDC() Setting CommissionerDeclarationCallback in "
+                        "CommissionerDeclarationHandler");
+        // Set the callback for handling CommissionerDeclaration messages.
+        matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
+            connectionCallbacks.mCommissionerDeclarationCallback);
+        mClientProvidedCommissionerDeclarationCallback = true;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    SuccessOrExit(err = SendUserDirectedCommissioningRequest());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::SendUDC() failed with %" CHIP_ERROR_FORMAT, err.Format());
+        resetState(err);
+    }
+}
+
 void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks, uint16_t commissioningWindowTimeoutSec,
                                                 IdentificationDeclarationOptions idOptions)
 {

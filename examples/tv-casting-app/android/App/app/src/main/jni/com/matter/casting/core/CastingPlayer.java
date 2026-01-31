@@ -76,6 +76,34 @@ public interface CastingPlayer {
   int hashCode();
 
   /**
+   * @brief Directly sends a User-directed Commissioning request with the provided idOptions. This
+   *     bypasses additionals checks and processes around commissioning like setting up a
+   *     commissioning-window and instead can be used to directly talk to the CastingPlayer.
+   * @param connectionCallbacks contains the onSuccess (Required), onFailure (Required) and
+   *     onCommissionerDeclaration (Optional) callbacks defiend in ConnectCallbacks.java.
+   *     <p>For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the
+   *     Commissioner replies with a CommissionerDeclaration message with PasscodeDialogDisplayed
+   *     and CommissionerPasscode set to true. Given these Commissioner state details, the client is
+   *     expected to perform some actions, detailed in the continueConnecting() API below, and then
+   *     call the continueConnecting() API to complete the process.
+   * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the
+   *     Commissionee to the Commissioner. These parameters specify the information relating to the
+   *     requested commissioning session.
+   *     <p>For example: To invoke the CastingPlayer/Commissioner-Generated passcode commissioning
+   *     flow, the client would call this API with IdentificationDeclarationOptions containing
+   *     CommissionerPasscode set to true. See IdentificationDeclarationOptions.java for a complete
+   *     list of optional parameters.
+   *     <p>Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants
+   *     to interact with after commissioning. If this value is passed in,
+   *     verifyOrEstablishConnection() will force UDC, in case the desired TargetApp is not found in
+   *     the on-device CastingStore.
+   * @return MatterError - MatterError.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error.
+   */
+  MatterError sendUDC(
+      ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions);
+
+  /**
    * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new
    *     commissioning session request. If the CastingApp does not have the nodeId and fabricIndex
    *     of this CastingPlayer cached on disk, this will execute the User Directed Commissioning

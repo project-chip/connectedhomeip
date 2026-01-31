@@ -48,6 +48,67 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return kMinCommissioningWindowTimeoutSec;
 }
 
+- (NSError *)sendUDCWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
+    identificationDeclarationOptions:(MCIdentificationDeclarationOptions * _Nullable)identificationDeclarationOptions
+{
+    ChipLogProgress(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() called");
+    VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning],
+        [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE],
+        ChipLogError(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() MCCastingApp NOT running"));
+
+    dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
+    dispatch_sync(workQueue, ^{
+        matter::casting::core::IdentificationDeclarationOptions cppIdOptions = [self setupCppIdOptions:identificationDeclarationOptions];
+
+        // Handles the connection complete event and calls the MCConnectionCallbacks connectionCompleteCallback callback provided by
+        // the Swift client. This callback is called by the cpp layer when the connection process has ended, regardless of whether it
+        // was successful or not.
+        void (^connectCallback)(CHIP_ERROR, matter::casting::core::CastingPlayer *) = ^(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
+            ChipLogProgress(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() connectCallback() called");
+            dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
+            dispatch_async(clientQueue, ^{
+                if (connectionCallbacks.connectionCompleteCallback) {
+                    connectionCallbacks.connectionCompleteCallback(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
+                } else {
+                    ChipLogError(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() connectCallback(), client failed to set the connectionCompleteCallback() callback");
+                }
+            });
+        };
+        // Handles the Commissioner Declaration event and calls the MCConnectionCallbacks commissionerDeclarationCallback callback
+        // provided by the Swift client. This callback is called by the cpp layer when the Commissionee receives a
+        // CommissionerDeclaration message from the CastingPlayer/Commissioner.
+        void (^commissionerDeclarationCallback)(const chip::Transport::PeerAddress & source, const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) = ^(const chip::Transport::PeerAddress &
+                                                                                                                                                                                                           source,
+            const chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cppCommissionerDeclaration) {
+            ChipLogProgress(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() commissionerDeclarationCallback() called with cpp CommissionerDeclaration message");
+            dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
+            dispatch_async(clientQueue, ^{
+                if (connectionCallbacks.commissionerDeclarationCallback) {
+                    // convert cppCommissionerDeclaration to a shared_ptr<CommissionerDeclaration> and pass it to the client callback
+                    auto cppCommissionerDeclarationPtr = std::make_shared<chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration>(cppCommissionerDeclaration);
+                    MCCommissionerDeclaration * objcCommissionerDeclaration = [[MCCommissionerDeclaration alloc]
+                        initWithCppCommissionerDeclaration:cppCommissionerDeclarationPtr];
+                    connectionCallbacks.commissionerDeclarationCallback(objcCommissionerDeclaration);
+                } else {
+                    ChipLogError(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() commissionerDeclarationCallback(), client failed to set the optional commissionerDeclarationCallback() callback");
+                }
+            });
+        };
+
+        matter::casting::core::ConnectionCallbacks cppConnectionCallbacks;
+        cppConnectionCallbacks.mOnConnectionComplete = connectCallback;
+        if (connectionCallbacks.commissionerDeclarationCallback) {
+            cppConnectionCallbacks.mCommissionerDeclarationCallback = commissionerDeclarationCallback;
+        } else {
+            ChipLogProgress(AppServer, "MCCastingPlayer.sendUDCWithCallbacks(), client did not set the optional commissionerDeclarationCallback()");
+        }
+
+        ChipLogProgress(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() calling cpp CastingPlayer.SendUDC()");
+        _cppCastingPlayer->SendUDC(cppConnectionCallbacks, cppIdOptions);
+    });
+    return nil;
+}
+
 - (NSError *)verifyOrEstablishConnectionWithCallbacks:(MCConnectionCallbacks * _Nonnull)connectionCallbacks
 {
     ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() called, MCConnectionCallbacks parameter only");
