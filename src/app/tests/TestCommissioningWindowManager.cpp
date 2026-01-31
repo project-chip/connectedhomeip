@@ -231,6 +231,15 @@ void TestCommissioningWindowManager::ServiceEvents()
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
+Clusters::AdministratorCommissioningLogic::Context CreateContext()
+{
+    return Clusters::AdministratorCommissioningLogic::Context{
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+    };
+}
+
 void TestCommissioningWindowManager::EstablishPASEHandshake(SessionManager & sessionManager, PASESession & pairingCommissioner,
                                                             TestSecurePairingDelegate & delegateCommissioner)
 {
@@ -569,7 +578,7 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningClearsPASESession)
     EXPECT_TRUE(commissionMgr.GetPASESession().HasValue());
     EXPECT_TRUE(commissionMgr.GetPASESession().Value()->AsSecureSession()->IsPASESession());
 
-    Clusters::AdministratorCommissioningLogic logic;
+    Clusters::AdministratorCommissioningLogic logic(CreateContext());
     Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
 
     ASSERT_EQ(logic.RevokeCommissioning(unused), Protocols::InteractionModel::Status::Success);
@@ -649,7 +658,7 @@ TEST_F(TestCommissioningWindowManager, RevokeCommissioningAfterCommissioningTime
     ASSERT_FALSE(commissionMgr.IsCommissioningWindowOpen());
     ASSERT_TRUE(Server::GetInstance().GetFailSafeContext().IsFailSafeArmed());
 
-    Clusters::AdministratorCommissioningLogic logic;
+    Clusters::AdministratorCommissioningLogic logic(CreateContext());
     Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
 
     // RevokeCommissioning is invoked after the commissioning window has timed out and therefore returns StatusCode::kWindowNotOpen.

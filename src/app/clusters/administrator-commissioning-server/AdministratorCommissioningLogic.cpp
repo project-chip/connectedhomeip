@@ -33,6 +33,7 @@ namespace Clusters {
 DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioningWindow(
     FabricIndex fabricIndex, const AdministratorCommissioning::Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
+
     MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
     auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
@@ -44,9 +45,9 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenCommissioning
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
-    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
+    const FabricInfo * fabricInfo = mContext.fabricTable.FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = mContext.failSafeContext;
+    auto & commissionMgr          = mContext.commissioningWindowManager;
 
     VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
     VerifyOrReturnError(failSafeContext.IsFailSafeFullyDisarmed(), ClusterStatusCode::ClusterSpecificFailure(StatusCode::kBusy));
@@ -83,9 +84,9 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::OpenBasicCommissi
 
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
 
-    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
-    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
+    const FabricInfo * fabricInfo = mContext.fabricTable.FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = mContext.failSafeContext;
+    auto & commissionMgr          = mContext.commissioningWindowManager;
 
     VerifyOrReturnError(fabricInfo != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCode::kPAKEParameterError));
 
@@ -107,7 +108,7 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received RevokeCommissioning command");
 
-    auto & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    auto & commissionMgr = mContext.commissioningWindowManager;
 
     commissionMgr.ExpireFailSafeIfHeldByOpenPASESession();
 

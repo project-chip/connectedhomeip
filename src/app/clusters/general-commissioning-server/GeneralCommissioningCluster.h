@@ -53,7 +53,7 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
-        FailSafeContext & failsafeContext;
+        FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
