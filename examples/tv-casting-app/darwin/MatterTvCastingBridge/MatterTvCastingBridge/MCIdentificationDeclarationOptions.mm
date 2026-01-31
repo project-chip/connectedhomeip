@@ -174,10 +174,9 @@
     cppIdOptions.mCancelPasscode = [self getCancelPasscode];
     cppIdOptions.mPasscodeLength = [self getPasscodeLength];
 
-    NSString *instanceNameStr = [self getInstanceName];
-    if (instanceNameStr != nil && instanceNameStr.length > 0)
-    {
-        const char *instanceName = [instanceNameStr UTF8String];
+    NSString * instanceNameStr = [self getInstanceName];
+    if (instanceNameStr != nil && instanceNameStr.length > 0) {
+        const char * instanceName = [instanceNameStr UTF8String];
         strncpy(cppIdOptions.mCommissioneeInstanceName, instanceName, sizeof(cppIdOptions.mCommissioneeInstanceName) - 1);
         cppIdOptions.mCommissioneeInstanceName[sizeof(cppIdOptions.mCommissioneeInstanceName) - 1] = '\0';
     }

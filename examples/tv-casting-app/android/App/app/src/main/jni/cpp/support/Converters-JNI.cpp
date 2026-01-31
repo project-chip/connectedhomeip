@@ -487,7 +487,8 @@ matter::casting::core::IdentificationDeclarationOptions * convertIdentificationD
     cppIdOptions->mPasscodeLength            = static_cast<uint8_t>(env->GetIntField(jIdOptions, passcodeLengthField));
 
     jstring jInstanceName = (jstring) env->GetObjectField(jIdOptions, instanceNameField);
-    if (jInstanceName != nullptr) {
+    if (jInstanceName != nullptr)
+    {
         const char * instanceNameCStr = env->GetStringUTFChars(jInstanceName, nullptr);
         strncpy(cppIdOptions->mCommissioneeInstanceName, instanceNameCStr, sizeof(cppIdOptions->mCommissioneeInstanceName) - 1);
         cppIdOptions->mCommissioneeInstanceName[sizeof(cppIdOptions->mCommissioneeInstanceName) - 1] = '\0';
