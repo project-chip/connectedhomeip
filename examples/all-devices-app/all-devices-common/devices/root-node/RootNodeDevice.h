@@ -42,6 +42,8 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
+        Access::AccessControl & accessControl;
+        PersistentStorageDelegate & persistentStorage;
         FailSafeContext & failsafeContext;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
