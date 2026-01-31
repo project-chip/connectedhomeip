@@ -11,5 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("groups-server") {
+import("//build_overrides/chip.gni")
+
+source_set("groups-server") {
+  sources = [
+    "GroupsCluster.cpp",
+    "GroupsCluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/identify-server:delegates",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/tracing:macros",
+    "${chip_root}/zzz_generated/app-common/clusters/GroupKeyManagement",
+    "${chip_root}/zzz_generated/app-common/clusters/Groups",
+  ]
 }

@@ -31,6 +31,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Identify::Id:
         MatterIdentifyClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Groups::Id:
+        MatterGroupsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterInitCallback(endpoint);
         break;
@@ -139,6 +142,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     {
     case app::Clusters::Identify::Id:
         MatterIdentifyClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::Groups::Id:
+        MatterGroupsClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterShutdownCallback(endpoint, shutdownType);
