@@ -495,6 +495,10 @@
 #include <clusters/TemperatureMeasurement/Commands.h>
 #include <clusters/TemperatureMeasurement/Events.h>
 #include <clusters/TemperatureMeasurement/Structs.h>
+#include <clusters/TestHiddenManufacturerSpecific/Attributes.h>
+#include <clusters/TestHiddenManufacturerSpecific/Commands.h>
+#include <clusters/TestHiddenManufacturerSpecific/Events.h>
+#include <clusters/TestHiddenManufacturerSpecific/Structs.h>
 #include <clusters/Thermostat/Attributes.h>
 #include <clusters/Thermostat/Commands.h>
 #include <clusters/Thermostat/Events.h>

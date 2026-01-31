@@ -1079,6 +1079,12 @@ jobs:
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/tests/scripts/mobile-device-test.py'
                   scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app"
+                  scripts/run_in_python_env.sh out/venv "scripts/tests/run_python_test.py \
+                      --factory-reset \
+                      --app objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app \
+                      --app-args '--discriminator 1234 --KVS kvs1' \
+                      --script-args '--commissioning-method on-network --discriminator 1234 --passcode 20202021 --endpoint 1' \
+                      --script src/python_testing/test_testing/test_manufacturer_specific_cluster.py"
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}

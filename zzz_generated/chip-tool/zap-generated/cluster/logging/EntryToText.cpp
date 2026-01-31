@@ -311,6 +311,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FaultInjection";
     case chip::app::Clusters::SampleMei::Id:
         return "SampleMei";
+    case chip::app::Clusters::TestHiddenManufacturerSpecific::Id:
+        return "TestHiddenManufacturerSpecific";
     default:
         return "Unknown";
     }
@@ -5120,6 +5122,25 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::SampleMei::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::SampleMei::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TestHiddenManufacturerSpecific::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::TestAttribute::Id:
+            return "TestAttribute";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TestHiddenManufacturerSpecific::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
