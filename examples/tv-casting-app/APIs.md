@@ -1197,7 +1197,7 @@ matter::casting::core::ConnectionCallbacks connectionCallbacks;
 connectionCallbacks.mCommissionerDeclarationCallback = [&instanceName, &targetCastingPlayer](
     const chip::Transport::PeerAddress & source,
     chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) {
-    
+
     if (cd.GetNoAppsFound()) {
         ChipLogProgress(AppServer, "Target app not found on CastingPlayer");
         // Handle the case where the app is not installed
@@ -1206,12 +1206,12 @@ connectionCallbacks.mCommissionerDeclarationCallback = [&instanceName, &targetCa
         ChipLogProgress(AppServer, "Target app found on CastingPlayer");
         // App is present, you can proceed with commissioning if desired
     }
-    
+
     // Step 4: Cancel the UDC session by sending CancelPasscode
     matter::casting::core::IdentificationDeclarationOptions cancelOptions;
     cancelOptions.mCancelPasscode = true;
     cancelOptions.mInstanceName = instanceName.c_str();
-    
+
     matter::casting::core::ConnectionCallbacks cancelCallbacks;
     // Send the cancel message using SendUDC
     targetCastingPlayer->SendUDC(cancelCallbacks, cancelOptions);
@@ -1268,7 +1268,7 @@ ConnectionCallbacks connectionCallbacks = new ConnectionCallbacks(
                 Log.i(TAG, "Target app found on CastingPlayer");
                 // App is present, you can proceed with commissioning if desired
             }
-            
+
             // Step 4: Cancel the UDC session
             IdentificationDeclarationOptions cancelOptions = new IdentificationDeclarationOptions(
                 /* noPasscode= */ false,
@@ -1279,7 +1279,7 @@ ConnectionCallbacks connectionCallbacks = new ConnectionCallbacks(
                 /* passcodeLength= */ 0
             );
             cancelOptions.setInstanceName(instanceName);
-            
+
             // Send the cancel message using sendUDC
             ConnectionCallbacks cancelCallbacks = new ConnectionCallbacks(
                 new MatterCallback<Void>() {
@@ -1296,7 +1296,7 @@ ConnectionCallbacks connectionCallbacks = new ConnectionCallbacks(
                 },
                 null  // No CommissionerDeclaration callback needed for cancel
             );
-            
+
             MatterError err = targetCastingPlayer.sendUDC(cancelCallbacks, cancelOptions);
             if (err.hasError()) {
                 Log.e(TAG, "Failed to send cancel UDC message: " + err);
@@ -1337,11 +1337,11 @@ let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { cd 
         self.Log.info("Target app found on CastingPlayer")
         // App is present, you can proceed with commissioning if desired
     }
-    
+
     // Step 4: Cancel the UDC session
     let cancelOptions = MCIdentificationDeclarationOptions(cancelPasscodeOnly: true)
     cancelOptions.setInstanceName(instanceName)
-    
+
     let cancelCallbacks = MCConnectionCallbacks(
         callbacks: { err in
             if err == nil {
@@ -1352,7 +1352,7 @@ let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { cd 
         },
         commissionerDeclarationCallback: nil  // No CommissionerDeclaration callback needed for cancel
     )
-    
+
     // Send the cancel message using sendUDCWithCallbacks
     let err = selectedCastingPlayer?.sendUDCWithCallbacks(cancelCallbacks, identificationDeclarationOptions: cancelOptions)
     if err != nil {
