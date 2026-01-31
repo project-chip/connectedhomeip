@@ -109,7 +109,7 @@ struct TestAccessControlCluster : public ::testing::Test
     inline static AccessControlCluster::Context defaultContext{
         .persistentStorage = Server::GetInstance().GetPersistentStorage(),
         .fabricTable       = Server::GetInstance().GetFabricTable(),
-        .accessControl     = Server::GetInstance().GetAccessControl(),
+        .accessControl     = Access::GetAccessControl(),
     };
 };
 
