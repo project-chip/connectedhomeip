@@ -119,10 +119,7 @@ struct TestAccessControlCluster : public ::testing::Test
 // and restores the previous provider in TearDown().
 struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluster
 {
-    TestAccessControlClusterWithMockProvider() :
-        mCluster(defaultContext),
-        mTester(mCluster)
-    {}
+    TestAccessControlClusterWithMockProvider() : mCluster(defaultContext), mTester(mCluster) {}
 
     void SetUp() override
     {
