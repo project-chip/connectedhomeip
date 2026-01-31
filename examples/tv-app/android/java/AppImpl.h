@@ -37,6 +37,7 @@
 #include "../include/application-basic/ApplicationBasicManager.h"
 #include "../include/content-control/ContentController.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
+#include "../include/keypad-input/AppKeypadInputManager.h"
 #include "../include/media-playback/AppMediaPlaybackManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
 #include "ChannelManager.h"
@@ -104,6 +105,7 @@ public:
         mAccountLoginDelegate(commandDelegate, setupPIN),
         mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
                                  to_underlying(SupportedProtocolsBitmap::kDash) | to_underlying(SupportedProtocolsBitmap::kHls)),
+        mKeypadInputDelegate(commandDelegate),
         mMediaPlaybackDelegate(attributeDelegate),
         mTargetNavigatorDelegate(attributeDelegate, { "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
@@ -126,7 +128,11 @@ public:
         mContentControlDelegate.SetEndpointId(GetEndpointId());
         return &mContentControlDelegate;
     };
-    KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
+    KeypadInputDelegate * GetKeypadInputDelegate() override
+    {
+        mKeypadInputDelegate.SetEndpointId(GetEndpointId());
+        return &mKeypadInputDelegate;
+    };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override
     {
         mMediaPlaybackDelegate.SetEndpointId(GetEndpointId());
@@ -145,7 +151,7 @@ protected:
     ChannelManager mChannelDelegate;
     ContentController mContentControlDelegate;
     AppContentLauncherManager mContentLauncherDelegate;
-    KeypadInputManager mKeypadInputDelegate;
+    AppKeypadInputManager mKeypadInputDelegate;
     AppMediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;
 };
