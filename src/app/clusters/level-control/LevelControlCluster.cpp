@@ -24,7 +24,6 @@
 #include <clusters/LevelControl/Commands.h>
 #include <clusters/LevelControl/Enums.h>
 #include <clusters/LevelControl/Metadata.h>
-#include <cmath>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemClock.h>
 
@@ -55,8 +54,11 @@ LevelControlValidator & GlobalLevelControlValidator()
 
 bool IsWithOnOffCommand(CommandId commandId)
 {
-    return commandId == Commands::MoveToLevelWithOnOff::Id || commandId == Commands::MoveWithOnOff::Id ||
-        commandId == Commands::StepWithOnOff::Id || commandId == Commands::StopWithOnOff::Id;
+    return commandId == Commands::MoveToLevelWithOnOff::Id //
+        || commandId == Commands::MoveWithOnOff::Id        //
+        || commandId == Commands::StepWithOnOff::Id        //
+        || commandId == Commands::StopWithOnOff::Id        //
+        ;
 }
 
 } // namespace
@@ -99,12 +101,8 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 
         if (!mStartUpCurrentLevel.IsNull())
         {
-            // Apply StartUpCurrentLevel logic (0 -> Min, Null -> Ignore, Value -> Value)
-            uint8_t target = mStartUpCurrentLevel.Value();
-            if (!IsValidLevel(target))
-            {
-                target = std::clamp<uint8_t>(target, mMinLevel, mMaxLevel);
-            }
+            // Clamp to valid levels if needed
+            const uint8_t target = std::clamp<uint8_t>(mStartUpCurrentLevel.Value(), mMinLevel, mMaxLevel);
 
             // Use SetValue to update internal state without triggering a report or check
             mCurrentLevel.SetValue(DataModel::MakeNullable(target), System::SystemClock().GetMonotonicMilliseconds64());
@@ -163,50 +161,42 @@ DataModel::ActionReturnStatus LevelControlCluster::WriteAttribute(const DataMode
     case Attributes::Options::Id: {
         BitMask<OptionsBitmap> options;
         ReturnErrorOnFailure(decoder.Decode(options));
-        VerifyOrReturnValue(mOptions != options, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         SetOptions(options);
         return Status::Success;
     }
     case Attributes::OnLevel::Id: {
         DataModel::Nullable<uint8_t> onLevel;
         ReturnErrorOnFailure(decoder.Decode(onLevel));
-        VerifyOrReturnValue(mOnLevel != onLevel, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         SetOnLevel(onLevel);
         return Status::Success;
     }
     case Attributes::DefaultMoveRate::Id: {
         DataModel::Nullable<uint8_t> rate;
         ReturnErrorOnFailure(decoder.Decode(rate));
-        VerifyOrReturnValue(mDefaultMoveRate != rate, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ReturnErrorOnFailure(SetDefaultMoveRate(rate));
         return Status::Success;
     }
     case Attributes::StartUpCurrentLevel::Id: {
         DataModel::Nullable<uint8_t> startup;
         ReturnErrorOnFailure(decoder.Decode(startup));
-        VerifyOrReturnValue(mStartUpCurrentLevel != startup, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ReturnErrorOnFailure(SetStartUpCurrentLevel(startup));
         return Status::Success;
     }
     case Attributes::OnTransitionTime::Id: {
         DataModel::Nullable<uint16_t> onTransitionTime;
         ReturnErrorOnFailure(decoder.Decode(onTransitionTime));
-        VerifyOrReturnValue(mOnTransitionTime != onTransitionTime, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         SetOnTransitionTime(onTransitionTime);
         return Status::Success;
     }
     case Attributes::OffTransitionTime::Id: {
         DataModel::Nullable<uint16_t> offTransitionTime;
         ReturnErrorOnFailure(decoder.Decode(offTransitionTime));
-        VerifyOrReturnValue(mOffTransitionTime != offTransitionTime, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         SetOffTransitionTime(offTransitionTime);
         return Status::Success;
     }
     case Attributes::OnOffTransitionTime::Id: {
         uint16_t onOffTransitionTime;
         ReturnErrorOnFailure(decoder.Decode(onOffTransitionTime));
-        VerifyOrReturnValue(mOnOffTransitionTime != onOffTransitionTime,
-                            DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         SetOnOffTransitionTime(onOffTransitionTime);
         return Status::Success;
     }
@@ -244,6 +234,7 @@ CHIP_ERROR LevelControlCluster::AcceptedCommands(const ConcreteClusterPath & pat
         Commands::Step::kMetadataEntry,
         Commands::Stop::kMetadataEntry,
         // This is odd but the spec mandates these commands even if the On/Off feature is not present
+        // Spec bug: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/12613
         Commands::MoveToLevelWithOnOff::kMetadataEntry,
         Commands::MoveWithOnOff::kMetadataEntry,
         Commands::StepWithOnOff::kMetadataEntry,
@@ -375,6 +366,10 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     VerifyOrReturnError(!mCurrentLevel.value().IsNull(), Status::Failure);
     VerifyOrReturnError(!rate.IsNull() || !mDefaultMoveRate.IsNull(), Status::Success); // No movement if rate is unspecified
 
+    // If rate is null, use default move rate (one of the two is guaranteed to be non-null here because of the earlier check)
+    uint8_t currentRate = !rate.IsNull() ? rate.Value() : mDefaultMoveRate.Value();
+    VerifyOrReturnError(currentRate != 0, Status::ConstraintError);
+
     if (IsWithOnOffCommand(commandId) && moveMode == MoveModeEnum::kUp)
     {
         ReturnErrorOnFailure(SetOnOff(true));
@@ -386,9 +381,6 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
 
     mCurrentCommandId = commandId;
     CancelTimer(); // Cancel any currently active transition before starting a new one.
-
-    // If rate is null, use default move rate
-    uint8_t currentRate = !rate.IsNull() ? rate.Value() : mDefaultMoveRate.Value();
 
     // Determine Direction first
     mIncreasing = (moveMode == MoveModeEnum::kUp);
@@ -499,6 +491,10 @@ DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId command
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     CancelTimer();
     UpdateRemainingTime(0, ReportingMode::kCommand);
+    // mCurrentLevel is guaranteed to have a value here.
+    // - If we were transitioning, it had a value.
+    // - If we weren't transitioning, it maintains its last state.
+    // - Startup ensures it has a value (either from NVM or defaults).
     return SetCurrentLevel(mCurrentLevel.value().Value());
 }
 
@@ -529,8 +525,14 @@ CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level)
     VerifyOrReturnError(IsValidLevel(level), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mCurrentLevel.value().IsNull() || mCurrentLevel.value().Value() != level, CHIP_NO_ERROR); // No change
 
-    mCurrentLevel.SetValue(DataModel::MakeNullable(level), System::SystemClock().GetMonotonicMilliseconds64());
-    NotifyAttributeChanged(Attributes::CurrentLevel::Id);
+    // Force report even if it violates the quieter reporting policy (e.g. within 1s of last report),
+    // because this is a state change that must be reported (e.g. end of transition).
+    AttributeDirtyState dirtyState = mCurrentLevel.SetValue(
+        DataModel::MakeNullable(level), System::SystemClock().GetMonotonicMilliseconds64(), [](const auto &) { return true; });
+    if (dirtyState == AttributeDirtyState::kMustReport)
+    {
+        NotifyAttributeChanged(Attributes::CurrentLevel::Id);
+    }
     StoreCurrentLevel(mCurrentLevel.value());
     mDelegate.OnLevelChanged(level);
 
@@ -643,7 +645,7 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
             auto lastDirty = candidate.lastDirtyValue.ValueOr(0);
             auto newValue  = candidate.newValue.ValueOr(0);
 
-            return ((newValue == 0 && lastDirty != 0) || std::abs(static_cast<int>(newValue) - static_cast<int>(lastDirty)) > 10);
+            return ((newValue == 0 && lastDirty != 0) || (newValue > lastDirty ? newValue - lastDirty : lastDirty - newValue) > 10);
         }) == AttributeDirtyState::kMustReport)
     {
         NotifyAttributeChanged(Attributes::RemainingTime::Id);
@@ -688,6 +690,8 @@ void LevelControlCluster::TimerFired()
     // End of transition
     if (currentLevel == mTargetLevel)
     {
+        // Safe to ignore error: mTargetLevel was validated when starting the transition.
+        // SetCurrentLevel calls mDelegate.OnLevelChanged(currentLevel), so the delegate is updated.
         RETURN_SAFELY_IGNORED SetCurrentLevel(currentLevel);
 
         UpdateRemainingTime(0, ReportingMode::kCommand); // Transition complete, ensure RemainingTime is 0
@@ -715,15 +719,7 @@ void LevelControlCluster::OnOffChanged(bool isOn)
     {
         // On Transition
         // 2. Determine Target Level (Capture before setting to Min)
-        uint8_t target = kMaxLevel; // Default Max
-        if (!mOnLevel.IsNull())
-        {
-            target = mOnLevel.Value();
-        }
-        else if (!mStoredLevel.IsNull())
-        {
-            target = mStoredLevel.Value();
-        }
+        const uint8_t target = mOnLevel.ValueOr(mLevelBeforeTurnedOff.ValueOr(kMaxLevel));
 
         // 1. Set to MinLevel
         // Ignore error as we are internally forcing a valid level (MinLevel) to start the transition.
@@ -748,7 +744,7 @@ void LevelControlCluster::OnOffChanged(bool isOn)
     {
         // Off Transition
         // Store CurrentLevel
-        mStoredLevel = mCurrentLevel.value();
+        mLevelBeforeTurnedOff = mCurrentLevel.value();
 
         // Move to MinLevel
         DataModel::Nullable<uint16_t> transitionTime;
