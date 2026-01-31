@@ -95,8 +95,21 @@ _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32, c_char_p, c_char_p, PyChipError)
+
+DevicePairingDelegate_OnCommissioningStatusUpdateFunct: typing.TypeAlias = typing.Callable[
+    [int, int, PyChipError],
+    None,
+]
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
     None, c_uint64, c_uint8, PyChipError)
+
+DevicePairingDelegate_OnCommissioningStageStartFunct: typing.TypeAlias = typing.Callable[
+    [int, bytes],
+    None,
+]
+_DevicePairingDelegate_OnCommissioningStageStartFunct = CFUNCTYPE(
+    None, c_uint64, c_char_p)
+
 _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
     None, c_uint64)
 # void (*)(Device *, CHIP_ERROR).
@@ -636,6 +649,22 @@ class ChipDeviceControllerBase():
     def isActive(self) -> bool:
         return self._isActive
 
+    def setCommissioningStatusUpdateCallback(
+        self,
+        commissioning_status_callback: DevicePairingDelegate_OnCommissioningStatusUpdateFunct,
+    ) -> None:
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+            self.pairingDelegate, commissioning_status_callback
+        )
+
+    def setCommissioningStageStartCallback(
+        self,
+        callback: DevicePairingDelegate_OnCommissioningStageStartFunct,
+    ) -> None:
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(
+            self.pairingDelegate, callback
+        )
+
     def Shutdown(self):
         '''
         Shuts down this controller and reclaims any used resources, including the bound
@@ -757,6 +786,29 @@ class ChipDeviceControllerBase():
                     self.devCtrl, discriminator, setupPinCode, nodeId)
             )
 
+            return await asyncio.futures.wrap_future(ctx.future)
+
+    async def ContinueCommissioningAfterConnectNetworkRequest(self, nodeId: int) -> int:
+        '''
+        This method is used in case of NFC-based Commissioning without power.
+        It instructs the commissioner to proceed to the 2nd commissioning phase on the
+        operational network, after the device has connected to that network.
+
+        Args:
+            nodeId (int): The node ID of the device (commissionee).
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
+        '''
+        self.CheckIsActive()
+
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(False)
+
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest(
+                    self.devCtrl, nodeId)
+            )
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def UnpairDevice(self, nodeId: int) -> None:
@@ -2444,6 +2496,10 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint16, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectNFC.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = PyChipError
@@ -2570,6 +2626,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.restype = PyChipError
+
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.argtypes = [
+                c_void_p, _DevicePairingDelegate_OnCommissioningStageStartFunct]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.restype = PyChipError
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnFabricCheckFunct]

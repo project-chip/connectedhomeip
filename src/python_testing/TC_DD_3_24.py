@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
 import logging
 
 from mobly import asserts
@@ -29,14 +28,16 @@ from matter.testing.runner import default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_DD_3_23(MatterBaseTest):
-    def desc_TC_DD_3_23(self) -> str:
-        return "[TC-DD-3.23] NFC-based commissioning - DUT with power [DUT as Commissionee]"
+class TC_DD_3_24(MatterBaseTest):
+    def desc_TC_DD_3_24(self) -> str:
+        return "[TC-DD-3.24] NFC-based commissioning - DUT without power [DUT as Commissionee]"
 
-    def steps_TC_DD_3_23(self) -> list[TestStep]:
+    def steps_TC_DD_3_24(self) -> list[TestStep]:
         return [
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
-            TestStep(2, 'Validate the NFC bit in payload and Perform the commissioning')
+            TestStep(2, "Validate the NFC bit in payload and perform the first phase of the commissioning, over NFC"),
+            TestStep(3, "DUT is powered ON."),
+            TestStep(4, "Commissioning is completed on the operational network."),
         ]
 
     def setup_test(self):
@@ -74,7 +75,7 @@ class TC_DD_3_23(MatterBaseTest):
         self.default_controller.setCommissioningStageStartCallback(self._commissioning_stage_start_callback)
 
     @async_test_body
-    async def test_TC_DD_3_23(self):
+    async def test_TC_DD_3_24(self):
 
         # Step 1: Here we check if the Tag is connected to the Host machine and read the NFC Tag data
         self.step(1)
@@ -95,10 +96,39 @@ class TC_DD_3_23(MatterBaseTest):
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
+
+        log.info("default_controller in test: %s (id=%s)",
+                 getattr(self, "default_controller", None),
+                 hex(id(self.default_controller)) if hasattr(self, "default_controller") else "N/A")
+
         commissioning_success = await self.commission_devices()
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
+        asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen!")
 
-        asserts.assert_false(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was seen which is not expected!")
+        self.step(3)
+
+        self.wait_for_user_input(prompt_msg="Power ON the device")
+
+        self.step(4)
+
+        asserts.assert_not_equal(
+            self.commissionee_node_id, 0,
+            "commissionee_node_id was not set before calling ContinueCommissioningAfterConnectNetworkRequest"
+        )
+
+        log.info(f"commissionee_node_id : 0x{self.commissionee_node_id:X}")
+
+        effective_node_id = await self.default_controller.ContinueCommissioningAfterConnectNetworkRequest(
+            self.commissionee_node_id
+        )
+
+        asserts.assert_equal(
+            effective_node_id,
+            self.commissionee_node_id,
+            "Effective node ID returned by ContinueCommissioningAfterConnectNetworkRequest "
+            "does not match commissionee_node_id"
+        )
+
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
 
 
