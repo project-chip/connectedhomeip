@@ -79,6 +79,11 @@ def diff_clusters(prior_revision: PrebuiltDataModelDirectory, new_revision: Preb
         changes = []
         if old.revision != new.revision:
             changes.append(f'\tRevision change - old: {old.revision} new: {new.revision}')
+            for r in range(old.revision+1, new.revision+1):
+                try:
+                    changes.append(f'\t\t{r}: {new.revision_desc[r]}')
+                except KeyError:
+                    changes.append(f'\t\t{r}: NOT PRESENT IN SPEC')
         changes.extend(str_element_changes('Features', old.features, new.features))
         changes.extend(str_element_changes('Attributes', old.attributes, new.attributes))
         changes.extend(str_element_changes('Accepted Commands', old.accepted_commands, new.accepted_commands))
@@ -110,6 +115,11 @@ def diff_device_types(prior_revision: PrebuiltDataModelDirectory, new_revision: 
         changes = []
         if old.revision != new.revision:
             changes.append(f'\tRevision change - old: {old.revision} new: {new.revision}')
+            for r in range(old.revision+1, new.revision+1):
+                try:
+                    changes.append(f'\t\t{r}: {new.revision_desc[r]}')
+                except KeyError:
+                    changes.append(f'\t\t{r}: NOT PRESENT IN SPEC')
         changes.extend(str_element_changes('Server Clusters', old.server_clusters, new.server_clusters))
         changes.extend(str_element_changes('Client Clusters', old.client_clusters, new.client_clusters))
 
@@ -119,37 +129,64 @@ def diff_device_types(prior_revision: PrebuiltDataModelDirectory, new_revision: 
 
 
 def _get_provisional(items):
-    return [e.name for e in items if e.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL]
+    return {e.name for e in items if e.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL}
 
 
-def get_all_provisional_clusters(new_revision: PrebuiltDataModelDirectory):
-    clusters, _ = build_xml_clusters(new_revision)
+def get_provisional_diff(rev1: PrebuiltDataModelDirectory, rev2: PrebuiltDataModelDirectory):
+    clusters_rev1, _ = build_xml_clusters(rev1)
+    clusters_rev2, _ = build_xml_clusters(rev2)
 
-    provisional_clusters = [c.name for c in clusters.values() if c.is_provisional]
-    print('\n\nProvisional Clusters')
-    print(f'\t{sorted(provisional_clusters)}')
+    provisional_clusters_rev1 = [c.name for c in clusters_rev1.values() if c.is_provisional]
+    provisional_clusters_rev2 = [c.name for c in clusters_rev2.values() if c.is_provisional]
 
-    for c in clusters.values():
-        features = _get_provisional(c.features.values())
-        attributes = _get_provisional(c.attributes.values())
-        accepted_commands = _get_provisional(c.accepted_commands.values())
-        generated_commands = _get_provisional(c.generated_commands.values())
-        events = _get_provisional(c.events.values())
+    rev2_additional_provisional_clusters = set(provisional_clusters_rev2) - set(provisional_clusters_rev1)
+    print(f'\n\nProvisional clusters in {rev2.dirname} not in {rev1.dirname}')
+    print(f'\t{sorted(rev2_additional_provisional_clusters)}')
+
+    for id, c2 in clusters_rev2.items():
+        if id not in clusters_rev1:
+            continue
+        c1 = clusters_rev1[id]
+        rev2_provisional_features = _get_provisional(c2.features.values())
+        rev1_provisional_features = _get_provisional(c1.features.values())
+        features = rev2_provisional_features - rev1_provisional_features
+
+        rev2_provisional_attributes = _get_provisional(c2.attributes.values())
+        rev1_provisional_attributes = _get_provisional(c1.attributes.values())
+        attributes = rev2_provisional_attributes - rev1_provisional_attributes
+
+        rev2_provisional_accepted_commands = _get_provisional(c2.accepted_commands.values())
+        rev1_provisional_accepted_commands = _get_provisional(c1.accepted_commands.values())
+        accepted_commands = rev2_provisional_accepted_commands - rev1_provisional_accepted_commands
+
+        rev2_provisional_generated_commands = _get_provisional(c2.generated_commands.values())
+        rev1_provisional_generated_commands = _get_provisional(c1.generated_commands.values())
+        generated_commands = rev2_provisional_generated_commands - rev1_provisional_generated_commands
+
+        rev2_provisional_events = _get_provisional(c2.events.values())
+        rev1_provisional_events = _get_provisional(c1.events.values())
+        events = rev2_provisional_events - rev1_provisional_events
 
         if not features and not attributes and not accepted_commands and not generated_commands and not events:
             continue
 
-        print(f'\n{c.name}')
+        print(f'\n{c2.name}')
+        print(f'Provisional elements in {rev2.dirname} that are not provisional in {rev1.dirname}')
         if features:
-            print(f'\tProvisional features: {features}')
+            print(f'\tFeatures: {features}')
         if attributes:
-            print(f'\tProvisional attributes: {attributes}')
+            print(f'\tAttributes: {attributes}')
         if accepted_commands:
-            print(f'\tProvisional accepted commands: {accepted_commands}')
+            print(f'\tAccepted commands: {accepted_commands}')
         if generated_commands:
-            print(f'\tProvisional generated commands: {generated_commands}')
+            print(f'\tGenerated commands: {generated_commands}')
         if events:
-            print(f'\tProvisional events: {events}')
+            print(f'\tEvents: {events}')
+
+
+def get_all_provisional_clusters(prior_revision: PrebuiltDataModelDirectory, new_revision: PrebuiltDataModelDirectory):
+    get_provisional_diff(prior_revision, new_revision)
+    get_provisional_diff(new_revision, prior_revision)
 
 
 def get_all_provisional_device_types(new_revision: PrebuiltDataModelDirectory):
@@ -172,7 +209,8 @@ REVISIONS = {'1.3': PrebuiltDataModelDirectory.k1_3,
              '1.4': PrebuiltDataModelDirectory.k1_4,
              '1.4.1': PrebuiltDataModelDirectory.k1_4_1,
              '1.4.2': PrebuiltDataModelDirectory.k1_4_2,
-             '1.5': PrebuiltDataModelDirectory.k1_5}
+             '1.5': PrebuiltDataModelDirectory.k1_5,
+             '1.5.1': PrebuiltDataModelDirectory.k1_5_1}
 
 
 @click.command()
@@ -181,7 +219,8 @@ REVISIONS = {'1.3': PrebuiltDataModelDirectory.k1_3,
 def main(prior_revision: str, new_revision: str):
     diff_clusters(REVISIONS[prior_revision], REVISIONS[new_revision])
     diff_device_types(REVISIONS[prior_revision], REVISIONS[new_revision])
-    get_all_provisional_clusters(REVISIONS[new_revision])
+    print('\n\n---------------Provisional checks----------------')
+    get_all_provisional_clusters(REVISIONS[prior_revision], REVISIONS[new_revision])
     get_all_provisional_device_types(REVISIONS[new_revision])
 
 
