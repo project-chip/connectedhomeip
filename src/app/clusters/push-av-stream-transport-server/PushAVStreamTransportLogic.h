@@ -206,7 +206,6 @@ private:
     // Helpers to store and load CurrentConnections list
     CHIP_ERROR StoreCurrentConnections();
     CHIP_ERROR LoadCurrentConnections();
-    CHIP_ERROR PersistAndNotify();
 };
 
 } // namespace Clusters

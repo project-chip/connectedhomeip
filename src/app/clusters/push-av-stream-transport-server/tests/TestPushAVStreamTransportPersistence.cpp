@@ -17,10 +17,11 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
-#include <app/persistence/tests/TestPersistence.h>
-#include <lib/support/tests/CHIPFaultInjection.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -37,15 +38,16 @@ public:
 
     void SetUp() override
     {
-        ASSERT_EQ(mPersistenceProvider.Init(), CHIP_NO_ERROR);
-        SetAttributePersistenceProvider(&mPersistenceProvider);
+        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
         mLogic.Init();
     }
 
-    void TearDown() override { SetAttributePersistenceProvider(nullptr); }
+    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
 
 protected:
-    TestPersistence mPersistenceProvider;
+    ClusterTester mClusterTester;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
     PushAvStreamTransportServerLogic mLogic{ 1, BitFlags<Feature>() };
 
     CHIP_ERROR TestStore()

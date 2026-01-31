@@ -135,7 +135,7 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
     {
         mCurrentConnections.push_back(transportConfiguration);
         result = UpsertResultEnum::kInserted;
-        LogErrorOnFailure(PersistAndNotify());
+        LogErrorOnFailure(StoreCurrentConnections());
     }
 
     MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
@@ -158,7 +158,7 @@ void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uin
     // If a connection was removed, the size will be smaller.
     if (mCurrentConnections.size() < originalSize)
     {
-        LogErrorOnFailure(PersistAndNotify());
+        LogErrorOnFailure(StoreCurrentConnections());
 
         // Notify the stack that the CurrentConnections attribute has changed.
         MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
@@ -1732,17 +1732,6 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
     return GeneratePushTransportEndEvent(connectionID);
 }
 
-CHIP_ERROR PushAvStreamTransportServerLogic::PersistAndNotify()
-{
-    ReturnErrorAndLogOnFailure(StoreCurrentConnections(), Zcl,
-                               "PushAVStreamTransport[ep=%d]: Failed to persist current connections", mEndpointId);
-
-    MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                           PushAvStreamTransport::Attributes::CurrentConnections::Id);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
 {
     uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
@@ -1794,7 +1783,24 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     mCurrentConnections.clear();
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        TransportConfigurationStorage connection;
+        // Decode into a temporary DecodableType first.
+        Structs::TransportConfigurationStruct::DecodableType decodedTransportConfig;
+        ReturnErrorOnFailure(decodedTransportConfig.Decode(reader));
+
+        // Now, create the storage version which will perform a deep copy of the data.
+        std::shared_ptr<TransportOptionsStorage> transportOptionsStorage;
+        if (decodedTransportConfig.transportOptions.HasValue())
+        {
+            transportOptionsStorage = std::make_shared<TransportOptionsStorage>(decodedTransportConfig.transportOptions.Value());
+            if (!transportOptionsStorage)
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        TransportConfigurationStorage connection(decodedTransportConfig.connectionID, transportOptionsStorage);
+        connection.transportStatus = decodedTransportConfig.transportStatus;
+        connection.fabricIndex     = decodedTransportConfig.fabricIndex;
         mCurrentConnections.push_back(connection);
     }
 

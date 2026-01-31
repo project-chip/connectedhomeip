@@ -38,8 +38,8 @@ namespace PushAvStreamTransport {
 // mCENCKeyIDBuffer: 16 bytes
 // metadataEnabled: ~2 bytes (EstimateStructOverhead)
 static constexpr size_t kCMAFContainerStorageSize =
-    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t),
-                                32 /* padding for string trackname */, 16, 16, sizeof(bool));
+    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t), kMaxTrackNameLength,
+                                sizeof(uint16_t), sizeof(uint16_t), sizeof(bool));
 
 // Size calculation for ContainerOptionsStorage
 // containerType: 1 byte
@@ -64,18 +64,18 @@ static constexpr size_t kTransportZoneOptionsSize =
 static constexpr size_t kTriggerOptionsStorageSize = TLV::EstimateStructOverhead(
     sizeof(uint8_t), kTransportZoneOptionsSize, sizeof(uint8_t), kTransportZoneOptionsSize, sizeof(uint16_t));
 
-static constexpr size_t kTransportOptionsStorageSize =
-    TLV::EstimateStructOverhead(sizeof(uint8_t),              // streamUsage
-                                sizeof(uint16_t),             // videoStreamID
-                                sizeof(uint16_t),             // audioStreamID
-                                sizeof(uint16_t),             // TLSEndpointID
-                                kMaxUrlLength,                // max url
-                                sizeof(uint8_t),              // ingestMethod
-                                sizeof(uint32_t),             // expiryTime
-                                kTriggerOptionsStorageSize,   // triggerOptions
-                                kContainerOptionsStorageSize, // containerOptions
-                                2 /* Array Overhead */ + 16 * TLV::EstimateStructOverhead(32 /* stream name */, sizeof(uint16_t)),
-                                2 /* Array Overhead */ + 16 * TLV::EstimateStructOverhead(32 /* stream name */, sizeof(uint16_t)));
+static constexpr size_t kTransportOptionsStorageSize = TLV::EstimateStructOverhead(
+    sizeof(uint8_t),              // streamUsage
+    sizeof(uint16_t),             // videoStreamID
+    sizeof(uint16_t),             // audioStreamID
+    sizeof(uint16_t),             // TLSEndpointID
+    kMaxUrlLength,                // max url
+    sizeof(uint8_t),              // ingestMethod
+    sizeof(uint32_t),             // expiryTime
+    kTriggerOptionsStorageSize,   // triggerOptions
+    kContainerOptionsStorageSize, // containerOptions
+    2u /* Array Overhead */ + 16u * TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)),
+    2u /* Array Overhead */ + 16u * TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)));
 
 /**
  * @brief Storage implementation for transport trigger options.
