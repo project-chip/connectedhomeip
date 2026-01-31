@@ -50,6 +50,8 @@ if (chip_device_platform == "auto") {
 
 declare_args() {
   # Enable openthread support.
+  chip_enable_otns = false
+
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
       chip_device_platform == "cc13x4_26x4" ||

@@ -16,7 +16,9 @@
  *    limitations under the License.
  */
 
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -153,6 +155,7 @@
 #include <inet/EndPointStateOpenThread.h>
 #include <openthread-system.h>
 #include <openthread/instance.h>
+extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
 using namespace chip;
@@ -739,6 +742,32 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#if CHIP_ENABLE_OTNS
+    if (LinuxDeviceOptions::GetInstance().mOtnsArgs != nullptr)
+    {
+        std::vector<std::string> args_storage;
+        std::vector<char *> otns_args;
+        otns_args.push_back(argv[0]);
+
+        std::stringstream ss(LinuxDeviceOptions::GetInstance().mOtnsArgs);
+        std::string arg;
+        while (ss >> arg)
+        {
+            args_storage.push_back(arg);
+        }
+
+        for (auto & s : args_storage)
+        {
+            otns_args.push_back(const_cast<char *>(s.c_str()));
+        }
+
+        otSysInit(static_cast<int>(otns_args.size()), otns_args.data());
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        otAppCliInit(otInstanceGetSingle());
+        ChipLogProgress(NotSpecified, "Thread initialized with OTNS args.");
+    }
+#else
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
     {
         std::string nodeid = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
@@ -749,6 +778,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");
     }
+#endif
 #else
     if (LinuxDeviceOptions::GetInstance().mThread)
     {

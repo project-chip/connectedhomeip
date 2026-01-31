@@ -319,6 +319,39 @@ jobs:
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
 
+    build_linux_otns:
+        name: Build on Linux (otns)
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+
+        container:
+            image: ghcr.io/project-chip/chip-build:181
+
+        steps:
+            - name: Dump GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
+            - name: Checkout
+              uses: actions/checkout@v5
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+
+            - name: Setup Build, Run Build and Run Tests
+              run: |
+                scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py \
+                   --target linux-x64-all-clusters-no-wifi-openthread-endpoint-otns-clang \
+                   build
+                  "
+
     build_linux_python_lib:
         name: Build on Linux (python_lib)
 
