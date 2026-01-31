@@ -288,6 +288,7 @@ eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/GeneralDiagnosticsClusterHardwareFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/GeneralDiagnosticsClusterNetworkFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/GeneralDiagnosticsClusterRadioFaultChangeEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/GroupcastClusterGroupcastTestingEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/MediaPlaybackClusterStateChangedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/MessagesClusterMessageCompleteEvent.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/eventstructs/MessagesClusterMessagePresentedEvent.kt",

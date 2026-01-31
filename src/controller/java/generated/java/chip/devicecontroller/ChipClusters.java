@@ -25030,6 +25030,9 @@ public class ChipClusters {
 
     private static final long MEMBERSHIP_ATTRIBUTE_ID = 0L;
     private static final long MAX_MEMBERSHIP_COUNT_ATTRIBUTE_ID = 1L;
+    private static final long MAX_MCAST_ADDR_COUNT_ATTRIBUTE_ID = 2L;
+    private static final long USED_MCAST_ADDR_COUNT_ATTRIBUTE_ID = 3L;
+    private static final long FABRIC_UNDER_TEST_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -25046,11 +25049,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Integer keySetID, Optional<byte[]> key, Optional<Boolean> useAuxiliaryACL, Optional<Boolean> replaceEndpoints) {
-      joinGroup(callback, groupID, endpoints, keySetID, key, useAuxiliaryACL, replaceEndpoints, 0);
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Integer keySetID, Optional<byte[]> key, Optional<Boolean> useAuxiliaryACL, Optional<Boolean> replaceEndpoints, Optional<Integer> mcastAddrPolicy) {
+      joinGroup(callback, groupID, endpoints, keySetID, key, useAuxiliaryACL, replaceEndpoints, mcastAddrPolicy, 0);
     }
 
-    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Integer keySetID, Optional<byte[]> key, Optional<Boolean> useAuxiliaryACL, Optional<Boolean> replaceEndpoints, int timedInvokeTimeoutMs) {
+    public void joinGroup(DefaultClusterCallback callback, Integer groupID, ArrayList<Integer> endpoints, Integer keySetID, Optional<byte[]> key, Optional<Boolean> useAuxiliaryACL, Optional<Boolean> replaceEndpoints, Optional<Integer> mcastAddrPolicy, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -25077,6 +25080,10 @@ public class ChipClusters {
       final long replaceEndpointsFieldID = 5L;
       BaseTLVType replaceEndpointstlvValue = replaceEndpoints.<BaseTLVType>map((nonOptionalreplaceEndpoints) -> new BooleanType(nonOptionalreplaceEndpoints)).orElse(new EmptyType());
       elements.add(new StructElement(replaceEndpointsFieldID, replaceEndpointstlvValue));
+
+      final long mcastAddrPolicyFieldID = 6L;
+      BaseTLVType mcastAddrPolicytlvValue = mcastAddrPolicy.<BaseTLVType>map((nonOptionalmcastAddrPolicy) -> new UIntType(nonOptionalmcastAddrPolicy)).orElse(new EmptyType());
+      elements.add(new StructElement(mcastAddrPolicyFieldID, mcastAddrPolicytlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -25179,6 +25186,30 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void groupcastTesting(DefaultClusterCallback callback, Integer testOperation, Optional<Integer> durationSeconds) {
+      groupcastTesting(callback, testOperation, durationSeconds, 0);
+    }
+
+    public void groupcastTesting(DefaultClusterCallback callback, Integer testOperation, Optional<Integer> durationSeconds, int timedInvokeTimeoutMs) {
+      final long commandId = 5L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long testOperationFieldID = 0L;
+      BaseTLVType testOperationtlvValue = new UIntType(testOperation);
+      elements.add(new StructElement(testOperationFieldID, testOperationtlvValue));
+
+      final long durationSecondsFieldID = 1L;
+      BaseTLVType durationSecondstlvValue = durationSeconds.<BaseTLVType>map((nonOptionaldurationSeconds) -> new UIntType(nonOptionaldurationSeconds)).orElse(new EmptyType());
+      elements.add(new StructElement(durationSecondsFieldID, durationSecondstlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface LeaveGroupResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer groupID, ArrayList<Integer> endpoints);
     }
@@ -25254,6 +25285,84 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, MAX_MEMBERSHIP_COUNT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxMcastAddrCountAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_MCAST_ADDR_COUNT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_MCAST_ADDR_COUNT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxMcastAddrCountAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_MCAST_ADDR_COUNT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_MCAST_ADDR_COUNT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readUsedMcastAddrCountAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, USED_MCAST_ADDR_COUNT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, USED_MCAST_ADDR_COUNT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeUsedMcastAddrCountAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, USED_MCAST_ADDR_COUNT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, USED_MCAST_ADDR_COUNT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readFabricUnderTestAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRIC_UNDER_TEST_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FABRIC_UNDER_TEST_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeFabricUnderTestAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRIC_UNDER_TEST_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, FABRIC_UNDER_TEST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
