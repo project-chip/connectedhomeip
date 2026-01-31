@@ -108,6 +108,18 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { 
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
 } // namespace PostionSemanticTag
 
+namespace NumberSemanticTag {
+constexpr const uint8_t kNamespace                                = 0x07; // Common Number Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = { .namespaceID = kNamespace, .tag = 0x01 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = { .namespaceID = kNamespace, .tag = 0x02 };
+} // namespace NumberSemanticTag
+
+namespace GenericSwitch9866e35d0b { // Tag lists for rootnode_genericswitch_9866e35d0b app
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { PostionSemanticTag::kBottom,
+                                                                               NumberSemanticTag::kTwo };
+} // namespace GenericSwitch9866e35d0b
+
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"
 #endif
@@ -548,12 +560,31 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     CooktopCookSurfaceInit(kCooktopEpId);
 }
 
+/**
+ * This initializer is for the generic switch application rootnode_genericswitch_9866e35d0b. To not have this initialiser affect
+ * new generic switch chef app, use a different set of endpoints.
+ */
+void GenericSwitch9866e35d0bInit()
+{
+    if (DeviceTypes::EndpointHasDeviceType(1, DeviceTypes::kGenericSwitchDeviceId))
+    {
+        TEMPORARY_RETURN_IGNORED SetTagList(
+            1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch9866e35d0b::kEp1TagList));
+    }
+    if (DeviceTypes::EndpointHasDeviceType(2, DeviceTypes::kGenericSwitchDeviceId))
+    {
+        TEMPORARY_RETURN_IGNORED SetTagList(
+            2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch9866e35d0b::kEp2TagList));
+    }
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
+    GenericSwitch9866e35d0bInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER

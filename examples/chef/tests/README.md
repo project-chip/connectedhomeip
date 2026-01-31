@@ -40,13 +40,13 @@ cd connectedhomeip
 git config --global --add safe.directory "*"
 python scripts/checkout_submodules.py --shallow --recursive --platform linux
 source ./scripts/bootstrap.sh
-scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env'
+scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env -pw true'
 ```
 
 4. Build chef app -
 
 ```
-./examples/chef/chef.py -b -d {app_name} -t linux
+./examples/chef/chef.py -br -d {app_name} -t linux
 ```
 
 5. Run test file (fill in `app_name` and `test_file`) -
