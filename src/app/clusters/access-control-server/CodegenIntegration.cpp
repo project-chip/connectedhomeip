@@ -42,7 +42,7 @@ public:
         gServer.Create(AccessControlCluster::Context{
             .persistentStorage = Server::GetInstance().GetPersistentStorage(),
             .fabricTable       = Server::GetInstance().GetFabricTable(),
-            .accessControl     = Access::GetAccessControl(),
+            .accessControl     = Server::GetInstance().GetAccessControl(),
         });
         return gServer.Registration();
     }
