@@ -26,15 +26,13 @@ import com.matter.casting.support.ConnectionCallbacks;
 import com.matter.casting.support.IdentificationDeclarationOptions;
 import com.matter.casting.support.MatterCallback;
 import com.matter.casting.support.MatterError;
-import com.matter.casting.support.TargetAppInfo;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
+import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.junit.runners.JUnit4;
 
 /** Unit tests for CastingPlayer.sendUDC() functionality. */
 @RunWith(JUnit4.class)
@@ -56,12 +54,12 @@ public class CastingPlayerSendUDCTest {
     // Arrange
     MatterCallback<Void> successCallback = mock(MatterCallback.class);
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -82,13 +80,13 @@ public class CastingPlayerSendUDCTest {
     // Arrange
     MatterCallback<Void> successCallback = mock(MatterCallback.class);
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
     when(idOptions.isNoPasscode()).thenReturn(true);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -109,13 +107,13 @@ public class CastingPlayerSendUDCTest {
     // Arrange
     MatterCallback<Void> successCallback = mock(MatterCallback.class);
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
     when(idOptions.isCancelPasscode()).thenReturn(true);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -137,13 +135,13 @@ public class CastingPlayerSendUDCTest {
 
     MatterCallback<Void> successCallback = mock(MatterCallback.class);
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
     when(idOptions.getInstanceName()).thenReturn(instanceName);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -166,13 +164,13 @@ public class CastingPlayerSendUDCTest {
 
     MatterCallback<Void> successCallback = mock(MatterCallback.class);
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
     when(idOptions.isNoPasscode()).thenReturn(true);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -185,8 +183,8 @@ public class CastingPlayerSendUDCTest {
   }
 
   /**
-   * Test: sendUDC with CommissionerDeclarationCallback Verifies that sendUDC properly registers
-   * the CommissionerDeclarationCallback
+   * Test: sendUDC with CommissionerDeclarationCallback Verifies that sendUDC properly registers the
+   * CommissionerDeclarationCallback
    */
   @Test
   public void testSendUDC_WithCommissionerDeclarationCallback() {
@@ -197,13 +195,13 @@ public class CastingPlayerSendUDCTest {
         mock(MatterCallback.class);
 
     ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(
-            successCallback, failureCallback, commissionerDeclarationCallback);
+        new ConnectionCallbacks(successCallback, failureCallback, commissionerDeclarationCallback);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
     when(idOptions.isNoPasscode()).thenReturn(true);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -236,7 +234,8 @@ public class CastingPlayerSendUDCTest {
             boolean appFound = !cd.getNoAppsFound();
 
             // Send CancelPasscode to end the UDC session
-            IdentificationDeclarationOptions cancelOptions = mock(IdentificationDeclarationOptions.class);
+            IdentificationDeclarationOptions cancelOptions =
+                mock(IdentificationDeclarationOptions.class);
             when(cancelOptions.isCancelPasscode()).thenReturn(true);
             when(cancelOptions.getInstanceName()).thenReturn(instanceName);
 
@@ -249,14 +248,14 @@ public class CastingPlayerSendUDCTest {
         };
 
     ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(
-            successCallback, failureCallback, commissionerDeclarationCallback);
+        new ConnectionCallbacks(successCallback, failureCallback, commissionerDeclarationCallback);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
     when(idOptions.isNoPasscode()).thenReturn(true);
     when(idOptions.getInstanceName()).thenReturn(instanceName);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -281,13 +280,13 @@ public class CastingPlayerSendUDCTest {
 
     MatterCallback<Void> successCallback = mock(MatterCallback.class);
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
     when(idOptions.isNoPasscode()).thenReturn(true);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act
@@ -299,21 +298,19 @@ public class CastingPlayerSendUDCTest {
     assertTrue("NoPasscode should be set", idOptions.isNoPasscode());
   }
 
-  /**
-   * Test: sendUDC with error response Verifies that sendUDC properly handles error responses
-   */
+  /** Test: sendUDC with error response Verifies that sendUDC properly handles error responses */
   @Test
   public void testSendUDC_WithError() {
     // Arrange
     MatterCallback<Void> successCallback = mock(MatterCallback.class);
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
 
     MatterError errorResult = new MatterError(1, "Test error");
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(errorResult);
 
     // Act
@@ -336,12 +333,12 @@ public class CastingPlayerSendUDCTest {
     MatterCallback<MatterError> failureCallback = mock(MatterCallback.class);
 
     // Create callbacks with required callbacks
-    ConnectionCallbacks callbacks =
-        new ConnectionCallbacks(successCallback, failureCallback, null);
+    ConnectionCallbacks callbacks = new ConnectionCallbacks(successCallback, failureCallback, null);
 
     IdentificationDeclarationOptions idOptions = mock(IdentificationDeclarationOptions.class);
 
-    when(mockCastingPlayer.sendUDC(any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
+    when(mockCastingPlayer.sendUDC(
+            any(ConnectionCallbacks.class), any(IdentificationDeclarationOptions.class)))
         .thenReturn(MatterError.NO_ERROR);
 
     // Act

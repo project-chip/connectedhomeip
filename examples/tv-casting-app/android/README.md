@@ -151,7 +151,8 @@ running on a Raspberry Pi.
 
 ## Running Unit Tests
 
-The Android TV Casting app includes unit tests for the SendUDC functionality and other features.
+The Android TV Casting app includes unit tests for the SendUDC functionality and
+other features.
 
 ### Running All Tests
 
@@ -179,11 +180,13 @@ After running tests, you can view detailed HTML reports:
 open app/build/reports/tests/testDebugUnitTest/index.html
 ```
 
-Or navigate to `app/build/reports/tests/testDebugUnitTest/` in your file browser.
+Or navigate to `app/build/reports/tests/testDebugUnitTest/` in your file
+browser.
 
 ### Test Coverage
 
-The SendUDC test suite (`CastingPlayerSendUDCTest.java`) includes 10 test cases covering:
+The SendUDC test suite (`CastingPlayerSendUDCTest.java`) includes 10 test cases
+covering:
 
 1. Basic sendUDC invocation with minimal options
 2. NoPasscode flag handling for app detection
@@ -199,12 +202,15 @@ The SendUDC test suite (`CastingPlayerSendUDCTest.java`) includes 10 test cases 
 ### Troubleshooting Tests
 
 **Issue**: Tests don't run or show as "up-to-date"
-- **Solution**: Clean and rebuild: `./gradlew clean test`
+
+-   **Solution**: Clean and rebuild: `./gradlew clean test`
 
 **Issue**: Native method errors (UnsatisfiedLinkError)
-- **Solution**: Ensure all native objects are properly mocked in tests
+
+-   **Solution**: Ensure all native objects are properly mocked in tests
 
 **Issue**: Gradle version compatibility errors
-- **Solution**: Verify you're using JDK 11 (not JDK 17) as per the build requirements above
+
+-   **Solution**: Verify you're using JDK 11 (not JDK 17) as per the build requirements above
 
 For more details on the test implementation, see the [test documentation](tv-casting-common/core/tests/README.md).
