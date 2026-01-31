@@ -56,7 +56,10 @@ CHIP_ERROR WifiScanResponseToTLV::EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag
                 result.bssid    = ByteSpan(scanResponse.bssid, sizeof(scanResponse.bssid));
                 result.channel  = scanResponse.channel;
                 result.wiFiBand = scanResponse.wiFiBand;
-                result.rssi     = scanResponse.rssi;
+                if (scanResponse.signal.type == DeviceLayer::NetworkCommissioning::WirelessSignalType::kdBm)
+                    result.rssi = scanResponse.signal.strength;
+                else
+                    result.rssi = 0;
                 ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), result));
 
                 ++networksEncoded;
