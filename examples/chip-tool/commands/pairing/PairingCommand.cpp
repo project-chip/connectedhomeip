@@ -17,12 +17,31 @@
  */
 
 #include "PairingCommand.h"
+#include "commissioner/error.hpp"
+#include "core/CHIPError.h"
+#include "dnssd/TxtFields.h"
+#include "dnssd/Types.h"
+#include "dnssd/minimal_mdns/Parser.h"
+#include "dnssd/minimal_mdns/QueryBuilder.h"
+#include "dnssd/minimal_mdns/RecordData.h"
+#include "dnssd/minimal_mdns/core/Constants.h"
+#include "dnssd/minimal_mdns/core/DnsHeader.h"
+#include "dnssd/minimal_mdns/core/QNameString.h"
+#include "inet/IPAddress.h"
+#include "inet/InetInterface.h"
 #include "platform/PlatformManager.h"
 #include <commands/common/DeviceScanner.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <cstddef>
+#include <future>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/ThreadDiscoveryCode.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <memory>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <protocols/secure_channel/PASESession.h>
 
 #include <setup_payload/ManualSetupPayloadParser.h>
@@ -30,9 +49,17 @@
 
 #include "../dcl/DCLClient.h"
 #include "../dcl/DisplayTermsAndConditions.h"
+#include "../third_party/ot-commissioner/repo/include/commissioner/commissioner.hpp"
+#include "support/BytesToHex.h"
+#include "support/CHIPMemString.h"
+#include "support/CodeUtils.h"
+#include "support/Span.h"
+#include "support/ThreadOperationalDataset.h"
 
 #include <iostream>
 #include <string>
+#include <sys/socket.h>
+#include <vector>
 
 using namespace ::chip;
 using namespace ::chip::Controller;
@@ -70,6 +97,11 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Unpair(remoteId);
         break;
     case PairingMode::Code:
+        if (mThreadBaPort.HasValue())
+        {
+            err = PairWithMeshCoP();
+            break;
+        }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
             mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
@@ -324,7 +356,7 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
         // be because the device is a ble device. In this case let's fall back to looking for
         // a device with this index and some RendezvousParameters.
         SetupPayload payload;
-        bool isQRCode = strncmp(mOnboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+        bool isQRCode = strncmp(OnboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
         if (isQRCode)
         {
             ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
@@ -358,6 +390,340 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 }
 
+class CommissionProxy : public ot::commissioner::CommissionerHandler,
+                        public mdns::Minimal::ParserDelegate,
+                        public mdns::Minimal::TxtRecordDelegate
+{
+    chip::Dnssd::DiscoveredNodeData nodeData;
+    int proxyFd          = -1;
+    bool aborted         = false;
+    uint16_t servicePort = 0;
+    bool notified        = false;
+
+    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override
+    {
+        ChipLogProgress(chipTool, "srp update=%d, msgId=%u, zoneCount=%u, prerequisiteCount=%u updateCount=%u additionalCount=%u",
+                        header.GetFlags().IsUpdate(), header.GetMessageId(), header.GetZoneCount(), header.GetPrerequisiteCount(),
+                        header.GetUpdateCount(), header.GetAdditionalCount());
+
+        if (header.GetUpdateCount() == 0)
+        {
+            ChipLogProgress(chipTool, "srp no update");
+        }
+
+        mdns::Minimal::BitPackedFlags flags = header.GetFlags();
+
+        flags.SetResponse();
+
+        std::vector<uint8_t> buffer(mdns::Minimal::ConstHeaderRef::kSizeBytes);
+        mdns::Minimal::HeaderRef response{ buffer.data() };
+        response.Clear();
+        response.SetMessageId(header.GetMessageId());
+        response.SetFlags(flags);
+
+        {
+            auto error = commissioner->SendToJoiner(JoinerIdToBytes(mJoinerId), mSrpClientPort, buffer);
+
+            if (error != ot::commissioner::ErrorCode::kNone)
+            {
+                aborted = true;
+            }
+        }
+    }
+
+    void OnQuery(const mdns::Minimal::QueryData & data) override
+    {
+        if (notified)
+        {
+            ChipLogProgress(chipTool, "already notified");
+        }
+
+        ChipLogProgress(chipTool, "srp zone: %s", mdns::Minimal::QNameString(data.GetName()).c_str());
+        nodeData.Set<Dnssd::CommissionNodeData>();
+    }
+
+    void OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data) override
+    {
+        if (notified)
+        {
+            ChipLogProgress(chipTool, "already notified");
+            return;
+        }
+
+        auto name = mdns::Minimal::QNameString(data.GetName());
+
+        auto & commissionData = nodeData.Get<Dnssd::CommissionNodeData>();
+
+        switch (data.GetType())
+        {
+        case mdns::Minimal::QType::A:
+        case mdns::Minimal::QType::AAAA:
+            Platform::CopyString(commissionData.hostName, name.c_str());
+            break;
+        case mdns::Minimal::QType::SRV: {
+            mdns::Minimal::SrvRecord srv;
+
+            Platform::CopyString(commissionData.instanceName, name.c_str());
+
+            if (!srv.Parse(data.GetData(), data.GetData()))
+            {
+                ChipLogProgress(chipTool, "failed to parse the SRV record");
+                return;
+            }
+
+#define MATTERC_SERVICE_SUFFIX "_matterc._udp.default.service.arpa"
+            if (!name.EndsWith(MATTERC_SERVICE_SUFFIX))
+            {
+                ChipLogProgress(chipTool, "unexpected service: %s", name.c_str());
+                return;
+            }
+
+            servicePort = srv.GetPort();
+
+            if (proxyFd != -1)
+            {
+                ChipLogProgress(chipTool, "already created");
+                return;
+            }
+
+            proxyFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+            if (proxyFd < 0)
+            {
+                ChipLogProgress(chipTool, "failed to create socket: %s", strerror(errno));
+                return;
+            }
+
+            {
+                sockaddr_in addr{
+                    AF_INET,
+                    0,
+                    { htobe32(0x7f000001) },
+                };
+
+                if (bind(proxyFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) != 0)
+                {
+                    ChipLogProgress(chipTool, "failed to bind proxy: %s", strerror(errno));
+                    close(proxyFd);
+                    proxyFd = -1;
+                    return;
+                }
+
+                socklen_t addr_len = sizeof(addr);
+                if (getsockname(proxyFd, reinterpret_cast<struct sockaddr *>(&addr), &addr_len) == -1)
+                {
+                    ChipLogProgress(chipTool, "failed to getsockname: %s", strerror(errno));
+                    close(proxyFd);
+                    proxyFd = -1;
+                    return;
+                }
+
+                commissionData.numIPs = 1;
+                commissionData.port   = ntohs(addr.sin_port);
+
+                ChipLogProgress(chipTool, "created proxy port=%u", commissionData.port);
+
+                commissionData.ipAddress[0] = Inet::IPAddress::FromSockAddr(addr);
+                commissionData.interfaceId  = Inet::InterfaceId::FromIPAddress(commissionData.ipAddress[0]);
+            }
+            break;
+        }
+        case mdns::Minimal::QType::TXT:
+            mdns::Minimal::ParseTxtRecord(data.GetData(), this);
+            break;
+        default:
+            break;
+        }
+    }
+    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
+    {
+        ByteSpan key(name.Start(), name.Size());
+        ByteSpan val(value.Start(), value.Size());
+
+        Dnssd::FillNodeDataFromTxt(key, val, nodeData.Get<Dnssd::CommissionNodeData>());
+    }
+
+    // Commissioner Handler
+    uint16_t mSrpClientPort = 0;
+    uint64_t mJoinerId      = 0;
+    std::vector<uint8_t> mJoinerIdBytes;
+    std::promise<Dnssd::DiscoveredNodeData> mTask;
+
+    static uint64_t JoinerIdFromBytes(const std::vector<uint8_t> & bytes)
+    {
+        const uint8_t * buffer = bytes.data();
+
+        return Encoding::BigEndian::Read64(buffer);
+    }
+    static std::vector<uint8_t> JoinerIdToBytes(uint64_t joinerId)
+    {
+        std::vector<uint8_t> bytes(sizeof(uint64_t));
+        uint8_t * buffer = bytes.data();
+
+        Encoding::BigEndian::Write64(buffer, joinerId);
+
+        return bytes;
+    }
+
+    void ProcessSrpUpdate(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort, const std::vector<uint8_t> & payload)
+    {
+        // Always parsing the packet to generate response.
+        if (!mdns::Minimal::ParsePacket(mdns::Minimal::BytesRange(payload.data(), payload.data() + payload.size()), this))
+        {
+            ChipLogError(chipTool, "failed to parse parsing srp");
+            return;
+        }
+
+        if (proxyFd != -1 && !notified)
+        {
+            mTask.set_value(nodeData);
+            notified = true;
+            struct sockaddr addr;
+            socklen_t addr_len             = sizeof(addr);
+            constexpr uint16_t kMaxPayload = 1280;
+            uint8_t buf[kMaxPayload];
+            ssize_t rval = -1;
+
+            while ((rval = recvfrom(proxyFd, buf, sizeof(buf), 0, &addr, &addr_len)) > 0)
+            {
+                std::vector<uint8_t> pkt(buf, &buf[rval]);
+                connect(proxyFd, &addr, addr_len);
+                auto error = commissioner->SendToJoiner(joinerIdBytes, servicePort, pkt);
+
+                if (error != ot::commissioner::ErrorCode::kNone)
+                {
+                    aborted = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    void OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
+                         const std::vector<uint8_t> & payload) override
+    {
+        if (joinerIdBytes.size() != sizeof(uint64_t))
+        {
+            ChipLogError(chipTool, "Unexpected joiner id size %zu", joinerIdBytes.size());
+            return;
+        }
+
+        if (aborted)
+        {
+            return;
+        }
+
+        uint64_t joinerId = JoinerIdFromBytes(joinerIdBytes);
+
+        ChipLogProgress(chipTool, "Get message from joiner id=0x%" PRIx64 " port=%u", joinerId, joinerPort);
+
+        if (mJoinerId == 0)
+        {
+            mJoinerId = joinerId;
+        }
+
+        if (mJoinerId != joinerId)
+        {
+            ChipLogProgress(chipTool, "Single Joiner is supported, ignoring different joiners");
+            return;
+        }
+
+        if (mSrpClientPort == 0)
+        {
+            mSrpClientPort = joinerPort;
+        }
+
+        if (mSrpClientPort == joinerPort)
+        {
+            std::thread([=]() { this->ProcessSrpUpdate(joinerIdBytes, joinerPort, payload); }).detach();
+        }
+        else if (proxyFd != -1)
+        {
+            auto sent = send(proxyFd, payload.data(), payload.size(), 0);
+            if (sent < 0)
+            {
+                ChipLogProgress(chipTool, "Failed to forward to joiner: %s", strerror(errno));
+                aborted = true;
+            }
+        }
+    }
+
+    std::shared_ptr<ot::commissioner::Commissioner> commissioner = ot::commissioner::Commissioner::Create(*this);
+
+    ot::commissioner::CommissionerDataset MakeCommissionerDataset(Thread::DiscoveryCode code)
+    {
+        ot::commissioner::CommissionerDataset dataset;
+
+        dataset.mJoinerUdpPort = ot::commissioner::kDefaultJoinerUdpPort;
+        dataset.mPresentFlags |= ot::commissioner::CommissionerDataset::kJoinerUdpPortBit;
+
+        dataset.mPresentFlags &= ~ot::commissioner::CommissionerDataset::kSessionIdBit;
+        dataset.mPresentFlags &= ~ot::commissioner::CommissionerDataset::kBorderAgentLocatorBit;
+
+        if (code.IsAny())
+        {
+            dataset.mSteeringData = std::vector<uint8_t>{ 0xff };
+        }
+        else
+        {
+            std::vector<uint8_t> joinerId = code.ToByteArray();
+            std::vector<uint8_t> steeringData(ot::commissioner::kMaxSteeringDataLength);
+
+            ot::commissioner::Commissioner::AddJoiner(steeringData, joinerId);
+            dataset.mSteeringData = steeringData;
+        }
+
+        dataset.mPresentFlags |= ot::commissioner::CommissionerDataset::kSteeringDataBit;
+
+        return dataset;
+    }
+
+public:
+    ~CommissionProxy()
+    {
+        if (proxyFd != -1)
+        {
+            close(proxyFd);
+            proxyFd = -1;
+        }
+    }
+
+    Dnssd::DiscoveredNodeData discover(uint8_t (&pskc)[Thread::kSizePSKc], const char * host, uint16_t port,
+                                       const Thread::DiscoveryCode code)
+    {
+        struct Logger : public ot::commissioner::Logger
+        {
+            void Log(ot::commissioner::LogLevel level, const std::string & region, const std::string & message) override
+            {
+                ChipLogProgress(chipTool, "[ot-commissioner][%u][%s]%s", static_cast<unsigned>(level), region.c_str(),
+                                message.c_str());
+            }
+        };
+        ot::commissioner::Config config;
+
+        config.mLogger    = std::make_shared<Logger>();
+        config.mEnableCcm = false;
+        config.mProxyMode = true;
+        config.mPSKc      = std::vector<uint8_t>(&pskc[0], &pskc[Thread::kSizePSKc]);
+
+        auto error = commissioner->Init(config);
+        VerifyOrDieWithMsg(error == ot::commissioner::ErrorCode::kNone, chipTool, "failed to init commissioner: %s",
+                           error.GetMessage().c_str());
+
+        ChipLogProgress(chipTool, "connecting to border agent");
+        std::string id;
+        error = commissioner->Petition(id, std::string(host), port);
+        VerifyOrDieWithMsg(error == ot::commissioner::ErrorCode::kNone, chipTool, "failed to connect: %s",
+                           error.GetMessage().c_str());
+
+        ChipLogProgress(chipTool, "updating steeringData for 0x%" PRIx64, code.AsUInt64());
+        error = commissioner->SetCommissionerDataset(MakeCommissionerDataset(code));
+        VerifyOrDieWithMsg(error == ot::commissioner::ErrorCode::kNone, chipTool, "failed enable joiners: %s",
+                           error.GetMessage().c_str());
+
+        return mTask.get_future().get();
+    }
+};
+
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 {
     Dnssd::DiscoveryFilter filter(mFilterType);
@@ -385,6 +751,53 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
     return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR PairingCommand::PairWithMeshCoP()
+{
+    static CommissionProxy proxy;
+
+    CHIP_ERROR error;
+    Thread::OperationalDatasetView dataset;
+    SetupPayload payload;
+
+    bool isQRCode = strncmp(mOnboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+    if (isQRCode)
+    {
+        ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    mSetupPINCode.emplace(payload.setUpPINCode);
+
+    Thread::DiscoveryCode code;
+    if (payload.discriminator.IsShortDiscriminator())
+    {
+        code = Thread::DiscoveryCode(payload.discriminator.GetShortValue(), mSetupPINCode.value());
+        ChipLogProgress(chipTool, "Discovery code from long discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+    else
+    {
+        code = Thread::DiscoveryCode(payload.discriminator.GetLongValue(), mSetupPINCode.value());
+        ChipLogProgress(chipTool, "Discovery code from short discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+    uint8_t pskc[Thread::kSizePSKc];
+
+    SuccessOrExit(error = dataset.Init(mOperationalDataset));
+
+    SuccessOrExitAction(error = dataset.GetPSKc(pskc), ChipLogProgress(chipTool, "Failed to retrieve PSKc"));
+
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    CurrentCommissioner().OnNodeDiscovered(proxy.discover(pskc, mThreadBaHost.Value(), mThreadBaPort.Value(), code));
+
+    ChipLogProgress(chipTool, "xykxyk matched one joiner");
+exit:
+    return error;
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
