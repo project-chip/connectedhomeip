@@ -688,6 +688,7 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
     }
     else
     {
+#if TARGET_OS_IPHONE
         // Suppress transient errors that don't require user notification.
         // EAGAIN: Resource temporarily unavailable (expected with non-blocking sockets)
         // ENOTCONN: Socket is not connected (can occur on iOS when device is locked)
@@ -695,6 +696,14 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         {
             OnReceiveError(this, lStatus, nullptr);
         }
+#else
+        // Suppress transient errors that don't require user notification.
+        // EAGAIN: Resource temporarily unavailable (expected with non-blocking sockets)
+        if (OnReceiveError != nullptr && lStatus != CHIP_ERROR_POSIX(EAGAIN))
+        {
+            OnReceiveError(this, lStatus, nullptr);
+        }
+#endif
     }
 }
 
