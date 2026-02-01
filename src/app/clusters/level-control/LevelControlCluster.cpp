@@ -534,9 +534,9 @@ CHIP_ERROR LevelControlCluster::SetCurrentLevel(uint8_t level, ReportingMode rep
     }
     else
     {
-        dirtyState = mCurrentLevel.SetValue(
-            DataModel::MakeNullable(level), now,
-            QuieterReportingAttribute<uint8_t>::GetPredicateForSufficientTimeSinceLastDirty(chip::System::Clock::Milliseconds64(1000)));
+        dirtyState = mCurrentLevel.SetValue(DataModel::MakeNullable(level), now,
+                                            QuieterReportingAttribute<uint8_t>::GetPredicateForSufficientTimeSinceLastDirty(
+                                                chip::System::Clock::Milliseconds64(1000)));
     }
 
     if (dirtyState == AttributeDirtyState::kMustReport)
@@ -562,8 +562,6 @@ void LevelControlCluster::StoreCurrentLevel(DataModel::Nullable<uint8_t> value)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "LevelControlCluster: Failed to store CurrentLevel: %" CHIP_ERROR_FORMAT, err.Format()));
 }
-
-
 
 CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
 {

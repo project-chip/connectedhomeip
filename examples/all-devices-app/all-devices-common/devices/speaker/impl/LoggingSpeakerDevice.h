@@ -39,8 +39,6 @@ public:
     void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> value) override;
     void OnOptionsChanged(BitMask<Clusters::LevelControl::OptionsBitmap> value) override;
     void OnOnLevelChanged(DataModel::Nullable<uint8_t> value) override;
-
-    // LevelControl -> OnOff Interaction
     CHIP_ERROR SetOnOff(bool on) override;
     bool GetOnOff() override;
 

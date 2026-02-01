@@ -22,25 +22,9 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-<<<<<<< HEAD
-LoggingSpeakerDevice::LoggingSpeakerDevice(TimerDelegate & timerDelegate) : SpeakerDevice(*this, *this, timerDelegate)
-{}
-
-LoggingSpeakerDevice::~LoggingSpeakerDevice()
-{
-    // Ensure clusters are destroyed
-    if (mLevelControlCluster.IsConstructed())
-        mLevelControlCluster.Destroy();
-    if (mOnOffCluster.IsConstructed())
-        mOnOffCluster.Destroy();
-    if (mIdentifyCluster.IsConstructed())
-        mIdentifyCluster.Destroy();
-}
-=======
 LoggingSpeakerDevice::LoggingSpeakerDevice(TimerDelegate & timerDelegate) : SpeakerDevice(*this, *this, timerDelegate) {}
 
 LoggingSpeakerDevice::~LoggingSpeakerDevice() {}
->>>>>>> 1647735d7b (Big clean up and address soome of the code review comments)
 
 // LevelControlDelegate
 
@@ -94,13 +78,12 @@ bool LoggingSpeakerDevice::GetOnOff()
 
 void LoggingSpeakerDevice::OnOffStartup(bool on)
 {
-    ChipLogProgress(AppServer, "LoggingSpeakerDevice: OnOff Startup: %d", on);
-    // Usually no action needed unless we need to sync LC state immediately?
+    ChipLogProgress(AppServer, "LoggingSpeakerDevice: OnOffStartup() - Speaker %s", on ? "Unmuted" : "Muted");
 }
 
 void LoggingSpeakerDevice::OnOnOffChanged(bool on)
 {
-    ChipLogProgress(AppServer, "LoggingSpeakerDevice: Speaker %s (Mute State Changed)", on ? "Unmuted" : "Muted");
+    ChipLogProgress(AppServer, "LoggingSpeakerDevice: OnOnOffChanged() - Speaker %s", on ? "Unmuted" : "Muted");
     // Forward to Level Control Cluster to handle "Effect of On/Off Commands on CurrentLevel"
     LevelControlCluster().OnOffChanged(on);
 }
