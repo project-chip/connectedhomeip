@@ -65,13 +65,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void Shutdown() override
+    void Shutdown(ClusterShutdownType shutdownType) override
     {
         if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == this)
         {
             SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
         }
-        DefaultServerCluster::Shutdown();
+        DefaultServerCluster::Shutdown(shutdownType);
     }
 
     // Server cluster implementation

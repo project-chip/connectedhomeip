@@ -108,6 +108,21 @@ protected:
 
     template <class T>
     void EncodeAttributeListIntoTLV(const DataModel::List<T> & aListAttribute, TLV::ScopedBufferTLVReader & outTlvReader);
+
+    void SetUp() override
+    {
+        AppContext::SetUp();
+        mOldProvider =
+            InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
+    }
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
+private:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 // Encodes an attribute of List Data Type into a TLV Reader object for testing WriteClient::PutPreencodedAttribute
@@ -343,7 +358,6 @@ TEST_F(TestWriteChunking, TestListChunking)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -434,7 +448,6 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -538,7 +551,6 @@ TEST_F(TestWriteChunking, TestBadChunking)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -621,7 +633,6 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -706,7 +717,6 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -781,7 +791,6 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -865,7 +874,6 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -929,7 +937,6 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -1114,7 +1121,6 @@ void TestWriteChunking::RunTest(Instructions instructions, EncodingMethod encodi
 TEST_F(TestWriteChunking, TestTransactionalList)
 {
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
@@ -1370,7 +1376,6 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions,
 TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
 {
     // Initialize the ember side server logic.
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.

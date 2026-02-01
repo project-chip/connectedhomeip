@@ -16,6 +16,7 @@
 
 #include <app/clusters/device-energy-management-server/CodegenIntegration.h>
 
+#include <app/util/generic-callbacks.h>
 #include <clusters/DeviceEnergyManagement/Metadata.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -43,7 +44,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
 
     if (err != CHIP_NO_ERROR)
     {
@@ -63,8 +64,8 @@ bool Instance::HasFeature(Feature aFeature) const
 } // namespace chip
 
 // The current implementation already manually instantiates and initializes the cluster, so no need for the codegen integration.
-void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId) {}
-void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId) {}
+void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId) {}
+void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
 
 // Legacy callback stubs
 void MatterDeviceEnergyManagementPluginServerInitCallback() {}

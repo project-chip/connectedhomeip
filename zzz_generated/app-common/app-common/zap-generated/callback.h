@@ -1097,6 +1097,16 @@ void emberAfSoilMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfAmbientContextSensingClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfAmbientContextSensingClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfWiFiNetworkManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5553,6 +5563,44 @@ MatterSoilMeasurementClusterServerPreAttributeChangedCallback(const chip::app::C
 void emberAfSoilMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Ambient Context Sensing Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAmbientContextSensingClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterAmbientContextSensingClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAmbientContextSensingClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterAmbientContextSensingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterAmbientContextSensingClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAmbientContextSensingClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Wi-Fi Network Management Cluster
 //
 
@@ -7073,12 +7121,6 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData);
 /**
- * @brief Thread Network Diagnostics Cluster ResetCounts Command callback (from client)
- */
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
-/**
  * @brief Bridged Device Basic Information Cluster KeepActive Command callback (from client)
  */
 bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
@@ -7142,18 +7184,6 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
 bool emberAfWaterTankLevelMonitoringClusterResetConditionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
- * @brief Valve Configuration and Control Cluster Open Command callback (from client)
- */
-bool emberAfValveConfigurationAndControlClusterOpenCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ValveConfigurationAndControl::Commands::Open::DecodableType & commandData);
-/**
- * @brief Valve Configuration and Control Cluster Close Command callback (from client)
- */
-bool emberAfValveConfigurationAndControlClusterCloseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
 /**
  * @brief Messages Cluster PresentMessagesRequest Command callback (from client)
  */

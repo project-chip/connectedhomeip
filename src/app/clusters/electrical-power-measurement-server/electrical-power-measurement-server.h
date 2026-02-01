@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,49 +17,6 @@
  */
 #pragma once
 
-#include "ElectricalPowerMeasurementCluster.h"
-#include "ElectricalPowerMeasurementDelegate.h"
-#include <app/AttributeAccessInterface.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ElectricalPowerMeasurement {
-
-class Instance : public AttributeAccessInterface
-{
-public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
-             BitMask<OptionalAttributes> aOptionalAttributes) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes)
-    {
-        /* set the base class delegates endpointId */
-        mDelegate.SetEndpointId(aEndpointId);
-    }
-    ~Instance() { Shutdown(); }
-
-    CHIP_ERROR Init();
-    void Shutdown();
-
-    bool HasFeature(Feature aFeature) const;
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
-
-private:
-    Delegate & mDelegate;
-    BitMask<Feature> mFeature;
-    BitMask<OptionalAttributes> mOptionalAttrs;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    CHIP_ERROR EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-    CHIP_ERROR EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-    CHIP_ERROR EncodeHarmonicCurrents(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-    CHIP_ERROR EncodeHarmonicPhases(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-};
-
-} // namespace ElectricalPowerMeasurement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// Note: This file exists for backwards compatibility only.
+// New code should directly use ElectricalPowerMeasurementCluster.h instead.
+#include <app/clusters/electrical-power-measurement-server/CodegenIntegration.h>

@@ -22,6 +22,7 @@ source_set("general-diagnostics-server") {
 
   public_deps = [
     "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/server",

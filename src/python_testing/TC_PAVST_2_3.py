@@ -47,7 +47,9 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -374,13 +376,13 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             streamUsage = aStreamUsagePriorities[0]
             containerOptions = {
                 "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
-                "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
+                "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
                                          "sessionGroup": 3, "trackName": "media"},
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,
-                 "TLSEndpointID": endpoint,
-                 "url": "https://{host_ip}:1234/streams/1",
+                 "TLSEndpointID": tlsEndpointId,
+                 "url": f"https://{host_ip}:1234/streams/1/",
                  "triggerOptions": {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kContinuous},
                  "ingestMethod": pvcluster.Enums.IngestMethodsEnum.kCMAFIngest,
                  "containerOptions": containerOptions,

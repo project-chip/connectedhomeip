@@ -99,7 +99,7 @@ void MatterBooleanStateConfigurationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBooleanStateConfigurationClusterShutdownCallback(EndpointId endpointId)
+void MatterBooleanStateConfigurationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -110,7 +110,7 @@ void MatterBooleanStateConfigurationClusterShutdownCallback(EndpointId endpointI
             .fixedClusterInstanceCount = kBooleanStateConfigurationFixedClusterCount,
             .maxClusterInstanceCount   = kBooleanStateConfigurationMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterBooleanStateConfigurationPluginServerInitCallback() {}

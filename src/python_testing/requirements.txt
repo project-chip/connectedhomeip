@@ -9,3 +9,5 @@ zeroconf
 ifaddr
 langcodes
 requests
+pycountry
+validators

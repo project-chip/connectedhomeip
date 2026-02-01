@@ -26,6 +26,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/ClusterId.h>
 #include <clusters/AdministratorCommissioning/ClusterId.h>
 #include <clusters/AirQuality/ClusterId.h>
+#include <clusters/AmbientContextSensing/ClusterId.h>
 #include <clusters/ApplicationBasic/ClusterId.h>
 #include <clusters/ApplicationLauncher/ClusterId.h>
 #include <clusters/AudioOutput/ClusterId.h>

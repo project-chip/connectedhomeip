@@ -1069,12 +1069,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRGroupcastClusterExpireGracePeriodParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTRGroupcastClusterConfigureAuxiliaryACLParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

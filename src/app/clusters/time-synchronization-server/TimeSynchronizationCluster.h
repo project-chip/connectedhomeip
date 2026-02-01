@@ -92,7 +92,7 @@ public:
                                const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    void Shutdown() override;
+    void Shutdown(ClusterShutdownType type) override;
 
     // Fabric Table delegate functions
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;

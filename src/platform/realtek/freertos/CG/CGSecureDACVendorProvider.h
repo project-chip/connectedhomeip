@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "cg/include/cg_nsc_veneer_customize.h"
 #include "chip_porting.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>

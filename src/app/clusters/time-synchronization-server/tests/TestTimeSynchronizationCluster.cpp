@@ -16,11 +16,12 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/TimeSynchronization/Attributes.h>
 #include <clusters/TimeSynchronization/Enums.h>
 #include <clusters/TimeSynchronization/Metadata.h>
@@ -58,20 +59,16 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                        TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                            }));
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), {}), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
-        const DataModel::AttributeEntry optionalAttributes[] = { TimeSource::kMetadataEntry };
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
@@ -79,16 +76,14 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                        TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                TimeSource::kMetadataEntry,
+                                            }));
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -98,20 +93,14 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                        TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                TrustedTimeSource::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = { TrustedTimeSource::kMetadataEntry };
-        OptionalAttributeSet<TrustedTimeSource::Id> optionalAttributeSet;
-        optionalAttributeSet.Set<TrustedTimeSource::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -121,21 +110,15 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                        TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                DefaultNTP::kMetadataEntry,
+                                                SupportsDNSResolve::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = { DefaultNTP::kMetadataEntry, SupportsDNSResolve::kMetadataEntry };
-        OptionalAttributeSet<DefaultNTP::Id, SupportsDNSResolve::Id> optionalAttributeSet;
-        optionalAttributeSet.Set<DefaultNTP::Id>();
-        optionalAttributeSet.Set<SupportsDNSResolve::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -145,20 +128,14 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                        TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                NTPServerAvailable::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = { NTPServerAvailable::kMetadataEntry };
-        OptionalAttributeSet<NTPServerAvailable::Id> optionalAttributeSet;
-        optionalAttributeSet.Set<NTPServerAvailable::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -168,30 +145,19 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
                                                        TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        ASSERT_EQ(timeSynchronization.Attributes(ConcreteClusterPath(kRootEndpointId, TimeSynchronization::Id), attributes),
-                  CHIP_NO_ERROR);
+        ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
+                                            {
+                                                UTCTime::kMetadataEntry,
+                                                Granularity::kMetadataEntry,
+                                                TimeZone::kMetadataEntry,
+                                                DSTOffset::kMetadataEntry,
+                                                LocalTime::kMetadataEntry,
+                                                TimeZoneDatabase::kMetadataEntry,
+                                                TimeZoneListMaxSize::kMetadataEntry,
+                                                DSTOffsetListMaxSize::kMetadataEntry,
+                                            }));
 
-        const DataModel::AttributeEntry optionalAttributes[] = {
-            TimeZone::kMetadataEntry,         DSTOffset::kMetadataEntry,           LocalTime::kMetadataEntry,
-            TimeZoneDatabase::kMetadataEntry, TimeZoneListMaxSize::kMetadataEntry, DSTOffsetListMaxSize::kMetadataEntry
-        };
-        OptionalAttributeSet<TimeZone::Id, DSTOffset::Id, LocalTime::Id, TimeZoneDatabase::Id, TimeZoneListMaxSize::Id,
-                             DSTOffsetListMaxSize::Id>
-            optionalAttributeSet;
-        optionalAttributeSet.Set<TimeZone::Id>();
-        optionalAttributeSet.Set<DSTOffset::Id>();
-        optionalAttributeSet.Set<LocalTime::Id>();
-        optionalAttributeSet.Set<TimeZoneDatabase::Id>();
-        optionalAttributeSet.Set<TimeZoneListMaxSize::Id>();
-        optionalAttributeSet.Set<DSTOffsetListMaxSize::Id>();
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-        AttributeListBuilder listBuilder(expected);
-        ASSERT_EQ(listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet), CHIP_NO_ERROR);
-        ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
-
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }
 
@@ -218,7 +184,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         UTCTime::TypeInfo::DecodableType utcTime{};
         ASSERT_EQ(tester.ReadAttribute(UTCTime::Id, utcTime), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -246,7 +212,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TimeSourceEnum timeSource{};
         ASSERT_EQ(tester.ReadAttribute(TimeSource::Id, timeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -273,7 +239,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         TrustedTimeSource::TypeInfo::DecodableType trustedTimeSource{};
         ASSERT_EQ(tester.ReadAttribute(TrustedTimeSource::Id, trustedTimeSource), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -303,7 +269,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         SupportsDNSResolve::TypeInfo::DecodableType supportsDNSResolve{};
         ASSERT_EQ(tester.ReadAttribute(SupportsDNSResolve::Id, supportsDNSResolve), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -330,7 +296,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         NTPServerAvailable::TypeInfo::DecodableType ntpServerAvailable{};
         ASSERT_EQ(tester.ReadAttribute(NTPServerAvailable::Id, ntpServerAvailable), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     {
@@ -372,6 +338,6 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         DSTOffsetListMaxSize::TypeInfo::DecodableType dstOffsetListMaxSize{};
         ASSERT_EQ(tester.ReadAttribute(DSTOffsetListMaxSize::Id, dstOffsetListMaxSize), CHIP_NO_ERROR);
 
-        timeSynchronization.Shutdown();
+        timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 }

@@ -279,10 +279,10 @@ own text context class.
 -   If your test requires access to private/protected members of the underlying
     class you're testing, you'll need to create an accessor class that performs
     these operations and is friended to the underlying class. Please name the
-    class `chip::Test::SomethingTestAccess` where `Something` is the name of the
-    underlying class whose private/protected members you're trying to access.
-    Then add `friend class chip::Test::SomethingTestAccess;` to the underlying
-    class. Make sure your test's BUILD.gn file contains
+    class `chip::Testing::SomethingTestAccess` where `Something` is the name of
+    the underlying class whose private/protected members you're trying to
+    access. Then add `friend class chip::Testing::SomethingTestAccess;` to the
+    underlying class. Make sure your test's BUILD.gn file contains
     `sources = [ "SomethingTestAccess.h" ]`. Before creating a new TestAccess
     class, check if one already exists. If it does exist but doesn't expose the
     member you need, you can add a function to that class to do so. Note that

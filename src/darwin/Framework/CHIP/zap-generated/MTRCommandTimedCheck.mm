@@ -1022,6 +1022,15 @@ static BOOL CommandNeedsTimedInvokeInSoilMeasurementCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientContextSensing;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -1691,6 +1700,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::SoilMeasurement::Id: {
         return CommandNeedsTimedInvokeInSoilMeasurementCluster(commandID);
+    }
+    case Clusters::AmbientContextSensing::Id: {
+        return CommandNeedsTimedInvokeInAmbientContextSensingCluster(commandID);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);

@@ -38,7 +38,7 @@ static const uint8_t aes128TestKey[]
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #else
-#include <platform/nxp/zephyr/DeviceInstanceInfoProviderImpl.h>
+#include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #endif
 
 #if CONFIG_CHIP_FACTORY_DATA && CONFIG_CHIP_ENCRYPTED_FACTORY_DATA

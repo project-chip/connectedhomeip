@@ -17,12 +17,80 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
 
+import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 
 assert(chip_device_platform == "linux")
+
+# Matter on Linux currently supports as first-class network
+# technologies: Bluetooth, Thread, Wi-Fi, and Ethernet with Bluetooth
+# reserved only for commissioning, and Thread, Wi-Fi, and Ethernet as
+# either commissioning transports, on-network commissioning networks,
+# and/or operational networks.
+#
+# On Linux, BlueZ and the bluetoothd daemon is the de facto Bluetooth
+# implementation.
+#
+# For Thread, OpenThread is the de facto Thread implementation for all
+# of Matter.
+#
+# However, for Ethernet and Wi-Fi, things are more diverse on Linux.
+#
+# In the nominal case (and currently in Matter), the Ethernet control
+# plane has no management software whatsoever beyond the Linux kernel
+# and the Wi-Fi control plane is handled by the wpa_supplicant daemon
+# over D-Bus.
+#
+# However, there are several further variants:
+#
+# 1. Instead of wpa_supplicant, Wi-Fi may be managed by iwd.
+# 2. Rather than being managed heterogeneously, as they are today in
+#    Matter, Ethernet, Wi-Fi, and, in some instances Cellular, may be
+#    further managed by one of:
+#    a. connman with:
+#       i.   Ethernet sub-managed by connman itself.
+#       ii.  Wi-Fi sub-managed by either:
+#            A.  iwd
+#            B. wpa_supplicant
+#       iii. Cellular managed by oFono.
+#    b. NetworkManager with:
+#       i.   Ethernet sub-managed by NetworkManager itself.
+#       ii.  Wi-Fi sub-managed by either:
+#            A. iwd
+#            B. wpa_supplicant
+#       iii. Cellular managed by ModemManager.
+# 3. All of networking is managed by some proprietary product- or
+#    platform-specific entity for which any of the above may be a backing
+#    implementation.
+#    a. Regardless, like ConfigurationManager today, there may be a
+#       desire to default the Matter build to (1) or (2) but then set a
+#       custom ConnectivityManager at runtime with a potential
+#       chip::DeviceLayer::SetConnectivityMgr.
+
+declare_args() {
+  # The Linux high-level network manager, if any, that owns network
+  # policy and state and orchestrates connectivity decisions and
+  # cross-interface policy.
+  #
+  # In the future, this might be "connman", "iwd", "networkmanager",
+  # or "wpa_supplicant". At present, this must be "wpa_supplicant".
+  chip_linux_network_manager = "wpa_supplicant"
+
+  # The Linux Wi-Fi Neighbor Awareness Networking (NAN)
+  # Unsynchronized Service Discovery (USD) / Public Action Frame
+  # (PAF) commissioning transport manager.
+  #
+  # In the future, this might be "iwd" or "wpa_supplicant".
+  # At present, this must be empty or "wpa_supplicant".
+  chip_linux_wifi_paf_manager = ""
+
+  if (chip_enable_wifi && chip_device_config_enable_wifipaf) {
+    chip_linux_wifi_paf_manager = "wpa_supplicant"
+  }
+}
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
@@ -46,6 +114,7 @@ static_library("Linux") {
     "../DeviceSafeQueue.h",
     "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
+    "../SingletonConnectivityManager.cpp",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPLinuxStorage.cpp",
@@ -84,10 +153,6 @@ static_library("Linux") {
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
   ]
-
-  if (chip_enable_openthread) {
-    sources += [ "NetworkCommissioningThreadDriver.cpp" ]
-  }
 
   if (chip_enable_ble) {
     sources += [
@@ -137,17 +202,6 @@ static_library("Linux") {
     deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }
 
-  if (chip_mdns == "platform") {
-    sources += [
-      "DnssdImpl.cpp",
-      "DnssdImpl.h",
-    ]
-
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
-
-    public_configs += [ ":avahi_client_config" ]
-  }
-
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
@@ -155,20 +209,104 @@ static_library("Linux") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_system_config_use_openthread_inet_endpoints) {
     sources += [
-      "ThreadStackManagerImpl.cpp",
-      "ThreadStackManagerImpl.h",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
+      "../OpenThread/OpenThreadUtils.cpp",
+      "ThreadStackManagerImpl_OpenThread.cpp",
+      "ThreadStackManagerImpl_OpenThread.h",
     ]
 
-    deps += [ "${chip_root}/src/app:app_config" ]
-    public_deps += [ "dbus/openthread" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/third_party/openthread/platforms/simulation",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+  } else {
+    if (chip_mdns == "platform") {
+      sources += [
+        "DnssdImpl.cpp",
+        "DnssdImpl.h",
+      ]
+
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+
+      public_configs += [ ":avahi_client_config" ]
+    }
+
+    if (chip_enable_openthread) {
+      sources += [
+        "NetworkCommissioningThreadDriver.cpp",
+        "ThreadStackManagerImpl.cpp",
+        "ThreadStackManagerImpl.h",
+      ]
+
+      deps += [ "${chip_root}/src/app:app_config" ]
+      public_deps += [ "dbus/openthread" ]
+    }
   }
 
-  if (chip_enable_wifi) {
-    sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
+  # If either Ethernet or Wi-Fi are enabled, validate and setup the
+  # network management sources and artifacts.
 
-    public_deps += [ "dbus/wpa" ]
+  if (chip_enable_ethernet || chip_enable_wifi) {
+    if (chip_enable_wifi) {
+      sources += [ "NetworkCommissioningWiFiDriver.cpp" ]
+    }
+
+    defines = [
+      "CHIP_LINUX_NETWORK_MANAGER=\"${chip_linux_network_manager}\"",
+      "CHIP_LINUX_WIFI_PAF_MANAGER=\"${chip_linux_wifi_paf_manager}\"",
+    ]
+
+    if (chip_linux_network_manager == "wpa_supplicant") {
+      defines += [ "CHIP_LINUX_NETWORK_MANAGER_WPA_SUPPLICANT=1" ]
+
+      sources +=
+          [ "ConnectivityManagerImpl_NetworkManagementWpaSupplicant.cpp" ]
+    } else {
+      assert(false,
+             "Linux network manager not specified or not supported: " +
+                 chip_linux_network_manager +
+                 ". chip_linux_network_manager must be 'wpa_supplicant'.")
+    }
+
+    # If Wi-Fi is enabled, validate and setup the Wi-Fi Neighbor
+    # Awareness Networking (NAN) Unsynchronized Service Discovery
+    # (USD) / Public Action Frame (PAF) commissioning transport
+    # management sources and artifacts.
+
+    if (chip_enable_wifi) {
+      if (chip_linux_wifi_paf_manager == "") {
+        defines += [ "CHIP_LINUX_WIFI_PAF_MANAGER_WPA_SUPPLICANT=0" ]
+      } else if (chip_linux_wifi_paf_manager == "wpa_supplicant") {
+        defines += [ "CHIP_LINUX_WIFI_PAF_MANAGER_WPA_SUPPLICANT=1" ]
+
+        sources += [ "ConnectivityManagerImpl_WiFiPafWpaSupplicant.cpp" ]
+      } else {
+        assert(
+            false,
+            "Linux Wi-Fi NAN USD / PAF manager not specified or not supported: " + chip_linux_wifi_paf_manager + ". chip_linux_paf_manager must be empty or 'wpa_supplicant'.")
+      }
+    }
+
+    needs_wpa_supplicant = chip_linux_network_manager == "wpa_supplicant" ||
+                           chip_linux_wifi_paf_manager == "wpa_supplicant"
+
+    if (needs_wpa_supplicant) {
+      public_deps += [ "dbus/wpa" ]
+    }
   }
 
   if (chip_enable_ble) {

@@ -203,6 +203,8 @@ public:
     ReadHandlerNode * GetReadHandlerNode(const ReadHandler * aReadHandler) { return FindReadHandlerNode(aReadHandler); }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
+    uint32_t GetTotalSubscriptionsEstablished() { return mNumTotalSubscriptionsEstablished; }
+
 protected:
     friend class chip::app::reporting::TestReportScheduler;
 
@@ -226,6 +228,7 @@ protected:
 
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
     TimerDelegate * mTimerDelegate;
+    uint32_t mNumTotalSubscriptionsEstablished = 0;
 };
 }; // namespace reporting
 }; // namespace app

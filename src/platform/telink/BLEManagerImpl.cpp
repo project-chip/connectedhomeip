@@ -335,6 +335,12 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
         ThreadStackMgrImpl().SetRadioBlocked(true);
 #endif
 
+        if (!BleLayer::IsInitialized())
+        {
+            // Re-initializing the BLE layer after shutdown
+            ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
+        }
+
         // Init BLE
         err = bt_enable(NULL);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));

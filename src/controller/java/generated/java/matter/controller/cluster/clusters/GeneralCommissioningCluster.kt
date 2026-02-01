@@ -161,9 +161,7 @@ class GeneralCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_ERROR_CODE)) {
         errorCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
@@ -227,9 +225,7 @@ class GeneralCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_ERROR_CODE)) {
         errorCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
@@ -281,9 +277,7 @@ class GeneralCommissioningCluster(
 
       if (tag == ContextSpecificTag(TAG_ERROR_CODE)) {
         errorCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()

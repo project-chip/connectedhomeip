@@ -68,7 +68,7 @@
 #include "WifiConnect.h"
 #endif
 
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
 #include "OperationalKeystore.h"
 #endif
 
@@ -80,7 +80,7 @@
 #include "DiagnosticLogsDemo.h"
 #endif
 
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
 #include "LowPower.h"
 #include "PWR_Interface.h"
 #endif
@@ -139,7 +139,7 @@ app::Clusters::NetworkCommissioning::Instance
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
-extern char baseServiceInstanceName[];
+extern const char sBaseServiceInstanceName[];
 #endif
 
 #ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
@@ -185,7 +185,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #endif
 
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -202,7 +202,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
-#if CONFIG_OPERATIONAL_KEYSTORE
+#if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     TEMPORARY_RETURN_IGNORED chip::NXP::App::OperationalKeystore::Init(persistentStorage);
 #endif
 
@@ -233,7 +233,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     /* Init Chip memory management before the stack */
     TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     TEMPORARY_RETURN_IGNORED chip::NXP::App::LowPower::Init();
 #endif
 
@@ -441,14 +441,14 @@ void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 
 void chip::NXP::App::AppTaskBase::AppMatter_DisallowDeviceToSleep(void)
 {
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     PWR_DisallowDeviceToSleep();
 #endif
 }
 
 void chip::NXP::App::AppTaskBase::AppMatter_AllowDeviceToSleep(void)
 {
-#if CONFIG_LOW_POWER
+#if CONFIG_NXP_USE_LOW_POWER
     PWR_AllowDeviceToSleep();
 #endif
 }
@@ -500,7 +500,7 @@ void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
                                                                                   Server::GetInstance().GetFailSafeContext());
 
         // Initialize TBR name
-        CharSpan brName(baseServiceInstanceName, strlen(baseServiceInstanceName));
+        CharSpan brName(sBaseServiceInstanceName, strlen(sBaseServiceInstanceName));
         sThreadBRDelegate.SetThreadBorderRouterName(brName);
         // Initialize TBR cluster
         TEMPORARY_RETURN_IGNORED sThreadBRMgmtInstance.Init();

@@ -263,7 +263,7 @@ class CADMINBaseTest(MatterBaseTest):
         finally:
             # Clean up subscription accumulator and return results
             if window_status_accumulator is not None:
-                await window_status_accumulator.cancel()
+                window_status_accumulator.cancel()
             return results
 
     async def open_commissioning_window_with_subscription_monitoring(

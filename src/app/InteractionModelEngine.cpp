@@ -58,6 +58,8 @@ namespace chip {
 namespace app {
 namespace {
 
+inline constexpr uint16_t kMaxNumSubscriptionsPerFabric = 10000;
+
 /**
  * Helper to handle wildcard events in the event path.
  *
@@ -2021,10 +2023,10 @@ bool InteractionModelEngine::HasActiveRead()
 uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    return UINT16_MAX;
+    return kMaxNumSubscriptionsPerFabric;
 #else
-    return static_cast<uint16_t>(
-        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+    return static_cast<uint16_t>(std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(),
+                                          static_cast<size_t>(kMaxNumSubscriptionsPerFabric)));
 #endif
 }
 
@@ -2269,5 +2271,20 @@ void InteractionModelEngine::ResetNumSubscriptionsRetries()
     }
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+MessageStats InteractionModelEngine::GetMessageStats()
+{
+    return GetExchangeManager()->GetSessionManager()->GetMessageStats();
+}
+
+SubscriptionStats InteractionModelEngine::GetSubscriptionStats(FabricIndex fabric)
+{
+    return SubscriptionStats{ .numTotalSubscriptions = GetReportScheduler()->GetTotalSubscriptionsEstablished(),
+                              .numCurrentSubscriptions =
+                                  static_cast<uint16_t>(GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
+                              .numCurrentSubscriptionsForFabric = static_cast<uint16_t>(
+                                  GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, fabric)) };
+}
+
 } // namespace app
 } // namespace chip

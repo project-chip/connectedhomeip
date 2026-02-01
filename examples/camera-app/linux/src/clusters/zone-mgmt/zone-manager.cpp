@@ -272,11 +272,6 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
                             foundTrigCtxt->triggerCount);
         }
     }
-
-    if (mCameraDevice)
-    {
-        mCameraDevice->HandlePushAvZoneTrigger(zoneId);
-    }
 }
 
 void ZoneManager::OnZoneStoppedEvent(uint16_t zoneId, chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason)

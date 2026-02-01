@@ -47,6 +47,10 @@
 #include <clusters/AirQuality/Commands.ipp>
 #include <clusters/AirQuality/Events.ipp>
 #include <clusters/AirQuality/Structs.ipp>
+#include <clusters/AmbientContextSensing/Attributes.ipp>
+#include <clusters/AmbientContextSensing/Commands.ipp>
+#include <clusters/AmbientContextSensing/Events.ipp>
+#include <clusters/AmbientContextSensing/Structs.ipp>
 #include <clusters/ApplicationBasic/Attributes.ipp>
 #include <clusters/ApplicationBasic/Commands.ipp>
 #include <clusters/ApplicationBasic/Events.ipp>
@@ -1067,8 +1071,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
             return true;
         case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
-            return true;
-        case Clusters::Groupcast::Commands::ExpireGracePeriod::Id:
             return true;
         case Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return true;

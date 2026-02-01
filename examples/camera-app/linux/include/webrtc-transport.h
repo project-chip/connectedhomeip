@@ -23,7 +23,9 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 
+#include <mutex>
 #include <string>
+#include <vector>
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
@@ -53,8 +55,8 @@ public:
     struct RequestArgs
     {
         uint16_t sessionId;
-        uint16_t videoStreamId;
-        uint16_t audioStreamId;
+        std::vector<uint16_t> videoStreams;
+        std::vector<uint16_t> audioStreams;
         chip::NodeId peerNodeId;
         chip::FabricIndex fabricIndex;
         chip::EndpointId originatingEndpointId;
@@ -143,4 +145,6 @@ private:
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+
+    std::mutex mTrackStatusLock;
 };

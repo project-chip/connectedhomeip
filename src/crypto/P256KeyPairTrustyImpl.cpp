@@ -22,7 +22,6 @@
 
 #include "CHIPCryptoPAL.h"
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <trusty_matter.h>
 
 namespace chip {

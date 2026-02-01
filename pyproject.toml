@@ -24,6 +24,9 @@ exclude = [
     "docs/development_controllers/matter-repl/*.ipynb",
 ]
 
+[tool.pyright]
+reportMissingTypeStubs = "warning"
+
 [tool.ruff.lint]
 select = [
     # Standard errors and warnings
@@ -52,3 +55,10 @@ ignore = [
     "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]
+
+[tool.mypy]
+mypy_path = ["matter/typings"]
+namespace_packages = true
+warn_unused_configs = true
+ignore_missing_imports = true
+explicit_package_bases = true

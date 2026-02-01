@@ -50,14 +50,14 @@ public:
 
     /**
      * @brief Initializes the WebRTCProviderClient with a ScopedNodeId, an EndpointId, and an optional
-     *        pointer to the WebRTCTransportRequestorServer.
+     *        pointer to the WebRTCTransportRequestorCluster.
      *
      * @param peerId              The PeerId (fabric + nodeId) for the remote device.
      * @param endpointId          The Matter endpoint on the remote device for WebRTCTransportProvider cluster.
-     * @param requestorServer     Pointer to a WebRTCTransportRequestorServer instance.
+     * @param requestorServer     Pointer to a WebRTCTransportRequestorCluster instance.
      */
     void Init(const chip::ScopedNodeId & peerId, chip::EndpointId endpointId,
-              chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer);
+              chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster * requestorServer);
 
     /**
      * @brief Sends a SolicitOffer command to the remote device.
@@ -221,7 +221,7 @@ private:
 
     State mState = State::Idle;
 
-    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * mRequestorServer = nullptr;
+    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorCluster * mRequestorServer = nullptr;
 
     // Data needed to send the WebRTCTransportProvider commands
     chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::Type mSolicitOfferData;

@@ -875,6 +875,35 @@ class ChipDeviceControllerBase():
             lambda: self._dmLib.pychip_DeviceController_DeleteAllSessionResumption(
                 self.devCtrl)).raise_on_error()
 
+    def SetLocalMRPConfig(self, idle_ms: int, active_ms: int, active_threshold_ms: int):
+        '''
+        Set the local MRP config. This will be advertised to peers and used by them for message retransmissions.
+
+        Args:
+            idle_ms (int): The idle retransmission interval in milliseconds.
+            active_ms (int): The active retransmission interval in milliseconds.
+            active_threshold_ms (int): The active threshold time in milliseconds.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetLocalMRPConfig(idle_ms, active_ms, active_threshold_ms)
+        ).raise_on_error()
+
+    def ResetLocalMRPConfig(self):
+        '''
+        Resets the local MRP config to the default values.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_ResetLocalMRPConfig()
+        ).raise_on_error()
+
     async def _establishPASESession(self, callFunct):
         self.CheckIsActive()
 
@@ -2508,6 +2537,19 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_DeleteAllSessionResumption.restype = PyChipError
+
+            try:
+                self._dmLib.pychip_DeviceController_SetLocalMRPConfig.restype = PyChipError
+                self._dmLib.pychip_DeviceController_SetLocalMRPConfig.argtypes = [c_uint32, c_uint32, c_uint16]
+
+                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig.restype = PyChipError
+                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig.argtypes = []
+            except AttributeError:
+                # This can happen if the SDK is not built with CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+                def _unsupported_dynamic_mrp(*args, **kwargs):
+                    raise NotImplementedError("Dynamic MRP config support is not available in this Matter SDK build.")
+                self._dmLib.pychip_DeviceController_SetLocalMRPConfig = _unsupported_dynamic_mrp
+                self._dmLib.pychip_DeviceController_ResetLocalMRPConfig = _unsupported_dynamic_mrp
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]

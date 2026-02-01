@@ -13,7 +13,7 @@ namespace Groupcast {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 5;
+inline constexpr uint32_t kAcceptedCommandsCount = 4;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 1;
@@ -30,12 +30,8 @@ namespace UpdateGroupKey {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace UpdateGroupKey
 
-namespace ExpireGracePeriod {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace ExpireGracePeriod
-
 namespace ConfigureAuxiliaryACL {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr CommandId Id = 0x00000004;
 } // namespace ConfigureAuxiliaryACL
 
 namespace LeaveGroupResponse {

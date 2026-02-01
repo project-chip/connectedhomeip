@@ -18,7 +18,18 @@
 # This file only changes defaults and thus all symbols here must be promptless
 # and safeguarded so that they only are applied when building Matter.
 
+if SOC_FAMILY_NXP_RW
+
 if CHIP
+
+rsource "Kconfig.features"
+
+# See config/common/cmake/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	default "NXP Semiconductors"
+
+config CHIP_ZEPHYR_USE_POSIX_DEFAULT_SOURCE
+	default n
 
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	default 1
@@ -46,6 +57,12 @@ config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
 	default 800 if NET_L2_OPENTHREAD
 	default 2000
 
+config CHIP_INET_ENABLE_TCP_ENDPOINT
+	default n
+
+config CHIP_ENABLE_READ_CLIENT
+	default y
+
 if CHIP_FACTORY_DATA
 
 config CHIP_DEVICE_VENDOR_ID
@@ -58,6 +75,27 @@ config CHIP_DEVICE_PRODUCT_ID
 	default 41510 if SOC_SERIES_RW6XX
 
 endif # CHIP_FACTORY_DATA
+
+config CHIP_MALLOC_SYS_HEAP
+	default y if !ARCH_POSIX
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+	bool
+	default y
+
+config CHIP_OTA_REQUESTOR
+	bool
+	select BOOTLOADER_MCUBOOT
+
+config BOOTLOADER_MCUBOOT
+	bool
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select STREAM_FLASH_ERASE
+
+config NET_L2_OPENTHREAD
+	default n
 
 config LOG
 	default y
@@ -249,6 +287,13 @@ config HCI_NXP_ENABLE_AUTO_SLEEP
 config CHIP_OTA_REQUESTOR
 	default n
 
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
+
 config CHIP_DEVICE_SOFTWARE_VERSION
 	default 1
 
@@ -401,9 +446,6 @@ endif
 config MBEDTLS
 	default y
 
-config MBEDTLS_CFG_FILE
-	default "config-tls-generic.h"
-
 config MBEDTLS_PSA_KEY_SLOT_COUNT
     default 64
 
@@ -411,7 +453,7 @@ config MBEDTLS_USER_CONFIG_ENABLE
     default y
 
 config MBEDTLS_USER_CONFIG_FILE
-    default "nxp-zephyr-mbedtls-config.h"
+    default "platform/nxp/zephyr/nxp-zephyr-mbedtls-config.h"
 
 config MBEDTLS_ENTROPY_C
 	default y
@@ -434,7 +476,7 @@ config MBEDTLS_CIPHER_AES_ENABLED
 config MBEDTLS_CIPHER_CCM_ENABLED
 	default y
 
-config MBEDTLS_CTR_DRBG_ENABLED
+config MBEDTLS_CTR_DRBG_C
 	default y
 
 config MBEDTLS_CIPHER_MODE_CBC_ENABLED
@@ -446,8 +488,10 @@ config MBEDTLS_ECP_C
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
 	default y
 
-config CHIP_CRYPTO_PSA
-	default y
+choice CHIP_CRYPTO
+    default CHIP_CRYPTO_PSA
+
+endchoice
 
 if CHIP_CRYPTO_PSA
 
@@ -520,4 +564,11 @@ config FLASH_SHELL
 
 endif # SHELL
 
-endif
+choice POSIX_AEP_CHOICE
+	prompt "POSIX Subprofile"
+	default POSIX_AEP_CHOICE_NONE
+endchoice
+
+endif # CHIP
+
+endif # SOC_FAMILY_NXP_RW

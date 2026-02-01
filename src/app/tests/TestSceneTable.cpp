@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
-#include <app/util/odd-sized-integers.h>
 #include <clusters/ColorControl/Ids.h>
 #include <clusters/LevelControl/Ids.h>
 #include <clusters/OnOff/Ids.h>
@@ -32,6 +32,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/odd-sized-integers.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
@@ -639,6 +640,7 @@ public:
         ASSERT_NE(sceneTable, nullptr);
         ASSERT_EQ(sceneTable->Init(*mpTestStorage, app::CodegenDataModelProvider::Instance()), CHIP_NO_ERROR);
         SetMockNodeConfig(SceneMockNodeConfig);
+        app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&app::CodegenDataModelProvider::Instance());
     }
 
     static void TearDownTestSuite()

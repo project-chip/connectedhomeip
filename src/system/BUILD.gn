@@ -23,6 +23,10 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("system.gni")
 
+assert(
+    chip_enable_openthread || !chip_system_config_use_openthread_inet_endpoints,
+    "OpenThread Endpoint is only available when Thread is enabled")
+
 if (chip_system_config_use_lwip) {
   import("//build_overrides/lwip.gni")
 }
@@ -154,6 +158,10 @@ buildconfig_header("system_buildconfig") {
 
 config("system_config") {
   include_dirs = chip_project_config_include_dirs
+
+  if (chip_system_config_use_openthread_inet_endpoints) {
+    defines = [ "CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT=1" ]
+  }
 }
 
 source_set("system_config_header") {

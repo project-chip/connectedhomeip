@@ -71,6 +71,82 @@
         {
             "name": "command_id_shims",
             "path": "partials/command_id_shims.zapt"
+        },
+        {
+            "name": "base_clusters_src_header",
+            "path": "partials/base_clusters_src_header.zapt"
+        },
+        {
+            "name": "base_clusters_command_impl",
+            "path": "partials/base_clusters_command_impl.zapt"
+        },
+        {
+            "name": "base_clusters_attribute_impl",
+            "path": "partials/base_clusters_attribute_impl.zapt"
+        },
+        {
+            "name": "clusters_src_header",
+            "path": "partials/clusters_src_header.zapt"
+        },
+        {
+            "name": "clusters_command_impl",
+            "path": "partials/clusters_command_impl.zapt"
+        },
+        {
+            "name": "placeholder_comment",
+            "path": "partials/placeholder_comment.zapt"
+        },
+        {
+            "name": "command_timed_invoke_properties",
+            "path": "partials/command_timed_invoke_properties.zapt"
+        },
+        {
+            "name": "command_init_with_response_value_decl",
+            "path": "partials/command_init_with_response_value_decl.zapt"
+        },
+        {
+            "name": "command_params_init_impl",
+            "path": "partials/command_params_init_impl.zapt"
+        },
+        {
+            "name": "command_params_copy_impl",
+            "path": "partials/command_params_copy_impl.zapt"
+        },
+        {
+            "name": "command_params_description_impl",
+            "path": "partials/command_params_description_impl.zapt"
+        },
+        {
+            "name": "command_params_internal_methods",
+            "path": "partials/command_params_internal_methods.zapt"
+        },
+        {
+            "name": "command_old_name_decl",
+            "path": "partials/command_old_name_decl.zapt"
+        },
+        {
+            "name": "command_old_name_impl",
+            "path": "partials/command_old_name_impl.zapt"
+        },
+        {
+            "name": "command_deprecated_fields_decl",
+            "path": "partials/command_deprecated_fields_decl.zapt"
+        },
+        {
+            "name": "command_deprecated_fields_impl",
+            "path": "partials/command_deprecated_fields_impl.zapt"
+        },
+        {
+            "name": "command_internal_methods_decl",
+            "path": "partials/command_internal_methods_decl.zapt"
+        },
+        {
+            "name": "command_payload_impl_imports",
+            "path": "partials/command_payload_impl_imports.zapt"
+        },
+        {
+            "name": "struct_old_name_variants",
+            "path": "partials/struct_old_name_variants.zapt"
         }
     ],
     "templates": [
@@ -78,6 +154,11 @@
             "path": "MTRBaseClusters_Internal.zapt",
             "name": "Objc ZCL asynchronous API Internal Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_Internal.h"
+        },
+        {
+            "path": "MTRBaseClusters_Private.zapt",
+            "name": "Objc ZCL asynchronous API Private Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_Private.h"
         },
         {
             "path": "MTRBaseClusters.zapt",
@@ -90,9 +171,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm"
         },
         {
+            "path": "MTRBaseClusters_Private-src.zapt",
+            "name": "Objc ZCL asynchronous API Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_Private.mm"
+        },
+        {
             "path": "MTRClusters_Internal.zapt",
             "name": "Objc ZCL synchronous API Internal Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_Internal.h"
+        },
+        {
+            "path": "MTRClusters_Private.zapt",
+            "name": "Objc ZCL synchronous API Private Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_Private.h"
         },
         {
             "path": "MTRClusters.zapt",
@@ -105,6 +196,11 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters.mm"
         },
         {
+            "path": "MTRClusters_Private-src.zapt",
+            "name": "Objc ZCL synchronous API Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusters_Private.mm"
+        },
+        {
             "path": "MTRStructsObjc.zapt",
             "name": "Objc reflections of MTR spec structs header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc.h"
@@ -115,9 +211,24 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc.mm"
         },
         {
+            "path": "MTRStructsObjc_Private.zapt",
+            "name": "Objc reflections of MTR spec structs Private header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc_Private.h"
+        },
+        {
+            "path": "MTRStructsObjc_Private-src.zapt",
+            "name": "Objc reflections of MTR spec structs Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRStructsObjc_Private.mm"
+        },
+        {
             "path": "MTRCommandPayloadsObjc.zapt",
             "name": "Objc reflections of MTR command payloads header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.h"
+        },
+        {
+            "path": "MTRCommandPayloadsObjc_Private.zapt",
+            "name": "Objc reflections of MTR command payloads Private header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc_Private.h"
         },
         {
             "path": "MTRCommandPayloadsObjc-src.zapt",
@@ -125,9 +236,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.mm"
         },
         {
+            "path": "MTRCommandPayloadsObjc_Private-src.zapt",
+            "name": "Objc reflections of MTR command payloads Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc_Private.mm"
+        },
+        {
             "path": "MTRCommandPayloads_Internal.zapt",
             "name": "Internal methods for objc reflections of MTR command payloads header",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloads_Internal.h"
+        },
+        {
+            "path": "MTRCommandPayloads_Private.zapt",
+            "name": "Private methods for objc reflections of MTR command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloads_Private.h"
         },
         {
             "path": "MTRAttributeTLVValueDecoder-src.zapt",
@@ -135,9 +256,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeTLVValueDecoder.mm"
         },
         {
+            "path": "MTRAttributeTLVValueDecoder_Private-src.zapt",
+            "name": "Decode TLV attribute values into Objc objects Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeTLVValueDecoder_Private.mm"
+        },
+        {
             "path": "MTREventTLVValueDecoder-src.zapt",
             "name": "Decode TLV event values into Objc objects",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTREventTLVValueDecoder.mm"
+        },
+        {
+            "path": "MTREventTLVValueDecoder_Private-src.zapt",
+            "name": "Decode TLV event values into Objc objects Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTREventTLVValueDecoder_Private.mm"
         },
         {
             "path": "MTRClusterConstants.zapt",
@@ -145,9 +276,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
         },
         {
+            "path": "MTRClusterConstants_Private.zapt",
+            "name": "Constants for cluster IDs Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants_Private.h"
+        },
+        {
             "path": "MTRClusterNames-src.zapt",
             "name": "Objc Cluster Names API",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterNames.mm"
+        },
+        {
+            "path": "MTRClusterNames_Private-src.zapt",
+            "name": "Objc Cluster Names API Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterNames_Private.mm"
         },
         {
             "path": "MTRAttributeSpecifiedCheck-src.zapt",
@@ -155,9 +296,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"
         },
         {
+            "path": "MTRAttributeSpecifiedCheck_Private-src.zapt",
+            "name": "Function to check if attribute is specified Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck_Private.mm"
+        },
+        {
             "path": "MTRCommandTimedCheck-src.zapt",
             "name": "Function to check if command needs timed invoke",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"
+        },
+        {
+            "path": "MTRCommandTimedCheck_Private-src.zapt",
+            "name": "Function to check if command needs timed invoke Private implementation",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck_Private.mm"
         },
         {
             "path": "MTRDeviceTypeMetadata-src.zapt",
