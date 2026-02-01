@@ -84,7 +84,10 @@ if (chip_build_tests) {
     defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
 
     if (chip_system_config_use_sockets && current_os != "zephyr") {
-      test_sources += [ "TestInetEndPoint.cpp" ]
+      test_sources += [
+        "TestInetEndPoint.cpp",
+        "TestUDPEndPointSocketRecovery.cpp",
+      ]
     }
 
     cflags = [ "-Wconversion" ]

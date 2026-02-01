@@ -295,4 +295,22 @@
 #define INET_CONFIG_UDP_SOCKET_MREQN 0
 #endif
 
+/**
+ *  @def INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+ *
+ *  @brief
+ *    Enable UDP socket recovery for platforms where sockets may become
+ *    invalid when the application is backgrounded (e.g., iOS).
+ *
+ *    When enabled, the UDP endpoint will detect broken sockets (EPIPE, ENOTCONN)
+ *    and automatically recreate them. This adds a small overhead to send operations
+ *    but ensures reliability on platforms with aggressive socket lifecycle management.
+ *
+ *    Default: 0 (disabled)
+ *    Platform-specific overrides: Darwin/iOS sets this to 1 in CHIPPlatformConfig.h
+ */
+#ifndef INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+#define INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY 0
+#endif // INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+
 // clang-format on

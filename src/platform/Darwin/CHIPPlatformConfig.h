@@ -90,3 +90,22 @@ extern "C" int __cxa_atexit(void (*f)(void *), void * p, void * d);
 #define CHIP_CONFIG_SECURE_SESSION_POOL_SIZE 1000
 
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT 0
+
+// ==================== iOS-Specific Socket Recovery ====================
+
+/**
+ * @def INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+ *
+ * Enable UDP socket recovery for platforms where sockets may become
+ * invalid when the application is backgrounded (e.g., iOS).
+ * When enabled, the UDP endpoint will detect and recreate broken sockets.
+ *
+ * This is enabled on all Darwin platforms (iOS and macOS) because:
+ * - iOS aggressively invalidates sockets when apps are backgrounded
+ * - macOS can also suspend apps (App Nap, low power mode)
+ * - The overhead is negligible (only activates when sockets are broken)
+ * - Provides defensive recovery for any socket invalidation scenario
+ */
+#ifndef INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+#define INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY 1
+#endif // INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY

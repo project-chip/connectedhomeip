@@ -292,9 +292,9 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
     // For now the entire message must fit within a single buffer.
     VerifyOrReturnError(!msg->HasChainedBuffer(), CHIP_ERROR_MESSAGE_TOO_LONG);
 
-#if TARGET_OS_IPHONE
-    // On iOS, check if the socket is still valid before attempting to send.
-    // When the app is backgrounded, iOS may invalidate socket file descriptors.
+#if INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+    // On platforms where sockets may become invalid when the app is backgrounded (e.g., iOS),
+    // check if the socket is still valid before attempting to send.
     // If we detect an invalid socket, close and recreate it.
     if (mSocket != kInvalidSocketFd)
     {
@@ -341,7 +341,7 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
             }
         }
     }
-#endif // TARGET_OS_IPHONE
+#endif // INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
 
     struct iovec msgIOV;
     msgIOV.iov_base = msg->Start();
@@ -466,9 +466,9 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
     if (lenSent == -1)
     {
         CHIP_ERROR sendError = CHIP_ERROR_POSIX(errno);
-#if TARGET_OS_IPHONE
-        // On iOS, if we get EPIPE or ENOTCONN, the socket was invalidated (likely due to backgrounding).
-        // Mark it as invalid so it will be recreated on the next send attempt.
+#if INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+        // On platforms where sockets may become invalid (e.g., iOS backgrounding),
+        // if we get EPIPE or ENOTCONN, mark the socket as invalid so it will be recreated on the next send attempt.
         if (errno == EPIPE || errno == ENOTCONN)
         {
             ChipLogError(Inet, "UDP socket send failed with %s, marking socket as invalid for recreation", ErrorStr(sendError));
@@ -477,7 +477,7 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
             close(mSocket);
             mSocket = kInvalidSocketFd;
         }
-#endif // TARGET_OS_IPHONE
+#endif // INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
         return sendError;
     }
 
@@ -752,10 +752,10 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
     }
     else
     {
-#if TARGET_OS_IPHONE
+#if INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
         // Suppress transient errors that don't require user notification.
         // EAGAIN: Resource temporarily unavailable (expected with non-blocking sockets)
-        // ENOTCONN: Socket is not connected (can occur on iOS when device is locked)
+        // ENOTCONN: Socket is not connected (can occur when device is locked or app backgrounded)
         if (OnReceiveError != nullptr && lStatus != CHIP_ERROR_POSIX(EAGAIN) && lStatus != CHIP_ERROR_POSIX(ENOTCONN))
         {
             OnReceiveError(this, lStatus, nullptr);
@@ -767,7 +767,7 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         {
             OnReceiveError(this, lStatus, nullptr);
         }
-#endif
+#endif // INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
     }
 }
 

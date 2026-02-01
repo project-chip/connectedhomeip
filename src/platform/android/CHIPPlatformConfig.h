@@ -54,3 +54,26 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #ifndef CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
+
+// ==================== Android Socket Recovery ====================
+
+/**
+ * @def INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+ *
+ * Enable UDP socket recovery for Android.
+ *
+ * Android aggressively manages background apps through:
+ * - Doze mode (network suspended after 30+ min idle)
+ * - App Standby (network restricted for unused apps)
+ * - Background execution limits (services stopped)
+ * - Battery optimization (connections closed)
+ * - Process death (complete state loss)
+ *
+ * Socket recovery detects broken sockets (EPIPE, ENOTCONN) and automatically
+ * recreates them, ensuring reliable reconnection when the app returns to foreground.
+ *
+ * The overhead is negligible - recovery only activates when sockets are actually broken.
+ */
+#ifndef INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
+#define INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY 1
+#endif // INET_CONFIG_ENABLE_UDP_SOCKET_RECOVERY
