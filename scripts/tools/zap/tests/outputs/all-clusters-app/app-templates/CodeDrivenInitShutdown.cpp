@@ -64,6 +64,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::SoftwareDiagnostics::Id:
         MatterSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
+        MatterThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         MatterWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -102,6 +105,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::ValveConfigurationAndControl::Id:
+        MatterValveConfigurationAndControlClusterInitCallback(endpoint);
         break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         MatterElectricalPowerMeasurementClusterInitCallback(endpoint);
@@ -167,6 +173,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::SoftwareDiagnostics::Id:
         MatterSoftwareDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
+        MatterThreadNetworkDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         MatterWiFiNetworkDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
         break;
@@ -205,6 +214,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::ValveConfigurationAndControl::Id:
+        MatterValveConfigurationAndControlClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         MatterElectricalPowerMeasurementClusterShutdownCallback(endpoint, shutdownType);

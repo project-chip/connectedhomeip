@@ -103,6 +103,11 @@ public:
         const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions);
 
     std::optional<DataModel::ActionReturnStatus>
+    ValidateStreamParameters(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                             const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions,
+                             const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr);
+
+    std::optional<DataModel::ActionReturnStatus>
     HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
 

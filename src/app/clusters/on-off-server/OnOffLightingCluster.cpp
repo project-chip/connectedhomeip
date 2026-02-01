@@ -128,11 +128,6 @@ CHIP_ERROR OnOffLightingCluster::AcceptedCommands(const ConcreteClusterPath & pa
 CHIP_ERROR OnOffLightingCluster::Attributes(const ConcreteClusterPath & path,
                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    AttributeListBuilder listBuilder(builder);
-
-    // Base attributes
-    ReturnErrorOnFailure(OnOffCluster::Attributes(path, builder));
-
     static const DataModel::AttributeEntry kLightingAttributes[] = {
         Attributes::GlobalSceneControl::kMetadataEntry,
         Attributes::OnTime::kMetadataEntry,
@@ -140,7 +135,10 @@ CHIP_ERROR OnOffLightingCluster::Attributes(const ConcreteClusterPath & path,
         Attributes::StartUpOnOff::kMetadataEntry,
     };
 
-    return listBuilder.Append(Span<const DataModel::AttributeEntry>(kLightingAttributes), {});
+    ReturnErrorOnFailure(builder.AppendElements(kLightingAttributes));
+
+    // Base attributes, this includes mandatory metadata.
+    return OnOffCluster::Attributes(path, builder);
 }
 
 DataModel::ActionReturnStatus OnOffLightingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

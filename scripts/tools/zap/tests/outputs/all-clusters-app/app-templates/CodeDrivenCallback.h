@@ -72,6 +72,10 @@ void MatterSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterThreadNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -124,6 +128,10 @@ void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::Endpoint
 void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterValveConfigurationAndControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpointId);
 
