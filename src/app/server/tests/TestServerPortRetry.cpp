@@ -325,7 +325,7 @@ TEST_F(TestServerPortRetry, TestInitTransportAlternatingErrors)
         {
             return CHIP_ERROR_POSIX(EADDRINUSE); // Retryable
         }
-        else if (attempt == 1)
+        if (attempt == 1)
         {
             return CHIP_ERROR_INVALID_ARGUMENT; // Non-retryable
         }
