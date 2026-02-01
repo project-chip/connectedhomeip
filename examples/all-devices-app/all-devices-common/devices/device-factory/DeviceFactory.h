@@ -112,7 +112,7 @@ private:
                     .timerDelegate     = mContext->timerDelegate,
             });
         };
-        mRegistry["speaker"]          = [this]() {
+        mRegistry["speaker"] = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<LoggingSpeakerDevice>(mContext->timerDelegate);
         };
