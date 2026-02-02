@@ -2217,8 +2217,8 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     if (!supportsConcurrent)
     {
         // Concurrent mode not supported.
-        // We are in operational phase so the commissioning channel is no more
-        //  available and it is not possible to re-arm the fail-safe timer.
+        // We are in operational phase so the commissioning channel is not
+        // available anymore and it is not possible to re-arm the fail-safe timer.
         return;
     }
 
