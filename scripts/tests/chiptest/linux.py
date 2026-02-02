@@ -69,13 +69,6 @@ def ensure_private_state():
         log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
-    # TODO remove this mount once otbr-agent doesn't require it anymore
-    log.debug("Remounting /var/lib/thread")
-    if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/var/lib/thread"]).returncode != 0:
-        log.error("Failed to mount /var/lib/thread as a temporary filesystem")
-        log.error("Are you using --privileged if running in docker?")
-        sys.exit(1)
-
 
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""

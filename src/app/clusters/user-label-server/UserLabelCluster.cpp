@@ -16,7 +16,6 @@
 
 #include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Server.h>
 #include <clusters/UserLabel/Metadata.h>
 
 #include <array>
@@ -31,8 +30,8 @@ namespace {
 class AutoReleaseIterator
 {
 public:
-    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider, EndpointId endpointId) :
-        mIterator(provider != nullptr ? provider->IterateUserLabel(endpointId) : nullptr)
+    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider, EndpointId endpointId) :
+        mIterator(provider.IterateUserLabel(endpointId))
     {}
     ~AutoReleaseIterator()
     {
@@ -50,9 +49,9 @@ private:
     DeviceLayer::DeviceInfoProvider::UserLabelIterator * mIterator;
 };
 
-CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider & provider)
 {
-    AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider(), endpoint);
+    AutoReleaseIterator it(provider, endpoint);
     VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
 
     return encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
@@ -72,11 +71,9 @@ bool IsValidLabelEntry(const Structs::LabelStruct::Type & entry)
     return (entry.label.size() <= UserLabelCluster::kMaxLabelSize) && (entry.value.size() <= UserLabelCluster::kMaxValueSize);
 }
 
-CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
+CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder,
+                          DeviceLayer::DeviceInfoProvider & provider)
 {
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-
-    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
     EndpointId endpoint = path.mEndpointId;
 
@@ -97,7 +94,7 @@ CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValue
         }
         ReturnErrorOnFailure(iter.GetStatus());
 
-        return provider->SetUserLabelList(endpoint, Span(labels.data(), numLabels));
+        return provider.SetUserLabelList(endpoint, Span(labels.data(), numLabels));
     }
 
     if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -108,7 +105,7 @@ CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValue
         VerifyOrReturnError(IsValidLabelEntry(entry), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         // Append the single user label entry
-        CHIP_ERROR err = provider->AppendUserLabel(endpoint, entry);
+        CHIP_ERROR err = provider.AppendUserLabel(endpoint, entry);
         if (err == CHIP_ERROR_NO_MEMORY)
         {
             return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
@@ -122,15 +119,13 @@ CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValue
 
 } // namespace
 
-UserLabelCluster::UserLabelCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, UserLabel::Id }) {}
-
 DataModel::ActionReturnStatus UserLabelCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
     case LabelList::Id:
-        return ReadLabelList(mPath.mEndpointId, encoder);
+        return ReadLabelList(mPath.mEndpointId, encoder, mContext.deviceInfoProvider);
     case ClusterRevision::Id:
         return encoder.Encode(UserLabel::kRevision);
     case FeatureMap::Id:
@@ -146,7 +141,7 @@ DataModel::ActionReturnStatus UserLabelCluster::WriteAttribute(const DataModel::
     switch (request.path.mAttributeId)
     {
     case LabelList::Id:
-        return NotifyAttributeChangedIfSuccess(LabelList::Id, WriteLabelList(request.path, decoder));
+        return NotifyAttributeChangedIfSuccess(LabelList::Id, WriteLabelList(request.path, decoder, mContext.deviceInfoProvider));
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
@@ -163,12 +158,12 @@ CHIP_ERROR UserLabelCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    return mContext.fabricTable.AddFabricDelegate(this);
 }
 
 void UserLabelCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -176,15 +171,13 @@ void UserLabelCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIn
 {
     // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
     // related data on the node which was created since it was commissioned.
-    VerifyOrReturn(Server::GetInstance().GetFabricTable().FabricCount() == 0);
+    VerifyOrReturn(mContext.fabricTable.FabricCount() == 0);
 
     ChipLogProgress(Zcl, "UserLabel: Last Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
     // Delete all user label data on the node which was added since it was commissioned.
-    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
-    VerifyOrReturn(provider != nullptr);
     // If UserLabel cluster is implemented on this endpoint
-    if (CHIP_NO_ERROR != provider->ClearUserLabelList(mPath.mEndpointId))
+    if (CHIP_NO_ERROR != mContext.deviceInfoProvider.ClearUserLabelList(mPath.mEndpointId))
     {
         ChipLogError(Zcl, "UserLabel: Failed to clear UserLabelList for endpoint: %d", mPath.mEndpointId);
     }

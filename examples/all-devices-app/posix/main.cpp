@@ -112,15 +112,22 @@ public:
                 .testEventTriggerDelegate = mContext.testEventTriggerDelegate,   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        })
+            },
+            []() {
+                BitFlags<AppRootNode::EnabledFeatures> features;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::EnableWiFi());
+#endif
+                return features;
+            }())
     {}
 
     CHIP_ERROR Startup()
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
-        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
         mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
         VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
@@ -136,7 +143,7 @@ public:
             mConstructedDevice->UnRegister(mDataModelProvider);
             mConstructedDevice.reset();
         }
-        mRootNode.UnRegister(mDataModelProvider);
+        mRootNode.RootDevice().UnRegister(mDataModelProvider);
     }
 
     chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
@@ -157,7 +164,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .timerDelegate = timerDelegate,
+        .groupDataProvider = gGroupDataProvider,                     //
+        .fabricTable       = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate     = timerDelegate,                          //
+
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -232,6 +242,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     chip::app::SetTerminateHandler(StopSignalHandler);
+
+    // This message is used as a marker for when the application process has started.
+    // See: scripts/tests/chiptest/test_definition.py
+    // TODO: A cleaner and more generic mechanism needs to be developed as a follow-up.
+    // Currently other places (OTA, TV) also scrape logs for information and a better way should be
+    // possible.
+    ChipLogProgress(DeviceLayer, "===== APP STATUS: Starting event loop =====");
 
     if (mainLoop != nullptr)
     {
