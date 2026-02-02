@@ -18,6 +18,8 @@
 
 import logging
 
+log = logging.getLogger(__name__)
+
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -84,7 +86,7 @@ class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
             # Validate 'name'
             assert_is_string(output.name, "'name' should be a string")
 
-            logging.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
+            log.info(f"Output Struct - index: {output.index}, outputType: {output.outputType}, name: {output.name}")
 
         # Step 3: Read CurrentOutput (only if OutputList is non-empty)
         if valid_indices:
