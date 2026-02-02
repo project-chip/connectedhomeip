@@ -27,6 +27,7 @@
 
 #include <app/util/basic-types.h>
 #include <inet/IPAddress.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
 
@@ -74,7 +75,7 @@ class GenericThreadStackManagerImpl_FreeRTOS;
 using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, const Span<Inet::IPAddress> & addresses,
                                     CHIP_ERROR error);
 using DnsBrowseCallback  = void (*)(void * context, chip::Dnssd::DnssdService * services, size_t servicesSize, bool finalBrowse,
-                                   CHIP_ERROR error);
+                                    CHIP_ERROR error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -108,6 +109,12 @@ public:
 
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
+    enum class ThreadAttachHints : uint32_t
+    {
+        kNoHint        = 0x0,
+        kRouterDisable = 0x1,
+    };
+    void SetAttachHints(BitFlags<ThreadAttachHints> hints);
     CHIP_ERROR AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
     CHIP_ERROR StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
@@ -284,6 +291,11 @@ inline bool ThreadStackManager::IsThreadEnabled()
 inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
 {
     return static_cast<ImplClass *>(this)->_SetThreadEnabled(val);
+}
+
+inline void ThreadStackManager::SetAttachHints(BitFlags<ThreadAttachHints> hints)
+{
+    static_cast<ImplClass *>(this)->_SetAttachHints(hints);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT

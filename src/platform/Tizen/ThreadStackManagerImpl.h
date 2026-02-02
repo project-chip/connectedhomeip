@@ -82,6 +82,8 @@ public:
 
     CHIP_ERROR _SetThreadEnabled(bool val);
 
+    void _SetAttachHints([[maybe_unused]] BitFlags<ThreadStackManager::ThreadAttachHints> hints) {}
+
     void _OnThreadAttachFinished(void);
 
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();

@@ -92,6 +92,7 @@ protected:
     bool _IsThreadAttached();
     CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
+    void _SetAttachHints(BitFlags<ThreadStackManager::ThreadAttachHints> hints);
     CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                       NetworkCommissioning::ThreadDriver::ConnectCallback * callback);
     void _OnThreadAttachFinished();
@@ -148,6 +149,9 @@ private:
     // ===== Private members for use by this class only.
 
     otInstance * mOTInst;
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    bool mRestoreRouterEligibility;
+#endif
     uint64_t mOverrunCount      = 0;
     bool mIsAttached            = false;
     bool mTemporaryRxOnWhenIdle = false;

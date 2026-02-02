@@ -74,6 +74,8 @@ public:
 
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
 
+    void _SetAttachHints([[maybe_unused]] BitFlags<ThreadStackManager::ThreadAttachHints> hints) {}
+
     void _OnNetworkScanFinished(GAsyncResult * res);
     static void _OnNetworkScanFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
 

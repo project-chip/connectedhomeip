@@ -300,6 +300,13 @@ class ThreadBorderRouter:
                                       text=True,
                                       encoding='UTF-8')
 
+        sniffer_cmd = f'ip netns exec {self._netns_app} tcpdump -ilo -U -Zroot -wthread.pcap udp port 9000'
+
+        self._sniffer = subprocess.Popen(sniffer_cmd,
+                                         stdout=sys.stdout,
+                                         stderr=subprocess.STDOUT,
+                                         shell=True)
+
         threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
 
         self.expect(r'Co-processor version:', timeout=20)
@@ -345,6 +352,10 @@ class ThreadBorderRouter:
         if self._otbr:
             self._otbr.terminate()
             self._otbr.wait()
+
+        if self._sniffer:
+            self._sniffer.terminate()
+            self._sniffer.wait()
 
 
 class WpaSupplicantMock(threading.Thread):

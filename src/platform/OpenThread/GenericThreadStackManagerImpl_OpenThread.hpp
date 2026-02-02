@@ -318,6 +318,32 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetAttachHints([[maybe_unused]] BitFlags<ThreadStackManager::ThreadAttachHints> hints)
+{
+    VerifyOrDie(mOTInst != nullptr);
+
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    Impl()->LockThreadStack();
+
+    if (hints.Has(ThreadStackManager::ThreadAttachHints::kRouterDisable))
+    {
+        mRestoreRouterEligibility = otThreadIsRouterEligible(mOTInst);
+        if (mRestoreRouterEligibility)
+        {
+            VerifyOrDie(otThreadSetRouterEligible(mOTInst, false) == OT_ERROR_NONE);
+        }
+    }
+    else if (mRestoreRouterEligibility)
+    {
+        VerifyOrDie(otThreadSetRouterEligible(mOTInst, true) == OT_ERROR_NONE);
+        mRestoreRouterEligibility = false;
+    }
+
+    Impl()->UnlockThreadStack();
+#endif
+}
+
+template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned()
 {
     VerifyOrReturnValue(mOTInst, false);

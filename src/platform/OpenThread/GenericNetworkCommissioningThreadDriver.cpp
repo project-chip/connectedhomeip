@@ -87,6 +87,10 @@ void GenericThreadDriver::OnThreadStateChangeHandler(const ChipDeviceEvent * eve
         }
         break;
 
+    case DeviceEventType::kCommissioningComplete:
+        ThreadStackMgr().SetAttachHints(ThreadStackManager::ThreadAttachHints::kNoHint);
+        break;
+
     default:
         break;
     }
@@ -235,6 +239,11 @@ void GenericThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * c
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    if (status == Status::kSuccess && !ConfigurationMgr().IsFullyProvisioned())
+    {
+        ThreadStackMgr().SetAttachHints(ThreadStackManager::ThreadAttachHints::kRouterDisable);
+    }
 
     if (status == Status::kSuccess &&
         DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) != CHIP_NO_ERROR)

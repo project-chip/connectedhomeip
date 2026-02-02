@@ -34,6 +34,7 @@ from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRun
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
 # If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
@@ -537,6 +538,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         test_end = time.monotonic()
                         log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
                 except Exception:
+                    os.system('echo base64 -d - "<<EOF" && base64 thread.pcap && echo EOF')
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                     observed_failures += 1
