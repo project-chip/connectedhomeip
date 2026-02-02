@@ -52,10 +52,10 @@ TEST_F(TestOperationalCredentials, TestAttributes)
         .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
         .dnssdServer                = app::DnssdServer::Instance(),
         .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
-        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
+        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+        .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
         .accessControl              = Access::GetAccessControl(),
-        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
+        .platformManager            = DeviceLayer::PlatformMgr(),
         .eventManagement            = EventManagement::GetInstance(),
     };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
@@ -79,10 +79,10 @@ TEST_F(TestOperationalCredentials, TestCommands)
         .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
         .dnssdServer                = app::DnssdServer::Instance(),
         .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
-        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
+        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+        .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
         .accessControl              = Access::GetAccessControl(),
-        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
+        .platformManager            = DeviceLayer::PlatformMgr(),
         .eventManagement            = EventManagement::GetInstance(),
     };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
