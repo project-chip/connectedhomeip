@@ -520,14 +520,16 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
                                         const Commands::OnWithTimedOff::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OnWithTimedOffCommand", "OnOff");
-    BitFlags<OnOffControlBitmap> onOffControl = commandData.onOffControl;
-    uint16_t onTime                           = commandData.onTime;
-    uint16_t offWaitTime                      = commandData.offWaitTime;
-    Status status                             = Status::Success;
-    chip::EndpointId endpoint                 = commandPath.mEndpointId;
-    bool isOn                                 = false;
-    uint16_t currentOffWaitTime               = MAX_ON_OFF_TIME_VALUE;
-    uint16_t currentOnTime                    = 0;
+    BitFlags<OnOffControlBitmap> onOffControl    = commandData.onOffControl;
+    uint16_t onTime                              = commandData.onTime;
+    uint16_t offWaitTime                         = commandData.offWaitTime;
+    Status status                                = Status::Success;
+    chip::EndpointId endpoint                    = commandPath.mEndpointId;
+    bool isOn                                    = false;
+    uint16_t currentOffWaitTime                  = MAX_ON_OFF_TIME_VALUE;
+    uint16_t currentOnTime                       = 0;
+    app::MarkAttributeDirty markOnTimeDirty      = app::MarkAttributeDirty::kNo;
+    app::MarkAttributeDirty markOffWaitTimeDirty = app::MarkAttributeDirty::kNo;
 
     EmberEventControl * event = configureEventControl(endpoint);
     VerifyOrExit(event != nullptr, status = Status::UnsupportedEndpoint);
@@ -548,16 +550,34 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
     if (currentOffWaitTime > 0 && !isOn)
     {
         uint16_t newOffWaitTime = currentOffWaitTime < offWaitTime ? currentOffWaitTime : offWaitTime;
-        OnOff::Attributes::OffWaitTime::Set(endpoint, newOffWaitTime);
+
+        // If the delta of the change is larger then 10 (1s) the change is reported
+        if (abs(newOffWaitTime - currentOffWaitTime) > 10)
+        {
+            markOffWaitTimeDirty = app::MarkAttributeDirty::kYes;
+        }
+        OnOff::Attributes::OffWaitTime::Set(endpoint, newOffWaitTime, markOffWaitTimeDirty);
 
         currentOffWaitTime = newOffWaitTime;
     }
     else
     {
         uint16_t newOnTime = currentOnTime > onTime ? currentOnTime : onTime;
-        OnOff::Attributes::OnTime::Set(endpoint, newOnTime);
 
-        OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
+        // If the delta of the change is larger then 10 (1s) the change is reported
+        if (abs(newOnTime - currentOnTime) > 10)
+        {
+            markOnTimeDirty = app::MarkAttributeDirty::kYes;
+        }
+        OnOff::Attributes::OnTime::Set(endpoint, newOnTime, markOnTimeDirty);
+
+        // If the delta of the change is larger then 10 (1s) the change is reported
+        if (abs(offWaitTime - currentOffWaitTime) > 10)
+        {
+            markOffWaitTimeDirty = app::MarkAttributeDirty::kYes;
+        }
+        OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime, markOffWaitTimeDirty);
+
         setOnOffValue(endpoint, Commands::On::Id, false);
 
         currentOnTime      = newOnTime;
@@ -602,15 +622,21 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (onTime > 0)
         {
             onTime--;
-            OnOff::Attributes::OnTime::Set(endpoint, onTime);
         }
 
         if (onTime == 0)
         {
+            // Report that OnTime reached 0
+            OnOff::Attributes::OnTime::Set(endpoint, onTime, app::MarkAttributeDirty::kYes);
+
             ChipLogDetail(Zcl, "Timer callback - Turning off OnOff");
 
-            OnOff::Attributes::OffWaitTime::Set(endpoint, 0);
             setOnOffValue(endpoint, Commands::Off::Id, false);
+        }
+        else
+        {
+            // Do not report the regular countdown
+            OnOff::Attributes::OnTime::Set(endpoint, onTime, app::MarkAttributeDirty::kNo);
         }
     }
     else // OnOff Off Case
@@ -622,7 +648,6 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (offWaitTime > 0)
         {
             offWaitTime--;
-            OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
         }
 
         ChipLogDetail(Zcl, "Timer Callback - wait Off Time:  %d", offWaitTime);
@@ -630,11 +655,17 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         // Validate if necessary to restart timer
         if (offWaitTime > 0)
         {
+            // Do not report the regular countdown
+            OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime, app::MarkAttributeDirty::kNo);
+
             // Restart Timer
             scheduleTimerCallbackMs(configureEventControl(endpoint), calculateNextWaitTimeMS());
         }
         else
         {
+            // Report that OffWaitTime reached 0
+            OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime, app::MarkAttributeDirty::kYes);
+
             ChipLogProgress(Zcl, "Timer  Callback - wait Off Time cycle finished");
 
             // Stop timer on the endpoint
@@ -734,8 +765,8 @@ static inline void unreg(OnOffEffect * inst)
 
 OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
                          EffectIdentifierEnum effectIdentifier, uint8_t effectVariant) :
-    mEndpoint(endpoint),
-    mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
+    mEndpoint(endpoint), mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier),
+    mEffectVariant(effectVariant)
 {
     reg(this);
 };
