@@ -19,6 +19,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementCluster.cpp"
     "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementCluster.h"
     "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementLogic.cpp"
-    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementLogic.h"
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementLogic.h"   
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"    
 )
