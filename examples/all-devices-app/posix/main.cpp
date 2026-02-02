@@ -112,7 +112,6 @@ public:
                     .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,   //
                     .diagnosticDataProvider   = mContext.diagnosticDataProvider,     //
                     .testEventTriggerDelegate = mContext.testEventTriggerDelegate,   //
-                    .dnssdServer              = mContext.dnssdServer,                //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
