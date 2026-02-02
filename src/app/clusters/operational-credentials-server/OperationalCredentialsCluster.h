@@ -16,16 +16,16 @@
  */
 #pragma once
 
+#include <access/AccessControl.h>
+#include <app/EventManagement.h>
 #include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <clusters/OperationalCredentials/ClusterId.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <include/platform/PlatformManager.h>
 #include <credentials/GroupDataProvider.h>
-#include <access/AccessControl.h>
-#include <app/EventManagement.h>
+#include <include/platform/PlatformManager.h>
 
 namespace chip {
 namespace app {
