@@ -204,7 +204,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .fabricTable            = Server::GetInstance().GetFabricTable(),                //
                 .accessControl          = Server::GetInstance().GetAccessControl(),              //
                 .persistentStorage      = Server::GetInstance().GetPersistentStorage(),          //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+                .failSafeContext        = Server::GetInstance().GetFailSafeContext(),            //
                 .platformManager        = DeviceLayer::PlatformMgr(),                            //
                 .groupDataProvider      = gGropupDataProvider,                                   //
                 .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //

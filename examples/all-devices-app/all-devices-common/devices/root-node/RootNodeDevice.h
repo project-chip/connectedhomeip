@@ -44,7 +44,7 @@ public:
         FabricTable & fabricTable;
         Access::AccessControl & accessControl;
         PersistentStorageDelegate & persistentStorage;
-        FailSafeContext & failsafeContext;
+        FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
