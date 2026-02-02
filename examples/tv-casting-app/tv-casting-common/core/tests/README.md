@@ -70,41 +70,46 @@ CastingPlayers are deleted:
 [  PASSED  ] 7 test(s).
 ```
 
-**Note:** You may see error messages about CastingStore operations failing. This is expected and normal - the tests don't initialize a full storage backend, so persistence operations fail gracefully. The tests still pass because they're testing the API structure, not storage.
+**Note:** You may see error messages about CastingStore operations failing. This
+is expected and normal - the tests don't initialize a full storage backend, so
+persistence operations fail gracefully. The tests still pass because they're
+testing the API structure, not storage.
 
-See [FABRIC_CLEANUP_TESTS.md](FABRIC_CLEANUP_TESTS.md) for detailed documentation.
+See [FABRIC_CLEANUP_TESTS.md](FABRIC_CLEANUP_TESTS.md) for detailed
+documentation.
 
 ### SendUDC Tests
 
-The `SendUDC` API is tested across multiple platforms with comprehensive test suites:
+The `SendUDC` API is tested across multiple platforms with comprehensive test
+suites:
 
 ### Android/Java Tests (`CastingPlayerSendUDCTest.java`)
 
 The Android tests use Mockito and JUnit4 to test:
 
-1. **Basic sendUDC invocation**: Verifying method calls with
-   minimal options
+1. **Basic sendUDC invocation**: Verifying method calls with minimal options
 2. **Flag handling**: Testing NoPasscode and CancelPasscode flags
 3. **InstanceName management**: Testing unique session identifiers
 4. **TargetAppInfo handling**: Testing app targeting with vendor IDs
 5. **Callback registration**: Testing CommissionerDeclarationCallback setup
 6. **Complete flow simulation**: Testing the full app detection workflow
-7. **Multiple target apps**: Testing support for multiple TargetAppInfo
-   entries
+7. **Multiple target apps**: Testing support for multiple TargetAppInfo entries
 8. **Error handling**: Testing error response handling
-9.  **Callback validation**: Testing required callback validation
+9. **Callback validation**: Testing required callback validation
 
 ### iOS/Objective-C Tests (`MCCastingPlayerSendUDCTests.m`)
 
 The iOS tests use XCTest and OCMock to test:
 
-1. **Basic sendUDCWithCallbacks invocation**: Verifying method calls with minimal options
+1. **Basic sendUDCWithCallbacks invocation**: Verifying method calls with
+   minimal options
 2. **Flag handling**: Testing NoPasscode and CancelPasscode flags
 3. **InstanceName management**: Testing UUID-based session identifiers
 4. **MCTargetAppInfo handling**: Testing app targeting
 5. **Callback registration**: Testing CommissionerDeclarationCallback setup
 6. **Complete flow simulation**: Testing the full app detection workflow
-7. **Multiple target apps**: Testing support for multiple MCTargetAppInfo entries
+7. **Multiple target apps**: Testing support for multiple MCTargetAppInfo
+   entries
 8. **Error handling**: Testing NSError response handling
 9. **Callback validation**: Testing required callback validation
 
@@ -354,10 +359,12 @@ This flow is tested in:
 ## Dependencies
 
 ### Android Tests
+
 -   JUnit 4
 -   Mockito for mocking (version 3.12.4 for Java 8 compatibility)
 
 ### iOS Tests
+
 -   XCTest framework
 -   OCMock for mocking
 
