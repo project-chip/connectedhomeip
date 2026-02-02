@@ -71,7 +71,7 @@ class TC_OO_2_8(MatterBaseTest):
                 TestStep(7, f"{THcommand} OnWithTimedOff command with AcceptOnlyWhenOn field set to 0, OnTime field set to 150 (15s) and OffWaitTime set to 50 (5s)",
                          test_plan_support.verify_success()),
 
-                TestStep(8, "Wait for 20 seconds"),
+                TestStep(8, "Wait for 25 seconds"),
 
                 TestStep(9, "TH stores the reported values of OnTime in all incoming reports for OnTime attribute, that contains data in reportedOnTimeValuesList and verifies reportedOnTimeValueList contains three entries",
                          "reportedOnTimeValueList has 3 entries in the list"),
