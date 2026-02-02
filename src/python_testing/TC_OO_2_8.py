@@ -55,7 +55,6 @@ log = logging.getLogger(__name__)
 class TC_OO_2_8(MatterBaseTest):
 
     def steps_TC_OO_2_8(self) -> list[TestStep]:
-        THRead = "TH reads"
         THcommand = "TH sends the command"
         return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
                 TestStep(2, f"{THcommand} Off command", test_plan_support.verify_success()),
