@@ -48,10 +48,12 @@ private:
     // SDK cluster servers
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
         mWebRTCTransportProviderServer;
-    std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementCluster> mAVStreamMgmtServerPtr;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementCluster>
+        mAVStreamMgmtServer;
 
-    // Helper to set attribute defaults for CameraAVStreamMgmt
-    void InitializeCameraAVStreamMgmt();
+    // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
+    void CreateAndInitializeCameraAVStreamMgmt();
+    CHIP_ERROR InitializeCameraAVStreamMgmt();
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);
