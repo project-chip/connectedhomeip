@@ -23,6 +23,9 @@
 #include <clusters/OperationalCredentials/ClusterId.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <include/platform/PlatformManager.h>
+#include <credentials/GroupDataProvider.h>
+#include <access/AccessControl.h>
+#include <app/EventManagement.h>
 
 namespace chip {
 namespace app {
@@ -38,11 +41,11 @@ public:
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
         CommissioningWindowManager & commissioningWindowManager;
-        DeviceAttestationCredentialsProvider & dacProvider;
+        Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         Credentials::GroupDataProvider & groupDataProvider;
         Access::AccessControl & accessControl;
         DeviceLayer::PlatformManager & platformManager;
-        EventManagement & eventManagement;
+        app::EventManagement & eventManagement;
     };
 
     OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
