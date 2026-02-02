@@ -176,6 +176,7 @@ ALLOW: Dict[str, Set[str]] = {
     # Not really for embedded consumers, because commissioners tend to not be embedded.
     'src/controller/SetUpCodePairer.h': {'deque', 'vector'},
     'src/controller/SetUpCodePairer.cpp': {'vector'},
+    'src/controller/NetworkRecover.h': {'deque', 'list'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
     'src/controller/ExamplePersistentStorage.h': {'string'},
