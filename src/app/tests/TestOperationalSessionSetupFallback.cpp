@@ -29,8 +29,6 @@
 #include <app/tests/AppTestContext.h>
 #include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
-// #include <lib/support/UnitTestContext.h>
-// #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -44,9 +42,7 @@ using namespace chip::Messaging;
 
 namespace {
 
-constexpr NodeId kTestNodeId       = 0x123456789abcdefULL;
-constexpr FabricIndex kFabricIndex = 1;
-constexpr uint16_t kTestPort       = 5540;
+constexpr uint16_t kTestPort = 5540;
 
 class MockOperationalSessionReleaseDelegate : public OperationalSessionReleaseDelegate
 {
@@ -126,15 +122,16 @@ protected:
     }
 };
 
-#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+
+constexpr NodeId kTestNodeId       = 0x123456789abcdefULL;
+constexpr FabricIndex kFabricIndex = 1;
 
 TEST_F(TestOperationalSessionSetupFallback, TestSetFallbackResolveResult)
 {
     // Test that we can set a fallback resolve result on OperationalSessionSetup
 
     ScopedNodeId peerId(kTestNodeId, kFabricIndex);
-    // CASEClientInitParams initParams;
-    // CASEClientPoolDelegate * clientPool = nullptr;
 
     // Note: This test is limited because OperationalSessionSetup requires significant
     // infrastructure (SessionManager, ExchangeManager, etc.) to fully instantiate.
@@ -236,16 +233,16 @@ TEST_F(TestOperationalSessionSetupFallback, TestMRPConfigInFallbackResult)
     EXPECT_EQ(result.mrpRemoteConfig.mActiveThresholdTime, customConfig.mActiveThresholdTime);
 }
 
-#else // !CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#else // !CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 TEST_F(TestOperationalSessionSetupFallback, TestFallbackDisabledByDefault)
 {
-    // When CHIP_CONFIG_ENABLE_MDNS_FALLBACK is not defined, the fallback
+    // When CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK is not defined, the fallback
     // functionality should not be compiled in. This test simply verifies
     // the test framework is working when the feature is disabled.
     SUCCEED();
 }
 
-#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 } // namespace

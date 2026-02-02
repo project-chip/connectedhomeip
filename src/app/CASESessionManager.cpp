@@ -133,13 +133,13 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
     // Set fallback result if provided
     if (fallbackResult.HasValue())
     {
         session->SetFallbackResolveResult(fallbackResult.Value());
     }
-#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
     if (onFailure != nullptr)
     {

@@ -284,13 +284,13 @@ public:
     void AddRetryHandler(Callback::Callback<OnDeviceConnectionRetry> * onRetry);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
     /**
-     * Set a fallback resolve result to use if mDNS resolution times out.
+     * Set a fallback resolve result to use if address resolution times out.
      * This should be called before Connect() to enable the fallback mechanism.
      */
     void SetFallbackResolveResult(const AddressResolve::ResolveResult & result);
-#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 private:
     enum class State : uint8_t
@@ -353,12 +353,11 @@ private:
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
-    // Fallback mDNS result to use if normal mDNS resolution times out
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // Fallback address resolve result to use if normal address resolution times out
     Optional<AddressResolve::ResolveResult> mFallbackResolveResult;
-    System::Clock::Timeout mFallbackTimeout = System::Clock::Seconds16(CHIP_CONFIG_MDNS_FALLBACK_TIMEOUT_SECONDS);
-    bool mUsingFallback                     = false;
-#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+    System::Clock::Timeout mFallbackTimeout = System::Clock::Seconds16(CHIP_CONFIG_ADDRESS_RESOLVE_FALLBACK_TIMEOUT_SECONDS);
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
     void MoveToState(State aTargetState);
 
@@ -469,10 +468,10 @@ private:
     void NotifyRetryHandlers(CHIP_ERROR error, System::Clock::Seconds16 timeoutEstimate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
-#if CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
     /**
-     * Timer callback that fires when mDNS resolution times out.
-     * Cancels the mDNS lookup and uses the fallback result instead.
+     * Timer callback that fires when address resolution times out.
+     * Cancels the address lookup and uses the fallback result instead.
      */
     static void OnFallbackTimeout(System::Layer * systemLayer, void * appState);
 
@@ -485,7 +484,13 @@ private:
      * Start the fallback timeout timer.
      */
     CHIP_ERROR StartFallbackTimer();
-#endif // CHIP_CONFIG_ENABLE_MDNS_FALLBACK
+
+    /**
+     * Helper to get the System::Layer from the session manager.
+     * Returns nullptr if not available.
+     */
+    System::Layer * GetSystemLayer();
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 };
 
 } // namespace chip

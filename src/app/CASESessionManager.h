@@ -64,7 +64,7 @@ public:
 
     /**
      * Find an existing session for the given node ID, or trigger a new session
-     * request with mDNS fallback support.
+     * request with optional DNS-SD fallback support.
      *
      * The caller can optionally provide `onConnection` and `onFailure` callback
      * objects. If provided, these will be used to inform the caller about

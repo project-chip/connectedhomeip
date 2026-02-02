@@ -80,8 +80,8 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY 1
 #define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
 
-// Enable MDNS fallback for casting clients with flaky mDNS
-#define CHIP_CONFIG_ENABLE_MDNS_FALLBACK 1
+// Enable address resolve fallback for casting clients with flaky DNS-SD
+#define CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK 1
 
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
