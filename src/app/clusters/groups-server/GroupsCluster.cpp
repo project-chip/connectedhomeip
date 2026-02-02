@@ -341,7 +341,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
     }
 #endif
 
-    TEMPORARY_RETURN_IGNORED provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
+    LogErrorOnFailure(provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId));
     status = Status::Success;
     MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id);
 exit:
