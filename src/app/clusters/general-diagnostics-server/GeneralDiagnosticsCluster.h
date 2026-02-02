@@ -23,6 +23,7 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
 #include <system/SystemClock.h>
@@ -62,8 +63,7 @@ public:
                               Context && context) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
-        mFeatureFlags(featureFlags), mDiagnosticsContext(std::move(context)),
-        mNodeStartupTimestamp(System::Clock::Microseconds64(0))
+        mFeatureFlags(featureFlags), mDiagnosticsContext(std::move(context))
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -135,7 +135,8 @@ public:
 
     System::Clock::Microseconds64 TimeSinceNodeStartup() const
     {
-        return System::SystemClock().GetMonotonicMicroseconds64() - mNodeStartupTimestamp;
+        VerifyOrReturnValue(mContext != nullptr, System::Clock::Microseconds64(0));
+        return System::SystemClock().GetMonotonicMicroseconds64() - mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
     }
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mDiagnosticsContext.testEventTriggerDelegate; }
@@ -145,7 +146,6 @@ protected:
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
     BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
     Context mDiagnosticsContext;
-    System::Clock::Microseconds64 mNodeStartupTimestamp;
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
