@@ -299,13 +299,12 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
     return infos
 
 
-def _get_matter_base_test():
-    """Lazy import to avoid circular dependency with matter_testing module."""
-    from matter.testing.matter_testing import MatterBaseTest
-    return MatterBaseTest
+# Import MatterBaseTest here - this works because matter_testing.py imports from
+# commissioning after MatterBaseTest class is fully defined (see end of matter_testing.py)
+from matter.testing.matter_testing import MatterBaseTest
 
 
-class CommissionDeviceTest(_get_matter_base_test()):
+class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""
 
     def __init__(self, *args):
