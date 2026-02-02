@@ -262,7 +262,7 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
             if (SupportsLightingApplications(endpoint))
             {
                 ChipLogProgress(Zcl, "Off completed. reset OnTime to  0");
-                Attributes::OnTime::Set(endpoint, 0, app::MarkAttributeDirty::kYes); // Reset onTime
+                Attributes::OnTime::Set(endpoint, 0); // Reset onTime
             }
         }
     }
@@ -626,12 +626,11 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 
         if (onTime == 0)
         {
-            // Report that OnTime reached 0
-            OnOff::Attributes::OnTime::Set(endpoint, onTime, app::MarkAttributeDirty::kYes);
+            OnOff::Attributes::OnTime::Set(endpoint, onTime);
 
             ChipLogDetail(Zcl, "Timer callback - Turning off OnOff");
 
-            OnOff::Attributes::OffWaitTime::Set(endpoint, 0, app::MarkAttributeDirty::kYes);
+            OnOff::Attributes::OffWaitTime::Set(endpoint, 0);
             setOnOffValue(endpoint, Commands::Off::Id, false);
         }
         else
@@ -664,8 +663,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         }
         else
         {
-            // Report that OffWaitTime reached 0
-            OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime, app::MarkAttributeDirty::kYes);
+            OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
 
             ChipLogProgress(Zcl, "Timer  Callback - wait Off Time cycle finished");
 
