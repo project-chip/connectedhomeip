@@ -104,7 +104,7 @@ public:
                     .configurationManager     = mContext.configurationManager,       //
                     .deviceControlServer      = mContext.deviceControlServer,        //
                     .fabricTable              = mContext.fabricTable,                //
-                    .failSafeContext          = mContext.failsafeContext,            //
+                    .failSafeContext          = mContext.failSafeContext,            //
                     .platformManager          = mContext.platformManager,            //
                     .groupDataProvider        = mContext.groupDataProvider,          //
                     .sessionManager           = mContext.sessionManager,             //
