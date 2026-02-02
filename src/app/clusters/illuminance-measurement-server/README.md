@@ -1,5 +1,7 @@
 # This cluster is currently following a code driven approach.
+
 # This means that the Accessors for the attribute MeasuredValue are no longer available.
+
 # Now to set the value for this attribute the following code change applies:
 
 # BEFORE (using the Accessors)
