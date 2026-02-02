@@ -544,7 +544,7 @@ exit:
         // but a better impl of the innards of FabricTable::CommitPendingFabricData would make it work.
         fabricTable.RevertPendingOpCertsExceptRoot();
 
-       
+
         (void) groupDataProvider.RemoveFabric(newFabricIndex);
         (void) accessControl.DeleteAllEntriesForFabric(newFabricIndex);
 
@@ -1286,7 +1286,7 @@ FailSafeContext & OperationalCredentialsCluster::GetFailSafeContext()
 
 Credentials::DeviceAttestationCredentialsProvider & OperationalCredentialsCluster::GetDACProvider()
 {
-    return mOpCredsContext.dacProvider;  
+    return mOpCredsContext.dacProvider;
 }
 
 SessionManager & OperationalCredentialsCluster::GetSessionManager()
