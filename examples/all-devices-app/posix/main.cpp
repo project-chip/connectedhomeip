@@ -123,7 +123,7 @@ public:
                     .testEventTriggerDelegate   = mContext.testEventTriggerDelegate,   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             },
             []() {
@@ -217,7 +217,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .eventManagement            = EventManagement::GetInstance(),                       //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
