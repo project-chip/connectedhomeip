@@ -135,7 +135,10 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Attributes(ReadOnlyBufferBu
 
 void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeId)
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, CameraAvSettingsUserLevelManagement::Id, aAttributeId);
+    if (mMarkDirtyCallback)
+    {
+        mMarkDirtyCallback(aAttributeId);
+    }
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(

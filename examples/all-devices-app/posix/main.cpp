@@ -77,7 +77,9 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
-        FailSafeContext & failsafeContext;
+        Access::AccessControl & accessControl;
+        PersistentStorageDelegate & persistentStorage;
+        FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
@@ -96,7 +98,9 @@ public:
                     .configurationManager   = mContext.configurationManager,       //
                     .deviceControlServer    = mContext.deviceControlServer,        //
                     .fabricTable            = mContext.fabricTable,                //
-                    .failsafeContext        = mContext.failsafeContext,            //
+                    .accessControl          = mContext.accessControl,              //
+                    .persistentStorage      = mContext.persistentStorage,          //
+                    .failSafeContext        = mContext.failSafeContext,            //
                     .platformManager        = mContext.platformManager,            //
                     .groupDataProvider      = mContext.groupDataProvider,          //
                     .sessionManager         = mContext.sessionManager,             //
@@ -174,7 +178,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
             .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
             .fabricTable                = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .accessControl              = Server::GetInstance().GetAccessControl(),              //
+            .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
             .platformManager            = DeviceLayer::PlatformMgr(),                            //
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
