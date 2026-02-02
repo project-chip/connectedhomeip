@@ -65,32 +65,44 @@ class TC_OO_2_8(MatterBaseTest):
                          test_plan_support.verify_success()),
                 TestStep(5, f"	{THcommand} OnWithTimedOff command with AcceptOnlyWhenOn field set to 0, OnTime field set to 100 (10s) and OffWaitTime set to 20 (2s)",
                          test_plan_support.verify_success()),
-
                 TestStep(6, "Wait for 5 seconds"),
-
                 TestStep(7, f"{THcommand} OnWithTimedOff command with AcceptOnlyWhenOn field set to 0, OnTime field set to 150 (15s) and OffWaitTime set to 50 (5s)",
                          test_plan_support.verify_success()),
-
-                TestStep(8, "Wait for 25 seconds"),
-
+                TestStep(8, "Wait for 20 seconds"),
                 TestStep(9, "TH stores the reported values of OnTime in all incoming reports for OnTime attribute, that contains data in reportedOnTimeValuesList and verifies reportedOnTimeValueList contains three entries",
                          "reportedOnTimeValueList has 3 entries in the list"),
-                TestStep(10, "TH verifies the first entry in reportedOnTimeValueList is approximately 100 (10s)",
+                TestStep(10, "TH verifies the first entry in reportedOnTimeValueList is approximately 100",
                          "The first entry in reportedOnTimeValueList is in the range 95 - 100"),
                 TestStep(11, "TH verifies the second entry in reportedOnTimeValueList is approximately 150",
                          "The second entry in reportedOnTimeValueList is in the range 145 - 150"),
                 TestStep(12, "TH verifies the third entry in reportedOnTimeValueList is 0",
                          "The third entry in reportedOnTimeValueList is equal to 0"),
-
                 TestStep(13, "TH stores the reported values of OffWaitTime in all incoming reports for OffWaitTime attribute, that contains data in reportedOffWaitTimeValueList and verifies reportedOffWaitTimeValueList contains three entries",
                          "reportedOffWaitTimeValueList has 3 entries in the list"),
-                TestStep(14, "TH verifies the first entry in reportedOffWaitTimeValueList is approximately 20 (2s)",
+                TestStep(14, "TH verifies the first entry in reportedOffWaitTimeValueList is approximately 20",
                          "The first entry in reportedOffWaitTimeValueList is in the range 15 - 20"),
-                TestStep(15, "TH verifies the second entry in reportedOffWaitTimeValueList is approximately 50",
-                         "The second entry in reportedOffWaitTimeValueList is in the range 45 - 50"),
+                TestStep(15, "TH verifies the second entry in reportedOffWaitTimeValueList is approximately 100",
+                         "The second entry in reportedOffWaitTimeValueList is in the range 95 - 100"),
                 TestStep(16, "TH verifies the third entry in reportedOffWaitTimeValueList is 0",
                          "The third entry in reportedOffWaitTimeValueList is equal to 0"),
-
+                TestStep(17, "Clear the received reports on the subscription"),
+                TestStep(18, f"{THcommand} OnWithTimedOff command with AcceptOnlyWhenOn field set to 0, OnTime field set to 100 (10s) and OffWaitTime set to 50 (5s)",
+                         test_plan_support.verify_success()),
+                TestStep(19, "Wait for 5 seconds"),
+                TestStep(20, f"{THcommand} Off command", test_plan_support.verify_success()),
+                TestStep(21, "Wait for 10 seconds"),
+                TestStep(22, "TH stores the reported values of OnTime in all incoming reports for OnTime attribute, that contains data in reportedOnTimeValuesList and verifies reportedOnTimeValueList contains two entries",
+                         "reportedOnTimeValueList has 2 entries in the list"),
+                TestStep(23, "TH verifies the first entry in reportedOnTimeValueList is approximately 100",
+                         "The first entry in reportedOnTimeValueList is in the range 95 - 100"),
+                TestStep(24, "TH verifies the second entry in reportedOnTimeValueList is 0",
+                         "The second entry in reportedOnTimeValueList is equal to 0"),
+                TestStep(25, "TH stores the reported values of OffWaitTime in all incoming reports for OffWaitTime attribute, that contains data in reportedOffWaitTimeValueList and verifies reportedOffWaitTimeValueList contains two entries",
+                         "reportedOffWaitTimeValueList has 2 entries in the list"),
+                TestStep(26, "TH verifies the first entry in reportedOffWaitTimeValueList is approximately 50",
+                         "The first entry in reportedOffWaitTimeValueList is in the range 45 - 50"),
+                TestStep(27, "TH verifies the second entry in reportedOffWaitTimeValueList is 0",
+                         "The second entry in reportedOffWaitTimeValueList is equal to 0"),
                 ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.OnOff))
@@ -122,20 +134,20 @@ class TC_OO_2_8(MatterBaseTest):
         await asyncio.sleep(5)
 
         self.step(7)
-        cmd = Clusters.OnOff.Commands.OnWithTimedOff(onOffControl=0, onTime=150, offWaitTime=50)
+        cmd = Clusters.OnOff.Commands.OnWithTimedOff(onOffControl=0, onTime=150, offWaitTime=100)
         await self.send_single_cmd(cmd)
 
         self.step(8)
-        log.info("Test waits for 25 seconds")
-        await asyncio.sleep(25)
+        log.info("Test waits for 20 seconds")
+        await asyncio.sleep(20)
 
         self.step(9)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OnTime]
+        reportedOnTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OnTime]
+        log.info(f'OnTime reports: {reportedOnTimeValueList}')
         asserts.assert_equal(count, 3, "Unexpected number of OnTime reports")
 
         self.step(10)
-        reportedOnTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OnTime]
-        log.info(f'OnTime reports: {reportedOnTimeValueList}')
         asserts.assert_less_equal(reportedOnTimeValueList[0].value, 100, "Unexpected first OnTime report")
         asserts.assert_almost_equal(reportedOnTimeValueList[0].value, 100, delta=10, msg="Unexpected first OnTime report")
 
@@ -148,21 +160,67 @@ class TC_OO_2_8(MatterBaseTest):
 
         self.step(13)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OffWaitTime]
-        asserts.assert_equal(count, 3, "Unexpected number of OnTime reports")
-
-        self.step(14)
         reportedOffWaitTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OffWaitTime]
         log.info(f'OffWaitTime reports: {reportedOffWaitTimeValueList}')
+        asserts.assert_equal(count, 3, "Unexpected number of OffWaitTime reports")
+
+        self.step(14)
         asserts.assert_less_equal(reportedOffWaitTimeValueList[0].value, 20, "Unexpected first OffWaitTime report")
         asserts.assert_almost_equal(reportedOffWaitTimeValueList[0].value, 20, delta=10, msg="Unexpected first OffWaitTime report")
 
         self.step(15)
-        asserts.assert_less_equal(reportedOffWaitTimeValueList[1].value, 50, "Unexpected second OffWaitTime report")
+        asserts.assert_less_equal(reportedOffWaitTimeValueList[1].value, 100, "Unexpected second OffWaitTime report")
         asserts.assert_almost_equal(reportedOffWaitTimeValueList[1].value,
-                                    50, delta=10, msg="Unexpected second OffWaitTime report")
+                                    100, delta=10, msg="Unexpected second OffWaitTime report")
 
         self.step(16)
         asserts.assert_equal(reportedOffWaitTimeValueList[2].value, 0, "Unexpected last OffWaitTime report")
+
+        self.step(17)
+        sub_handler.reset()
+        reportedOnTimeValueList = []
+        reportedOffWaitTimeValueList = []
+
+        self.step(18)
+        cmd = Clusters.OnOff.Commands.OnWithTimedOff(onOffControl=0, onTime=100, offWaitTime=50)
+        await self.send_single_cmd(cmd)
+
+        self.step(19)
+        log.info("Test waits for 5 seconds")
+        await asyncio.sleep(5)
+
+        self.step(20)
+        await self.send_single_cmd(Clusters.OnOff.Commands.Off())
+
+        self.step(21)
+        log.info("Test waits for 10 seconds")
+        await asyncio.sleep(5)
+
+        self.step(22)
+        count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OnTime]
+        reportedOnTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OnTime]
+        log.info(f'OnTime reports: {reportedOnTimeValueList}')
+        asserts.assert_equal(count, 2, "Unexpected number of OnTime reports")
+
+        self.step(23)
+        asserts.assert_less_equal(reportedOnTimeValueList[0].value, 100, "Unexpected first OnTime report")
+        asserts.assert_almost_equal(reportedOnTimeValueList[0].value, 100, delta=10, msg="Unexpected first OnTime report")
+
+        self.step(24)
+        asserts.assert_equal(reportedOnTimeValueList[1].value, 0, "Unexpected last OffWaitTime report")
+
+        self.step(25)
+        count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OffWaitTime]
+        reportedOffWaitTimeValueList = sub_handler.attribute_reports[Clusters.OnOff.Attributes.OffWaitTime]
+        log.info(f'OffWaitTime reports: {reportedOffWaitTimeValueList}')
+        asserts.assert_equal(count, 2, "Unexpected number of OffWaitTime reports")
+
+        self.step(26)
+        asserts.assert_less_equal(reportedOffWaitTimeValueList[0].value, 50, "Unexpected first OffWaitTime report")
+        asserts.assert_almost_equal(reportedOffWaitTimeValueList[0].value, 50, delta=10, msg="Unexpected first OffWaitTime report")
+
+        self.step(27)
+        asserts.assert_equal(reportedOffWaitTimeValueList[1].value, 0, "Unexpected last OffWaitTime report")
 
 
 if __name__ == "__main__":
