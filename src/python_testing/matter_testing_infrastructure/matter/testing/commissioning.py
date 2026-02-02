@@ -300,29 +300,34 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
     return infos
 
 
-class CommissionDeviceTest(base_test.BaseTestClass):
+def _get_matter_base_test():
+    """Lazy import to avoid circular dependency with matter_testing module."""
+    from matter.testing.matter_testing import MatterBaseTest
+    return MatterBaseTest
+
+
+class CommissionDeviceTest(_get_matter_base_test()):
     """Test class auto-injected at the start of test list to commission a device when requested"""
 
     def __init__(self, *args):
         super().__init__(*args)
         # This class is used to commission the device so is set to True
         self.is_commissioning = True
-        # Save the stashed values into attributes to avoid mobly conflic with ctypes when mobly performs copy().
-        test_config = args[0]
-        self.default_controller = test_config.user_params['default_controller']
-        meta_config = test_config.user_params['meta_config']
-        self.dut_node_ids: List[int] = meta_config['dut_node_ids']
+
+        # Use inherited matter_test_config property instead of manual extraction
+        config = self.matter_test_config
+        self.dut_node_ids: List[int] = config.dut_node_ids
         self.commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=meta_config['commissionee_ip_address_just_for_testing'],
-            commissioning_method=meta_config['commissioning_method'],
-            thread_operational_dataset=meta_config['thread_operational_dataset'],
-            wifi_passphrase=meta_config['wifi_passphrase'],
-            wifi_ssid=meta_config['wifi_ssid'],
-            tc_version_to_simulate=meta_config['tc_version_to_simulate'],
-            tc_user_response_to_simulate=meta_config['tc_user_response_to_simulate'],
+            commissionee_ip_address_just_for_testing=config.commissionee_ip_address_just_for_testing,
+            commissioning_method=config.commissioning_method,
+            thread_operational_dataset=config.thread_operational_dataset,
+            wifi_passphrase=config.wifi_passphrase,
+            wifi_ssid=config.wifi_ssid,
+            tc_version_to_simulate=config.tc_version_to_simulate,
+            tc_user_response_to_simulate=config.tc_user_response_to_simulate,
         )
-        self.setup_payloads: List[SetupPayloadInfo] = get_setup_payload_info_config(
-            global_stash.unstash_globally(test_config.user_params['matter_test_config']))
+        # Use inherited get_setup_payload_info method
+        self.setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
 
     def test_run_commissioning(self):
         """This method is the test called by mobly, which try to commission the device until is complete or raises an error.
@@ -336,15 +341,7 @@ class CommissionDeviceTest(base_test.BaseTestClass):
             commissioning_info=self.commissioning_info
         )):
             raise signals.TestAbortAll("Failed to commission node(s)")
-
-    # Default controller is used by commission_devices
-    @property
-    def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
-        return global_stash.unstash_globally(self._default_controller)
-
-    @default_controller.setter
-    def default_controller(self, tmp_default_controller):
-        self._default_controller = tmp_default_controller
+    # default_controller is now inherited from MatterBaseTest
 
 
 @dataclass
