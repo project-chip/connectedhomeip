@@ -50,7 +50,7 @@ public:
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
             .dnssdServer                = app::DnssdServer::Instance(),
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-            .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
+            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
             .groupDataProvider          = *Credentials::GetGroupDataProvider(),
             .accessControl              = Access::GetAccessControl(),
             .platformManager            = DeviceLayer::PlatformMgr(),
