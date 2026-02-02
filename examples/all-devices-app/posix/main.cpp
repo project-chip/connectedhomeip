@@ -82,6 +82,8 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
+        Access::AccessControl & accessControl;
+        PersistentStorageDelegate & persistentStorage;
         FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
@@ -104,6 +106,8 @@ public:
                     .configurationManager     = mContext.configurationManager,       //
                     .deviceControlServer      = mContext.deviceControlServer,        //
                     .fabricTable              = mContext.fabricTable,                //
+                    .accessControl            = mContext.accessControl,              //
+                    .persistentStorage        = mContext.persistentStorage,          //
                     .failSafeContext          = mContext.failSafeContext,            //
                     .platformManager          = mContext.platformManager,            //
                     .groupDataProvider        = mContext.groupDataProvider,          //
@@ -185,6 +189,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
             .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
             .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .accessControl              = Server::GetInstance().GetAccessControl(),              //
+            .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
             .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
             .platformManager            = DeviceLayer::PlatformMgr(),                            //
             .groupDataProvider          = gGroupDataProvider,                                    //
