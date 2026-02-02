@@ -115,7 +115,6 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                               .accessControl              = mContext.accessControl,
                                               .platformManager            = mContext.platformManager,
                                               .eventManagement            = mContext.eventManagement,
-                                              .groupDataProvider          = mContext.groupDataProvider,
 
                                           });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
