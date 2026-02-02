@@ -204,7 +204,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .configurationManager     = DeviceLayer::ConfigurationMgr(),                       //
                 .deviceControlServer      = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
                 .fabricTable              = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext          = Server::GetInstance().GetFailSafeContext(),            //
+                .failSafeContext          = Server::GetInstance().GetFailSafeContext(),            //
                 .platformManager          = DeviceLayer::PlatformMgr(),                            //
                 .groupDataProvider        = gGropupDataProvider,                                   //
                 .sessionManager           = Server::GetInstance().GetSecureSessionManager(),       //
@@ -212,6 +212,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .deviceLoadStatusProvider = *InteractionModelEngine::GetInstance(),                //
                 .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),              //
                 .testEventTriggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate(),   //
+                .dnssdServer              = DnssdServer::Instance(),                               //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

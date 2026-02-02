@@ -82,7 +82,7 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
-        FailSafeContext & failsafeContext;
+        FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
@@ -104,7 +104,7 @@ public:
                     .configurationManager     = mContext.configurationManager,       //
                     .deviceControlServer      = mContext.deviceControlServer,        //
                     .fabricTable              = mContext.fabricTable,                //
-                    .failsafeContext          = mContext.failsafeContext,            //
+                    .failSafeContext          = mContext.failsafeContext,            //
                     .platformManager          = mContext.platformManager,            //
                     .groupDataProvider        = mContext.groupDataProvider,          //
                     .sessionManager           = mContext.sessionManager,             //
@@ -112,6 +112,7 @@ public:
                     .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,   //
                     .diagnosticDataProvider   = mContext.diagnosticDataProvider,     //
                     .testEventTriggerDelegate = mContext.testEventTriggerDelegate,   //
+                    .dnssdServer              = mContext.dnssdServer,                //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
@@ -185,7 +186,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
             .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
             .fabricTable                = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
             .platformManager            = DeviceLayer::PlatformMgr(),                            //
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
