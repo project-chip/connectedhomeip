@@ -168,19 +168,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
-
     // ========================================================================
     // Stubs required to satisfy the ConfigurationManager Interface
     // ========================================================================
 
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
 
-    // --- Missing Stubs (Fixes "abstract class" errors) ---
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override
     {
@@ -216,6 +213,12 @@ public:
     CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR IncrementLifetimeCounter() override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+#endif
 
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override
     {
@@ -267,8 +270,6 @@ private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
 };
 
-static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup = nullptr;
-
 class MockDelegate : public BasicInformationCluster::Delegate
 {
 public:
@@ -284,16 +285,19 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+        // Back up any existing DeviceInstanceInfoProvider and install the mock provider. This is required on platforms that build
+        // all unit tests into a single binary(e.g. Nordic), where global DeviceLayer state persists across test suites.
+        // DeviceInstanceInfoProvider has no universal default and cannot be reliably reset via Init/Shutdown, so without this
+        // backup/restore the mock would leak into subsequent tests.
         sDeviceInstanceInfoProviderBackup = DeviceLayer::TestOnlyTryGetDeviceInstanceInfoProvider();
-#endif
     }
 
     static void TearDownTestSuite()
     {
         // For the DeviceInstanceInfoProvider there is no default instance. Restore the provider that was installed prior to this
         // test suite, if any.
-        if (sDeviceInstanceInfoProviderBackup)
+        if (sDeviceInstanceInfoProviderBackup != nullptr)
         {
             DeviceLayer::SetDeviceInstanceInfoProvider(sDeviceInstanceInfoProviderBackup);
         }
@@ -303,8 +307,11 @@ struct TestBasicInformationReadWrite : public ::testing::Test
 
     TestBasicInformationReadWrite() {}
     chip::Testing::TestServerClusterContext testContext;
+    static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup;
     MockDelegate mDelegate;
 };
+
+DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDeviceInstanceInfoProviderBackup = nullptr;
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {

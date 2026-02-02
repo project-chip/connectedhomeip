@@ -296,10 +296,10 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
 {
     using namespace BasicInformation::Attributes;
 
-    // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
-    //       costs some flash (even though code would be more readable that way...)
     auto * deviceInfoProvider = mDelegate->GetDeviceInstanceInfoProvider();
-    auto & configManager      = mDelegate->GetConfigurationManager();
+    VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    auto & configManager = mDelegate->GetConfigurationManager();
 
     switch (request.path.mAttributeId)
     {

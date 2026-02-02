@@ -131,7 +131,6 @@ class MockDelegate : public BasicInformationCluster::Delegate
 {
 public:
     DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() override { return &mDeviceInfoProvider; }
-    // You can stub these or mock them if needed for specific tests
     DeviceLayer::ConfigurationManager & GetConfigurationManager() override { return chip::DeviceLayer::ConfigurationMgr(); }
     DeviceLayer::PlatformManager & GetPlatformManager() override { return chip::DeviceLayer::PlatformMgr(); }
 
