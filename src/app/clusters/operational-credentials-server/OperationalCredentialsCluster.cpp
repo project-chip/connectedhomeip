@@ -68,7 +68,8 @@ const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler, Fabri
 }
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
-                                                             FabricIndex fabricIndex, uint64_t subject, Access::AccessControl & accessControl)
+                                                             FabricIndex fabricIndex, uint64_t subject,
+                                                             Access::AccessControl & accessControl)
 {
     NodeId subjectAsNodeID = static_cast<NodeId>(subject);
 
@@ -400,20 +401,19 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
                                                           FailSafeContext & failSafeContext, DnssdServer & dnssdServer,
                                                           CommissioningWindowManager & commissioningWindowManager,
                                                           Credentials::GroupDataProvider & groupDataProvider,
-                                                          Access::AccessControl & accessControl,
-                                                          bool & reportChange)
+                                                          Access::AccessControl & accessControl, bool & reportChange)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     Commands::AddNOC::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-    auto & NOCValue          = commandData.NOCValue;
-    auto & ICACValue         = commandData.ICACValue;
-    auto & adminVendorId     = commandData.adminVendorId;
-    auto & ipkValue          = commandData.IPKValue;
-    auto nocResponse         = NodeOperationalCertStatusEnum::kOk;
-    auto errorStatus         = Status::Success;
-    bool needRevert          = false;
+    auto & NOCValue      = commandData.NOCValue;
+    auto & ICACValue     = commandData.ICACValue;
+    auto & adminVendorId = commandData.adminVendorId;
+    auto & ipkValue      = commandData.IPKValue;
+    auto nocResponse     = NodeOperationalCertStatusEnum::kOk;
+    auto errorStatus     = Status::Success;
+    bool needRevert      = false;
 
     CHIP_ERROR err             = CHIP_NO_ERROR;
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
@@ -543,7 +543,6 @@ exit:
         // trusted root previously added. It possibly got reverted in case of the worst kinds of errors,
         // but a better impl of the innards of FabricTable::CommitPendingFabricData would make it work.
         fabricTable.RevertPendingOpCertsExceptRoot();
-
 
         (void) groupDataProvider.RemoveFabric(newFabricIndex);
         (void) accessControl.DeleteAllEntriesForFabric(newFabricIndex);
@@ -1184,10 +1183,10 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     case OperationalCredentials::Commands::CSRRequest::Id:
         return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
     case OperationalCredentials::Commands::AddNOC::Id: {
-        bool reportChange = false;
-        std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(),
-                         GetCommissioningWindowManager(), mOpCredsContext.groupDataProvider, mOpCredsContext.accessControl, reportChange);
+        bool reportChange                                         = false;
+        std::optional<DataModel::ActionReturnStatus> returnStatus = HandleAddNOC(
+            handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(),
+            GetCommissioningWindowManager(), mOpCredsContext.groupDataProvider, mOpCredsContext.accessControl, reportChange);
         if (reportChange)
         {
             // Notify the attributes containing fabric metadata can be read with new data

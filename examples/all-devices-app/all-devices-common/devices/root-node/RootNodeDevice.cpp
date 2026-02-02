@@ -54,7 +54,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = mContext.commissioningWindowManager, //
                 .configurationManager   = mContext.configurationManager,       //
                 .deviceControlServer    = mContext.deviceControlServer,        //
@@ -62,7 +62,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                 .failSafeContext        = mContext.failSafeContext,            //
                 .platformManager        = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());
@@ -110,12 +110,12 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                               .sessionManager             = mContext.sessionManager,
                                               .dnssdServer                = mContext.dnssdServer,
                                               .commissioningWindowManager = mContext.commissioningWindowManager,
-                                                .dacProvider                = mContext.dacProvider,
-                                                .groupDataProvider          = mContext.groupDataProvider,
-                                                .accessControl              = mContext.accessControl,
-                                                .platformManager            = mContext.platformManager,
-                                                .eventManagement            = mContext.eventManagement,
-                                                .groupDataProvider          = mContext.groupDataProvider,
+                                              .dacProvider                = mContext.dacProvider,
+                                              .groupDataProvider          = mContext.groupDataProvider,
+                                              .accessControl              = mContext.accessControl,
+                                              .platformManager            = mContext.platformManager,
+                                              .eventManagement            = mContext.eventManagement,
+                                              .groupDataProvider          = mContext.groupDataProvider,
 
                                           });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));

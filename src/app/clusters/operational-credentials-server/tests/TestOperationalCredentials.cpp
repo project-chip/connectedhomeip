@@ -46,18 +46,18 @@ struct TestOperationalCredentials : public ::testing::Test
 
 TEST_F(TestOperationalCredentials, TestAttributes)
 {
-    OperationalCredentialsCluster::Context context = { .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                       .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                       .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                       .dnssdServer     = app::DnssdServer::Instance(),
-                                                       .commissioningWindowManager =
-                                                           Server::GetInstance().GetCommissioningWindowManager(),
-                                                        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
-                                                        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
-                                                        .accessControl              = Access::GetAccessControl(),
-                                                        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
-                                                        .eventManagement            = EventManagement::GetInstance(),
-                                                   };
+    OperationalCredentialsCluster::Context context = {
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                = app::DnssdServer::Instance(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
+        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
+        .accessControl              = Access::GetAccessControl(),
+        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
+        .eventManagement            = EventManagement::GetInstance(),
+    };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
@@ -73,17 +73,18 @@ TEST_F(TestOperationalCredentials, TestAttributes)
 
 TEST_F(TestOperationalCredentials, TestCommands)
 {
-    OperationalCredentialsCluster::Context context = { .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                       .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                       .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                       .dnssdServer     = app::DnssdServer::Instance(),
-                                                       .commissioningWindowManager =
-                                                           Server::GetInstance().GetCommissioningWindowManager(),
-                                                        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
-                                                        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
-                                                        .accessControl              = Access::GetAccessControl(),
-                                                        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
-                                                        .eventManagement            = EventManagement::GetInstance(),};
+    OperationalCredentialsCluster::Context context = {
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+        .dnssdServer                = app::DnssdServer::Instance(),
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
+        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
+        .accessControl              = Access::GetAccessControl(),
+        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
+        .eventManagement            = EventManagement::GetInstance(),
+    };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
