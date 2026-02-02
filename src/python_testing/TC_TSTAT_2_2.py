@@ -41,7 +41,6 @@ from typing import Optional
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
