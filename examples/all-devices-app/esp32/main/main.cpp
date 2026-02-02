@@ -184,7 +184,7 @@ void DeviceEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 }
 
 chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate,
-                                                                      TestEventTriggerDelegate * testEventTriggerDelegate)
+                                                                     TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     // Initialize the attribute persistence provider with the storage delegate
     CHIP_ERROR err = gAttributePersistenceProvider.Init(delegate);
@@ -264,8 +264,8 @@ void InitServer(intptr_t context)
         return;
     }
 
-    initParams.dataModelProvider = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate,
-                                                                       initParams.testEventTriggerDelegate);
+    initParams.dataModelProvider =
+        PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
