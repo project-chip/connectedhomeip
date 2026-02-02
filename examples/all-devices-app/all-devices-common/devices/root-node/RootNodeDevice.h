@@ -61,7 +61,6 @@ public:
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         TestEventTriggerDelegate * testEventTriggerDelegate;
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
-        Access::AccessControl & accessControl;
         EventManagement & eventManagement;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
