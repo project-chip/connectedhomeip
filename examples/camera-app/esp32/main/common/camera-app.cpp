@@ -293,11 +293,6 @@ void CameraAppShutdown()
     gCameraApp = nullptr;
 }
 
+void MatterCameraAvStreamManagementClusterInitCallback(chip::EndpointId endpointId) {}
 
-void MatterCameraAvStreamManagementClusterInitCallback(chip::EndpointId endpointId){}
-
-void MatterCameraAvSettingsUserLevelManagementPluginServerInitCallback(){}
-
-void MatterChimePluginServerInitCallback(){}
-
-void MatterPushAvStreamTransportPluginServerInitCallback(){}
+void MatterCameraAvStreamManagementPluginServerInitCallback() {}
