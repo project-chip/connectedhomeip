@@ -97,19 +97,21 @@ public:
     };
 
     CodeDrivenDataModelDevices(const Context & context) :
-        mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence), mRootNode({
-            .commissioningWindowManager   = mContext.commissioningWindowManager, //
-                .configurationManager     = mContext.configurationManager,       //
-                .deviceControlServer      = mContext.deviceControlServer,        //
-                .fabricTable              = mContext.fabricTable,                //
-                .failsafeContext          = mContext.failsafeContext,            //
-                .platformManager          = mContext.platformManager,            //
-                .groupDataProvider        = mContext.groupDataProvider,          //
-                .sessionManager           = mContext.sessionManager,             //
-                .dnssdServer              = mContext.dnssdServer,                //
-                .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,   //
-                .diagnosticDataProvider   = mContext.diagnosticDataProvider,     //
-                .testEventTriggerDelegate = mContext.testEventTriggerDelegate,   //
+        mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
+        mRootNode(
+            {
+                .commissioningWindowManager   = mContext.commissioningWindowManager, //
+                    .configurationManager     = mContext.configurationManager,       //
+                    .deviceControlServer      = mContext.deviceControlServer,        //
+                    .fabricTable              = mContext.fabricTable,                //
+                    .failsafeContext          = mContext.failsafeContext,            //
+                    .platformManager          = mContext.platformManager,            //
+                    .groupDataProvider        = mContext.groupDataProvider,          //
+                    .sessionManager           = mContext.sessionManager,             //
+                    .dnssdServer              = mContext.dnssdServer,                //
+                    .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,   //
+                    .diagnosticDataProvider   = mContext.diagnosticDataProvider,     //
+                    .testEventTriggerDelegate = mContext.testEventTriggerDelegate,   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
