@@ -149,7 +149,7 @@ jobs:
             - name: Build example All Clusters App (Target:ESP32P4, Ethernet)
               run: |
                 scripts/examples/esp_example.sh all-clusters-app sdkconfig.eth.esp32p4 esp32p4
-                rm -rf examples/lighting-app/esp32/{build,managed_components}
+                rm -rf examples/all-clusters-app/esp32/{build,managed_components}
 
             - name: Build example Lighting App (external platform)
               run: |
