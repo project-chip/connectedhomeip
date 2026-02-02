@@ -15194,13 +15194,10 @@ public class ClusterIDMapping {
             AmbientContextType(3L),
             AmbientContextTypeSupported(4L),
             SimultaneousDetectionLimit(5L),
-            CountThresholdReached(6L),
-            CountThreshold(7L),
-            ObjectCount(8L),
-            HoldTime(9L),
-            HoldTimeLimits(10L),
-            PredictedActivity(11L),
-            PrivacyModeEnabled(12L),
+            ObjectCountReached(6L),
+            HoldTime(7L),
+            HoldTimeLimits(8L),
+            PredictedActivity(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -15225,7 +15222,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            AmbientContextDetected(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
