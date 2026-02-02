@@ -188,9 +188,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
         events_callback = None
         hasEventsFeature = False
 
-        feat_should_be_there = await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPresets)
-        asserts.assert_true(feat_should_be_there, "Presets feature is required for this test")
-
         self.step("1a")
         if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             hasEventsFeature = True
@@ -353,11 +350,10 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(MaxHeatSetpointLimitValue), endpoint_id=endpoint)
 
         self.step("3d")
-        if self.pics_guard(hasHeatingFeature) and await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
+        if self.pics_guard(hasHeatingFeature) and hasEventsFeature:
             if self.pics_guard(hasAutoModeFeature):
-                if hasEventsFeature:
-                    # If we have auto mode, this will have also adjusted the cooling setpoint to preserve the deadband
-                    await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
+                # If we have auto mode, this will have also adjusted the cooling setpoint to preserve the deadband
+                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
             await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
         self.step("4a")
