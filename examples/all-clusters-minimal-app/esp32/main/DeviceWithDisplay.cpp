@@ -587,11 +587,7 @@ void SetupPretendDevices()
     auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
     if (illuminanceMeasurement != nullptr)
     {
-        CHIP_ERROR err = illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(1000));
-        if (err != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(TAG, "Failed to set initial illuminance: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        LogErrorOnFailure(illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(1000)));
     }
 
     AddDevice("Color Light");
