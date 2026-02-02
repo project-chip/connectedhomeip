@@ -142,7 +142,8 @@ protected:
     System::Clock::Microseconds64 TimeSinceNodeStartup() const
     {
         VerifyOrReturnValue(mContext != nullptr, System::Clock::Microseconds64(0));
-        return System::SystemClock().GetMonotonicMicroseconds64() - mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
+        return System::SystemClock().GetMonotonicMicroseconds64() -
+            mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
     }
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mDiagnosticsContext.testEventTriggerDelegate; }
