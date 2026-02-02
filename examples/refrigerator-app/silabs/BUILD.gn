@@ -105,12 +105,12 @@ if (wifi_soc) {
 
     if (use_temp_sensor) {
       include_dirs += [
-        "${efr32_sdk_root}/platform/driver/i2cspm/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/config",
-        "${efr32_sdk_root}/hardware/driver/si70xx/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_select",
-        "${efr32_sdk_root}/platform/common/config",
+        "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/inc,
+        "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht",
+        "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht/config",
+        "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/inc",
+        "${efr32_sdk_root}/platform_common/platform/common/config",
+        "${efr32_sdk_root}/platform_core/platform/common/config/",
       ]
 
       defines += [ "USE_TEMP_SENSOR" ]
@@ -141,10 +141,10 @@ silabs_executable("refrigerator_app") {
 
   if (use_temp_sensor) {
     sources += [
-      "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
-      "${efr32_sdk_root}/platform/common/src/sl_status.c",
-      "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
+      "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/src/sl_si70xx.c",
+      "${efr32_sdk_root}/platform_common/platform/common/src/sl_status.c",
+      "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/src/sl_i2cspm.c",
+      "${efr32_sdk_root}/platform_core/platform/emlib/src/em_i2c.c",
       "${examples_common_plat_dir}/TemperatureSensor.cpp",
       "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
     ]

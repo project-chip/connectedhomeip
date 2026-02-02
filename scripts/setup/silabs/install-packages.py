@@ -164,6 +164,12 @@ def slt_where(slt_cli_path, package):
     return None
 
 
+def get_repo_root():
+    """Return the repository root (three levels up from this script)."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.normpath(os.path.join(script_dir, "..", "..", ".."))
+
+
 def get_sdk_paths_gni_path():
     """Return the path to the SDK paths .gni file."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -177,11 +183,8 @@ def _gni_escape(path):
     return path.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def write_sdk_paths_reference(slt_cli_path):
-    """Run slt where for simplicity-sdk and wiseconnect and write paths to sdk_paths.gni."""
-    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk")
-    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect")
-
+def write_sdk_paths_reference(simplicity_sdk_path, wiseconnect_path):
+    """Write SDK paths to sdk_paths.gni."""
     if not simplicity_sdk_path:
         logging.warning("simplicity-sdk path not found, not written to reference file")
     if not wiseconnect_path:
@@ -202,6 +205,37 @@ def write_sdk_paths_reference(slt_cli_path):
         sys.exit(1)
 
 
+def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
+    """Create symlinks: third_party/silabs/simplicity_sdk and wifi_sdk to SLT SDK locations."""
+    repo_root = get_repo_root()
+    silabs_dir = os.path.join(repo_root, "third_party", "silabs")
+
+    def create_symlink(target_path, link_name):
+        if not target_path or not os.path.isdir(target_path):
+            logging.warning(f"Target path does not exist or is not a directory: {target_path}")
+            return
+        link_path = os.path.join(silabs_dir, link_name)
+        try:
+            os.makedirs(silabs_dir, exist_ok=True)
+            if os.path.lexists(link_path):
+                if os.path.islink(link_path):
+                    current = os.path.realpath(link_path)
+                    if os.path.realpath(target_path) == current:
+                        logging.info(f"Symlink already up to date: {link_path}")
+                        return
+                    os.remove(link_path)
+                else:
+                    logging.warning(f"Path exists and is not a symlink, skipping: {link_path}")
+                    return
+            os.symlink(target_path, link_path)
+            logging.info(f"Created symlink {link_path} -> {target_path}")
+        except OSError as e:
+            logging.warning(f"Could not create symlink {link_path}: {e}")
+
+    create_symlink(simplicity_sdk_path, "simplicity_sdk")
+    create_symlink(wiseconnect_path, "wifi_sdk")
+
+
 def setup_slt_environment(verbose=False):
     """Main function to setup SLT CLI and install required packages."""
     setup_logging(verbose)
@@ -209,7 +243,11 @@ def setup_slt_environment(verbose=False):
     slt_cli_path = ensure_slt_available()
     update_slt_cli(slt_cli_path)
     install_sdk_packages(slt_cli_path)
-    write_sdk_paths_reference(slt_cli_path)
+
+    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk")
+    wiseconnect_path = slt_where(slt_cli_path, "wiseconnect")
+    write_sdk_paths_reference(simplicity_sdk_path, wiseconnect_path)
+    create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path)
 
     return slt_cli_path
 
