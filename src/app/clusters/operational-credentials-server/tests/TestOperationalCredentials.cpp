@@ -51,7 +51,13 @@ TEST_F(TestOperationalCredentials, TestAttributes)
                                                        .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
                                                        .dnssdServer     = app::DnssdServer::Instance(),
                                                        .commissioningWindowManager =
-                                                           Server::GetInstance().GetCommissioningWindowManager() };
+                                                           Server::GetInstance().GetCommissioningWindowManager(),
+                                                        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
+                                                        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
+                                                        .accessControl              = Access::GetAccessControl(),
+                                                        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
+                                                        .eventManagement            = EventManagement::GetInstance(),
+                                                   };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
@@ -72,7 +78,12 @@ TEST_F(TestOperationalCredentials, TestCommands)
                                                        .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
                                                        .dnssdServer     = app::DnssdServer::Instance(),
                                                        .commissioningWindowManager =
-                                                           Server::GetInstance().GetCommissioningWindowManager() };
+                                                           Server::GetInstance().GetCommissioningWindowManager(),
+                                                        .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
+                                                        .groupDataProvider          = Server::GetInstance().GetGroupDataProvider(),
+                                                        .accessControl              = Access::GetAccessControl(),
+                                                        .platformManager            = DeviceLayer::PlatformManager::GetInstance(),
+                                                        .eventManagement            = EventManagement::GetInstance(),};
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
