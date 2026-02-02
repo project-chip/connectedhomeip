@@ -25,28 +25,28 @@ details.
 
 -   Install tool chain
 
-                  $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+                    $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
 
 -   Build the example application:
 
-                  $ cd ~/connectedhomeip/examples/water-heater-app/linux
-                  $ git submodule update --init
-                  $ source third_party/connectedhomeip/scripts/activate.sh
-                  $ gn gen out/debug
-                  $ ninja -C out/debug
+                    $ cd ~/connectedhomeip/examples/water-heater-app/linux
+                    $ git submodule update --init
+                    $ source third_party/connectedhomeip/scripts/activate.sh
+                    $ gn gen out/debug
+                    $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
-                  $ cd ~/connectedhomeip/examples/water-heater-app/linux
-                  $ rm -rf out/
+                    $ cd ~/connectedhomeip/examples/water-heater-app/linux
+                    $ rm -rf out/
 
 -   Build the example with pigweed RPC
 
-                  $ cd ~/connectedhomeip/examples/water-heater-app/linux
-                  $ git submodule update --init
-                  $ source third_party/connectedhomeip/scripts/activate.sh
-                  $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-                  $ ninja -C out/debug
+                    $ cd ~/connectedhomeip/examples/water-heater-app/linux
+                    $ git submodule update --init
+                    $ source third_party/connectedhomeip/scripts/activate.sh
+                    $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+                    $ ninja -C out/debug
 
 ## Commandline arguments
 
@@ -103,10 +103,10 @@ details.
 
     -   Run Linux Water Heater Example App
 
-                      $ cd ~/connectedhomeip/examples/water-heater-app/linux
-                      $ sudo out/debug/chip-water-heater-app --ble-controller [bluetooth controller number]
-                      # In this example, the device we want to use is hci1
-                      $ sudo out/debug/chip-water-heater-app --ble-controller 1
+                        $ cd ~/connectedhomeip/examples/water-heater-app/linux
+                        $ sudo out/debug/matter-water-heater-app --ble-controller [bluetooth controller number]
+                        # In this example, the device we want to use is hci1
+                        $ sudo out/debug/matter-water-heater-app --ble-controller 1
 
     -   Test the device using ChipDeviceController on your laptop / workstation
         etc.
@@ -141,7 +141,7 @@ Step-by-step:
 1. Run the Water Heater application:
 
     ```
-    rm /tmp/chip_* && ./out/debug/chip-water-heater-app --trace-to json:log --enable-key 000102030405060708090a0b0c0d0e0f
+    rm /tmp/chip_* && ./out/debug/matter-water-heater-app --trace-to json:log --enable-key 000102030405060708090a0b0c0d0e0f
     ```
 
 1. Commission with chip-tool as node `0x12344321`:

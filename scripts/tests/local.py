@@ -194,7 +194,7 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             env_key="WATER_HEATER_APP",
             cli_key="water-heater",
             target=f"{target_prefix}-water-heater-{suffix}",
-            binary="chip-water-heater-app",
+            binary="matter-water-heater-app",
         )
     )
     targets.append(

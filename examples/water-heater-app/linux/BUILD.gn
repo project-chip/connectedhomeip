@@ -32,7 +32,7 @@ config("includes") {
   ]
 }
 
-executable("chip-water-heater-app") {
+executable("matter-water-heater-app") {
   sources = [
     # Water Heater Common files
     "${chip_root}/examples/water-heater-app/water-heater-common/src/WaterHeaterDelegateImpl.cpp",
@@ -49,7 +49,6 @@ executable("chip-water-heater-app") {
     "${chip_root}/examples/energy-management/energy-management-triggers:tests-event-triggers",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/water-heater-app/water-heater-common",
-    "${chip_root}/examples/water-heater-app/water-heater-common:water-heater-common-lib",
     "${chip_root}/examples/water-heater-app/water-heater-common:water-heater-common-lib",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/lib",
@@ -110,7 +109,7 @@ executable("chip-water-heater-app") {
 }
 
 group("linux") {
-  deps = [ ":chip-water-heater-app" ]
+  deps = [ ":matter-water-heater-app" ]
 }
 
 group("default") {

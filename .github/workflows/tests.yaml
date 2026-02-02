@@ -392,7 +392,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
-                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/chip-water-heater-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -463,7 +463,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
-                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/chip-water-heater-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
             - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
@@ -489,7 +489,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
-                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/chip-water-heater-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v6
@@ -646,7 +646,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/darwin-${{matrix.arch}}-evse-${BUILD_VARIANT}/chip-evse-app \
-                     --app-path water-heater:./objdir-clone/darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT}/chip-water-heater-app \
+                     --app-path water-heater:./objdir-clone/darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -1054,7 +1054,7 @@ jobs:
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
-                  echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test/chip-water-heater-app" >> /tmp/test_env.yaml
+                  echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
                   echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   # keep-sorted: end
 

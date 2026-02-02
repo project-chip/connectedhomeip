@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/clusters/mode-base-server/mode-base-server.h>
-#include <cstring>
 
 namespace chip {
 namespace app {

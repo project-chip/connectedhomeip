@@ -332,8 +332,8 @@ class HostApp(Enum):
             yield 'chip-evse-app'
             yield 'chip-evse-app.map'
         elif self == HostApp.WATER_HEATER:
-            yield 'chip-water-heater-app'
-            yield 'chip-water-heater-app.map'
+            yield 'matter-water-heater-app'
+            yield 'matter-water-heater-app.map'
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'

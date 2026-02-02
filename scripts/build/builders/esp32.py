@@ -90,7 +90,7 @@ class Esp32App(Enum):
         if self == Esp32App.EVSE:
             return 'chip-evse-app'
         if self == Esp32App.WATER_HEATER:
-            return 'chip-water-heater-app'
+            return 'matter-water-heater-app'
         if self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         if self == Esp32App.LOCK:
