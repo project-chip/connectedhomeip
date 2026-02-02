@@ -7115,12 +7115,6 @@ bool emberAfLevelControlClusterMoveToClosestFrequencyCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::DecodableType & commandData);
 /**
- * @brief Thread Network Diagnostics Cluster ResetCounts Command callback (from client)
- */
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::DecodableType & commandData);
-/**
  * @brief Bridged Device Basic Information Cluster KeepActive Command callback (from client)
  */
 bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(

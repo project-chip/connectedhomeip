@@ -88,6 +88,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/scenes-server/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
+      "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/clusters/time-synchronization-server/tests",
       "${chip_root}/src/app/clusters/tls-certificate-management-server/tests",
