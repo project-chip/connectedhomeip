@@ -84,10 +84,10 @@ class TC_OO_2_8(MatterBaseTest):
 
                 TestStep(13, "TH stores the reported values of OffWaitTime in all incoming reports for OffWaitTime attribute, that contains data in reportedOffWaitTimeValueList and verifies reportedOffWaitTimeValueList contains three entries",
                          "reportedOffWaitTimeValueList has 3 entries in the list"),
-                TestStep(14, "TH verifies the first entry in reportedOffWaitTimeValueList is approximately 100 (10s)",
-                         "The first entry in reportedOffWaitTimeValueList is in the range 95 - 100"),
-                TestStep(15, "TH verifies the second entry in reportedOffWaitTimeValueList is approximately 150",
-                         "The second entry in reportedOffWaitTimeValueList is in the range 145 - 150"),
+                TestStep(14, "TH verifies the first entry in reportedOffWaitTimeValueList is approximately 20 (2s)",
+                         "The first entry in reportedOffWaitTimeValueList is in the range 15 - 20"),
+                TestStep(15, "TH verifies the second entry in reportedOffWaitTimeValueList is approximately 50",
+                         "The second entry in reportedOffWaitTimeValueList is in the range 45 - 50"),
                 TestStep(16, "TH verifies the third entry in reportedOffWaitTimeValueList is 0",
                          "The third entry in reportedOffWaitTimeValueList is equal to 0"),
 
@@ -147,7 +147,7 @@ class TC_OO_2_8(MatterBaseTest):
         asserts.assert_equal(reportedOnTimeValueList[2].value, 0, "Unexpected last OnTime report")
 
         self.step(13)
-        count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OnTime]
+        count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OffWaitTime]
         asserts.assert_equal(count, 3, "Unexpected number of OnTime reports")
 
         self.step(14)
