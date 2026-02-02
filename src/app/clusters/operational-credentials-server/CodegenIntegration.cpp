@@ -18,6 +18,7 @@
 #include <app/static-cluster-config/OperationalCredentials.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
+#include <credentials/GroupDataProvider.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
@@ -48,7 +49,12 @@ public:
                                                            .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
                                                            .dnssdServer     = app::DnssdServer::Instance(),
                                                            .commissioningWindowManager =
-                                                               Server::GetInstance().GetCommissioningWindowManager() };
+                                                               Server::GetInstance().GetCommissioningWindowManager(),
+                                                            .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(),
+                                                            .groupDataProvider          = *Credentials::GetGroupDataProvider(),
+                                                            .accessControl              = Access::GetAccessControl(),
+                                                            .platformManager            = DeviceLayer::PlatformMgr(),
+                                                            .eventManagement            = EventManagement::GetInstance(),};
         gServer.Create(endpointId, context);
         return gServer.Registration();
     }

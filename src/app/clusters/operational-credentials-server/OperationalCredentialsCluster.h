@@ -43,7 +43,6 @@ public:
         Access::AccessControl & accessControl;
         DeviceLayer::PlatformManager & platformManager;
         EventManagement & eventManagement;
-        GroupDataProvider & groupDataProvider;
     };
 
     OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
