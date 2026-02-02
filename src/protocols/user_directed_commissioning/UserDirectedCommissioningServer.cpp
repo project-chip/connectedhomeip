@@ -56,8 +56,8 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
     ChipLogProgress(AppServer, "IdentityDeclaration DataLength()=%" PRIu32, static_cast<uint32_t>(msg->DataLength()));
 
-    uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
-    size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
+    uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes] = {};
+    size_t udcPayloadLength                                            = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
     TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
 
     IdentificationDeclaration id;

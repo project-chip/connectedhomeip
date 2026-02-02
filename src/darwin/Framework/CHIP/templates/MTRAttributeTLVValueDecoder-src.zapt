@@ -49,6 +49,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
 }
 
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -82,6 +83,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
     return nil;
 }
 {{/if}}
+{{/unless}}
 {{/zcl_clusters}}
 
 id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
@@ -92,11 +94,13 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
 
     switch (aPath.mClusterId) {
         {{#zcl_clusters}}
+        {{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mAttributeId, aReader, aError);
         }
         {{/if}}
+        {{/unless}}
         {{/zcl_clusters}}
         default: {
             break;

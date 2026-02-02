@@ -273,7 +273,7 @@ else
                 shift
                 ;;
             --verbose)
-                optArgs+="sl_verbose_mode=true "
+                optArgs+="sl_verbose_mode=true chip_detail_logging=true "
                 VERBOSE_MODE=true
                 shift
                 ;;
@@ -345,6 +345,10 @@ else
     if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
         echo "Switching OpenThread ROOT"
         optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+    fi
+
+    if [ "$VERBOSE_MODE" == false ]; then
+        optArgs+="chip_detail_logging=false "
     fi
 
     "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"

@@ -145,6 +145,10 @@ static_library("chip-tool-utils") {
         [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
   }
 
+  if (chip_device_platform == "linux" && chip_enable_ot_commissioner) {
+    deps += [ "${chip_root}/third_party/ot-commissioner" ]
+  }
+
   output_dir = root_out_dir
 }
 

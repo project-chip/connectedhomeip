@@ -498,33 +498,18 @@ void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSourc
         }
         return;
     }
-    if (mGranularity != granularity)
-    {
-        mGranularity = granularity;
-        NotifyAttributeChanged(Granularity::Id);
-    }
-    if (mTimeSource != timeSource)
-    {
-        mTimeSource = timeSource;
-        NotifyAttributeChanged(TimeSource::Id);
-    }
+    SetAttributeValue(mGranularity, granularity, Granularity::Id);
+    SetAttributeValue(mTimeSource, timeSource, TimeSource::Id);
 }
 
 void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
 {
     if (timeSyncSuccessful)
     {
-        if (mGranularity != GranularityEnum::kMillisecondsGranularity)
-        {
-            mGranularity = GranularityEnum::kMillisecondsGranularity;
-            NotifyAttributeChanged(Granularity::Id);
-        }
+        SetAttributeValue(mGranularity, GranularityEnum::kMillisecondsGranularity, Granularity::Id);
+
         // Non-matter SNTP because we know it's external and there's only one source
-        if (mTimeSource != TimeSourceEnum::kNonMatterSNTP)
-        {
-            mTimeSource = TimeSourceEnum::kNonMatterSNTP;
-            NotifyAttributeChanged(TimeSource::Id);
-        }
+        SetAttributeValue(mTimeSource, TimeSourceEnum::kNonMatterSNTP, TimeSource::Id);
     }
     else
     {
@@ -873,16 +858,8 @@ CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityE
             return err;
         }
         GetDelegate()->UTCTimeAvailabilityChanged(utct);
-        if (mGranularity != gran)
-        {
-            mGranularity = gran;
-            NotifyAttributeChanged(Granularity::Id);
-        }
-        if (mTimeSource != tsrc)
-        {
-            mTimeSource = tsrc;
-            NotifyAttributeChanged(TimeSource::Id);
-        }
+        SetAttributeValue(mGranularity, gran, Granularity::Id);
+        SetAttributeValue(mTimeSource, tsrc, TimeSource::Id);
         return CHIP_NO_ERROR;
     };
 

@@ -359,6 +359,8 @@ fabric_scoped struct WebRTCSessionStruct {
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
   fabric_idx fabricIndex = 254;
 }
 
@@ -3263,7 +3265,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_doorlock = 10, version 3;
+  device type ma_doorlock = 10, version 4;
 
 
   server cluster Identify {
@@ -3353,7 +3355,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x7DB3;
-    ram      attribute clusterRevision default = 8;
+    ram      attribute clusterRevision default = 10;
 
     handle command LockDoor;
     handle command UnlockDoor;

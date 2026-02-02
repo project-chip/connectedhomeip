@@ -14,7 +14,7 @@ namespace AmbientContextSensing {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 18;
+inline constexpr uint32_t kAttributesCount = 15;
 
 namespace HumanActivityDetected {
 inline constexpr AttributeId Id = 0x00000000;
@@ -40,33 +40,21 @@ namespace SimultaneousDetectionLimit {
 inline constexpr AttributeId Id = 0x00000005;
 } // namespace SimultaneousDetectionLimit
 
-namespace CountThresholdReached {
+namespace ObjectCountReached {
 inline constexpr AttributeId Id = 0x00000006;
-} // namespace CountThresholdReached
-
-namespace CountThreshold {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace CountThreshold
-
-namespace ObjectCount {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace ObjectCount
+} // namespace ObjectCountReached
 
 namespace HoldTime {
-inline constexpr AttributeId Id = 0x00000009;
+inline constexpr AttributeId Id = 0x00000007;
 } // namespace HoldTime
 
 namespace HoldTimeLimits {
-inline constexpr AttributeId Id = 0x0000000A;
+inline constexpr AttributeId Id = 0x00000008;
 } // namespace HoldTimeLimits
 
 namespace PredictedActivity {
-inline constexpr AttributeId Id = 0x0000000B;
+inline constexpr AttributeId Id = 0x00000009;
 } // namespace PredictedActivity
-
-namespace PrivacyModeEnabled {
-inline constexpr AttributeId Id = 0x0000000C;
-} // namespace PrivacyModeEnabled
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

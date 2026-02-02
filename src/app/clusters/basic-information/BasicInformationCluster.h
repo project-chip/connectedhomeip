@@ -22,6 +22,7 @@
 #include <clusters/BasicInformation/AttributeIds.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -29,26 +30,13 @@ namespace app {
 namespace Clusters {
 
 /// This class provides a code-driven implementation for the Basic Information cluster,
-/// centralizing its logic and state. It is designed as a singleton because the cluster
-/// is defined to exist only once per node, specifically on the root endpoint (Endpoint 0).
-///
+/// centralizing its logic and state.
+
 /// As a PlatformManagerDelegate, it automatically hooks into the node's lifecycle to
 /// emit the mandatory StartUp and optional ShutDown events, ensuring spec compliance.
-///
-/// Note on the implementation of the singleton pattern:
-/// The constructor is public to allow for a global variable instantiation. This approach
-/// can save flash memory compared to a function-static instance, which often requires
-/// additional thread-safety mechanisms. The intended usage is via the static
-/// `Instance()` method, which returns a reference to the global instance.
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
-    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id })
-    {
-        // Unless told otherwise, unique id is mandatory
-        mEnabledOptionalAttributes.Set<BasicInformation::Attributes::UniqueID::Id>();
-    }
-
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
         BasicInformation::Attributes::ManufacturingDate::Id,       //
         BasicInformation::Attributes::PartNumber::Id,              //
@@ -64,11 +52,16 @@ public:
         BasicInformation::Attributes::UniqueID::Id //
         >;
 
-    static BasicInformationCluster & Instance();
+    BasicInformationCluster(OptionalAttributesSet optionalAttributeSet,
+                            DeviceLayer::DeviceInstanceInfoProvider * deviceInfoProvider = nullptr) :
+        DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }),
+        mEnabledOptionalAttributes(optionalAttributeSet), mDeviceInfoProvider(deviceInfoProvider)
+    {
+        mEnabledOptionalAttributes
+            .Set<BasicInformation::Attributes::UniqueID::Id>(); // Unless told otherwise, unique id is mandatory
+    }
 
     OptionalAttributesSet & OptionalAttributes() { return mEnabledOptionalAttributes; }
-
-    bool GetLocalConfigDisabled() { return mLocalConfigDisabled; }
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -86,11 +79,12 @@ public:
 private:
     // write without notification
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
+    CHIP_ERROR GetDeviceInstanceInfoProviderImpl(DeviceLayer::DeviceInstanceInfoProvider ** outDeviceInfoProvider);
 
     OptionalAttributesSet mEnabledOptionalAttributes;
 
     Storage::String<32> mNodeLabel;
-    bool mLocalConfigDisabled = false;
+    DeviceLayer::DeviceInstanceInfoProvider * mDeviceInfoProvider = nullptr;
 };
 
 } // namespace Clusters

@@ -588,6 +588,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataEnabled, value["metadataEnabled"]));
     valueCopy.removeMember("metadataEnabled");
 
+    if (value.isMember("videoStreams"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreams");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreams, value["videoStreams"]));
+    }
+    valueCopy.removeMember("videoStreams");
+
+    if (value.isMember("audioStreams"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreams");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreams, value["audioStreams"]));
+    }
+    valueCopy.removeMember("audioStreams");
+
     if (value.isMember("fabricIndex"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
@@ -607,6 +621,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::WebR
     ComplexArgumentParser::Finalize(request.videoStreamID);
     ComplexArgumentParser::Finalize(request.audioStreamID);
     ComplexArgumentParser::Finalize(request.metadataEnabled);
+    ComplexArgumentParser::Finalize(request.videoStreams);
+    ComplexArgumentParser::Finalize(request.audioStreams);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
@@ -3118,7 +3134,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("MembershipStruct.groupID", "groupID", value.isMember("groupID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("MembershipStruct.endpoints", "endpoints", value.isMember("endpoints")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MembershipStruct.keyID", "keyID", value.isMember("keyID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MembershipStruct.keySetID", "keySetID", value.isMember("keySetID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MembershipStruct.hasAuxiliaryACL", "hasAuxiliaryACL",
                                                                   value.isMember("hasAuxiliaryACL")));
 
@@ -3131,20 +3148,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoints, value["endpoints"]));
     valueCopy.removeMember("endpoints");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "keyID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.keyID, value["keyID"]));
-    valueCopy.removeMember("keyID");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "keySetID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.keySetID, value["keySetID"]));
+    valueCopy.removeMember("keySetID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hasAuxiliaryACL");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hasAuxiliaryACL, value["hasAuxiliaryACL"]));
     valueCopy.removeMember("hasAuxiliaryACL");
-
-    if (value.isMember("expiringKeyID"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "expiringKeyID");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.expiringKeyID, value["expiringKeyID"]));
-    }
-    valueCopy.removeMember("expiringKeyID");
 
     if (value.isMember("fabricIndex"))
     {
@@ -3160,9 +3170,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Groupcast::Structs::Me
 {
     ComplexArgumentParser::Finalize(request.groupID);
     ComplexArgumentParser::Finalize(request.endpoints);
-    ComplexArgumentParser::Finalize(request.keyID);
+    ComplexArgumentParser::Finalize(request.keySetID);
     ComplexArgumentParser::Finalize(request.hasAuxiliaryACL);
-    ComplexArgumentParser::Finalize(request.expiringKeyID);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
@@ -5317,6 +5326,21 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("detectionStartTime");
 
+    if (value.isMember("objectCountThreshold"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "objectCountThreshold");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.objectCountThreshold, value["objectCountThreshold"]));
+    }
+    valueCopy.removeMember("objectCountThreshold");
+
+    if (value.isMember("objectCount"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "objectCount");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.objectCount, value["objectCount"]));
+    }
+    valueCopy.removeMember("objectCount");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -5324,6 +5348,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AmbientContextSensing:
 {
     ComplexArgumentParser::Finalize(request.ambientContextSensed);
     ComplexArgumentParser::Finalize(request.detectionStartTime);
+    ComplexArgumentParser::Finalize(request.objectCountThreshold);
+    ComplexArgumentParser::Finalize(request.objectCount);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -7700,6 +7726,70 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.sensitivity);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.audioStreamName", "audioStreamName",
+                                                                  value.isMember("audioStreamName")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AudioStreamStruct.audioStreamID", "audioStreamID",
+                                                                  value.isMember("audioStreamID")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreamName");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamName, value["audioStreamName"]));
+    valueCopy.removeMember("audioStreamName");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreamID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreamID, value["audioStreamID"]));
+    valueCopy.removeMember("audioStreamID");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.audioStreamName);
+    ComplexArgumentParser::Finalize(request.audioStreamID);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.videoStreamName", "videoStreamName",
+                                                                  value.isMember("videoStreamName")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.videoStreamID", "videoStreamID",
+                                                                  value.isMember("videoStreamID")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreamName");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamName, value["videoStreamName"]));
+    valueCopy.removeMember("videoStreamName");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreamID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreamID, value["videoStreamID"]));
+    valueCopy.removeMember("videoStreamID");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.videoStreamName);
+    ComplexArgumentParser::Finalize(request.videoStreamID);
+}
+
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
                              chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request,
@@ -7939,6 +8029,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("expiryTime");
 
+    if (value.isMember("videoStreams"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "videoStreams");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.videoStreams, value["videoStreams"]));
+    }
+    valueCopy.removeMember("videoStreams");
+
+    if (value.isMember("audioStreams"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "audioStreams");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.audioStreams, value["audioStreams"]));
+    }
+    valueCopy.removeMember("audioStreams");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -7953,6 +8057,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::PushAvStreamTransport:
     ComplexArgumentParser::Finalize(request.ingestMethod);
     ComplexArgumentParser::Finalize(request.containerOptions);
     ComplexArgumentParser::Finalize(request.expiryTime);
+    ComplexArgumentParser::Finalize(request.videoStreams);
+    ComplexArgumentParser::Finalize(request.audioStreams);
 }
 
 CHIP_ERROR

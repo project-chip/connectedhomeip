@@ -211,9 +211,30 @@ Your cluster implementation must provide public getter and setter APIs for each
 attribute to allow applications to interact with cluster state.
 
 -   **Getter Methods:** Provide a getter method for every attribute (e.g.,
-    `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`).
--   **Setter Methods:** Provide setter methods for all non-fixed (mutable)
-    attributes (e.g., `SetAlarmsActive()`, `SetCurrentSensitivityLevel()`).
+    `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`). Applications need
+    these to read the current cluster state.
+
+    -   **Return by value (preferred):** Getters should return copies of data
+        whenever practical. This avoids lifetime and ownership concerns.
+
+    -   **Avoid returning pointers or references:** Returning pointers or
+        references to internal cluster data create lifetime risks—if the
+        underlying memory is deallocated while the caller still holds the
+        pointer, use-after-free bugs can occur. If you must return a pointer or
+        reference, clearly document that the returned value is only valid for
+        immediate use and must not be stored.
+
+-   **Setter Methods:** Provide methods to modify all non-fixed (mutable)
+    attributes in spec-compliant ways. For simple attributes, this may be a
+    straightforward setter (e.g., `SetCurrentSensitivityLevel()`). However, spec
+    compliance may require updating multiple attributes together atomically—in
+    such cases, provide a higher-level API that encapsulates the required
+    behavior rather than individual setters. When the application's driver state
+    changes, these methods can be used to update the cluster's state
+    accordingly. Setters are also responsible for triggering attribute change
+    notifications (see
+    [Attribute Change Notifications](#attribute-change-notifications)).
+
 -   **Example:** The
     [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
     cluster demonstrates this pattern.
@@ -363,9 +384,6 @@ implementation.
 6. **Update ZAP Configuration:** To prevent the Ember framework from allocating
    memory for your cluster's attributes (which are now managed by your
    `ClusterLogic`), you must:
-    - In `src/app/common/templates/config-data.yaml`, consider adding your
-      cluster to `CommandHandlerInterfaceOnlyClusters` if it does not need Ember
-      command dispatch.
     - In `src/app/zap-templates/zcl/zcl.json` and
       `zcl-with-test-extensions.json`, add all non-list attributes of your
       cluster to `attributeAccessInterfaceAttributes`. This marks them as

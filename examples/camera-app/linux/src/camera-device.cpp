@@ -90,10 +90,38 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
-        // Forward raw H.264 encoded frames to media controller
-        // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
-        // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
-        self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID);
+        GstClockTime rawPts = GST_BUFFER_PTS(buffer);
+        if (rawPts == GST_CLOCK_TIME_NONE)
+        {
+            rawPts = GST_BUFFER_DTS(buffer);
+            if (rawPts == GST_CLOCK_TIME_NONE)
+            {
+                rawPts = 0;
+            }
+        }
+        auto firstPtsIt = self->mVideoStreamFirstPts.find(videoStreamID);
+        if (firstPtsIt == self->mVideoStreamFirstPts.end())
+        {
+            self->mVideoStreamFirstPts[videoStreamID] = rawPts;
+        }
+        GstClockTime offsetNs = 0;
+        int64_t startEpoch    = self->mVideoStreamStartEpochs[videoStreamID];
+        int64_t ts            = 0;
+        if (rawPts >= self->mVideoStreamFirstPts[videoStreamID])
+        {
+            offsetNs = rawPts - self->mVideoStreamFirstPts[videoStreamID];
+            ts       = startEpoch + (offsetNs / 1000000); // Convert ns to ms
+            // Forward raw H.264 encoded frames to media controller with timestamp
+            // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
+            // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
+            self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID, ts);
+        }
+        else
+        {
+            ChipLogError(Camera,
+                         "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mVideoStreamFirstPts[videoStreamID], videoStreamID);
+        }
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -134,10 +162,38 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
-        // Forward raw Opus encoded frames to media controller
-        // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
-        // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
-        self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID);
+        GstClockTime rawPts = GST_BUFFER_PTS(buffer);
+        if (rawPts == GST_CLOCK_TIME_NONE)
+        {
+            rawPts = GST_BUFFER_DTS(buffer);
+            if (rawPts == GST_CLOCK_TIME_NONE)
+            {
+                rawPts = 0;
+            }
+        }
+        auto firstPtsIt = self->mAudioStreamFirstPts.find(audioStreamID);
+        if (firstPtsIt == self->mAudioStreamFirstPts.end())
+        {
+            self->mAudioStreamFirstPts[audioStreamID] = rawPts;
+        }
+        GstClockTime offsetNs = 0;
+        int64_t startEpoch    = self->mAudioStreamStartEpochs[audioStreamID];
+        int64_t ts            = 0;
+        if (rawPts >= self->mAudioStreamFirstPts[audioStreamID])
+        {
+            offsetNs = rawPts - self->mAudioStreamFirstPts[audioStreamID];
+            ts       = startEpoch + (offsetNs / 1000000); // Convert ns to ms
+            // Forward raw Opus encoded frames to media controller with timestamp
+            // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
+            // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
+            self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID, ts);
+        }
+        else
+        {
+            ChipLogError(Camera,
+                         "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
+                         rawPts, self->mAudioStreamFirstPts[audioStreamID], audioStreamID);
+        }
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -907,6 +963,10 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    mVideoStreamFirstPts.erase(streamID);
+    auto now                          = std::chrono::steady_clock::now().time_since_epoch();
+    mVideoStreamStartEpochs[streamID] = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+
     // Store in stream context
     it->videoContext = videoPipeline;
 
@@ -1005,6 +1065,10 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
         it->audioContext = nullptr;
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
+
+    mAudioStreamFirstPts.erase(streamID);
+    auto now                          = std::chrono::steady_clock::now().time_since_epoch();
+    mAudioStreamStartEpochs[streamID] = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
 
     // Store in stream context
     it->audioContext = audioPipeline;
@@ -1796,8 +1860,7 @@ CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
     return mCameraAVStreamManager;
 }
 
-CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
-CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+CameraAvSettingsUserLevelManagementDelegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
 }

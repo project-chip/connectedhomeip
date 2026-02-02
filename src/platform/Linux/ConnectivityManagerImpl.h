@@ -130,8 +130,12 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 public:
+    // Singleton
+
+    static ConnectivityManagerImpl & GetDefaultInstance(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -190,18 +194,6 @@ public:
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
-
-    struct WiFiNetworkScanned
-    {
-        // The fields matches WiFiInterfaceScanResult::Type.
-        uint8_t ssid[Internal::kMaxWiFiSSIDLength];
-        uint8_t ssidLen;
-        uint8_t bssid[6];
-        int8_t rssi;
-        uint16_t frequencyBand;
-        uint8_t channel;
-        uint8_t security;
-    };
 
     CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -273,13 +265,6 @@ private:
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
 #endif
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConnectivityManager & ConnectivityMgr();
-    friend ConnectivityManagerImpl & ConnectivityMgrImpl();
-
-    static ConnectivityManagerImpl sInstance;
-
     // ===== Private members reserved for use by this class only.
 
     char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
@@ -327,28 +312,6 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
 }
 
 #endif
-
-/**
- * Returns the public interface of the ConnectivityManager singleton object.
- *
- * chip applications should use this to access features of the ConnectivityManager object
- * that are common to all platforms.
- */
-inline ConnectivityManager & ConnectivityMgr()
-{
-    return ConnectivityManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConnectivityManager singleton object.
- *
- * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
- */
-inline ConnectivityManagerImpl & ConnectivityMgrImpl()
-{
-    return ConnectivityManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

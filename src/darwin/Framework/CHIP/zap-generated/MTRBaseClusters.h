@@ -6293,15 +6293,9 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command UpdateGroupKey
  *
- * This command SHALL allow a fabric maintainer to update the OperationalGroupKey for an existing group ID that the server is a member of.
+ * This command SHALL allow a fabric administrator to update the OperationalGroupKey associated with the existing group identified by GroupID, which is already joined.
  */
 - (void)updateGroupKeyWithParams:(MTRGroupcastClusterUpdateGroupKeyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command ExpireGracePeriod
- *
- * This command SHALL allow a fabric maintainer to expire the grace period of the previous key for an existing group ID that the server is a member of.
- */
-- (void)expireGracePeriodWithParams:(MTRGroupcastClusterExpireGracePeriodParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command ConfigureAuxiliaryACL
  *
@@ -12977,25 +12971,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeSimultaneousDetectionLimitWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCountThresholdReachedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeCountThresholdReachedWithParams:(MTRSubscribeParams *)params
-                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeCountThresholdReachedWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeCountThresholdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeCountThresholdWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeCountThresholdWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeCountThresholdWithParams:(MTRSubscribeParams *)params
-                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeCountThresholdWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeObjectCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeObjectCountWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeObjectCountWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeObjectCountReachedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeObjectCountReachedWithParams:(MTRSubscribeParams *)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeObjectCountReachedWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeHoldTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeHoldTimeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -13016,12 +12996,6 @@ MTR_PROVISIONALLY_AVAILABLE
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributePredictedActivityWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributePrivacyModeEnabledWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributePrivacyModeEnabledWithParams:(MTRSubscribeParams *)params
-                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributePrivacyModeEnabledWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -15767,7 +15741,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command PlayChimeSound
  *
- * This command will play the currently selected chime.
+ * This command will play the currently selected chime or the chime passed in.
  */
 - (void)playChimeSoundWithParams:(MTRChimeClusterPlayChimeSoundParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)playChimeSoundWithCompletion:(MTRStatusCompletion)completion
@@ -21782,7 +21756,7 @@ typedef NS_OPTIONS(uint32_t, MTRAmbientContextSensingFeature) {
     MTRAmbientContextSensingFeatureHumanActivity MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRAmbientContextSensingFeatureObjectCounting MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRAmbientContextSensingFeatureObjectIdentification MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRAmbientContextSensingFeatureSoundClassification MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRAmbientContextSensingFeatureSoundIdentification MTR_PROVISIONALLY_AVAILABLE = 0x8,
     MTRAmbientContextSensingFeaturePredictedActivity MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
@@ -22281,6 +22255,7 @@ typedef NS_ENUM(uint8_t, MTRCameraAVStreamManagementAudioCodec) {
 
 typedef NS_ENUM(uint8_t, MTRCameraAVStreamManagementImageCodec) {
     MTRCameraAVStreamManagementImageCodecJPEG MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRCameraAVStreamManagementImageCodecHEIC MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRCameraAVStreamManagementTriStateAuto) {
@@ -22358,6 +22333,8 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportStatusCode) {
     MTRPushAVStreamTransportStatusCodeInvalidOptions MTR_PROVISIONALLY_AVAILABLE = 0x09,
     MTRPushAVStreamTransportStatusCodeInvalidStreamUsage MTR_PROVISIONALLY_AVAILABLE = 0x0A,
     MTRPushAVStreamTransportStatusCodeInvalidTime MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRPushAVStreamTransportStatusCodeInvalidPreRollLength MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRPushAVStreamTransportStatusCodeDuplicateStreamValues MTR_PROVISIONALLY_AVAILABLE = 0x0D,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTransportStatus) {
@@ -22375,6 +22352,7 @@ typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportTriggerActivationReason) {
     MTRPushAVStreamTransportTriggerActivationReasonUserInitiated MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRPushAVStreamTransportTriggerActivationReasonAutomation MTR_PROVISIONALLY_AVAILABLE = 0x01,
     MTRPushAVStreamTransportTriggerActivationReasonEmergency MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRPushAVStreamTransportTriggerActivationReasonDoorbellPressed MTR_PROVISIONALLY_AVAILABLE = 0x03,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRPushAVStreamTransportFeature) {

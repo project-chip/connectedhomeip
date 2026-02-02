@@ -40,11 +40,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class GroupcastCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class LeaveGroupResponse(
-    val groupID: UShort,
-    val endpoints: List<UShort>?,
-    val listTooLarge: Boolean?,
-  )
+  class LeaveGroupResponse(val groupID: UShort, val endpoints: List<UShort>)
 
   class MembershipAttribute(val value: List<GroupcastClusterMembershipStruct>)
 
@@ -90,10 +86,10 @@ class GroupcastCluster(private val controller: MatterController, private val end
   suspend fun joinGroup(
     groupID: UShort,
     endpoints: List<UShort>,
-    keyID: UInt,
+    keySetID: UShort,
     key: ByteArray?,
-    gracePeriod: UInt?,
     useAuxiliaryACL: Boolean?,
+    replaceEndpoints: Boolean?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u
@@ -111,18 +107,20 @@ class GroupcastCluster(private val controller: MatterController, private val end
     }
     tlvWriter.endArray()
 
-    val TAG_KEY_ID_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_KEY_ID_REQ), keyID)
+    val TAG_KEY_SET_ID_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_KEY_SET_ID_REQ), keySetID)
 
     val TAG_KEY_REQ: Int = 3
     key?.let { tlvWriter.put(ContextSpecificTag(TAG_KEY_REQ), key) }
 
-    val TAG_GRACE_PERIOD_REQ: Int = 4
-    gracePeriod?.let { tlvWriter.put(ContextSpecificTag(TAG_GRACE_PERIOD_REQ), gracePeriod) }
-
-    val TAG_USE_AUXILIARY_ACL_REQ: Int = 5
+    val TAG_USE_AUXILIARY_ACL_REQ: Int = 4
     useAuxiliaryACL?.let {
       tlvWriter.put(ContextSpecificTag(TAG_USE_AUXILIARY_ACL_REQ), useAuxiliaryACL)
+    }
+
+    val TAG_REPLACE_ENDPOINTS_REQ: Int = 5
+    replaceEndpoints?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_REPLACE_ENDPOINTS_REQ), replaceEndpoints)
     }
     tlvWriter.endStructure()
 
@@ -178,9 +176,6 @@ class GroupcastCluster(private val controller: MatterController, private val end
     val TAG_ENDPOINTS: Int = 1
     var endpoints_decoded: List<UShort>? = null
 
-    val TAG_LIST_TOO_LARGE: Int = 2
-    var listTooLarge_decoded: Boolean? = null
-
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
@@ -188,33 +183,12 @@ class GroupcastCluster(private val controller: MatterController, private val end
         groupID_decoded = tlvReader.getUShort(tag)
       } else if (tag == ContextSpecificTag(TAG_ENDPOINTS)) {
         endpoints_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              buildList<UShort> {
-                tlvReader.enterArray(tag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUShort(AnonymousTag))
-                }
-                tlvReader.exitContainer()
-              }
-            } else {
-              null
+          buildList<UShort> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getUShort(AnonymousTag))
             }
-          }
-      } else if (tag == ContextSpecificTag(TAG_LIST_TOO_LARGE)) {
-        listTooLarge_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getBoolean(tag)
-            } else {
-              null
-            }
+            tlvReader.exitContainer()
           }
       } else {
         tlvReader.skipElement()
@@ -225,16 +199,19 @@ class GroupcastCluster(private val controller: MatterController, private val end
       throw IllegalStateException("groupID not found in TLV")
     }
 
+    if (endpoints_decoded == null) {
+      throw IllegalStateException("endpoints not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
-    return LeaveGroupResponse(groupID_decoded, endpoints_decoded, listTooLarge_decoded)
+    return LeaveGroupResponse(groupID_decoded, endpoints_decoded)
   }
 
   suspend fun updateGroupKey(
     groupID: UShort,
-    keyID: UInt,
+    keySetID: UShort,
     key: ByteArray?,
-    gracePeriod: UInt?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 3u
@@ -245,35 +222,11 @@ class GroupcastCluster(private val controller: MatterController, private val end
     val TAG_GROUP_ID_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
-    val TAG_KEY_ID_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_KEY_ID_REQ), keyID)
+    val TAG_KEY_SET_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_KEY_SET_ID_REQ), keySetID)
 
     val TAG_KEY_REQ: Int = 2
     key?.let { tlvWriter.put(ContextSpecificTag(TAG_KEY_REQ), key) }
-
-    val TAG_GRACE_PERIOD_REQ: Int = 3
-    gracePeriod?.let { tlvWriter.put(ContextSpecificTag(TAG_GRACE_PERIOD_REQ), gracePeriod) }
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun expireGracePeriod(groupID: UShort, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 4u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_GROUP_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -292,7 +245,7 @@ class GroupcastCluster(private val controller: MatterController, private val end
     useAuxiliaryACL: Boolean,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 5u
+    val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)

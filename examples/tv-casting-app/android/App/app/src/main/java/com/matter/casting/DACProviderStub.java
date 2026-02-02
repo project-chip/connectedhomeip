@@ -17,6 +17,7 @@
 package com.matter.casting;
 
 import android.util.Base64;
+import android.util.Log;
 import com.matter.casting.support.DACProvider;
 import java.math.BigInteger;
 import java.security.AlgorithmParameters;
@@ -26,8 +27,11 @@ import java.security.Signature;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 public class DACProviderStub implements DACProvider {
+
+  private static final String TAG = DACProviderStub.class.getSimpleName();
 
   private String kDevelopmentDAC_Cert_FFF1_8001 =
       "MIIB5zCCAY6gAwIBAgIIac3xDenlTtEwCgYIKoZIzj0EAwIwPTElMCMGA1UEAwwcTWF0dGVyIERldiBQQUkgMHhGRkYxIG5vIFBJRDEUMBIGCisGAQQBgqJ8AgEMBEZGRjEwIBcNMjIwMjA1MDAwMDAwWhgPOTk5OTEyMzEyMzU5NTlaMFMxJTAjBgNVBAMMHE1hdHRlciBEZXYgREFDIDB4RkZGMS8weDgwMDExFDASBgorBgEEAYKifAIBDARGRkYxMRQwEgYKKwYBBAGConwCAgwEODAwMTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABEY6xpNCkQoOVYj8b/Vrtj5i7M7LFI99TrA+5VJgFBV2fRalxmP3k+SRIyYLgpenzX58/HsxaznZjpDSk3dzjoKjYDBeMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMB0GA1UdDgQWBBSI3eezADgpMs/3NMBGJIEPRBaKbzAfBgNVHSMEGDAWgBRjVA5H9kscONE4hKRi0WwZXY/7PDAKBggqhkjOPQQDAgNHADBEAiABJ6J7S0RhDuL83E0reIVWNmC8D3bxchntagjfsrPBzQIga1ngr0Xz6yqFuRnTVzFSjGAoxBUjlUXhCOTlTnCXE1M=";
@@ -76,14 +80,24 @@ public class DACProviderStub implements DACProvider {
     try {
       byte[] privateKeyBytes = Base64.decode(kDevelopmentDAC_PrivateKey_FFF1_8001, Base64.DEFAULT);
 
-      AlgorithmParameters algorithmParameters = AlgorithmParameters.getInstance("EC");
-      algorithmParameters.init(new ECGenParameterSpec("secp256r1"));
-      ECParameterSpec parameterSpec = algorithmParameters.getParameterSpec(ECParameterSpec.class);
-      ECPrivateKeySpec ecPrivateKeySpec =
-          new ECPrivateKeySpec(new BigInteger(1, privateKeyBytes), parameterSpec);
-
+      PrivateKey privateKey = null;
       KeyFactory keyFactory = KeyFactory.getInstance("EC");
-      PrivateKey privateKey = keyFactory.generatePrivate(ecPrivateKeySpec);
+      // the format can be determined by the header in the private key file:
+      // -----BEGIN PRIVATE KEY----- - PKCS#8 format
+      // -----BEGIN EC PRIVATE KEY----- - SEC1/traditional EC format
+      try {
+        // Try PKCS#8 format first.
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+        privateKey = keyFactory.generatePrivate(keySpec);
+      } catch (java.security.spec.InvalidKeySpecException e) {
+        // Fallback to SEC1 format.
+        AlgorithmParameters algorithmParameters = AlgorithmParameters.getInstance("EC");
+        algorithmParameters.init(new ECGenParameterSpec("secp256r1"));
+        ECParameterSpec parameterSpec = algorithmParameters.getParameterSpec(ECParameterSpec.class);
+        ECPrivateKeySpec ecPrivateKeySpec =
+            new ECPrivateKeySpec(new BigInteger(1, privateKeyBytes), parameterSpec);
+        privateKey = keyFactory.generatePrivate(ecPrivateKeySpec);
+      }
 
       Signature signature = Signature.getInstance("SHA256withECDSA");
       signature.initSign(privateKey);
@@ -93,6 +107,7 @@ public class DACProviderStub implements DACProvider {
       return signature.sign();
 
     } catch (Exception e) {
+      Log.e(TAG, "SignWithDeviceAttestationKey failed", e);
       return null;
     }
   }

@@ -55,11 +55,6 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(UpdateGroupKey::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kManage);
 } // namespace UpdateGroupKey
-namespace ExpireGracePeriod {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ExpireGracePeriod::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kManage);
-} // namespace ExpireGracePeriod
 namespace ConfigureAuxiliaryACL {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ConfigureAuxiliaryACL::Id,
