@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,14 +22,8 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/MessageDef/AttributeDataIB.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ThreadNetworkDiagnostics {
+namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
 CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
-} // namespace ThreadNetworkDiagnostics
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ThreadNetworkDiagnostics

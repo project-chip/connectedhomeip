@@ -423,6 +423,12 @@ private:
         kUpdated  = 0x01,
     };
 
+    enum class StreamType : uint8_t
+    {
+        kVideo = 0,
+        kAudio = 1,
+    };
+
     Delegate & mDelegate;
     std::vector<WebRTCSessionStruct> mCurrentSessions;
 
@@ -435,6 +441,15 @@ private:
     Protocols::InteractionModel::Status
     CheckTurnsOrStunsRequiresUTCTime(const char * commandName,
                                      const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers);
+
+    // Stream validation helpers
+    Protocols::InteractionModel::Status ValidateStreamID(const char * commandName,
+                                                         const Optional<DataModel::Nullable<uint16_t>> & streamID,
+                                                         Optional<std::vector<uint16_t>> & outStreams, StreamType streamType);
+
+    Protocols::InteractionModel::Status ValidateStreams(const char * commandName,
+                                                        const Optional<DataModel::DecodableList<uint16_t>> & inStreams,
+                                                        Optional<std::vector<uint16_t>> & outStreams, StreamType streamType);
 
     // Templated helper to decode and dispatch commands
     template <typename DecodableType, typename HandlerFunc>
