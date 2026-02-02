@@ -23,9 +23,8 @@ import logging
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
-from mobly import asserts, base_test, signals
+from mobly import asserts, signals
 
-import matter.testing.global_stash as global_stash
 from matter import ChipDeviceCtrl, discovery
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
