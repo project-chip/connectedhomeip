@@ -133,6 +133,12 @@ public:
         return mDiagnosticsContext.diagnosticDataProvider.GetActiveNetworkFaults(networkFaults);
     }
 
+protected:
+    OptionalAttributeSet mOptionalAttributeSet;
+    CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
+    BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
+    Context mDiagnosticsContext;
+
     System::Clock::Microseconds64 TimeSinceNodeStartup() const
     {
         VerifyOrReturnValue(mContext != nullptr, System::Clock::Microseconds64(0));
@@ -140,12 +146,6 @@ public:
     }
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mDiagnosticsContext.testEventTriggerDelegate; }
-
-protected:
-    OptionalAttributeSet mOptionalAttributeSet;
-    CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
-    BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
-    Context mDiagnosticsContext;
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
