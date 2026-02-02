@@ -77,7 +77,7 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
-        FailSafeContext & failsafeContext;
+        FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
@@ -96,7 +96,7 @@ public:
                     .configurationManager   = mContext.configurationManager,       //
                     .deviceControlServer    = mContext.deviceControlServer,        //
                     .fabricTable            = mContext.fabricTable,                //
-                    .failsafeContext        = mContext.failsafeContext,            //
+                    .failSafeContext        = mContext.failSafeContext,            //
                     .platformManager        = mContext.platformManager,            //
                     .groupDataProvider      = mContext.groupDataProvider,          //
                     .sessionManager         = mContext.sessionManager,             //
@@ -174,7 +174,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
             .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
             .fabricTable                = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
             .platformManager            = DeviceLayer::PlatformMgr(),                            //
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //

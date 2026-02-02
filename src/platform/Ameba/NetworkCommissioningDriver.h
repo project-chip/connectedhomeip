@@ -26,7 +26,7 @@ namespace NetworkCommissioning {
 namespace {
 inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
 inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 35;
 } // namespace
 
 class AmebaScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -111,6 +111,7 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork();
     void OnConnectWiFiNetworkFailed(uint16_t reason);
+    static void OnConnectWiFiNetworkFailedTimer(chip::System::Layer * aLayer, void * aAppState);
     void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 
