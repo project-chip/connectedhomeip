@@ -124,6 +124,50 @@ Status AmebaWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
     return Status::kSuccess;
 }
 
+void AmebaWiFiDriver::OnConnectWiFiNetwork()
+{
+    if (mpConnectCallback)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailedTimer, nullptr);
+        mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
+        mpConnectCallback = nullptr;
+    }
+}
+
+void AmebaWiFiDriver::OnConnectWiFiNetworkFailed(uint16_t reason)
+{
+    if (mpConnectCallback)
+    {
+        Status status;
+        switch (reason)
+        {
+        case RTW_NONE_NETWORK:
+            status = Status::kNetworkNotFound;
+            break;
+        case RTW_CONNECT_FAIL:
+#if defined(CONFIG_PLATFORM_8710C)
+        case RTW_4WAY_HANDSHAKE_TIMEOUT:
+#endif
+        case RTW_WRONG_PASSWORD:
+            status = Status::kAuthFailure;
+            break;
+        case RTW_DHCP_FAIL:
+        case RTW_UNKNOWN:
+        default:
+            status = Status::kUnknownError;
+            break;
+        }
+        mpConnectCallback->OnResult(status, CharSpan(), 0);
+        mpConnectCallback = nullptr;
+    }
+}
+
+void AmebaWiFiDriver::OnConnectWiFiNetworkFailedTimer(chip::System::Layer * aLayer, void * aAppState)
+{
+    matter_wifi_set_autoreconnect(0);
+    AmebaWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed(RTW_CONNECT_FAIL);
+}
+
 CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -159,45 +203,11 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
         ConnectivityMgrImpl().ChangeWiFiStationState(state);
         chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
     });
+
+    err = DeviceLayer::SystemLayer().StartTimer(static_cast<System::Clock::Timeout>(kWiFiConnectNetworkTimeoutSeconds * 1000),
+                                                OnConnectWiFiNetworkFailedTimer, nullptr);
 #endif
     return err;
-}
-
-void AmebaWiFiDriver::OnConnectWiFiNetwork()
-{
-    if (mpConnectCallback)
-    {
-        mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
-        mpConnectCallback = nullptr;
-    }
-}
-
-void AmebaWiFiDriver::OnConnectWiFiNetworkFailed(uint16_t reason)
-{
-    if (mpConnectCallback)
-    {
-        Status status;
-        switch (reason)
-        {
-        case RTW_NONE_NETWORK:
-            status = Status::kNetworkNotFound;
-            break;
-        case RTW_CONNECT_FAIL:
-#if defined(CONFIG_PLATFORM_8710C)
-        case RTW_4WAY_HANDSHAKE_TIMEOUT:
-#endif
-        case RTW_WRONG_PASSWORD:
-            status = Status::kAuthFailure;
-            break;
-        case RTW_DHCP_FAIL:
-        case RTW_UNKNOWN:
-        default:
-            status = Status::kUnknownError;
-            break;
-        }
-        mpConnectCallback->OnResult(status, CharSpan(), 0);
-        mpConnectCallback = nullptr;
-    }
 }
 
 void AmebaWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
