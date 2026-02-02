@@ -2,7 +2,10 @@
 
 ## Overview
 
-This document describes the unit tests for the CastingPlayer fabric cleanup functionality introduced in PR #42854. The tests ensure that when a CastingPlayer (VideoPlayer) is deleted from the CastingStore cache, the associated fabric is properly removed from the fabric table.
+This document describes the unit tests for the CastingPlayer fabric cleanup
+functionality introduced in PR #42854. The tests ensure that when a
+CastingPlayer (VideoPlayer) is deleted from the CastingStore cache, the
+associated fabric is properly removed from the fabric table.
 
 ## Problem Statement
 
@@ -93,7 +96,7 @@ The `RemoveFabric()` method on CastingPlayer:
 #### `CastingStoreDelete_TriggersFabricCleanup`
 
 -   **Purpose:** Documents the pattern for deleting a CastingPlayer
--   **Expected:** `RemoveFabric()` should be called before 
+-   **Expected:** `RemoveFabric()` should be called before
     `CastingStore::Delete()`
 
 #### `RemoveFabric_UpdatesCastingStore`
@@ -112,19 +115,19 @@ The `RemoveFabric()` method on CastingPlayer:
 
 #### `Disconnect_PreservesFabricInfo`
 
--   **Purpose:** Verifies `Disconnect()` doesn't automatically call 
+-   **Purpose:** Verifies `Disconnect()` doesn't automatically call
     `RemoveFabric()`
 -   **Expected:** Fabric info preserved after `Disconnect()`
--   **Rationale:** `Disconnect()` is for temporary disconnection, 
+-   **Rationale:** `Disconnect()` is for temporary disconnection,
     `RemoveFabric()` is for permanent cleanup
 
 ### 7. Intentional Fabric Removal
 
 #### `RemoveFabric_AfterSuccessfulConnection`
 
--   **Purpose:** Tests calling `RemoveFabric()` to force UDC flow on next 
+-   **Purpose:** Tests calling `RemoveFabric()` to force UDC flow on next
     connection
--   **Expected:** Fabric cleared, next connection will trigger User Directed 
+-   **Expected:** Fabric cleared, next connection will trigger User Directed
     Commissioning
 -   **Use Case:** User wants to re-commission the device
 
@@ -232,7 +235,7 @@ All 14 tests should **PASS**:
 ### Functions Tested
 
 1. **`CastingPlayer::RemoveFabric()`**
-   
+
     - Fabric table deletion
     - Field clearing (fabricIndex, nodeId)
     - CastingStore update
@@ -249,8 +252,8 @@ All 14 tests should **PASS**:
 
 ### Coverage Summary
 
-| Component                  | Coverage   |
-| -------------------------- | ---------- |
+| Component                  | Coverage    |
+| -------------------------- | ----------- |
 | RemoveFabric() core logic  | ✅ Complete |
 | Field clearing             | ✅ Complete |
 | Edge cases (null, invalid) | ✅ Complete |
@@ -263,7 +266,7 @@ All 14 tests should **PASS**:
 ### ✅ Covered by Unit Tests
 
 1. **Fabric Removal Logic**
-   
+
     - Fabric index and node ID clearing
     - Attribute preservation
     - Multiple calls safety
@@ -315,17 +318,17 @@ test_casting_player_fabric_cleanup:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v2
-    
+
         - name: Build tests
           run: |
               ./scripts/build/build_examples.py --target linux-x64-tests build
-    
+
         - name: Run fabric cleanup tests
           run: |
               ./out/linux-x64-tests/libTvCastingCommonTests \
                 --gtest_filter="TestCastingPlayerFabricCleanup.*" \
                 --gtest_output=xml:fabric_cleanup_results.xml
-    
+
         - name: Upload results
           uses: actions/upload-artifact@v2
           with:
@@ -404,7 +407,7 @@ test_casting_player_fabric_cleanup:
 ## Benefits
 
 1. ✅ **Prevents Fabric Table Pollution**
-   
+
     - Ensures stale fabrics are removed
     - Prevents accumulation of invalid entries
 
@@ -455,11 +458,10 @@ test_casting_player_fabric_cleanup:
 
 ## Summary
 
-✅ **14 comprehensive unit tests** covering fabric cleanup functionality
-✅ **Complete coverage** of RemoveFabric() logic and edge cases
-✅ **Connection failure** cleanup sequences validated
-✅ **CastingStore integration** patterns documented
-✅ **CI/CD ready** with example workflow configuration
+✅ **14 comprehensive unit tests** covering fabric cleanup functionality ✅
+**Complete coverage** of RemoveFabric() logic and edge cases ✅ **Connection
+failure** cleanup sequences validated ✅ **CastingStore integration** patterns
+documented ✅ **CI/CD ready** with example workflow configuration
 
 These tests ensure that PR #42854's fabric cleanup functionality works correctly
 and will continue to work as the codebase evolves.

@@ -31,7 +31,7 @@ if (chip_build_tests) {
     }
 
     # TV Casting app tests (platform-independent)
-    tests += 
+    tests +=
         [ "${chip_root}/examples/tv-casting-app/tv-casting-common/core/tests" ]
   }
 }
