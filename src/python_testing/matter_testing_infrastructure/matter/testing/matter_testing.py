@@ -1608,5 +1608,4 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
 
 # Import from commissioning module placed here to avoid circular import.
 # CommissionDeviceTest extends MatterBaseTest, so MatterBaseTest must be defined first.
-from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
-                                          get_setup_payload_info_config)
+from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices, get_setup_payload_info_config)  # isort: skip  # noqa: E402

@@ -301,7 +301,7 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
 
 # Import MatterBaseTest here - this works because matter_testing.py imports from
 # commissioning after MatterBaseTest class is fully defined (see end of matter_testing.py)
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest  # isort: skip  # noqa: E402
 
 
 class CommissionDeviceTest(MatterBaseTest):
