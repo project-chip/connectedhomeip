@@ -19,6 +19,7 @@
 #include "NetworkCommissioningCluster.h"
 
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
+#include <app/server/Server.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -59,9 +60,9 @@ private:
 
     CodegenGeneralCommissioningBreadcrumbTracker mTracker;
     NetworkCommissioningCluster::Context mContext{
-        .failSafeContext    = chip::Server::GetInstance().GetFailSafeContext(),
-        .platformMgr        = chip::DeviceLayer::PlatformMgr(),
-        .deviceControlServer = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+        .failSafeContext    = Server::GetInstance().GetFailSafeContext(),
+        .platformMgr        = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
     };
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 };
