@@ -44,21 +44,6 @@ enum class OptionalAttributes : uint32_t
     kSupportsApproximateEvEfficiency    = 0x4
 };
 
-enum class FeatureAttributes : uint32_t
-{
-    kDischargingEnabledUntil  = 0x1,   // V2x feature
-    kMaximumDischargeCurrent  = 0x2,   // V2x feature
-    kNextChargeStartTime      = 0x4,   // ChargingPreferences feature
-    kNextChargeTargetTime     = 0x8,   // ChargingPreferences feature
-    kNextChargeRequiredEnergy = 0x10,  // ChargingPreferences feature
-    kNextChargeTargetSoC      = 0x20,  // ChargingPreferences feature
-    kApproximateEvEfficiency  = 0x40,  // ChargingPreferences feature & kSupportsApproximateEvEfficiency
-    kStateOfCharge            = 0x80,  // SoCReporting feature
-    kBatteryCapacity          = 0x100, // SoCReporting feature
-    kVehicleID                = 0x200, // PlugAndCharge feature
-    kSessionEnergyDischarged  = 0x400  // V2x feature
-};
-
 enum class OptionalCommands : uint32_t
 {
     kSupportsStartDiagnostics = 0x1
@@ -78,8 +63,8 @@ public:
 
         Config(EndpointId aEndpointId, EnergyEvse::Delegate & aDelegate, BitMask<EnergyEvse::Feature> aFeature,
                BitMask<EnergyEvse::OptionalAttributes> aOptionalAttrs, BitMask<EnergyEvse::OptionalCommands> aOptionalCmds) :
-            endpointId(aEndpointId),
-            delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds), optionalAttrs(aOptionalAttrs)
+            endpointId(aEndpointId), delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds),
+            optionalAttrs(aOptionalAttrs)
         {}
     };
     // We don't want to allow the default constructor as this cluster requires a delegate to be set
