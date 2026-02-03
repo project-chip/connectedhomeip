@@ -568,13 +568,21 @@ void GenericSwitchInit()
 {
     if (DeviceTypes::EndpointHasDeviceType(1, DeviceTypes::kGenericSwitchDeviceId))
     {
-        TEMPORARY_RETURN_IGNORED SetTagList(
-            1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch::kEp1TagList));
+        CHIP_ERROR err =
+            SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch::kEp1TagList));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error setting tag list for generic switch on endpoint 1 %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     if (DeviceTypes::EndpointHasDeviceType(2, DeviceTypes::kGenericSwitchDeviceId))
     {
-        TEMPORARY_RETURN_IGNORED SetTagList(
-            2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch::kEp2TagList));
+        CHIP_ERROR err =
+            SetTagList(2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch::kEp2TagList));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error setting tag list for generic switch on endpoint 2 %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 }
 
