@@ -209,6 +209,8 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .groupDataProvider      = gGropupDataProvider,                                   //
                 .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
                 .dnssdServer            = DnssdServer::Instance(),                               //
+                .dacProvider            = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+                .eventManagement        = EventManagement::GetInstance(),                         //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
