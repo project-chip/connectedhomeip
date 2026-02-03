@@ -42,7 +42,6 @@ if sys.platform == 'linux':
     with PythonPath(os.path.join(DEFAULT_CHIP_ROOT, 'src/python_testing/matter_testing_infrastructure/matter/testing'), relative_to=__file__):
         from linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, LinuxNamespacedExecutor, WpaSupplicantMock,
                            ensure_network_namespace_availability, ensure_private_state)
-    # print ("FILIP:" + DEFAULT_CHIP_ROOT)
 
 if sys.platform == 'darwin':
     import chiptest.darwin
