@@ -37,6 +37,70 @@ namespace {
 // Constants
 constexpr uint16_t kMaxConcurrentWebRTCSessions = 5;
 
+/**
+ * @brief Validates that an SDP contains the minimum required fields for WebRTC.
+ *
+ * This function checks that the SDP has the mandatory session-level fields per RFC 8866
+ * plus the necessary ICE and DTLS parameters required by the underlying WebRTC library.
+ * Without these fields, the library would throw an exception when trying to set the
+ * remote description.
+ *
+ * Required fields (per RFC 8866):
+ * - Version (v=)
+ * - Origin (o=)
+ * - Session name (s=)
+ * - Connection (c=)
+ * - Timing (t=)
+ * - At least one media line (m=)
+ *
+ * Required fields (WebRTC-specific):
+ * - ICE user fragment (a=ice-ufrag:)
+ * - ICE password (a=ice-pwd:)
+ * - DTLS fingerprint (a=fingerprint:)
+ *
+ * @param sdp The SDP string to validate
+ * @return true if the SDP contains all required fields, false otherwise
+ */
+bool ValidateSdpFields(const std::string & sdp)
+{
+    if (sdp.empty())
+    {
+        ChipLogError(Camera, "ValidateSdpFields: SDP is empty");
+        return false;
+    }
+
+    struct SdpRequirement
+    {
+        const char * substring;
+        const char * description;
+    };
+
+    // Define the list of required substrings and their corresponding descriptions for error logging.
+    // These include mandatory SDP session-level fields per RFC 8866 plus WebRTC-specific requirements.
+    static const SdpRequirement kRequirements[] = {
+        { "v=", "version" },
+        { "o=", "origin" },
+        { "s=", "session name" },
+        { "c=", "connection" },
+        { "t=", "timing" },
+        { "m=", "media line" },
+        { "a=ice-ufrag:", "ICE user fragment" },
+        { "a=ice-pwd:", "ICE password" },
+        { "a=fingerprint:", "DTLS fingerprint" },
+    };
+
+    for (const auto & req : kRequirements)
+    {
+        if (sdp.find(req.substring) == std::string::npos)
+        {
+            ChipLogError(Camera, "ValidateSdpFields: SDP has no %s (%s): %s", req.description, req.substring, sdp.c_str());
+            return false;
+        }
+    }
+
+    return true;
+}
+
 } // namespace
 
 void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
@@ -262,6 +326,11 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 {
     ChipLogProgress(Camera, "HandleProvideOffer called");
 
+    if (!ValidateSdpFields(args.sdp))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     // Initialize a new WebRTC session from the ProvideOfferRequestArgs
     outSession.id             = args.sessionId;
     outSession.peerNodeID     = args.peerNodeId;
@@ -384,9 +453,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (sdpAnswer.empty())
+    if (!ValidateSdpFields(sdpAnswer))
     {
-        ChipLogError(Camera, "Provided SDP Answer is empty for session ID %u", sessionId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
