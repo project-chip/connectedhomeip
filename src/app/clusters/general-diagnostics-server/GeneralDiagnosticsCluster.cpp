@@ -463,8 +463,14 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
 System::Clock::Milliseconds64 GeneralDiagnosticsCluster::TimeSinceNodeStartup() const
 {
     VerifyOrReturnValue(mContext != nullptr, System::Clock::Milliseconds64(0));
-    return System::SystemClock().GetMonotonicMilliseconds64() -
-        mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
+    auto now         = System::SystemClock().GetMonotonicMilliseconds64();
+    auto startupTime = mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
+
+    if (startupTime > now)
+    {
+        return System::Clock::Milliseconds64(0);
+    }
+    return now - startupTime;
 }
 
 std::optional<DataModel::ActionReturnStatus>
