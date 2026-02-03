@@ -212,7 +212,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
             .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
-            .dacProvider                = *sCredentials::GetDeviceAttestationCredentialsProvider(), //
+            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .accessControl              = Access::GetAccessControl(),              //
             .eventManagement            = EventManagement::GetInstance(),                       //
 
