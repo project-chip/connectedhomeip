@@ -25,7 +25,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-
 class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
     def desc_TC_AUDIOOUTPUT_7_5(self) -> str:
         return "[TC_AUDIOOUTPUT-7.5] AudioOutput CurrentOutput attribute validation"
