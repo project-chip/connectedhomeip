@@ -129,7 +129,8 @@ public:
             id.SetCommissionerPasscodeReady(true);
             id.SetInstanceName(mCommissioneeInstanceName);
         }
-        else if ((mCancelPasscode || mNoPasscode) && mCommissioneeInstanceName != nullptr && strlen(mCommissioneeInstanceName) != 0)
+        // mCommissioneeInstanceName cannot be null
+        else if ((mCancelPasscode || mNoPasscode) && strlen(mCommissioneeInstanceName) != 0)
         {
             id.SetInstanceName(mCommissioneeInstanceName);
         }
