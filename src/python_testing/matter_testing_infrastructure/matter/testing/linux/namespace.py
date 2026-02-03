@@ -29,41 +29,7 @@ import time
 import traceback
 from typing import IO, Any
 
-# from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
-
-
-# Debug: Print environment context when import fails
-try:
-    from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
-except ModuleNotFoundError:
-    print("\n" + "="*50)
-    print("DEBUG: CHIPTEST IMPORT FAILED - CONTEXT VERIFICATION")
-    print("="*50)
-    print(f"Current Working Directory: {os.getcwd()}")
-    print(f"Python Path: {sys.path}")
-    print(f"File Location: {__file__}")
-    print("Module Search Paths:")
-    for path in sys.path:
-        print(f" - {path}")
-    print("Module Resolution Attempted: chiptest.runner")
-    print("Error Traceback:")
-    traceback.print_exc()
-    print("="*50 + "\n")
-    raise  # Re-raise the original exception
-
-print("\n" + "="*50)
-print("DEBUG: CHIPTEST IMPORT FAILED - CONTEXT VERIFICATION")
-print("="*50)
-print(f"Current Working Directory: {os.getcwd()}")
-print(f"Python Path: {sys.path}")
-print(f"File Location: {__file__}")
-print("Module Search Paths:")
-for path in sys.path:
-    print(f" - {path}")
-print("Module Resolution Attempted: chiptest.runner")
-print("Error Traceback:")
-traceback.print_exc()
-print("="*50 + "\n")
+from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
 log = logging.getLogger(__name__)
 
