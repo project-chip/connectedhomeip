@@ -164,23 +164,25 @@ std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FailSafeContext & failSa
 /// is not armed for the given fabric index.
 ///
 /// This just wraps EnsureFailsafeIsArmed with a one-liner for check & return.
-#define RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(failSafeContext, fabricIndex)                                                                     \
-    if (std::optional<ActionReturnStatus> status = EnsureFailsafeIsArmed(failSafeContext, fabricIndex); status.has_value())                         \
+#define RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(failSafeContext, fabricIndex)                                                    \
+    if (std::optional<ActionReturnStatus> status = EnsureFailsafeIsArmed(failSafeContext, fabricIndex); status.has_value())        \
     {                                                                                                                              \
         return status;                                                                                                             \
     }                                                                                                                              \
     (void) 0
 } // namespace
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker, const Context & context) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId), mFeatureFlags(WiFiFeatures(driver)),
-    mpWirelessDriver(driver), mpBaseDriver(driver), mBreadcrumbTracker(tracker), mClusterContext(context)
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker,
+                                                         const Context & context) :
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+    mEndpointId(endpointId), mFeatureFlags(WiFiFeatures(driver)), mpWirelessDriver(driver), mpBaseDriver(driver),
+    mBreadcrumbTracker(tracker), mClusterContext(context)
 {
     mpDriver.Set<WiFiDriver *>(driver);
 }
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver,
-                                                         BreadCrumbTracker & tracker, const Context & context) :
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, BreadCrumbTracker & tracker,
+                                                         const Context & context) :
     DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
     mEndpointId(endpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver),
     mBreadcrumbTracker(tracker), mClusterContext(context)

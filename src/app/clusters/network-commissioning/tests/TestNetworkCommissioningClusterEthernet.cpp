@@ -19,12 +19,12 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/server/Server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -58,8 +58,8 @@ struct TestNetworkCommissioningClusterEthernet : public ::testing::Test
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     NetworkCommissioningCluster::Context defaultContext{
-        .failSafeContext    = Server::GetInstance().GetFailSafeContext(),
-        .platformMgr        = DeviceLayer::PlatformMgr(),
+        .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
+        .platformMgr         = DeviceLayer::PlatformMgr(),
         .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
     };
 };

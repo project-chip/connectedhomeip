@@ -19,10 +19,10 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
-#include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/NetworkCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
@@ -82,7 +82,8 @@ public:
 
     NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, BreadCrumbTracker & tracker, const Context & context);
 
-    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, BreadCrumbTracker & tracker, const Context & context);
+    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, BreadCrumbTracker & tracker,
+                                const Context & context);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
