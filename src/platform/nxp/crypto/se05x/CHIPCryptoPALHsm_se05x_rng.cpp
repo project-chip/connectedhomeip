@@ -79,6 +79,7 @@ void free_entropy_context_h()
         mbedtls_entropy_free(&gsEntropyContext_h.mEntropy);
         mbedtls_ctr_drbg_free(&gsEntropyContext_h.mDRBGCtxt);
         gsEntropyContext_h.mInitialized = false;
+        gsEntropyContext_h.mDRBGSeeded  = false;
     }
 }
 

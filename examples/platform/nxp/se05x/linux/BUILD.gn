@@ -110,11 +110,21 @@ source_set("app-main") {
     defines += [ "ENABLE_SE05X_DEVICE_ATTESTATION=1" ]
   }
 
+  if (chip_se05x_spake_verifier_use_tp_values) {
+    defines += [ "ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=1" ]
+  }
+
+  defines +=
+      [ "SE05X_SPAKE_VERIFIER_TP_SET_NO=$chip_se05x_spake_verifier_tp_set_no" ]
+
+  defines += [
+    "SE05X_SPAKE_VERIFIER_TP_ITTER_CNT=$chip_se05x_spake_verifier_tp_itter_cnt",
+  ]
+
   sources = [
     "../../../linux/AppMain.h",
     "../../../linux/CommissionableInit.cpp",
     "../../../linux/CommissionableInit.h",
-    "../../../linux/LinuxCommissionableDataProvider.cpp",
     "../../../linux/LinuxCommissionableDataProvider.h",
     "../../../linux/NamedPipeCommands.cpp",
     "../../../linux/NamedPipeCommands.h",
@@ -126,6 +136,7 @@ source_set("app-main") {
     "../../../linux/testing/CustomCSRResponseOperationalKeyStore.h",
     "../DeviceAttestationSe05xCredsExample.cpp",
     "AppMain.cpp",
+    "LinuxCommissionableDataProvider_se05x.cpp",
   ]
 
   public_deps = [

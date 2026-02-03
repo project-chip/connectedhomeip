@@ -19,20 +19,22 @@
 
 #include <string.h>
 
-#include <CHIPCryptoPAL_se05x.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 #include <type_traits>
 
-#include <CHIPCryptoPALHsm_se05x_config.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h>
 #include <system/SystemMutex.h>
 
 /* se05x includes */
 #include "ex_sss_boot.h"
 #include "fsl_sss_api.h"
+#include "se051h_nfc_comm_prov.h"
+#include "se05x_host_gpio.h"
 #include <fsl_sss_se05x_apis.h>
 #include <se05x_APDU.h>
 
@@ -79,11 +81,18 @@ extern "C" {
 CHIP_ERROR se05x_session_open(void);
 
 /**
- * @brief Check if key exists in se05x.
- * @param[in] Key id of the key to be checked.
+ * @brief Close session to se05x secure element.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_check_object_exists(uint32_t keyid);
+CHIP_ERROR se05x_close_session(void);
+
+/**
+ * @brief Check if key exists in se05x.
+ * @param[in] Key id of the key to be checked.
+ * @param[out] key_exists boolean true if the key id presents.
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_check_object_exists(uint32_t keyid, bool * key_exists);
 
 /**
  * @brief Delete the key in se05x.

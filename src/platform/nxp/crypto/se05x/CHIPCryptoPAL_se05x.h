@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "CHIPCryptoPALHsm_se05x_config.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/DataModelTypes.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h>
 
 #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 typedef struct hsm_pake_context_s

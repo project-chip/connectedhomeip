@@ -24,7 +24,6 @@
 
 #include "CHIPCryptoPALHsm_se05x_utils.h"
 #include "fsl_sss_policy.h"
-#include "se05x_host_gpio.h"
 
 ex_sss_boot_ctx_t gex_sss_chip_ctx;
 static int is_session_open = 0;
@@ -86,9 +85,9 @@ CHIP_ERROR se05x_session_open(void)
     }
 
     ChipLogDetail(Crypto, "Turn ON SE05x secure element before session open");
-    if (se05x_host_gpio_set_value(1) != 0)
+    if (se05x_host_gpio_power_set(1) != 0)
     {
-        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_set_value(1) function");
+        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_power_set(1) function");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -139,9 +138,9 @@ CHIP_ERROR se05x_close_session(void)
     }
 
     ChipLogDetail(Crypto, "Turn OFF SE05x secure element after session close");
-    if (se05x_host_gpio_set_value(0) != 0)
+    if (se05x_host_gpio_power_set(0) != 0)
     {
-        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_set_value(0) function");
+        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_power_set(0) function");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -153,7 +152,7 @@ CHIP_ERROR se05x_close_session(void)
 }
 
 /* Check if key exists in se05x */
-CHIP_ERROR se05x_check_object_exists(uint32_t keyid)
+CHIP_ERROR se05x_check_object_exists(uint32_t keyid, bool * key_exists)
 {
     smStatus_t smstatus   = SM_NOT_OK;
     SE05x_Result_t exists = kSE05x_Result_NA;
@@ -174,9 +173,11 @@ CHIP_ERROR se05x_check_object_exists(uint32_t keyid)
         }
         if (exists == kSE05x_Result_FAILURE)
         {
-            ChipLogError(Crypto, "se05x warn: Key doesnot exists");
-            return CHIP_ERROR_INTERNAL;
+            ChipLogDetail(Crypto, "se05x warn: Key doesnot exists");
+            *key_exists = false;
+            return CHIP_NO_ERROR;
         }
+        *key_exists = true;
     }
 
     return CHIP_NO_ERROR;
