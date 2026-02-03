@@ -132,7 +132,7 @@ public:
 struct TestBasicInformationCluster : public ::testing::Test
 {
     MockDeviceInstanceInfoProvider mDeviceInfoProvider;
-    BasicInformationCluster::Context mContext = { .deviceInstanceInfoProvider = &mDeviceInfoProvider,
+    BasicInformationCluster::Context mContext = { .deviceInstanceInfoProvider = mDeviceInfoProvider,
                                                   .configurationManager       = chip::DeviceLayer::ConfigurationMgr(),
                                                   .platformManager            = chip::DeviceLayer::PlatformMgr() };
 

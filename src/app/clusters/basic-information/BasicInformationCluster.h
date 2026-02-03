@@ -41,9 +41,7 @@ public:
     // Define the Context struct with References
     struct Context
     {
-        // Using pointer as we have seen converting to reference
-        // costs some flash (even though code would be more readable that way...)
-        DeviceLayer::DeviceInstanceInfoProvider * deviceInstanceInfoProvider;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::PlatformManager & platformManager;
     };

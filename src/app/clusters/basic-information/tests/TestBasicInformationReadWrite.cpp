@@ -301,7 +301,7 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     MockDeviceInstanceInfoProvider mDeviceInfoProvider;
     MockConfigurationManager mMockConfigurationManager;
     BasicInformationCluster::Context mContext = {
-        .deviceInstanceInfoProvider = &mDeviceInfoProvider,
+        .deviceInstanceInfoProvider = mDeviceInfoProvider,
         .configurationManager       = mMockConfigurationManager,
         .platformManager            = chip::DeviceLayer::PlatformMgr(),
     };

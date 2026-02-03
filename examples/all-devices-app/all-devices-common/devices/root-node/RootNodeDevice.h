@@ -45,6 +45,7 @@ public:
         Access::AccessControl & accessControl;
         PersistentStorageDelegate & persistentStorage;
         FailSafeContext & failSafeContext;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
