@@ -40,7 +40,7 @@ private:
     Json::Value mJsonValue;
     Camera::CameraDevice * mCameraDevice = nullptr;
 
-    void OnZoneTriggeredHandler(uint16_t zoneId);
+    void OnZoneTriggeredHandler(const std::vector<uint16_t> & zoneIds);
     void OnSetHardPrivacyModeOnHandler(bool value);
 };
 

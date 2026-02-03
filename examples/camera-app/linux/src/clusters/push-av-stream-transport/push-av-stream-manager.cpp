@@ -306,7 +306,10 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     {
         mTransportMap[connectionID]->ConfigureRecorderTimeSetting(timeControl.Value());
     }
-    mTransportMap[connectionID]->TriggerTransport(activationReason);
+
+    // Pass zoneIDs with at least 1 invalidZoneId to match the earlier implementation
+    std::vector<int> zoneIds = { kInvalidZoneId };
+    mTransportMap[connectionID]->TriggerTransport(activationReason, zoneIds);
 
     return Status::Success;
 }
@@ -669,7 +672,7 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
+void PushAvStreamTransportManager::HandleZoneTrigger(const std::vector<uint16_t> & zoneIds)
 {
     for (auto & pavst : mTransportMap)
     {
@@ -678,7 +681,15 @@ void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {
-            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, zoneId, 10);
+            // Convert uint16_t zone IDs to int zone IDs for the transport API
+            std::vector<int> intZoneIds;
+            intZoneIds.reserve(zoneIds.size());
+            for (const auto & zoneId : zoneIds)
+            {
+                intZoneIds.push_back(static_cast<int>(zoneId));
+            }
+
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, intZoneIds, 10);
         }
     }
 }
