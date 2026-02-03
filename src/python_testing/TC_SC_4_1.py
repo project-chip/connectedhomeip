@@ -666,11 +666,6 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify that bit 0 is clear
         asserts.assert_true((T_int & 0x01) == 0, f"T key ({t_key}) bit 0 must be clear.")
 
-        # Verify that TCP bit (0x04) matches the PICS exactly if 'supports_tcp' is True
-        if self.supports_tcp:
-            tcp_bit_set = (T_int & 0x04) != 0
-            asserts.assert_true(tcp_bit_set, "TCP bit (0x04) must be set if MCORE.SC.TCP PICS is set.")
-
         # Verify that the value encodes TCP capability per PICS:
         #   - If 'supports_tcp' is True, T key allowed values are (4, 6)
         #   - If 'supports_tcp' is False, T key allowed values are (0)
