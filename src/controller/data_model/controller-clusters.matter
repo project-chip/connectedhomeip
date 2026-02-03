@@ -4383,21 +4383,58 @@ provisional cluster ScenesManagement = 98 {
 cluster Groupcast = 101 {
   revision 1;
 
+  enum GroupcastTestResultEnum : enum8 {
+    kSuccess = 0;
+    kGeneralError = 1;
+    kMessageReplay = 2;
+    kFailedAuth = 3;
+    kNoAvailableKey = 4;
+    kSendFailure = 5;
+  }
+
+  enum GroupcastTestingEnum : enum8 {
+    kDisableTesting = 0;
+    kEnableListenerTesting = 1;
+    kEnableSenderTesting = 2;
+  }
+
+  enum MulticastAddrPolicyEnum : enum8 {
+    kIanaAddr = 0;
+    kPerGroup = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kListener = 0x1;
     kSender = 0x2;
+    kPerGroup = 0x4;
   }
 
   fabric_scoped struct MembershipStruct {
     group_id groupID = 0;
-    endpoint_no endpoints[] = 1;
+    optional endpoint_no endpoints[] = 1;
     fabric_sensitive int16u keySetID = 2;
-    boolean hasAuxiliaryACL = 3;
+    optional boolean hasAuxiliaryACL = 3;
+    MulticastAddrPolicyEnum mcastAddrPolicy = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_sensitive info event access(read: administer) GroupcastTesting = 0 {
+    optional octet_string sourceIpAddress = 0;
+    optional octet_string destinationIpAddress = 1;
+    optional group_id groupID = 2;
+    optional endpoint_no endpointID = 3;
+    optional cluster_id clusterID = 4;
+    optional int32u elementID = 5;
+    optional boolean accessAllowed = 6;
+    GroupcastTestResultEnum groupcastTestResult = 7;
     fabric_idx fabricIndex = 254;
   }
 
   readonly attribute MembershipStruct membership[] = 0;
   readonly attribute int16u maxMembershipCount = 1;
+  readonly attribute int16u maxMcastAddrCount = 2;
+  readonly attribute int16u usedMcastAddrCount = 3;
+  readonly attribute fabric_idx fabricUnderTest = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4411,6 +4448,7 @@ cluster Groupcast = 101 {
     optional octet_string<16> key = 3;
     optional boolean useAuxiliaryACL = 4;
     optional boolean replaceEndpoints = 5;
+    optional MulticastAddrPolicyEnum mcastAddrPolicy = 6;
   }
 
   request struct LeaveGroupRequest {
@@ -4434,6 +4472,11 @@ cluster Groupcast = 101 {
     boolean useAuxiliaryACL = 1;
   }
 
+  request struct GroupcastTestingRequest {
+    GroupcastTestingEnum testOperation = 0;
+    optional int16u durationSeconds = 1;
+  }
+
   /** This command SHALL be used to instruct the server to join a multicast group. */
   fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
   /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
@@ -4442,6 +4485,8 @@ cluster Groupcast = 101 {
   fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
   /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
   fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 4;
+  /** This command SHALL allow an Administrator to configure test modes that allow validation of Groupcast communication. */
+  fabric command access(invoke: administer) GroupcastTesting(GroupcastTestingRequest): DefaultSuccess = 5;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -5802,7 +5847,7 @@ provisional cluster ElectricalGridConditions = 160 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
-  revision 7;
+  revision 10;
 
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
@@ -7616,7 +7661,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 7;
+  revision 9;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
