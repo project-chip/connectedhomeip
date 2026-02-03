@@ -38,6 +38,7 @@ TEST_NODE_ID = '0x12344321'
 TEST_DISCRIMINATOR = '3840'
 TEST_PASSCODE = '20202021'
 TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
+TEST_THREAD_DATASET = '0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff'
 
 
 class App:
@@ -110,8 +111,16 @@ class App:
         # Watch for both mDNS advertisement start as well as event loop start.
         # These two messages can appear in any order depending on the implementation.
         # Waiting for both makes the startup detection more robust.
-        assert self.process is not None and self.outpipe is not None, "waitForAnyAdvertisement can be called only after start()"
-        self.__waitFor(["mDNS service published:", "APP STATUS: Starting event loop"])
+        #
+        # For a Thread-only node, the mDNS advertisement is not started immediately
+        # after start, so it is skipped for Thread node.
+        assert self.process is not None and self.outpipe is not None, "waitForApplicationUp can be called only after start()"
+
+        what = ["APP STATUS: Starting event loop"]
+        if not any(arg.startswith("--thread-node-id=") for arg in self.subproc.args):
+            what += ["mDNS service published:"]
+
+        self.__waitFor(what)
 
     def waitForMessage(self, message: str, timeoutInSeconds: float = 10):
         self.__waitFor([message], timeoutInSeconds=timeoutInSeconds)
@@ -248,7 +257,7 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     'camera-controller': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-camera-controller'),
     'closure': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='closure-app'),
     'energy-gateway': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-energy-gateway-app'),
-    'energy-management': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-energy-management-app'),
+    'evse': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-evse-app'),
     'fabric-bridge': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-bridge-app'),
     'fabric-admin': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-admin'),
     'fabric-sync': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-sync'),
@@ -454,7 +463,9 @@ class TestDefinition:
             pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: int | None = None,
-            ble_controller_tool: int | None = None):
+            ble_controller_tool: int | None = None,
+            op_network: str = 'WiFi',
+            ):
         """
         Executes the given test case using the provided runner for execution.
         Will iterate and execute every target.
@@ -462,13 +473,14 @@ class TestDefinition:
         for target in self.targets:
             log.info('Executing %s::%s', self.name, target.name)
             self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
-                          test_runtime, ble_controller_app, ble_controller_tool)
+                          test_runtime, ble_controller_app, ble_controller_tool, op_network)
 
     def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
                  pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
                  test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
                  ble_controller_app: int | None = None,
-                 ble_controller_tool: int | None = None):
+                 ble_controller_tool: int | None = None,
+                 op_network: str = 'WiFi'):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
@@ -491,7 +503,13 @@ class TestDefinition:
                             subproc = subproc.with_args(arg)
 
                     if ble_controller_app is not None:
-                        subproc = subproc.with_args("--ble-controller", str(ble_controller_app), "--wifi")
+                        subproc = subproc.with_args("--ble-controller", str(ble_controller_app))
+                        if op_network == 'WiFi':
+                            subproc = subproc.with_args("--wifi")
+                        elif op_network == 'Thread':
+                            # The node id must not conflict with ThreadBorderRouter.NODE_ID
+                            subproc = subproc.with_args("--thread-node-id=2")
+
                     app = App(runner, subproc)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
@@ -543,9 +561,14 @@ class TestDefinition:
 
                 pairing_cmd = subproc_info_repo['chip-tool-with-python']
                 if ble_controller_tool is not None:
-                    pairing_cmd = pairing_cmd.with_args(
-                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
-                    pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                    if op_network == 'WiFi':
+                        pairing_cmd = pairing_cmd.with_args(
+                            "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
+                        pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                    elif op_network == 'Thread':
+                        pairing_cmd = pairing_cmd.with_args(
+                            "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", TEST_SETUP_QR_CODE)
+                        pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 

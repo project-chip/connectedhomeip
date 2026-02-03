@@ -24,6 +24,7 @@ from .gn import GnBuilder
 
 
 class Efr32App(Enum):
+    EVSE = auto()
     LIGHT = auto()
     LOCK = auto()
     SWITCH = auto()
@@ -35,6 +36,8 @@ class Efr32App(Enum):
     CLOSURE = auto()
 
     def ExampleName(self):
+        if self == Efr32App.EVSE:
+            return 'evse-app'
         if self == Efr32App.LIGHT:
             return 'lighting-app'
         if self == Efr32App.LOCK:
@@ -54,6 +57,8 @@ class Efr32App(Enum):
         raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
+        if self == Efr32App.EVSE:
+            return 'matter-silabs-evse-example'
         if self == Efr32App.LIGHT:
             return 'matter-silabs-lighting-example'
         if self == Efr32App.LOCK:
@@ -75,6 +80,8 @@ class Efr32App(Enum):
         raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
+        if self == Efr32App.EVSE:
+            return 'evse_app.flashbundle.txt'
         if self == Efr32App.LIGHT:
             return 'lighting_app.flashbundle.txt'
         if self == Efr32App.LOCK:

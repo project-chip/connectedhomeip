@@ -584,6 +584,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:fixedbuffer",
       "${chip_root}/src/lib/support:timer-delegate",
     ]
 

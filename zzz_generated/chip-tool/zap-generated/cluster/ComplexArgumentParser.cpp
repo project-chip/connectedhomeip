@@ -5326,6 +5326,21 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("detectionStartTime");
 
+    if (value.isMember("objectCountThreshold"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "objectCountThreshold");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.objectCountThreshold, value["objectCountThreshold"]));
+    }
+    valueCopy.removeMember("objectCountThreshold");
+
+    if (value.isMember("objectCount"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "objectCount");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.objectCount, value["objectCount"]));
+    }
+    valueCopy.removeMember("objectCount");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -5333,6 +5348,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AmbientContextSensing:
 {
     ComplexArgumentParser::Finalize(request.ambientContextSensed);
     ComplexArgumentParser::Finalize(request.detectionStartTime);
+    ComplexArgumentParser::Finalize(request.objectCountThreshold);
+    ComplexArgumentParser::Finalize(request.objectCount);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

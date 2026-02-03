@@ -52,6 +52,7 @@
 import logging
 import random
 import re
+from enum import IntEnum
 from pathlib import Path
 from typing import Tuple
 
@@ -74,6 +75,7 @@ from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.credentials import CredentialSource, get_cd_certs
 from matter.testing.decorators import async_test_body
+from matter.testing.problem_notices import CommandPathLocation
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader
 
@@ -142,10 +144,12 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> Tuple[
 
     return dac_vid, dac_pid, pai_vid, pai_pid
 
-# To set the directory for the CD certificates use
+# To set the directory for the CD signer certificates use
 # --string-arg cd_cert_dir:'your_directory_name'
 # ex. --string-arg cd_cert_dir:'credentials/development/cd-certs'
-# default is 'credentials/development/cd-certs'.
+# default is the internal development CD signer certificates
+# This directory is only used for test CDs or provisional CDs when the override_provisional_cd_check_warning flag is used.
+# For production and provisional CDs with no flag, the internal production CD signer certificates are used
 
 
 class TC_DA_1_2(BasicCompositionTests):
@@ -177,7 +181,7 @@ class TC_DA_1_2(BasicCompositionTests):
                 TestStep("6.6", "Verify CD security level", "security level = 0"),
                 TestStep("6.7", "Verify CD security_information", "security_information = 0"),
                 TestStep("6.8", "Verify CD version_number", "version_number is an integer in range 0..65535"),
-                TestStep("6.9", "Verify CD certification_type", "certification_type has a value between 1..2"),
+                TestStep("6.9", "Verify CD certification_type", "certification_type has a value between 0..2"),
                 TestStep("7.0", "Extract the Vendor ID (VID) and Product ID (PID) from the DAC. Extract the VID from the PAI. Extract the PID from the PAI, if present",
                          "VID and PID are present and properly encoded in the DAC. VID is present and properly encoded in the PAI. If the PID is present in the PAI, it is properly encoded"),
                 TestStep("7.1", "", "If the dac_origin_vendor_id is present in the CD, confirm the dac_origin_product_id is also present. If the dac_origin_vendor_id is not present in the CD, confirm the dac_origin_product_id is also not present."),
@@ -191,7 +195,12 @@ class TC_DA_1_2(BasicCompositionTests):
                           "* If it is present in the PAI certificate, the Product ID (PID) in the subject is contained in the product_id_array field in the Certification Declaration.\n")),
                 TestStep(8, "If the Certification Declaration has authorized_paa_list, check that the authority_key_id extension of the PAI matches one found in the authorized_paa_list",
                          "PAA from PAI authority_key_id extension matches one found in authorized_paa_list"),
-                TestStep(9, "Verify that the certification_declaration CMS enveloped can be verified with the well-known Certification Declaration public key used to originally sign the Certification Declaration", "Signature verification passes"),
+                TestStep(9, ("Verify that the certification_declaration CMS enveloped can be verified with Certification Declaration public key.\n"
+                             "For official CDs the signer must be one of the well-known CSA CD signing keys.\n"
+                             "For provisional CDs, the signer must be one of the well-known CSA CD signing keys unless the `override_provisional_cd_check_warning` flag is set to acknowledge the use of a provisional CD that cannot be used in production devices."
+                             "For test and development CDs, the signer certificates may be one of the development certificates or can be provided by the tester."
+                             ),
+                         "Signature verification passes"),
                 TestStep(10, "Verify attestation_nonce", ("* attestation_nonce is present in the attestation_elements_message structure\n"
                                                           "* attestation_nonce value matches the AttestationNonce field value sent in the AttestationRequest Command sent by the commissioner\n"
                                                           "* attestation_nonce is a 32 byte-long octet string\n")),
@@ -206,6 +215,12 @@ class TC_DA_1_2(BasicCompositionTests):
 
     @async_test_body
     async def test_TC_DA_1_2(self):
+        class CertificationType(IntEnum):
+            kTest = 0
+            kProvisional = 1
+            kOfficial = 2
+
+        # NOTE: this parameter is not used for production CDs or provisional CDs without the override flag.
         cd_cert_dir = self.user_params.get("cd_cert_dir")
         if cd_cert_dir is None:
             cd_cert_dir = CredentialSource.kDevelopment
@@ -217,6 +232,11 @@ class TC_DA_1_2(BasicCompositionTests):
         if do_test_over_pase:
             setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
             await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
+
+        override_provisional_cd_check_warning = self.user_params.get("override_provisional_cd_check_warning", False)
+
+        problem_location = CommandPathLocation(endpoint_id=0, cluster_id=Clusters.OperationalCredentials.id,
+                                               command_id=Clusters.OperationalCredentials.Commands.AttestationRequest.command_id)
 
         # Commissioning - done
         self.step(0)
@@ -362,11 +382,24 @@ class TC_DA_1_2(BasicCompositionTests):
         asserts.assert_in(version_number, range(0, 65535), "Version number out of range")
         self.step("6.9")
         if post_cert_test:
-            asserts.assert_equal(certification_type, 2, "Certification declaration is not marked as production.")
-        elif self.is_pics_sdk_ci_only:
-            asserts.assert_in(certification_type, [0, 1, 2], "Certification type is out of range")
-        else:
-            asserts.assert_in(certification_type, [1, 2], "Certification type is out of range")
+            asserts.assert_in(certification_type, [CertificationType.kProvisional, CertificationType.kOfficial],
+                              "Certification declaration is not marked as production or provisional.")
+            if certification_type == CertificationType.kProvisional:
+                # This is a provisional CD, which is technically allowed, but unexpected in the interop lab. Create a warning,
+                # but delay reporting until the end of the test.
+                msg = """
+                WARNING ONLY: This product contains a provisional certification declaration.
+                While this is technically allowed, it is unexpected since devices are expected to replace provisional
+                CDs on update. This is not a full failure, but the manufacturer should be informed.
+                """
+                self.record_warning(test_name=self.current_test_info.name, problem=msg, location=problem_location)
+
+        # At certification testing, we now allow test CDs.
+        # Provisional CDs must be signed by a CSA CD signing key (unless there is an override).
+        # Production CDs must always be signed by a CSA CD signing key.
+        # The signature check is handled in step 9.
+        asserts.assert_in(certification_type, [CertificationType.kTest, CertificationType.kProvisional,
+                          CertificationType.kOfficial], "Certification type is out of range")
 
         self.step("7.0")
         dac_vid, dac_pid, pai_vid, pai_pid = parse_ids_from_certs(parsed_dac, parsed_pai)
@@ -413,20 +446,54 @@ class TC_DA_1_2(BasicCompositionTests):
 
         self.step(9)
         signature_cd = bytes(signer_info['signature'])
-        certs = {}
-        for filename in get_cd_certs(cd_cert_dir).iterdir():
-            if not filename.name.endswith('.der'):
-                continue
-            with filename.open("rb") as f:
-                log.info(f'Parsing CD signing certificate file: {filename}')
-                try:
-                    cert = x509.load_der_x509_certificate(f.read())
-                except ValueError:
-                    log.info(f'File {filename} is not a valid certificate, skipping')
+
+        def load_certs(cd_signers):
+            certs = {}
+            for filename in get_cd_certs(cd_signers).iterdir():
+                if not filename.name.endswith('.der'):
                     continue
-                pub = cert.public_key()
-                ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
-                certs[ski] = pub
+                with filename.open("rb") as f:
+                    log.info(f'Parsing CD signing certificate file: {filename}')
+                    try:
+                        cert = x509.load_der_x509_certificate(f.read())
+                    except ValueError:
+                        log.info(f'File {filename} is not a valid certificate, skipping')
+                        continue
+                    pub = cert.public_key()
+                    ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
+                    certs[ski] = pub
+            return certs
+        # If the CD is a test CD, or a provisional key with the specified override, it can be signed by the supplied CD signers.
+        # if the CD is a provisional CD with no override, or a full production CD, it MUST be signed by the official CD signers.
+        prod_certs = load_certs(CredentialSource.kProduction)
+        if certification_type == CertificationType.kTest or (override_provisional_cd_check_warning and certification_type == CertificationType.kProvisional):
+            certs = load_certs(cd_cert_dir)
+        else:
+            certs = prod_certs
+
+        if certification_type == CertificationType.kProvisional and subject_key_identifier not in prod_certs:
+            msg = """WARNING: This device is using a CD that is marked as provisional, but which is not signed by the official CSA
+                     CD signing key.
+
+                     Devices were previously required to bring such a certificate to certification, but recent changes to the
+                     specification to support CSA-signed provisional CDs have resulted in changes to these requirements.
+
+                     The restrictions on CD certification type for certification testing have been loosened such that is it now
+                     acceptable to bring a test CD to certification.
+                     During this transition period, non-CSA signed provisional CDs are still being accepted for certification
+                     testing. Note that such CDs are NOT suitable for use on production devices.
+
+                     """
+            if override_provisional_cd_check_warning:
+                msg += "Press enter to acknowledge that this provisional CD cannot be used in a production device."
+                self.wait_for_user_input(msg)
+            else:
+                msg += """
+                     To continue using a non-CSA signed provisional CD for certification testing, please set the
+                     override_provisional_cd_check_warning flag (`--bool-arg override_provisional_cd_check_warning:true')
+                     and re-run this test.
+                   """
+                self.record_error(test_name=self.current_test_info.name, location=problem_location, problem=msg)
 
         asserts.assert_true(subject_key_identifier in certs, "Subject key identifier not found in CD certs")
         try:
@@ -482,6 +549,9 @@ class TC_DA_1_2(BasicCompositionTests):
             asserts.fail("Received Success response when an INVALID_COMMAND was expected")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Received incorrect error from AttestationRequest command")
+
+        if self.problems:
+            self.fail("Problems found during test")
 
 
 if __name__ == "__main__":

@@ -51,8 +51,8 @@ public:
     {
         uint16_t sessionId;
         StreamUsageEnum streamUsage;
-        Optional<DataModel::Nullable<uint16_t>> videoStreamId;
-        Optional<DataModel::Nullable<uint16_t>> audioStreamId;
+        Optional<std::vector<uint16_t>> videoStreams;
+        Optional<std::vector<uint16_t>> audioStreams;
         Optional<Structs::SFrameStruct::Type> sFrameConfig;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
@@ -120,8 +120,8 @@ public:
      *
      * @param[in]  args
      *   Contains all input arguments for the command, including the SDP Offer, session usage, etc.
-     *   If the video stream ID is missing, the delegate MUST automatically select a matching video stream.
-     *   If the audio stream ID is missing, the delegate MUST automatically select a matching audio stream.
+     *   If the video streams are missing, the delegate MUST automatically select matching video streams.
+     *   If the audio streams are missing, the delegate MUST automatically select matching audio streams.
      *   In either case, upon successful selection, the delegate is responsible for internally incrementing
      *   the reference count on any used video and audio streams.
      *
@@ -182,16 +182,12 @@ public:
      *
      * @param[in] sessionId      The ID of the session to end.
      * @param[in] reasonCode     Reason for ending the session (e.g. normal closure, resource limit).
-     * @param[in] videoStreamID  The nullable ID of the video stream associated with the session.
-     * @param[in] audioStreamID  The nullable ID of the audio stream associated with the session.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success
      *   - Error if no matching session is found or some cleanup error occurs
      */
-    virtual CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                        DataModel::Nullable<uint16_t> videoStreamID,
-                                        DataModel::Nullable<uint16_t> audioStreamID) = 0;
+    virtual CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) = 0;
 
     /**
      * @brief Validates the requested stream usage against the camera's resource management
@@ -203,14 +199,14 @@ public:
      *  - If the provided IDs are null, it matches against an allocated stream with the same stream usage
      *    and updates the IDs to those for the matching stream
      *
-     * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
-     * @param[in,out] videoStreamId  Optional identifier for the requested video stream.
-     * @param[in,out] audioStreamId  Optional identifier for the requested audio stream.
+     * @param[in] streamUsage       The desired usage type for the stream (e.g. live view, recording, etc.).
+     * @param[in,out] videoStreams  Optional array of video stream IDs.
+     * @param[in,out] audioStreams  Optional array of audio stream IDs.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
      */
-    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
+                                           Optional<std::vector<uint16_t>> & audioStreams) = 0;
 
     /**
      * @brief
@@ -243,6 +239,38 @@ public:
      *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
      */
     virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given VideoStreams match values in AllocatedVideoStreams.
+     *
+     *   This method is called during SolicitOffer command processing when VideoStreams
+     *   is present and not null. The implementation must check if each provided IDs exist
+     *   in the AllocatedVideoStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] videoStreams  The video streams to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the VideoStreams are valid and match AllocatedVideoStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails or a match can't be found
+     */
+    virtual CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given AudioStreams match values in AllocatedAudioStreams.
+     *
+     *   This method is called during SolicitOffer command processing when AudioStreams
+     *   is present and not null. The implementation must check if each provided IDs exist
+     *   in the AllocatedAudioStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] audioStreams  The audio streams to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the AudioStreams are valid and match AllocatedAudioStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
+     */
+    virtual CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) = 0;
 
     /**
      * @brief
@@ -395,6 +423,12 @@ private:
         kUpdated  = 0x01,
     };
 
+    enum class StreamType : uint8_t
+    {
+        kVideo = 0,
+        kAudio = 1,
+    };
+
     Delegate & mDelegate;
     std::vector<WebRTCSessionStruct> mCurrentSessions;
 
@@ -407,6 +441,15 @@ private:
     Protocols::InteractionModel::Status
     CheckTurnsOrStunsRequiresUTCTime(const char * commandName,
                                      const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers);
+
+    // Stream validation helpers
+    Protocols::InteractionModel::Status ValidateStreamID(const char * commandName,
+                                                         const Optional<DataModel::Nullable<uint16_t>> & streamID,
+                                                         Optional<std::vector<uint16_t>> & outStreams, StreamType streamType);
+
+    Protocols::InteractionModel::Status ValidateStreams(const char * commandName,
+                                                        const Optional<DataModel::DecodableList<uint16_t>> & inStreams,
+                                                        Optional<std::vector<uint16_t>> & outStreams, StreamType streamType);
 
     // Templated helper to decode and dispatch commands
     template <typename DecodableType, typename HandlerFunc>

@@ -17,18 +17,19 @@ sample app.
 > Developers can find more resources on the
 > [Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US).
 
--   [Introduction](#introduction)
--   [Requirements](#requirements)
-    -   [Hardware Requirements](#hardware-requirements)
-    -   [Software Requirements](#software-requirements)
-    -   [Software Artifacts](#software-artifacts)
--   [Building](#building)
-    -   [Build Script](#build-script)
-    -   [Build Arguments](#build-arguments)
--   [Flashing](#flashing)
-    -   [Flasher Arguments](#flasher-arguments)
--   [Standard Application Behavior](#standard-application-behavior)
--   [Silabs CLI](#silabs-cli)
+-   [Silicon Labs Matter Solution Guide](#silicon-labs-matter-solution-guide)
+    -   [Introduction](#introduction)
+    -   [Requirements](#requirements)
+        -   [Hardware Requirements](#hardware-requirements)
+        -   [Software Requirements](#software-requirements)
+            -   [Software Artifacts](#software-artifacts)
+    -   [Building](#building)
+        -   [Build Script](#build-script)
+            -   [Build Arguments](#build-arguments)
+    -   [Flashing](#flashing)
+        -   [Flasher Arguments](#flasher-arguments)
+    -   [Standard Application Behavior](#standard-application-behavior)
+    -   [Silabs CLI](#silabs-cli)
 
 ## Requirements
 
@@ -79,7 +80,7 @@ offers extra sample applications for different device-types
                 <li> <a href="../../../examples/air-quality-sensor-app/silabs/README.md">Air Quality Sensor App</a></li>
                 <li> <a href="../../../examples/closure-app/silabs/README.md">Closure App</a></li>
                 <li> <a href="../../../examples/dishwasher-app/silabs/README.md">Dishwasher App</a></li>
-                <li> <a href="../../../examples/energy-management-app/silabs/README.md">Energy Management App</a></li>
+                <li> <a href="../../../examples/evse-app/silabs/README.md">Energy Management App</a></li>
                 <li> <a href="../../../examples/lit-icd-app/silabs/README.md">LIT ICD App</a></li>
                 <li> <a href="../../../examples/refrigerator-app/silabs/README.md">Refrigerator App</a></li>
                 <li> <a href="../../../examples/window-app/silabs/README.md">Window App</a></li>

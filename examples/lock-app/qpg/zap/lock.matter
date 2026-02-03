@@ -2222,7 +2222,7 @@ cluster IcdManagement = 70 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
-  revision 7;
+  revision 10;
 
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;

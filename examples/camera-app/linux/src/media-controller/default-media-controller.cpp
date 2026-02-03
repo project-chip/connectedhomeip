@@ -38,12 +38,14 @@ void DefaultMediaController::SetCameraDevice(Camera::CameraDevice * device)
     }
 }
 
-void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
+void DefaultMediaController::RegisterTransport(Transport * transport, const std::vector<uint16_t> & videoStreams,
+                                               const std::vector<uint16_t> & audioStreams)
 {
-    ChipLogProgress(Camera, "Registering transport: videoStreamID=%u, audioStreamID=%u", videoStreamID, audioStreamID);
+    ChipLogProgress(Camera, "Registering transport: videoStreams count=%u, audioStreams count=%u",
+                    static_cast<unsigned>(videoStreams.size()), static_cast<unsigned>(audioStreams.size()));
 
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
-    mConnections.push_back({ transport, videoStreamID, audioStreamID });
+    mConnections.push_back({ transport, videoStreams, audioStreams });
 
     auto * bufferSink     = new BufferSink();
     bufferSink->transport = transport;
@@ -65,8 +67,17 @@ void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t v
     }
 
     std::unordered_set<std::string> streamKeys;
-    streamKeys.insert("a" + std::to_string(audioStreamID));
-    streamKeys.insert("v" + std::to_string(videoStreamID));
+    for (uint16_t audioStream : audioStreams)
+    {
+        streamKeys.insert("a" + std::to_string(audioStream));
+        ChipLogProgress(Camera, "  Registered audioStream=%u", audioStream);
+    }
+
+    for (uint16_t videoStream : videoStreams)
+    {
+        streamKeys.insert("v" + std::to_string(videoStream));
+        ChipLogProgress(Camera, "  Registered videoStream=%u", videoStream);
+    }
 
     mPreRollBuffer.RegisterTransportToBuffer(bufferSink, streamKeys);
     mSinkMap[transport] = bufferSink;
@@ -89,16 +100,16 @@ void DefaultMediaController::UnregisterTransport(Transport * transport)
     }
 }
 
-void DefaultMediaController::DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID)
+void DefaultMediaController::DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID, int64_t timestamp)
 {
     std::string streamKey = "v" + std::to_string(videoStreamID);
-    mPreRollBuffer.PushFrameToBuffer(streamKey, data, size);
+    mPreRollBuffer.PushFrameToBuffer(streamKey, data, size, timestamp);
 }
 
-void DefaultMediaController::DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID)
+void DefaultMediaController::DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID, int64_t timestamp)
 {
     std::string streamKey = "a" + std::to_string(audioStreamID);
-    mPreRollBuffer.PushFrameToBuffer(streamKey, data, size);
+    mPreRollBuffer.PushFrameToBuffer(streamKey, data, size, timestamp);
 }
 
 void DefaultMediaController::SetPreRollLength(Transport * transport, uint16_t preRollBufferLength)
@@ -121,9 +132,12 @@ Transport * DefaultMediaController::GetTransportForVideoStream(uint16_t videoStr
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
     for (const auto & conn : mConnections)
     {
-        if (conn.videoStreamID == videoStreamID)
+        for (uint16_t id : conn.videoStreams)
         {
-            return conn.transport;
+            if (id == videoStreamID)
+            {
+                return conn.transport;
+            }
         }
     }
     return nullptr;
@@ -134,9 +148,12 @@ Transport * DefaultMediaController::GetTransportForAudioStream(uint16_t audioStr
     std::lock_guard<std::mutex> lock(mConnectionsMutex);
     for (const auto & conn : mConnections)
     {
-        if (conn.audioStreamID == audioStreamID)
+        for (uint16_t id : conn.audioStreams)
         {
-            return conn.transport;
+            if (id == audioStreamID)
+            {
+                return conn.transport;
+            }
         }
     }
     return nullptr;

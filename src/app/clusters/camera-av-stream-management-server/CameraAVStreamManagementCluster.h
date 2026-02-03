@@ -331,18 +331,6 @@ public:
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
     /**
-     * @brief Called by transports when they start using the corresponding audio and video streams.
-     *
-     */
-    virtual CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
-
-    /**
-     * @brief Called by transports when they release the corresponding audio and video streams.
-     *
-     */
-    virtual CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) = 0;
-
-    /**
      * @brief Provides read-only access to the list of currently allocated video streams.
      * This allows other components (like PushAVStreamTransportManager) to query
      * allocated stream parameters (e.g., for bandwidth calculation) without directly
