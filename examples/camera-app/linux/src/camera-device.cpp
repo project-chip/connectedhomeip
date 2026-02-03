@@ -1636,10 +1636,13 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneId)
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
-    mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
-    mPushAVTransportManager.HandleZoneTrigger(zoneId);
+    for (const auto & zoneId : zoneIds)
+    {
+        mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
+    }
+    mPushAVTransportManager.HandleZoneTrigger(zoneIds);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
