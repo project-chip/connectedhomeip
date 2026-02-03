@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025- Project CHIP Authors
+#    Copyright (c) 2025-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values-tcp
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run2:
@@ -41,7 +41,7 @@
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --qr-code MT:-24J0KQS02-10648G00
-#       --PICS src/app/tests/suites/certification/ci-pics-values-tcp
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run3:
@@ -53,7 +53,7 @@
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --qr-code MT:-24J0KQS02-10648G00
-#       --PICS src/app/tests/suites/certification/ci-pics-values-tcp
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
