@@ -449,6 +449,10 @@ class Session(BaseModel):
     uploaded_manifests: list[Tuple[str, str]] = []
     complete: bool = False
 
+    # HLS-specific tracking attributes
+    hls_expected_track_count: Optional[int] = None
+    hls_completed_tracks: int = 0
+
 
 class Stream(BaseModel):
     # Configuration of the PushAv stream
@@ -703,10 +707,101 @@ class PushAvServer:
                 if stream.interface != SupportedIngestInterface.hls:
                     errors.append("Unsupported manifest object extension")
 
-                if session is None:
-                    session = stream.new_session()
+                # Parse the m3u8 content
+                body_str = body.decode('utf-8', errors='replace')
+                lines = body_str.split('\n')
 
-                # TODO Lifecycle validation for HLS manifests
+                # Check if this is a multi-variant playlist (session_name/index.m3u8)
+                # or a media playlist (session_name/track_name/index.m3u8)
+                multi_variant_path_regex = re.compile(r"^session_\d+/index$")
+                media_playlist_path_regex = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/index$")
+
+                is_multi_variant = multi_variant_path_regex.match(file_path)
+                is_media_playlist = media_playlist_path_regex.match(file_path)
+
+                if is_multi_variant:
+                    # Multi-variant playlist validation
+                    if session is None:
+                        session = stream.new_session()
+
+                    # Multi-variant playlist must be uploaded first
+                    if len(session.uploaded_segments) > 0:
+                        errors.append("Multi-variant playlist must be uploaded first, before any tracks")
+
+                    # Count tracks by counting EXT-X-MEDIA and EXT-X-STREAM-INF lines
+                    track_count = 0
+                    for line in lines:
+                        if line.startswith('#EXT-X-MEDIA') or line.startswith('#EXT-X-STREAM-INF'):
+                            track_count += 1
+
+                    if track_count == 0:
+                        errors.append("Multi-variant playlist must contain at least one EXT-X-MEDIA or EXT-X-STREAM-INF tag")
+
+                    # Store track count in session for later validation
+                    # We'll use a custom attribute to track this
+                    if not hasattr(session, 'hls_expected_track_count'):
+                        session.hls_expected_track_count = track_count
+                    elif session.hls_expected_track_count != track_count:
+                        errors.append(f"Multi-variant playlist track count mismatch: expected {session.hls_expected_track_count}, got {track_count}")
+
+                elif is_media_playlist:
+                    # Media playlist validation
+                    if session is None:
+                        errors.append("No active session when uploading media playlist")
+                        session = stream.new_session()
+
+                    # Validate track name
+                    # Todo this must either be audio/video/metadata
+                    track_name_in_path = is_media_playlist.group("trackName")
+                    track_name = stream.track_name
+                    if track_name and track_name != track_name_in_path:
+                        errors.append(
+                            "Track name mismatch: "
+                            f"{track_name_in_path} != {track_name}, "
+                            "must match TrackName provided in ContainerOptions"
+                        )
+
+                    # Check if this is initial or final media playlist
+                    has_ext_x_playlist_type = any(line.startswith('#EXT-X-PLAYLIST-TYPE') for line in lines)
+                    has_ext_x_endlist = any(line.startswith('#EXT-X-ENDLIST') for line in lines)
+                    has_extinf = any(line.startswith('#EXTINF') for line in lines)
+                    has_segment_lines = any(not line.startswith('#') and line.strip() != '' for line in lines)
+
+                    # Check if multi-variant playlist was uploaded first
+                    if not hasattr(session, 'hls_expected_track_count'):
+                        errors.append("Multi-variant playlist must be uploaded before media playlists")
+
+                    if has_ext_x_endlist:
+                        # Final media playlist
+                        if not has_ext_x_playlist_type:
+                            errors.append("Final media playlist must contain #EXT-X-PLAYLIST-TYPE:VOD")
+                        if 'VOD' not in body_str:
+                            errors.append("Final media playlist must have #EXT-X-PLAYLIST-TYPE:VOD")
+                        if not has_extinf:
+                            errors.append("Final media playlist must contain #EXTINF tags")
+                        if not has_segment_lines:
+                            errors.append("Final media playlist must contain segment lines")
+
+                        # Track completion
+                        if not hasattr(session, 'hls_completed_tracks'):
+                            session.hls_completed_tracks = 0
+                        session.hls_completed_tracks += 1
+
+                        # Check if all tracks are completed
+                        if session.hls_completed_tracks == session.hls_expected_track_count:
+                            session.complete = True
+                    else:
+                        # Initial media playlist
+                        if has_ext_x_playlist_type:
+                            errors.append("Initial media playlist must NOT contain #EXT-X-PLAYLIST-TYPE")
+                        if has_ext_x_endlist:
+                            errors.append("Initial media playlist must NOT contain #EXT-X-ENDLIST")
+                        if has_extinf:
+                            errors.append("Initial media playlist must NOT contain #EXTINF tags")
+                        if has_segment_lines:
+                            errors.append("Initial media playlist must NOT contain segment lines")
+                else:
+                    errors.append("HLS manifest must be uploaded as session_X/index.m3u8 (multi-variant) or session_X/track_name/index.m3u8 (media playlist)")
 
                 session.uploaded_manifests.append((file_path_with_ext, file_path_with_ext + ".crt"))
             elif ext == "m4s" or ext == "init":
@@ -715,11 +810,15 @@ class PushAvServer:
                 if session is not None:
                     session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
                 else:
-                    errors.append("No active session when uploading " + file_path_with_ext + ", segment uploaded before mpd")
+                    if stream.interface == SupportedIngestInterface.dash:
+                        errors.append("No active session when uploading " + file_path_with_ext + ", segment uploaded before mpd")
+                    elif stream.interface == SupportedIngestInterface.hls:
+                        errors.append("No active session when uploading " + file_path_with_ext + ", segment uploaded before multi-variant playlist")
 
                 # The Track's init segment is uploaded as `session_name/track_name/track_name.init`.
                 # Note that the extension is not part of the `file_path` variable.
                 #
+                # DASH:
                 # `/session_1/index.mpd` - Initial upload. Has `MPD@type="dynamic"`.
                 # `/session_1/video1/video1.init`
                 # `/session_1/audio1/audio1.init`
@@ -730,6 +829,19 @@ class PushAvServer:
                 # `/session_1/video1/segment_1003.m4s`
                 # `/session_1/audio1/segment_1003.m4s`
                 # `/session_1/index.mpd` - Final upload. Has `MPD@type="static"`.
+                #
+                # HLS:
+                # `/session_1/index.m3u8` - Multi-variant playlist
+                # `/session_1/video1/index.m3u8` - Initial media playlist
+                # `/session_1/audio1/index.m3u8` - Initial media playlist
+                # `/session_1/video1/video1.init`
+                # `/session_1/audio1/audio1.init`
+                # `/session_1/video1/segment_1001.m4s`
+                # `/session_1/audio1/segment_1001.m4s`
+                # `/session_1/video1/segment_1002.m4s`
+                # `/session_1/audio1/segment_1002.m4s`
+                # `/session_1/video1/index.m3u8` - Final media playlist with #EXT-X-ENDLIST
+                # `/session_1/audio1/index.m3u8` - Final media playlist with #EXT-X-ENDLIST
 
                 path_regex = r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$"
                 if ext == "init":
@@ -750,6 +862,19 @@ class PushAvServer:
                         errors.append("Track name mismatch: "
                                       f"{track_name_in_path} != {track_name}, "
                                       "must match TrackName provided in ContainerOptions")
+
+                    # HLS-specific validation for media segments
+                    if stream.interface == SupportedIngestInterface.hls and ext == "m4s":
+                        # Check for X-EXTINF-duration header as per HLS rules
+                        extinf_duration = req.headers.get('X-EXTINF-duration')
+                        if extinf_duration is None:
+                            errors.append("HLS media segments must include X-EXTINF-duration header")
+                        else:
+                            # Validate that the duration is a valid decimal floating-point value
+                            try:
+                                float(extinf_duration)
+                            except ValueError:
+                                errors.append(f"X-EXTINF-duration header must be a valid decimal floating-point value, got: {extinf_duration}")
             else:
                 errors.append(f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}")
 
