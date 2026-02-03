@@ -120,7 +120,7 @@ configure it to trust our running OTA provider and then trigger an announcement.
     ```
 
 2.  **Set ACL on Provider:** Write to the `ACL` attribute on the device's
-    "AccessControl" cluster in order to let the Device (DUT) to request the
+    "AccessControl" cluster in order to let the Device (DUT) request the
     Provider about available updates.
 
     -   **Chip-tool (controller) Node ID:** `${ADMIN_NODE_ID}`, defaults to
@@ -158,8 +158,6 @@ configure it to trust our running OTA provider and then trigger an announcement.
 -   **In the OTA Provider terminal**, you will see log output showing the device
     connecting and downloading the image. Key messages include:
 
-    -   `HandleQueryImage`
-    -   `HandleApplyUpdateRequest`
     -   Progress indicators for the image download (`[BDX] ...`).
 
 -   **On the device's console/log**, you will see it receiving the command,
