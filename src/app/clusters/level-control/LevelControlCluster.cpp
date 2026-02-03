@@ -795,6 +795,7 @@ void LevelControlCluster::StartTransition(uint32_t tickDurationMs, uint32_t tran
 {
     mTransitionTimeMs = transitionTimeMs;
     mTickDurationMs   = tickDurationMs;
+    mElapsedTimeMs    = 0;
 
     // Command invoked: Set RemainingTime using full reporting rules
     UpdateRemainingTime(mTransitionTimeMs, ReportingMode::kForceReport);
