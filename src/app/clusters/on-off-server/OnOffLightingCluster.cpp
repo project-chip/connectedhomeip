@@ -162,18 +162,18 @@ DataModel::ActionReturnStatus OnOffLightingCluster::ReadAttribute(const DataMode
 DataModel::ActionReturnStatus OnOffLightingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                    AttributeValueDecoder & decoder)
 {
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
-}
-
-DataModel::ActionReturnStatus OnOffLightingCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
-                                                              AttributeValueDecoder & decoder)
-{
     switch (request.path.mAttributeId)
     {
     case Attributes::OnTime::Id: {
         uint16_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOnTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+        if (abs(mOnTime - value) > mValueDeltaReportTrigger)
+        {
+            NotifyAttributeChanged(request.path.mAttributeId);
+        }
+
         mOnTime = value;
         UpdateTimer();
         return Status::Success;
@@ -182,13 +182,27 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteImpl(const DataModel::W
         uint16_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
         VerifyOrReturnValue(mOffWaitTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+        if (abs(mOffWaitTime - value) > mValueDeltaReportTrigger)
+        {
+            NotifyAttributeChanged(request.path.mAttributeId);
+        }
+
         mOffWaitTime = value;
         UpdateTimer();
         return Status::Success;
     }
     case Attributes::StartUpOnOff::Id: {
         AttributePersistence persistence(mContext->attributeStorage);
-        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mStartUpOnOff);
+        app::DataModel::ActionReturnStatus result =
+            persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mStartUpOnOff);
+        if (!result.IsSuccess())
+        {
+            return result;
+        }
+
+        NotifyAttributeChanged(request.path.mAttributeId);
+        return Status::Success;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
@@ -220,13 +234,27 @@ std::optional<DataModel::ActionReturnStatus> OnOffLightingCluster::InvokeCommand
 
 void OnOffLightingCluster::SetOnTime(uint16_t value)
 {
-    VerifyOrReturn(SetAttributeValue(mOnTime, value, Attributes::OnTime::Id));
+    VerifyOrReturn(mOnTime != value);
+
+    if (abs(mOnTime - value) > mValueDeltaReportTrigger)
+    {
+        NotifyAttributeChanged(Attributes::OnTime::Id);
+    }
+
+    mOnTime = value;
     UpdateTimer();
 }
 
 void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
 {
-    VerifyOrReturn(SetAttributeValue(mOffWaitTime, value, Attributes::OffWaitTime::Id));
+    VerifyOrReturn(mOffWaitTime != value);
+
+    if (abs(mOffWaitTime - value) > mValueDeltaReportTrigger)
+    {
+        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+    }
+
+    mOffWaitTime = value;
     UpdateTimer();
 }
 
@@ -288,10 +316,12 @@ void OnOffLightingCluster::TimerFired()
 
         // TIMED_ON state: we decrement OnTime  to see if we need to turn off
         mOnTime--;
-        NotifyAttributeChanged(Attributes::OnTime::Id);
 
         // If timer is not yet 0, update the timer and keep going. Otherwise move to off state.
         VerifyOrReturn(mOnTime == 0, UpdateTimer());
+
+        // Only notify is OnTime reaches 0
+        NotifyAttributeChanged(Attributes::OnTime::Id);
 
         // transition TIMED_ON to OFF - clear off wait time and turn off
         SetOffWaitTime(0);
@@ -302,7 +332,13 @@ void OnOffLightingCluster::TimerFired()
         VerifyOrReturn(mOffWaitTime > 0);
 
         mOffWaitTime--;
-        NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+
+        // Only notify is OffWaitTime reaches 0
+        if (mOffWaitTime == 0)
+        {
+            NotifyAttributeChanged(Attributes::OffWaitTime::Id);
+        }
+
         UpdateTimer();
     }
 }
