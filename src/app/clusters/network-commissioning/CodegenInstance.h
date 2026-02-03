@@ -45,9 +45,9 @@ public:
     /// Calls Shutdown on the cluster and unregisters the cluster from the CodegenDataModelProvider Registry
     void Shutdown();
 
-    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
-    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
-    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker) {}
+    Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker, mContext) {}
+    Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker, mContext) {}
+    Instance(EndpointId aEndpointId, EthernetDriver * apDelegate) : mCluster(aEndpointId, apDelegate, mTracker, mContext) {}
 
 private:
     // Does the tracking via the public general commissioning cluster (if available)
@@ -58,6 +58,11 @@ private:
     };
 
     CodegenGeneralCommissioningBreadcrumbTracker mTracker;
+    NetworkCommissioningCluster::Context mContext{
+        .failSafeContext    = chip::Server::GetInstance().GetFailSafeContext(),
+        .platformMgr        = chip::DeviceLayer::PlatformMgr(),
+        .deviceControlServer = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 };
 

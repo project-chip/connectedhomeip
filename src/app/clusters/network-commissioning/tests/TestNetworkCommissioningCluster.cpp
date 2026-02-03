@@ -19,6 +19,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server/Server.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -55,8 +56,14 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    NetworkCommissioningCluster::Context defaultContext{
+        .failSafeContext    = Server::GetInstance().GetFailSafeContext(),
+        .platformMgr        = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
 };
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
@@ -65,7 +72,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
 
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker, defaultContext);
 
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
@@ -94,7 +101,7 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
     NoopBreadcrumbTracker tracker;
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker, defaultContext);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

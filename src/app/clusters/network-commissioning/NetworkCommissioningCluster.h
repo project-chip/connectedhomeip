@@ -22,9 +22,11 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
+#include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/NetworkCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
+#include <include/platform/DeviceControlServer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -69,11 +71,18 @@ public:
     using WiFiDriver     = DeviceLayer::NetworkCommissioning::WiFiDriver;
     using EthernetDriver = DeviceLayer::NetworkCommissioning::EthernetDriver;
 
-    NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker);
+    struct Context
+    {
+        FailSafeContext & failSafeContext;
+        DeviceLayer::PlatformManager & platformMgr;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
+    };
 
-    NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, BreadCrumbTracker & tracker);
+    NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker, const Context & context);
 
-    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, BreadCrumbTracker & tracker);
+    NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, BreadCrumbTracker & tracker, const Context & context);
+
+    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, BreadCrumbTracker & tracker, const Context & context);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -231,6 +240,7 @@ private:
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
     BreadCrumbTracker & mBreadcrumbTracker;
+    Context mClusterContext;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
     void SetLastConnectErrorValue(NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);
