@@ -30,8 +30,6 @@ from typing import IO, Any
 
 # from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
-import os
-import sys
 import traceback
 
 # Debug: Print environment context when import fails
@@ -44,11 +42,11 @@ except ModuleNotFoundError:
     print(f"Current Working Directory: {os.getcwd()}")
     print(f"Python Path: {sys.path}")
     print(f"File Location: {__file__}")
-    print(f"Module Search Paths:")
+    print("Module Search Paths:")
     for path in sys.path:
         print(f" - {path}")
-    print(f"Module Resolution Attempted: chiptest.runner")
-    print(f"Error Traceback:")
+    print("Module Resolution Attempted: chiptest.runner")
+    print("Error Traceback:")
     traceback.print_exc()
     print("="*50 + "\n")
     raise  # Re-raise the original exception
@@ -59,11 +57,11 @@ print("="*50)
 print(f"Current Working Directory: {os.getcwd()}")
 print(f"Python Path: {sys.path}")
 print(f"File Location: {__file__}")
-print(f"Module Search Paths:")
+print("Module Search Paths:")
 for path in sys.path:
     print(f" - {path}")
-print(f"Module Resolution Attempted: chiptest.runner")
-print(f"Error Traceback:")
+print("Module Resolution Attempted: chiptest.runner")
+print("Error Traceback:")
 traceback.print_exc()
 print("="*50 + "\n")
 
