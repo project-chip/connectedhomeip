@@ -170,25 +170,22 @@ std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FailSafeContext & failSa
 } // namespace
 
 NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, const Context & context) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-    mEndpointId(endpointId), mFeatureFlags(WiFiFeatures(driver)), mpWirelessDriver(driver), mpBaseDriver(driver),
-    mClusterContext(context)
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId), mFeatureFlags(WiFiFeatures(driver)),
+    mpWirelessDriver(driver), mpBaseDriver(driver), mClusterContext(context)
 {
     mpDriver.Set<WiFiDriver *>(driver);
 }
 
 NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, const Context & context) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-    mEndpointId(endpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver),
-    mClusterContext(context)
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId),
+    mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver), mClusterContext(context)
 {
     mpDriver.Set<ThreadDriver *>(driver);
 }
 
 NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, const Context & context) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-    mEndpointId(endpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(driver),
-    mClusterContext(context)
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId),
+    mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(driver), mClusterContext(context)
 {}
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION

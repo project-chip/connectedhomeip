@@ -61,7 +61,7 @@ struct TestNetworkCommissioningClusterEthernet : public ::testing::Test
     inline static NetworkCommissioningCluster::Context defaultContext{
         .breadcrumbTracker   = tracker,
         .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
-        .platformManager         = DeviceLayer::PlatformMgr(),
+        .platformManager     = DeviceLayer::PlatformMgr(),
         .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
     };
 };
