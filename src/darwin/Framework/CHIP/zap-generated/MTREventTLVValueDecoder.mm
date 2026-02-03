@@ -2476,6 +2476,91 @@ static id _Nullable DecodeEventPayloadForGroupcastCluster(EventId aEventId, TLV:
 {
     using namespace Clusters::Groupcast;
     switch (aEventId) {
+    case Events::GroupcastTesting::Id: {
+        Events::GroupcastTesting::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRGroupcastClusterGroupcastTestingEvent new];
+
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.sourceIpAddress.HasValue()) {
+                memberValue = AsData(cppValue.sourceIpAddress.Value());
+            } else {
+                memberValue = nil;
+            }
+            value.sourceIpAddress = memberValue;
+        } while (0);
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.destinationIpAddress.HasValue()) {
+                memberValue = AsData(cppValue.destinationIpAddress.Value());
+            } else {
+                memberValue = nil;
+            }
+            value.destinationIpAddress = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.groupID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.groupID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.groupID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.endpointID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.endpointID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.endpointID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.clusterID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.clusterID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.clusterID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.elementID.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.elementID.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.elementID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.accessAllowed.HasValue()) {
+                memberValue = [NSNumber numberWithBool:cppValue.accessAllowed.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.accessAllowed = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.groupcastTestResult)];
+            value.groupcastTestResult = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         // Not a known Groupcast event.
         break;
