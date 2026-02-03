@@ -59,20 +59,21 @@ struct TestNetworkCommissioningCluster : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
-    NetworkCommissioningCluster::Context defaultContext{
+    inline static NoopBreadcrumbTracker tracker;
+    inline static NetworkCommissioningCluster::Context defaultContext{
+        .breadcrumbTracker   = tracker,
         .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
-        .platformManager         = DeviceLayer::PlatformMgr(),
+        .platformManager     = DeviceLayer::PlatformMgr(),
         .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
     };
 };
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
-    NoopBreadcrumbTracker tracker;
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
 
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker, defaultContext);
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
 
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
@@ -100,8 +101,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    NoopBreadcrumbTracker tracker;
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker, defaultContext);
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

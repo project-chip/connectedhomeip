@@ -169,29 +169,26 @@ std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FailSafeContext & failSa
     (void) 0
 } // namespace
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker,
-                                                         const Context & context) :
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, const Context & context) :
     DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
     mEndpointId(endpointId), mFeatureFlags(WiFiFeatures(driver)), mpWirelessDriver(driver), mpBaseDriver(driver),
-    mBreadcrumbTracker(tracker), mClusterContext(context)
+    mClusterContext(context)
 {
     mpDriver.Set<WiFiDriver *>(driver);
 }
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, BreadCrumbTracker & tracker,
-                                                         const Context & context) :
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, const Context & context) :
     DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
     mEndpointId(endpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver),
-    mBreadcrumbTracker(tracker), mClusterContext(context)
+    mClusterContext(context)
 {
     mpDriver.Set<ThreadDriver *>(driver);
 }
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver,
-                                                         BreadCrumbTracker & tracker, const Context & context) :
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, const Context & context) :
     DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
     mEndpointId(endpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(driver),
-    mBreadcrumbTracker(tracker), mClusterContext(context)
+    mClusterContext(context)
 {}
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -587,7 +584,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateThreadNetwork(CommandHandler & han
 void NetworkCommissioningCluster::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    mBreadcrumbTracker.SetBreadCrumb(breadcrumb.Value());
+    mClusterContext.breadcrumbTracker(breadcrumb.Value());
 }
 
 void NetworkCommissioningCluster::CommitSavedBreadcrumb()

@@ -73,17 +73,17 @@ public:
 
     struct Context
     {
+        BreadCrumbTracker & breadcrumbTracker;
         FailSafeContext & failSafeContext;
         DeviceLayer::PlatformManager & platformManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
     };
 
-    NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker, const Context & context);
+    NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, const Context & context);
 
-    NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, BreadCrumbTracker & tracker, const Context & context);
+    NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, const Context & context);
 
-    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, BreadCrumbTracker & tracker,
-                                const Context & context);
+    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, const Context & context);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -240,7 +240,6 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
-    BreadCrumbTracker & mBreadcrumbTracker;
     Context mClusterContext;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);

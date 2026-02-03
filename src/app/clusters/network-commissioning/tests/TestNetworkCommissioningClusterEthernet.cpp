@@ -57,7 +57,9 @@ struct TestNetworkCommissioningClusterEthernet : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
-    NetworkCommissioningCluster::Context defaultContext{
+    inline static NoopBreadcrumbTracker tracker;
+    inline static NetworkCommissioningCluster::Context defaultContext{
+        .breadcrumbTracker   = tracker,
         .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
         .platformManager         = DeviceLayer::PlatformMgr(),
         .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
@@ -66,10 +68,9 @@ struct TestNetworkCommissioningClusterEthernet : public ::testing::Test
 
 TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
 {
-    NoopBreadcrumbTracker tracker;
     Testing::FakeEthernetDriver fakeEthernetDriver;
     ByteSpan testInterfaceName(Uint8::from_const_char("eth0_test"), 9);
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeEthernetDriver, tracker, defaultContext);
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeEthernetDriver, defaultContext);
     chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
