@@ -423,6 +423,8 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
+    Access::AccessControl & GetAccessControl() { return mAccessControl; }
+
     CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
