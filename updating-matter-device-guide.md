@@ -86,7 +86,7 @@ Open a **new terminal** and start the OTA Provider application. It needs to be
 running to serve the OTA image file to the device when requested.
 
 -   The provider will be assigned its own Node ID on the fabric. By default, it
-    will use **Node ID ${PROVIDER_NODE_ID}**.
+    will use **Node ID \${PROVIDER_NODE_ID}**.
 -   You must provide the path to your `.ota` image file using the `-f` flag.
 
 ```bash
