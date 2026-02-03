@@ -42,6 +42,24 @@ struct TestIlluminanceMeasurementCluster : public ::testing::Test
     TestServerClusterContext testContext;
 };
 
+void TestMandatoryAttributes(ClusterTester & tester)
+{
+    uint16_t revision{};
+    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
+
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint16_t> measuredValue{};
+    ASSERT_EQ(tester.ReadAttribute(MeasuredValue::Id, measuredValue), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint16_t> minMeasuredValue{};
+    ASSERT_EQ(tester.ReadAttribute(MinMeasuredValue::Id, minMeasuredValue), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint16_t> maxMeasuredValue{};
+    ASSERT_EQ(tester.ReadAttribute(MaxMeasuredValue::Id, maxMeasuredValue), CHIP_NO_ERROR);
+}
+
 } // namespace
 
 TEST_F(TestIlluminanceMeasurementCluster, AttributeTest)
@@ -81,24 +99,6 @@ TEST_F(TestIlluminanceMeasurementCluster, AttributeTest)
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
-}
-
-void TestMandatoryAttributes(ClusterTester & tester)
-{
-    uint16_t revision{};
-    ASSERT_EQ(tester.ReadAttribute(ClusterRevision::Id, revision), CHIP_NO_ERROR);
-
-    uint32_t featureMap{};
-    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint16_t> measuredValue{};
-    ASSERT_EQ(tester.ReadAttribute(MeasuredValue::Id, measuredValue), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint16_t> minMeasuredValue{};
-    ASSERT_EQ(tester.ReadAttribute(MinMeasuredValue::Id, minMeasuredValue), CHIP_NO_ERROR);
-
-    DataModel::Nullable<uint16_t> maxMeasuredValue{};
-    ASSERT_EQ(tester.ReadAttribute(MaxMeasuredValue::Id, maxMeasuredValue), CHIP_NO_ERROR);
 }
 
 TEST_F(TestIlluminanceMeasurementCluster, ReadAttributeTest)
