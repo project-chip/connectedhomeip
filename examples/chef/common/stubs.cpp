@@ -114,11 +114,11 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = { .namespace
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = { .namespaceID = kNamespace, .tag = 0x02 };
 } // namespace NumberSemanticTag
 
-namespace GenericSwitch9866e35d0b { // Tag lists for rootnode_genericswitch_9866e35d0b app
+namespace GenericSwitch { // Tag lists for rootnode_genericswitch_9866e35d0b app
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { PostionSemanticTag::kBottom,
                                                                                NumberSemanticTag::kTwo };
-} // namespace GenericSwitch9866e35d0b
+} // namespace GenericSwitch
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"
@@ -564,17 +564,17 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
  * This initializer is for the generic switch application rootnode_genericswitch_9866e35d0b. To not have this initialiser affect
  * new generic switch chef app, use a different set of endpoints.
  */
-void GenericSwitch9866e35d0bInit()
+void GenericSwitchInit()
 {
     if (DeviceTypes::EndpointHasDeviceType(1, DeviceTypes::kGenericSwitchDeviceId))
     {
         TEMPORARY_RETURN_IGNORED SetTagList(
-            1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch9866e35d0b::kEp1TagList));
+            1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch::kEp1TagList));
     }
     if (DeviceTypes::EndpointHasDeviceType(2, DeviceTypes::kGenericSwitchDeviceId))
     {
         TEMPORARY_RETURN_IGNORED SetTagList(
-            2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch9866e35d0b::kEp2TagList));
+            2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch::kEp2TagList));
     }
 }
 
@@ -584,7 +584,7 @@ void ApplicationInit()
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
-    GenericSwitch9866e35d0bInit();
+    GenericSwitchInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
