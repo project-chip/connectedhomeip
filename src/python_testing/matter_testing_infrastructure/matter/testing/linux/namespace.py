@@ -26,11 +26,11 @@ import shlex
 import subprocess
 import sys
 import time
+import traceback
 from typing import IO, Any
 
 # from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 
-import traceback
 
 # Debug: Print environment context when import fails
 try:
