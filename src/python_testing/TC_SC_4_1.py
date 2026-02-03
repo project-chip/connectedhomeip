@@ -313,6 +313,7 @@ class TC_SC_4_1(MatterBaseTest):
 
         # TH performs a PTR record query against the short discriminator subtype
         # when the long discriminator is provided, as it can be derived from it.
+        # This is used to verify that the instance name is the same for both.
         # The inverse derivation isn't possible (e.g. short -> long)
         if is_long_discriminator:
             # Derive the short discriminator subtype from the long discriminator
