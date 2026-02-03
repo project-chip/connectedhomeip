@@ -139,12 +139,7 @@ protected:
     BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
     Context mDiagnosticsContext;
 
-    System::Clock::Microseconds64 TimeSinceNodeStartup() const
-    {
-        VerifyOrReturnValue(mContext != nullptr, System::Clock::Microseconds64(0));
-        return System::SystemClock().GetMonotonicMicroseconds64() -
-            mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
-    }
+    System::Clock::Milliseconds64 TimeSinceNodeStartup() const;
 
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() const { return mDiagnosticsContext.testEventTriggerDelegate; }
 };

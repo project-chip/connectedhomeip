@@ -131,15 +131,13 @@ DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTr
 
 std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                                 const Commands::TimeSnapshot::DecodableType & commandData,
-                                                                System::Clock::Microseconds64 timeSinceNodeStartup)
+                                                                System::Clock::Milliseconds64 timeSinceNodeStartup)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
     Commands::TimeSnapshotResponse::Type response;
 
-    System::Clock::Milliseconds64 system_time_ms = std::chrono::duration_cast<System::Clock::Milliseconds64>(timeSinceNodeStartup);
-
-    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    response.systemTimeMs = static_cast<uint64_t>(timeSinceNodeStartup.count());
     handler.AddResponse(commandPath, response);
     return std::nullopt;
 }
@@ -152,7 +150,7 @@ std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler &
 std::optional<DataModel::ActionReturnStatus>
 HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const Commands::TimeSnapshot::DecodableType & commandData,
-                                System::Clock::Microseconds64 timeSinceNodeStartup)
+                                System::Clock::Milliseconds64 timeSinceNodeStartup)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -167,9 +165,7 @@ HandleTimeSnapshotWithPosixTime(CommandHandler & handler, const ConcreteCommandP
         posix_time_ms = System::Clock::Milliseconds64{ 0 };
     }
 
-    System::Clock::Milliseconds64 system_time_ms = std::chrono::duration_cast<System::Clock::Milliseconds64>(timeSinceNodeStartup);
-
-    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    response.systemTimeMs = static_cast<uint64_t>(timeSinceNodeStartup.count());
     if (posix_time_ms.count() != 0)
     {
         response.posixTimeMs.SetNonNull(posix_time_ms.count());
@@ -462,6 +458,13 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     }
 
     return err;
+}
+
+System::Clock::Milliseconds64 GeneralDiagnosticsCluster::TimeSinceNodeStartup() const
+{
+    VerifyOrReturnValue(mContext != nullptr, System::Clock::Milliseconds64(0));
+    return System::SystemClock().GetMonotonicMilliseconds64() -
+        mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
 }
 
 std::optional<DataModel::ActionReturnStatus>
