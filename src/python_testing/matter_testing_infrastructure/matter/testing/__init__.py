@@ -1,7 +1,7 @@
-__all__ = []
+import contextlib
 
-try:
+__all__: list[str] = []
+
+with contextlib.suppress(ImportError)
     from . import linux
-except ImportError:
-    # linux module requires chiptest which may not be visible here
-    pass
+    __all__ += ["linux"]
