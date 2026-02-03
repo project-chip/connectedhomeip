@@ -318,6 +318,10 @@ def get_location_from_element(element: ElementTree.Element, cluster_id: Optional
             return AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
         if element.tag == 'event':
             return EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
+        if element.tag == 'cluster':
+            return ClusterPathLocation(endpoint_id=0, cluster_id=int(element.attrib['id'], 0))
+        if element.tag == 'deviceType':
+            return DeviceTypePathLocation(endpoint_id=0, device_type_id=int(element.attrib['id'], 0))
         return cluster_location
     except (KeyError, ValueError):
         # If we can't find the id or can't parse it
@@ -338,7 +342,7 @@ def get_conformance(element: ElementTree.Element, cluster_id: Optional[uint]) ->
 XmlElementDescriptor = tuple[ElementTree.Element, ElementTree.Element, Optional[ElementTree.Element]]
 
 
-def parse_revision_history(top_level: ElementTree.Element, location: ProblemLocation) -> tuple[dict[int, str], list[ProblemNotice]]:
+def parse_revision_history(top_level: ElementTree.Element) -> tuple[dict[int, str], list[ProblemNotice]]:
     revision_desc = {}
     problems = []
     history = top_level.find('revisionHistory')
@@ -348,7 +352,7 @@ def parse_revision_history(top_level: ElementTree.Element, location: ProblemLoca
                 rev = int(e.get('revision', 'error'), 0)
                 revision_desc[rev] = e.get('summary', '')
             except ValueError:
-                problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                problems.append(ProblemNotice(test_name='Spec XML parsing', location=get_location_from_element(top_level, None),
                                               severity=ProblemSeverity.WARNING,
                                               problem='Revision in revision history is missing or is not an int'))
     return revision_desc, problems
@@ -394,9 +398,7 @@ class ClusterParser:
         self.params = ConformanceParseParameters(feature_map=self.create_feature_map(), attribute_map=self.create_attribute_map(),
                                                  command_map=self.create_command_map())
 
-        location = ClusterPathLocation(
-            endpoint_id=0, cluster_id=self._cluster_id if self._cluster_id is not None else 0)
-        self._revision_desc, problems = parse_revision_history(cluster, location)
+        self._revision_desc, problems = parse_revision_history(cluster)
         self._problems.extend(problems)
 
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
@@ -1376,8 +1378,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
         if id in DEVICE_TYPE_NAME_FIXES:
             device_name = DEVICE_TYPE_NAME_FIXES[id]
 
-        location = DeviceTypePathLocation(device_type_id=id)
-        revision_desc, rev_problems = parse_revision_history(d, location)
+        revision_desc, rev_problems = parse_revision_history(d)
         problems.extend(rev_problems)
 
         try:
