@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import shlex
 
 import click
 
@@ -31,6 +32,13 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None,
         "-DBUILD_SHARED_LIBS=OFF",
     ]
 
+    # Default compilers
+    c_compiler = 'gcc'
+    cxx_compiler = 'g++'
+    if clang:
+        c_compiler = 'clang'
+        cxx_compiler = 'clang++'
+
     # Handle cross compilation
     if cross_compile_cpu_type:
         # Map GN cpu type to CMake processor
@@ -56,47 +64,37 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None,
 
         if target_cc and target_cxx:
             # Use explicit compilers from args.gn
-            cmake_cmd.extend(
-                [
-                    f"-DCMAKE_C_COMPILER={target_cc}",
-                    f"-DCMAKE_CXX_COMPILER={target_cxx}",
-                ]
-            )
+            c_compiler = target_cc
+            cxx_compiler = target_cxx
         elif cross_compile_cpu_type == "arm64":
-            # Fallback for arm64 clang cross compilation with sysroot
             sysroot = SysRootPath("SYSROOT_AARCH64")
-            cmake_cmd.extend(
-                [
-                    "-DCMAKE_C_COMPILER=clang" if clang else "-DCMAKE_C_COMPILER=gcc",
-                    "-DCMAKE_CXX_COMPILER=clang++" if clang else "-DCMAKE_CXX_COMPILER=g++",
-                    "-DCMAKE_C_COMPILER_TARGET=aarch64-linux-gnu",
-                    "-DCMAKE_CXX_COMPILER_TARGET=aarch64-linux-gnu",
-                    f"-DCMAKE_SYSROOT={sysroot}",
-                ]
-            )
-    else:
-        # Native compilation
-        if clang:
-            cmake_cmd.extend(
-                [
-                    "-DCMAKE_C_COMPILER=clang",
-                    "-DCMAKE_CXX_COMPILER=clang++",
-                ]
-            )
-        else:
-            cmake_cmd.extend(
-                [
-                    "-DCMAKE_C_COMPILER=gcc",
-                    "-DCMAKE_CXX_COMPILER=g++",
-                ]
-            )
+            cmake_cmd.append(f"-DCMAKE_SYSROOT={sysroot}")
 
-    print(f"Running: {' '.join(cmake_cmd)}")
+            if clang:
+                # These defines are not used by gcc
+                cmake_cmd.extend(
+                    [
+                        "-DCMAKE_C_COMPILER_TARGET=aarch64-linux-gnu",
+                        "-DCMAKE_CXX_COMPILER_TARGET=aarch64-linux-gnu",
+                    ]
+                )
+        else:
+            raise NotImplementedError(f"No sysroot and compiler targets defined for target_cpu '{cross_compile_cpu_type}'")
+
+    # Set compilers for CMake
+    cmake_cmd.extend(
+        [
+            f"-DCMAKE_C_COMPILER={c_compiler}",
+            f"-DCMAKE_CXX_COMPILER={cxx_compiler}",
+        ]
+    )
+
+    print(f"Running: {shlex.join(cmake_cmd)}")
     subprocess.run(cmake_cmd, cwd=repo_dir, check=True)
 
     # Build with Make
     make_cmd = ["make", "-j%d" % os.cpu_count()]
-    print(f"Running: {' '.join(make_cmd)}")
+    print(f"Running: {shlex.join(make_cmd)}")
     subprocess.run(make_cmd, cwd=build_dir, check=True)
 
     print("libdatachannel build complete.")
