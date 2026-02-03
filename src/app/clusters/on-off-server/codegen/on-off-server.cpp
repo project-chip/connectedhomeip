@@ -530,6 +530,7 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
     uint16_t currentOnTime                       = 0;
     app::MarkAttributeDirty markOnTimeDirty      = app::MarkAttributeDirty::kNo;
     app::MarkAttributeDirty markOffWaitTimeDirty = app::MarkAttributeDirty::kNo;
+    uint8_t valueDeltaReportTrigger              = 10;
 
     EmberEventControl * event = configureEventControl(endpoint);
     VerifyOrExit(event != nullptr, status = Status::UnsupportedEndpoint);
@@ -552,7 +553,7 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
         uint16_t newOffWaitTime = currentOffWaitTime < offWaitTime ? currentOffWaitTime : offWaitTime;
 
         // If the delta of the change is larger then 10 (1s) the change is reported
-        if (abs(newOffWaitTime - currentOffWaitTime) > 10)
+        if (abs(newOffWaitTime - currentOffWaitTime) > valueDeltaReportTrigger)
         {
             markOffWaitTimeDirty = app::MarkAttributeDirty::kYes;
         }
@@ -565,14 +566,14 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
         uint16_t newOnTime = currentOnTime > onTime ? currentOnTime : onTime;
 
         // If the delta of the change is larger then 10 (1s) the change is reported
-        if (abs(newOnTime - currentOnTime) > 10)
+        if (abs(newOnTime - currentOnTime) > valueDeltaReportTrigger)
         {
             markOnTimeDirty = app::MarkAttributeDirty::kYes;
         }
         OnOff::Attributes::OnTime::Set(endpoint, newOnTime, markOnTimeDirty);
 
         // If the delta of the change is larger then 10 (1s) the change is reported
-        if (abs(offWaitTime - currentOffWaitTime) > 10)
+        if (abs(offWaitTime - currentOffWaitTime) > valueDeltaReportTrigger)
         {
             markOffWaitTimeDirty = app::MarkAttributeDirty::kYes;
         }
