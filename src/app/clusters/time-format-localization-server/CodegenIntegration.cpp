@@ -75,7 +75,7 @@ public:
 
         gServer.Create(endpointId, featureMap, defaultHourFormat, defaultCalendarType,
                        TimeFormatLocalizationCluster::Context{
-                           .deviceInfoProvider = []() -> DeviceLayer::DeviceInfoProvider& {
+                           .deviceInfoProvider = []() -> DeviceLayer::DeviceInfoProvider & {
                                auto provider = DeviceLayer::GetDeviceInfoProvider();
                                VerifyOrDie(provider != nullptr);
                                return *provider;
