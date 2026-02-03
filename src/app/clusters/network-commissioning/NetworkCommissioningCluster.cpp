@@ -581,7 +581,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateThreadNetwork(CommandHandler & han
 void NetworkCommissioningCluster::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    mClusterContext.breadcrumbTracker(breadcrumb.Value());
+    mClusterContext.breadcrumbTracker.SetBreadCrumb(breadcrumb.Value());
 }
 
 void NetworkCommissioningCluster::CommitSavedBreadcrumb()
