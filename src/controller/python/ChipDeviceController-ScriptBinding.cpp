@@ -865,7 +865,7 @@ PyChipError pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequ
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     return ToPyChipError(devCtrl->ContinueCommissioningAfterConnectNetworkRequest(remoteDeviceId));
 #else
-    return ToPyChipError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    return ToPyChipError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
