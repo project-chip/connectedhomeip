@@ -16,15 +16,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_asserts import assert_is_string, assert_valid_uint8
+import matter.clusters as Clusters
+from mobly import asserts
 import logging
 
-from mobly import asserts
-
-import matter.clusters as Clusters
-from matter.testing.matter_asserts import assert_is_string, assert_valid_uint8
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
 log = logging.getLogger(__name__)
+
 
 
 class TC_AUDIOOUTPUT_7_5(MatterBaseTest):
