@@ -61,7 +61,7 @@ struct TestNetworkCommissioningCluster : public ::testing::Test
 
     NetworkCommissioningCluster::Context defaultContext{
         .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
-        .platformMgr         = DeviceLayer::PlatformMgr(),
+        .platformManager         = DeviceLayer::PlatformMgr(),
         .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
     };
 };

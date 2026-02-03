@@ -206,7 +206,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .persistentStorage      = Server::GetInstance().GetPersistentStorage(),          //
                 .failSafeContext        = Server::GetInstance().GetFailSafeContext(),            //
                 .platformManager        = DeviceLayer::PlatformMgr(),                            //
-                .groupDataProvider      = gGropupDataProvider,                                   //
+                .groupDataProvider      = gGroupDataProvider,                                    //
                 .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
                 .dnssdServer            = DnssdServer::Instance(),                               //
 
@@ -216,6 +216,9 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         },
         WifiRootNodeDevice::WifiContext{
             .wifiDriver = sWiFiDriver,
+            .platformManager = DeviceLayer::PlatformMgr(),
+            .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+            .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
         });
     err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)

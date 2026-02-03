@@ -61,7 +61,7 @@ private:
     CodegenGeneralCommissioningBreadcrumbTracker mTracker;
     NetworkCommissioningCluster::Context mContext{
         .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
-        .platformMgr         = DeviceLayer::PlatformMgr(),
+        .platformManager         = DeviceLayer::PlatformMgr(),
         .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
     };
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;

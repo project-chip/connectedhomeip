@@ -74,7 +74,7 @@ public:
     struct Context
     {
         FailSafeContext & failSafeContext;
-        DeviceLayer::PlatformManager & platformMgr;
+        DeviceLayer::PlatformManager & platformManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
     };
 

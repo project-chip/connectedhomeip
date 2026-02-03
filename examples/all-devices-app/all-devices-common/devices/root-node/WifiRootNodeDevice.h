@@ -30,6 +30,9 @@ public:
     struct WifiContext
     {
         DeviceLayer::NetworkCommissioning::WiFiDriver & wifiDriver;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::PlatformManager & platformManager;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
     };
 
     WifiRootNodeDevice(const Context & context, const WifiContext & wifiContext) :

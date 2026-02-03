@@ -200,7 +200,7 @@ NetworkCommissioningCluster::NetworkInstanceList NetworkCommissioningCluster::sI
 
 CHIP_ERROR NetworkCommissioningCluster::Init()
 {
-    ReturnErrorOnFailure(mClusterContext.platformMgr.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
