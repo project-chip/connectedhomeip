@@ -38,13 +38,14 @@ namespace Clusters {
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
-    class Delegate
+    // Define the Context struct with References
+    struct Context
     {
-    public:
-        virtual ~Delegate()                                                               = default;
-        virtual DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() = 0;
-        virtual DeviceLayer::ConfigurationManager & GetConfigurationManager()             = 0;
-        virtual DeviceLayer::PlatformManager & GetPlatformManager()                       = 0;
+        // Using pointer as we have seen converting to reference
+        // costs some flash (even though code would be more readable that way...)
+        DeviceLayer::DeviceInstanceInfoProvider * deviceInstanceInfoProvider;
+        DeviceLayer::ConfigurationManager & configurationManager;
+        DeviceLayer::PlatformManager & platformManager;
     };
 
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
@@ -62,9 +63,9 @@ public:
         BasicInformation::Attributes::UniqueID::Id //
         >;
 
-    BasicInformationCluster(OptionalAttributesSet optionalAttributeSet, Delegate * delegate) :
+    BasicInformationCluster(OptionalAttributesSet optionalAttributeSet, Context ctx) :
         DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }), mEnabledOptionalAttributes(optionalAttributeSet),
-        mDelegate(delegate)
+        mClusterContext(ctx)
     {
         mEnabledOptionalAttributes
             .Set<BasicInformation::Attributes::UniqueID::Id>(); // Unless told otherwise, unique id is mandatory
@@ -82,7 +83,18 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     // PlatformManagerDelegate
+    /**
+     * @brief Initialize the cluster
+     *
+     * This method attempts to register the cluster as the DeviceLayer::PlatformManagerDelegate
+     * to receive system shutdown events (OnShutDown).
+     * * NOTE: Registration is conditional. It will ONLY register this cluster as the delegate
+     * if the PlatformManager does not currently have a delegate set. If the application
+     * has already registered a delegate, this cluster will respect that configuration
+     * and will NOT overwrite it.
+     */
     void OnStartUp(uint32_t softwareVersion) override;
+
     void OnShutDown() override;
 
 private:
@@ -92,7 +104,7 @@ private:
     OptionalAttributesSet mEnabledOptionalAttributes;
 
     Storage::String<32> mNodeLabel;
-    Delegate * mDelegate;
+    Context mClusterContext;
 };
 
 } // namespace Clusters

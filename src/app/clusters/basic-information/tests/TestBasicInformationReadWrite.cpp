@@ -269,17 +269,6 @@ public:
 private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
 };
-
-class MockDelegate : public BasicInformationCluster::Delegate
-{
-public:
-    DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() override { return &mDeviceInfoProvider; }
-    DeviceLayer::ConfigurationManager & GetConfigurationManager() override { return mMockConfigurationManager; }
-    DeviceLayer::PlatformManager & GetPlatformManager() override { return chip::DeviceLayer::PlatformMgr(); }
-
-    MockConfigurationManager mMockConfigurationManager;
-    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
-};
 struct TestBasicInformationReadWrite : public ::testing::Test
 {
     static void SetUpTestSuite()
@@ -308,7 +297,14 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     TestBasicInformationReadWrite() {}
     chip::Testing::TestServerClusterContext testContext;
     static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup;
-    MockDelegate mDelegate;
+    // Context
+    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
+    MockConfigurationManager mMockConfigurationManager;
+    BasicInformationCluster::Context mContext = {
+        .deviceInstanceInfoProvider = &mDeviceInfoProvider,
+        .configurationManager       = mMockConfigurationManager,
+        .platformManager            = chip::DeviceLayer::PlatformMgr(),
+    };
 };
 
 DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDeviceInstanceInfoProviderBackup = nullptr;
@@ -316,7 +312,7 @@ DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDevice
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -371,7 +367,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 
     BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
     optionalAttributeSet.Set<Attributes::ManufacturingDate::Id>();
-    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
     chip::Testing::ClusterTester tester(cluster);
 
     // VendorName
@@ -445,10 +441,10 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
     {
         char buf[32];
         CharSpan val(buf);
-        mDelegate.mDeviceInfoProvider.SetManufacturingDateSuffix("ABCDEFGH");
+        mDeviceInfoProvider.SetManufacturingDateSuffix("ABCDEFGH");
         ASSERT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
         EXPECT_TRUE(val.data_equal("20230615ABCDEFGH"_span));
-        mDelegate.mDeviceInfoProvider.SetManufacturingDateSuffix(nullptr);
+        mDeviceInfoProvider.SetManufacturingDateSuffix(nullptr);
     }
 
     // UniqueID (Mandatory in Rev 4+, so if it fails, cluster rev must be < 4)
@@ -497,7 +493,7 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -519,7 +515,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
     const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -553,7 +549,7 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 
     BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
     optionalAttributeSet.Set<Attributes::LocalConfigDisabled::Id>();
-    BasicInformationCluster cluster(optionalAttributeSet, &mDelegate);
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 

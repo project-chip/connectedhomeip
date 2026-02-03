@@ -27,25 +27,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
-
-namespace {
-
-class RootNodeBasicInfoDelegate : public BasicInformationCluster::Delegate
-{
-public:
-    DeviceLayer::DeviceInstanceInfoProvider * GetDeviceInstanceInfoProvider() override
-    {
-        return DeviceLayer::GetDeviceInstanceInfoProvider();
-    }
-
-    DeviceLayer::ConfigurationManager & GetConfigurationManager() override { return DeviceLayer::ConfigurationMgr(); }
-
-    DeviceLayer::PlatformManager & GetPlatformManager() override { return DeviceLayer::PlatformMgr(); }
-};
-
-static RootNodeBasicInfoDelegate gBasicInfoDelegate;
-
-} // namespace
 namespace chip {
 namespace app {
 
@@ -65,19 +46,25 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
             .Set<BasicInformation::Attributes::Reachable::Id>();
 
-    mBasicInformationCluster.Create(optionalAttributeSet, &gBasicInfoDelegate);
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    VerifyOrDie(provider != nullptr);
+
+    mBasicInformationCluster.Create(optionalAttributeSet,
+                                    BasicInformationCluster::Context{ .deviceInstanceInfoProvider = *provider,
+                                                                      .configurationManager       = DeviceLayer::ConfigurationMgr(),
+                                                                      .platformManager            = DeviceLayer::PlatformMgr() });
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager   = mContext.configurationManager,       //
-                .deviceControlServer    = mContext.deviceControlServer,        //
-                .fabricTable            = mContext.fabricTable,                //
-                .failSafeContext        = mContext.failSafeContext,            //
-                .platformManager        = mContext.platformManager,            //
+            .configurationManager       = mContext.configurationManager,       //
+            .deviceControlServer        = mContext.deviceControlServer,        //
+            .fabricTable                = mContext.fabricTable,                //
+            .failSafeContext            = mContext.failSafeContext,            //
+            .platformManager            = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());

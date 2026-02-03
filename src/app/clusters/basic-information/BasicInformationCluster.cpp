@@ -296,10 +296,10 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
 {
     using namespace BasicInformation::Attributes;
 
-    auto * deviceInfoProvider = mDelegate->GetDeviceInstanceInfoProvider();
+    auto * deviceInfoProvider = mClusterContext.deviceInstanceInfoProvider;
     VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    auto & configManager = mDelegate->GetConfigurationManager();
+    auto & configManager = mClusterContext.configurationManager;
 
     switch (request.path.mAttributeId)
     {
@@ -394,7 +394,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         CharSpan location;
         ReturnErrorOnFailure(decoder.Decode(location));
         VerifyOrReturnError(location.size() == kExpectedFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
-        return mDelegate->GetConfigurationManager().StoreCountryCode(location.data(), location.size());
+        return mClusterContext.configurationManager.StoreCountryCode(location.data(), location.size());
     }
     case NodeLabel::Id: {
         CharSpan label;
@@ -403,8 +403,8 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel
         return persistence.StoreString(request.path, mNodeLabel);
     }
     case LocalConfigDisabled::Id: {
-        auto deviceInfoProvider  = mDelegate->GetDeviceInstanceInfoProvider();
-        bool localConfigDisabled = false;
+        auto * deviceInfoProvider = mClusterContext.deviceInstanceInfoProvider;
+        bool localConfigDisabled  = false;
         ReturnErrorOnFailure(deviceInfoProvider->GetLocalConfigDisabled(localConfigDisabled));
         auto decodeStatus = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, localConfigDisabled);
         ReturnErrorOnFailure(deviceInfoProvider->SetLocalConfigDisabled(localConfigDisabled));
@@ -443,9 +443,16 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (mDelegate->GetPlatformManager().GetDelegate() == nullptr)
+
+    // Register this cluster as the PlatformManager delegate to receive shutdown events.
+    //
+    // We only register if the PlatformManager does not currently have a delegate.
+    // This prevents the cluster from overwriting a delegate that may have been explicitly
+    // registered by the application logic. If a delegate is already present, this cluster
+    // will simply not intercept the shutdown signal via this mechanism.
+    if (mClusterContext.platformManager.GetDelegate() == nullptr)
     {
-        mDelegate->GetPlatformManager().SetDelegate(this);
+        mClusterContext.platformManager.SetDelegate(this);
     }
 
     AttributePersistence persistence(context.attributeStorage);
@@ -458,16 +465,22 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     bool localConfigDisabled = false;
     (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
                                                    localConfigDisabled, false);
-    ReturnErrorOnFailure(mDelegate->GetDeviceInstanceInfoProvider()->SetLocalConfigDisabled(localConfigDisabled));
+
+    if (mClusterContext.deviceInstanceInfoProvider != nullptr)
+    {
+        // Propagate the restored 'LocalConfigDisabled' state to the DeviceInstanceInfoProvider
+        // so the underlying platform layer is aware of the configuration.
+        ReturnErrorOnFailure(mClusterContext.deviceInstanceInfoProvider->SetLocalConfigDisabled(localConfigDisabled));
+    }
 
     return CHIP_NO_ERROR;
 }
 
 void BasicInformationCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    if (mDelegate->GetPlatformManager().GetDelegate() == this)
+    if (mClusterContext.platformManager.GetDelegate() == this)
     {
-        mDelegate->GetPlatformManager().SetDelegate(nullptr);
+        mClusterContext.platformManager.SetDelegate(nullptr);
     }
     DefaultServerCluster::Shutdown(shutdownType);
 }
