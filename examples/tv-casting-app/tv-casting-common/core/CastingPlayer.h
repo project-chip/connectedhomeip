@@ -148,7 +148,7 @@ public:
      * This bypasses additionals checks and processes around commissioning like setting up a
      * commissioning-window and instead can be used to directly talk to the CastingPlayer.
      *
-     * @param connectionCallbacks contains the ConnectCallback (Required) and CommissionerDeclarationCallback (Optional) defiend in
+     * @param connectionCallbacks contains the ConnectCallback (Required) and CommissionerDeclarationCallback (Optional) defined in
      * ConnectCallbacks.h.
      *
      * For example: During CastingPlayer/Commissioner-Generated passcode commissioning, the Commissioner replies with a

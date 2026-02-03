@@ -35,6 +35,11 @@ void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, Identificat
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(
+        connectionCallbacks.mOnConnectionComplete != nullptr,
+        ChipLogError(AppServer,
+                     "CastingPlayer::VerifyOrEstablishConnection() ConnectionCallbacks.mOnConnectionComplete was not provided"));
+
     mOnCompleted         = connectionCallbacks.mOnConnectionComplete;
     mTargetCastingPlayer = weak_from_this();
     mIdOptions           = idOptions;
@@ -55,6 +60,7 @@ void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, Identificat
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     SuccessOrExit(err = SendUserDirectedCommissioningRequest());
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // clear the UdcStatus to allow other UDC messages to be sent
     TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

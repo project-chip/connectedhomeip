@@ -1166,8 +1166,9 @@ The app detection workflow consists of four steps:
    message to the `CastingPlayer` with the `instanceName`, `NoPasscode` set to
    `true`, and `targetAppInfo` containing the app you want to check for.
 3. **Check the CommissionerDeclaration response**: The `CastingPlayer` will
-   respond with a CommissionerDeclaration message. If the `NoAppsFound` field is
-   `true`, the target app was not found on the `CastingPlayer`.
+   respond with a CommissionerDeclaration message with `NeedsPasscode` set to
+   `true` and `PasscodeDialogDisplayed` set to `false`. If the `NoAppsFound`
+   field is `true`, the target app was not found on the `CastingPlayer`.
 4. **Cancel the UDC session**: Send another IdentificationDeclaration message
    with the same `instanceName` and `CancelPasscode` set to `true` to
    immediately end the UDC session. This is important because the default Matter
