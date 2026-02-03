@@ -459,6 +459,7 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 {
     return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
 }
+
 void pychip_OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
 {
     return sTestCommissioner.OnCommissioningStageStart(nodeId, stage);
