@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChannelClusterProgramCastStruct(
-  val name: String,
-  val role: String
-) {
+class ChannelClusterProgramCastStruct(val name: String, val role: String) {
   override fun toString(): String = buildString {
     append("ChannelClusterProgramCastStruct {\n")
     append("\tname : $name\n")
@@ -52,7 +47,7 @@ class ChannelClusterProgramCastStruct(
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val role = tlvReader.getString(ContextSpecificTag(TAG_ROLE))
-      
+
       tlvReader.exitContainer()
 
       return ChannelClusterProgramCastStruct(name, role)

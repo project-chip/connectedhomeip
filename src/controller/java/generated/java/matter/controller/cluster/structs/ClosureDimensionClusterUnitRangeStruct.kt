@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ClosureDimensionClusterUnitRangeStruct(
-  val min: Short,
-  val max: Short
-) {
+class ClosureDimensionClusterUnitRangeStruct(val min: Short, val max: Short) {
   override fun toString(): String = buildString {
     append("ClosureDimensionClusterUnitRangeStruct {\n")
     append("\tmin : $min\n")
@@ -52,7 +47,7 @@ class ClosureDimensionClusterUnitRangeStruct(
       tlvReader.enterStructure(tlvTag)
       val min = tlvReader.getShort(ContextSpecificTag(TAG_MIN))
       val max = tlvReader.getShort(ContextSpecificTag(TAG_MAX))
-      
+
       tlvReader.exitContainer()
 
       return ClosureDimensionClusterUnitRangeStruct(min, max)

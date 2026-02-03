@@ -18,7 +18,6 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterActivePresetChangeEvent(
   val previousPresetHandle: Optional<ByteArray>?,
-  val currentPresetHandle: ByteArray?
+  val currentPresetHandle: ByteArray?,
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterActivePresetChangeEvent {\n")
@@ -40,9 +39,9 @@ class ThermostatClusterActivePresetChangeEvent(
       startStructure(tlvTag)
       if (previousPresetHandle != null) {
         if (previousPresetHandle.isPresent) {
-        val optpreviousPresetHandle = previousPresetHandle.get()
-        put(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE), optpreviousPresetHandle)
-      }
+          val optpreviousPresetHandle = previousPresetHandle.get()
+          put(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE), optpreviousPresetHandle)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))
       }
@@ -59,25 +58,27 @@ class ThermostatClusterActivePresetChangeEvent(
     private const val TAG_PREVIOUS_PRESET_HANDLE = 0
     private const val TAG_CURRENT_PRESET_HANDLE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterActivePresetChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterActivePresetChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousPresetHandle = if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))) {
-        Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE)))
-      } else {
-        Optional.empty()
-      }
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))
-        null
-      }
-      val currentPresetHandle = if (!tlvReader.isNull()) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
-        null
-      }
-      
+      val previousPresetHandle =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))) {
+            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_PREVIOUS_PRESET_HANDLE))
+          null
+        }
+      val currentPresetHandle =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_PRESET_HANDLE))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ThermostatClusterActivePresetChangeEvent(previousPresetHandle, currentPresetHandle)

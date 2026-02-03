@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -29,7 +27,7 @@ class GeneralDiagnosticsClusterDeviceLoadStruct(
   val currentSubscriptionsForFabric: UShort,
   val totalSubscriptionsEstablished: UInt,
   val totalInteractionModelMessagesSent: UInt,
-  val totalInteractionModelMessagesReceived: UInt
+  val totalInteractionModelMessagesReceived: UInt,
 ) {
   override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterDeviceLoadStruct {\n")
@@ -47,8 +45,14 @@ class GeneralDiagnosticsClusterDeviceLoadStruct(
       put(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS), currentSubscriptions)
       put(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS_FOR_FABRIC), currentSubscriptionsForFabric)
       put(ContextSpecificTag(TAG_TOTAL_SUBSCRIPTIONS_ESTABLISHED), totalSubscriptionsEstablished)
-      put(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT), totalInteractionModelMessagesSent)
-      put(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED), totalInteractionModelMessagesReceived)
+      put(
+        ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT),
+        totalInteractionModelMessagesSent,
+      )
+      put(
+        ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED),
+        totalInteractionModelMessagesReceived,
+      )
       endStructure()
     }
   }
@@ -63,14 +67,24 @@ class GeneralDiagnosticsClusterDeviceLoadStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterDeviceLoadStruct {
       tlvReader.enterStructure(tlvTag)
       val currentSubscriptions = tlvReader.getUShort(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS))
-      val currentSubscriptionsForFabric = tlvReader.getUShort(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS_FOR_FABRIC))
-      val totalSubscriptionsEstablished = tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_SUBSCRIPTIONS_ESTABLISHED))
-      val totalInteractionModelMessagesSent = tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT))
-      val totalInteractionModelMessagesReceived = tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED))
-      
+      val currentSubscriptionsForFabric =
+        tlvReader.getUShort(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS_FOR_FABRIC))
+      val totalSubscriptionsEstablished =
+        tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_SUBSCRIPTIONS_ESTABLISHED))
+      val totalInteractionModelMessagesSent =
+        tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT))
+      val totalInteractionModelMessagesReceived =
+        tlvReader.getUInt(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED))
+
       tlvReader.exitContainer()
 
-      return GeneralDiagnosticsClusterDeviceLoadStruct(currentSubscriptions, currentSubscriptionsForFabric, totalSubscriptionsEstablished, totalInteractionModelMessagesSent, totalInteractionModelMessagesReceived)
+      return GeneralDiagnosticsClusterDeviceLoadStruct(
+        currentSubscriptions,
+        currentSubscriptionsForFabric,
+        totalSubscriptionsEstablished,
+        totalInteractionModelMessagesSent,
+        totalInteractionModelMessagesReceived,
+      )
     }
   }
 }

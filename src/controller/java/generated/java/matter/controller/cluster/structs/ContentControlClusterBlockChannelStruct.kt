@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class ContentControlClusterBlockChannelStruct(
   val blockChannelIndex: UShort?,
   val majorNumber: UShort,
   val minorNumber: UShort,
-  val identifier: Optional<String>
+  val identifier: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("ContentControlClusterBlockChannelStruct {\n")
@@ -65,23 +64,30 @@ class ContentControlClusterBlockChannelStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterBlockChannelStruct {
       tlvReader.enterStructure(tlvTag)
-      val blockChannelIndex = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
-      null
-    }
+      val blockChannelIndex =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_BLOCK_CHANNEL_INDEX))
+          null
+        }
       val majorNumber = tlvReader.getUShort(ContextSpecificTag(TAG_MAJOR_NUMBER))
       val minorNumber = tlvReader.getUShort(ContextSpecificTag(TAG_MINOR_NUMBER))
-      val identifier = if (tlvReader.isNextTag(ContextSpecificTag(TAG_IDENTIFIER))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER)))
-    } else {
-      Optional.empty()
-    }
-      
+      val identifier =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_IDENTIFIER))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ContentControlClusterBlockChannelStruct(blockChannelIndex, majorNumber, minorNumber, identifier)
+      return ContentControlClusterBlockChannelStruct(
+        blockChannelIndex,
+        majorNumber,
+        minorNumber,
+        identifier,
+      )
     }
   }
 }

@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +28,7 @@ class ScenesManagementClusterSceneInfoStruct(
   val currentGroup: UShort,
   val sceneValid: Boolean,
   val remainingCapacity: UByte,
-  val fabricIndex: UByte
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ScenesManagementClusterSceneInfoStruct {\n")
@@ -72,10 +70,17 @@ class ScenesManagementClusterSceneInfoStruct(
       val sceneValid = tlvReader.getBoolean(ContextSpecificTag(TAG_SCENE_VALID))
       val remainingCapacity = tlvReader.getUByte(ContextSpecificTag(TAG_REMAINING_CAPACITY))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return ScenesManagementClusterSceneInfoStruct(sceneCount, currentScene, currentGroup, sceneValid, remainingCapacity, fabricIndex)
+      return ScenesManagementClusterSceneInfoStruct(
+        sceneCount,
+        currentScene,
+        currentGroup,
+        sceneValid,
+        remainingCapacity,
+        fabricIndex,
+      )
     }
   }
 }

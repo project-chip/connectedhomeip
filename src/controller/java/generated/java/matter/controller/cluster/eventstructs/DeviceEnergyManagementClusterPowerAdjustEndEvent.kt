@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class DeviceEnergyManagementClusterPowerAdjustEndEvent(
   val cause: UByte,
   val duration: UInt,
-  val energyUse: Long
+  val energyUse: Long,
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterPowerAdjustEndEvent {\n")
@@ -52,12 +50,15 @@ class DeviceEnergyManagementClusterPowerAdjustEndEvent(
     private const val TAG_DURATION = 1
     private const val TAG_ENERGY_USE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DeviceEnergyManagementClusterPowerAdjustEndEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): DeviceEnergyManagementClusterPowerAdjustEndEvent {
       tlvReader.enterStructure(tlvTag)
       val cause = tlvReader.getUByte(ContextSpecificTag(TAG_CAUSE))
       val duration = tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
       val energyUse = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_USE))
-      
+
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementClusterPowerAdjustEndEvent(cause, duration, energyUse)

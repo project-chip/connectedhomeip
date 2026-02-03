@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChannelClusterAdditionalInfoStruct(
-  val name: String,
-  val value: String
-) {
+class ChannelClusterAdditionalInfoStruct(val name: String, val value: String) {
   override fun toString(): String = buildString {
     append("ChannelClusterAdditionalInfoStruct {\n")
     append("\tname : $name\n")
@@ -52,7 +47,7 @@ class ChannelClusterAdditionalInfoStruct(
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return ChannelClusterAdditionalInfoStruct(name, value)

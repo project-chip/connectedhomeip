@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DoorLockClusterDoorStateChangeEvent(
-  val doorState: UByte
-) {
+class DoorLockClusterDoorStateChangeEvent(val doorState: UByte) {
   override fun toString(): String = buildString {
     append("DoorLockClusterDoorStateChangeEvent {\n")
     append("\tdoorState : $doorState\n")
@@ -44,10 +40,10 @@ class DoorLockClusterDoorStateChangeEvent(
   companion object {
     private const val TAG_DOOR_STATE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DoorLockClusterDoorStateChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterDoorStateChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val doorState = tlvReader.getUByte(ContextSpecificTag(TAG_DOOR_STATE))
-      
+
       tlvReader.exitContainer()
 
       return DoorLockClusterDoorStateChangeEvent(doorState)

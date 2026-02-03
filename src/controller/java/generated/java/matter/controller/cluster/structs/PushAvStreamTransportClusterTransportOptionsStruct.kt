@@ -35,7 +35,7 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
   val containerOptions: PushAvStreamTransportClusterContainerOptionsStruct,
   val expiryTime: Optional<UInt>,
   val videoStreams: Optional<List<PushAvStreamTransportClusterVideoStreamStruct>>,
-  val audioStreams: Optional<List<PushAvStreamTransportClusterAudioStreamStruct>>
+  val audioStreams: Optional<List<PushAvStreamTransportClusterAudioStreamStruct>>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportOptionsStruct {\n")
@@ -59,17 +59,17 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID != null) {
         if (videoStreamID.isPresent) {
-        val optvideoStreamID = videoStreamID.get()
-        put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), optvideoStreamID)
-      }
+          val optvideoStreamID = videoStreamID.get()
+          put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), optvideoStreamID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
       }
       if (audioStreamID != null) {
         if (audioStreamID.isPresent) {
-        val optaudioStreamID = audioStreamID.get()
-        put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), optaudioStreamID)
-      }
+          val optaudioStreamID = audioStreamID.get()
+          put(ContextSpecificTag(TAG_AUDIO_STREAM_ID), optaudioStreamID)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       }
@@ -85,18 +85,18 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
       if (videoStreams.isPresent) {
         val optvideoStreams = videoStreams.get()
         startArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-      for (item in optvideoStreams.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
+        for (item in optvideoStreams.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
       if (audioStreams.isPresent) {
         val optaudioStreams = audioStreams.get()
         startArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-      for (item in optaudioStreams.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
+        for (item in optaudioStreams.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
       endStructure()
     }
@@ -115,65 +115,97 @@ class PushAvStreamTransportClusterTransportOptionsStruct(
     private const val TAG_VIDEO_STREAMS = 9
     private const val TAG_AUDIO_STREAMS = 10
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterTransportOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
-      val videoStreamID = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-      null
-    }
-      val audioStreamID = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      null
-    }
+      val videoStreamID =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAM_ID))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+          null
+        }
+      val audioStreamID =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAM_ID))) {
+            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+          null
+        }
       val TLSEndpointID = tlvReader.getUShort(ContextSpecificTag(TAG_TLS_ENDPOINT_ID))
       val url = tlvReader.getString(ContextSpecificTag(TAG_URL))
-      val triggerOptions = PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(ContextSpecificTag(TAG_TRIGGER_OPTIONS), tlvReader)
+      val triggerOptions =
+        PushAvStreamTransportClusterTransportTriggerOptionsStruct.fromTlv(
+          ContextSpecificTag(TAG_TRIGGER_OPTIONS),
+          tlvReader,
+        )
       val ingestMethod = tlvReader.getUByte(ContextSpecificTag(TAG_INGEST_METHOD))
-      val containerOptions = PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(ContextSpecificTag(TAG_CONTAINER_OPTIONS), tlvReader)
-      val expiryTime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRY_TIME)))
-    } else {
-      Optional.empty()
-    }
-      val videoStreams = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAMS))) {
-      Optional.of(buildList<PushAvStreamTransportClusterVideoStreamStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(PushAvStreamTransportClusterVideoStreamStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val audioStreams = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAMS))) {
-      Optional.of(buildList<PushAvStreamTransportClusterAudioStreamStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(PushAvStreamTransportClusterAudioStreamStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      
+      val containerOptions =
+        PushAvStreamTransportClusterContainerOptionsStruct.fromTlv(
+          ContextSpecificTag(TAG_CONTAINER_OPTIONS),
+          tlvReader,
+        )
+      val expiryTime =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXPIRY_TIME))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRY_TIME)))
+        } else {
+          Optional.empty()
+        }
+      val videoStreams =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAMS))) {
+          Optional.of(
+            buildList<PushAvStreamTransportClusterVideoStreamStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
+              while (!tlvReader.isEndOfContainer()) {
+                add(PushAvStreamTransportClusterVideoStreamStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val audioStreams =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAMS))) {
+          Optional.of(
+            buildList<PushAvStreamTransportClusterAudioStreamStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
+              while (!tlvReader.isEndOfContainer()) {
+                add(PushAvStreamTransportClusterAudioStreamStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportOptionsStruct(streamUsage, videoStreamID, audioStreamID, TLSEndpointID, url, triggerOptions, ingestMethod, containerOptions, expiryTime, videoStreams, audioStreams)
+      return PushAvStreamTransportClusterTransportOptionsStruct(
+        streamUsage,
+        videoStreamID,
+        audioStreamID,
+        TLSEndpointID,
+        url,
+        triggerOptions,
+        ingestMethod,
+        containerOptions,
+        expiryTime,
+        videoStreams,
+        audioStreams,
+      )
     }
   }
 }

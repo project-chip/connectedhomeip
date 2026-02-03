@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +26,7 @@ class ContentControlClusterTimePeriodStruct(
   val startHour: UByte,
   val startMinute: UByte,
   val endHour: UByte,
-  val endMinute: UByte
+  val endMinute: UByte,
 ) {
   override fun toString(): String = buildString {
     append("ContentControlClusterTimePeriodStruct {\n")
@@ -62,7 +60,7 @@ class ContentControlClusterTimePeriodStruct(
       val startMinute = tlvReader.getUByte(ContextSpecificTag(TAG_START_MINUTE))
       val endHour = tlvReader.getUByte(ContextSpecificTag(TAG_END_HOUR))
       val endMinute = tlvReader.getUByte(ContextSpecificTag(TAG_END_MINUTE))
-      
+
       tlvReader.exitContainer()
 
       return ContentControlClusterTimePeriodStruct(startHour, startMinute, endHour, endMinute)

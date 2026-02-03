@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -24,9 +23,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class UnitTestingClusterDoubleNestedStructList(
-  val a: List<UnitTestingClusterNestedStructList>
-) {
+class UnitTestingClusterDoubleNestedStructList(val a: List<UnitTestingClusterNestedStructList>) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterDoubleNestedStructList {\n")
     append("\ta : $a\n")
@@ -50,14 +47,15 @@ class UnitTestingClusterDoubleNestedStructList(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterDoubleNestedStructList {
       tlvReader.enterStructure(tlvTag)
-      val a = buildList<UnitTestingClusterNestedStructList> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_A))
-      while(!tlvReader.isEndOfContainer()) {
-        add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val a =
+        buildList<UnitTestingClusterNestedStructList> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_A))
+          while (!tlvReader.isEndOfContainer()) {
+            add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return UnitTestingClusterDoubleNestedStructList(a)

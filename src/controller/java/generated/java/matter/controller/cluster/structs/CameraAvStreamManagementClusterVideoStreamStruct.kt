@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -37,7 +36,7 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
   val keyFrameInterval: UShort,
   val watermarkEnabled: Optional<Boolean>,
   val OSDEnabled: Optional<Boolean>,
-  val referenceCount: UByte
+  val referenceCount: UByte,
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoStreamStruct {\n")
@@ -98,33 +97,60 @@ class CameraAvStreamManagementClusterVideoStreamStruct(
     private const val TAG_OSD_ENABLED = 11
     private const val TAG_REFERENCE_COUNT = 12
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvStreamManagementClusterVideoStreamStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvStreamManagementClusterVideoStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoCodec = tlvReader.getUByte(ContextSpecificTag(TAG_VIDEO_CODEC))
       val minFrameRate = tlvReader.getUShort(ContextSpecificTag(TAG_MIN_FRAME_RATE))
       val maxFrameRate = tlvReader.getUShort(ContextSpecificTag(TAG_MAX_FRAME_RATE))
-      val minResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MIN_RESOLUTION), tlvReader)
-      val maxResolution = CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(ContextSpecificTag(TAG_MAX_RESOLUTION), tlvReader)
+      val minResolution =
+        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
+          ContextSpecificTag(TAG_MIN_RESOLUTION),
+          tlvReader,
+        )
+      val maxResolution =
+        CameraAvStreamManagementClusterVideoResolutionStruct.fromTlv(
+          ContextSpecificTag(TAG_MAX_RESOLUTION),
+          tlvReader,
+        )
       val minBitRate = tlvReader.getUInt(ContextSpecificTag(TAG_MIN_BIT_RATE))
       val maxBitRate = tlvReader.getUInt(ContextSpecificTag(TAG_MAX_BIT_RATE))
       val keyFrameInterval = tlvReader.getUShort(ContextSpecificTag(TAG_KEY_FRAME_INTERVAL))
-      val watermarkEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
-    } else {
-      Optional.empty()
-    }
-      val OSDEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_OSD_ENABLED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OSD_ENABLED)))
-    } else {
-      Optional.empty()
-    }
+      val watermarkEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_WATERMARK_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_WATERMARK_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+      val OSDEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OSD_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_OSD_ENABLED)))
+        } else {
+          Optional.empty()
+        }
       val referenceCount = tlvReader.getUByte(ContextSpecificTag(TAG_REFERENCE_COUNT))
-      
+
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterVideoStreamStruct(videoStreamID, streamUsage, videoCodec, minFrameRate, maxFrameRate, minResolution, maxResolution, minBitRate, maxBitRate, keyFrameInterval, watermarkEnabled, OSDEnabled, referenceCount)
+      return CameraAvStreamManagementClusterVideoStreamStruct(
+        videoStreamID,
+        streamUsage,
+        videoCodec,
+        minFrameRate,
+        maxFrameRate,
+        minResolution,
+        maxResolution,
+        minBitRate,
+        maxBitRate,
+        keyFrameInterval,
+        watermarkEnabled,
+        OSDEnabled,
+        referenceCount,
+      )
     }
   }
 }

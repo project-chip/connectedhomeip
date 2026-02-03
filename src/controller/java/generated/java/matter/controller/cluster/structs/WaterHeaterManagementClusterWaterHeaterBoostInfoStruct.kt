@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +29,7 @@ class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
   val emergencyBoost: Optional<Boolean>,
   val temporarySetpoint: Optional<Short>,
   val targetPercentage: Optional<UByte>,
-  val targetReheat: Optional<UByte>
+  val targetReheat: Optional<UByte>,
 ) {
   override fun toString(): String = buildString {
     append("WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {\n")
@@ -79,38 +78,53 @@ class WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
     private const val TAG_TARGET_PERCENTAGE = 4
     private const val TAG_TARGET_REHEAT = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WaterHeaterManagementClusterWaterHeaterBoostInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val duration = tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
-      val oneShot = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ONE_SHOT))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ONE_SHOT)))
-    } else {
-      Optional.empty()
-    }
-      val emergencyBoost = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EMERGENCY_BOOST))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_EMERGENCY_BOOST)))
-    } else {
-      Optional.empty()
-    }
-      val temporarySetpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPORARY_SETPOINT))) {
-      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_TEMPORARY_SETPOINT)))
-    } else {
-      Optional.empty()
-    }
-      val targetPercentage = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_PERCENTAGE))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_TARGET_PERCENTAGE)))
-    } else {
-      Optional.empty()
-    }
-      val targetReheat = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_REHEAT))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_TARGET_REHEAT)))
-    } else {
-      Optional.empty()
-    }
-      
+      val oneShot =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ONE_SHOT))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ONE_SHOT)))
+        } else {
+          Optional.empty()
+        }
+      val emergencyBoost =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EMERGENCY_BOOST))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_EMERGENCY_BOOST)))
+        } else {
+          Optional.empty()
+        }
+      val temporarySetpoint =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPORARY_SETPOINT))) {
+          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_TEMPORARY_SETPOINT)))
+        } else {
+          Optional.empty()
+        }
+      val targetPercentage =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_PERCENTAGE))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_TARGET_PERCENTAGE)))
+        } else {
+          Optional.empty()
+        }
+      val targetReheat =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_REHEAT))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_TARGET_REHEAT)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat)
+      return WaterHeaterManagementClusterWaterHeaterBoostInfoStruct(
+        duration,
+        oneShot,
+        emergencyBoost,
+        temporarySetpoint,
+        targetPercentage,
+        targetReheat,
+      )
     }
   }
 }

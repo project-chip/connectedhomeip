@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
   val price: Long,
   val source: UByte,
   val description: Optional<String>,
-  val tariffComponentID: Optional<UInt>
+  val tariffComponentID: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("CommodityPriceClusterCommodityPriceComponentStruct {\n")
@@ -62,24 +61,34 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
     private const val TAG_DESCRIPTION = 2
     private const val TAG_TARIFF_COMPONENT_ID = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterCommodityPriceComponentStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CommodityPriceClusterCommodityPriceComponentStruct {
       tlvReader.enterStructure(tlvTag)
       val price = tlvReader.getLong(ContextSpecificTag(TAG_PRICE))
       val source = tlvReader.getUByte(ContextSpecificTag(TAG_SOURCE))
-      val description = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))
-    } else {
-      Optional.empty()
-    }
-      val tariffComponentID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARIFF_COMPONENT_ID))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TARIFF_COMPONENT_ID)))
-    } else {
-      Optional.empty()
-    }
-      
+      val description =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))
+        } else {
+          Optional.empty()
+        }
+      val tariffComponentID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARIFF_COMPONENT_ID))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TARIFF_COMPONENT_ID)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return CommodityPriceClusterCommodityPriceComponentStruct(price, source, description, tariffComponentID)
+      return CommodityPriceClusterCommodityPriceComponentStruct(
+        price,
+        source,
+        description,
+        tariffComponentID,
+      )
     }
   }
 }

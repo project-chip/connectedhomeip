@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EcosystemInformationClusterDeviceTypeStruct(
-  val deviceType: UInt,
-  val revision: UShort
-) {
+class EcosystemInformationClusterDeviceTypeStruct(val deviceType: UInt, val revision: UShort) {
   override fun toString(): String = buildString {
     append("EcosystemInformationClusterDeviceTypeStruct {\n")
     append("\tdeviceType : $deviceType\n")
@@ -52,7 +47,7 @@ class EcosystemInformationClusterDeviceTypeStruct(
       tlvReader.enterStructure(tlvTag)
       val deviceType = tlvReader.getUInt(ContextSpecificTag(TAG_DEVICE_TYPE))
       val revision = tlvReader.getUShort(ContextSpecificTag(TAG_REVISION))
-      
+
       tlvReader.exitContainer()
 
       return EcosystemInformationClusterDeviceTypeStruct(deviceType, revision)

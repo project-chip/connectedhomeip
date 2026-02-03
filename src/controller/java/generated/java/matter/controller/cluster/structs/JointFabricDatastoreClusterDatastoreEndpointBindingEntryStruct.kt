@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -29,7 +27,7 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
   val endpointID: UShort,
   val listID: UShort,
   val binding: JointFabricDatastoreClusterDatastoreBindingTargetStruct,
-  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct
+  val statusEntry: JointFabricDatastoreClusterDatastoreStatusEntryStruct,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {\n")
@@ -60,17 +58,34 @@ class JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
     private const val TAG_BINDING = 3
     private const val TAG_STATUS_ENTRY = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val endpointID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_ID))
       val listID = tlvReader.getUShort(ContextSpecificTag(TAG_LIST_ID))
-      val binding = JointFabricDatastoreClusterDatastoreBindingTargetStruct.fromTlv(ContextSpecificTag(TAG_BINDING), tlvReader)
-      val statusEntry = JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(ContextSpecificTag(TAG_STATUS_ENTRY), tlvReader)
-      
+      val binding =
+        JointFabricDatastoreClusterDatastoreBindingTargetStruct.fromTlv(
+          ContextSpecificTag(TAG_BINDING),
+          tlvReader,
+        )
+      val statusEntry =
+        JointFabricDatastoreClusterDatastoreStatusEntryStruct.fromTlv(
+          ContextSpecificTag(TAG_STATUS_ENTRY),
+          tlvReader,
+        )
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(nodeID, endpointID, listID, binding, statusEntry)
+      return JointFabricDatastoreClusterDatastoreEndpointBindingEntryStruct(
+        nodeID,
+        endpointID,
+        listID,
+        binding,
+        statusEntry,
+      )
     }
   }
 }

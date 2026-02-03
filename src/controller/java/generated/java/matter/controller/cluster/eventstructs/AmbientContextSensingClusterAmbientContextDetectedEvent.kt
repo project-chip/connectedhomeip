@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -25,7 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AmbientContextSensingClusterAmbientContextDetectedEvent(
-  val ambientContextType: List<matter.controller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct>
+  val ambientContextType:
+    List<matter.controller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct>
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextDetectedEvent {\n")
@@ -48,16 +48,25 @@ class AmbientContextSensingClusterAmbientContextDetectedEvent(
   companion object {
     private const val TAG_AMBIENT_CONTEXT_TYPE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AmbientContextSensingClusterAmbientContextDetectedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AmbientContextSensingClusterAmbientContextDetectedEvent {
       tlvReader.enterStructure(tlvTag)
-      val ambientContextType = buildList <matter.controller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(matter.controller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct.fromTlv(AnonymousTag, tlvReader))
+      val ambientContextType =
+        buildList<
+          matter.controller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct
+        > {
+          tlvReader.enterArray(ContextSpecificTag(TAG_AMBIENT_CONTEXT_TYPE))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(
+              matter.controller.cluster.structs.AmbientContextSensingClusterAmbientContextTypeStruct
+                .fromTlv(AnonymousTag, tlvReader)
+            )
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
-      }
-      
+
       tlvReader.exitContainer()
 
       return AmbientContextSensingClusterAmbientContextDetectedEvent(ambientContextType)
