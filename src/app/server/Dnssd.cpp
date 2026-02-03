@@ -174,6 +174,15 @@ void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 }
 #endif
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+template <class AdvertisingParams>
+void DnssdServer::AddTCPKeyToAdvertisement(AdvertisingParams & advParams)
+{
+    advParams.SetTCPSupportModes(mTCPServerEnabled ? chip::Dnssd::TCPModeAdvertise::kTCPClientServer
+                                                   : chip::Dnssd::TCPModeAdvertise::kTCPClient);
+}
+#endif
+
 void DnssdServer::GetPrimaryOrFallbackMACAddress(MutableByteSpan & mac)
 {
     if (ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
@@ -218,8 +227,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 #endif
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        advertiseParameters.SetTCPSupportModes(mTCPServerEnabled ? chip::Dnssd::TCPModeAdvertise::kTCPClientServer
-                                                                 : chip::Dnssd::TCPModeAdvertise::kTCPClient);
+        AddTCPKeyToAdvertisement(advertiseParameters);
 #endif
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
@@ -303,6 +311,10 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     AddICDKeyToAdvertisement(advertiseParameters);
+#endif
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    AddTCPKeyToAdvertisement(advertiseParameters);
 #endif
 
     if (commissionableNode)
