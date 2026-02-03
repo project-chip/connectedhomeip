@@ -29,7 +29,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server/Server.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
 #include <clusters/NetworkCommissioning/Commands.h>
@@ -46,8 +45,6 @@
 #include <optional>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/DeviceControlServer.h>
-#include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
