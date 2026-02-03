@@ -294,39 +294,44 @@ class TC_SC_4_1(MatterBaseTest):
 
         return None
 
-    async def _verify_discriminator_subtype_advertisements(self, subtypes: list[str], discriminator_subtype: str, discriminator_ptr_instance_name: str) -> None:
+    async def _verify_discriminator_subtype_advertisements(self, subtypes: list[str], discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool) -> None:
         # Determine discriminator type (Long or Short) to verify
-        is_qr_code = self.setup_code_type == SetupCodeType.QR_CODE
-        size_txt = "Long" if is_qr_code else "Short"
-        discriminator_prefix = '_L' if is_qr_code else '_S'
+        size_txt = "Long" if is_long_discriminator else "Short"
         assert_valid_discriminator_subtype = (
-            assert_valid_long_discriminator_subtype if is_qr_code else assert_valid_short_discriminator_subtype
+            assert_valid_long_discriminator_subtype if is_long_discriminator else assert_valid_short_discriminator_subtype
         )
 
         # Verify that the Discriminator subtype is present
-        discriminator_subtypes_list = [s for s in subtypes if s.startswith(discriminator_prefix)]
-        asserts.assert_in(discriminator_subtype, discriminator_subtypes_list,
-                          f"'{size_txt} Discriminator Subtype' must be present.")
+        asserts.assert_in(discriminator_subtype, subtypes, f"'{size_txt} Discriminator Subtype' must be present.")
 
         # Verify that it contains a valid 12-bit (Long) or 4 bit (Short) variable
         # length decimal number in ASCII text, omitting any leading zeros value
         assert_valid_discriminator_subtype(discriminator_subtype)
 
-        # TH performs a PTR record query against the Discriminator subtype (Long or Short)
-        ptr_records = await MdnsDiscovery().get_ptr_records(
-            service_types=[discriminator_subtype],
-            log_output=True
-        )
+        # TH performs a PTR record query against the short discriminator subtype
+        # when the long discriminator is provided, as it can be derived from it.
+        # The inverse derivation isn't possible (e.g. short -> long)
+        if is_long_discriminator:
+            # Derive the short discriminator subtype from the long discriminator
+            short_discriminator = (int(discriminator) >> 8) & 0x0F
+            short_discriminator_prefix = '_S'
+            short_discriminator_subtype = f"{short_discriminator_prefix}{short_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
-        # Verify that there is one, and only one, Discriminator subtype PTR record
-        asserts.assert_equal(len(ptr_records), 1, f"There must only be one '{size_txt} Discriminator Subtype' PTR record.")
-        other_discriminator_ptr = ptr_records[0]
+            # Performs PTR record query
+            ptr_records = await MdnsDiscovery().get_ptr_records(
+                service_types=[short_discriminator_subtype],
+                log_output=True
+            )
 
-        # Verify that the Short and Long Discriminator Subtype PTR record's instance names are equal
-        asserts.assert_equal(other_discriminator_ptr.instance_name, discriminator_ptr_instance_name,
-                             "Short and Long Discriminator Subtype PTR record's instance names must be equal.")
+            # Verify that there is one, and only one, Short Discriminator subtype PTR record
+            asserts.assert_equal(len(ptr_records), 1, "There must only be one 'Short Discriminator Subtype' PTR record.")
+            short_discriminator_ptr = ptr_records[0]
 
-    async def _verify_commissionable_subtypes(self, discriminator_subtype: str, discriminator_ptr_instance_name: str, extended_discovery: bool = False) -> None:
+            # Verify that the Short and Long Discriminator Subtype PTR record's instance names are equal
+            asserts.assert_equal(short_discriminator_ptr.instance_name, discriminator_ptr_instance_name,
+                                 "Short and Long Discriminator Subtype PTR record's instance names must be equal.")
+
+    async def _verify_commissionable_subtypes(self, discriminator: str, discriminator_subtype: str, discriminator_ptr_instance_name: str, is_long_discriminator: bool, extended_discovery: bool = False) -> None:
         # Construct CM subtype
         cm_subtype = f"_CM._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
@@ -334,7 +339,7 @@ class TC_SC_4_1(MatterBaseTest):
         subtypes = await MdnsDiscovery().get_commissionable_subtypes(log_output=True)
 
         # *** LONG/SHORT DISCRIMINATOR SUBTYPE ***
-        await self._verify_discriminator_subtype_advertisements(subtypes, discriminator_subtype, discriminator_ptr_instance_name)
+        await self._verify_discriminator_subtype_advertisements(subtypes, discriminator, discriminator_subtype, discriminator_ptr_instance_name, is_long_discriminator)
 
         # *** IN COMMISSIONING MODE SUBTYPE ***
         # Verify the expected presence of the 'In Commissioning Mode Subtype' _CM
@@ -699,7 +704,6 @@ class TC_SC_4_1(MatterBaseTest):
         self.supports_icd = False
         self.supports_lit = False
         self.setup_code_type = None
-        long_discriminator = None
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
 
         # *** STEP 1 ***
@@ -743,6 +747,7 @@ class TC_SC_4_1(MatterBaseTest):
             self.setup_code_type = SetupCodeType.QR_CODE
         else:
             self.setup_code_type = SetupCodeType.NONE_SUPLIED
+        is_long_discriminator = self.setup_code_type == SetupCodeType.QR_CODE
 
         # *** STEP 6 ***
         # Check if the Open Basic Commissioning Window command is supported
@@ -768,7 +773,7 @@ class TC_SC_4_1(MatterBaseTest):
             # TH gets the discriminator from the DUT and constructs the Discriminator
             # subtype (Long or Short)based on the setup code type (QR or Manual)
             self.step(8)
-            discriminator_subtype, _ = self.get_discriminator_subtype(is_obcw=True)
+            discriminator_subtype, discriminator = self.get_discriminator_subtype(is_obcw=True)
 
             # *** STEP 9 ***
             # Get the Discriminator Subtype (Long or Short) PTR record's instance name
@@ -778,7 +783,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 10 ***
             # Verify commissionable subtype advertisements
             self.step(10)
-            await self._verify_commissionable_subtypes(discriminator_subtype, discriminator_ptr_instance_name)
+            await self._verify_commissionable_subtypes(discriminator, discriminator_subtype, discriminator_ptr_instance_name, is_long_discriminator)
 
             # *** STEP 11 ***
             # Verify SRV record advertisements
@@ -827,7 +832,7 @@ class TC_SC_4_1(MatterBaseTest):
         # *** STEP 18 ***
         # Verify commissionable subtype advertisements
         self.step(18)
-        await self._verify_commissionable_subtypes(long_discriminator_subtype, long_discriminator_ptr_instance_name)
+        await self._verify_commissionable_subtypes(long_discriminator, long_discriminator_subtype, long_discriminator_ptr_instance_name, is_long_discriminator=True)
 
         # *** STEP 19 ***
         # Verify SRV record advertisements
@@ -863,7 +868,7 @@ class TC_SC_4_1(MatterBaseTest):
             # *** STEP 24 ***
             # Verify commissionable subtype advertisements
             self.step(24)
-            await self._verify_commissionable_subtypes(long_discriminator_subtype, long_discriminator_ptr_instance_name, extended_discovery_mode)
+            await self._verify_commissionable_subtypes(long_discriminator, long_discriminator_subtype, long_discriminator_ptr_instance_name, is_long_discriminator=True, extended_discovery=extended_discovery_mode)
 
             # *** STEP 25 ***
             # Verify SRV record advertisements
