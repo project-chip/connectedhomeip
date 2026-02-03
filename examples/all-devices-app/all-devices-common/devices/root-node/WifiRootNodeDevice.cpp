@@ -36,9 +36,9 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
 
     mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver, mGeneralCommissioningCluster.Cluster(),
                                         NetworkCommissioningCluster::Context{
-                                            .failSafeContext     = mWifiContext.failSafeContext,
-                                            .platformManager         = mWifiContext.platformManager,
-                                            .deviceControlServer = mWifiContext.deviceControlServer,
+                                            .failSafeContext     = mContext.failSafeContext,
+                                            .platformManager     = mContext.platformManager,
+                                            .deviceControlServer = mContext.deviceControlServer,
                                         });
     ReturnErrorOnFailure(mNetworkCommissioningCluster.Cluster().Init());
     ReturnErrorOnFailure(provider.AddCluster(mNetworkCommissioningCluster.Registration()));

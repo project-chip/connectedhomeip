@@ -216,9 +216,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         },
         WifiRootNodeDevice::WifiContext{
             .wifiDriver = sWiFiDriver,
-            .platformManager = DeviceLayer::PlatformMgr(),
-            .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-            .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
         });
     err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
