@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -29,7 +30,7 @@ class BasicInformationClusterCapabilityMinimaStruct(
   val simultaneousInvocationsSupported: Optional<UShort>,
   val simultaneousWritesSupported: Optional<UShort>,
   val readPathsSupported: Optional<UShort>,
-  val subscribePathsSupported: Optional<UShort>,
+  val subscribePathsSupported: Optional<UShort>
 ) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterCapabilityMinimaStruct {\n")
@@ -49,10 +50,7 @@ class BasicInformationClusterCapabilityMinimaStruct(
       put(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC), subscriptionsPerFabric)
       if (simultaneousInvocationsSupported.isPresent) {
         val optsimultaneousInvocationsSupported = simultaneousInvocationsSupported.get()
-        put(
-          ContextSpecificTag(TAG_SIMULTANEOUS_INVOCATIONS_SUPPORTED),
-          optsimultaneousInvocationsSupported,
-        )
+        put(ContextSpecificTag(TAG_SIMULTANEOUS_INVOCATIONS_SUPPORTED), optsimultaneousInvocationsSupported)
       }
       if (simultaneousWritesSupported.isPresent) {
         val optsimultaneousWritesSupported = simultaneousWritesSupported.get()
@@ -80,47 +78,32 @@ class BasicInformationClusterCapabilityMinimaStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterCapabilityMinimaStruct {
       tlvReader.enterStructure(tlvTag)
-      val caseSessionsPerFabric =
-        tlvReader.getUShort(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
-      val subscriptionsPerFabric =
-        tlvReader.getUShort(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
-      val simultaneousInvocationsSupported =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SIMULTANEOUS_INVOCATIONS_SUPPORTED))) {
-          Optional.of(
-            tlvReader.getUShort(ContextSpecificTag(TAG_SIMULTANEOUS_INVOCATIONS_SUPPORTED))
-          )
-        } else {
-          Optional.empty()
-        }
-      val simultaneousWritesSupported =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SIMULTANEOUS_WRITES_SUPPORTED))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_SIMULTANEOUS_WRITES_SUPPORTED)))
-        } else {
-          Optional.empty()
-        }
-      val readPathsSupported =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_READ_PATHS_SUPPORTED))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_READ_PATHS_SUPPORTED)))
-        } else {
-          Optional.empty()
-        }
-      val subscribePathsSupported =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUBSCRIBE_PATHS_SUPPORTED))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_SUBSCRIBE_PATHS_SUPPORTED)))
-        } else {
-          Optional.empty()
-        }
-
+      val caseSessionsPerFabric = tlvReader.getUShort(ContextSpecificTag(TAG_CASE_SESSIONS_PER_FABRIC))
+      val subscriptionsPerFabric = tlvReader.getUShort(ContextSpecificTag(TAG_SUBSCRIPTIONS_PER_FABRIC))
+      val simultaneousInvocationsSupported = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SIMULTANEOUS_INVOCATIONS_SUPPORTED))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_SIMULTANEOUS_INVOCATIONS_SUPPORTED)))
+    } else {
+      Optional.empty()
+    }
+      val simultaneousWritesSupported = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SIMULTANEOUS_WRITES_SUPPORTED))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_SIMULTANEOUS_WRITES_SUPPORTED)))
+    } else {
+      Optional.empty()
+    }
+      val readPathsSupported = if (tlvReader.isNextTag(ContextSpecificTag(TAG_READ_PATHS_SUPPORTED))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_READ_PATHS_SUPPORTED)))
+    } else {
+      Optional.empty()
+    }
+      val subscribePathsSupported = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUBSCRIBE_PATHS_SUPPORTED))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_SUBSCRIBE_PATHS_SUPPORTED)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return BasicInformationClusterCapabilityMinimaStruct(
-        caseSessionsPerFabric,
-        subscriptionsPerFabric,
-        simultaneousInvocationsSupported,
-        simultaneousWritesSupported,
-        readPathsSupported,
-        subscribePathsSupported,
-      )
+      return BasicInformationClusterCapabilityMinimaStruct(caseSessionsPerFabric, subscriptionsPerFabric, simultaneousInvocationsSupported, simultaneousWritesSupported, readPathsSupported, subscribePathsSupported)
     }
   }
 }

@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CommodityTariffClusterPeakPeriodStruct(val severity: UByte, val peakPeriod: UShort) {
+class CommodityTariffClusterPeakPeriodStruct(
+  val severity: UByte,
+  val peakPeriod: UShort
+) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterPeakPeriodStruct {\n")
     append("\tseverity : $severity\n")
@@ -47,7 +52,7 @@ class CommodityTariffClusterPeakPeriodStruct(val severity: UByte, val peakPeriod
       tlvReader.enterStructure(tlvTag)
       val severity = tlvReader.getUByte(ContextSpecificTag(TAG_SEVERITY))
       val peakPeriod = tlvReader.getUShort(ContextSpecificTag(TAG_PEAK_PERIOD))
-
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterPeakPeriodStruct(severity, peakPeriod)

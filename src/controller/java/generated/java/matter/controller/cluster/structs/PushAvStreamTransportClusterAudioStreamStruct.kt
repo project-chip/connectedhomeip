@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterAudioStreamStruct(
   val audioStreamName: String,
-  val audioStreamID: UShort,
+  val audioStreamID: UShort
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterAudioStreamStruct {\n")
@@ -50,7 +52,7 @@ class PushAvStreamTransportClusterAudioStreamStruct(
       tlvReader.enterStructure(tlvTag)
       val audioStreamName = tlvReader.getString(ContextSpecificTag(TAG_AUDIO_STREAM_NAME))
       val audioStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-
+      
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterAudioStreamStruct(audioStreamName, audioStreamID)
