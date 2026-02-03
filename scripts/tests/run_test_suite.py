@@ -33,13 +33,13 @@ from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
-if sys.platform == 'linux':
-    root_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), '..', '..'))
+DEFAULT_CHIP_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', '..'))
 
+if sys.platform == 'linux':
     from python_path import PythonPath
 
-    with PythonPath(os.path.join(root_path, 'src/python_testing/matter_testing_infrastructure/matter/testing'), relative_to=__file__):
+    with PythonPath(os.path.join(DEFAULT_CHIP_ROOT, 'src/python_testing/matter_testing_infrastructure/matter/testing'), relative_to=__file__):
         from linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, LinuxNamespacedExecutor, WpaSupplicantMock,
                            ensure_network_namespace_availability, ensure_private_state)
 
