@@ -203,17 +203,17 @@ class XmlDeviceTypeClusterRequirements:
             for mask, conformance in self.feature_overrides.items():
                 bit = math.log2(mask)
                 overrides += f'bit {int(bit)}: {str(conformance)} '
-            ret += f'Feature overrides: {overrides}'
+            ret += f'-- Feature overrides: {overrides}'
         if self.attribute_overrides:
             overrides = ""
             for id, conformance in self.attribute_overrides.items():
                 overrides += f'{id:04X}: {str(conformance)} '
-            ret += f'Attribute overrides: {overrides}'
+            ret += f'-- Attribute overrides: {overrides}'
         if self.command_overrides:
             overrides = ""
             for id, conformance in self.command_overrides.items():
                 overrides += f'{id:04X}: {str(conformance)} '
-            ret += f'Command overrides: {overrides}'
+            ret += f'-- Command overrides: {overrides}'
 
         return ret
 
