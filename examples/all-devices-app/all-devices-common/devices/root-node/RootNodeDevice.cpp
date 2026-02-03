@@ -50,7 +50,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     VerifyOrDie(provider != nullptr);
 
     mBasicInformationCluster.Create(optionalAttributeSet,
-                                    BasicInformationCluster::Context{ .deviceInstanceInfoProvider = *provider,
+                                    BasicInformationCluster::Context{ .deviceInstanceInfoProvider = provider,
                                                                       .configurationManager       = DeviceLayer::ConfigurationMgr(),
                                                                       .platformManager            = DeviceLayer::PlatformMgr() });
 

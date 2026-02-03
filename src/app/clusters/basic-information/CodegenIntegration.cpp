@@ -62,7 +62,7 @@ public:
         DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
         VerifyOrDie(provider != nullptr);
 
-        BasicInformationCluster::Context context = { .deviceInstanceInfoProvider = *provider,
+        BasicInformationCluster::Context context = { .deviceInstanceInfoProvider = provider,
                                                      .configurationManager       = DeviceLayer::ConfigurationMgr(),
                                                      .platformManager            = DeviceLayer::PlatformMgr() };
         gServer.Create(optionalAttributeSet, context);
