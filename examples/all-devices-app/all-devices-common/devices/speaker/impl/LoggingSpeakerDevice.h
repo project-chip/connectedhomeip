@@ -31,7 +31,12 @@ namespace app {
 class LoggingSpeakerDevice : public SpeakerDevice, public Clusters::LevelControlDelegate, public Clusters::OnOffDelegate
 {
 public:
-    LoggingSpeakerDevice(TimerDelegate & timerDelegate);
+    struct Context
+    {
+        TimerDelegate & timerDelegate;
+    };
+
+    LoggingSpeakerDevice(const Context & context);
     ~LoggingSpeakerDevice() override;
 
     // LevelControlDelegate

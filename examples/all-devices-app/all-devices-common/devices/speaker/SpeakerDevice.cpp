@@ -48,7 +48,16 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     // Level Control (Volume)
     LevelControlCluster::Config lcConfig(endpoint, mTimerDelegate, mLevelDelegate);
     lcConfig.WithOnOff();
-    lcConfig.WithInitialCurrentLevel(0);
+
+    // TODO: The following attributes/features are not required for a Speaker device type.
+    // Enable them here temporarily to fully test the LevelControl in CI.
+    // When we have a proper level light device type these can be removed.
+    lcConfig.WithInitialCurrentLevel(1);
+    lcConfig.WithOnOffTransitionTime(0);
+    lcConfig.WithOnTransitionTime(0);
+    lcConfig.WithOffTransitionTime(0);
+    lcConfig.WithLighting(DataModel::NullNullable);
+    lcConfig.WithDefaultMoveRate(DataModel::NullNullable);
 
     mLevelControlCluster.Create(lcConfig);
     ReturnErrorOnFailure(provider.AddCluster(mLevelControlCluster.Registration()));

@@ -61,6 +61,8 @@ bool IsWithOnOffCommand(CommandId commandId)
         ;
 }
 
+constexpr CommandId kInternalOffTransition = 0xFFFFFFFF; // Sentinel value to identify internal fade-to-off transitions
+
 } // namespace
 
 LevelControlCluster::LevelControlCluster(const Config & config) :
@@ -87,12 +89,15 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence attributePersistence(context.attributeStorage);
 
-    DataModel::Nullable<uint8_t> currentLevel;
-    attributePersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), currentLevel,
-        mCurrentLevel.value());
-    mCurrentLevel.SetValue(currentLevel, System::SystemClock().GetMonotonicMilliseconds64());
+    // 1. Determine the initial value for CurrentLevel
+    // Start with the default/reset value (set in constructor)
+    DataModel::Nullable<uint8_t> currentLevel = mCurrentLevel.value();
 
+    // Try to load from persistence. If not found, it keeps 'currentLevel' (which is the default).
+    attributePersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), currentLevel, currentLevel);
+
+    // 2. Handle Lighting logic (StartUpCurrentLevel overrides persistence)
     if (mFeatureMap.Has(Feature::kLighting))
     {
         attributePersistence.LoadNativeEndianValue(
@@ -101,13 +106,21 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
 
         if (!mStartUpCurrentLevel.IsNull())
         {
-            // Clamp to valid levels if needed
-            const uint8_t target = std::clamp<uint8_t>(mStartUpCurrentLevel.Value(), mMinLevel, mMaxLevel);
-
-            // Use SetValue to update internal state without triggering a report or check
-            mCurrentLevel.SetValue(DataModel::MakeNullable(target), System::SystemClock().GetMonotonicMilliseconds64());
+            currentLevel = mStartUpCurrentLevel;
         }
     }
+
+    // 3. Validation and Clamping
+    // Ensure CurrentLevel is within Min/Max bounds.
+    // This handles cases where StartUpCurrentLevel is null, but the restored/initial CurrentLevel
+    // is outside the valid range (e.g. initial=0 with Lighting feature min=1).
+    if (!currentLevel.IsNull())
+    {
+        currentLevel.SetNonNull(std::clamp<uint8_t>(currentLevel.Value(), mMinLevel, mMaxLevel));
+    }
+
+    // 4. Commit to Attribute and Delegate (Single SetValue call)
+    mCurrentLevel.SetValue(currentLevel, System::SystemClock().GetMonotonicMilliseconds64());
 
     if (!mCurrentLevel.value().IsNull())
     {
@@ -346,9 +359,21 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
     if (transitionTimeMs == 0 || totalSteps == 0 || mTickDurationMs == 0)
     {
         CHIP_ERROR status = SetCurrentLevel(mTargetLevel, ReportingMode::kForceReport);
-        if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && mTargetLevel == mMinLevel)
+        if (status == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(SetOnOff(false));
+            if ((IsWithOnOffCommand(commandId) || commandId == kInternalOffTransition) && mTargetLevel == mMinLevel)
+            {
+                ReturnErrorOnFailure(SetOnOff(false));
+            }
+            if (commandId == kInternalOffTransition && mTargetLevel == mMinLevel)
+            {
+                // This was an internal fade-to-off. Restoring the previous level ensures that the next
+                // "On" command (which might not specify a level) restores the brightness the user expects.
+                if (mOnLevel.IsNull() && !mLevelBeforeTurnedOff.IsNull())
+                {
+                    ReturnErrorOnFailure(SetCurrentLevel(mLevelBeforeTurnedOff.Value(), ReportingMode::kForceReport));
+                }
+            }
         }
         return status;
     }
@@ -687,9 +712,20 @@ void LevelControlCluster::TimerFired()
         UpdateRemainingTime(0, ReportingMode::kForceReport); // Transition complete, ensure RemainingTime is 0
 
         // If reached minimum, turn off OnOff cluster
-        if (IsWithOnOffCommand(mCurrentCommandId) && (currentLevel == mMinLevel || currentLevel == 0))
+        if ((IsWithOnOffCommand(mCurrentCommandId) || mCurrentCommandId == kInternalOffTransition) &&
+            (currentLevel == mMinLevel || currentLevel == 0))
         {
             LogErrorOnFailure(SetOnOff(false));
+        }
+
+        if (mCurrentCommandId == kInternalOffTransition && mTargetLevel == mMinLevel)
+        {
+            // This was an internal fade-to-off. Restoring the previous level ensures that the next
+            // "On" command (which might not specify a level) restores the brightness the user expects.
+            if (mOnLevel.IsNull() && !mLevelBeforeTurnedOff.IsNull())
+            {
+                RETURN_SAFELY_IGNORED SetCurrentLevel(mLevelBeforeTurnedOff.Value(), ReportingMode::kForceReport);
+            }
         }
         return;
     }
@@ -749,7 +785,9 @@ void LevelControlCluster::OnOffChanged(bool isOn)
         // Force execution to allow fading out even if device is technically "Off"
         BitMask<OptionsBitmap> optionsMask(OptionsBitmap::kExecuteIfOff);
         BitMask<OptionsBitmap> optionsOverride(OptionsBitmap::kExecuteIfOff);
-        MoveToLevelCommand(Commands::MoveToLevelWithOnOff::Id, mMinLevel, transitionTime, optionsMask, optionsOverride);
+        // Use kInternalOffTransition to differentiate this from a user-requested MoveToLevel.
+        // This allows us to restore the pre-off level after the transition completes.
+        MoveToLevelCommand(kInternalOffTransition, mMinLevel, transitionTime, optionsMask, optionsOverride);
     }
 }
 

@@ -49,6 +49,24 @@ TEST_F(TestLevelControlLighting, TestStartUpCurrentLevel)
     }
 }
 
+TEST_F(TestLevelControlLighting, TestInitialLevelValidation)
+{
+    // Test case to confirm bug fix: InitialCurrentLevel(0) should be clamped to MinLevel(1) if Lighting is enabled.
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
+                                     .WithInitialCurrentLevel(0)
+                                     .WithLighting(DataModel::NullNullable) };
+    chip::Testing::ClusterTester tester(cluster);
+
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint8_t> currentLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, currentLevel).IsSuccess());
+
+    // Expectation: Clamped to MinLevel (1)
+    EXPECT_EQ(currentLevel.Value(), 1u);
+    EXPECT_GE(currentLevel.Value(), cluster.GetMinLevel());
+}
+
 TEST_F(TestLevelControlLighting, TestLightingEnforcesConstraints)
 {
     {

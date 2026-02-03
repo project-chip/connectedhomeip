@@ -22,7 +22,7 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-LoggingSpeakerDevice::LoggingSpeakerDevice(TimerDelegate & timerDelegate) : SpeakerDevice(*this, *this, timerDelegate) {}
+LoggingSpeakerDevice::LoggingSpeakerDevice(const Context & context) : SpeakerDevice(*this, *this, context.timerDelegate) {}
 
 LoggingSpeakerDevice::~LoggingSpeakerDevice() {}
 

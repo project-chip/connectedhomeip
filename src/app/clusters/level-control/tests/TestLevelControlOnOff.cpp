@@ -258,6 +258,7 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
     // 1. Turn OFF
 
     // Should store 200, move to MinLevel (0) over 10s.
+    // Then, because OnLevel is null, it should RESTORE the stored level (200) at the end.
 
     cluster.OnOffChanged(false);
 
@@ -274,7 +275,9 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
 
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
 
-    EXPECT_EQ(readLevel.Value(), 0u);
+    // Spec: If OnLevel is not defined, set the CurrentLevel to the stored level.
+    // Stored level was 200.
+    EXPECT_EQ(readLevel.Value(), 200u);
 
     // 2. Turn ON
 
@@ -319,6 +322,40 @@ TEST_F(TestLevelControlOnOff, TestOnOffChangedDefaultLevel)
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 254u);
+}
+
+TEST_F(TestLevelControlOnOff, TestRestorationBehaviorWhenOnLevelNull)
+{
+    // Reproduce TC-LVL-3.1 scenario:
+    // Device has Lighting (MinLevel=1) and OnOff.
+    // OnLevel is null (default).
+    // When turning Off, it should transition to MinLevel but then RESTORE the stored level.
+
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
+                                     .WithLighting(DataModel::NullNullable) // MinLevel=1
+                                     .WithOnOff() };                        // Dependency active
+
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Initial state: Level 100, On
+    EXPECT_TRUE(cluster
+                    .MoveToLevel(100, DataModel::MakeNullable(static_cast<uint16_t>(0)),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
+                                 BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
+                    .IsSuccess());
+    mockDelegate.mOn = true;
+
+    // Turn Off
+    cluster.OnOffChanged(false);
+
+    // Expectation:
+    // 1. Stored Level = 100.
+    // 2. Transition to MinLevel (1).
+    // 3. Since OnLevel is null, restore Stored Level (100).
+    DataModel::Nullable<uint8_t> readLevel;
+    EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
+    EXPECT_EQ(readLevel.Value(), 100u);
 }
 
 class ReentrantMockDelegate : public MockLevelControlDelegate
