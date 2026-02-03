@@ -148,7 +148,6 @@ private:
     chip::app::DefaultAttributePersistenceProvider mAttributePersistence;
 
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
-
     AppRootNode mRootNode;
     std::unique_ptr<DeviceInterface> mConstructedDevice;
 };
