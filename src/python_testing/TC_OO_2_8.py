@@ -193,7 +193,7 @@ class TC_OO_2_8(MatterBaseTest):
 
         self.step(21)
         log.info("Test waits for 10 seconds")
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
 
         self.step(22)
         count = sub_handler.attribute_report_counts[Clusters.OnOff.Attributes.OnTime]
