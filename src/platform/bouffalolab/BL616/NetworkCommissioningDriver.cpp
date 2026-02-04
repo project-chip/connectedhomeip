@@ -20,7 +20,7 @@
 #include <lwip/netif.h>
 #include <lwip/tcpip.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 extern "C" {
 #undef IS_ENABLED
 #include <wifi_mgmr.h>
@@ -36,29 +36,23 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-bool BLScanResponseIterator::Next(WiFiScanResponse & item)
-{
-    if (mIternum >= mSize)
-    {
-        return false;
-    }
+auto converter = [](const wifi_mgmr_scan_item_t& raw) -> WiFiScanResponse {
+    WiFiScanResponse item;
 
-    item.security.SetRaw(mpScanResults[mIternum].auth);
-    item.ssidLen  = (uint32_t) (mpScanResults[mIternum].ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-         ? mpScanResults[mIternum].ssid_len
+    item.security.SetRaw(raw.auth);
+    item.ssidLen  = (uint32_t) (raw.ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+         ? raw.ssid_len
          : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
-    item.channel  = mpScanResults[mIternum].channel;
+    item.channel  = raw.channel;
     item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-    item.rssi     = mpScanResults[mIternum].rssi;
-    memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
-    memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
+    item.rssi     = raw.rssi;
+    memcpy(item.ssid, raw.ssid, item.ssidLen);
+    memcpy(item.bssid, raw.bssid, 6);
 
-    mIternum++;
-    return true;
-}
+    return item;
+};
 
-
-CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
+CHIP_ERROR BflbWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
     size_t ssidLen        = 0;
@@ -88,14 +82,14 @@ exit:
     return err;
 }
 
-void BLWiFiDriver::Shutdown()
+void BflbWiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
 }
 
-CHIP_ERROR BLWiFiDriver::CommitConfiguration()
+CHIP_ERROR BflbWiFiDriver::CommitConfiguration()
 {
-    ChipLogProgress(NetworkProvisioning, "BLWiFiDriver::CommitConfiguration");
+    ChipLogProgress(NetworkProvisioning, "BflbWiFiDriver::CommitConfiguration");
     ReturnErrorOnFailure(
         PersistedStorage::KeyValueStoreMgr().Put(BLConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(BLConfig::kConfigKey_WiFiPassword, mStagingNetwork.credentials,
@@ -104,18 +98,18 @@ CHIP_ERROR BLWiFiDriver::CommitConfiguration()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLWiFiDriver::RevertConfiguration()
+CHIP_ERROR BflbWiFiDriver::RevertConfiguration()
 {
     mStagingNetwork = mSavedNetwork;
     return CHIP_NO_ERROR;
 }
 
-bool BLWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
+bool BflbWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 {
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status BLWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+Status BflbWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                         uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
@@ -134,7 +128,7 @@ Status BLWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, Mut
     return Status::kSuccess;
 }
 
-Status BLWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
+Status BflbWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -146,7 +140,7 @@ Status BLWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebu
     return Status::kSuccess;
 }
 
-Status BLWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
+Status BflbWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText.reduce_size(0);
 
@@ -156,7 +150,7 @@ Status BLWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
     return Status::kSuccess;
 }
 
-CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
+CHIP_ERROR BflbWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
     wifi_mgmr_sta_connect_params_t conn_param = { 0 };
 
@@ -182,7 +176,7 @@ CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     return CHIP_NO_ERROR;
 }
 
-void BLWiFiDriver::OnConnectWiFiNetwork(bool isConnected)
+void BflbWiFiDriver::OnConnectWiFiNetwork(bool isConnected)
 {
     if (mpConnectCallback)
     {
@@ -198,7 +192,7 @@ void BLWiFiDriver::OnConnectWiFiNetwork(bool isConnected)
     }
 }
 
-void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
+void BflbWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
@@ -224,7 +218,7 @@ exit:
     }
 }
 
-void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
+void BflbWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
     if (callback != nullptr)
     {
@@ -244,23 +238,18 @@ void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
     }
 }
 
-void BLWiFiDriver::OnScanWiFiNetworkDone()
+void BflbWiFiDriver::OnScanWiFiNetworkDone()
 {
     uint32_t nums = wifi_mgmr_sta_scanlist_nums_get();
+    struct wifi_mgmr_scan_item * pScanList = nullptr;
+    wifi_mgmr_scan_item_t * pScanResult = nullptr;
+    uint32_t scanResultNum = 0;
+
     if (nums)
     {
-        struct wifi_mgmr_scan_item * pScanList = (struct wifi_mgmr_scan_item *) MemoryAlloc(nums * sizeof(wifi_mgmr_scan_item_t));
-
-        if (NULL == pScanList || 0 == wifi_mgmr_sta_scanlist_dump(pScanList, nums))
+        pScanList = (struct wifi_mgmr_scan_item *) MemoryAlloc(nums * sizeof(wifi_mgmr_scan_item_t));
+        if (pScanList || wifi_mgmr_sta_scanlist_dump(pScanList, nums)) 
         {
-            mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
-            mpScanCallback = nullptr;
-        }
-        else
-        {
-            wifi_mgmr_scan_item_t * pScanResult = NULL;
-            uint32_t scanResultNum              = 0;
-
             if (mScanSSIDlength)
             {
                 for (uint32_t i = 0; i < nums; i++)
@@ -278,36 +267,23 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
                 pScanResult   = pScanList;
                 scanResultNum = nums;
             }
-
-            if (CHIP_NO_ERROR != DeviceLayer::SystemLayer().ScheduleLambda([scanResultNum, pScanResult, pScanList]() {
-                    BLScanResponseIterator iter(scanResultNum, pScanResult);
-
-                    if (GetInstance().mpScanCallback)
-                    {
-                        GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-                        GetInstance().mpScanCallback = nullptr;
-                    }
-                    else
-                    {
-                        ChipLogError(DeviceLayer, "can't find the ScanCallback function");
-                    }
-
-                    MemoryFree(pScanList);
-                }))
-            {
-                MemoryFree(pScanList);
-            }
         }
     }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "No AP found");
-        if (mpScanCallback != nullptr)
-        {
-            mpScanCallback->OnFinished(Status::kNetworkNotFound, CharSpan(), nullptr);
-            mpScanCallback = nullptr;
+
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([scanResultNum, pScanResult, pScanList]() {
+        if (GetInstance().mpScanCallback) {
+            BflbScanResponseIterator iter(scanResultNum, pScanResult, converter);
+            GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
         }
+        else {
+            ChipLogError(DeviceLayer, "can't find the ScanCallback function");
+        }
+    });
+
+    if (pScanList) {
+        MemoryFree(pScanList);
     }
+    mScanSSIDlength = 0;
 }
 
 CHIP_ERROR GetConfiguredNetwork(Network & network)
@@ -325,7 +301,7 @@ CHIP_ERROR GetConfiguredNetwork(Network & network)
     return CHIP_ERROR_INTERNAL;
 }
 
-void BLWiFiDriver::OnNetworkStatusChange()
+void BflbWiFiDriver::OnNetworkStatusChange()
 {
     Network configuredNetwork;
 
@@ -348,22 +324,24 @@ void BLWiFiDriver::OnNetworkStatusChange()
     }
 }
 
-void BLWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
+CHIP_ERROR BflbWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
 {
     mLastDisconnectedReason = wifi_mgmr_sta_info_status_code_get();
+
+    return CHIP_NO_ERROR;
 }
 
-int32_t BLWiFiDriver::GetLastDisconnectReason()
+int32_t BflbWiFiDriver::GetLastDisconnectReason()
 {
     return mLastDisconnectedReason;
 }
 
-size_t BLWiFiDriver::WiFiNetworkIterator::Count()
+size_t BflbWiFiDriver::WiFiNetworkIterator::Count()
 {
     return mDriver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
 }
 
-bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
+bool BflbWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
     if (mExhausted || mDriver->mStagingNetwork.ssidLen == 0)
     {
@@ -399,14 +377,14 @@ void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     case kWiFiOnInitDone:
         break;
     case kWiFiOnScanDone:
-        BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
+        BflbWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
         break;
     case kWiFiOnConnecting:
         ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
         ConnectivityMgrImpl().OnConnectivityChanged(deviceInterface_getNetif());
         break;
     case kWiFiOnConnected:
-        BLWiFiDriver::GetInstance().OnNetworkStatusChange();
+        BflbWiFiDriver::GetInstance().OnNetworkStatusChange();
         break;
     case kGotIpAddress:
         ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
@@ -477,7 +455,6 @@ extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_
 
     if (((LWIP_NSC_IPV6_ADDR_STATE_CHANGED | LWIP_NSC_IPV6_SET) & reason) && args)
     {
-
         if (args->ipv6_addr_state_changed.addr_index >= LWIP_IPV6_NUM_ADDRESSES ||
             ip6_addr_islinklocal(netif_ip6_addr(nif, args->ipv6_addr_state_changed.addr_index)))
         {

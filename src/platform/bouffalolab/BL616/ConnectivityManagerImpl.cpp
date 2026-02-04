@@ -37,8 +37,8 @@ namespace DeviceLayer {
 
 void ConnectivityManagerImpl::OnWiFiStationDisconnected()
 {
-    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
-    uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
+    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BflbWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    uint16_t reason = NetworkCommissioning::BflbWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();

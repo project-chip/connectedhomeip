@@ -89,7 +89,7 @@ static_library("BL702L") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../common/ThreadStackManagerImpl.cpp",
     ]
 
     if (chip_mdns == "platform") {

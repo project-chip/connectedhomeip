@@ -307,6 +307,7 @@ template("bouffalo_sdk") {
       "${bouffalo_sdk_root}/bsp/board/bl616dk/board.c",
       "${bouffalo_sdk_root}/bsp/board/bl616dk/board_flash_psram.c",
       "${bouffalo_sdk_root}/bsp/board/bl616dk/board_rf.c",
+      "${bouffalo_sdk_root}/bsp/board/bl616dk/board_gpio.c",
       "${bouffalo_sdk_root}/bsp/board/bl616dk/fw_header.c",
     ]
 
@@ -328,6 +329,34 @@ template("bouffalo_sdk") {
     ]
 
     public_configs = [ ":${sdk_target_name}_config_board" ]
+  }
+
+  config("${sdk_target_name}_config_eth_phy") {
+    include_dirs = [ 
+      "${bouffalo_sdk_root}/bsp/common/eth_phy",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/lwip_netif_emac",
+    ]
+  }
+
+  source_set("${sdk_target_name}_eth_phy") {
+    sources = [
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/eth_phy.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/eth_phy_port.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/ephy_general.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/ephy_lan8720.c",
+      "${bouffalo_sdk_root}/bsp/common/eth_phy/lwip_netif_emac/lwip_netif_emac.c",
+    ]
+
+    configs += [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_std_drv",
+      ":${sdk_target_name}_config_lhal",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_lwip",
+      ":${sdk_target_name}_config_freertos",
+    ]
+
+    public_configs = [ ":${sdk_target_name}_config_eth_phy" ]
   }
 
   config("${sdk_target_name}_config_shell") {
@@ -460,6 +489,7 @@ template("bouffalo_sdk") {
     configs += [
       ":${sdk_target_name}_config_mm",
       ":${sdk_target_name}_config_lhal",
+      ":${sdk_target_name}_config_utils",
     ]
     public_configs = [ ":${sdk_target_name}_config" ]
   }
@@ -1222,7 +1252,9 @@ template("bouffalo_sdk") {
     ]
 
     sources = [
-      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_alarm_bl616.c",
+      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_alarm.c",
+      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_frame.c",
+      "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_linkmetric.c",
       "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_radio.c",
       "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_radio_bflb.c",
       "${bouffalo_sdk_root}/components/wireless/thread/openthread_port/ot_sys_bflb.c",
@@ -1232,7 +1264,6 @@ template("bouffalo_sdk") {
 
     libs = [
       "${bouffalo_sdk_root}/components/wireless/lmac154/lmac154/lib/liblmac154_bl616.a",
-      "${bouffalo_sdk_root}/components/wireless/thread/openthread_utils/lib/libopenthread_utils_bl616.a",
     ]
 
     configs += [ 
@@ -1301,6 +1332,10 @@ template("bouffalo_sdk") {
     } else if (defined(invoker.chip_enable_openthread) &&
                invoker.chip_enable_openthread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
+    } else if (defined(invoker.chip_enable_ethernet) &&
+               invoker.chip_enable_ethernet) {
+      public_deps += [ ":${sdk_target_name}_eth_phy" ]
+      public_deps += [ ":${sdk_target_name}_lwip" ]
     }
 
     if (defined(invoker.chip_config_network_layer_ble) &&

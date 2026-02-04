@@ -101,7 +101,7 @@ static_library("BL702") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../common/ThreadStackManagerImpl.cpp",
     ]
 
     if (chip_mdns == "platform") {
@@ -118,7 +118,7 @@ static_library("BL702") {
     sources += [
       "ConfigurationManagerImpl.cpp",
       "ConnectivityManagerImpl.cpp",
-      "EthernetInterface.c",
+      "NetworkCommissioningEthernetDriver.cpp"
     ]
 
     deps += [

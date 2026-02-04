@@ -228,7 +228,6 @@ bouffalolab_executable("lighting_app") {
   inputs = [ ldscript ]
 
   if (chip_print_memory_usage) {
-    ldflags += [ "-Wl,--defsym=__RAM_PBUF_POOL=0" ]
     ldflags += [
       "-Wl,--print-memory-usage",
       "-fstack-usage",

@@ -29,6 +29,10 @@ extern "C" {
 extern "C" void hal_reboot(void);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+extern "C" struct netif * deviceInterface_getNetif(void);
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -225,6 +229,18 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     hal_reboot();
 #endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
+{
+    if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    memcpy(buf.data(), deviceInterface_getNetif()->hwaddr, ConfigurationManager::kPrimaryMACAddressLength);
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 ConfigurationManager & ConfigurationMgrImpl()
 {
