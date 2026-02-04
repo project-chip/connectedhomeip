@@ -399,10 +399,16 @@ def monitor_app_restart_requests(
         handle_factory_reset(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
 
         # Restart the app
-        new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
-        new_app_manager.start()
+        log.info("Restarting app '%s'...", app)
         with app_manager_lock:
+
+            # Stop the app
+            log.info("Stopping app...")
             app_manager_ref[0].stop()
+
+            # Start the app
+            new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+            new_app_manager.start()
             app_manager_ref[0] = new_app_manager
 
         # Restart complete, continue monitoring for additional restart requests
