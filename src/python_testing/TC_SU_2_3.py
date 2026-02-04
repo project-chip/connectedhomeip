@@ -216,8 +216,13 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
         asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
 
-        event_cb.reset()
-        event_cb.cancel()
+        applying_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 1000)
+        logger.info(f"Applying: {applying_event}")
+        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kApplying, applying_event.newState,
+                             f"New state is {applying_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kApplying}")
+
+        # event_cb.reset()
+        # event_cb.cancel()
 
         self.terminate_provider()
         # controller.ExpireSessions(nodeId=provider_node_id)
@@ -259,9 +264,9 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
         # await self.set_default_ota_providers_list(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
 
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
-                                            expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
-        await event_cb.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=self.endpoint, fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        # event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
+        #                                     expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
+        # await event_cb.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=self.endpoint, fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         await self.announce_ota_provider(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
 
