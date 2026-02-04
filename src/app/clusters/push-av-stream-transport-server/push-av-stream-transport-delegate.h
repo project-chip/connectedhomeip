@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
-#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
@@ -147,6 +147,16 @@ public:
      */
     virtual bool ValidateSegmentDuration(uint16_t segmentDuration,
                                          const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) = 0;
+
+    /**
+     * @brief Validates the provided Max Pre Roll Length.
+     *
+     * @param maxPreRollLength Max Pre Roll length to validate
+     * @param videoStreamId The video stream ID to be validated against
+     * @return true if the Max pre-roll length is greater than or equal to KeyFrameInterval for the provided videoStreamId, false
+       otherwise
+     */
+    virtual bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) = 0;
 
     /**
      * @brief Validates bandwidth requirements against camera's resource management.
@@ -297,6 +307,15 @@ public:
     virtual CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) = 0;
 
     /**
+     * @brief Gets the current CMAF session number for the specified connection.
+     *
+     * @param connectionID The connection ID for which to get the session number
+     * @param sessionNumber Output parameter for the current session number
+     * @return true if a session number is available, false otherwise
+     */
+    virtual bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) = 0;
+
+    /**
      * @brief Sets the PushAvStreamTransportServer instance for the delegate.
      *
      * This method is called by the PushAvStreamTransportServer to provide
@@ -307,6 +326,7 @@ public:
      */
     virtual void SetPushAvStreamTransportServer(PushAvStreamTransportServer * server) = 0;
 };
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

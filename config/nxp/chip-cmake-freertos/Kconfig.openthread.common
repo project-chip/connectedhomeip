@@ -14,6 +14,13 @@
 #   limitations under the License.
 #
 
+# Define NET_L2_OPENTHREAD config for FreeRTOS compatibility with Zephyr (already defined in Zephyr module)
+# to enable shared code and Kconfig across both platforms.
+config NET_L2_OPENTHREAD
+	bool "Enable Thread support"
+	help
+	  Enable OT support.
+
 if NET_L2_OPENTHREAD
 
 config OT_ROOT
@@ -90,5 +97,30 @@ config OT_NXP_SPINEL_INTERFACE_LINK
 	help
 		Define the spinel interface used for host transceiver communication
 
+choice THREAD_DEVICE_TYPE_SELECTION
+	prompt "Thread device type selection based on ConnectivityManager::ThreadDeviceType enum"
+	default ROUTER if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
+	default FULL_END_DEVICE
+	config ROUTER
+		bool "Router"
+	config FULL_END_DEVICE
+		bool "Full end device"
+	config MINIMAL_END_DEVICE
+		bool "Minimal end device"
+	config SLEEPY_END_DEVICE
+		bool "Sleepy end device"
+	config SYNCHRONIZED_SLEEPY_END_DEVICE
+		bool "Synchronized sleepy end device"
+endchoice
+
+config THREAD_DEVICE_TYPE
+	string "Thread device type registered with the connectivity manager"
+	default "kThreadDeviceType_Router" if ROUTER
+	default "kThreadDeviceType_FullEndDevice" if FULL_END_DEVICE
+	default "kThreadDeviceType_MinimalEndDevice" if MINIMAL_END_DEVICE
+	default "kThreadDeviceType_SleepyEndDevice" if SLEEPY_END_DEVICE
+	default "kThreadDeviceType_SynchronizedSleepyEndDevice" if SYNCHRONIZED_SLEEPY_END_DEVICE
+	help
+		Thread device type registered with the connectivity manager
 
 endif # NET_L2_OPENTHREAD

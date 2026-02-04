@@ -33,30 +33,32 @@ PushAVUploader::PushAVUploader() : mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
-    // Ensure final MPD upload during uploader thread termination to persist media data before shutdown.
-    if (!mMPDPath.first.empty() && !mMPDPath.second.empty())
+    std::pair<std::string, std::string> lastUploadJob;
     {
-        ChipLogProgress(Camera, "Uploading final MPD to server before shutdown");
-        UploadData(mMPDPath);
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        while (mAvData.size() > 1)
+        {
+            mAvData.pop();
+        }
+
+        if (!mAvData.empty())
+        {
+            lastUploadJob = std::move(mAvData.front());
+            mAvData.pop();
+        }
+    }
+
+    if (!lastUploadJob.first.empty() && !lastUploadJob.second.empty())
+    {
+        const std::filesystem::path filePath(lastUploadJob.first);
+
+        if (filePath.extension() == ".mpd")
+        {
+            UploadData(lastUploadJob);
+        }
     }
 
     Stop();
-
-    while (!mAvData.empty())
-    {
-        std::pair<std::string, std::string> uploadJob = std::move(mAvData.front());
-        mAvData.pop();
-
-        std::error_code ec;
-        if (!std::filesystem::remove(uploadJob.first, ec))
-        {
-            ChipLogError(Camera, "Failed to delete file: %s, error: %s", uploadJob.first.c_str(), ec.message().c_str());
-        }
-        else
-        {
-            ChipLogDetail(Camera, "Successfully deleted file: %s", uploadJob.first.c_str());
-        }
-    }
 }
 
 // Helper function to convert certificate from DER format to PEM format
@@ -222,11 +224,11 @@ void PushAVUploader::Stop()
     }
 }
 
-void PushAVUploader::AddUploadData(std::string & filename, std::string & url)
+void PushAVUploader::AddUploadData(const std::string & filename, const std::string & url)
 {
     ChipLogProgress(Camera, "Added file name %s to queue", filename.c_str());
     std::lock_guard<std::mutex> lock(mQueueMutex);
-    auto data = make_pair(filename, url);
+    auto data = std::make_pair(filename, url);
     mAvData.push(data);
 }
 
@@ -255,6 +257,101 @@ size_t PushAvUploadCb(void * ptr, size_t size, size_t nmemb, void * stream)
     return (size_t) copyChunk;
 }
 
+std::string ProcessInitUploadPath(std::string path, const std::vector<std::string> & streamIdNameMap)
+{
+    auto result = std::move(path);
+    // Replace stream ID placeholder #__X__# with stream name
+    const auto startPos = result.find("#__");
+    const auto endPos   = result.find("__#");
+    if (startPos != std::string::npos && endPos != std::string::npos && startPos + 4 == endPos)
+    {
+        const int streamId = result[startPos + 3] - '0';
+        if (streamId >= 0 && streamId < static_cast<int>(streamIdNameMap.size()))
+        {
+            // Path traversal check - reject if stream name contains dangerous characters
+            if (streamIdNameMap[streamId].find("..") != std::string::npos ||
+                streamIdNameMap[streamId].find('/') != std::string::npos)
+            {
+                ChipLogError(Camera, "Invalid stream name '%s' detected, rejecting to prevent path traversal",
+                             streamIdNameMap[streamId].c_str());
+                return path;
+            }
+            result.replace(startPos, 7, streamIdNameMap[streamId] + "/" + streamIdNameMap[streamId]);
+        }
+        else
+        {
+            ChipLogError(Camera, "Stream ID %d not found in streamIdNameMap", streamId);
+            return path;
+        }
+    }
+    ChipLogDetail(Camera, "Processed init upload path to %s", result.c_str());
+    return result;
+}
+
+std::string ProcessM4SUploadPath(std::string path, const std::vector<std::string> & streamIdNameMap)
+{
+    auto result = std::move(path);
+
+    // Replace stream ID placeholder #__X__# with stream name
+    const auto startPos = result.find("#__");
+    const auto endPos   = result.find("__#");
+
+    if (startPos != std::string::npos && endPos != std::string::npos && startPos + 4 == endPos)
+    {
+        const int streamId = result[startPos + 3] - '0';
+
+        if (streamId >= 0 && streamId < static_cast<int>(streamIdNameMap.size()))
+        {
+            // Path traversal check - reject if stream name contains dangerous characters
+            if (streamIdNameMap[streamId].find("..") != std::string::npos ||
+                streamIdNameMap[streamId].find('/') != std::string::npos)
+            {
+                ChipLogError(Camera, "Invalid stream name '%s' detected, rejecting to prevent path traversal",
+                             streamIdNameMap[streamId].c_str());
+                return path;
+            }
+            result.replace(startPos, 7, streamIdNameMap[streamId] + "/");
+        }
+        else
+        {
+            return path;
+        }
+    }
+
+    // Update segment number by adding 1000
+    const auto segmentPos = result.find("segment_");
+    if (segmentPos != std::string::npos)
+    {
+        const auto numberStart = segmentPos + 8;
+        const auto m4sPos      = result.find(".m4s", numberStart);
+
+        if (m4sPos != std::string::npos && (m4sPos - numberStart) >= 4 && (m4sPos - numberStart) <= 5)
+        {
+            const auto numberStr = result.substr(numberStart, 4);
+            char * endPtr;
+            const long originalNumber = std::strtol(numberStr.c_str(), &endPtr, 10);
+
+            if (endPtr == numberStr.c_str() || *endPtr != '\0' || originalNumber > INT_MAX || originalNumber < INT_MIN)
+            {
+                ChipLogError(Camera, "Invalid segment number format: %s", numberStr.c_str());
+                return path;
+            }
+
+            auto newNumber = static_cast<int>(originalNumber) + 1000;
+            if (newNumber > 9999)
+            {
+                ChipLogError(Camera, "Segment number overflow: %d", newNumber);
+                newNumber = 0;
+            }
+            const auto newNumberStr = std::string(4 - std::to_string(newNumber).length(), '0') + std::to_string(newNumber);
+            result.replace(numberStart, 4, newNumberStr);
+        }
+    }
+
+    ChipLogDetail(Camera, "Updated M4S upload path to %s", result.c_str());
+    return result;
+}
+
 void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 {
     CURL * curl = curl_easy_init();
@@ -277,11 +374,18 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     if (!file.read(buffer.data(), static_cast<std::streamsize>(size)))
     {
         ChipLogError(Camera, "Failed to read file into buffer");
+        file.close();
         return;
     }
     file.close();
+
     PushAvUploadInfo upload;
     upload.mData = (char *) std::malloc(size);
+    if (!upload.mData)
+    {
+        ChipLogError(Camera, "Failed to allocate memory for upload data");
+        return;
+    }
     memcpy(upload.mData, buffer.data(), size);
     upload.mSize                = static_cast<long>(size);
     upload.mBytesRead           = 0;
@@ -289,7 +393,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 
     // Determine content type based on file extension
     std::string contentType = "application/*"; // Default fallback
-
+    std::string fullPath    = data.first;
     // Extract file extension from full path using std::filesystem
     std::filesystem::path filePath(data.first);
     std::filesystem::path extension = filePath.extension();
@@ -300,17 +404,18 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     else if (extension == ".m4s")
     {
         contentType = "video/iso.segment"; // Media segment
+        fullPath    = ProcessM4SUploadPath(data.first, mStreamIdNameMap);
     }
     else if (extension == ".init")
     {
         contentType = "video/mp4"; // Initialization segment
+        fullPath    = ProcessInitUploadPath(data.first, mStreamIdNameMap);
     }
 
     std::string contentTypeHeader = "Content-Type: " + contentType;
     headers                       = curl_slist_append(headers, contentTypeHeader.c_str());
 
     // Extract the filename from the full path
-    std::string fullPath = data.first;
     std::string filename = "";
     std::string baseUrl  = data.second;
     std::string fullUrl;

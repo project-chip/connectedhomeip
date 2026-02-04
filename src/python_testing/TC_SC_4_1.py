@@ -65,10 +65,11 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
                                           assert_valid_commissionable_instance_name, assert_valid_d_key,
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
-                                          assert_valid_long_discriminator_subtype, assert_valid_ph_key, assert_valid_pi_key,
-                                          assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
-                                          assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
-                                          assert_valid_vendor_subtype, assert_valid_vp_key)
+                                          assert_valid_long_discriminator_subtype, assert_valid_ph_key,
+                                          assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_ri_key,
+                                          assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
+                                          assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
+                                          assert_valid_vp_key)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -628,6 +629,9 @@ class TC_SC_4_1(MatterBaseTest):
             # Verify it is encoded as a valid UTF-8 string
             # with a maximum length of 128 bytes
             assert_valid_pi_key(pi_key)
+
+        # Verify the relationship between PH and PI keys
+        assert_valid_ph_pi_relationship(txt_record.txt)
 
     def verify_t_key(self, txt_record) -> None:
         # If 'supports_tcp' is False and T key is not present, nothing to check

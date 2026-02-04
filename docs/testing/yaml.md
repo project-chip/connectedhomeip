@@ -420,11 +420,10 @@ up examples apps, PICS and PIXIT values for use in the CI.
 
 ### Defining the CI test arguments
 
-Generally YAML auto-selects an application to run the test against based on the
-YAML name. You may need more control in cases when you want the same test to
-apply to multiple applications or provide custom arguments. In that case, the
-YAML file supports a `CI` entry that contains a list of `name`, `app` and `args`
-(optional) to execute.
+YAML tests will run against the `all-clusters` application by default. If you
+need to run the same test against a different application or with multiple sets
+of custom arguments, the YAML file supports a `CI` entry that contains a list of
+`name`, `app` and `args` (optional) to execute.
 
 ```yaml
 CI:
@@ -451,7 +450,7 @@ full list):
 -   `bridge`
 -   `closure`
 -   `energy-gateway`
--   `energy-management`
+-   `evse`
 -   `fabric-sync`
 -   `lit-icd`
 -   `lock`

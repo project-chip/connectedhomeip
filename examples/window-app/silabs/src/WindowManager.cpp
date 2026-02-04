@@ -20,6 +20,7 @@
 #include <AppConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -63,6 +64,23 @@ using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
+
+namespace {
+// Position Namespace for semantic tags (from Common Namespace spec)
+// See: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Position.adoc
+constexpr uint8_t kNamespacePosition = 8;
+constexpr uint8_t kTagPositionLeft   = 0;
+constexpr uint8_t kTagPositionRight  = 1;
+
+// Set unique TagList for endpoints 1 and 2 (both have Window Covering device type)
+const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint1TagList[] = {
+    { .namespaceID = kNamespacePosition, .tag = kTagPositionLeft },
+};
+
+const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint2TagList[] = {
+    { .namespaceID = kNamespacePosition, .tag = kTagPositionRight },
+};
+} // namespace
 
 WindowManager WindowManager::sWindow;
 
@@ -574,6 +592,14 @@ CHIP_ERROR WindowManager::Init()
     // Coverings
     mCoverList[0].Init(WINDOW_COVER_ENDPOINT1);
     mCoverList[1].Init(WINDOW_COVER_ENDPOINT2);
+
+    // Set unique TagList for endpoints 1 and 2 (both have Window Covering device type)
+    SuccessOrDie(
+        SetTagList(WINDOW_COVER_ENDPOINT1,
+                   chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint1TagList)));
+    SuccessOrDie(
+        SetTagList(WINDOW_COVER_ENDPOINT2,
+                   chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList)));
 
     // Initialize LEDs
     LEDWidget::InitGpio();

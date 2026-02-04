@@ -820,6 +820,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::RvcOperationalState::Events::OperationCompletion::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Groupcast::Events::GroupcastTesting::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::BooleanStateConfiguration::Events::AlarmsStateChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::BooleanStateConfiguration::Events::SensorFault::DecodableType & value);
@@ -952,6 +954,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetected::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TargetNavigator::Events::TargetUpdated::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::MediaPlayback::Events::StateChanged::DecodableType & value);
@@ -970,6 +974,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PushAvStreamTransport::Events::PushTransportBegin::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PushAvStreamTransport::Events::PushTransportEnd::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Chime::Events::ChimeStartedPlaying::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::CommissionerControl::Events::CommissioningRequestResult::DecodableType & value);
