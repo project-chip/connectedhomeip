@@ -268,14 +268,7 @@ public:
     /**
      * Test whether @a error belongs to the Range @a range.
      */
-    constexpr bool IsRange(Range range) const
-    {
-        if (range == Range::kPlatformExtended)
-        {
-            return mError & (1u << kPlatformBit);
-        }
-        return range == static_cast<Range>(GetField(kRangeStartBit, kRangeLength, mError));
-    }
+    constexpr bool IsRange(Range range) const { return range == GetRange(); }
 
     /**
      * Get the Range to which the @a error belongs.
@@ -302,7 +295,7 @@ public:
     }
 
     /**
-     * Test whether if @a value type can be losslessly encapsulated in a CHIP_ERROR.
+     * Test whether @a value type can be losslessly encapsulated in a CHIP_ERROR.
      *
      * @note
      * This function does not check the actual value, only the type T.
