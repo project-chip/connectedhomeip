@@ -13,12 +13,20 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+#
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/boolean_state_2_2_fifo
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --app-pipe /tmp/boolean_state_2_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -48,155 +56,245 @@ logger = logging.getLogger(__name__)
 
 class TC_BOOL_2_2(MatterBaseTest):
 
-    async def set_dut_state_value(self, endpoint: int, state: bool):
-        """Set the DUT's BooleanState value via named pipe command."""
-        logger.info(f" --- Setting DUT StateValue to {'TRUE' if state else 'FALSE'}")
-        if self.is_pics_sdk_ci_only:    # for running in CI
-            command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": state}
-            self.write_to_app_pipe(command_dict)
-        else:                           # for manual testing
-            self.wait_for_user_input(
-                prompt_msg=f"Bring the DUT into a state so StateValue is {'TRUE' if state else 'FALSE'}.")
-
-    async def read_state_value_from_dut(self, endpoint):
-        """Read the StateValue attribute from the DUT."""
-        return await self.read_single_attribute_check_success(
-            endpoint=endpoint,
-            cluster=Clusters.BooleanState,
-            attribute=Clusters.BooleanState.Attributes.StateValue)
-
-    async def is_state_change_event_supported(self) -> bool:
-        """Check if StateChange event is supported via PICS or feature map."""
-        # TODO: In future spec version also check feature map for event support
-        # when that capability is added. See https://github.com/project-chip/connectedhomeip/issues/42425
-        # feature_map = await self.read_single_attribute_check_success(
-        #     cluster=Clusters.BooleanState,
-        #     attribute=Clusters.BooleanState.Attributes.FeatureMap
-        # )
-        # return self.check_pics("BOOL.S.E00") or bool(feature_map & Clusters.BooleanState.Bitmaps.Feature.kEventSupport)
-
-        return self.check_pics("BOOL.S.E00")
-
     def desc_TC_BOOL_2_2(self) -> str:
         return "[TC-BOOL-2.2] Primary Functionality with Server as DUT"
 
     def steps_TC_BOOL_2_2(self) -> list[TestStep]:
         return [
             TestStep("1", "Commission DUT to TH", is_commissioning=True),
-            TestStep("1a", "Set up subscription to StateValue attribute and StateChange event."),
-            TestStep("2a", "Bring the DUT into a state so StateValue is FALSE."),
-            TestStep("2b", "TH reads the StateValue attribute from the DUT.",
-                     "Verify that the value in the response is FALSE."),
-            TestStep("3a", "Bring the DUT into a state so StateValue is TRUE."),
-            TestStep("3b", "TH waits for a StateChange event report from the DUT.",
-                     "Verify that StateChange event has StateValue set to TRUE."),
-            TestStep("3c", "TH waits for a StateValue attribute report from the DUT.",
-                     "Verify that StateValue in the report is TRUE."),
-            TestStep("4a", "Bring the DUT into a state so StateValue is FALSE."),
-            TestStep("4b", "TH waits for a StateChange event report from the DUT.",
-                     "Verify that StateChange event has StateValue set to FALSE."),
-            TestStep("4c", "TH waits for a StateValue attribute report from the DUT.",
-                     "Verify that StateValue in the report is FALSE."),
+            TestStep("2", "TH reads FeatureMap attribute.", "DUT replies with FeatureMap attribute."),
+            TestStep("3", "Bring the DUT into a state so StateValue is FALSE"),
+            TestStep("4", "TH prompt operator to verify the device is in FALSE state"),
+            TestStep(
+                "5",
+                "Set up a wildcard subscription for attributes and events of the Boolean State Cluster, "
+                "with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false",
+                "Subscription successfully established",
+            ),
+            TestStep("6", "Start accumulating all attribute and event reports on the subscription."),
+            TestStep("7", "Prompt operator to bring the DUT into a state so StateValue is TRUE"),
+            TestStep("8", "TH reads StateValue attribute from the DUT", "DUT responds success and value is TRUE"),
+            TestStep(
+                "9",
+                "Wait for up to 30 seconds for TH to have received an attribute data report",
+                "Attribute report received within 30 seconds and StateValue == TRUE",
+            ),
+            TestStep(
+                "10",
+                "If either CHGEVENT featIsSupported or BOOL.S.E00(StateChange) is set, "
+                "TH checks if an event data report is received in the previous wait; if not, "
+                "TH waits to receive an event data report for up to 30 seconds",
+                "Event report received within 30 seconds and StateChange.StateValue == TRUE",
+            ),
+            TestStep("11", "TH clears the accumulated subscription reports and restart accumulating."),
+            TestStep("12", "Prompt operator to bring the DUT into a state so StateValue is FALSE"),
+            TestStep("13", "TH reads StateValue attribute from the DUT", "DUT responds success and value is FALSE"),
+            TestStep(
+                "14",
+                "Wait for up to 30 seconds for TH to have received an attribute data report",
+                "Attribute report received within 30 seconds and StateValue == FALSE",
+            ),
+            TestStep(
+                "15",
+                "If either CHGEVENT featIsSupported or BOOL.S.E00(StateChange) is set, "
+                "TH checks if an event data report is received in the previous wait; if not, "
+                "TH waits to receive an event data report for up to 30 seconds",
+                "Event report received within 30 seconds and StateChange.StateValue == FALSE",
+            ),
         ]
 
     def pics_TC_BOOL_2_2(self) -> list[str]:
         return [
             "BOOL.S",
-            "BOOL.S.E00",  # StateChange event
+            "BOOL.S.M.ManuallyControlled",
         ]
 
+    def _has_state_change_event(self) -> bool:
+        """
+        Determines whether StateChange event should be tested.
+
+        Current behavior:
+          - Gated solely by PICS BOOL.S.E00(StateChange)
+
+        Future behavior:
+          - PICS BOOL.S.E00(StateChange) OR
+          - FeatureMap CHGEVENT bit (when defined for BooleanState)
+        """
+        if self.check_pics("BOOL.S.E00"):
+            return True
+
+        # Future extension point:
+        # if self._feature_map_has_chgevent():
+        #     return True
+
+        return False
+
+    async def _set_dut_state_value(self, endpoint: int, state: bool) -> None:
+        """
+        In CI we drive the all-clusters-app via the named pipe.
+        In manual runs, we prompt the operator.
+        """
+        logger.info("Setting DUT StateValue to %s", "TRUE" if state else "FALSE")
+        if self.is_pics_sdk_ci_only:
+            command_dict = {"Name": "SetBooleanState", "EndpointId": endpoint, "NewState": state}
+            self.write_to_app_pipe(command_dict)
+        else:
+            self.wait_for_user_input(
+                prompt_msg=f"Bring the DUT into a state so StateValue is {'TRUE' if state else 'FALSE'}."
+            )
+
+    async def _read_state_value(self, dev_ctrl, node_id: int, endpoint: int) -> bool:
+        cbool = Clusters.BooleanState
+        val = await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl,
+            node_id=node_id,
+            endpoint=endpoint,
+            cluster=cbool,
+            attribute=cbool.Attributes.StateValue,
+        )
+        return val
+
     @run_if_endpoint_matches(has_cluster(Clusters.BooleanState))
-    async def test_TC_BOOL_2_2(self):
-
-        # Commission DUT to TH done
-        self.step("1")
-
+    async def test_TC_BOOL_2_2(self) -> None:
         cbool = Clusters.BooleanState
         endpoint = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
 
-        # Check if the StateChange event is supported via PICS or feature map
-        has_event = await self.is_state_change_event_supported()
+        # Step 1: Commissioning
+        self.step("1")
 
-        if not has_event:
-            logger.info("StateChange event (BOOL.S.E00) is not supported. Skipping remaining steps.")
-            self.mark_all_remaining_steps_skipped("1a")
-            return
+        # Step 2: Read FeatureMap
+        self.step("2")
+        feature_map = await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl,
+            node_id=node_id,
+            endpoint=endpoint,
+            cluster=cbool,
+            attribute=cbool.Attributes.FeatureMap,
+        )
+        logger.info(f"FeatureMap attribute: {feature_map}")
 
-        # Set up subscription to StateValue attribute and StateChange event.
-        self.step("1a")
+        # Check if StateChange event is supported
+        has_state_change_event = self._has_state_change_event()
+        logger.info(f"StateChange event test enabled: {has_state_change_event}")
 
-        attribute_listener = AttributeSubscriptionHandler(expected_cluster=cbool, expected_attribute=cbool.Attributes.StateValue)
-        await attribute_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        # Step 3: Put DUT in FALSE
+        self.step("3")
+        await self._set_dut_state_value(endpoint, state=False)
 
-        event_listener = EventSubscriptionHandler(expected_cluster=cbool)
-        await event_listener.start(dev_ctrl, node_id, endpoint=endpoint)
+        # Step 4: Verify FALSE
+        self.step("4")
+        state_value = await self._read_state_value(dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint)
+        logger.info(f"StateValue: {state_value}")
+        asserts.assert_false(state_value, "StateValue should be FALSE")
 
-        # Bring the DUT into a state so StateValue is FALSE.
-        self.step("2a")
+        # Step 5/6: Subscription + accumulate reports
+        self.step("5")
 
-        await self.set_dut_state_value(endpoint, state=False)
+        attr_cb = AttributeSubscriptionHandler(expected_cluster=cbool)
 
-        # TH reads the StateValue attribute from the DUT.
-        self.step("2b")
+        event_cb = EventSubscriptionHandler(expected_cluster=cbool)
 
-        state_value = await self.read_state_value_from_dut(endpoint)
-        logger.info(f" --- Step 2b: state_value: {state_value}")
+        self.step("6")
+        await attr_cb.start(
+            dev_ctrl=dev_ctrl,
+            node_id=node_id,
+            endpoint=endpoint,
+            min_interval_sec=0,
+            max_interval_sec=30,
+            keepSubscriptions=False,
+        )
 
-        # Verify that value in the response is FALSE.
-        asserts.assert_false(state_value, " --- Step 2b: state_value should be False.")
+        if has_state_change_event:
+            await event_cb.start(
+                dev_ctrl=dev_ctrl,
+                node_id=node_id,
+                endpoint=endpoint,
+                min_interval_sec=0,
+                max_interval_sec=30,
+            )
 
-        # Bring the DUT into a state so StateValue is TRUE.
-        self.step("3a")
+        # Step 7: Set TRUE
+        self.step("7")
+        await self._set_dut_state_value(endpoint, state=True)
 
-        await self.set_dut_state_value(endpoint, state=True)
+        # Step 8: Read StateValue == TRUE
+        self.step("8")
+        state_value = await self._read_state_value(dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint)
+        logger.info(f"StateValue: {state_value}")
+        asserts.assert_true(state_value, "StateValue should be TRUE")
 
-        # TH waits for a StateChange event report from the DUT.
-        self.step("3b")
+        # Step 9: Wait attribute report within 30s and verify it indicates TRUE
+        self.step("9")
 
-        post_prompt_settle_delay_seconds = 1.0 if self.is_pics_sdk_ci_only else 10.0  # longer delay for manual testing
-        event = event_listener.wait_for_event_report(
-            cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
-        # Verify that StateChange event has StateValue set to TRUE.
-        asserts.assert_true(event.stateValue, "Unexpected stateValue on StateChange")
+        item = attr_cb.wait_for_attribute_report(timeout_sec=30)
 
-        # TH waits for a StateValue attribute report from the DUT.
-        self.step("3c")
+        asserts.assert_equal(item.endpoint_id, endpoint, "Attribute report received for unexpected endpoint")
+        asserts.assert_equal(item.attribute, cbool.Attributes.StateValue, "Received unexpected attribute report")
+        asserts.assert_true(item.value, "Report value for StateValue should be TRUE")
 
-        attribute_listener.wait_for_attribute_report(timeout_sec=post_prompt_settle_delay_seconds)
-        # Get the most recent StateValue attribute report
-        state_value_reports = attribute_listener.attribute_reports.get(cbool.Attributes.StateValue, [])
-        asserts.assert_greater(len(state_value_reports), 0, "No StateValue attribute reports received")
-        latest_report = state_value_reports[-1]
-        logger.info(f" --- Step 3c: latest_report.value: {latest_report.value}")
-        # Verify that StateValue in the report is TRUE.
-        asserts.assert_true(latest_report.value, "Expected StateValue attribute report to be TRUE")
+        # Step 10: Event report if supported
+        self.step("10")
 
-        # Bring the DUT into a state so StateValue is FALSE.
-        self.step("4a")
+        if has_state_change_event:
+            if event_cb.get_size() > 0:
+                evt = event_cb.get_last_event()
+                asserts.assert_is_not_none(evt, "Expected queued StateChange event")
+                data = evt.Data
+            else:
+                data = event_cb.wait_for_event_report(
+                    cbool.Events.StateChange,
+                    timeout_sec=30
+                )
 
-        await self.set_dut_state_value(endpoint, state=False)
+            asserts.assert_true(
+                data.stateValue,
+                "StateChange event should have StateValue == TRUE"
+            )
 
-        # TH waits for a StateChange event report from the DUT.
-        self.step("4b")
+        # Step 11: Clear accumulated reports
+        self.step("11")
+        attr_cb.reset()
+        event_cb.reset()
 
-        event = event_listener.wait_for_event_report(
-            cbool.Events.StateChange, timeout_sec=post_prompt_settle_delay_seconds)
-        # Verify that StateChange event has StateValue set to FALSE.
-        asserts.assert_false(event.stateValue, "Unexpected stateValue on StateChange")
+        # Step 12: Set FALSE
+        self.step("12")
+        await self._set_dut_state_value(endpoint, state=False)
 
-        # TH waits for a StateValue attribute report from the DUT.
-        self.step("4c")
+        # Step 13: Read StateValue == FALSE
+        self.step("13")
+        state_value = await self._read_state_value(dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint)
+        logger.info(f"StateValue: {state_value}")
+        asserts.assert_false(state_value, "StateValue should be FALSE at step 13")
 
-        attribute_listener.wait_for_attribute_report(timeout_sec=post_prompt_settle_delay_seconds)
-        # Get the most recent StateValue attribute report
-        state_value_reports = attribute_listener.attribute_reports.get(cbool.Attributes.StateValue, [])
-        asserts.assert_greater(len(state_value_reports), 0, "No StateValue attribute reports received")
-        latest_report = state_value_reports[-1]
-        logger.info(f" --- Step 4c: latest_report.value: {latest_report.value}")
-        # Verify that StateValue in the report is FALSE.
-        asserts.assert_false(latest_report.value, "Expected StateValue attribute report to be FALSE")
+        # Step 14: Wait attribute report within 30s and verify it indicates FALSE
+        self.step("14")
+
+        item = attr_cb.wait_for_attribute_report(timeout_sec=30)
+
+        asserts.assert_equal(item.endpoint_id, endpoint, "Attribute report received for unexpected endpoint")
+        asserts.assert_equal(item.attribute, cbool.Attributes.StateValue, "Received unexpected attribute report")
+        asserts.assert_false(item.value, "Report value for StateValue should be FALSE")
+
+        # Step 15: Event report if supported
+        self.step("15")
+
+        if has_state_change_event:
+            if event_cb.get_size() > 0:
+                evt = event_cb.get_last_event()
+                asserts.assert_is_not_none(evt, "Expected queued StateChange event")
+                data = evt.Data
+            else:
+                data = event_cb.wait_for_event_report(
+                    cbool.Events.StateChange,
+                    timeout_sec=30
+                )
+
+            asserts.assert_false(
+                data.stateValue,
+                "StateChange event should have StateValue == FALSE"
+            )
 
 
 if __name__ == "__main__":
