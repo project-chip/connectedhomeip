@@ -94,7 +94,7 @@ class Subprocess(threading.Thread):
             else:
                 self.captured_stdout.append(line)
         return line
-    
+
     def get_stdout(self) -> bytes:
         """Get captured stdout as bytes and reset the buffer."""
         temp = b''.join(self.captured_stdout)

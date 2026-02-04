@@ -76,9 +76,9 @@ class AppServerSubprocess(Subprocess):
 
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
-                         output_cb=lambda line, is_stderr: self.PREFIX + line, 
-                         f_stdout=f_stdout, 
-                         f_stderr=f_stderr, 
+                         output_cb=lambda line, is_stderr: self.PREFIX + line,
+                         f_stdout=f_stdout,
+                         f_stderr=f_stderr,
                          capture_output=capture_output)
 
 
@@ -118,7 +118,7 @@ class JFControllerSubprocess(Subprocess):
     PREFIX = b"[JF-CTRL]"
 
     def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
-                 vendor_id: int, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer, 
+                 vendor_id: int, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer,
                  f_stderr: BinaryIO = stderr.buffer, capture_output: bool = False):
 
         # Build the command list
@@ -135,8 +135,8 @@ class JFControllerSubprocess(Subprocess):
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
                          output_cb=lambda line, is_stderr: self.PREFIX + line,
-                         f_stdout=f_stdout, 
-                         f_stderr=f_stderr, 
+                         f_stdout=f_stdout,
+                         f_stderr=f_stderr,
                          capture_output=capture_output)
 
 
