@@ -372,7 +372,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
 
     // Immediate move
     ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport));
-    
+
     if ((IsWithOnOffCommand(commandId) || commandId == kInternalOffTransition) && targetLevel == mMinLevel)
     {
         ReturnErrorOnFailure(SetOnOff(false));
@@ -653,10 +653,10 @@ bool LevelControlCluster::GetOnOff()
 void LevelControlCluster::OnOffStartup(bool on)
 {
     // Per spec, On/Off and Level Control are intrinsically independent variables.
-    // Each cluster handles its own initialization via StartUpOnOff and 
-    // StartUpCurrentLevel attributes. Coupling logic (e.g., OnLevel) is 
+    // Each cluster handles its own initialization via StartUpOnOff and
+    // StartUpCurrentLevel attributes. Coupling logic (e.g., OnLevel) is
     // strictly command-based and does not apply to the initial power-up state.
-    // The application may implement custom logic if desired and use the cluster's public API 
+    // The application may implement custom logic if desired and use the cluster's public API
     // to set state after boot.
 }
 
