@@ -40,7 +40,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId                      = attributePath.mClusterId;
     [[maybe_unused]] AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+    ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == Identify::Id)
     {

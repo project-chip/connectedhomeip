@@ -33,6 +33,7 @@
 
 #include "LinuxCommissionableDataProvider.h"
 #include "Options.h"
+#include <DeviceInfoProviderImpl.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
@@ -96,6 +97,8 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 // For shell and command line processing of commands
 ExampleCredentialIssuerCommands gCredIssuerCommands;
 Commands gCommands;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
@@ -180,6 +183,10 @@ int main(int argc, char * argv[])
     }
 
     SuccessOrExit(err = CastingServer::GetInstance()->PreInit());
+
+    // DeviceInfoProvider is needed by localization configuration cluster, so we set it before Server::Init to set up the storage of
+    // DeviceInfoProvider properly.
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;

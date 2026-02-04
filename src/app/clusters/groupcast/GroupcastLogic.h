@@ -47,7 +47,6 @@ public:
     CHIP_ERROR LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
                           Groupcast::Commands::LeaveGroupResponse::Type & response);
     CHIP_ERROR UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
-    CHIP_ERROR ExpireGracePeriod(FabricIndex fabric_index, const Groupcast::Commands::ExpireGracePeriod::DecodableType & data);
     CHIP_ERROR ConfigureAuxiliaryACL(FabricIndex fabric_index,
                                      const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 

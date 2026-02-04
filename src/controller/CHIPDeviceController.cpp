@@ -46,7 +46,6 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/Base64.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
@@ -839,7 +838,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
         {
-            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
+            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %" PRIu64,
                             params.GetPeerAddress().GetRemoteId());
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
@@ -934,7 +933,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
-        ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %lu", device->GetDeviceId());
+        ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %" PRIu64, device->GetDeviceId());
         auto remoteId = device->GetDeviceId();
         auto params   = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
 
@@ -951,7 +950,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
-        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %" PRIu64 ", err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
                      err.Format());
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
@@ -2212,6 +2211,16 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     VerifyOrDie(self->GetCommissioningStage() == CommissioningStage::kFindOperationalForStayActive ||
                 self->GetCommissioningStage() == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
+
+    bool supportsConcurrent =
+        self->mCommissioningDelegate->GetCommissioningParameters().GetSupportsConcurrentConnection().ValueOr(true);
+    if (!supportsConcurrent)
+    {
+        // Concurrent mode not supported.
+        // We are in operational phase so the commissioning channel is not
+        // available anymore and it is not possible to re-arm the fail-safe timer.
+        return;
+    }
 
     // We need to do the fail-safe arming over the PASE session.
     auto * commissioneeDevice = self->FindCommissioneeDevice(peerId.GetNodeId());

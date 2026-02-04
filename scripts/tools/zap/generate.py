@@ -353,7 +353,7 @@ def main():
 
         # on 64 bit systems, allow maximum memory usage to go over 4GB (#15620)
         if sys.maxsize >= 2**32:
-            os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
+            os.environ["NODE_OPTIONS"] = "--max-old-space-size=16384 --no-force-async-hooks-checks"
 
         # `zap-cli` may extract things into a temporary directory. ensure extraction
         # does not conflict.

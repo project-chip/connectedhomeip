@@ -356,8 +356,12 @@ config MBEDTLS_HEAP_SIZE
 
 # Enable PSA Crypto dependencies for Matter
 
+choice CHIP_CRYPTO
+    default CHIP_CRYPTO_PSA if !CHIP_WIFI
+
+endchoice
+
 config CHIP_CRYPTO_PSA
-    default y if !CHIP_WIFI
     imply PSA_WANT_ALG_SPAKE2P_MATTER
     imply PSA_WANT_KEY_TYPE_SPAKE2P_KEY_PAIR_IMPORT if PSA_CRYPTO_DRIVER_OBERON
 

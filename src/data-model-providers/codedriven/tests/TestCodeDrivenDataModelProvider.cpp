@@ -190,10 +190,10 @@ public:
         return DefaultServerCluster::Startup(context);
     }
 
-    void Shutdown() override
+    void Shutdown(ClusterShutdownType shutdownType) override
     {
         shutdownCallCount++;
-        DefaultServerCluster::Shutdown();
+        DefaultServerCluster::Shutdown(shutdownType);
     }
 
     int startupCallCount  = 0;

@@ -43,6 +43,8 @@ using namespace chip;
 using namespace chip::Crypto;
 using namespace chip::Credentials;
 
+void RunCommissionerDUTVectorsTest(bool allowTestKeys);
+
 static void OnAttestationInformationVerificationCallback(void * context, const DeviceAttestationVerifier::AttestationInfo & info,
                                                          AttestationVerificationResult result)
 {
@@ -59,10 +61,21 @@ struct TestCommissionerDUTVectors : public ::testing::Test
 
 TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
 {
+    RunCommissionerDUTVectorsTest(true);
+}
+
+TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectorsNoTestKeys)
+{
+    RunCommissionerDUTVectorsTest(false);
+}
+
+void RunCommissionerDUTVectorsTest(bool allowTestKeys)
+{
     chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
     DeviceAttestationVerifier * example_dac_verifier =
         GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
     ASSERT_NE(example_dac_verifier, nullptr);
+    example_dac_verifier->EnableCdTestKeySupport(allowTestKeys);
 
     std::string dirPath("../../../../../credentials/development/commissioner_dut/");
     DIR * dir = opendir(dirPath.c_str());
@@ -87,6 +100,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
         if (strstr(entry->d_name, "struct_dac_sig_curve_secp256k1"))
             continue;
 
+        ChipLogProgress(NotSpecified, "Testing case: %s", entry->d_name);
         std::string jsonFilePath = dirPath + std::string(entry->d_name) + std::string("/test_case_vector.json");
 
         chip::Credentials::Examples::TestHarnessDACProvider dacProvider;
@@ -174,7 +188,9 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
             isSuccessCase = true;
         }
 
-        if (isSuccessCase)
+        // Every example in the SDK uses test keys because we don't have official signers. Expect they will all fail if we disallow
+        // test keys
+        if (isSuccessCase && allowTestKeys)
         {
             EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
         }

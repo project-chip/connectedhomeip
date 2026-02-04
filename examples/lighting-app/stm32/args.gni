@@ -26,6 +26,5 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/lighting-app/stm32/include/STM32WB5" ]
 chip_enable_openthread = true
 chip_enable_ble = true
-chip_config_enable_arg_parser = false
 chip_openthread_ftd = false
 chip_detail_logging = false

@@ -70,6 +70,9 @@ class AppsRegister:
     def uninit(self) -> None:
         self._stop_xmlrpc_server()
 
+    def terminate(self):
+        self.uninit()
+
     @property
     @with_accessories_lock
     def accessories(self):

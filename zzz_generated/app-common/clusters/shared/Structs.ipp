@@ -856,6 +856,8 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kVideoStreams), videoStreams);
+    encoder.Encode(to_underlying(Fields::kAudioStreams), audioStreams);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -901,6 +903,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
             err = DataModel::Decode(reader, metadataEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreams))
+        {
+            err = DataModel::Decode(reader, videoStreams);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreams))
+        {
+            err = DataModel::Decode(reader, audioStreams);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {

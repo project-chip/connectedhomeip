@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/server-cluster/ServerClusterInterface.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/AccessControl.h>
@@ -22,16 +23,18 @@
 #endif
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/AccessControl/Enums.h>
 #include <clusters/AccessControl/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include <app-common/zap-generated/cluster-objects.h>
 #endif
@@ -43,6 +46,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
+using chip::Testing::IsGeneratedCommandsListEqualTo;
 // Simple DeviceTypeResolver for tests
 class TestDeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
 {
@@ -100,6 +106,11 @@ struct TestAccessControlCluster : public ::testing::Test
         Access::GetAccessControl().Finish();
         Platform::MemoryShutdown();
     }
+    inline static AccessControlCluster::Context defaultContext{
+        .persistentStorage = Server::GetInstance().GetPersistentStorage(),
+        .fabricTable       = Server::GetInstance().GetFabricTable(),
+        .accessControl     = Access::GetAccessControl(),
+    };
 };
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -108,7 +119,7 @@ struct TestAccessControlCluster : public ::testing::Test
 // and restores the previous provider in TearDown().
 struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluster
 {
-    TestAccessControlClusterWithMockProvider() : mTester(mCluster) {}
+    TestAccessControlClusterWithMockProvider() : mCluster(defaultContext), mTester(mCluster) {}
 
     void SetUp() override
     {
@@ -121,13 +132,14 @@ struct TestAccessControlClusterWithMockProvider : public TestAccessControlCluste
 
     void TearDown() override
     {
-        mCluster.Shutdown();
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         // Restore the previous provider to avoid use-after-free issues
         Access::GetAccessControl().SetAccessRestrictionProvider(mPreviousProvider);
     }
 
     TestAccessRestrictionProvider mMockProvider;
     AccessControlCluster mCluster;
+    // mTester must be declared after mCluster to ensure proper construction order
     Testing::ClusterTester mTester;
 
 private:
@@ -137,13 +149,13 @@ private:
 
 TEST_F(TestAccessControlCluster, CompileTest)
 {
-    AccessControlCluster cluster;
+    AccessControlCluster cluster(defaultContext);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, AccessControl::Id }), BitFlags<ClusterQualityFlags>());
 }
 
 TEST_F(TestAccessControlCluster, CommandsTest)
 {
-    AccessControlCluster cluster;
+    AccessControlCluster cluster(defaultContext);
     ConcreteClusterPath accessControlPath = ConcreteClusterPath(kRootEndpointId, AccessControl::Id);
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
@@ -156,43 +168,39 @@ TEST_F(TestAccessControlCluster, CommandsTest)
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Check accepted commands
-    ASSERT_EQ(acceptedCommands.size(), AccessControl::Commands::kAcceptedCommandsCount);
-    ASSERT_EQ(acceptedCommands[0].commandId, AccessControl::Commands::ReviewFabricRestrictions::Id);
-    ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
-              AccessControl::Commands::ReviewFabricRestrictions::kMetadataEntry.GetInvokePrivilege());
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  AccessControl::Commands::ReviewFabricRestrictions::kMetadataEntry,
+                                              }));
 
     // Check generated commands
-    ASSERT_EQ(generatedCommands.size(), AccessControl::Commands::kGeneratedCommandsCount);
-    ASSERT_EQ(generatedCommands[0], AccessControl::Commands::ReviewFabricRestrictionsResponse::Id);
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                               {
+                                                   AccessControl::Commands::ReviewFabricRestrictionsResponse::Id,
+                                               }));
 #else
-    ASSERT_EQ(acceptedCommands.size(), (size_t) (0));
-    ASSERT_EQ(generatedCommands.size(), (size_t) (0));
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, {}));
 #endif
 }
 
 TEST_F(TestAccessControlCluster, AttributesTest)
 {
-    AccessControlCluster cluster;
-    ConcreteClusterPath accessControlPath = ConcreteClusterPath(kRootEndpointId, AccessControl::Id);
+    AccessControlCluster cluster(defaultContext);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-    ASSERT_EQ(cluster.Attributes(accessControlPath, attributesBuilder), CHIP_NO_ERROR);
+    std::vector<DataModel::AttributeEntry> expectedAttributes(AccessControl::Attributes::kMandatoryMetadata.begin(),
+                                                              AccessControl::Attributes::kMandatoryMetadata.end());
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-    ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+    expectedAttributes.push_back(AccessControl::Attributes::Extension::kMetadataEntry);
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+    expectedAttributes.push_back(AccessControl::Attributes::CommissioningARL::kMetadataEntry);
+    expectedAttributes.push_back(AccessControl::Attributes::Arl::kMetadataEntry);
 #endif
-    }),
-              CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
 }
 
 // Helper function to count elements in a decodable list
@@ -213,7 +221,7 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
 // Test that all available attributes (mandatory and optional) can be read
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
 {
-    AccessControlCluster cluster;
+    AccessControlCluster cluster(defaultContext);
     Testing::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -266,7 +274,7 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
     ASSERT_EQ(arlCount, 0u);
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS

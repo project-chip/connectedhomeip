@@ -20,9 +20,9 @@ from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
-from matter.testing.conformance import ConformanceDecision, ConformanceException
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, ConformanceException
 from matter.testing.global_attribute_ids import is_standard_attribute_id
-from matter.testing.matter_testing import default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
 from matter.tlv import uint
 
@@ -50,6 +50,8 @@ class TestSpecParsingSelection(DeviceConformanceTests):
                              "Incorrect directory selected for 1.4.2")
         asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.k1_5,
                              "Incorrect directory selected for 1.5")
+        asserts.assert_equal(dm_from_spec_version(0x01050100), PrebuiltDataModelDirectory.k1_5_1,
+                             "Incorrect directory selected for 1.5.1")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -62,9 +64,9 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.4.FF"):
             dm_from_spec_version(0x0104FF00)
 
-        # Any dot release besides 0 for 1.5 should error
-        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.1"):
-            dm_from_spec_version(0x01050100)
+        # Any dot release above .1 should error for 1.5
+        with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.2"):
+            dm_from_spec_version(0x01050200)
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.5.FF"):
             dm_from_spec_version(0x0105FF00)
 
@@ -94,13 +96,14 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             spec_attributes = xml_clusters[cluster.id].attributes
             spec_accepted_commands = xml_clusters[cluster.id].accepted_commands
             spec_generated_commands = xml_clusters[cluster.id].generated_commands
+            info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[], all_command_list=[], cluster_revision=1)
             # Build just the lists - basic composition checks the wildcard against the lists, conformance just uses lists
             attributes = [id for id, a in spec_attributes.items() if a.conformance(
-                feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+                info).decision == ConformanceDecision.MANDATORY]
             accepted_commands = [id for id, c in spec_accepted_commands.items() if c.conformance(
-                feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+                info).decision == ConformanceDecision.MANDATORY]
             generated_commands = [id for id, c in spec_generated_commands.items() if c.conformance(
-                feature_map, [], []).decision == ConformanceDecision.MANDATORY]
+                info).decision == ConformanceDecision.MANDATORY]
             attr = cluster.Attributes
 
             resp = {}

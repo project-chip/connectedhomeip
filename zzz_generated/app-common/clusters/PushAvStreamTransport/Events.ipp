@@ -38,6 +38,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kConnectionID), connectionID));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kTriggerType), triggerType));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kActivationReason), activationReason));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kContainerType), containerType));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kCMAFSessionNumber), CMAFSessionNumber));
     return aWriter.EndContainer(outer);
 }
 
@@ -63,6 +65,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, activationReason);
         }
+        else if (__context_tag == to_underlying(Fields::kContainerType))
+        {
+            err = DataModel::Decode(reader, containerType);
+        }
+        else if (__context_tag == to_underlying(Fields::kCMAFSessionNumber))
+        {
+            err = DataModel::Decode(reader, CMAFSessionNumber);
+        }
         else
         {
         }
@@ -77,6 +87,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kConnectionID), connectionID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kContainerType), containerType));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kCMAFSessionNumber), CMAFSessionNumber));
     return aWriter.EndContainer(outer);
 }
 
@@ -93,6 +105,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kConnectionID))
         {
             err = DataModel::Decode(reader, connectionID);
+        }
+        else if (__context_tag == to_underlying(Fields::kContainerType))
+        {
+            err = DataModel::Decode(reader, containerType);
+        }
+        else if (__context_tag == to_underlying(Fields::kCMAFSessionNumber))
+        {
+            err = DataModel::Decode(reader, CMAFSessionNumber);
         }
         else
         {

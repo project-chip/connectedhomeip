@@ -27,8 +27,6 @@
 
 #include <lib/core/CHIPCore.h>
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -163,5 +161,3 @@ public:
 
 } // namespace ArgParser
 } // namespace chip
-
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER

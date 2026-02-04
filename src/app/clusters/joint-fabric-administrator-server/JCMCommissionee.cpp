@@ -302,14 +302,7 @@ TrustVerificationError JCMCommissionee::PerformVendorIdVerification()
 
         chip::Messaging::ExchangeManager * exchangeMgr = &chip::Server::GetInstance().GetExchangeManager();
 
-        auto sessionHandleGetter = [this]() -> Optional<SessionHandle> {
-            Messaging::ExchangeContext * ec = this->mCommandHandle.Get()->GetExchangeContext();
-            if (ec == nullptr)
-            {
-                return Optional<SessionHandle>::Missing();
-            }
-            return MakeOptional(ec->GetSessionHandle());
-        };
+        auto sessionHandleGetter = [this]() -> Optional<SessionHandle> { return mSessionHolder.Get(); };
 
         CHIP_ERROR verifyErr = VerifyVendorId(exchangeMgr, sessionHandleGetter, &mInfo);
         if (verifyErr != CHIP_NO_ERROR)
