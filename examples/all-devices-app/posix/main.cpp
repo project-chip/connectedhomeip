@@ -220,7 +220,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
             .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
-            .accessControl              = Access::GetAccessControl(),              //
             .eventManagement            = EventManagement::GetInstance(),                       //
              .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                     //
 
