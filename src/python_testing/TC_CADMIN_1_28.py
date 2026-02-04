@@ -45,12 +45,10 @@ from mdns_discovery import mdns_discovery
 import matter.clusters as Clusters
 from support_modules.cadmin_support import CADMINBaseTest
 import matter.tlv
-from matter.testing.commissioning import CustomCommissioningParameters
 from matter import CertificateAuthority
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -139,7 +137,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
     @async_test_body
     async def test_TC_CADMIN_1_28(self):
-        
+
         self.step("1")
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
@@ -305,7 +303,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             message=f"pairing onnetwork 22 {self.thserver_fabric_b_passcode}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
             timeout=10)
-        
+
         # Creating a Controller for Ecosystem B
         _fabric_b_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoBCtrlStorage['repl-config'], self.ecoBCtrlStorage['sdk-config'])
@@ -340,7 +338,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
         services = [self.ParsedService(service) for service in raw_services]
         for parsed_service in services:
             if parsed_service.cm == 3:
-                service_found = [True, parsed_service] 
+                service_found = [True, parsed_service]
                 break
         asserts.assert_true(service_found[0], f"Successfully found service with CM={service_found[1].cm}, D={service_found[1].d}")
 
@@ -355,25 +353,25 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         log_fab_a_admin = self.fabric_a_admin.get_stdout()
         log_fab_b_ctrl = self.fabric_b_ctrl.get_stdout()
-        asserts.assert_in(b"[SVR] Commissioning completed session establishment step", log_fab_a_admin, 
+        asserts.assert_in(b"[SVR] Commissioning completed session establishment step", log_fab_a_admin,
                           "CASE session was established with success")
 
         self.step("6")
-        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: STORING_ENDPOINT_ID", log_fab_a_admin, 
+        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: STORING_ENDPOINT_ID", log_fab_a_admin,
                           "Fabric Table Vendor ID Verification procedure is successful")
-        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: READING_COMMISSIONER_ADMIN_FABRIC_INDEX", log_fab_a_admin, 
+        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: READING_COMMISSIONER_ADMIN_FABRIC_INDEX", log_fab_a_admin,
                           "Fabric Table Vendor ID Verification procedure is successful")
 
         self.step("7")
         # Command 0x0E is SignVIDVerificationResponse which contains the ICAC CSR response in JCM context
-        asserts.assert_in(b"[CTL] Successfully received SignVIDVerificationResponse", log_fab_b_ctrl, 
+        asserts.assert_in(b"[CTL] Successfully received SignVIDVerificationResponse", log_fab_b_ctrl,
                           "DUT_AJF sends ICACCSRResponse to TH_AAF2 with ICAC CSR certificate as a DER-encoded string")
-        
+
         self.step("8")
         # Command 0x05 is CSRResponse
-        asserts.assert_in(b"[CTL] Received certificate signing request from the device", log_fab_b_ctrl, 
+        asserts.assert_in(b"[CTL] Received certificate signing request from the device", log_fab_b_ctrl,
                           "DUT_AJF sends ICACResponse to TH_AAF2")
-        
+
         self.step("9")
         response = await devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,

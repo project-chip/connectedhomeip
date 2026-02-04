@@ -115,9 +115,9 @@ class TC_CADMIN_1_27(MatterBaseTest):
 
     def steps_TC_CADMIN_1_27(self) -> list[TestStep]:
         return [
-            TestStep("1", "DUT_AAF starts a commissioning process to commission TH_DEV1 on Fabric 1", 
+            TestStep("1", "DUT_AAF starts a commissioning process to commission TH_DEV1 on Fabric 1",
                      "TH_DEV1 is commissioned by DUT_AAF on Fabric 1"),
-            TestStep("2", "TH_AJF2 starts a commissioning process to commission TH_DEV2 on Fabric 2", 
+            TestStep("2", "TH_AJF2 starts a commissioning process to commission TH_DEV2 on Fabric 2",
                      "TH_DEV2 is commissioned by TH_AJF2 on Fabric 2"),
             TestStep("3", "Open a Commissioning Window on TH_AJF2 using OpenJointCommissioningWindow command",
                      "Verify TH_AJF2 opens its Commissioning window to allow another commissioning"),
@@ -440,33 +440,33 @@ class TC_CADMIN_1_27(MatterBaseTest):
             timeout=30)
 
         log_fab_a_ctrl = self.fabric_a_ctrl.get_stdout()
-        asserts.assert_in(b"[CTL] Successfully finished commissioning step 'AttestationVerification'", log_fab_a_ctrl, 
+        asserts.assert_in(b"[CTL] Successfully finished commissioning step 'AttestationVerification'", log_fab_a_ctrl,
                           "DUT_AAF complete with success step 10 (successful Device Attestation Procedure) from standard commissioning flow for TH_AJF2")
 
         self.step("5")
-        asserts.assert_in(b"[CTL] JCM: Successfully parsed the Administrator NOC and ICAC", log_fab_a_ctrl, 
+        asserts.assert_in(b"[CTL] JCM: Successfully parsed the Administrator NOC and ICAC", log_fab_a_ctrl,
                           "NOC verification confirms the presence of Administrator CAT")
-        
+
         self.step("6")
-        asserts.assert_in(b"[CTL] JCM: Successfully parsed the Administrator Fabric Table", log_fab_a_ctrl, 
+        asserts.assert_in(b"[CTL] JCM: Successfully parsed the Administrator Fabric Table", log_fab_a_ctrl,
                           "Fabric Table Vendor ID Verification procedure is successful")
-        
+
         self.step("7")
-        asserts.assert_in(b"[TOO] CASE establishment successful", log_fab_a_ctrl, 
+        asserts.assert_in(b"[TOO] CASE establishment successful", log_fab_a_ctrl,
                           "CASE session was established with success")
-        
+
         log_fab_b_admin = self.fabric_b_admin.get_stdout()
 
         self.step("8")
-        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: STORING_ENDPOINT_ID", log_fab_b_admin, 
+        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: STORING_ENDPOINT_ID", log_fab_b_admin,
                           "TH_AJF2 saves the endpoint as JointEndPointA")
 
         self.step("9")
-        asserts.assert_in(b"[CTL] Received callback from the CA for NOC Chain generation. Status: Success", log_fab_a_ctrl, 
+        asserts.assert_in(b"[CTL] Received callback from the CA for NOC Chain generation. Status: Success", log_fab_a_ctrl,
                           "TH_AJF2 save the cross-signed ICAC from AddICAC command as JFCorssSignedICAC")
-        
+
         self.step("10")
-        asserts.assert_in(b"[CTL] Commissioning complete for node ID 0x000000000000000F: success", log_fab_a_ctrl, 
+        asserts.assert_in(b"[CTL] Commissioning complete for node ID 0x000000000000000F: success", log_fab_a_ctrl,
                           "TCommissioning of TH_AJF2 by DUT_AAF is completed successfully")
 
         # Shutdown the Python Controllers started at the beginning of this script
