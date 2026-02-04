@@ -389,7 +389,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         asserts.assert_equal(
             self.jfctrl_fabric_b_vid,
             response[0][Clusters.OperationalCredentials].fabrics[0].vendorID,
-            "JF-Admin App on Ecosystem A doesn't have the correct VID")
+            "JF-Admin App on Ecosystem B doesn't have the correct VID")
 
         response = await devCtrlEcoB.ReadAttribute(
             nodeId=22, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
@@ -467,7 +467,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         
         self.step("10")
         asserts.assert_in(b"[CTL] Commissioning complete for node ID 0x000000000000000F: success", log_fab_a_ctrl, 
-                          "TH_AJF2 save the cross-signed ICAC from AddICAC command as JFCorssSignedICAC")
+                          "TCommissioning of TH_AJF2 by DUT_AAF is completed successfully")
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()

@@ -60,7 +60,7 @@ class Subprocess(threading.Thread):
             f_stdout: The file to forward the stdout to.
             f_stderr: The file to forward the stderr to.
             capture_output: Flag to capture stdout and stderr in a buffer
-            captured_stdout: Buffer for captured stdoud
+            captured_stdout: Buffer for captured stdout
             captured_stderr: Buffer for captured stderr
         """
         super().__init__()
