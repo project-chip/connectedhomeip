@@ -23,11 +23,11 @@ source_set("level-control") {
 
   public_deps = [
     "${chip_root}/src/app/cluster-building-blocks",
+    "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/zzz_generated/app-common/clusters/LevelControl",
   ]
 }
