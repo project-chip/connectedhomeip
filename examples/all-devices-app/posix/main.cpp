@@ -85,6 +85,8 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
+        Credentials::DeviceAttestationCredentialsProvider & dacProvider;
+        EventManagement & eventManagement;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -107,6 +109,9 @@ public:
                     .groupDataProvider          = mContext.groupDataProvider,          //
                     .sessionManager             = mContext.sessionManager,             //
                     .dnssdServer                = mContext.dnssdServer,                //
+                    .dacProvider                = mContext.dacProvider,                //
+                    .eventManagement            = mContext.eventManagement,            //
+
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
@@ -194,6 +199,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
             .dnssdServer                = DnssdServer::Instance(),                               //
+            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+            .eventManagement            = EventManagement::GetInstance(),                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
