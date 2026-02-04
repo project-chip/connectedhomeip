@@ -530,7 +530,7 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ChipLogProgress(Camera, "EndSession for session: %u", sessionId);
+    ChipLogProgress(Camera, "EndSession for session: %u, reason: %u", sessionId, static_cast<unsigned>(reasonCode));
     CleanupSession(sessionId);
 
     return CHIP_NO_ERROR;
