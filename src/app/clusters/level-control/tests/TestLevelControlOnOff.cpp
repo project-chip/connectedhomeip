@@ -247,7 +247,7 @@ TEST_F(TestLevelControlOnOff, TestStepWithOnOff)
     EXPECT_TRUE(tester.Invoke(Commands::StepWithOnOff::Id, data).IsSuccess());
 
     EXPECT_TRUE(onOffCluster.GetOnOff());
-    
+
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 10u);
