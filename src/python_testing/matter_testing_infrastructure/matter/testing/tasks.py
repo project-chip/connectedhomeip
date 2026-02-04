@@ -74,8 +74,8 @@ class Subprocess(threading.Thread):
         self.output_match: Optional[re.Pattern] = None
         self.returncode = None
         self.capture_output = capture_output
-        self.captured_stdout = []
-        self.captured_stderr = []
+        self.captured_stdout: list[bytes] = []
+        self.captured_stderr: list[bytes] = []
 
     def set_output_match(self, pattern: Union[str, re.Pattern]):
         if isinstance(pattern, str):
