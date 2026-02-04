@@ -125,8 +125,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
-                                        .WithOnOff(onOffCluster) };
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     onOffCluster.AddDelegate(&cluster);
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -161,7 +160,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     EXPECT_EQ(readLevel.Value(), 10u);
 
     // 2. Move Down to 0 with OnOff. Should Turn Off AT END.
-    data.level                   = 0;
+    data.level = 0;
 
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevelWithOnOff::Id, data).IsSuccess());
 
@@ -280,9 +279,9 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
     chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
 
     // Configure OnOffTransitionTime
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
-                                     .WithOnOff(onOffCluster)
-                                     .WithOnOffTransitionTime(100) }; // 10s
+    LevelControlCluster cluster{
+        LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster).WithOnOffTransitionTime(100)
+    }; // 10s
 
     onOffCluster.AddDelegate(&cluster);
 
@@ -382,7 +381,7 @@ TEST_F(TestLevelControlOnOff, TestRestorationBehaviorWhenOnLevelNull)
 
     LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate)
                                      .WithLighting(DataModel::NullNullable) // MinLevel=1
-                                     .WithOnOff(onOffCluster) };                        // Dependency active
+                                     .WithOnOff(onOffCluster) };            // Dependency active
     onOffCluster.AddDelegate(&cluster);
 
     chip::Testing::ClusterTester tester(cluster);
