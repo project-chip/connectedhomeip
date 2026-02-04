@@ -79,7 +79,7 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None,
                     ]
                 )
         else:
-            raise NotImplementedError(f"No sysroot and compiler targets defined for target_cpu '{cross_compile_cpu_type}'")
+            raise click.UsageError(f"No sysroot and compiler targets defined for target_cpu '{cross_compile_cpu_type}'")
 
     # Set compilers for CMake
     cmake_cmd.extend(
