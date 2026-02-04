@@ -66,7 +66,6 @@ executable("matter-water-heater-app") {
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
-      "PW_RPC_ELEC_SERVICE=1",
       "PW_RPC_TRACING_SERVICE=1",
     ]
 
@@ -92,7 +91,6 @@ executable("matter-water-heater-app") {
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:elec_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",
     ]
 

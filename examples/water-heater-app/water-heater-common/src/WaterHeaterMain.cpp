@@ -31,6 +31,7 @@
 #include <WaterHeaterManufacturer.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
+#include <energy-management/electrical-sensor/include/ElectricalPowerMeasurementDelegate.h>
 #include <water-heater-mode.h>
 
 #include <DEMConfig.h>
@@ -189,230 +190,29 @@ CHIP_ERROR WaterHeaterManufacturerShutdown()
     return CHIP_NO_ERROR;
 }
 
-/*
- *  @brief  Creates a Delegate and Instance for PowerTopology clusters
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
- */
-CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId)
-{
-    CHIP_ERROR err;
-
-    if (gPTDelegate || gPTInstance)
-    {
-        ChipLogError(AppServer, "PowerTopology Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gPTDelegate = std::make_unique<PowerTopologyDelegate>();
-    if (!gPTDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for PowerTopology Delegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    gPTInstance = std::make_unique<PowerTopologyInstance>(
-        EndpointId(endpointId), *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology));
-
-    if (!gPTInstance)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for PowerTopology Instance");
-        gPTDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    err = gPTInstance->Init(); /* Register Attribute & Command handlers */
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gPTInstance");
-        gPTInstance.reset();
-        gPTDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerTopologyShutdown()
-{
-    /* Do this in the order Instance first, then delegate
-     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
-     */
-    if (gPTInstance)
-    {
-        /* deregister attribute & command handlers */
-        gPTInstance->Shutdown();
-        gPTInstance.reset();
-    }
-
-    if (gPTDelegate)
-    {
-        gPTDelegate.reset();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-/*
- *  @brief  Creates a Delegate and Instance for Electrical Power Measurement cluster
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
- */
-CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId)
-{
-    CHIP_ERROR err;
-
-    if (gEPMDelegate || gEPMInstance)
-    {
-        ChipLogError(AppServer, "EPM Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gEPMDelegate = std::make_unique<ElectricalPowerMeasurementDelegate>();
-    if (!gEPMDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for EPM Delegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Manufacturer may optionally not support all features, commands & attributes */
-    /* Turning on all optional features and attributes for test certification purposes */
-    gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
-        EndpointId(endpointId), *gEPMDelegate,
-        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
-            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
-            ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
-            ElectricalPowerMeasurement::Feature::kPowerQuality),
-        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
-
-    if (!gEPMInstance)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for EPM Instance");
-        gEPMDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    err = gEPMInstance->Init(); /* Register Attribute & Command handlers */
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gEPMInstance");
-        gEPMInstance.reset();
-        gEPMDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ElectricalPowerMeasurementShutdown()
-{
-    /* Do this in the order Instance first, then delegate
-     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
-     */
-    if (gEPMInstance)
-    {
-        /* deregister attribute & command handlers */
-        gEPMInstance->Shutdown();
-        gEPMInstance.reset();
-    }
-
-    if (gEPMDelegate)
-    {
-        gEPMDelegate.reset();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-/*
- *  @brief  Creates a Delegate and Instance for DEM
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
- */
-CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId)
-{
-    if (gDEMDelegate || gDEMInstance)
-    {
-        ChipLogError(AppServer, "DEM Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gDEMDelegate = std::make_unique<DeviceEnergyManagementDelegate>();
-    if (!gDEMDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementDelegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
-
-    /* Manufacturer may optionally not support all features, commands & attributes */
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(endpointId, *gDEMDelegate, featureMap);
-
-    if (!gDEMInstance)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementManager");
-        gDEMDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    gDEMDelegate->SetDeviceEnergyManagementInstance(*gDEMInstance);
-
-    CHIP_ERROR err = gDEMInstance->Init(); /* Register Attribute & Command handlers */
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gDEMInstance");
-        gDEMInstance.reset();
-        gDEMDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void DeviceEnergyManagementShutdown()
-{
-    /* Do this in the order Instance first, then delegate
-     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
-     */
-    if (gDEMInstance)
-    {
-        /* deregister attribute & command handlers */
-        gDEMInstance->Shutdown();
-        gDEMInstance.reset();
-    }
-    if (gDEMDelegate)
-    {
-        gDEMDelegate.reset();
-    }
-}
-
 CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 {
     if (!gCommonClustersInitialized)
     {
-        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId);
-        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(endpointId);
-        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId);
+        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, GetFeatureMapFromCmdLine());
+        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(
+            endpointId, gEPMDelegate, gEPMInstance,
+            BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(ElectricalPowerMeasurement::Feature::kDirectCurrent,
+                                                                   ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+            BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor));
+        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId, gPTDelegate, gPTInstance);
     }
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(gEPMDelegate && gEPMInstance, CHIP_ERROR_INCORRECT_STATE);
@@ -492,18 +292,19 @@ void WaterHeaterApplicationInit()
     gDEMDelegate->SetDEMManufacturerDelegate(*gWaterHeaterManufacturer.get());
 
     // Set the abs min and max power
-    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetAbsMinPower(1200000); // 1.2KW
-    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetAbsMaxPower(7600000); // 7.6KW
+    // Simulating a heat pump water heater with a max power of 5.6KW
+    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetAbsMinPower(0);       // 0KW
+    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetAbsMaxPower(5600000); // 5.6KW
 }
 
 void WaterHeaterApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App (WaterHeater): WaterHeaterShutdown()");
+    ChipLogDetail(AppServer, "Water Heater App: WaterHeaterShutdown()");
 
     /* Shutdown in reverse order that they were created */
-    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown();              /* Free the PowerTopology */
-    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(); /* Free the Energy Meter */
-    DeviceEnergyManagementShutdown();                              /* Free the DEM */
+    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown(gPTInstance, gPTDelegate);                /* Free the PowerTopology */
+    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(gEPMInstance, gEPMDelegate); /* Free the Energy Meter */
+    DeviceEnergyManagementShutdown(gDEMInstance, gDEMDelegate);                              /* Free the DEM */
 
     // Shutdown Water Heater specific clusters
     TEMPORARY_RETURN_IGNORED WaterHeaterManufacturerShutdown();
