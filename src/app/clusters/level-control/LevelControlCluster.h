@@ -266,6 +266,10 @@ private:
     CommandId mCurrentCommandId = kInvalidCommandId;
     DataModel::Nullable<uint8_t> mLevelBeforeTurnedOff; // Stores the level before turning Off, to restore on On if OnLevel is null.
 
+    // Jitter Compensation
+    uint64_t mTransitionStartTimeMs = 0;
+    uint8_t mInitialLevel           = 0;
+
     // Used to ignore/prevent reentrance of OnOffChanged callbacks when we are programmatically setting On/Off state
     // during a Level Control command (like MoveToLevelWithOnOff).
     bool mTemporarilyIgnoreOnOffCallbacks = false;

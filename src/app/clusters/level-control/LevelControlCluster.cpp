@@ -697,9 +697,17 @@ void LevelControlCluster::TimerFired()
 {
     VerifyOrReturn(!mCurrentLevel.value().IsNull());
 
-    mElapsedTimeMs += mTickDurationMs;
+    uint64_t now = System::SystemClock().GetMonotonicMilliseconds64().count();
+    // Check for monotonic clock rollover or backward jump (though rare/impossible for monotonic) just in case
+    if (now < mTransitionStartTimeMs)
+    {
+        mTransitionStartTimeMs = now; // restart reference
+    }
 
-    // RemainingTime update: This is a "regular countdown", so use Tick logic (only report at 0)
+    uint64_t elapsed = now - mTransitionStartTimeMs;
+    mElapsedTimeMs   = static_cast<uint32_t>(elapsed);
+
+    // RemainingTime update
     uint16_t remainingTimeMs = 0;
     if (mFeatureMap.Has(Feature::kLighting) && mTransitionTimeMs > 0 && mElapsedTimeMs < mTransitionTimeMs)
     {
@@ -707,29 +715,37 @@ void LevelControlCluster::TimerFired()
     }
     UpdateRemainingTime(remainingTimeMs, ReportingMode::kQuietReport);
 
-    // Calculate new level
-    uint8_t currentLevel = mCurrentLevel.value().Value();
-    if (mIncreasing && (currentLevel < mTargetLevel))
+    // Calculate new level based on time interpolation
+    uint8_t currentLevel = mInitialLevel;
+
+    if (mElapsedTimeMs >= mTransitionTimeMs)
     {
-        currentLevel++;
+        currentLevel = mTargetLevel;
     }
-    else if (!mIncreasing && (currentLevel > mTargetLevel))
+    else if (mTransitionTimeMs > 0)
     {
-        currentLevel--;
+        // Interpolate
+        // Delta = Target - Initial (signed)
+        // Progress = Elapsed / Total
+        // New = Initial + Delta * Progress
+        // Use 64-bit to prevent overflow during multiply
+        int32_t delta = static_cast<int32_t>(mTargetLevel) - static_cast<int32_t>(mInitialLevel);
+        int32_t change = static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
+        currentLevel = static_cast<uint8_t>(static_cast<int32_t>(mInitialLevel) + change);
     }
 
     // End of transition
-    if (currentLevel == mTargetLevel)
+    if (currentLevel == mTargetLevel || mElapsedTimeMs >= mTransitionTimeMs)
     {
         // Safe to ignore error: mTargetLevel was validated when starting the transition.
         // SetCurrentLevel calls mDelegate.OnLevelChanged(currentLevel), so the delegate is updated.
-        RETURN_SAFELY_IGNORED SetCurrentLevel(currentLevel, ReportingMode::kForceReport);
+        RETURN_SAFELY_IGNORED SetCurrentLevel(mTargetLevel, ReportingMode::kForceReport);
 
         UpdateRemainingTime(0, ReportingMode::kForceReport); // Transition complete, ensure RemainingTime is 0
 
         // If reached minimum, turn off OnOff cluster
         if ((IsWithOnOffCommand(mCurrentCommandId) || mCurrentCommandId == kInternalOffTransition) &&
-            (currentLevel == mMinLevel || currentLevel == 0))
+            (mTargetLevel == mMinLevel || mTargetLevel == 0))
         {
             LogErrorOnFailure(SetOnOff(false));
         }
@@ -812,6 +828,9 @@ void LevelControlCluster::StartTransition(uint32_t tickDurationMs, uint32_t tran
     mTransitionTimeMs = transitionTimeMs;
     mTickDurationMs   = tickDurationMs;
     mElapsedTimeMs    = 0;
+
+    mTransitionStartTimeMs = System::SystemClock().GetMonotonicMilliseconds64().count();
+    mInitialLevel          = mCurrentLevel.value().Value();
 
     // Command invoked: Set RemainingTime using full reporting rules
     UpdateRemainingTime(mTransitionTimeMs, ReportingMode::kForceReport);

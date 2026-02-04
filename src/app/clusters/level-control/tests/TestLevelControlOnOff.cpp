@@ -152,7 +152,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     // Advance to end
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     }
 
     DataModel::Nullable<uint8_t> readLevel;
@@ -170,7 +170,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     // Advance to end
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     }
 
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
@@ -310,7 +310,7 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
 
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     }
 
     DataModel::Nullable<uint8_t> readLevel;
@@ -331,7 +331,7 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
 
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     }
 
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
@@ -449,7 +449,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffReentrancy)
     int limit = 300;
     while (mockTimer.IsTimerActive(&cluster) && limit-- > 0)
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     }
 
     DataModel::Nullable<uint8_t> readLevel;
@@ -480,13 +480,13 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     // Off -> Stores 200.
     EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
     while (mockTimer.IsTimerActive(&cluster))
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     EXPECT_FALSE(onOffCluster.GetOnOff());
 
     // On -> Restores 200.
     EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
     while (mockTimer.IsTimerActive(&cluster))
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     EXPECT_TRUE(onOffCluster.GetOnOff());
 
     DataModel::Nullable<uint8_t> readLevel;
@@ -508,7 +508,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     int limit = 200;
     while (mockTimer.IsTimerActive(&cluster) && limit-- > 0)
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     }
 
     EXPECT_FALSE(onOffCluster.GetOnOff());
@@ -519,7 +519,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
 
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     }
 
     // 5. Check Level.

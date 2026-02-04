@@ -391,7 +391,7 @@ TEST_F(TestLevelControlBase, TestTimerFired)
     EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
 
     // Advance 1000ms -> Level 1
-    mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    AdvanceClock(System::Clock::Milliseconds64(1000));
 
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
@@ -399,7 +399,7 @@ TEST_F(TestLevelControlBase, TestTimerFired)
     EXPECT_TRUE(mockTimer.IsTimerActive(&cluster)); // Still going
 
     // Advance 1000ms -> Level 2
-    mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+    AdvanceClock(System::Clock::Milliseconds64(1000));
 
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 2u);
@@ -440,6 +440,7 @@ TEST_F(TestLevelControlBase, TestStopCommand)
 
 TEST_F(TestLevelControlBase, TestMoveToLevelFallback)
 {
+    // Test that if we are transitioning, a new command overrides it.
     LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOffTransitionTime(0) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -509,7 +510,7 @@ TEST_F(TestLevelControlBase, TestMoveCommand)
     // Advance 1s -> should increase by 10 (approx)
     for (int i = 0; i < 10; i++)
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     }
 
     DataModel::Nullable<uint8_t> readLevel;
@@ -552,7 +553,7 @@ TEST_F(TestLevelControlBase, TestStepCommand)
     // Advance 10s. Should reach 10.
     for (int i = 0; i < 10; i++)
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(1000));
+        AdvanceClock(System::Clock::Milliseconds64(1000));
     }
 
     DataModel::Nullable<uint8_t> readLevel;
@@ -600,8 +601,7 @@ TEST_F(TestLevelControlBase, TestCurrentLevelReporting)
     // Advance 500ms (Step 1: Level 1)
     // 0.5s elapsed. Should NOT report (less than 1s).
     changeListener.DirtyList().clear();
-    mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
-    mockTimer.AdvanceClock(System::Clock::Milliseconds64(500));
+    AdvanceClock(System::Clock::Milliseconds64(500));
 
     // Verify Level changed
     EXPECT_EQ(cluster.GetCurrentLevel().Value(), 1u);
@@ -619,8 +619,7 @@ TEST_F(TestLevelControlBase, TestCurrentLevelReporting)
     // 1.0s elapsed from start. Should report now?
     // "At most once per second". Last report was at t=0 (start). Now t=1000ms.
     changeListener.DirtyList().clear();
-    mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
-    mockTimer.AdvanceClock(System::Clock::Milliseconds64(500));
+    AdvanceClock(System::Clock::Milliseconds64(500));
     EXPECT_EQ(cluster.GetCurrentLevel().Value(), 2u);
 
     reported = false;

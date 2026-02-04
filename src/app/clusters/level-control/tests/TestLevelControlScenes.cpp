@@ -123,7 +123,7 @@ TEST_F(TestLevelControlScenes, TestApplyScene)
     // Advance to end
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     }
 
     DataModel::Nullable<uint8_t> readLevel;

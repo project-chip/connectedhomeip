@@ -56,4 +56,10 @@ struct LevelControlTestBase : public ::testing::Test
     chip::TimerDelegateMock mockTimer;
     chip::System::Clock::Internal::RAIIMockClock mockClock;
     MockLevelControlDelegate mockDelegate;
+
+    void AdvanceClock(chip::System::Clock::Milliseconds64 duration)
+    {
+        mockClock.AdvanceMonotonic(duration);
+        mockTimer.AdvanceClock(duration);
+    }
 };

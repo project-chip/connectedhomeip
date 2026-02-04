@@ -135,7 +135,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
     // Advance 1s (1000ms) in 100ms steps to ensure recursive timers fire
     for (int i = 0; i < 10; i++)
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     }
 
     // Now it should be updated.
@@ -146,7 +146,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
     // Advance 5s more (50 ticks of 100ms)
     for (int i = 0; i < 50; i++)
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     }
     EXPECT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, remainingTime).IsSuccess());
     EXPECT_EQ(remainingTime, 40);
@@ -154,7 +154,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
     // Finish
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     }
 
     EXPECT_TRUE(tester.ReadAttribute(Attributes::RemainingTime::Id, remainingTime).IsSuccess());
@@ -201,7 +201,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
     // Wait to finish
     while (mockTimer.IsTimerActive(&cluster))
     {
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     }
 
     // At end (0), it might report? Logic says: if (remainingTimeDs == 0 && mLastReported != 0).
@@ -228,7 +228,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
 
     // Advance 0.5s. Remaining 95. Delta 5. No report (countdown).
     for (int i = 0; i < 5; ++i)
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
 
     reported = false;
     for (auto & id : changeListener.DirtyList())
@@ -241,7 +241,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
     // Advance 1s more (total 1.5s). Remaining 85.
     // Not a new transition. Not 0. Should NOT report.
     for (int i = 0; i < 10; ++i)
-        mockTimer.AdvanceClock(System::Clock::Milliseconds64(100));
+        AdvanceClock(System::Clock::Milliseconds64(100));
     reported = false;
     for (auto & id : changeListener.DirtyList())
     {
@@ -316,7 +316,7 @@ TEST_F(TestLevelControlLighting, TestReportingAtTransitionEnd)
     // 3. Advance time by 500ms to complete the transition.
     // This calls TimerFired -> SetCurrentLevel(201).
     mockClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
-    mockTimer.AdvanceClock(System::Clock::Milliseconds64(500));
+    AdvanceClock(System::Clock::Milliseconds64(500));
 
     // 4. Verify that the transition completed.
     EXPECT_EQ(cluster.GetCurrentLevel().Value(), 201u);
