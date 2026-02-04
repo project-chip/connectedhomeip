@@ -196,6 +196,13 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to get DeviceInstanceInfoProvider.");
+        return nullptr;
+    }
+
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
         RootNodeDevice::Context {
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //

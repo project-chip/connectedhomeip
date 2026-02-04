@@ -27,7 +27,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
-
 namespace chip {
 namespace app {
 
@@ -47,7 +46,11 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
             .Set<BasicInformation::Attributes::Reachable::Id>();
 
-    mBasicInformationCluster.Create(optionalAttributeSet);
+    mBasicInformationCluster.Create(
+        optionalAttributeSet,
+        BasicInformationCluster::Context{ .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider,
+                                          .configurationManager       = mContext.configurationManager,
+                                          .platformManager            = mContext.platformManager });
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
