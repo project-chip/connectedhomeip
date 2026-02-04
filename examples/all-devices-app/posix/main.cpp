@@ -177,7 +177,7 @@ private:
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
-
+    
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
@@ -200,10 +200,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
-    // Initialize the safe attribute persistence provider
-    SuccessOrDie(gSafeAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
-    SetSafeAttributePersistenceProvider(&gSafeAttributePersistenceProvider);
-
+    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                 //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
@@ -273,7 +271,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(payload.productID));
     PrintOnboardingCodes(payload);
 
-    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     chip::app::SetTerminateHandler(StopSignalHandler);
 
