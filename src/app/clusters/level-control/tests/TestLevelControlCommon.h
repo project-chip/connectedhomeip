@@ -18,6 +18,7 @@
 
 #include <app/clusters/level-control/LevelControlCluster.h>
 #include <app/clusters/level-control/LevelControlDelegate.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
 #include <lib/support/TimerDelegateMock.h>
 #include <pw_unit_test/framework.h>
 #include <system/RAIIMockClock.h>
@@ -39,25 +40,12 @@ public:
         mLevelChangedCalled = true;
     }
 
-    // OnOff methods
-    CHIP_ERROR SetOnOff(bool on) override
-    {
-        mSetOnOffCalled = true;
-        mOn             = on;
-        return CHIP_NO_ERROR;
-    }
-
-    bool GetOnOff() override { return mOn; }
-
     chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> mOptions;
     chip::app::DataModel::Nullable<uint8_t> mOnLevel;
     chip::app::DataModel::Nullable<uint8_t> mDefaultMoveRate;
 
     bool mLevelChangedCalled = false;
     uint8_t mLevel           = 0;
-
-    bool mSetOnOffCalled = false;
-    bool mOn             = false;
 };
 
 struct LevelControlTestBase : public ::testing::Test

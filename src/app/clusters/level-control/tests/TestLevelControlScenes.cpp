@@ -169,16 +169,20 @@ TEST_F(TestLevelControlScenes, TestApplySceneImmediate)
 
 TEST_F(TestLevelControlScenes, TestApplySceneWhileOff)
 {
-    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff() };
+    chip::app::Clusters::OnOffCluster::Context onOffContext{ mockTimer };
+    chip::app::Clusters::OnOffCluster onOffCluster{ kTestEndpointId, onOffContext };
+
+    LevelControlCluster cluster{ LevelControlCluster::Config(kTestEndpointId, mockTimer, mockDelegate).WithOnOff(onOffCluster) };
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(onOffCluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_TRUE(cluster
                     .MoveToLevel(0, DataModel::MakeNullable(static_cast<uint16_t>(0)),
                                  BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff),
                                  BitMask<LevelControl::OptionsBitmap>(LevelControl::OptionsBitmap::kExecuteIfOff))
                     .IsSuccess());
-    mockDelegate.mOn = false; // OFF
+    EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR); // OFF
 
     // Scene with level 50
     uint8_t buffer[128];

@@ -33,21 +33,6 @@ public:
     virtual void OnOnLevelChanged(DataModel::Nullable<uint8_t> onLevel) {}
     virtual void OnDefaultMoveRateChanged(DataModel::Nullable<uint8_t> defaultMoveRate) {}
     virtual void OnLevelChanged(uint8_t level) {}
-
-    // OnOff Feature integration
-    // These are required if the OnOff feature is enabled.
-
-    /**
-     * @brief Called when the Level Control cluster determines that the OnOff state should change.
-     * @param on True to turn On, False to turn Off.
-     */
-    virtual CHIP_ERROR SetOnOff(bool on) { return CHIP_NO_ERROR; }
-
-    /**
-     * @brief Retrieve the current OnOff state.
-     * @return True if On, False if Off.
-     */
-    virtual bool GetOnOff() { return false; }
 };
 
 } // namespace chip::app::Clusters

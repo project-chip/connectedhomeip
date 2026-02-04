@@ -19,6 +19,8 @@
 
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/level-control/LevelControlDelegate.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
+#include <app/clusters/on-off-server/OnOffDelegate.h>
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/data-model/Nullable.h>
 #include <app/persistence/AttributePersistenceProvider.h>
@@ -43,7 +45,10 @@ namespace chip::app::Clusters {
  * - Scenes.
  * - RemainingTime reporting.
  */
-class LevelControlCluster : public DefaultServerCluster, public TimerContext, public scenes::DefaultSceneHandlerImpl
+class LevelControlCluster : public DefaultServerCluster,
+                            public TimerContext,
+                            public scenes::DefaultSceneHandlerImpl,
+                            public OnOffDelegate
 {
 public:
     // Helper set for managing optional attributes availability based on configuration.
@@ -65,9 +70,10 @@ public:
             mEndpointId(endpoint), mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
-        Config & WithOnOff()
+        Config & WithOnOff(OnOffCluster & onOffCluster)
         {
             mFeatureMap.Set(LevelControl::Feature::kOnOff);
+            mOnOffCluster = &onOffCluster;
             return *this;
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
@@ -127,6 +133,7 @@ public:
         EndpointId mEndpointId;
         LevelControlDelegate & mDelegate;
         TimerDelegate & mTimerDelegate;
+        OnOffCluster * mOnOffCluster = nullptr;
 
         uint8_t mMinLevel = 0;
         uint8_t mMaxLevel = kMaxLevel;
@@ -142,7 +149,7 @@ public:
     };
 
     LevelControlCluster(const Config & config);
-    ~LevelControlCluster() = default;
+    ~LevelControlCluster() { CancelTimer(); }
 
     // ServerClusterInterface Implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -156,6 +163,10 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+
+    // OnOffDelegate Implementation
+    void OnOffStartup(bool on) override;
+    void OnOnOffChanged(bool on) override;
 
     // Cluster Public API
     void SetOptions(BitMask<LevelControl::OptionsBitmap> newOptions);
@@ -215,12 +226,6 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override;
 
-    // Updates the Level Control state in response to an On/Off cluster state change.
-    // Spec: "Effect of On/Off Commands on the CurrentLevel attribute".
-    // isOn=true: Move to OnLevel (or stored/previous) starting from MinLevel.
-    // isOn=false: Move to MinLevel and store current level.
-    void OnOffChanged(bool isOn);
-
 private:
     enum class ReportingMode
     {
@@ -249,6 +254,7 @@ private:
     BitMask<LevelControl::Feature> mFeatureMap;
     LevelControlDelegate & mDelegate;
     TimerDelegate & mTimerDelegate;
+    OnOffCluster * mOnOffCluster = nullptr;
 
     // Transition Logic State
     uint8_t mTargetLevel       = 0;
@@ -267,6 +273,7 @@ private:
     // Helpers
     bool IsValidLevel(uint8_t level);
     CHIP_ERROR SetOnOff(bool on);
+    bool GetOnOff();
     bool ShouldExecuteIfOff(BitMask<LevelControl::OptionsBitmap> optionsMask, BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
     // Setup and start the transition

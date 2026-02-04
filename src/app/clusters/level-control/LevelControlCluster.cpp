@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/LevelControl/Attributes.h>
@@ -74,8 +75,11 @@ LevelControlCluster::LevelControlCluster(const Config & config) :
     mStartUpCurrentLevel(config.mStartUpCurrentLevel), mRemainingTime(DataModel::Nullable<uint16_t>(0)),
     mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
     mOnOffTransitionTime(config.mOnOffTransitionTime), mOptionalAttributes(config.mOptionalAttributes),
-    mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate)
-{}
+    mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate),
+    mOnOffCluster(config.mOnOffCluster)
+{
+    VerifyOrDie(!mFeatureMap.Has(Feature::kOnOff) || mOnOffCluster != nullptr);
+}
 
 void LevelControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
@@ -626,13 +630,25 @@ bool LevelControlCluster::IsValidLevel(uint8_t level)
 
 CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 {
-    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff) && !(on && mDelegate.GetOnOff()), CHIP_NO_ERROR);
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), CHIP_NO_ERROR);
+    VerifyOrReturnError(on != GetOnOff(), CHIP_NO_ERROR);
 
     // Prevent potential callback loops
     mTemporarilyIgnoreOnOffCallbacks = true;
-    CHIP_ERROR err                   = mDelegate.SetOnOff(on);
+    CHIP_ERROR err                   = mOnOffCluster->SetOnOff(on);
     mTemporarilyIgnoreOnOffCallbacks = false;
     return err;
+}
+
+bool LevelControlCluster::GetOnOff()
+{
+    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), false);
+    return mOnOffCluster->GetOnOff();
+}
+
+void LevelControlCluster::OnOffStartup(bool on)
+{
+    // Do nothing for now
 }
 
 void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, ReportingMode mode)
@@ -736,7 +752,7 @@ void LevelControlCluster::TimerFired()
     StartTimer(mTickDurationMs);
 }
 
-void LevelControlCluster::OnOffChanged(bool isOn)
+void LevelControlCluster::OnOnOffChanged(bool isOn)
 {
     VerifyOrReturn(!mCurrentLevel.value().IsNull() && !mTemporarilyIgnoreOnOffCallbacks);
 
@@ -812,7 +828,7 @@ bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask,
 
     // 1. If On/Off feature is not supported, there is no dependency, so we execute.
     // 2. If the OnOff state is On, we execute.
-    if (!mFeatureMap.Has(Feature::kOnOff) || mDelegate.GetOnOff())
+    if (!mFeatureMap.Has(Feature::kOnOff) || GetOnOff())
     {
         return true;
     }

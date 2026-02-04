@@ -27,6 +27,7 @@ source_set("level-control") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/clusters/on-off-server",
     "${chip_root}/zzz_generated/app-common/clusters/LevelControl",
   ]
 }
