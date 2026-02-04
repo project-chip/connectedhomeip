@@ -53,7 +53,7 @@ LevelControlValidator & GlobalLevelControlValidator()
     return sValidator;
 }
 
-bool IsWithOnOffCommand(CommandId commandId)
+constexpr bool IsWithOnOffCommand(CommandId commandId)
 {
     return commandId == Commands::MoveToLevelWithOnOff::Id //
         || commandId == Commands::MoveWithOnOff::Id        //
@@ -357,36 +357,36 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
 
     // Refresh CurrentLevel (might have changed due to OnOff logic) and set Direction
     currentLevel    = mCurrentLevel.value().ValueOr(currentLevel);
-    bool increasing = (targetLevel > currentLevel);
 
     // Calculate duration per step
-    uint8_t totalSteps      = (increasing) ? (targetLevel - currentLevel) : (currentLevel - targetLevel);
+    auto totalSteps      = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
     uint32_t tickDurationMs = (totalSteps > 0) ? (transitionTimeMs / totalSteps) : 0;
 
-    // Immediate move
-    if (transitionTimeMs == 0 || totalSteps == 0 || tickDurationMs == 0)
+
+    if (tickDurationMs > 0)
     {
-        CHIP_ERROR status = SetCurrentLevel(targetLevel, ReportingMode::kForceReport);
-        if (status == CHIP_NO_ERROR)
-        {
-            if ((IsWithOnOffCommand(commandId) || commandId == kInternalOffTransition) && targetLevel == mMinLevel)
-            {
-                ReturnErrorOnFailure(SetOnOff(false));
-            }
-            if (commandId == kInternalOffTransition && targetLevel == mMinLevel)
-            {
-                // This was an internal fade-to-off. Restoring the previous level ensures that the next
-                // "On" command (which might not specify a level) restores the brightness the user expects.
-                if (mOnLevel.IsNull() && !mLevelBeforeTurnedOff.IsNull())
-                {
-                    ReturnErrorOnFailure(SetCurrentLevel(mLevelBeforeTurnedOff.Value(), ReportingMode::kForceReport));
-                }
-            }
-        }
-        return status;
+        // We are doing a timed transition, start it.
+        mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs);
+        return Status::Success;
     }
 
-    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs);
+    // Immediate move
+    ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport));
+    
+    if ((IsWithOnOffCommand(commandId) || commandId == kInternalOffTransition) && targetLevel == mMinLevel)
+    {
+        ReturnErrorOnFailure(SetOnOff(false));
+    }
+
+    if (commandId == kInternalOffTransition && targetLevel == mMinLevel)
+    {
+        // This was an internal fade-to-off. Restoring the previous level ensures that the next
+        // "On" command (which might not specify a level) restores the brightness the user expects.
+        if (mOnLevel.IsNull() && !mLevelBeforeTurnedOff.IsNull())
+        {
+            ReturnErrorOnFailure(SetCurrentLevel(mLevelBeforeTurnedOff.Value(), ReportingMode::kForceReport));
+        }
+    }
     return Status::Success;
 }
 
@@ -436,7 +436,9 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
     uint8_t currentLevel    = mCurrentLevel.value().Value();
-    uint8_t difference      = (increasing ? (targetLevel - currentLevel) : (currentLevel - targetLevel));
+    uint8_t difference = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
+
+    // currentRate is known not to be 0 (ConstraintError check above)
     uint32_t tickDurationMs = 1000 / currentRate;
     if (tickDurationMs == 0)
     {
@@ -589,11 +591,9 @@ void LevelControlCluster::StoreCurrentLevel(DataModel::Nullable<uint8_t> value)
     NumericAttributeTraits<uint8_t>::StorageType storageValue;
     DataModel::NullableToStorage(value, storageValue);
 
-    CHIP_ERROR err = mContext->attributeStorage.WriteValue(
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
         ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue)));
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "LevelControlCluster: Failed to store CurrentLevel: %" CHIP_ERROR_FORMAT, err.Format()));
+        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
 }
 
 CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
@@ -652,7 +652,12 @@ bool LevelControlCluster::GetOnOff()
 
 void LevelControlCluster::OnOffStartup(bool on)
 {
-    // Do nothing for now
+    // Per spec, On/Off and Level Control are intrinsically independent variables.
+    // Each cluster handles its own initialization via StartUpOnOff and 
+    // StartUpCurrentLevel attributes. Coupling logic (e.g., OnLevel) is 
+    // strictly command-based and does not apply to the initial power-up state.
+    // The application may implement custom logic if desired and use the cluster's public API 
+    // to set state after boot.
 }
 
 void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, ReportingMode mode)

@@ -30,6 +30,7 @@ using namespace chip::app::Clusters::LevelControl;
 
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
+using chip::Protocols::InteractionModel::Status;
 
 struct TestLevelControlBase : public LevelControlTestBase
 {
@@ -135,7 +136,7 @@ TEST_F(TestLevelControlBase, TestWriteDefaultMoveRateZero)
     // EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     EXPECT_EQ(tester.WriteAttribute(Attributes::DefaultMoveRate::Id, DataModel::MakeNullable<uint8_t>(0)),
-              CHIP_IM_GLOBAL_STATUS(ConstraintError));
+              Status::ConstraintError);
 }
 
 TEST_F(TestLevelControlBase, TestAttributes)
