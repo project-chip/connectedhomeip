@@ -12,18 +12,18 @@ details.
 
 <hr>
 
--   [Matter Linux EVSE Example](#matter-linux-evse-example)
-    -   [Building](#building)
-    -   [Commandline arguments](#commandline-arguments)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Device Tracing](#device-tracing)
-    -   [Python Test Cases](#python-test-cases)
-        -   [Running the test cases:](#running-the-test-cases)
-    -   [MATTER-REPL Interaction](#matter-repl-interaction)
-        -   [Building matter-repl:](#building-matter-repl)
-        -   [Activating python virtual env](#activating-python-virtual-env)
-        -   [Interacting with matter-repl and the example app](#interacting-with-matter-repl-and-the-example-app)
-        -   [Using matter-repl to Fake a charging session](#using-matter-repl-to-fake-a-charging-session)
+- [Matter Linux EVSE Example](#matter-linux-evse-example)
+  - [Building](#building)
+  - [Commandline arguments](#commandline-arguments)
+  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+  - [Device Tracing](#device-tracing)
+  - [Python Test Cases](#python-test-cases)
+    - [Running the test cases:](#running-the-test-cases)
+  - [MATTER-REPL Interaction](#matter-repl-interaction)
+    - [Building matter-repl:](#building-matter-repl)
+    - [Activating python virtual env](#activating-python-virtual-env)
+    - [Interacting with matter-repl and the example app](#interacting-with-matter-repl-and-the-example-app)
+    - [Using matter-repl to Fake a charging session](#using-matter-repl-to-fake-a-charging-session)
 
 <hr>
 
@@ -70,10 +70,6 @@ details.
     Use the specific Bluetooth controller for BLE advertisement and connections.
     For details on controller selection refer to
     [Linux BLE Settings](/platforms/linux/ble_settings.md).
-
--   `--application <evse | water-heater>`
-
-    Emulate either an EVSE or Water Heater example.
 
 -   `--featureSet <feature map for Device Energy Management e.g. 0x7a>`
 
