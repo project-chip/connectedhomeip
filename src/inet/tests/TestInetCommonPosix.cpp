@@ -388,8 +388,10 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
             TEMPORARY_RETURN_IGNORED
             chip::DeviceLayer::PlatformMgr().ScheduleWork(
                 [](intptr_t) -> void {
-                TEMPORARY_RETURN_IGNORED
-                    chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+                    TEMPORARY_RETURN_IGNORED
+                    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+                },
+                (intptr_t) nullptr);
 #endif // CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
             chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
