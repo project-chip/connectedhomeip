@@ -730,7 +730,8 @@ void LevelControlCluster::TimerFired()
         // New = Initial + Delta * Progress
         // Use 64-bit to prevent overflow during multiply
         int32_t delta = static_cast<int32_t>(mTargetLevel) - static_cast<int32_t>(mInitialLevel);
-        int32_t change = static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
+        int32_t change =
+            static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
         currentLevel = static_cast<uint8_t>(static_cast<int32_t>(mInitialLevel) + change);
     }
 
