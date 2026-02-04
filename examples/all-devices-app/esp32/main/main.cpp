@@ -214,7 +214,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
                 .deviceInstanceInfoProvider = *provider,                                             //
                 .platformManager            = DeviceLayer::PlatformMgr(),                            //
-                .groupDataProvider          = gGropupDataProvider,                                   //
+                .groupDataProvider          = gGroupDataProvider,                                    //
                 .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
                 .dnssdServer                = DnssdServer::Instance(),                               //
 

@@ -1498,18 +1498,19 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     VerifyOrReturnError(bssidLen == kWiFiBSSIDLength, false);
     memcpy(result.ssid, ssidStr, ssidLen);
     memcpy(result.bssid, bssidBuf, bssidLen);
-    result.ssidLen = ssidLen;
+    result.ssidLen     = ssidLen;
+    result.signal.type = NetworkCommissioning::WirelessSignalType::kdBm;
     if (signal < INT8_MIN)
     {
-        result.rssi = INT8_MIN;
+        result.signal.strength = INT8_MIN;
     }
     else if (signal > INT8_MAX)
     {
-        result.rssi = INT8_MAX;
+        result.signal.strength = INT8_MAX;
     }
     else
     {
-        result.rssi = static_cast<uint8_t>(signal);
+        result.signal.strength = static_cast<uint8_t>(signal);
     }
 
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);

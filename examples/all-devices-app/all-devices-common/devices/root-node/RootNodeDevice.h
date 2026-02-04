@@ -66,11 +66,11 @@ public:
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
 protected:
+    Context mContext;
+
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
-    Context mContext;
-
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;
