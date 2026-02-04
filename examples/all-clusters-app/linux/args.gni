@@ -51,3 +51,6 @@ openthread_project_core_config_file = rebase_path(
         get_path_info(
             "${chip_root}/third_party/openthread/repo/examples/platforms/simulation/openthread-core-simulation-config.h",
             "abspath"))
+
+# Enable Network-Recovery over commissioning network
+chip_enable_network_recovery = true

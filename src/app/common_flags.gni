@@ -41,4 +41,8 @@ declare_args() {
 
   # Flag that controls whether the camera server is enabled
   matter_enable_camera_server = false
+
+  # Controls network-recovery over commmissioning network, when the device disconnects
+  # from its operational network.
+  chip_enable_network_recovery = false
 }
