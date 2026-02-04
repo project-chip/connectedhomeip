@@ -318,7 +318,6 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         self.step("3")
         self.fabric_a_admin.get_stdout()
-        ojcw_discriminator = random.randint(0, 4095)
         try:
             response = await devCtrlEcoA.OpenJointCommissioningWindow(
                 nodeId=1,
