@@ -103,6 +103,40 @@ bool ValidateSdpFields(const std::string & sdp)
     return true;
 }
 
+/**
+ * @brief Converts Matter ICE server structures to the internal ICEServerInfo format.
+ *
+ * @param matterIceServers The Matter protocol ICE server list
+ * @return std::vector<ICEServerInfo> The converted ICE server info list
+ */
+template <typename T>
+std::vector<ICEServerInfo> ConvertICEServers(const T & matterIceServers)
+{
+    std::vector<ICEServerInfo> iceServers;
+    for (const auto & server : matterIceServers)
+    {
+        ICEServerInfo info;
+        auto urlsIter = server.URLs.begin();
+        while (urlsIter.Next())
+        {
+            info.urls.emplace_back(urlsIter.GetValue().data(), urlsIter.GetValue().size());
+        }
+        if (server.username.HasValue())
+        {
+            info.username = std::string(server.username.Value().data(), server.username.Value().size());
+        }
+        if (server.credential.HasValue())
+        {
+            info.credential = std::string(server.credential.Value().data(), server.credential.Value().size());
+        }
+        if (!info.urls.empty())
+        {
+            iceServers.push_back(std::move(info));
+        }
+    }
+    return iceServers;
+}
+
 } // namespace
 
 void WebRTCProviderManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
@@ -207,6 +241,11 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     {
         transport->sFrameConfig = args.sFrameConfig;
         ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
+    if (args.iceServers.HasValue())
+    {
+        transport->SetICEServers(ConvertICEServers(args.iceServers.Value()));
     }
 
     // Check resource availability before proceeding
@@ -416,6 +455,11 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     {
         transport->sFrameConfig = args.sFrameConfig;
         ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
+    if (args.iceServers.HasValue())
+    {
+        transport->SetICEServers(ConvertICEServers(args.iceServers.Value()));
     }
 
     transport->Start();
