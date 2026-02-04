@@ -25,8 +25,9 @@ if (chip_build_tests) {
   chip_test_group("example_tests") {
     deps = []
     tests = []
+
     if (chip_device_platform == "linux" && current_os == "linux") {
-      tests += [ "${chip_root}/examples/energy-management-app/energy-management-common/tests" ]
+      tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
   }
 }

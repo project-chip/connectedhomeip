@@ -15,7 +15,6 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Groupcast::Commands::JoinGroup::kMetadataEntry,
     Groupcast::Commands::LeaveGroup::kMetadataEntry,
     Groupcast::Commands::UpdateGroupKey::kMetadataEntry,
-    Groupcast::Commands::ExpireGracePeriod::kMetadataEntry,
     Groupcast::Commands::ConfigureAuxiliaryACL::kMetadataEntry,
 };
 } // namespace
@@ -73,11 +72,6 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::UpdateGroupKey::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         return mLogic.UpdateGroupKey(fabric_index, data);
-    }
-    case Groupcast::Commands::ExpireGracePeriod::Id: {
-        Groupcast::Commands::ExpireGracePeriod::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        return mLogic.ExpireGracePeriod(fabric_index, data);
     }
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;

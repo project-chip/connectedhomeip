@@ -64,6 +64,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::SoftwareDiagnostics::Id:
         MatterSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
+        MatterThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         MatterWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -103,6 +106,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ValveConfigurationAndControl::Id:
+        MatterValveConfigurationAndControlClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         MatterElectricalPowerMeasurementClusterInitCallback(endpoint);
         break;
@@ -112,11 +118,17 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterInitCallback(endpoint);
         break;
+    case app::Clusters::IlluminanceMeasurement::Id:
+        MatterIlluminanceMeasurementClusterInitCallback(endpoint);
+        break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterInitCallback(endpoint);
         break;
     case app::Clusters::Chime::Id:
         MatterChimeClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::TlsCertificateManagement::Id:
+        MatterTlsCertificateManagementClusterInitCallback(endpoint);
         break;
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterInitCallback(endpoint);
@@ -164,6 +176,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::SoftwareDiagnostics::Id:
         MatterSoftwareDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
+        MatterThreadNetworkDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         MatterWiFiNetworkDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
         break;
@@ -203,6 +218,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::ValveConfigurationAndControl::Id:
+        MatterValveConfigurationAndControlClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::ElectricalPowerMeasurement::Id:
         MatterElectricalPowerMeasurementClusterShutdownCallback(endpoint, shutdownType);
         break;
@@ -212,11 +230,17 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::IlluminanceMeasurement::Id:
+        MatterIlluminanceMeasurementClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::Chime::Id:
         MatterChimeClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::TlsCertificateManagement::Id:
+        MatterTlsCertificateManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::TlsClientManagement::Id:
         MatterTlsClientManagementClusterShutdownCallback(endpoint, shutdownType);

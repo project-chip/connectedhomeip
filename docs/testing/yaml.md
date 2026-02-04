@@ -418,6 +418,48 @@ application, the KVS file will be in /tmp as chip_kvs
 Please see [CI testing](./ci_testing.md) for more information about how to set
 up examples apps, PICS and PIXIT values for use in the CI.
 
+### Defining the CI test arguments
+
+YAML tests will run against the `all-clusters` application by default. If you
+need to run the same test against a different application or with multiple sets
+of custom arguments, the YAML file supports a `CI` entry that contains a list of
+`name`, `app` and `args` (optional) to execute.
+
+```yaml
+CI:
+    - name: "This is displayed in logs"
+      # application name MUST be a supported placeholder
+      app: all-clusters
+    - name: "Some other names"
+      app: rvc
+      # Optional arguments, a list
+      args: ["--vendor-name", "Testing"]
+    - name: "Test against lit-icd app"
+      app: lit-icd
+      # List can be split in separate lines
+      args:
+          - --vendor-name
+          - test123
+```
+
+Application names are supported placeholders that will be replaced with the full
+application path. Example supported applications (see `test_definition.py` for a
+full list):
+
+-   `all-clusters`
+-   `bridge`
+-   `closure`
+-   `energy-gateway`
+-   `evse`
+-   `fabric-sync`
+-   `lit-icd`
+-   `lock`
+-   `microwave-oven`
+-   `network-manager`
+-   `ota-requestor`
+-   `rvc`
+-   `tv`
+
 ### Running in the TH
 
 TODO: Do we have a permanent link to the most up to date TH documentation? If

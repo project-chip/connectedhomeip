@@ -19,6 +19,7 @@ source_set("device-energy-management-server") {
     "DeviceEnergyManagementCluster.cpp",
     "DeviceEnergyManagementCluster.h",
     "DeviceEnergyManagementDelegate.h",
+    "DeviceEnergyManagementTestEventTriggerHandler.h",
   ]
 
   public_deps = [

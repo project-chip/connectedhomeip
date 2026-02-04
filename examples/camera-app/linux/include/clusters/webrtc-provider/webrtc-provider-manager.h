@@ -59,26 +59,26 @@ public:
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
 
-    CHIP_ERROR
-    HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
+    CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
     CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
-                                chip::app::DataModel::Nullable<uint16_t> videoStreamID,
-                                chip::app::DataModel::Nullable<uint16_t> audioStreamID) override;
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override;
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, chip::Optional<std::vector<uint16_t>> & videoStreams,
+                                   chip::Optional<std::vector<uint16_t>> & audioStreams) override;
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
 
     CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
+
+    CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override;
 
     CHIP_ERROR IsStreamUsageSupported(StreamUsageEnum streamUsage) override;
 

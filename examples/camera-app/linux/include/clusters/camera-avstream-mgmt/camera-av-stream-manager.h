@@ -67,14 +67,20 @@ public:
                                                         ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
-    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                        Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
+                        Optional<std::vector<uint16_t>> & audioStreams) override;
 
     CHIP_ERROR
     ValidateVideoStreamID(uint16_t videoStreamId) override;
 
     CHIP_ERROR
     ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR
+    ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
+
+    CHIP_ERROR
+    ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override;
 
     CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
 
@@ -90,9 +96,11 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(const std::vector<uint16_t> & audioStreams,
+                                                   const std::vector<uint16_t> & videoStreams) override;
 
-    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(const std::vector<uint16_t> & audioStreams,
+                                                   const std::vector<uint16_t> & videoStreams) override;
 
     const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
 

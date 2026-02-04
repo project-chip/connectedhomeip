@@ -1,0 +1,68 @@
+{{> header excludeZapComment=true}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRClusters.h"
+#import "MTRDevice.h"
+#import "MTRCommandPayloadsObjc_Private.h"
+
+NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+
+/**
+ * Cluster {{name}}
+ *    {{description}}
+ */
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericCluster
+
+{{> commandDeclarations}}
+
+{{> attributeDeclarations}}
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} (Availability)
+
+/**
+{{#zcl_commands}}
+{{#first}}
+ * For all instance methods that take a completion (i.e. command invocations),
+ * the completion will be called on the provided queue.
+{{/first}}
+{{else}}
+ * The queue is currently unused, but may be used in the future for calling completions
+ * for command invocations if commands are added to this cluster.
+{{/zcl_commands}}
+ */
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue;
+
+@end
+{{/if}}
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+
+/**
+ * Cluster {{name}}
+ *    {{description}}
+ */
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} (PrivateExtensions)
+
+{{> commandDeclarations manufacturerCodeOnly=true}}
+
+{{> attributeDeclarations manufacturerCodeOnly=true}}
+
+@end
+{{/if}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

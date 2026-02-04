@@ -79,7 +79,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
     Crypto::DefaultSessionKeystore mMockKeystore;
     FabricTestFixture fabricHelper{ &mTestContext.StorageDelegate() };
 
-    GroupKeyManagementCluster mCluster{ fabricHelper.GetFabricTable() };
+    GroupKeyManagementCluster mCluster{ { fabricHelper.GetFabricTable(), mRealProvider } };
 
     ClusterTester tester{ mCluster };
 

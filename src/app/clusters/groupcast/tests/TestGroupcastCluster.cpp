@@ -59,6 +59,9 @@ TEST_F(TestGroupcastCluster, TestAttributes)
                                             {
                                                 Attributes::Membership::kMetadataEntry,
                                                 Attributes::MaxMembershipCount::kMetadataEntry,
+                                                Attributes::MaxMcastAddrCount::kMetadataEntry,
+                                                Attributes::UsedMcastAddrCount::kMetadataEntry,
+                                                Attributes::FabricUnderTest::kMetadataEntry,
                                             }));
     }
 
@@ -84,7 +87,6 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
                                                   Commands::JoinGroup::kMetadataEntry,
                                                   Commands::LeaveGroup::kMetadataEntry,
                                                   Commands::UpdateGroupKey::kMetadataEntry,
-                                                  Commands::ExpireGracePeriod::kMetadataEntry,
                                                   Commands::ConfigureAuxiliaryACL::kMetadataEntry,
                                               }));
 }
@@ -102,9 +104,8 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     Commands::JoinGroup::Type cmdData;
     cmdData.groupID         = 1;
     cmdData.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
-    cmdData.keyID           = 0xAABBCCDD;
+    cmdData.keySetID        = 0xAABB;
     cmdData.key             = MakeOptional(ByteSpan(keyData));
-    cmdData.gracePeriod     = MakeOptional(0U);
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
     chip::Testing::MockCommandHandler cmdHandler;

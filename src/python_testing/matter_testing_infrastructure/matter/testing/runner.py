@@ -769,11 +769,13 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
         if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
             LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
-                         "The payload is read directly from the NFC tag.")
+                         "The onboarding data is read directly from the NFC tag.")
             sys.exit(1)
 
-        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-        nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
+        from matter.testing.nfc import NFCReader
+        nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
+        reader = NFCReader(nfc_reader_index)
+        nfc_tag_data = reader.read_nfc_tag_data()
         args.qr_code.append(nfc_tag_data)
 
     # Populate commissioning config if present, exiting on error
@@ -801,6 +803,11 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         # Verify from start the named pipe exists.
         LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
+
+    config.pipe_name_out = args.app_pipe_out
+    if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
+        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name_out)
+        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
@@ -849,7 +856,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe', type=str, default=None,
+                             help="The full path of the app to send an out-of-band command from test to app")
+    basic_group.add_argument('--app-pipe-out', type=str, default=None,
+                             help="The full path of the app to read an out-of-band command from app to test")
     basic_group.add_argument('--restart-flag-file', type=str, default=None,
                              help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--debug', action="store_true", default=False,

@@ -16,6 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/groups-server.cpp"
-    "${CLUSTER_DIR}/groups-server.h"
+    "${CLUSTER_DIR}/GroupsCluster.cpp"
 )

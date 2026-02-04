@@ -96,7 +96,7 @@ scripts/tests/run_test_suite.py run --help-paths
   kind: app
 - key: energy-gateway
   kind: app
-- key: energy-management
+- key: evse
   kind: app
 - key: fabric-bridge
   kind: app
@@ -119,6 +119,23 @@ involve multiple devices or other than on-network commissioning (e.g. ble-wifi
 or ble-thread), some additional setup is needed.
 
 ### Running tests in Linux network namespaces
+
+The test suite on Linux uses user namespaces (`unshare --map-root-user`) to
+create these isolated network environments. On some systems, this feature might
+be disabled by default. To enable it, ensure the following lines are present in
+`/etc/sysctl.conf` or a new file under `/etc/sysctl.d/`:
+
+```
+kernel.unprivileged_userns_clone = 1
+```
+
+On systems with AppArmor (like Ubuntu), you also need:
+
+```
+kernel.apparmor_restrict_unprivileged_userns = 0
+```
+
+After adding these lines, apply the changes by running `sudo sysctl --system`.
 
 The simplest way to mock more complex network topologies is to use Linux network
 namespaces. Each device (controller or DUT) is run in its own network namespace,
@@ -197,8 +214,8 @@ flowchart TD
 ```
 
 In order to run tests with mocked BLE and Wi-Fi connectivity and Linux network
-namespaces use the `--ble-wifi` option to the `run` command of the
-`scripts/tests/run_test_suite.py` script:
+namespaces use the `--commissioning-method ble-wifi` option to the `run` command
+of the `scripts/tests/run_test_suite.py` script:
 
 ```shell
 # Run the TestOperationalState test case with ble-wifi commissioning
@@ -208,5 +225,5 @@ scripts/tests/run_test_suite.py --runner chip_tool_python \
     run \
     --app-path all-clusters:out/linux-x64-all-clusters/chip-all-clusters-app \
     --tool-path chip-tool:out/linux-x64-chip-tool/chip-tool \
-    --ble-wifi
+    --commissioning-method ble-wifi
 ```
