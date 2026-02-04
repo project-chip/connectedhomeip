@@ -106,6 +106,16 @@ static_library("nxp_crypto_lib") {
     public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
+  public_deps += [
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  if ((nxp_platform != "rt/rw61x") && (nxp_platform != "rt/rt1060")) {
+    public_deps += [ "${chip_root}/src/platform" ]
+    public_deps += [ "${chip_root}/src/app/server" ]
+  }
+
   include_dirs = [
     ".",
     "${chip_root}/src/crypto",
