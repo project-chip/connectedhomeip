@@ -21,7 +21,6 @@
  */
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -47,6 +46,9 @@ using Protocols::InteractionModel::Status;
 
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
+
+// Global callback to call when globalOTARequestorInstance is set.
+void (*internalOnSetRequestorInstance)(OTARequestorInterface * instance) = nullptr;
 
 // Abort the QueryImage download request if there's been no progress for 5 minutes
 static constexpr System::Clock::Timeout kDownloadTimeoutSec = chip::System::Clock::Seconds32(5 * 60);
@@ -97,25 +99,15 @@ static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & re
 void SetRequestorInstance(OTARequestorInterface * instance)
 {
     globalOTARequestorInstance = instance;
+    if (internalOnSetRequestorInstance != nullptr)
+    {
+        internalOnSetRequestorInstance(globalOTARequestorInstance);
+    }
 }
 
 OTARequestorInterface * GetRequestorInstance()
 {
     return globalOTARequestorInstance;
-}
-
-void DefaultOTARequestor::InitState(intptr_t context)
-{
-    DefaultOTARequestor * requestorCore = reinterpret_cast<DefaultOTARequestor *>(context);
-    VerifyOrDie(requestorCore != nullptr);
-
-    // This initialization may occur due to the following:
-    //   1) Regular boot up - the states should already be correct
-    //   2) Reboot from applying an image - once the image has been confirmed, the provider will be notified of the new version and
-    //   all relevant states will reset for a new OTA update. If the image cannot be confirmed, the driver will be responsible for
-    //   resetting the states appropriately, including the current update state.
-    OtaRequestorServerSetUpdateState(requestorCore->mCurrentUpdateState);
-    OtaRequestorServerSetUpdateStateProgress(app::DataModel::NullNullable);
 }
 
 CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver,
@@ -131,9 +123,6 @@ CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & stor
 
     // Load data from KVS
     LoadCurrentUpdateInfo();
-
-    // Schedule the initializations that needs to be performed in the CHIP context
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(InitState, reinterpret_cast<intptr_t>(this));
 
     return chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(OnCommissioningCompleteRequestor, reinterpret_cast<intptr_t>(this));
 }
@@ -408,13 +397,13 @@ void DefaultOTARequestor::CancelImageUpdate()
 
 CHIP_ERROR DefaultOTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, DataModel::Nullable<uint8_t> & progress)
 {
-    VerifyOrReturnError(OtaRequestorServerGetUpdateStateProgress(endpointId, progress) == Status::Success, CHIP_ERROR_BAD_REQUEST);
+    progress = mCurrentUpdateStateProgress;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultOTARequestor::GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state)
 {
-    VerifyOrReturnError(OtaRequestorServerGetUpdateState(endpointId, state) == Status::Success, CHIP_ERROR_BAD_REQUEST);
+    state = mCurrentUpdateState;
     return CHIP_NO_ERROR;
 }
 
@@ -581,7 +570,20 @@ void DefaultOTARequestor::NotifyUpdateApplied()
         return;
     }
 
-    OtaRequestorServerOnVersionApplied(mCurrentVersion, productId);
+    DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrDie(dataModelProvider != nullptr);
+    OtaSoftwareUpdateRequestor::Events::VersionApplied::Type event{ mCurrentVersion, productId };
+
+    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+    {
+        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
+        {
+            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
+            {
+                static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
+            }
+        }
+    }
 
     ConnectToProvider(kNotifyUpdateApplied);
 }
@@ -640,7 +642,7 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
 
 void DefaultOTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
 {
-    OtaRequestorServerSetUpdateStateProgress(percent);
+    mCurrentUpdateStateProgress = percent;
 }
 
 IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
@@ -659,15 +661,10 @@ IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
 
 void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAChangeReasonEnum reason, CHIP_ERROR error)
 {
-    // Set server UpdateState attribute
-    OtaRequestorServerSetUpdateState(newState);
-
     // The UpdateStateProgress attribute only applies to the downloading state
     if (newState != OTAUpdateStateEnum::kDownloading)
     {
-        DataModel::Nullable<uint8_t> percent;
-        percent.SetNull();
-        OtaRequestorServerSetUpdateStateProgress(percent);
+        mCurrentUpdateStateProgress.SetNull();
     }
 
     // Log the StateTransition event
@@ -677,11 +674,28 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     {
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
-    OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
     OTAUpdateStateEnum prevState = mCurrentUpdateState;
     // Update the new state before handling the state transition
     mCurrentUpdateState = newState;
+
+    if (prevState != newState)
+    {
+        DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+        VerifyOrDie(dataModelProvider != nullptr);
+        OtaSoftwareUpdateRequestor::Events::StateTransition::Type event{ prevState, newState, reason, targetSoftwareVersion };
+
+        for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+        {
+            for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
+            {
+                if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
+                {
+                    static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
+                }
+            }
+        }
+    }
 
     if ((newState == OTAUpdateStateEnum::kIdle) && (prevState != OTAUpdateStateEnum::kIdle))
     {
@@ -701,7 +715,22 @@ void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReas
     VerifyOrDie(imageProcessor != nullptr);
     Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
-    OtaRequestorServerOnDownloadError(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
+
+    DataModel::Provider * dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrDie(dataModelProvider != nullptr);
+    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event{ mTargetVersion, imageProcessor->GetBytesDownloaded(),
+                                                                   progressPercent, platformCode };
+
+    for (app::DataModel::EndpointEntry endpoint : dataModelProvider->EndpointsIgnoreError())
+    {
+        for (app::DataModel::ServerClusterEntry cluster : dataModelProvider->ServerClustersIgnoreError(endpoint.id))
+        {
+            if (cluster.clusterId == OtaSoftwareUpdateRequestor::Id)
+            {
+                static_cast<DataModel::EventsGenerator &>(EventManagement::GetInstance()).GenerateEvent(event, endpoint.id);
+            }
+        }
+    }
 
     // Whenever an error occurs, always reset to Idle state
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, reason, error);

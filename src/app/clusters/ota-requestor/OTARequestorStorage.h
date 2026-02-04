@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -29,7 +30,7 @@ class OTARequestorStorage
 {
 public:
     using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-    using OTAUpdateStateEnum   = app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using OTAUpdateStateEnum   = app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
 
     virtual ~OTARequestorStorage() {}
 

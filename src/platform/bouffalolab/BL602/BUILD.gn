@@ -76,6 +76,7 @@ static_library("BL602") {
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]

@@ -48,6 +48,7 @@ source_set("multi-ota-common") {
     "OTAMultiImageProcessorImpl.cpp",
     "OTATlvProcessor.cpp",
   ]
+  deps = [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -63,6 +64,7 @@ source_set("multi-ota-common") {
 
 source_set("multi-ota-efr32") {
   sources = [ "OTAFirmwareProcessor.cpp" ]
+  deps = [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   public_deps = [
     ":multi-ota-common",
     "${silabs_platform_dir}/platformAbstraction:gsdk",
@@ -82,6 +84,7 @@ source_set("multi-ota-efr32") {
 
 source_set("multi-ota-siwx") {
   sources = [ "SiWx917/OTAWiFiFirmwareProcessor.cpp" ]
+  deps = [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   public_deps = [
     ":multi-ota-common",
     "${silabs_platform_dir}/platformAbstraction:wisemcu",

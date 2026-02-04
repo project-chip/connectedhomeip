@@ -20,8 +20,9 @@
  * Any implementation of the OTA Requestor must implement this interface.
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
-
+#include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 #include <lib/core/ClusterEnums.h>
 
 #pragma once
@@ -225,5 +226,9 @@ void SetRequestorInstance(OTARequestorInterface * instance);
 
 // Get the object implementing OTARequestorInterface
 OTARequestorInterface * GetRequestorInstance();
+
+// An internal callback to assist with backwards compatibility for codegen. The implementation of SetRequestorInstance must call
+// this (if not null) after setting the requestor instance. THIS MUST ONLY BE SET IN CodegenIntegration.cpp!
+extern void (*internalOnSetRequestorInstance)(OTARequestorInterface * instance);
 
 } // namespace chip
