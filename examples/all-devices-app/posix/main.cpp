@@ -85,6 +85,7 @@ public:
         Access::AccessControl & accessControl;
         PersistentStorageDelegate & persistentStorage;
         FailSafeContext & failSafeContext;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
@@ -102,20 +103,21 @@ public:
         mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
         mRootNode(
             {
-                .commissioningWindowManager   = mContext.commissioningWindowManager, //
-                    .configurationManager     = mContext.configurationManager,       //
-                    .deviceControlServer      = mContext.deviceControlServer,        //
-                    .fabricTable              = mContext.fabricTable,                //
-                    .accessControl            = mContext.accessControl,              //
-                    .persistentStorage        = mContext.persistentStorage,          //
-                    .failSafeContext          = mContext.failSafeContext,            //
-                    .platformManager          = mContext.platformManager,            //
-                    .groupDataProvider        = mContext.groupDataProvider,          //
-                    .sessionManager           = mContext.sessionManager,             //
-                    .dnssdServer              = mContext.dnssdServer,                //
-                    .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,   //
-                    .diagnosticDataProvider   = mContext.diagnosticDataProvider,     //
-                    .testEventTriggerDelegate = mContext.testEventTriggerDelegate,   //
+                .commissioningWindowManager     = mContext.commissioningWindowManager, //
+                    .configurationManager       = mContext.configurationManager,       //
+                    .deviceControlServer        = mContext.deviceControlServer,        //
+                    .fabricTable                = mContext.fabricTable,                //
+                    .accessControl              = mContext.accessControl,              //
+                    .persistentStorage          = mContext.persistentStorage,          //
+                    .failSafeContext            = mContext.failSafeContext,            //
+                    .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider, //
+                    .platformManager            = mContext.platformManager,            //
+                    .groupDataProvider          = mContext.groupDataProvider,          //
+                    .sessionManager             = mContext.sessionManager,             //
+                    .dnssdServer                = mContext.dnssdServer,                //
+                    .deviceLoadStatusProvider   = mContext.deviceLoadStatusProvider,   //
+                    .diagnosticDataProvider     = mContext.diagnosticDataProvider,     //
+                    .testEventTriggerDelegate   = mContext.testEventTriggerDelegate,   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
@@ -183,6 +185,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to get the DeviceInstanceInfoProvifer.");
+        chipDie();
+    }
+
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                 //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
@@ -192,6 +201,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .accessControl              = Server::GetInstance().GetAccessControl(),              //
             .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
             .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .deviceInstanceInfoProvider = *provider,                                             //
             .platformManager            = DeviceLayer::PlatformMgr(),                            //
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
