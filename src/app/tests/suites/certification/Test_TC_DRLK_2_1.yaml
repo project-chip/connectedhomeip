@@ -347,21 +347,21 @@ tests:
               maxValue: 4294967294
 
     - label: "Step 6a: TH reads DoorClosedEvents attribute from DUT"
-      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      PICS: !DRLK.S.A0005
       command: "readAttribute"
       attribute: "DoorClosedEvents"
       response:
           error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
-      PICS: DRLK.S.F05 && DRLK.S.A0005
+      PICS: DRLK.S.A0005
       command: "writeAttribute"
       attribute: "DoorClosedEvents"
       arguments:
           value: 0
 
     - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
-      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      PICS: !DRLK.S.A0005
       command: "writeAttribute"
       attribute: "DoorClosedEvents"
       arguments:
@@ -370,14 +370,14 @@ tests:
           error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
-      PICS: DRLK.S.F05 && DRLK.S.A0005
+      PICS: DRLK.S.A0005
       command: "readAttribute"
       attribute: "DoorClosedEvents"
       response:
           value: 0
 
     - label: "Step 6c: TH reads DoorClosedEvents attribute from DUT"
-      PICS: DRLK.S.F05 && !DRLK.S.A0005
+      PICS: !DRLK.S.A0005
       command: "readAttribute"
       attribute: "DoorClosedEvents"
       response:
@@ -394,21 +394,21 @@ tests:
               maxValue: 65534
 
     - label: "Step 7a: TH reads OpenPeriod attribute from DUT"
-      PICS: DRLK.S.F05 && !DRLK.S.A0006
+      PICS: !DRLK.S.A0006
       command: "readAttribute"
       attribute: "OpenPeriod"
       response:
           error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 7b: TH writes OpenPeriod attribute as 2 minutes"
-      PICS: DRLK.S.F05 && DRLK.S.A0006
+      PICS: DRLK.S.A0006
       command: "writeAttribute"
       attribute: "OpenPeriod"
       arguments:
           value: 2
 
     - label: "Step 7b: TH writes OpenPeriod attribute as 2 minutes"
-      PICS: DRLK.S.F05 && !DRLK.S.A0006
+      PICS: !DRLK.S.A0006
       command: "writeAttribute"
       attribute: "OpenPeriod"
       arguments:
@@ -417,14 +417,14 @@ tests:
           error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 7c: TH reads OpenPeriod attribute from DUT"
-      PICS: DRLK.S.F05 && DRLK.S.A0006
+      PICS: DRLK.S.A0006
       command: "readAttribute"
       attribute: "OpenPeriod"
       response:
           value: 2
 
     - label: "Step 7c: TH reads OpenPeriod attribute from DUT"
-      PICS: DRLK.S.F05 && !DRLK.S.A0006
+      PICS: !DRLK.S.A0006
       command: "readAttribute"
       attribute: "OpenPeriod"
       response:
