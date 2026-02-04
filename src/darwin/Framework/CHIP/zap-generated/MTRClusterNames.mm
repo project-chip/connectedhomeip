@@ -3778,6 +3778,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxMembershipCount";
             break;
 
+        case MTRAttributeIDTypeClusterGroupcastAttributeMaxMcastAddrCountID:
+            result = @"MaxMcastAddrCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeUsedMcastAddrCountID:
+            result = @"UsedMcastAddrCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeFabricUnderTestID:
+            result = @"FabricUnderTest";
+            break;
+
         case MTRAttributeIDTypeClusterGroupcastAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -10729,6 +10741,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ConfigureAuxiliaryACL";
             break;
 
+        case MTRCommandIDTypeClusterGroupcastCommandGroupcastTestingID:
+            result = @"GroupcastTesting";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -15337,6 +15353,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeGroupcastID:
 
         switch (eventID) {
+
+            // Cluster Groupcast events
+        case MTREventIDTypeClusterGroupcastEventGroupcastTestingID:
+            result = @"GroupcastTesting";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

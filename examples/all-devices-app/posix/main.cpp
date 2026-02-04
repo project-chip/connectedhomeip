@@ -77,7 +77,10 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
-        FailSafeContext & failsafeContext;
+        Access::AccessControl & accessControl;
+        PersistentStorageDelegate & persistentStorage;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
@@ -89,27 +92,39 @@ public:
     };
 
     CodeDrivenDataModelDevices(const Context & context) :
-        mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence), mRootNode({
-            .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager   = mContext.configurationManager,       //
-                .deviceControlServer    = mContext.deviceControlServer,        //
-                .fabricTable            = mContext.fabricTable,                //
-                .failsafeContext        = mContext.failsafeContext,            //
-                .platformManager        = mContext.platformManager,            //
-                .groupDataProvider      = mContext.groupDataProvider,          //
-                .sessionManager         = mContext.sessionManager,             //
-                .dnssdServer            = mContext.dnssdServer,                //
+        mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
+        mRootNode(
+            {
+                .commissioningWindowManager     = mContext.commissioningWindowManager, //
+                    .configurationManager       = mContext.configurationManager,       //
+                    .deviceControlServer        = mContext.deviceControlServer,        //
+                    .fabricTable                = mContext.fabricTable,                //
+                    .accessControl              = mContext.accessControl,              //
+                    .persistentStorage          = mContext.persistentStorage,          //
+                    .failSafeContext            = mContext.failSafeContext,            //
+                    .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider, //
+                    .platformManager            = mContext.platformManager,            //
+                    .groupDataProvider          = mContext.groupDataProvider,          //
+                    .sessionManager             = mContext.sessionManager,             //
+                    .dnssdServer                = mContext.dnssdServer,                //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+                    .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        })
+            },
+            []() {
+                BitFlags<AppRootNode::EnabledFeatures> features;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                features.Set(AppRootNode::EnabledFeatures::kWiFi, AppOptions::EnableWiFi());
+#endif
+                return features;
+            }())
     {}
 
     CHIP_ERROR Startup()
     {
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
-        ReturnErrorOnFailure(mRootNode.Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
+        ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
         mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
         VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
@@ -125,7 +140,7 @@ public:
             mConstructedDevice->UnRegister(mDataModelProvider);
             mConstructedDevice.reset();
         }
-        mRootNode.UnRegister(mDataModelProvider);
+        mRootNode.RootDevice().UnRegister(mDataModelProvider);
     }
 
     chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }
@@ -146,7 +161,10 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .timerDelegate = timerDelegate,
+        .groupDataProvider = gGroupDataProvider,                     //
+        .fabricTable       = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate     = timerDelegate,                          //
+
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -156,13 +174,23 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to get the DeviceInstanceInfoProvifer.");
+        chipDie();
+    }
+
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                 //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
             .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
             .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
             .fabricTable                = Server::GetInstance().GetFabricTable(),                //
-            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .accessControl              = Server::GetInstance().GetAccessControl(),              //
+            .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .deviceInstanceInfoProvider = *provider,                                             //
             .platformManager            = DeviceLayer::PlatformMgr(),                            //
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
@@ -218,6 +246,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     chip::app::SetTerminateHandler(StopSignalHandler);
+
+    // This message is used as a marker for when the application process has started.
+    // See: scripts/tests/chiptest/test_definition.py
+    // TODO: A cleaner and more generic mechanism needs to be developed as a follow-up.
+    // Currently other places (OTA, TV) also scrape logs for information and a better way should be
+    // possible.
+    ChipLogProgress(DeviceLayer, "===== APP STATUS: Starting event loop =====");
 
     if (mainLoop != nullptr)
     {

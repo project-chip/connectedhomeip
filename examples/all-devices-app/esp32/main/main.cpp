@@ -93,7 +93,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
-Credentials::GroupDataProviderImpl gGropupDataProvider;
+Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -196,17 +196,27 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to get DeviceInstanceInfoProvider.");
+        return nullptr;
+    }
+
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
         RootNodeDevice::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
-                .groupDataProvider      = gGropupDataProvider,                                   //
-                .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
-                .dnssdServer            = DnssdServer::Instance(),                               //
+            .commissioningWindowManager     = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+                .accessControl              = Server::GetInstance().GetAccessControl(),              //
+                .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+                .deviceInstanceInfoProvider = *provider,                                             //
+                .platformManager            = DeviceLayer::PlatformMgr(),                            //
+                .groupDataProvider          = gGropupDataProvider,                                   //
+                .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+                .dnssdServer                = DnssdServer::Instance(),                               //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -245,7 +255,9 @@ void InitServer(intptr_t context)
 {
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
-        .timerDelegate = timerDelegate,
+        .groupDataProvider = gGroupDataProvider,                     //
+        .fabricTable       = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate     = timerDelegate,                          //
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;

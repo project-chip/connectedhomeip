@@ -88,6 +88,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
+        self.jfadmin_fabric_a_node_id = 1
 
         # Start Fabric A JF-Administrator App
         self.fabric_a_admin = AppServerSubprocess(
@@ -113,9 +114,9 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {
+            message=f"pairing onnetwork-long {self.jfadmin_fabric_a_node_id} {self.jfadmin_fabric_a_passcode} {
                 self.jfadmin_fabric_a_discriminator} --anchor true",
-            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            expected_output=f"[JF] Anchor Administrator (nodeId={self.jfadmin_fabric_a_node_id}) commissioned with success",
             timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
@@ -162,7 +163,9 @@ class TC_JFDS_2_1(MatterBaseTest):
             TestStep("3", "TH reads AnchorVendorID attribute from DUT",
                      "Verify that the VendorId of the DUT is returned"),
             TestStep("4", "TH reads FriendlyName from DUT",
-                     "Verify that the a valid string is returned")
+                     "Verify that a valid string is returned"),
+            TestStep("5", "TH reads Status from DUT",
+                     "Verify that the Status attribute shows 'Pending' state")
         ]
 
     @async_test_body
@@ -181,27 +184,36 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
             returnClusterObject=True)
-        asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].anchorRootCA), 0)
+        asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].anchorRootCA), 1)
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
             returnClusterObject=True)
-        asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorNodeID, 0)
+        asserts.assert_equal(response[1][Clusters.JointFabricDatastore].anchorNodeID, self.jfadmin_fabric_a_node_id)
 
         self.step("3")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
             returnClusterObject=True)
-        asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
+        asserts.assert_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, self.jfctrl_fabric_a_vid)
 
         self.step("4")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.FriendlyName)],
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(1, Clusters.JointFabricDatastore.Attributes.FriendlyName)],
             returnClusterObject=True)
         asserts.assert_is_instance(response[1][Clusters.JointFabricDatastore].friendlyName, str)
+        asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].friendlyName), 1)
+
+        self.step("5")
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeId=self.jfadmin_fabric_a_node_id, attributes=[(1, Clusters.JointFabricDatastore.Attributes.Status)],
+            returnClusterObject=True)
+        asserts.assert_equal(
+            response[1][Clusters.JointFabricDatastore].status.state,
+            Clusters.JointFabricDatastore.Enums.DatastoreStateEnum.kPending)
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()

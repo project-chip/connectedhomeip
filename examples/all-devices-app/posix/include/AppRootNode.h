@@ -34,42 +34,47 @@
 
 namespace chip::app {
 
-class AppRootNode : public DeviceInterface
+/// Provides an application root node for darwin and linux.
+///
+/// In particular if the SDK supports WIFI, it will also provide the ability
+/// to enable wifi in the root node.
+class AppRootNode
 {
 public:
-    AppRootNode(const RootNodeDevice::Context & context) :
-        DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)),
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        mRootNodeDevice(context, { .wifiDriver = mWiFiDriver })
+    enum class EnabledFeatures : uint32_t
     {
-        mWiFiDriver.Set5gSupport(true);
-    }
-#else
+        kNone = 0,
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        kWiFi = 0x01, // enable wifi support
+#endif
+    };
+
+    AppRootNode(const RootNodeDevice::Context & context, BitFlags<EnabledFeatures> features = {}) :
+        mEnabledFeatures(features),
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        mWiFiRootNodeDevice(context, { .wifiDriver = mWiFiDriver }),
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
         mRootNodeDevice(context)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
+        mWiFiDriver.Set5gSupport(true);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override
+    SingleEndpointDevice & RootDevice()
     {
-        return mRootNodeDevice.Register(endpoint, provider, parentId);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        if (mEnabledFeatures.Has(EnabledFeatures::kWiFi))
+        {
+            return mWiFiRootNodeDevice;
+        }
+#endif
+        return mRootNodeDevice;
     }
-
-    /// Removes a device's clusters from the given provider. This
-    /// must only be called when register has succeeded before. Expected
-    /// usage of this function is for when the device is no longer needed
-    /// (for example, on shutdown), to destroy the device's clusters.
-    void UnRegister(CodeDrivenDataModelProvider & provider) override { return mRootNodeDevice.UnRegister(provider); }
-
-    CHIP_ERROR DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const override
-    {
-        return mRootNodeDevice.DeviceTypes(out);
-    }
-
-    CHIP_ERROR ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const override { return mRootNodeDevice.ClientClusters(out); }
 
 private:
+    BitFlags<EnabledFeatures> mEnabledFeatures;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -78,10 +83,11 @@ private:
     DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWiFiDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
-    WifiRootNodeDevice mRootNodeDevice;
+    WifiRootNodeDevice mWiFiRootNodeDevice;
 #else
-    RootNodeDevice mRootNodeDevice;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+    RootNodeDevice mRootNodeDevice;
 };
 
 } // namespace chip::app

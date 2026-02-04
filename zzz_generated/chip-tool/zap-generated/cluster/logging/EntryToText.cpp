@@ -2086,6 +2086,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Membership";
         case chip::app::Clusters::Groupcast::Attributes::MaxMembershipCount::Id:
             return "MaxMembershipCount";
+        case chip::app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id:
+            return "MaxMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id:
+            return "UsedMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::FabricUnderTest::Id:
+            return "FabricUnderTest";
         case chip::app::Clusters::Groupcast::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Groupcast::Attributes::AcceptedCommandList::Id:
@@ -5658,6 +5664,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "UpdateGroupKey";
         case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return "ConfigureAuxiliaryACL";
+        case chip::app::Clusters::Groupcast::Commands::GroupcastTesting::Id:
+            return "GroupcastTesting";
         default:
             return "Unknown";
         }
