@@ -217,6 +217,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       device_layer_target_define = "LINUX"
       defines += [
         "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     } else if (chip_device_platform == "tizen") {
@@ -583,6 +584,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:fixedbuffer",
       "${chip_root}/src/lib/support:timer-delegate",
     ]
 

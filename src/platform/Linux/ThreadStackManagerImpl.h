@@ -17,6 +17,10 @@
 
 #pragma once
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include "ThreadStackManagerImpl_OpenThread.h"
+#else
+
 #include <memory>
 #include <vector>
 
@@ -165,3 +169,4 @@ inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
 
 } // namespace DeviceLayer
 } // namespace chip
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT

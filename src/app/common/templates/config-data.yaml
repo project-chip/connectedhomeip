@@ -147,9 +147,11 @@ CodeDrivenClusters:
     - Software Diagnostics
     - TLS Certificate Management
     - TLS Client Management
+    - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization
     - Unit Localization
     - User Label
+    - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
     # keep-sorted end

@@ -191,10 +191,10 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     targets.append(
         ApplicationTarget(
             kind=SubprocessKind.APP,
-            env_key="ENERGY_MANAGEMENT_APP",
-            cli_key="energy-management",
-            target=f"{target_prefix}-energy-management-{suffix}",
-            binary="chip-energy-management-app",
+            env_key="EVSE_APP",
+            cli_key="evse",
+            target=f"{target_prefix}-evse-{suffix}",
+            binary="chip-evse-app",
         )
     )
     targets.append(
@@ -367,7 +367,7 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             kind=SubprocessKind.APP,
             env_key="ALL_DEVICES_APP",
             cli_key="all-devices",
-            target=f"{target_prefix}-all-devices-app",
+            target=f"{target_prefix}-all-devices-{suffix}",
             binary="all-devices-app"
         )
     )
@@ -1305,7 +1305,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:177
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:181
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

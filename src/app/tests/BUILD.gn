@@ -143,11 +143,13 @@ source_set("thread-border-router-management-test-srcs") {
     # Sources needed because codegen integration of general commissioning provides general commissioning instance
     "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
     "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.h",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server/CodegenIntegration.cpp",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
@@ -330,14 +332,17 @@ chip_test_suite("tests") {
     ]
   }
 
-  if (chip_config_network_layer_ble &&
-      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+  # TestCommissioningWindowManager uses MockClock to advance time and force timer expiration which
+  # does not behave as expected on darwin
+  if (chip_config_network_layer_ble && chip_device_platform == "linux") {
     test_sources += [ "TestCommissioningWindowManager.cpp" ]
     public_deps += [
+      "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
-  } else if (!chip_fake_platform) {
+  }
+  if (!chip_fake_platform) {
     test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
     public_deps += [ ":thread-border-router-management-test-srcs" ]
   }
