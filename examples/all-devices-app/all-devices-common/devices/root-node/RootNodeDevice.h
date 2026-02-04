@@ -42,7 +42,10 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
-        FailSafeContext & failsafeContext;
+        Access::AccessControl & accessControl;
+        PersistentStorageDelegate & persistentStorage;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;

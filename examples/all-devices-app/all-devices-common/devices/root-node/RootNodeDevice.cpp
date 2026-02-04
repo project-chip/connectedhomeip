@@ -27,7 +27,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
-
 namespace chip {
 namespace app {
 
@@ -47,7 +46,11 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
             .Set<BasicInformation::Attributes::Reachable::Id>();
 
-    mBasicInformationCluster.Create(optionalAttributeSet);
+    mBasicInformationCluster.Create(
+        optionalAttributeSet,
+        BasicInformationCluster::Context{ .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider,
+                                          .configurationManager       = mContext.configurationManager,
+                                          .platformManager            = mContext.platformManager });
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
@@ -56,7 +59,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                 .configurationManager   = mContext.configurationManager,       //
                 .deviceControlServer    = mContext.deviceControlServer,        //
                 .fabricTable            = mContext.fabricTable,                //
-                .failsafeContext        = mContext.failsafeContext,            //
+                .failSafeContext        = mContext.failSafeContext,            //
                 .platformManager        = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
@@ -65,7 +68,14 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
         GeneralCommissioningCluster::OptionalAttributes());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralCommissioningCluster.Registration()));
 
-    mAdministratorCommissioningCluster.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>{});
+    mAdministratorCommissioningCluster.Create(
+        endpointId, BitFlags<AdministratorCommissioning::Feature>{},
+        AdministratorCommissioningCluster::Context{ .commissioningWindowManager = mContext.commissioningWindowManager,
+                                                    .fabricTable                = mContext.fabricTable,
+                                                    // Note: We pull FailSafeContext directly from Server instead of via
+                                                    // CommissioningWindowManager because the WindowManager's internal
+                                                    // Server pointer is not yet initialized at this stage of registration.
+                                                    .failSafeContext = mContext.failSafeContext });
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
@@ -81,13 +91,17 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet{});
     ReturnErrorOnFailure(provider.AddCluster(mSoftwareDiagnosticsServerCluster.Registration()));
 
-    mAccessControlCluster.Create();
+    mAccessControlCluster.Create(AccessControlCluster::Context{
+        .persistentStorage = mContext.persistentStorage,
+        .fabricTable       = mContext.fabricTable,
+        .accessControl     = mContext.accessControl,
+    });
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
     mOperationalCredentialsCluster.Create(endpointId,
                                           OperationalCredentialsCluster::Context{
                                               .fabricTable                = mContext.fabricTable,
-                                              .failSafeContext            = mContext.failsafeContext,
+                                              .failSafeContext            = mContext.failSafeContext,
                                               .sessionManager             = mContext.sessionManager,
                                               .dnssdServer                = mContext.dnssdServer,
                                               .commissioningWindowManager = mContext.commissioningWindowManager,

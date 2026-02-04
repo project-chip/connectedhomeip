@@ -7566,6 +7566,39 @@ public class ClusterReadMapping {
           readGroupcastMaxMembershipCountCommandParams
         );
         result.put("readMaxMembershipCountAttribute", readGroupcastMaxMembershipCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGroupcastMaxMcastAddrCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGroupcastMaxMcastAddrCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GroupcastCluster) cluster).readMaxMcastAddrCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGroupcastMaxMcastAddrCountCommandParams
+        );
+        result.put("readMaxMcastAddrCountAttribute", readGroupcastMaxMcastAddrCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGroupcastUsedMcastAddrCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGroupcastUsedMcastAddrCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GroupcastCluster) cluster).readUsedMcastAddrCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGroupcastUsedMcastAddrCountCommandParams
+        );
+        result.put("readUsedMcastAddrCountAttribute", readGroupcastUsedMcastAddrCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGroupcastFabricUnderTestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGroupcastFabricUnderTestAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GroupcastCluster) cluster).readFabricUnderTestAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGroupcastFabricUnderTestCommandParams
+        );
+        result.put("readFabricUnderTestAttribute", readGroupcastFabricUnderTestAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGroupcastGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGroupcastGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

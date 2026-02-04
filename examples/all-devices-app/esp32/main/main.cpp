@@ -196,17 +196,27 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to get DeviceInstanceInfoProvider.");
+        return nullptr;
+    }
+
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
         RootNodeDevice::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
-                .groupDataProvider      = gGroupDataProvider,                                    //
-                .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
-                .dnssdServer            = DnssdServer::Instance(),                               //
+            .commissioningWindowManager     = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+                .accessControl              = Server::GetInstance().GetAccessControl(),              //
+                .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+                .deviceInstanceInfoProvider = *provider,                                             //
+                .platformManager            = DeviceLayer::PlatformMgr(),                            //
+                .groupDataProvider          = gGropupDataProvider,                                   //
+                .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+                .dnssdServer                = DnssdServer::Instance(),                               //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
