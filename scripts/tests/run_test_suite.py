@@ -90,7 +90,7 @@ def validate_test_order(ctx: click.Context, param: click.Parameter, value: Any) 
         raise click.BadParameter("Test order needs to be a string.")
     if value == "alphabetic":
         return None
-    if (value_split := value.split(":"))[0] == "random":
+    if (value_split := value.split(":", maxsplit=1))[0] == "random":
         if len(value_split) == 1:
             return str(time.time_ns())
         if len(value_split) == 2:
