@@ -271,7 +271,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(payload.productID));
     PrintOnboardingCodes(payload);
 
-
     chip::app::SetTerminateHandler(StopSignalHandler);
 
     // This message is used as a marker for when the application process has started.
