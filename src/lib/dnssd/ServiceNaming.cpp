@@ -35,8 +35,7 @@ CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peer
     NodeId nodeId               = peerId.GetNodeId();
     CompressedFabricId fabricId = peerId.GetCompressedFabricId();
 
-    snprintf(buffer, bufferLen, "%08" PRIX32 "%08" PRIX32 "-%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(fabricId >> 32),
-             static_cast<uint32_t>(fabricId), static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
+    snprintf(buffer, bufferLen, "%016" PRIX64 "-%016" PRIX64, fabricId, nodeId);
 
     return CHIP_NO_ERROR;
 }
