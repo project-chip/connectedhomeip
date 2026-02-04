@@ -50,7 +50,8 @@ public:
     ~BluezAdvertisement() { Shutdown(); }
 
     CHIP_ERROR Init(BluezAdapter1 * apAdapter, const char * aAdvUUID, const char * aAdvName);
-    CHIP_ERROR SetupServiceData(ServiceDataFlags aFlags);
+    CHIP_ERROR SetupCommissioningServiceData(ServiceDataFlags aFlags);
+    CHIP_ERROR SetupNetworkRecoveryServiceData(ServiceDataFlags aFlags, uint64_t recoveryIdentifier, uint8_t reason);
     CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
 

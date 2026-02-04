@@ -41,6 +41,7 @@
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/NetworkRecoveryDataProvider.h>
 
 #include "bluez/BluezEndpoint.h"
 
@@ -561,7 +562,19 @@ void BLEManagerImpl::DriveBLEState()
             if (mFlags.Has(Flags::kExtAdvertisingEnabled))
                 serviceDataFlags |= BluezAdvertisement::kServiceDataExtendedAnnouncement;
 #endif
-            SuccessOrExit(err = mBLEAdvertisement.SetupServiceData(serviceDataFlags));
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+            if (ShouldAdvertiseNetworkRecovery())
+            {
+                uint64_t recoveryIdentifier;
+                uint8_t reason;
+                SuccessOrExit(err = GetNetworkRecoveryDataProvider()->GetNetworkRecoveryIdentifier(recoveryIdentifier));
+                SuccessOrExit(err = GetNetworkRecoveryDataProvider()->GetNetworkRecoveryReason(reason));
+                SuccessOrExit(err =
+                                  mBLEAdvertisement.SetupNetworkRecoveryServiceData(serviceDataFlags, recoveryIdentifier, reason));
+            }
+            else
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+                SuccessOrExit(err = mBLEAdvertisement.SetupCommissioningServiceData(serviceDataFlags));
 
             // Set or update the advertising intervals.
             SuccessOrExit(err = mBLEAdvertisement.SetIntervals(GetAdvertisingIntervals()));
@@ -594,6 +607,19 @@ exit:
     {
         DisableBLEService(err);
     }
+}
+bool BLEManagerImpl::ShouldAdvertiseNetworkRecovery()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    bool wifiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    bool wifiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+    bool wifiConnected   = ConnectivityMgr().IsWiFiStationConnected();
+    ChipLogProgress(DeviceLayer, "BLE Checking WiFi connection status: P=%d,E=%d,C=%d", wifiProvisioned, wifiEnabled,
+                    wifiConnected);
+    return GetNetworkRecoveryDataProvider()->ShouldAdvertise();
+#else  // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    return false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
 }
 
 void BLEManagerImpl::DisableBLEService(CHIP_ERROR err)

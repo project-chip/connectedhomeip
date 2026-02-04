@@ -233,11 +233,10 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
 #if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
     case RecoveryIdentifier::Id: {
         chip::MutableByteSpan aRecoveryIdentifier(mRecoveryIdentifier, sizeof(mRecoveryIdentifier));
-        RecoveryIdentifier::Get(aPath.mEndpointId, aRecoveryIdentifier);
-        return aEncoder.Encode(aRecoveryIdentifier);
+        return encoder.Encode(aRecoveryIdentifier);
     }
     case NetworkRecoveryReason::Id: {
-        return aEncoder.Encode(mNetworkRecoveryReasonValue);
+        return encoder.Encode(mNetworkRecoveryReasonValue);
     }
 #else  // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
     case RecoveryIdentifier::Id:
@@ -402,7 +401,7 @@ CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
 #if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
     // Generate RecoveryIdentifier if it is the first time
-    if (fabricTable.FabricCount() == 0)
+    if (mClusterContext.fabricTable.FabricCount() == 0)
     {
         GenerateAndSetRecoveryIdentifier();
     }
@@ -714,7 +713,8 @@ void GeneralCommissioningCluster::GenerateAndSetRecoveryIdentifier(void)
     // Generate a random byte array for the recovery identifier
     for (uint8_t i = 0; i < 3; i++)
     { // avoid the identifer is zero, when is zero, try more times.
-        Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(aRecoveryIdentifier), sizeof(aRecoveryIdentifier));
+        auto err = Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(aRecoveryIdentifier), sizeof(aRecoveryIdentifier));
+        (void) err;
         if (!chip::Encoding::BigEndian::Get64(aRecoveryIdentifier))
         {
             break;

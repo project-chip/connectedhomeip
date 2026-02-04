@@ -131,8 +131,8 @@ CHIP_ERROR BluezAdvertisement::Init(BluezAdapter1 * apAdapter, const char * aAdv
         g_snprintf(mAdvName, sizeof(mAdvName), "%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff);
     }
 
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezAdvertisement * self) { return self->InitImpl(); }, this);
+    CHIP_ERROR err =
+        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezAdvertisement * self) { return self->InitImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(Ble, "Failed to schedule BLE advertisement Init() on CHIPoBluez thread"));
 
@@ -150,7 +150,7 @@ CHIP_ERROR BluezAdvertisement::SetIntervals(AdvertisingIntervals aAdvIntervals)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
+CHIP_ERROR BluezAdvertisement::SetupCommissioningServiceData(ServiceDataFlags aFlags)
 {
     VerifyOrReturnError(mAdv, CHIP_ERROR_UNINITIALIZED);
 
@@ -176,6 +176,35 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
     g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_add(&serviceDataBuilder, "{sv}", mAdvUUID,
                           g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &deviceInfo, sizeof(deviceInfo), sizeof(uint8_t)));
+
+    GVariant * serviceData = g_variant_builder_end(&serviceDataBuilder);
+
+    GAutoPtr<char> debugStr(g_variant_print(serviceData, TRUE));
+    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
+
+    bluez_leadvertisement1_set_service_data(mAdv.get(), serviceData);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BluezAdvertisement::SetupNetworkRecoveryServiceData(ServiceDataFlags aFlags, uint64_t recoveryIdentifier, uint8_t reason)
+{
+    Ble::ChipBLENetworkRecoveryInfo deviceNetworkRecoveryInfo;
+    deviceNetworkRecoveryInfo.Init();
+    deviceNetworkRecoveryInfo.SetRecoveryIdentifier(recoveryIdentifier);
+    deviceNetworkRecoveryInfo.SetPrimaryReason(reason);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    deviceNetworkRecoveryInfo.SetAdditionalDataFlag(true);
+#else
+    deviceNetworkRecoveryInfo.SetAdditionalDataFlag(false);
+#endif
+
+    GVariantBuilder serviceDataBuilder;
+    g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&serviceDataBuilder, "{sv}", mAdvUUID,
+                          g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &deviceNetworkRecoveryInfo,
+                                                    sizeof(deviceNetworkRecoveryInfo), sizeof(uint8_t)));
 
     GVariant * serviceData = g_variant_builder_end(&serviceDataBuilder);
 
@@ -269,8 +298,7 @@ CHIP_ERROR BluezAdvertisement::Start()
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnValue(!mIsAdvertising, CHIP_NO_ERROR, ChipLogDetail(DeviceLayer, "BLE advertising already started"));
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezAdvertisement * self) { return self->StartImpl(); }, this);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezAdvertisement * self) { return self->StartImpl(); }, this);
 }
 
 void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
@@ -320,8 +348,7 @@ CHIP_ERROR BluezAdvertisement::Stop()
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnValue(mIsAdvertising, CHIP_NO_ERROR, ChipLogDetail(DeviceLayer, "BLE advertising already stopped"));
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezAdvertisement * self) { return self->StopImpl(); }, this);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezAdvertisement * self) { return self->StopImpl(); }, this);
 }
 
 } // namespace Internal

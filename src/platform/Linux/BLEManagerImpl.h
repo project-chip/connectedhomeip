@@ -194,6 +194,8 @@ private:
     void NotifyCHIPoBLEConnectionClosed();
     void NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change);
 
+    bool ShouldAdvertiseNetworkRecovery();
+
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
 
