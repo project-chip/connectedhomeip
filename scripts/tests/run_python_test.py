@@ -380,41 +380,36 @@ def monitor_app_restart_requests(
         app_stdin_pipe,
         restart_flag_file):
     while True:
+        # Try to read the restart flag file
         try:
-            # Try to read the restart flag file
-            try:
-                with open(restart_flag_file, 'r') as f:
-                    flag_file_content = f.read().strip()
-            except FileNotFoundError:
-                # File doesn't exist yet, continue waiting
-                time.sleep(0.5)
-                continue
-
-            # Successfully read the flag file, remove to prevent multiple restarts
-            os.unlink(restart_flag_file)
-            is_factory_reset = (flag_file_content == "factory reset")
-            is_factory_reset_app_only = (flag_file_content == "factory reset app only")
-            log.info("%s requested by test script", flag_file_content.capitalize())
-
-            # Handle app factory reset if requested
-            handle_factory_reset(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
-
-            # Restart the app
-            new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
-            new_app_manager.start()
-            with app_manager_lock:
-                app_manager_ref[0].stop()
-                app_manager_ref[0] = new_app_manager
-
-            # Restart complete, continue monitoring for additional restart requests
-            log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
-
-            # Sleep to prevent tight loop
+            with open(restart_flag_file, 'r') as f:
+                flag_file_content = f.read().strip()
+        except FileNotFoundError:
+            # File doesn't exist yet, continue waiting
             time.sleep(0.5)
-        except Exception as e:
-            log.error("Error in app restart monitor: %r", e)
-            # Sleep to prevent tight loop
-            time.sleep(0.5)
+            continue
+
+        # Successfully read the flag file, remove to prevent multiple restarts
+        os.unlink(restart_flag_file)
+        is_factory_reset = (flag_file_content == "factory reset")
+        is_factory_reset_app_only = (flag_file_content == "factory reset app only")
+        log.info("%s requested by test script", flag_file_content.capitalize())
+
+        # Handle app factory reset if requested
+        handle_factory_reset(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
+
+        # Restart the app
+        new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        new_app_manager.start()
+        with app_manager_lock:
+            app_manager_ref[0].stop()
+            app_manager_ref[0] = new_app_manager
+
+        # Restart complete, continue monitoring for additional restart requests
+        log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
+
+        # Sleep to prevent tight loop
+        time.sleep(0.5)
 
 
 if __name__ == '__main__':
