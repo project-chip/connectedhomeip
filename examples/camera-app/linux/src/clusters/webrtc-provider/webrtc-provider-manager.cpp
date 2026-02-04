@@ -22,6 +22,7 @@
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <webrtc-transport.h>
 
@@ -36,6 +37,7 @@ namespace {
 
 // Constants
 constexpr uint16_t kMaxConcurrentWebRTCSessions = 5;
+constexpr uint32_t kConnectionTimeoutSeconds    = 30;
 
 /**
  * @brief Validates that an SDP contains the minimum required fields for WebRTC.
@@ -232,6 +234,9 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
     transport->MoveToState(WebrtcTransport::State::SendingOffer);
+
+    // Start a connection timeout timer to clean up stale sessions that never reach Connected state
+    StartConnectionTimer(args.sessionId);
 
     ChipLogProgress(Camera, "Generate and set the SDP");
     if (transport->GetPeerConnection())
@@ -431,6 +436,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
     transport->MoveToState(WebrtcTransport::State::SendingAnswer);
+
+    // Start a connection timeout timer to clean up stale sessions that never reach Connected state
+    StartConnectionTimer(args.sessionId);
 
     if (peerConnection != nullptr)
     {
@@ -1257,4 +1265,47 @@ CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams(uint16_t sessionId)
 
     return mCameraDevice->GetCameraAVStreamMgmtController().OnTransportReleaseAudioVideoStreams(args.audioStreams,
                                                                                                 args.videoStreams);
+}
+
+void WebRTCProviderManager::StartConnectionTimer(uint16_t sessionId)
+{
+    auto * ctx     = chip::Platform::New<ConnectionTimeoutContext>();
+    ctx->manager   = this;
+    ctx->sessionId = sessionId;
+
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kConnectionTimeoutSeconds),
+                                                           OnConnectionTimeoutCallback, ctx);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to start connection timeout timer for session %u: %" CHIP_ERROR_FORMAT, sessionId,
+                     err.Format());
+        chip::Platform::Delete(ctx);
+    }
+}
+
+void WebRTCProviderManager::OnConnectionTimeoutCallback(chip::System::Layer * systemLayer, void * context)
+{
+    auto * ctx = static_cast<ConnectionTimeoutContext *>(context);
+    ctx->manager->HandleConnectionTimeout(ctx->sessionId);
+    chip::Platform::Delete(ctx);
+}
+
+void WebRTCProviderManager::HandleConnectionTimeout(uint16_t sessionId)
+{
+    WebrtcTransport * transport = GetTransport(sessionId);
+    if (transport == nullptr)
+    {
+        // Session was already cleaned up
+        return;
+    }
+
+    if (transport->IsConnected())
+    {
+        // Connection was established, no timeout needed
+        return;
+    }
+
+    ChipLogError(Camera, "Connection timeout for session %u after %u seconds, cleaning up stale session", sessionId,
+                 kConnectionTimeoutSeconds);
+    CleanupSession(sessionId);
 }

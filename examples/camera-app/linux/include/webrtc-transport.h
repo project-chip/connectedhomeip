@@ -74,6 +74,8 @@ public:
 
     State GetState() { return mState; }
 
+    bool IsConnected() const { return mConnected; }
+
     // Send video data for a given stream ID
     void SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID) override;
 
@@ -131,6 +133,7 @@ public:
 private:
     CommandType mCommandType = CommandType::kUndefined;
     State mState             = State::Idle;
+    bool mConnected          = false;
 
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
 
