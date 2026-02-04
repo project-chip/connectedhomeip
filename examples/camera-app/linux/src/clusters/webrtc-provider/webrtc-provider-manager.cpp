@@ -949,12 +949,6 @@ void WebRTCProviderManager::CleanupSession(uint16_t sessionId)
     // Remove from session maps
     mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
 
-    // Remove from current sessions list in the WebRTC Transport Provider
-    if (mWebRTCTransportProvider != nullptr)
-    {
-        mWebRTCTransportProvider->RemoveSession(sessionId);
-    }
-
     // Finally, remove and destroy the transport
     mWebrtcTransportMap.erase(sessionId);
 
