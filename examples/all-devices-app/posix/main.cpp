@@ -202,8 +202,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
-
-
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                 //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
