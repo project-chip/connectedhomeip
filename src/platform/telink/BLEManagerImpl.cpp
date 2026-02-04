@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2024 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -329,6 +329,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
     if (!mBLERadioInitialized)
     {
+        mReadyToAttachThread = false;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         // Deinit Thread
         TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(false);

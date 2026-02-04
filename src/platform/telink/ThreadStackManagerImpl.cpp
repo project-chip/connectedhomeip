@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
         /* On Telink platform it's not possible to rise Thread network when its used by BLE,
            so just mark that it's provisioned and rise Thread after BLE disconnect */
         result = SetThreadProvision(dataset.AsByteSpan());
-        if (result == CHIP_NO_ERROR)
+        if (result == CHIP_NO_ERROR && callback != nullptr)
         {
             mReadyToAttach = true;
             callback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
