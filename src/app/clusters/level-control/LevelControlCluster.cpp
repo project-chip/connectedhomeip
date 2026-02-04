@@ -356,12 +356,11 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
     const uint32_t transitionTimeMs = transitionTimeDS.ValueOr(mOnOffTransitionTime) * 100;
 
     // Refresh CurrentLevel (might have changed due to OnOff logic) and set Direction
-    currentLevel    = mCurrentLevel.value().ValueOr(currentLevel);
+    currentLevel = mCurrentLevel.value().ValueOr(currentLevel);
 
     // Calculate duration per step
-    auto totalSteps      = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
+    auto totalSteps         = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
     uint32_t tickDurationMs = (totalSteps > 0) ? (transitionTimeMs / totalSteps) : 0;
-
 
     if (tickDurationMs > 0)
     {
@@ -435,8 +434,8 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     }
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
-    uint8_t currentLevel    = mCurrentLevel.value().Value();
-    uint8_t difference = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
+    uint8_t currentLevel = mCurrentLevel.value().Value();
+    uint8_t difference   = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
 
     // currentRate is known not to be 0 (ConstraintError check above)
     uint32_t tickDurationMs = 1000 / currentRate;
