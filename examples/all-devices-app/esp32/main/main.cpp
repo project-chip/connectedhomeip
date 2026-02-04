@@ -205,20 +205,19 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
         RootNodeDevice::Context {
-            .commissioningWindowManager     = Server::GetInstance().GetCommissioningWindowManager(),   //
-                .configurationManager       = DeviceLayer::ConfigurationMgr(),                         //
-                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
-                .fabricTable                = Server::GetInstance().GetFabricTable(),                  //
-                .accessControl              = Server::GetInstance().GetAccessControl(),                //
-                .persistentStorage          = Server::GetInstance().GetPersistentStorage(),            //
-                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),              //
-                .deviceInstanceInfoProvider = *provider,                                               //
-                .platformManager            = DeviceLayer::PlatformMgr(),                              //
-                .groupDataProvider          = gGropupDataProvider,                                     //
-                .sessionManager             = Server::GetInstance().GetSecureSessionManager(),         //
-                .dnssdServer                = DnssdServer::Instance(),                                 //
-                .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
-                .eventManagement            = EventManagement::GetInstance(),                          //
+            .commissioningWindowManager     = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+                .accessControl              = Server::GetInstance().GetAccessControl(),              //
+                .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+                .deviceInstanceInfoProvider = *provider,                                             //
+                .platformManager            = DeviceLayer::PlatformMgr(),                            //
+                .groupDataProvider          = gGropupDataProvider,                                   //
+                .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+                .dnssdServer                = DnssdServer::Instance(),                               //
+
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
