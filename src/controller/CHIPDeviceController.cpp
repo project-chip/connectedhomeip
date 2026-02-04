@@ -2562,6 +2562,7 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
             {
                 ChipLogProgress(Controller, "NetworkCommissioning Features: has Thread. endpointid = %u", path.mEndpointId);
                 info.network.thread.endpoint = path.mEndpointId;
+                mAutoCommissioner.SetNetworkSetupNeeded(true);
             }
             else if (features.Has(NetworkCommissioning::Feature::kEthernetNetworkInterface))
             {

@@ -70,6 +70,7 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
+#include <platform/NetworkCommissioning.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
