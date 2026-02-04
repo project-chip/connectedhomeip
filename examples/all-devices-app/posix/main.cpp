@@ -172,7 +172,7 @@ private:
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
-    
+
     static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
@@ -196,7 +196,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
-    
+
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                 //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
