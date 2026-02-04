@@ -120,14 +120,11 @@ class TC_BOOL_2_2(MatterBaseTest):
           - PICS BOOL.S.E00(StateChange) OR
           - FeatureMap CHGEVENT bit (when defined for BooleanState)
         """
-        if self.check_pics("BOOL.S.E00"):
-            return True
+        return self.check_pics("BOOL.S.E00")
 
         # Future extension point:
         # if self._feature_map_has_chgevent():
         #     return True
-
-        return False
 
     async def _set_dut_state_value(self, endpoint: int, state: bool) -> None:
         """
@@ -145,14 +142,13 @@ class TC_BOOL_2_2(MatterBaseTest):
 
     async def _read_state_value(self, dev_ctrl, node_id: int, endpoint: int) -> bool:
         cbool = Clusters.BooleanState
-        val = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl,
             node_id=node_id,
             endpoint=endpoint,
             cluster=cbool,
             attribute=cbool.Attributes.StateValue,
         )
-        return val
 
     @run_if_endpoint_matches(has_cluster(Clusters.BooleanState))
     async def test_TC_BOOL_2_2(self) -> None:
