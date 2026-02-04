@@ -466,7 +466,7 @@ System::Clock::Milliseconds64 GeneralDiagnosticsCluster::TimeSinceNodeStartup() 
     auto now         = System::SystemClock().GetMonotonicMilliseconds64();
     auto startupTime = mContext->interactionContext.eventsGenerator.GetMonotonicStartupTime();
 
-    if (startupTime > now)
+    if (startupTime == System::Clock::Milliseconds64(0) || startupTime > now)
     {
         return System::Clock::Milliseconds64(0);
     }
