@@ -39,11 +39,11 @@ import random
 import tempfile
 from configparser import ConfigParser
 
-from mobly import asserts
 from mdns_discovery import mdns_discovery
+from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
 
 import matter.clusters as Clusters
-from support_modules.cadmin_support import CADMINBaseTest
 import matter.tlv
 from matter import CertificateAuthority
 from matter.storage import VolatileTemporaryPersistentStorage
