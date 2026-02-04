@@ -14,7 +14,7 @@ CONFIG_BT_NIMBLE_TRANSPORT_UART=n
 # Increase main task stack size
 CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
 
-# Suppress deprecate warning for RMT
+# Suppress deprecated warning for RMT
 CONFIG_RMT_SUPPRESS_DEPRECATE_WARN=y
 
 # LwIP
