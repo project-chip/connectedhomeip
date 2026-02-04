@@ -234,15 +234,10 @@ class TC_BOOL_2_2(MatterBaseTest):
         self.step("10")
 
         if has_state_change_event:
-            if event_cb.get_size() > 0:
-                evt = event_cb.get_last_event()
-                asserts.assert_is_not_none(evt, "Expected queued StateChange event")
-                data = evt.Data
-            else:
-                data = event_cb.wait_for_event_report(
-                    cbool.Events.StateChange,
-                    timeout_sec=30
-                )
+            data = event_cb.wait_for_event_report(
+                cbool.Events.StateChange,
+                timeout_sec=30
+            )
 
             asserts.assert_true(
                 data.stateValue,
@@ -277,15 +272,10 @@ class TC_BOOL_2_2(MatterBaseTest):
         self.step("15")
 
         if has_state_change_event:
-            if event_cb.get_size() > 0:
-                evt = event_cb.get_last_event()
-                asserts.assert_is_not_none(evt, "Expected queued StateChange event")
-                data = evt.Data
-            else:
-                data = event_cb.wait_for_event_report(
-                    cbool.Events.StateChange,
-                    timeout_sec=30
-                )
+            data = event_cb.wait_for_event_report(
+                cbool.Events.StateChange,
+                timeout_sec=30
+            )
 
             asserts.assert_false(
                 data.stateValue,
