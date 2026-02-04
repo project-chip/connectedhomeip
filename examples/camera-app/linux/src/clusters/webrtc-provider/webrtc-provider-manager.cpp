@@ -1076,6 +1076,13 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
             ChipLogProgress(Camera, "Peer connection closed for session %u, cleaning up resources", sessionId);
             CleanupSession(sessionId);
+
+            // Remove from current sessions list in the WebRTC Transport Provider
+            // This MUST be called on the Matter thread with the stack lock held
+            if (mWebRTCTransportProvider != nullptr)
+            {
+                mWebRTCTransportProvider->RemoveSession(sessionId);
+            }
         });
     }
 }
