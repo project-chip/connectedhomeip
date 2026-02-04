@@ -47,7 +47,8 @@ class Subprocess(threading.Thread):
     def __init__(self, program: str, *args,
                  output_cb: Optional[Callable[[bytes, bool], bytes]] = None,
                  f_stdout: BinaryIO = sys.stdout.buffer,
-                 f_stderr: BinaryIO = sys.stderr.buffer):
+                 f_stderr: BinaryIO = sys.stderr.buffer,
+                 capture_output: bool = False):
         """Initialize the subprocess.
 
         Args:
@@ -58,6 +59,9 @@ class Subprocess(threading.Thread):
                 output comes from stderr. It should return the processed output.
             f_stdout: The file to forward the stdout to.
             f_stderr: The file to forward the stderr to.
+            capture_output: Flag to capture stdout and stderr in a buffer
+            captured_stdout: Buffer for captured stdoud
+            captured_stderr: Buffer for captured stderr
         """
         super().__init__()
         self.event = threading.Event()
@@ -69,6 +73,9 @@ class Subprocess(threading.Thread):
         self.f_stderr = f_stderr
         self.output_match: Optional[re.Pattern] = None
         self.returncode = None
+        self.capture_output = capture_output
+        self.captured_stdout = []
+        self.captured_stderr = []
 
     def set_output_match(self, pattern: Union[str, re.Pattern]):
         if isinstance(pattern, str):
@@ -81,7 +88,24 @@ class Subprocess(threading.Thread):
             self.event.set()
         if self.output_cb is not None:
             line = self.output_cb(line, is_stderr)
+        if self.capture_output:
+            if is_stderr:
+                self.captured_stderr.append(line)
+            else:
+                self.captured_stdout.append(line)
         return line
+    
+    def get_stdout(self) -> bytes:
+        """Get captured stdout as bytes and reset the buffer."""
+        temp = b''.join(self.captured_stdout)
+        self.captured_stdout = []
+        return temp
+
+    def get_stderr(self) -> bytes:
+        """Get captured stderr as bytes and reset the buffer."""
+        temp =  b''.join(self.captured_stderr)
+        self.captured_stderr = []
+        return temp
 
     def run(self):
         """Thread entry point."""
