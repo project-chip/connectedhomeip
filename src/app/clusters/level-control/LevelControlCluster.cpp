@@ -435,8 +435,8 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
     }
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
-    uint8_t currentLevel = mCurrentLevel.value().Value();
-    uint8_t difference   = (increasing ? (targetLevel - currentLevel) : (currentLevel - targetLevel));
+    uint8_t currentLevel    = mCurrentLevel.value().Value();
+    uint8_t difference      = (increasing ? (targetLevel - currentLevel) : (currentLevel - targetLevel));
     uint32_t tickDurationMs = 1000 / currentRate;
     if (tickDurationMs == 0)
     {
@@ -690,7 +690,7 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
 }
 
 void LevelControlCluster::TransitionHandler::StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel,
-                                                           uint32_t transitionTimeMs, uint32_t stepDurationMs)
+                                                             uint32_t transitionTimeMs, uint32_t stepDurationMs)
 {
     mCurrentCommandId = commandId;
     mInitialLevel     = initialLevel;
@@ -744,9 +744,10 @@ void LevelControlCluster::TransitionHandler::TimerFired()
     else if (mTransitionTimeMs > 0)
     {
         // Interpolate
-        int32_t delta  = static_cast<int32_t>(mTargetLevel) - static_cast<int32_t>(mInitialLevel);
-        int32_t change = static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
-        currentLevel   = static_cast<uint8_t>(static_cast<int32_t>(mInitialLevel) + change);
+        int32_t delta = static_cast<int32_t>(mTargetLevel) - static_cast<int32_t>(mInitialLevel);
+        int32_t change =
+            static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
+        currentLevel = static_cast<uint8_t>(static_cast<int32_t>(mInitialLevel) + change);
     }
 
     // End of transition
@@ -769,7 +770,8 @@ void LevelControlCluster::TransitionHandler::TimerFired()
             // Internal fade-to-off complete. Restore previous level.
             if (mCluster.mOnLevel.IsNull() && !mCluster.mLevelBeforeTurnedOff.IsNull())
             {
-                RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(mCluster.mLevelBeforeTurnedOff.Value(), LevelControlCluster::ReportingMode::kForceReport);
+                RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(mCluster.mLevelBeforeTurnedOff.Value(),
+                                                               LevelControlCluster::ReportingMode::kForceReport);
             }
         }
         return;

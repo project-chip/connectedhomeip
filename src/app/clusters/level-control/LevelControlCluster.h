@@ -45,9 +45,7 @@ namespace chip::app::Clusters {
  * - Scenes.
  * - RemainingTime reporting.
  */
-class LevelControlCluster : public DefaultServerCluster,
-                            public scenes::DefaultSceneHandlerImpl,
-                            public OnOffDelegate
+class LevelControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl, public OnOffDelegate
 {
 public:
     // Helper set for managing optional attributes availability based on configuration.
