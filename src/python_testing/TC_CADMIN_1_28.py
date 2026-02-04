@@ -120,7 +120,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             TestStep("2", "DUT_AJF starts a commissioning process to commission TH_DEV2 on Fabric 2",
                      "TH_DEV2 is commissioned by DUT_AJF on Fabric 2"),
             TestStep("3", "Open a Commissioning Window on DUT_AJF using OpenJointCommissioningWindow command",
-                    "Verify DUT_AJF opens its Commissioning window to allow another commissioning"),
+                     "Verify DUT_AJF opens its Commissioning window to allow another commissioning"),
             TestStep("4", "DNS-SD records shows DUT_AJF advertising",
                      "Verify that the DNS-SD advertisement has JF key with a value between 1 and 15"),
             TestStep("5", "TH_AAF2 starts a commissioning process to commission DUT_AJF on Fabric 2 proceeding to step 19 (successful established CASE session)",
@@ -329,7 +329,6 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             )
         except Exception as e:
             asserts.assert_true(False, f'Exception {e} occured during OJCW')
-
 
         self.step("4")
         service_found = [False, None]

@@ -103,7 +103,7 @@ class Subprocess(threading.Thread):
 
     def get_stderr(self) -> bytes:
         """Get captured stderr as bytes and reset the buffer."""
-        temp =  b''.join(self.captured_stderr)
+        temp = b''.join(self.captured_stderr)
         self.captured_stderr = []
         return temp
 
