@@ -62,7 +62,10 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None,
             ]
         )
 
-        if target_cc and target_cxx:
+        if target_cc or target_cxx:
+            if not (target_cc and target_cxx):
+                raise click.UsageError("--target-cc and --target-cxx options need to be used together")
+
             # Use explicit compilers from args.gn
             c_compiler = target_cc
             cxx_compiler = target_cxx
