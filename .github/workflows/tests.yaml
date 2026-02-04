@@ -362,6 +362,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -405,6 +406,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
@@ -427,6 +429,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -449,6 +452,7 @@ jobs:
                      --exclude-tags EXTRA_SLOW \
                      --exclude-tags SLOW \
                      --exclude-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -474,6 +478,7 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner matter_repl_python \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -628,6 +633,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -657,6 +663,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
