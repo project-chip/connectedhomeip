@@ -52,7 +52,7 @@ public:
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
             .groupDataProvider          = *Credentials::GetGroupDataProvider(),
-            .accessControl              = Access::GetAccessControl(),
+            .accessControl              = Server::GetInstance().GetAccessControl(),
             .platformManager            = DeviceLayer::PlatformMgr(),
             .eventManagement            = EventManagement::GetInstance(),
         };
