@@ -152,7 +152,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTime)
     EXPECT_EQ(remainingTime, 40);
 
     // Finish
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(100));
     }
@@ -199,7 +199,7 @@ TEST_F(TestLevelControlLighting, TestRemainingTimeReporting)
     EXPECT_FALSE(reported);
 
     // Wait to finish
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(100));
     }
@@ -320,7 +320,7 @@ TEST_F(TestLevelControlLighting, TestReportingAtTransitionEnd)
 
     // 4. Verify that the transition completed.
     EXPECT_EQ(cluster.GetCurrentLevel().Value(), 201u);
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 
     // 5. Verify that a report was generated for the final level (201).
     bool reported = false;

@@ -76,14 +76,19 @@ LevelControlCluster::LevelControlCluster(const Config & config) :
     mOnTransitionTime(config.mOnTransitionTime), mOffTransitionTime(config.mOffTransitionTime),
     mOnOffTransitionTime(config.mOnOffTransitionTime), mOptionalAttributes(config.mOptionalAttributes),
     mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate), mTimerDelegate(config.mTimerDelegate),
-    mOnOffCluster(config.mOnOffCluster)
+    mOnOffCluster(config.mOnOffCluster), mTransitionHandler(*this)
 {
     VerifyOrDie(!mFeatureMap.Has(Feature::kOnOff) || mOnOffCluster != nullptr);
 }
 
+LevelControlCluster::~LevelControlCluster()
+{
+    mTransitionHandler.StopTransition();
+}
+
 void LevelControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    CancelTimer();
+    mTransitionHandler.StopTransition();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -328,7 +333,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
         return Status::Success;
     }
 
-    CancelTimer(); // Cancel any currently active transition before starting a new one.
+    mTransitionHandler.StopTransition(); // Cancel any currently active transition before starting a new one.
 
     if (mCurrentLevel.value().IsNull())
     {
@@ -344,32 +349,31 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
     }
 
     uint8_t currentLevel = mCurrentLevel.value().Value();
-    mTargetLevel         = level;
-    mCurrentCommandId    = commandId;
+    uint8_t targetLevel  = level;
 
     // Calculate Transition Time in Milliseconds
     // Priority: Command argument > OnOffTransitionTime > 0 (Immediate)
     const uint32_t transitionTimeMs = transitionTimeDS.ValueOr(mOnOffTransitionTime) * 100;
 
     // Refresh CurrentLevel (might have changed due to OnOff logic) and set Direction
-    currentLevel = mCurrentLevel.value().ValueOr(currentLevel);
-    mIncreasing  = (mTargetLevel > currentLevel);
+    currentLevel    = mCurrentLevel.value().ValueOr(currentLevel);
+    bool increasing = (targetLevel > currentLevel);
 
     // Calculate duration per step
-    uint8_t totalSteps = (mIncreasing) ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel);
-    mTickDurationMs    = (totalSteps > 0) ? (transitionTimeMs / totalSteps) : 0;
+    uint8_t totalSteps      = (increasing) ? (targetLevel - currentLevel) : (currentLevel - targetLevel);
+    uint32_t tickDurationMs = (totalSteps > 0) ? (transitionTimeMs / totalSteps) : 0;
 
     // Immediate move
-    if (transitionTimeMs == 0 || totalSteps == 0 || mTickDurationMs == 0)
+    if (transitionTimeMs == 0 || totalSteps == 0 || tickDurationMs == 0)
     {
-        CHIP_ERROR status = SetCurrentLevel(mTargetLevel, ReportingMode::kForceReport);
+        CHIP_ERROR status = SetCurrentLevel(targetLevel, ReportingMode::kForceReport);
         if (status == CHIP_NO_ERROR)
         {
-            if ((IsWithOnOffCommand(commandId) || commandId == kInternalOffTransition) && mTargetLevel == mMinLevel)
+            if ((IsWithOnOffCommand(commandId) || commandId == kInternalOffTransition) && targetLevel == mMinLevel)
             {
                 ReturnErrorOnFailure(SetOnOff(false));
             }
-            if (commandId == kInternalOffTransition && mTargetLevel == mMinLevel)
+            if (commandId == kInternalOffTransition && targetLevel == mMinLevel)
             {
                 // This was an internal fade-to-off. Restoring the previous level ensures that the next
                 // "On" command (which might not specify a level) restores the brightness the user expects.
@@ -382,7 +386,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
         return status;
     }
 
-    StartTransition(mTickDurationMs, transitionTimeMs);
+    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs);
     return Status::Success;
 }
 
@@ -408,38 +412,38 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
         return Status::Success;
     }
 
-    mCurrentCommandId = commandId;
-    CancelTimer(); // Cancel any currently active transition before starting a new one.
+    mTransitionHandler.StopTransition(); // Cancel any currently active transition before starting a new one.
 
     // Determine Direction first
-    mIncreasing = (moveMode == MoveModeEnum::kUp);
+    bool increasing = (moveMode == MoveModeEnum::kUp);
+    uint8_t targetLevel;
 
     // Now determine Target and Check Constraints (safe from clobbering)
-    if (mIncreasing)
+    if (increasing)
     {
-        mTargetLevel = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
+        targetLevel = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
         // Check if already at target
         uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel < mTargetLevel, Status::Success);
+        VerifyOrReturnError(currentLevel < targetLevel, Status::Success);
     }
     else
     {
-        mTargetLevel = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
+        targetLevel = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
         // Check if already at target
         uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel > mTargetLevel, Status::Success);
+        VerifyOrReturnError(currentLevel > targetLevel, Status::Success);
     }
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
     uint8_t currentLevel = mCurrentLevel.value().Value();
-    uint8_t difference   = (mIncreasing ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel));
-    mTickDurationMs      = 1000 / currentRate;
-    if (mTickDurationMs == 0)
+    uint8_t difference   = (increasing ? (targetLevel - currentLevel) : (currentLevel - targetLevel));
+    uint32_t tickDurationMs = 1000 / currentRate;
+    if (tickDurationMs == 0)
     {
-        mTickDurationMs = 1;
+        tickDurationMs = 1;
     }
 
-    StartTransition(mTickDurationMs, difference * mTickDurationMs);
+    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, difference * tickDurationMs, tickDurationMs);
     return Status::Success;
 }
 
@@ -468,27 +472,27 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
         return Status::Success;
     }
 
-    mCurrentCommandId = commandId;
-    CancelTimer();
+    mTransitionHandler.StopTransition();
 
-    mIncreasing          = (stepMode == StepModeEnum::kUp);
+    bool increasing      = (stepMode == StepModeEnum::kUp);
     uint8_t currentLevel = mCurrentLevel.value().Value();
+    uint8_t targetLevel;
 
     // Spec: "Up: Increase CurrentLevel by StepSize units, or until it reaches the maximum level..."
     // Spec: "Down: Decrease CurrentLevel by StepSize units, or until it reaches the minimum level..."
-    if (mIncreasing)
+    if (increasing)
     {
-        int max      = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
-        mTargetLevel = static_cast<uint8_t>(std::min(currentLevel + stepSize, max));
+        int max     = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
+        targetLevel = static_cast<uint8_t>(std::min(currentLevel + stepSize, max));
     }
     else
     {
-        int min      = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
-        mTargetLevel = static_cast<uint8_t>(std::max(currentLevel - stepSize, min));
+        int min     = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
+        targetLevel = static_cast<uint8_t>(std::max(currentLevel - stepSize, min));
     }
 
     // Calculate effective step duration
-    uint8_t totalSteps = (mIncreasing ? (mTargetLevel - currentLevel) : (currentLevel - mTargetLevel));
+    uint8_t totalSteps = (increasing ? (targetLevel - currentLevel) : (currentLevel - targetLevel));
 
     // Spec: "If the TransitionTime field is equal to null, the device SHOULD move as fast as it is able."
     uint32_t transitionTimeMs = transitionTime.ValueOr(0) * 100;
@@ -496,19 +500,19 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
     // Check if immediate transition is needed (0 time or 0 duration calculated)
     if (transitionTimeMs == 0 || totalSteps == 0 || (transitionTimeMs / totalSteps) == 0)
     {
-        CHIP_ERROR status = SetCurrentLevel(mTargetLevel, ReportingMode::kForceReport);
+        CHIP_ERROR status = SetCurrentLevel(targetLevel, ReportingMode::kForceReport);
 
         // Spec: "If any command that has the effect of setting the CurrentLevel attribute to the minimum level...
         // the OnOff attribute... SHALL be set to FALSE"
-        if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && mTargetLevel == mMinLevel)
+        if (status == CHIP_NO_ERROR && IsWithOnOffCommand(commandId) && targetLevel == mMinLevel)
         {
             ReturnErrorOnFailure(SetOnOff(false));
         }
         return status;
     }
 
-    mTickDurationMs = transitionTimeMs / totalSteps;
-    StartTransition(mTickDurationMs, transitionTimeMs);
+    uint32_t tickDurationMs = transitionTimeMs / totalSteps;
+    mTransitionHandler.StartTransition(commandId, currentLevel, targetLevel, transitionTimeMs, tickDurationMs);
     return Status::Success;
 }
 
@@ -518,7 +522,7 @@ DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId command
     // Spec (Options Attribute): "Command execution SHALL NOT continue beyond the Options processing if...
     // The command is one of the ‘without On/Off’ commands: ... Stop."
     VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
-    CancelTimer();
+    mTransitionHandler.StopTransition();
     UpdateRemainingTime(0, ReportingMode::kForceReport);
     // mCurrentLevel is guaranteed to have a value here.
     // - If we were transitioning, it had a value.
@@ -671,7 +675,9 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
                 return candidate.newValue.ValueOr(0) == 0 && candidate.lastDirtyValue.ValueOr(0) != 0;
             }
 
-            VerifyOrReturnValue(mTransitionTimeMs >= 1000, false);
+            // Transitions shorter than 1 second (10ds) will never satisfy the "higher than 10" requirement for the initial report,
+            // so we filter them out early to avoid unnecessary processing.
+            VerifyOrReturnValue(mTransitionHandler.GetTransitionTimeMs() >= 1000, false);
 
             auto lastDirty = candidate.lastDirtyValue.ValueOr(0);
             auto newValue  = candidate.newValue.ValueOr(0);
@@ -683,22 +689,35 @@ void LevelControlCluster::UpdateRemainingTime(uint32_t remainingTimeMs, Reportin
     }
 }
 
-void LevelControlCluster::StartTimer(uint32_t delayMs)
+void LevelControlCluster::TransitionHandler::StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel,
+                                                           uint32_t transitionTimeMs, uint32_t stepDurationMs)
 {
-    SuccessOrDie(mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(delayMs)));
+    mCurrentCommandId = commandId;
+    mInitialLevel     = initialLevel;
+    mTargetLevel      = targetLevel;
+    mTransitionTimeMs = transitionTimeMs;
+    mTickDurationMs   = stepDurationMs;
+    mElapsedTimeMs    = 0;
+
+    mTransitionStartTimeMs = System::SystemClock().GetMonotonicMilliseconds64().count();
+
+    // Command invoked: Set RemainingTime using full reporting rules
+    mCluster.UpdateRemainingTime(mTransitionTimeMs, LevelControlCluster::ReportingMode::kForceReport);
+    SuccessOrDie(mCluster.mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(mTickDurationMs)));
 }
 
-void LevelControlCluster::CancelTimer()
+void LevelControlCluster::TransitionHandler::StopTransition()
 {
-    mTimerDelegate.CancelTimer(this);
+    mCluster.mTimerDelegate.CancelTimer(this);
+    mCluster.UpdateRemainingTime(0, LevelControlCluster::ReportingMode::kForceReport);
 }
 
-void LevelControlCluster::TimerFired()
+void LevelControlCluster::TransitionHandler::TimerFired()
 {
-    VerifyOrReturn(!mCurrentLevel.value().IsNull());
+    VerifyOrReturn(!mCluster.mCurrentLevel.value().IsNull());
 
     uint64_t now = System::SystemClock().GetMonotonicMilliseconds64().count();
-    // Check for monotonic clock rollover or backward jump (though rare/impossible for monotonic) just in case
+    // Check for monotonic clock rollover or backward jump
     if (now < mTransitionStartTimeMs)
     {
         mTransitionStartTimeMs = now; // restart reference
@@ -709,11 +728,11 @@ void LevelControlCluster::TimerFired()
 
     // RemainingTime update
     uint16_t remainingTimeMs = 0;
-    if (mFeatureMap.Has(Feature::kLighting) && mTransitionTimeMs > 0 && mElapsedTimeMs < mTransitionTimeMs)
+    if (mCluster.mFeatureMap.Has(Feature::kLighting) && mTransitionTimeMs > 0 && mElapsedTimeMs < mTransitionTimeMs)
     {
         remainingTimeMs = static_cast<uint16_t>(mTransitionTimeMs - mElapsedTimeMs);
     }
-    UpdateRemainingTime(remainingTimeMs, ReportingMode::kQuietReport);
+    mCluster.UpdateRemainingTime(remainingTimeMs, LevelControlCluster::ReportingMode::kQuietReport);
 
     // Calculate new level based on time interpolation
     uint8_t currentLevel = mInitialLevel;
@@ -725,48 +744,40 @@ void LevelControlCluster::TimerFired()
     else if (mTransitionTimeMs > 0)
     {
         // Interpolate
-        // Delta = Target - Initial (signed)
-        // Progress = Elapsed / Total
-        // New = Initial + Delta * Progress
-        // Use 64-bit to prevent overflow during multiply
-        int32_t delta = static_cast<int32_t>(mTargetLevel) - static_cast<int32_t>(mInitialLevel);
-        int32_t change =
-            static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
-        currentLevel = static_cast<uint8_t>(static_cast<int32_t>(mInitialLevel) + change);
+        int32_t delta  = static_cast<int32_t>(mTargetLevel) - static_cast<int32_t>(mInitialLevel);
+        int32_t change = static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
+        currentLevel   = static_cast<uint8_t>(static_cast<int32_t>(mInitialLevel) + change);
     }
 
     // End of transition
     if (currentLevel == mTargetLevel || mElapsedTimeMs >= mTransitionTimeMs)
     {
         // Safe to ignore error: mTargetLevel was validated when starting the transition.
-        // SetCurrentLevel calls mDelegate.OnLevelChanged(currentLevel), so the delegate is updated.
-        RETURN_SAFELY_IGNORED SetCurrentLevel(mTargetLevel, ReportingMode::kForceReport);
+        RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(mTargetLevel, LevelControlCluster::ReportingMode::kForceReport);
 
-        UpdateRemainingTime(0, ReportingMode::kForceReport); // Transition complete, ensure RemainingTime is 0
+        mCluster.UpdateRemainingTime(0, LevelControlCluster::ReportingMode::kForceReport); // Transition complete
 
         // If reached minimum, turn off OnOff cluster
         if ((IsWithOnOffCommand(mCurrentCommandId) || mCurrentCommandId == kInternalOffTransition) &&
-            (mTargetLevel == mMinLevel || mTargetLevel == 0))
+            (mTargetLevel == mCluster.mMinLevel || mTargetLevel == 0))
         {
-            LogErrorOnFailure(SetOnOff(false));
+            LogErrorOnFailure(mCluster.SetOnOff(false));
         }
 
-        if (mCurrentCommandId == kInternalOffTransition && mTargetLevel == mMinLevel)
+        if (mCurrentCommandId == kInternalOffTransition && mTargetLevel == mCluster.mMinLevel)
         {
-            // This was an internal fade-to-off. Restoring the previous level ensures that the next
-            // "On" command (which might not specify a level) restores the brightness the user expects.
-            if (mOnLevel.IsNull() && !mLevelBeforeTurnedOff.IsNull())
+            // Internal fade-to-off complete. Restore previous level.
+            if (mCluster.mOnLevel.IsNull() && !mCluster.mLevelBeforeTurnedOff.IsNull())
             {
-                RETURN_SAFELY_IGNORED SetCurrentLevel(mLevelBeforeTurnedOff.Value(), ReportingMode::kForceReport);
+                RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(mCluster.mLevelBeforeTurnedOff.Value(), LevelControlCluster::ReportingMode::kForceReport);
             }
         }
         return;
     }
 
-    // Ignore error as this is a background tick.
-    RETURN_SAFELY_IGNORED SetCurrentLevel(currentLevel, ReportingMode::kQuietReport);
-
-    StartTimer(mTickDurationMs);
+    // Intermediate tick
+    RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(currentLevel, LevelControlCluster::ReportingMode::kQuietReport);
+    SuccessOrDie(mCluster.mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(mTickDurationMs)));
 }
 
 void LevelControlCluster::OnOnOffChanged(bool isOn)
@@ -822,20 +833,6 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
         // This allows us to restore the pre-off level after the transition completes.
         MoveToLevelCommand(kInternalOffTransition, mMinLevel, transitionTime, optionsMask, optionsOverride);
     }
-}
-
-void LevelControlCluster::StartTransition(uint32_t tickDurationMs, uint32_t transitionTimeMs)
-{
-    mTransitionTimeMs = transitionTimeMs;
-    mTickDurationMs   = tickDurationMs;
-    mElapsedTimeMs    = 0;
-
-    mTransitionStartTimeMs = System::SystemClock().GetMonotonicMilliseconds64().count();
-    mInitialLevel          = mCurrentLevel.value().Value();
-
-    // Command invoked: Set RemainingTime using full reporting rules
-    UpdateRemainingTime(mTransitionTimeMs, ReportingMode::kForceReport);
-    StartTimer(mTickDurationMs);
 }
 
 bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)

@@ -46,7 +46,6 @@ namespace chip::app::Clusters {
  * - RemainingTime reporting.
  */
 class LevelControlCluster : public DefaultServerCluster,
-                            public TimerContext,
                             public scenes::DefaultSceneHandlerImpl,
                             public OnOffDelegate
 {
@@ -149,7 +148,7 @@ public:
     };
 
     LevelControlCluster(const Config & config);
-    ~LevelControlCluster() { CancelTimer(); }
+    ~LevelControlCluster();
 
     // ServerClusterInterface Implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -217,9 +216,6 @@ public:
     DataModel::Nullable<uint16_t> GetOffTransitionTime() const { return mOffTransitionTime; }
     uint16_t GetOnOffTransitionTime() const { return mOnOffTransitionTime; }
 
-    // TimerContext
-    void TimerFired() override;
-
     // SceneHandler implementation
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override;
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override;
@@ -256,19 +252,40 @@ private:
     TimerDelegate & mTimerDelegate;
     OnOffCluster * mOnOffCluster = nullptr;
 
-    // Transition Logic State
-    uint8_t mTargetLevel       = 0;
-    uint32_t mTransitionTimeMs = 0;
-    uint32_t mElapsedTimeMs    = 0;
-    uint32_t mTickDurationMs   = 0;
-    // Tracks the direction of the transition (increase vs decrease) across repeated TimerFired calls.
-    bool mIncreasing            = false;
-    CommandId mCurrentCommandId = kInvalidCommandId;
     DataModel::Nullable<uint8_t> mLevelBeforeTurnedOff; // Stores the level before turning Off, to restore on On if OnLevel is null.
 
-    // Jitter Compensation
-    uint64_t mTransitionStartTimeMs = 0;
-    uint8_t mInitialLevel           = 0;
+    // Private helper class to aggregate state and timing of level transitions. This helps keep the main
+    // cluster class cleaner.
+    class TransitionHandler : public TimerContext
+    {
+    public:
+        TransitionHandler(LevelControlCluster & cluster) : mCluster(cluster) {}
+
+        void StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel, uint32_t transitionTimeMs,
+                             uint32_t stepDurationMs);
+        void StopTransition();
+
+        uint32_t GetTransitionTimeMs() const { return mTransitionTimeMs; }
+
+        // TimerContext
+        void TimerFired() override;
+
+    private:
+        LevelControlCluster & mCluster;
+
+        // Transition Logic State
+        uint8_t mInitialLevel           = 0;
+        uint8_t mTargetLevel            = 0;
+        uint32_t mTransitionTimeMs      = 0;
+        uint32_t mElapsedTimeMs         = 0;
+        uint32_t mTickDurationMs        = 0;
+        uint64_t mTransitionStartTimeMs = 0;
+        CommandId mCurrentCommandId     = kInvalidCommandId;
+    };
+
+    TransitionHandler mTransitionHandler;
+
+    // Jitter Compensation (Moved to TransitionHandler)
 
     // Used to ignore/prevent reentrance of OnOffChanged callbacks when we are programmatically setting On/Off state
     // during a Level Control command (like MoveToLevelWithOnOff).
@@ -280,16 +297,10 @@ private:
     bool GetOnOff();
     bool ShouldExecuteIfOff(BitMask<LevelControl::OptionsBitmap> optionsMask, BitMask<LevelControl::OptionsBitmap> optionsOverride);
 
-    // Setup and start the transition
-    void StartTransition(uint32_t durationMs, uint32_t transitionTimeMs);
-
     // Helper to write CurrentLevel to NVM.
     void StoreCurrentLevel(DataModel::Nullable<uint8_t> value);
 
     void UpdateRemainingTime(uint32_t remainingTimeMs, ReportingMode mode);
-
-    void StartTimer(uint32_t delayMs);
-    void CancelTimer();
 
     DataModel::ActionReturnStatus MoveToLevelCommand(CommandId commandId, uint8_t level,
                                                      DataModel::Nullable<uint16_t> transitionTimeDS,

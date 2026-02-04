@@ -118,10 +118,10 @@ TEST_F(TestLevelControlScenes, TestApplyScene)
     EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, LevelControl::Id, serializedBytes, 1000), CHIP_NO_ERROR);
 
     // Timer should be active (transition from 0 to 20 over 1000ms)
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     // Advance to end
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(100));
     }
@@ -160,7 +160,7 @@ TEST_F(TestLevelControlScenes, TestApplySceneImmediate)
     EXPECT_EQ(cluster.ApplyScene(kTestEndpointId, LevelControl::Id, serializedBytes, 0), CHIP_NO_ERROR);
 
     // Should be immediate -> No Timer
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());

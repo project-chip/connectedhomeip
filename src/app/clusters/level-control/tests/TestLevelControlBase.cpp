@@ -255,7 +255,7 @@ TEST_F(TestLevelControlBase, TestImmediateExecution)
     EXPECT_EQ(readLevel.Value(), 100u);
 
     EXPECT_EQ(mockDelegate.mLevel, 100u);
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 }
 
 TEST_F(TestLevelControlBase, TestGetters)
@@ -335,7 +335,7 @@ TEST_F(TestLevelControlBase, TestMoveToLevelCommand)
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
 
     // Timer should be active
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     // Level should still be 0 (time hasn't passed)
     DataModel::Nullable<uint8_t> readLevel;
@@ -388,7 +388,7 @@ TEST_F(TestLevelControlBase, TestTimerFired)
     data.optionsOverride.ClearAll();
 
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     // Advance 1000ms -> Level 1
     AdvanceClock(System::Clock::Milliseconds64(1000));
@@ -396,7 +396,7 @@ TEST_F(TestLevelControlBase, TestTimerFired)
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 1u);
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster)); // Still going
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr)); // Still going
 
     // Advance 1000ms -> Level 2
     AdvanceClock(System::Clock::Milliseconds64(1000));
@@ -405,7 +405,7 @@ TEST_F(TestLevelControlBase, TestTimerFired)
     EXPECT_EQ(readLevel.Value(), 2u);
 
     // Timer should stop
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 }
 
 TEST_F(TestLevelControlBase, TestStopCommand)
@@ -427,7 +427,7 @@ TEST_F(TestLevelControlBase, TestStopCommand)
     data.optionsMask.ClearAll();
     data.optionsOverride.ClearAll();
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     // Stop
     Commands::Stop::Type stopData;
@@ -435,7 +435,7 @@ TEST_F(TestLevelControlBase, TestStopCommand)
     stopData.optionsOverride.ClearAll();
 
     EXPECT_TRUE(tester.Invoke(Commands::Stop::Id, stopData).IsSuccess());
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 }
 
 TEST_F(TestLevelControlBase, TestMoveToLevelFallback)
@@ -462,9 +462,9 @@ TEST_F(TestLevelControlBase, TestMoveToLevelFallback)
     data.optionsOverride.ClearAll();
 
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
-    mockTimer.CancelTimer(&cluster); // or call Stop
+    mockTimer.CancelTimer(nullptr); // or call Stop
     Commands::Stop::Type stopData;
     stopData.optionsMask.ClearAll();
     stopData.optionsOverride.ClearAll();
@@ -476,7 +476,7 @@ TEST_F(TestLevelControlBase, TestMoveToLevelFallback)
 
     data.level = 50;
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevel::Id, data).IsSuccess());
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 
     DataModel::Nullable<uint8_t> readLevel;
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
@@ -505,7 +505,7 @@ TEST_F(TestLevelControlBase, TestMoveCommand)
     data.optionsOverride.ClearAll();
 
     EXPECT_TRUE(tester.Invoke(Commands::Move::Id, data).IsSuccess());
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     // Advance 1s -> should increase by 10 (approx)
     for (int i = 0; i < 10; i++)
@@ -522,7 +522,7 @@ TEST_F(TestLevelControlBase, TestMoveCommand)
     stopData.optionsMask.ClearAll();
     stopData.optionsOverride.ClearAll();
     EXPECT_TRUE(tester.Invoke(Commands::Stop::Id, stopData).IsSuccess());
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 }
 
 TEST_F(TestLevelControlBase, TestStepCommand)
@@ -548,7 +548,7 @@ TEST_F(TestLevelControlBase, TestStepCommand)
     data.optionsOverride.ClearAll();
 
     EXPECT_TRUE(tester.Invoke(Commands::Step::Id, data).IsSuccess());
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     // Advance 10s. Should reach 10.
     for (int i = 0; i < 10; i++)
@@ -560,7 +560,7 @@ TEST_F(TestLevelControlBase, TestStepCommand)
     EXPECT_TRUE(tester.ReadAttribute(Attributes::CurrentLevel::Id, readLevel).IsSuccess());
     EXPECT_EQ(readLevel.Value(), 10u);
 
-    EXPECT_FALSE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(mockTimer.IsTimerActive(nullptr));
 }
 
 TEST_F(TestLevelControlBase, TestCurrentLevelReporting)

@@ -150,7 +150,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     EXPECT_TRUE(onOffCluster.GetOnOff());
 
     // Advance to end
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(1000));
     }
@@ -168,7 +168,7 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffCommand)
     EXPECT_TRUE(onOffCluster.GetOnOff());
 
     // Advance to end
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(1000));
     }
@@ -211,7 +211,7 @@ TEST_F(TestLevelControlOnOff, TestMoveWithOnOff)
     EXPECT_TRUE(tester.Invoke(Commands::MoveWithOnOff::Id, data).IsSuccess());
 
     EXPECT_TRUE(onOffCluster.GetOnOff());
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 }
 
 TEST_F(TestLevelControlOnOff, TestStepWithOnOff)
@@ -306,9 +306,9 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
 
     EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(1000));
     }
@@ -327,9 +327,9 @@ TEST_F(TestLevelControlOnOff, TestOnOffChanged)
 
     EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(1000));
     }
@@ -443,11 +443,11 @@ TEST_F(TestLevelControlOnOff, TestMoveToLevelWithOnOffReentrancy)
     EXPECT_TRUE(tester.Invoke(Commands::MoveToLevelWithOnOff::Id, data).IsSuccess());
 
     // Verify timer IS active (transition to 254 started)
-    EXPECT_TRUE(mockTimer.IsTimerActive(&cluster));
+    EXPECT_TRUE(mockTimer.IsTimerActive(nullptr));
 
     // Verify we reach 254 eventually
     int limit = 300;
-    while (mockTimer.IsTimerActive(&cluster) && limit-- > 0)
+    while (mockTimer.IsTimerActive(nullptr) && limit-- > 0)
     {
         AdvanceClock(System::Clock::Milliseconds64(100));
     }
@@ -479,13 +479,13 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     // Prime mLevelBeforeTurnedOff by turning Off and On once
     // Off -> Stores 200.
     EXPECT_EQ(onOffCluster.SetOnOff(false), CHIP_NO_ERROR);
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
         AdvanceClock(System::Clock::Milliseconds64(1000));
     EXPECT_FALSE(onOffCluster.GetOnOff());
 
     // On -> Restores 200.
     EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
         AdvanceClock(System::Clock::Milliseconds64(1000));
     EXPECT_TRUE(onOffCluster.GetOnOff());
 
@@ -506,7 +506,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
 
     // 3. Advance time to finish.
     int limit = 200;
-    while (mockTimer.IsTimerActive(&cluster) && limit-- > 0)
+    while (mockTimer.IsTimerActive(nullptr) && limit-- > 0)
     {
         AdvanceClock(System::Clock::Milliseconds64(1000));
     }
@@ -517,7 +517,7 @@ TEST_F(TestLevelControlOnOff, TestStoredLevelCorruption)
     // Should restore 200 (from mLevelBeforeTurnedOff) NOT MinLevel (0/1).
     EXPECT_EQ(onOffCluster.SetOnOff(true), CHIP_NO_ERROR);
 
-    while (mockTimer.IsTimerActive(&cluster))
+    while (mockTimer.IsTimerActive(nullptr))
     {
         AdvanceClock(System::Clock::Milliseconds64(1000));
     }
