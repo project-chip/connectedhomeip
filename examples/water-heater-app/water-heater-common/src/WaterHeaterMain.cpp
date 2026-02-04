@@ -31,7 +31,6 @@
 #include <WaterHeaterManufacturer.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
-#include <energy-management/electrical-sensor/include/ElectricalPowerMeasurementDelegate.h>
 #include <water-heater-mode.h>
 
 #include <DEMConfig.h>
