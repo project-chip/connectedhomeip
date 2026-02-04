@@ -208,6 +208,8 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
     {
         chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
         TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap);
+        // These features and optional attributes are used to make the app pass certification
+        // We recommend implementers of the app to modify these to fit their needs
         TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(
             endpointId, gEPMDelegate, gEPMInstance,
             BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(

@@ -194,10 +194,14 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
     if (!gCommonClustersInitialized)
     {
         TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, GetFeatureMapFromCmdLine());
+        // These features and optional attributes are used to make the app pass certification
+        // We recommend implementers of the app to modify these to fit their needs
         TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(
             endpointId, gEPMDelegate, gEPMInstance,
-            BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(ElectricalPowerMeasurement::Feature::kDirectCurrent,
-                                                                   ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+            BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
+                ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
+                ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
+                ElectricalPowerMeasurement::Feature::kPowerQuality),
             BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
@@ -210,7 +214,8 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
-                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor));
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
         TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId, gPTDelegate, gPTInstance);
     }
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
