@@ -156,7 +156,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
-    '--test-order', 'random_seed',
+    '--test-order', 'test_order_seed',
     type=click.UNPROCESSED,
     callback=validate_test_order,
     default="alphabetic",
@@ -181,7 +181,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.pass_context
 def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], random_seed: str | None, find_path: list[str], runner: str,
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
          chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
@@ -265,12 +265,12 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
 
         tests_filtered.append(test)
 
-    if random_seed is None:
+    if test_order_seed is None:
         log.info('Executing the tests in alphabetic order')
         tests_filtered.sort(key=lambda x: x.name)
     else:
-        log.info('Using the following seed for test order randomization: %s', random_seed)
-        random.seed(random_seed)
+        log.info('Using the following seed for test order randomization: %s', test_order_seed)
+        random.seed(test_order_seed)
         random.shuffle(tests_filtered)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
