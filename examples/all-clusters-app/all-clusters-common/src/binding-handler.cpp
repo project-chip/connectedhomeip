@@ -116,7 +116,7 @@ static void BoundDeviceContextReleaseHandler(void * context)
 static void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init({ &Binding::Table::GetInstance(), &server.GetFabricTable(),
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init({ &app::Clusters::Binding::Table::GetInstance(), &server.GetFabricTable(),
                                                                     server.GetCASESessionManager(),
                                                                     &server.GetPersistentStorage() });
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
