@@ -106,6 +106,7 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         return Status::Failure;
     }
     mTransportMap[connectionID] = std::move(transport);
+    mTransportMap[connectionID]->SetTransportManager(this);
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
     mTransportMap[connectionID]->SetFabricIndex(accessingFabricIndex);
 
@@ -799,4 +800,12 @@ bool PushAvStreamTransportManager::GetCMAFSessionNumber(const uint16_t connectio
 
     sessionNumber = transportIt->second->GetSessionNumber();
     return true;
+}
+
+void PushAvStreamTransportManager::ResetTransportSinkStateForTransport(PushAVTransport * transport)
+{
+    if (mMediaController != nullptr)
+    {
+        mMediaController->ResetTransportSinkState(transport);
+    }
 }
