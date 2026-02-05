@@ -1072,8 +1072,10 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
 {
     ChipLogProgress(Camera, "Connection state changed for session %u: %s", sessionId, connected ? "connected" : "disconnected");
 
-    // Cancel any pending connection timeout timer for this session
-    CancelConnectionTimer(sessionId);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+        // Cancel any pending connection timeout timer for this session
+        CancelConnectionTimer(sessionId);
+    });
 
     if (connected)
     {
