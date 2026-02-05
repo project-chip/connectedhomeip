@@ -510,8 +510,8 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
           "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
           "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c",
-          "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
           "${efr32_sdk_root}/security_mbedtls_source/include/psa/crypto_compat.h",
+          "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
 
           # WISECONNECT 3 SDK
           "${sl_si91x_psa_crypto_path}/aead/src/sl_si91x_psa_aead.c",
@@ -642,15 +642,15 @@ template("siwx917_sdk") {
     sources = [
       # si91x component
       "${efr32_sdk_root}/cmsis/RTOS2/Source/os_systick.c",
-      "${efr32_sdk_root}/platform_common/platform/common/src/sl_assert.c",
       "${efr32_sdk_root}/cmsis_common/platform/common/src/sl_cmsis_os2_common.c",
-      "${efr32_sdk_root}/platform_core/platform/common/src/sl_core_cortexm.c",
+      "${efr32_sdk_root}/cmsis_common/platform/common/src/sli_cmsis_os2_ext_task_register.c",
+      "${efr32_sdk_root}/freertos/cmsis/Source/cmsis_os2.c",
+      "${efr32_sdk_root}/platform_common/platform/common/src/sl_assert.c",
       "${efr32_sdk_root}/platform_common/platform/common/src/sl_slist.c",
       "${efr32_sdk_root}/platform_common/platform/common/src/sl_string.c",
       "${efr32_sdk_root}/platform_common/platform/common/src/sl_syscalls.c",
-      "${efr32_sdk_root}/cmsis_common/platform/common/src/sli_cmsis_os2_ext_task_register.c",
+      "${efr32_sdk_root}/platform_core/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_mbedtls.c",
-      "${efr32_sdk_root}/freertos/cmsis/Source/cmsis_os2.c",
       "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
       "${wifi_sdk_root}/components/sli_wifi/src/sli_wifi.c",
       "${wifi_sdk_root}/components/sli_wifi/src/sli_wifi_utility.c",
@@ -680,12 +680,12 @@ template("siwx917_sdk") {
 
       # si91x_basic_buffers component
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",
+      "${wifi_sdk_root}/components/common/src/malloc_thread_safety.c",
       "${wifi_sdk_root}/components/common/src/sl_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_system_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c",
-      "${wifi_sdk_root}/components/common/src/malloc_thread_safety.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/rsi_debug.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/sl_si91x_stack_object_declare.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c",
@@ -737,8 +737,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/sli_wifi_command_engine/src/sli_wifi_command_engine.c",
 
       # modified hal
-      "${efr32_sdk_root}/platform_core/platform/service/system/src/sl_system_init.c",
-      "${efr32_sdk_root}/platform_core/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/freertos/kernel/list.c",
@@ -748,6 +746,8 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/freertos/kernel/timers.c",
+      "${efr32_sdk_root}/platform_core/platform/service/system/src/sl_system_init.c",
+      "${efr32_sdk_root}/platform_core/platform/service/system/src/sl_system_kernel.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_event_handler.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_iostream_handles.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",

@@ -35,7 +35,7 @@ declare_args() {
   use_thread_coap_lib = false
 
   # enable by default for thread/non-wifi-ncp builds
-  enable_openthread_cli = !(use_SiWx917)
+  enable_openthread_cli = !use_SiWx917
 
   # Max KVS entry counts. Its the current maximal value we support.
   kvs_max_entries = 511
@@ -245,7 +245,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/bluetooth_mesh/inc",
       "${efr32_sdk_root}/bluetooth_le_controller/inc",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/graphics",
-      "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/memory_manager", 
+      "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/memory_manager",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/queue",
       "${efr32_sdk_root}/security_mbedtls_source/include/",
       "${efr32_sdk_root}/security_mbedtls_source/include/mbedtls",
@@ -412,7 +412,8 @@ template("efr32_sdk") {
     }
 
     if (use_wstk_leds) {
-      _include_dirs += [ "${efr32_sdk_root}/platform_core/platform/driver/leddrv/inc" ]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/platform_core/platform/driver/leddrv/inc" ]
 
       defines += [ "ENABLE_WSTK_LEDS" ]
     }
@@ -422,7 +423,8 @@ template("efr32_sdk") {
     }
 
     if (use_wstk_buttons) {
-      _include_dirs += [ "${efr32_sdk_root}/platform_core/platform/driver/button/inc" ]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/platform_core/platform/driver/button/inc" ]
     }
 
     if (invoker.enable_matter_aws) {
@@ -692,16 +694,27 @@ template("efr32_sdk") {
     sources = [
       "${efr32_sdk_root}/boards/hardware/board/src/sl_board_control_gpio.c",
       "${efr32_sdk_root}/boards/hardware/board/src/sl_board_init.c",
-      "${efr32_sdk_root}/cmsis/RTOS2/Source/os_systick.c",
+      "${efr32_sdk_root}/bootloader/platform/bootloader/core/flash/btl_internal_flash.c",
+      "${efr32_sdk_root}/bootloader/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/bootloader_interface/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/bootloader_interface/platform/bootloader/api/btl_interface_storage.c",
       "${efr32_sdk_root}/bootloader_interface/platform/bootloader/app_properties/app_properties.c",
-      "${efr32_sdk_root}/bootloader/platform/bootloader/core/flash/btl_internal_flash.c",
-      "${efr32_sdk_root}/bootloader/platform/bootloader/security/sha/crypto_sha.c",
-      "${efr32_sdk_root}/platform_core/platform/common/src/sl_core_cortexm.c",
+      "${efr32_sdk_root}/cmsis/RTOS2/Source/os_systick.c",
+      "${efr32_sdk_root}/cmsis_common/platform/common/src/sli_cmsis_os2_ext_task_register.c",
+      "${efr32_sdk_root}/common_15_4/util/plugin/security_manager/security_manager.c",
+      "${efr32_sdk_root}/freertos/cmsis/Source/cmsis_os2.c",
+      "${efr32_sdk_root}/freertos/kernel/croutine.c",
+      "${efr32_sdk_root}/freertos/kernel/event_groups.c",
+      "${efr32_sdk_root}/freertos/kernel/list.c",
+      "${efr32_sdk_root}/freertos/kernel/portable/MemMang/heap_3.c",
+      "${efr32_sdk_root}/freertos/kernel/portable/SiliconLabs/cortexm/tick_power_manager.c",
+      "${efr32_sdk_root}/freertos/kernel/queue.c",
+      "${efr32_sdk_root}/freertos/kernel/stream_buffer.c",
+      "${efr32_sdk_root}/freertos/kernel/tasks.c",
+      "${efr32_sdk_root}/freertos/kernel/timers.c",
       "${efr32_sdk_root}/platform_common/platform/common/src/sl_slist.c",
       "${efr32_sdk_root}/platform_common/platform/common/src/sl_string.c",
-      "${efr32_sdk_root}/cmsis_common/platform/common/src/sli_cmsis_os2_ext_task_register.c",
+      "${efr32_sdk_root}/platform_core/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/platform_core/platform/driver/gpio/src/sl_gpio.c",
       "${efr32_sdk_root}/platform_core/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform_core/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
@@ -726,27 +739,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_gpio.c",
       "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_sysrtc.c",
       "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_system.c",
-      "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_conversions_efr32.c",
-      "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
-      "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_pti/sl_rail_util_pti.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/error.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_ccm.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_ecdsa_ecdh.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_sha.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_entropy_hardware.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_mbedtls.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_psa_crypto.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_init.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_builtin_keys.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_signature.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c",
-      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sli_crypto/src/sl_crypto_s2.c",
-      "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
       "${efr32_sdk_root}/platform_core/platform/service/clock_manager/src/sl_clock_manager.c",
       "${efr32_sdk_root}/platform_core/platform/service/clock_manager/src/sl_clock_manager_init.c",
       "${efr32_sdk_root}/platform_core/platform/service/device_manager/src/sl_device_clock.c",
@@ -776,18 +768,27 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
       "${efr32_sdk_root}/platform_core/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform_core/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
-      "${efr32_sdk_root}/common_15_4/util/plugin/security_manager/security_manager.c",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/queue/circular_queue.c",
-      "${efr32_sdk_root}/freertos/cmsis/Source/cmsis_os2.c",
-      "${efr32_sdk_root}/freertos/kernel/croutine.c",
-      "${efr32_sdk_root}/freertos/kernel/event_groups.c",
-      "${efr32_sdk_root}/freertos/kernel/list.c",
-      "${efr32_sdk_root}/freertos/kernel/portable/MemMang/heap_3.c",
-      "${efr32_sdk_root}/freertos/kernel/portable/SiliconLabs/cortexm/tick_power_manager.c",
-      "${efr32_sdk_root}/freertos/kernel/queue.c",
-      "${efr32_sdk_root}/freertos/kernel/stream_buffer.c",
-      "${efr32_sdk_root}/freertos/kernel/tasks.c",
-      "${efr32_sdk_root}/freertos/kernel/timers.c",
+      "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_conversions_efr32.c",
+      "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
+      "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_pti/sl_rail_util_pti.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/error.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_ccm.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_cmac.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_ecdsa_ecdh.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/mbedtls_sha.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_entropy_hardware.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_mbedtls.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_psa_crypto.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_init.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_builtin_keys.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_signature.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c",
+      "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sli_crypto/src/sl_crypto_s2.c",
       "${efr32_sdk_root}/security_mbedtls_source/include/mbedtls/platform.h",
       "${efr32_sdk_root}/security_mbedtls_source/library/aes.c",
       "${efr32_sdk_root}/security_mbedtls_source/library/asn1parse.c",
@@ -847,6 +848,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/security_mbedtls_source/library/x509_csr.c",
       "${efr32_sdk_root}/security_mbedtls_source/library/x509write_crt.c",
       "${efr32_sdk_root}/security_mbedtls_source/library/x509write_csr.c",
+      "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
       "${silabs_gen_folder}/autogen/gatt_db.c",
       "${silabs_gen_folder}/autogen/sl_bluetooth.c",
       "${silabs_gen_folder}/autogen/sl_board_default_init.c",
@@ -936,7 +938,9 @@ template("efr32_sdk") {
     }
 
     if (sl_matter_debug_watchdog_enable) {
-      sources += [ "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_wdog.c" ]
+      sources += [
+        "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_wdog.c",
+      ]
     }
 
     # COS and SWO sources files for when we use generate with slc
@@ -1004,9 +1008,9 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/MGM24/Source/startup_mgm24.c",
         "${efr32_sdk_root}/devices/platform/Device/SiliconLabs/MGM24/Source/system_mgm24.c",
-        "${efr32_sdk_root}/rail_library/plugin/fem_util/sl_fem_util.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/clocks/sl_device_clock_efr32xg24.c",
         "${efr32_sdk_root}/platform_core/platform/service/device_manager/devices/sl_device_peripheral_hal_efr32xg24.c",
+        "${efr32_sdk_root}/rail_library/plugin/fem_util/sl_fem_util.c",
       ]
     } else if (silabs_family == "efr32mg26") {
       sources += [
@@ -1019,19 +1023,19 @@ template("efr32_sdk") {
 
     if (is_series_2) {
       sources += [
+        "${efr32_sdk_root}/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/mpu_wrappers_v2_asm.c",
+        "${efr32_sdk_root}/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
+        "${efr32_sdk_root}/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+        "${efr32_sdk_root}/platform_core/platform/service/clock_manager/src/sl_clock_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform_core/platform/service/clock_manager/src/sl_clock_manager_init_hal_s2.c",
+        "${efr32_sdk_root}/platform_core/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
+        "${efr32_sdk_root}/platform_core/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform_core/platform/service/mpu/src/sl_mpu_s2.c",
+        "${efr32_sdk_root}/platform_core/platform/service/power_manager/src/sleep_loop/sl_power_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform_core/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
         "${efr32_sdk_root}/rail_library/plugin/pa-conversions/pa_curves_efr32.c",
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_rssi/sl_rail_util_rssi.c",
         "${efr32_sdk_root}/rail_library/plugin/sl_rail_util_sequencer/sl_rail_util_sequencer.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_entropy.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_hash.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_key_derivation.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_key_handling.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_signature.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_util.c",
-        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sli_se_manager_mailbox.c",
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/se_aes.c",
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/se_jpake.c",
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_radioaes.c",
@@ -1050,16 +1054,16 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_hash.c",
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_driver_mac.c",
         "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_psa_driver/src/sli_se_transparent_key_derivation.c",
-        "${efr32_sdk_root}/platform_core/platform/service/clock_manager/src/sl_clock_manager_hal_s2.c",
-        "${efr32_sdk_root}/platform_core/platform/service/clock_manager/src/sl_clock_manager_init_hal_s2.c",
-        "${efr32_sdk_root}/platform_core/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
-        "${efr32_sdk_root}/platform_core/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
-        "${efr32_sdk_root}/platform_core/platform/service/mpu/src/sl_mpu_s2.c",
-        "${efr32_sdk_root}/platform_core/platform/service/power_manager/src/sleep_loop/sl_power_manager_hal_s2.c",
-        "${efr32_sdk_root}/platform_core/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
-        "${efr32_sdk_root}/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/mpu_wrappers_v2_asm.c",
-        "${efr32_sdk_root}/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
-        "${efr32_sdk_root}/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_entropy.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_hash.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_key_derivation.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_key_handling.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_signature.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sl_se_manager_util.c",
+        "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/se_manager/src/sli_se_manager_mailbox.c",
       ]
     }
 

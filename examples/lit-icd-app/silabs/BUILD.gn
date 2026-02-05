@@ -88,7 +88,6 @@ if (wifi_soc) {
       "${examples_common_plat_dir}",
     ]
 
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
