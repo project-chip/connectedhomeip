@@ -82,13 +82,6 @@ namespace app {
                 return Attributes(builder);
             }
 
-            CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return mDiagnosticDataProvider.GetCurrentHeapFree(out); }
-            CHIP_ERROR GetCurrentHeapUsed(uint64_t & out) const { return mDiagnosticDataProvider.GetCurrentHeapUsed(out); }
-            CHIP_ERROR GetCurrentHighWatermark(uint64_t & out) const
-            {
-                return mDiagnosticDataProvider.GetCurrentHeapHighWatermark(out);
-            }
-
             // Encodes the thread metrics list, using the provided encoder.
             CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder) const;
 

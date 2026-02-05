@@ -57,17 +57,17 @@ DataModel::ActionReturnStatus SoftwareDiagnosticsServerCluster::ReadAttribute(co
     {
     case Attributes::CurrentHeapFree::Id: {
         uint64_t value;
-        CHIP_ERROR err = GetCurrentHeapFree(value);
+        CHIP_ERROR err = mDiagnosticDataProvider.GetCurrentHeapFree(value);
         return EncodeValue(value, err, encoder);
     }
     case Attributes::CurrentHeapUsed::Id: {
         uint64_t value;
-        CHIP_ERROR err = GetCurrentHeapUsed(value);
+        CHIP_ERROR err = mDiagnosticDataProvider.GetCurrentHeapUsed(value);
         return EncodeValue(value, err, encoder);
     }
     case Attributes::CurrentHeapHighWatermark::Id: {
         uint64_t value;
-        CHIP_ERROR err = GetCurrentHighWatermark(value);
+        CHIP_ERROR err = mDiagnosticDataProvider.GetCurrentHeapHighWatermark(value);
         return EncodeValue(value, err, encoder);
     }
     case Attributes::ThreadMetrics::Id:
