@@ -34,6 +34,7 @@ exclude_patterns = [
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
+    "**/tests/*.md",
 ]
 
 

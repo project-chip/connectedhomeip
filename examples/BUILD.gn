@@ -28,5 +28,9 @@ if (chip_build_tests) {
     if (chip_device_platform == "linux" && current_os == "linux") {
       tests += [ "${chip_root}/examples/energy-management-app/energy-management-common/tests" ]
     }
+
+    # TV Casting app tests (platform-independent)
+    tests +=
+        [ "${chip_root}/examples/tv-casting-app/tv-casting-common/core/tests" ]
   }
 }
