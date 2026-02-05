@@ -151,7 +151,7 @@ private:
         TLV::EstimateStructOverhead(sizeof(uint16_t),                                    // connectionID
                                     sizeof(uint8_t),                                     // transportStatus
                                     PushAvStreamTransport::kTransportOptionsStorageSize, // estimated transportOptions
-                                    sizeof(uint64_t)                                     // fabricIndex
+                                    sizeof(FabricIndex)                                  // fabricIndex
         );
 
     // Max size for the TLV-encoded array of CurrentConnection structs
