@@ -37,33 +37,33 @@ const uint32_t w1in_id_p = 0x7D200004;
 #endif
 
 #if ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-static CHIP_ERROR get_trust_provisioned_w0L_ids(uint32_t itterationCnt, uint32_t * tp_w0in_id_v, uint32_t * tp_Lin_id_v)
+static CHIP_ERROR get_trust_provisioned_w0L_ids(uint32_t iterationCnt, uint32_t * tp_w0in_id_v, uint32_t * tp_Lin_id_v)
 {
 
     switch (SE05X_SPAKE_VERIFIER_TP_SET_NO)
     {
     case 1: {
-        if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 1000)
+        if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 1000)
         {
             *tp_w0in_id_v = 0x7FFF2011;
             *tp_Lin_id_v  = 0x7FFF2021;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 5000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 5000)
         {
             *tp_w0in_id_v = 0x7FFF2012;
             *tp_Lin_id_v  = 0x7FFF2022;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 10000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 10000)
         {
             *tp_w0in_id_v = 0x7FFF2013;
             *tp_Lin_id_v  = 0x7FFF2023;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 50000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 50000)
         {
             *tp_w0in_id_v = 0x7FFF2014;
             *tp_Lin_id_v  = 0x7FFF2024;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 100000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 100000)
         {
             *tp_w0in_id_v = 0x7FFF2015;
             *tp_Lin_id_v  = 0x7FFF2025;
@@ -75,27 +75,27 @@ static CHIP_ERROR get_trust_provisioned_w0L_ids(uint32_t itterationCnt, uint32_t
     }
     break;
     case 2: {
-        if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 1000)
+        if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 1000)
         {
             *tp_w0in_id_v = 0x7FFF2016;
             *tp_Lin_id_v  = 0x7FFF2026;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 5000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 5000)
         {
             *tp_w0in_id_v = 0x7FFF2017;
             *tp_Lin_id_v  = 0x7FFF2027;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 10000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 10000)
         {
             *tp_w0in_id_v = 0x7FFF2018;
             *tp_Lin_id_v  = 0x7FFF2028;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 50000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 50000)
         {
             *tp_w0in_id_v = 0x7FFF2019;
             *tp_Lin_id_v  = 0x7FFF2029;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 100000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 100000)
         {
             *tp_w0in_id_v = 0x7FFF201A;
             *tp_Lin_id_v  = 0x7FFF202A;
@@ -107,27 +107,27 @@ static CHIP_ERROR get_trust_provisioned_w0L_ids(uint32_t itterationCnt, uint32_t
     }
     break;
     case 3: {
-        if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 1000)
+        if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 1000)
         {
             *tp_w0in_id_v = 0x7FFF201B;
             *tp_Lin_id_v  = 0x7FFF202B;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 5000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 5000)
         {
             *tp_w0in_id_v = 0x7FFF201C;
             *tp_Lin_id_v  = 0x7FFF202C;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 10000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 10000)
         {
             *tp_w0in_id_v = 0x7FFF201D;
             *tp_Lin_id_v  = 0x7FFF202D;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 50000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 50000)
         {
             *tp_w0in_id_v = 0x7FFF201E;
             *tp_Lin_id_v  = 0x7FFF202E;
         }
-        else if (SE05X_SPAKE_VERIFIER_TP_ITTER_CNT == 100000)
+        else if (SE05X_SPAKE_VERIFIER_TP_ITER_CNT == 100000)
         {
             *tp_w0in_id_v = 0x7FFF201F;
             *tp_Lin_id_v  = 0x7FFF202F;
@@ -390,7 +390,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
     /* Using TP values.*/
     uint32_t tp_w0in_id_v = 0;
     uint32_t tp_Lin_id_v  = 0;
-    CHIP_ERROR err        = get_trust_provisioned_w0L_ids(SE05X_SPAKE_VERIFIER_TP_ITTER_CNT, &tp_w0in_id_v, &tp_Lin_id_v);
+    CHIP_ERROR err        = get_trust_provisioned_w0L_ids(SE05X_SPAKE_VERIFIER_TP_ITER_CNT, &tp_w0in_id_v, &tp_Lin_id_v);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogProgress(Crypto, "SE05x: Error in getting W0 and L TP ids");

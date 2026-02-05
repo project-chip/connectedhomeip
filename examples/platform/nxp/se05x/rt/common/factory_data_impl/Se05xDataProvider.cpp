@@ -115,7 +115,7 @@ CHIP_ERROR Se05xDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
 
 CHIP_ERROR Se05xDataProviderImpl::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
-    iterationCount = SE05X_SPAKE_VERIFIER_TP_ITTER_CNT;
+    iterationCount = SE05X_SPAKE_VERIFIER_TP_ITER_CNT;
     return CHIP_NO_ERROR;
 }
 #endif

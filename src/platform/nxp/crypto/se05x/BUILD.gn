@@ -95,7 +95,7 @@ static_library("nxp_crypto_lib") {
       "SE05X_SPAKE_VERIFIER_TP_SET_NO=$chip_se05x_spake_verifier_tp_set_no",
     ]
 
-    defines += [ "SE05X_SPAKE_VERIFIER_TP_ITTER_CNT=$chip_se05x_spake_verifier_tp_itter_cnt" ]
+    defines += [ "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt" ]
   }
 
   external_mbedtls = current_os == "zephyr" || nxp_external_sdk

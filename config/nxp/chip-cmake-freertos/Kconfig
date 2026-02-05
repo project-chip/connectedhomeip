@@ -207,11 +207,11 @@ config CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO
 	help
 		SE05x Trust Provisioned spake verifier set number.
 
-config CHIP_SE05X_SPAKE_VERIFIER_TP_ITTER_CNT
-	int "SE05x Trust Provisioned spake verifier itteration count"
+config CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT
+	int "SE05x Trust Provisioned spake verifier iteration count"
 	default 1000
 	help
-		SE05x Trust Provisioned spake verifier itteration count.
+		SE05x Trust Provisioned spake verifier iteration count.
 
 endif # CHIP_SE05X
 

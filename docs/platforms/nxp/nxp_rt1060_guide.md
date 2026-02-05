@@ -384,6 +384,8 @@ To enable Thread Border Router support see the [build](#building) section.
 
 The complete Border Router guide is located [here](./nxp_otbr_guide.md).
 
+<a name="se05x_secure_element_with_rt1060"></a>
+
 ## Enabling SE05x Secure Element with MIMXRT1060-EVK-B
 
 ### Hardware connections

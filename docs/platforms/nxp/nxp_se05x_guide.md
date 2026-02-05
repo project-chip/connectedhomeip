@@ -98,22 +98,6 @@ all-clusters-app examples.
 **Prerequisites:** Refer to [RW61x](nxp_rw61x_guide.md) to set up the build
 environment.
 
-#### Building Thermostat for NFC Commissioning
-
-**With Pre-Provisioned WiFi Credentials:**
-
-```bash
-west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y
-```
-
-**Without Pre-Provisioned WiFi Credentials:**
-
-```bash
-west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi_onnetwork.conf -DCONFIG_CHIP_SE05X=y -DCONFIG_CHIP_APP_WIFI_SSID=\"<wifi_ssid>\" -DCONFIG_CHIP_APP_WIFI_PASSWORD=\"<password>\"
-```
-
-#### Hardware Connections and Building with SE05x
-
 Refer to [RW61x and SE05x](./nxp_rw61x_guide.md#se05x_secure_element_with_rw61x)
 for detailed hardware connections and build instructions.
 
@@ -130,6 +114,9 @@ and all-clusters-app examples.
 
 **Prerequisites:** Refer to [RT1060](nxp_rt1060_guide.md) to set up the build
 environment.
+
+Refer to [RW61x and SE05x](./nxp_rt1060_guide.md#se05x_secure_element_with_rt1060)
+for detailed hardware connections and build instructions.
 
 Refer to [SE05x Crypto Configurations](#se05x_crypto_configurations) to control
 which crypto operations are offloaded to SE05x.
@@ -159,7 +146,7 @@ to SE05x:
 | chip_se05x_device_attestation           | Device attestation       | Boolean | false   |
 | chip_se05x_spake_verifier_use_tp_values | SPAKE with TP verifiers  | Boolean | false   |
 | chip_se05x_spake_verifier_tp_set_no     | TP Passcode set number   | Integer | 1       |
-| chip_se05x_spake_verifier_tp_itter_cnt  | SPAKE iteration count    | Integer | 1000    |
+| chip_se05x_spake_verifier_tp_iter_cnt   | SPAKE iteration count    | Integer | 1000    |
 
 **Example:**
 
@@ -182,7 +169,7 @@ gn gen out --args="chip_se05x_device_attestation=true chip_se05x_hkdf_sha256=tru
 | CONFIG_CHIP_SE05X_DEVICE_ATTESTATION           | Device attestation       | n       |
 | CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES | SPAKE with TP verifiers  | n       |
 | CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO     | TP Passcode set number   | 1       |
-| CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITTER_CNT  | SPAKE iteration count    | 1000    |
+| CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT   | SPAKE iteration count    | 1000    |
 
 **Example:**
 
@@ -342,13 +329,13 @@ corresponding QR code to the T4T applet.
 **GN Build:**
 
 ```bash
-gn gen out --args="chip_se05x_spake_verifier=true chip_se05x_spake_verifier_use_tp_values=true chip_se05x_spake_verifier_tp_set_no=1 chip_se05x_spake_verifier_tp_itter_cnt=1000"
+gn gen out --args="chip_se05x_spake_verifier=true chip_se05x_spake_verifier_use_tp_values=true chip_se05x_spake_verifier_tp_set_no=1 chip_se05x_spake_verifier_tp_iter_cnt=1000"
 ```
 
 **CMake Build:**
 
 ```bash
-west build -d <out_dir> -b <board> <example_path> -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO=1 -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITTER_CNT=1000
+west build -d <out_dir> -b <board> <example_path> -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO=1 -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT=1000
 ```
 
 **Running the Example:**

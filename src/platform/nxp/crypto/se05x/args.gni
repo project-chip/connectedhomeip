@@ -31,5 +31,5 @@ declare_args() {
   chip_se05x_device_attestation = false
   chip_se05x_spake_verifier_use_tp_values = false
   chip_se05x_spake_verifier_tp_set_no = 1
-  chip_se05x_spake_verifier_tp_itter_cnt = 1000
+  chip_se05x_spake_verifier_tp_iter_cnt = 1000
 }

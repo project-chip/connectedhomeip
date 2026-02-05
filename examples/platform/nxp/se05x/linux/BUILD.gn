@@ -180,16 +180,16 @@ source_set("app-main") {
   if (chip_se05x_device_attestation) {
     defines += [ "ENABLE_SE05X_DEVICE_ATTESTATION=1" ]
   }
- 
+
   if (chip_se05x_spake_verifier_use_tp_values) {
     defines += [ "ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=1" ]
   }
- 
+
   defines +=
       [ "SE05X_SPAKE_VERIFIER_TP_SET_NO=$chip_se05x_spake_verifier_tp_set_no" ]
- 
+
   defines += [
-    "SE05X_SPAKE_VERIFIER_TP_ITTER_CNT=$chip_se05x_spake_verifier_tp_itter_cnt",
+    "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt",
   ]
 
   sources = [
