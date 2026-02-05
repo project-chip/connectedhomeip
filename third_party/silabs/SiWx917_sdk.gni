@@ -60,6 +60,15 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform_core/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform_core/platform/service/device_init/inc",
+      "${efr32_sdk_root}/platform_common/platform/common/inc",
+      "${efr32_sdk_root}/platform_core/platform/emdrv/dmadrv/inc",
+      "${efr32_sdk_root}/platform_core/platform/driver/gpio/inc",
+      "${efr32_sdk_root}/platform_core/platform/emdrv/gpiointerrupt/inc",
+      "${efr32_sdk_root}/platform_core/platform/emdrv/dmadrv/inc/s2_signals",
+      "${efr32_sdk_root}/platform_core/platform/emdrv/dmadrv/config",
+      "${efr32_sdk_root}/platform_core/platform/emdrv/spidrv/inc",
+      "${efr32_sdk_root}/platform_core/platform/emdrv/spidrv/config",
+      "${efr32_sdk_root}/platform_core/platform/service/device_manager/inc",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/config",
 
@@ -76,6 +85,9 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
+      "${wifi_sdk_root}/components/sli_wifi/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sl_log/inc",
+      "${wifi_sdk_root}/components/device/stm32/silabs_utility/common/inc",
 
       # siwx917_soc component
       "${wifi_sdk_root}/components/board/silabs/config/${silabs_board}",
@@ -95,6 +107,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/config",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/inc",
+      "${wifi_sdk_root}/components/sli_buffer_manager/inc",
 
       # wifi component
       "${wifi_sdk_root}/components/protocol/wifi/inc",
@@ -639,6 +652,8 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/sl_mbedtls.c",
       "${efr32_sdk_root}/freertos/cmsis/Source/cmsis_os2.c",
       "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
+      "${wifi_sdk_root}/components/sli_wifi/src/sli_wifi.c",
+      "${wifi_sdk_root}/components/sli_wifi/src/sli_wifi_utility.c",
 
       # nvm3
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/src/nvm3.c",
@@ -652,6 +667,7 @@ template("siwx917_sdk") {
       # wifi component
       "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",
       "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_callback_framework.c",
+      "${wifi_sdk_root}/components/protocol/wifi/src/sli_wifi_callback_framework.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
 
       # network_manager component
@@ -715,6 +731,8 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sli_net_si91x_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sli_wifi_memory_manager.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sli_wifi_power_profile.c",
       "${wifi_sdk_root}/components/sli_si91x_wifi_event_handler/src/sli_si91x_wifi_event_handler.c",
       "${wifi_sdk_root}/components/sli_wifi_command_engine/src/sli_wifi_command_engine.c",
 
