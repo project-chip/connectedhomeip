@@ -1322,7 +1322,7 @@ void WebRTCProviderManager::HandleConnectionTimeout(uint16_t sessionId)
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport == nullptr)
     {
-        // Session was already cleaned up
+        ChipLogProgress(Camera, "Session: %u was already cleaned up", sessionId);
         return;
     }
 
