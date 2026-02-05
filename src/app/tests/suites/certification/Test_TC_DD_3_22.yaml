@@ -26,7 +26,7 @@ config:
 
 tests:
   - label: "Step 1: Commission DUT to TH"
-    cluster: "Basic Information"
+    cluster: "DelayCommands"
     command: "WaitForCommissionee"
     arguments:
       values:
