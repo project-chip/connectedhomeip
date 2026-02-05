@@ -77,7 +77,7 @@ struct ManagerInitParams
 class Manager
 {
 public:
-    Manager(): mFabricTableDelegate(*this) {}
+    Manager() : mFabricTableDelegate(*this) {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -181,7 +181,7 @@ private:
     struct BindingFabricTableDelegate : public chip::FabricTable::Delegate
     {
         Manager & bindingManager;
-        Table * bindingTable{nullptr};
+        Table * bindingTable{ nullptr };
 
         BindingFabricTableDelegate(Manager & manager) : bindingManager(manager) {}
 
@@ -190,7 +190,7 @@ private:
         void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
             VerifyOrDie(bindingTable != nullptr);
-            auto iter           = bindingTable->begin();
+            auto iter = bindingTable->begin();
             while (iter != bindingTable->end())
             {
                 if (iter->fabricIndex == fabricIndex)
