@@ -50,7 +50,7 @@
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
 #  [TC-OCC-3.1] test procedure step 5, 9, 14
-#  [TC-OCC-3.2] test precedure step 3a, 3c
+#  [TC-OCC-3.2] test procedure step 3a, 3c
 
 import asyncio
 import logging
@@ -140,7 +140,7 @@ class TC_OCC_3_1(MatterBaseTest):
             has_occevent_feature = (feature_map & cluster.Bitmaps.Feature.kOccupancyEventReporting) != 0
         except AttributeError:
             has_occevent_feature = False
-        
+
         occupancy_event_supported = has_occevent_feature or self.check_pics("OCC.S.E00") or self.is_ci
 
         log.info(f"Feature map: 0x{feature_map:x}, OCCEVENT feature: {has_occevent_feature}")
@@ -157,7 +157,7 @@ class TC_OCC_3_1(MatterBaseTest):
         self.step(4)
         if has_hold_time:
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-            asserts.assert_equal(holdtime_dut, hold_time, "HoldTime read-back does not match the written value of 10")
+            asserts.assert_equal(holdtime_dut, hold_time, f"HoldTime read-back does not match the written value of {hold_time}")
         else:
             log.info("HoldTime attribute not supported. Skipping step 4.")
             self.mark_current_step_skipped()
@@ -177,9 +177,9 @@ class TC_OCC_3_1(MatterBaseTest):
 
         self.step(7)
         # Set up wildcard subscription for attributes and events
-        # MinIntervalFloor = 0, MaxIntervalCeiling = 30, KeepSubscriptions = false
+        # MinIntervalFloor = 0, MaxIntervalCeiling = 30, KeepSubscriptions = false (EventSubscriptionHandler has True hardcoded and can't be changed)
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
-        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         if occupancy_event_supported:
             event_listener = EventSubscriptionHandler(expected_cluster=cluster)
@@ -231,13 +231,13 @@ class TC_OCC_3_1(MatterBaseTest):
         if self.is_ci:
             # CI call to trigger unoccupied.
             self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": endpoint_id, "Occupancy": 0})
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Ensure the sensor no longer detects occupancy, then press ENTER")
 
         if has_hold_time:
             log.info(f"Waiting for HoldTime duration ({hold_time} seconds) plus buffer...")
             await asyncio.sleep(hold_time + 2.0)  # add extra 2 seconds buffer
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Type any letter and press ENTER after the sensor occupancy is back to unoccupied state (occupancy attribute = 0)")
 
         self.step(15)
         # TH reads Occupancy attribute - verify received value is 0 (Unoccupied)
