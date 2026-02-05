@@ -30,8 +30,8 @@ constexpr uint8_t kMinNumberOfPositions = 2;
 
 SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features,
                              const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Switch::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
-    mConfig(config)
+    DefaultServerCluster({ endpointId, Switch::Id }),
+    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
 {
     mNumberOfPositions = kMinNumberOfPositions;
 }
