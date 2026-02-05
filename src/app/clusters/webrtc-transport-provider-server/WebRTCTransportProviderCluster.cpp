@@ -274,7 +274,7 @@ CHIP_ERROR WebRTCTransportProviderCluster::AcceptedCommands(const ConcreteCluste
 }
 
 CHIP_ERROR WebRTCTransportProviderCluster::GeneratedCommands(const ConcreteClusterPath & path,
-                                                          ReadOnlyBufferBuilder<CommandId> & builder)
+                                                             ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return builder.AppendElements({
         Commands::SolicitOfferResponse::Id,
