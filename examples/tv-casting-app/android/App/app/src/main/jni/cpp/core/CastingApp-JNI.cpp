@@ -102,7 +102,7 @@ JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    err = chip::app::Clusters::Binding::Manager::GetInstance().Init({ &app::Clusters::Binding::Table::GetInstance(),
+    err = chip::app::Clusters::Binding::Manager::GetInstance().Init({ &chip::app::Clusters::Binding::Table::GetInstance(),
                                                                       &server.GetFabricTable(), server.GetCASESessionManager(),
                                                                       &server.GetPersistentStorage() });
     VerifyOrReturnValue(err == CHIP_NO_ERROR, support::convertMatterErrorFromCppToJava(err),

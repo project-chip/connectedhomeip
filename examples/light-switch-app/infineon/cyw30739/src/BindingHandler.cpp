@@ -261,7 +261,7 @@ void BindingHandler::InitInternal(intptr_t aArg)
     CHIP_ERROR ret = CHIP_NO_ERROR;
     auto & server  = Server::GetInstance();
 
-    ret = Binding::Manager::GetInstance().Init({ &app::Clusters::Binding::Table::GetInstance(), &server.GetFabricTable(),
+    ret = Binding::Manager::GetInstance().Init({ &chip::app::Clusters::Binding::Table::GetInstance(), &server.GetFabricTable(),
                                                  server.GetCASESessionManager(), &server.GetPersistentStorage() });
     if (CHIP_NO_ERROR != ret)
     {
