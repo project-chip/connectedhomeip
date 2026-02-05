@@ -89,7 +89,8 @@ class TC_GCAST_2_1(MatterBaseTest):
 
         self.step(5)
         usedMcastAddrCount = await self.read_single_attribute_check_success(groupcast_cluster, used_mcast_addr_count_attribute)
-        asserts.assert_true(usedMcastAddrCount <= A_max, f"UsedMcastAddrCount ({usedMcastAddrCount}) should be <= MaxMcastAddrCount ({A_max})")
+        asserts.assert_true(usedMcastAddrCount <= A_max,
+                            f"UsedMcastAddrCount ({usedMcastAddrCount}) should be <= MaxMcastAddrCount ({A_max})")
 
         self.step(6)
         fabricUnderTest = await self.read_single_attribute_check_success(groupcast_cluster, fabric_under_test_attribute)

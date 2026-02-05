@@ -88,7 +88,6 @@ class TC_GCAST_2_6(MatterBaseTest):
         M_max = await self.read_single_attribute_check_success(groupcast_cluster, max_membership_count_attribute)
         asserts.assert_true(M_max >= 10, "MaxMembershipCount attribute should be >= 10")
 
-
         self.step("1b")
         self.th1 = self.default_controller
         self.discriminatorTH2 = random.randint(0, 4095)

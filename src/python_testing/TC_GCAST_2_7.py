@@ -140,7 +140,8 @@ class TC_GCAST_2_7(MatterBaseTest):
         f1_current_group_count = 1
 
         self.step("4b")
-        membership_matcher = generate_membership_entry_matcher(groupID1, mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
+        membership_matcher = generate_membership_entry_matcher(
+            groupID1, mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step("4c")
@@ -161,7 +162,8 @@ class TC_GCAST_2_7(MatterBaseTest):
         f1_current_group_count += 1
 
         self.step("5b")
-        membership_matcher = generate_membership_entry_matcher(groupID2, mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kIanaAddr)
+        membership_matcher = generate_membership_entry_matcher(
+            groupID2, mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kIanaAddr)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step("5c")
@@ -251,6 +253,7 @@ class TC_GCAST_2_7(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ResourceExhausted,
                                  f"Send JoinGroup command error should be {Status.ResourceExhausted} instead of {e.status}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

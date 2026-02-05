@@ -52,7 +52,8 @@ async def get_feature_map(test) -> tuple:
     pga_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kPerGroup)
     asserts.assert_true(sd_enabled or ln_enabled,
                         "At least one of the following features must be enabled: Listener or Sender.")
-    logger.info(f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled} | PGA supported: {pga_enabled}")
+    logger.info(
+        f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled} | PGA supported: {pga_enabled}")
     return ln_enabled, sd_enabled, pga_enabled
 
 

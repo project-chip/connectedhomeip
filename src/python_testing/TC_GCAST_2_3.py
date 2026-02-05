@@ -146,9 +146,9 @@ class TC_GCAST_2_3(MatterBaseTest):
 
         self.step(5)
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
-                groupID=groupID2,
-                keySetID=keySetID1)
-            )
+            groupID=groupID2,
+            keySetID=keySetID1)
+        )
 
         self.step(6)
         sub.reset()

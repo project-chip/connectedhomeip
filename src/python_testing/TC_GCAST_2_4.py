@@ -67,7 +67,8 @@ class TC_GCAST_2_4(MatterBaseTest):
             TestStep("4a", "Join Group G3 with existing KeySetID K1 using JoinGroup"),
             TestStep("4b", "If DUT only support one non-root and non-aggregator endpoint, skip to step 4e"),
             TestStep("4c", "Remove EP2 from Group G3. LeaveGroup (GroupID=G3, Endpoints=[EP2])"),
-            TestStep("4d", "TH awaits subscription report of new Membership within max interval. (G3 entry with endpoints list [EP1])"),
+            TestStep(
+                "4d", "TH awaits subscription report of new Membership within max interval. (G3 entry with endpoints list [EP1])"),
             TestStep("4e", "Remove EP1 from Group G3. LeaveGroup (GroupID=G3, Endpoints=[EP1])"),
             TestStep("4f", "TH awaits subscription report of new Membership within max interval. (If SD supported: G3 entry with empty endpoints list, else G3 entry removed)"),
             TestStep(5, "Attempt to Leave a non-existing group. LeaveGroup (GroupID=NonExisting)"),
@@ -130,7 +131,6 @@ class TC_GCAST_2_4(MatterBaseTest):
         self.step(3)
         if not ln_enabled:
             self.mark_step_range_skipped("4a", "4f")
-
 
         self.step("4a")
         groupID3 = 3
@@ -204,6 +204,7 @@ class TC_GCAST_2_4(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
