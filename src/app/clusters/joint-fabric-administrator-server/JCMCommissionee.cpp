@@ -360,7 +360,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
             if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && rootSpan.size())
             {
                 mInfo.adminRCAC.CopyFromSpan(rootSpan);
-                if ((rootSpan.size() == 0) || (mInfo.adminRCAC.AllocatedSize() != rootSpan.size()))
+                if (mInfo.adminRCAC.AllocatedSize() != rootSpan.size())
                 {
                     ChipLogError(JointFabric, "JCM: Failed to store administrator root cert");
                     onComplete(CHIP_ERROR_INTERNAL);
