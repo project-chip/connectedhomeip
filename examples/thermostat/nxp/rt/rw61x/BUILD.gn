@@ -222,7 +222,7 @@ rt_executable("thermostat") {
   ]
 
   # Operational key secure storage
-  defines += [ "CONFIG_OPERATIONAL_KEYSTORE=1" ]
+  defines += [ "CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE=1" ]
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]

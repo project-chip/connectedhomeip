@@ -67,15 +67,15 @@ struct Type;
 struct DecodableType;
 } // namespace UpdateGroupKey
 
-namespace ExpireGracePeriod {
-struct Type;
-struct DecodableType;
-} // namespace ExpireGracePeriod
-
 namespace ConfigureAuxiliaryACL {
 struct Type;
 struct DecodableType;
 } // namespace ConfigureAuxiliaryACL
+
+namespace GroupcastTesting {
+struct Type;
+struct DecodableType;
+} // namespace GroupcastTesting
 
 } // namespace Commands
 
@@ -83,12 +83,13 @@ namespace Commands {
 namespace JoinGroup {
 enum class Fields : uint8_t
 {
-    kGroupID         = 0,
-    kEndpoints       = 1,
-    kKeyID           = 2,
-    kKey             = 3,
-    kGracePeriod     = 4,
-    kUseAuxiliaryACL = 5,
+    kGroupID          = 0,
+    kEndpoints        = 1,
+    kKeySetID         = 2,
+    kKey              = 3,
+    kUseAuxiliaryACL  = 4,
+    kReplaceEndpoints = 5,
+    kMcastAddrPolicy  = 6,
 };
 
 struct Type
@@ -100,10 +101,11 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     DataModel::List<const chip::EndpointId> endpoints;
-    uint32_t keyID = static_cast<uint32_t>(0);
+    uint16_t keySetID = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> key;
-    Optional<uint32_t> gracePeriod;
     Optional<bool> useAuxiliaryACL;
+    Optional<bool> replaceEndpoints;
+    Optional<MulticastAddrPolicyEnum> mcastAddrPolicy;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -121,10 +123,11 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
-    uint32_t keyID = static_cast<uint32_t>(0);
+    uint16_t keySetID = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> key;
-    Optional<uint32_t> gracePeriod;
     Optional<bool> useAuxiliaryACL;
+    Optional<bool> replaceEndpoints;
+    Optional<MulticastAddrPolicyEnum> mcastAddrPolicy;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
@@ -169,9 +172,8 @@ public:
 namespace LeaveGroupResponse {
 enum class Fields : uint8_t
 {
-    kGroupID      = 0,
-    kEndpoints    = 1,
-    kListTooLarge = 2,
+    kGroupID   = 0,
+    kEndpoints = 1,
 };
 
 struct Type
@@ -182,8 +184,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    Optional<DataModel::List<const chip::EndpointId>> endpoints;
-    Optional<bool> listTooLarge;
+    DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -199,8 +200,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    Optional<DataModel::DecodableList<chip::EndpointId>> endpoints;
-    Optional<bool> listTooLarge;
+    DataModel::DecodableList<chip::EndpointId> endpoints;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -208,10 +208,9 @@ public:
 namespace UpdateGroupKey {
 enum class Fields : uint8_t
 {
-    kGroupID     = 0,
-    kKeyID       = 1,
-    kKey         = 2,
-    kGracePeriod = 3,
+    kGroupID  = 0,
+    kKeySetID = 1,
+    kKey      = 2,
 };
 
 struct Type
@@ -222,9 +221,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    uint32_t keyID        = static_cast<uint32_t>(0);
+    uint16_t keySetID     = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> key;
-    Optional<uint32_t> gracePeriod;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -241,47 +239,12 @@ public:
     static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    uint32_t keyID        = static_cast<uint32_t>(0);
+    uint16_t keySetID     = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> key;
-    Optional<uint32_t> gracePeriod;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace UpdateGroupKey
-namespace ExpireGracePeriod {
-enum class Fields : uint8_t
-{
-    kGroupID = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ExpireGracePeriod::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
-
-    chip::GroupId groupID = static_cast<chip::GroupId>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ExpireGracePeriod::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
-    static constexpr bool kIsFabricScoped = true;
-
-    chip::GroupId groupID = static_cast<chip::GroupId>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
-};
-}; // namespace ExpireGracePeriod
 namespace ConfigureAuxiliaryACL {
 enum class Fields : uint8_t
 {
@@ -319,6 +282,43 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
 }; // namespace ConfigureAuxiliaryACL
+namespace GroupcastTesting {
+enum class Fields : uint8_t
+{
+    kTestOperation   = 0,
+    kDurationSeconds = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GroupcastTesting::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
+
+    GroupcastTestingEnum testOperation = static_cast<GroupcastTestingEnum>(0);
+    Optional<uint16_t> durationSeconds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GroupcastTesting::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    GroupcastTestingEnum testOperation = static_cast<GroupcastTestingEnum>(0);
+    Optional<uint16_t> durationSeconds;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+};
+}; // namespace GroupcastTesting
 } // namespace Commands
 } // namespace Groupcast
 } // namespace Clusters

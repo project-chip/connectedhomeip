@@ -16,19 +16,21 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
-#include <devices/root-node/RootNodeDevice.h>
+#include <devices/root-node/WifiRootNodeDevice.h>
 #include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <esp_system.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -93,6 +95,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
+Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
@@ -180,7 +183,8 @@ void DeviceEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg
              static_cast<unsigned int>(heap_caps_get_total_size(MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM)));
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate,
+                                                                     TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     // Initialize the attribute persistence provider with the storage delegate
     CHIP_ERROR err = gAttributePersistenceProvider.Init(delegate);
@@ -195,8 +199,39 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
-    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(&sWiFiDriver);
-    err             = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to get DeviceInstanceInfoProvider.");
+        return nullptr;
+    }
+
+    gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
+        RootNodeDevice::Context {
+            .commissioningWindowManager     = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+                .accessControl              = Server::GetInstance().GetAccessControl(),              //
+                .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+                .deviceInstanceInfoProvider = *provider,                                             //
+                .platformManager            = DeviceLayer::PlatformMgr(),                            //
+                .groupDataProvider          = gGroupDataProvider,                                    //
+                .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+                .dnssdServer                = DnssdServer::Instance(),                               //
+                .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
+                .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
+                .testEventTriggerDelegate   = testEventTriggerDelegate,                              //
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        },
+        WifiRootNodeDevice::WifiContext{
+            .wifiDriver = sWiFiDriver,
+        });
+    err = gRootNodeDevice->Register(kRootEndpointId, dataModelProvider, kInvalidEndpointId);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to register root node device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -224,6 +259,13 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
 void InitServer(intptr_t context)
 {
+    static DefaultTimerDelegate timerDelegate;
+    DeviceFactory::GetInstance().Init(DeviceFactory::Context{
+        .groupDataProvider = gGroupDataProvider,                     //
+        .fabricTable       = Server::GetInstance().GetFabricTable(), //
+        .timerDelegate     = timerDelegate,                          //
+    });
+
     static chip::CommonCaseDeviceServerInitParams initParams;
     CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
     if (err != CHIP_NO_ERROR)
@@ -232,7 +274,8 @@ void InitServer(intptr_t context)
         return;
     }
 
-    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider =
+        PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
@@ -273,7 +316,7 @@ void InitServerWithDeviceType(std::string deviceType)
     gDeviceType = std::move(deviceType);
 
     // Init the server
-    PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    SuccessOrDie(PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }
 
 extern "C" void app_main()
@@ -321,7 +364,7 @@ extern "C" void app_main()
     }
 
     // Register event handler to restart DNS-SD on connectivity change
-    PlatformMgr().AddEventHandler(DeviceEventHandler, 0);
+    SuccessOrDie(PlatformMgr().AddEventHandler(DeviceEventHandler, 0));
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
     SetCommissionableDataProvider(&sFactoryDataProvider);

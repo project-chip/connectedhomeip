@@ -33,7 +33,7 @@ public:
     CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override;
     CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
 
-    chip::Protocols::InteractionModel::Status PlayChimeSound() override;
+    chip::Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
 
 private:
     using ChimeSoundStructType = chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type;

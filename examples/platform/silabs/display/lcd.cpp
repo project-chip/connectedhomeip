@@ -21,6 +21,7 @@
 
 #include "demo-ui.h"
 #include "lcd.h"
+#include <platform/PlatformError.h>
 
 #include "dmd.h"
 #include "glib.h"
@@ -72,8 +73,8 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status = sl_board_enable_display();
     if (status != SL_STATUS_OK)
     {
-        SILABS_LOG("Board Display enable fail %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("Board Display enable fail %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
 #endif
 
@@ -81,16 +82,16 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status = DMD_init(0);
     if (DMD_OK != status)
     {
-        SILABS_LOG("DMD init failed %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("DMD init failed %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
 
     /* Initialize the glib context */
     status = GLIB_contextInit(&glibContext);
     if (GLIB_OK != status)
     {
-        SILABS_LOG("Glib context init failed %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("Glib context init failed %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
 
     glibContext.backgroundColor = White;
@@ -98,8 +99,8 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status                      = GLIB_clear(&glibContext);
     if (GLIB_OK != status)
     {
-        SILABS_LOG("Glib clear failed %d", status);
-        err = CHIP_ERROR_INTERNAL;
+        SILABS_LOG("Glib clear failed %lx", status);
+        err = MATTER_PLATFORM_ERROR(status);
     }
     demoUIInit(&glibContext);
 

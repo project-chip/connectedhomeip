@@ -1,1 +1,1 @@
-180 : [NXP] Update VSCode Docker image (Zephyr update)
+183 : Gstreamer: install gstreamer1.0-plugins-good, gstreamer1.0-plugins-ugly for cross compiling Camera app

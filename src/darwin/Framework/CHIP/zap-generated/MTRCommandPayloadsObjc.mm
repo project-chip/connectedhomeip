@@ -15592,13 +15592,15 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _endpoints = [NSArray array];
 
-        _keyID = @(0);
+        _keySetID = @(0);
 
         _key = nil;
 
-        _gracePeriod = nil;
-
         _useAuxiliaryACL = nil;
+
+        _replaceEndpoints = nil;
+
+        _mcastAddrPolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15611,10 +15613,11 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.keyID = self.keyID;
+    other.keySetID = self.keySetID;
     other.key = self.key;
-    other.gracePeriod = self.gracePeriod;
     other.useAuxiliaryACL = self.useAuxiliaryACL;
+    other.replaceEndpoints = self.replaceEndpoints;
+    other.mcastAddrPolicy = self.mcastAddrPolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15623,7 +15626,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keyID:%@; key:%@; gracePeriod:%@; useAuxiliaryACL:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keyID, [_key base64EncodedStringWithOptions:0], _gracePeriod, _useAuxiliaryACL];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; key:%@; useAuxiliaryACL:%@; replaceEndpoints:%@; mcastAddrPolicy:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, [_key base64EncodedStringWithOptions:0], _useAuxiliaryACL, _replaceEndpoints, _mcastAddrPolicy];
     return descriptionString;
 }
 
@@ -15664,7 +15667,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        encodableStruct.keyID = self.keyID.unsignedIntValue;
+        encodableStruct.keySetID = self.keySetID.unsignedShortValue;
     }
     {
         if (self.key != nil) {
@@ -15673,15 +15676,21 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        if (self.gracePeriod != nil) {
-            auto & definedValue_0 = encodableStruct.gracePeriod.Emplace();
-            definedValue_0 = self.gracePeriod.unsignedIntValue;
-        }
-    }
-    {
         if (self.useAuxiliaryACL != nil) {
             auto & definedValue_0 = encodableStruct.useAuxiliaryACL.Emplace();
             definedValue_0 = self.useAuxiliaryACL.boolValue;
+        }
+    }
+    {
+        if (self.replaceEndpoints != nil) {
+            auto & definedValue_0 = encodableStruct.replaceEndpoints.Emplace();
+            definedValue_0 = self.replaceEndpoints.boolValue;
+        }
+    }
+    {
+        if (self.mcastAddrPolicy != nil) {
+            auto & definedValue_0 = encodableStruct.mcastAddrPolicy.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mcastAddrPolicy.unsignedCharValue);
         }
     }
 
@@ -15840,9 +15849,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupID = @(0);
 
-        _endpoints = nil;
-
-        _listTooLarge = nil;
+        _endpoints = [NSArray array];
     }
     return self;
 }
@@ -15853,14 +15860,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
     other.groupID = self.groupID;
     other.endpoints = self.endpoints;
-    other.listTooLarge = self.listTooLarge;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; listTooLarge:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _listTooLarge];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; >", NSStringFromClass([self class]), _groupID, _endpoints];
     return descriptionString;
 }
 
@@ -15924,31 +15930,20 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
     }
     {
-        if (decodableStruct.endpoints.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = decodableStruct.endpoints.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedShort:entry_1];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-                self.endpoints = array_1;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.endpoints.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
             }
-        } else {
-            self.endpoints = nil;
-        }
-    }
-    {
-        if (decodableStruct.listTooLarge.HasValue()) {
-            self.listTooLarge = [NSNumber numberWithBool:decodableStruct.listTooLarge.Value()];
-        } else {
-            self.listTooLarge = nil;
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.endpoints = array_0;
         }
     }
     return CHIP_NO_ERROR;
@@ -15963,11 +15958,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _groupID = @(0);
 
-        _keyID = @(0);
+        _keySetID = @(0);
 
         _key = nil;
-
-        _gracePeriod = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15979,9 +15972,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTRGroupcastClusterUpdateGroupKeyParams alloc] init];
 
     other.groupID = self.groupID;
-    other.keyID = self.keyID;
+    other.keySetID = self.keySetID;
     other.key = self.key;
-    other.gracePeriod = self.gracePeriod;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15990,7 +15982,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; keyID:%@; key:%@; gracePeriod:%@; >", NSStringFromClass([self class]), _groupID, _keyID, [_key base64EncodedStringWithOptions:0], _gracePeriod];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; keySetID:%@; key:%@; >", NSStringFromClass([self class]), _groupID, _keySetID, [_key base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -16006,98 +15998,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
     {
-        encodableStruct.keyID = self.keyID.unsignedIntValue;
+        encodableStruct.keySetID = self.keySetID.unsignedShortValue;
     }
     {
         if (self.key != nil) {
             auto & definedValue_0 = encodableStruct.key.Emplace();
             definedValue_0 = AsByteSpan(self.key);
         }
-    }
-    {
-        if (self.gracePeriod != nil) {
-            auto & definedValue_0 = encodableStruct.gracePeriod.Emplace();
-            definedValue_0 = self.gracePeriod.unsignedIntValue;
-        }
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRGroupcastClusterExpireGracePeriodParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRGroupcastClusterExpireGracePeriodParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRGroupcastClusterExpireGracePeriodParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16183,6 +16090,94 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         encodableStruct.useAuxiliaryACL = self.useAuxiliaryACL.boolValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRGroupcastClusterGroupcastTestingParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _testOperation = @(0);
+
+        _durationSeconds = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRGroupcastClusterGroupcastTestingParams alloc] init];
+
+    other.testOperation = self.testOperation;
+    other.durationSeconds = self.durationSeconds;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: testOperation:%@; durationSeconds:%@; >", NSStringFromClass([self class]), _testOperation, _durationSeconds];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRGroupcastClusterGroupcastTestingParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Groupcast::Commands::GroupcastTesting::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.testOperation = static_cast<std::remove_reference_t<decltype(encodableStruct.testOperation)>>(self.testOperation.unsignedCharValue);
+    }
+    {
+        if (self.durationSeconds != nil) {
+            auto & definedValue_0 = encodableStruct.durationSeconds.Emplace();
+            definedValue_0 = self.durationSeconds.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -39714,6 +39709,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _chimeID = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -39724,6 +39721,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     auto other = [[MTRChimeClusterPlayChimeSoundParams alloc] init];
 
+    other.chimeID = self.chimeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -39732,7 +39730,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chimeID:%@; >", NSStringFromClass([self class]), _chimeID];
     return descriptionString;
 }
 
@@ -39744,6 +39742,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     chip::app::Clusters::Chime::Commands::PlayChimeSound::Type encodableStruct;
     ListFreer listFreer;
+    {
+        if (self.chimeID != nil) {
+            auto & definedValue_0 = encodableStruct.chimeID.Emplace();
+            definedValue_0 = self.chimeID.unsignedCharValue;
+        }
+    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {

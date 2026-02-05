@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <minmdns/MinMdnsConfig.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
