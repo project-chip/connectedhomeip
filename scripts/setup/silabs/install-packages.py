@@ -15,10 +15,12 @@ import subprocess
 import sys
 from zipfile import ZipFile
 
+logger = logging.getLogger(__name__)
+
 try:
     import dload
 except ImportError:
-    logging.error("dload package is required. Install it with: pip install dload")
+    logger.error("dload package is required. Install it with: pip install dload")
     sys.exit(1)
 
 
@@ -36,7 +38,7 @@ def get_platform_vars():
     elif platform == "linux":
         platform_name = "linux"
     else:
-        logging.error(f"ERROR: Platform {platform} is not supported (Linux and macOS only)")
+        logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
     slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.0.1-{platform_name}-x64.zip"
@@ -57,9 +59,9 @@ def make_executable(path):
             st = os.stat(path)
             os.chmod(path, st.st_mode | stat.S_IEXEC)
         except OSError as e:
-            logging.warning(f"Could not make {path} executable: {e}")
+            logger.warning("Could not make %s executable: %s", path, e)
     else:
-        logging.warning(f"Path {path} does not exist to make executable.")
+        logger.warning("Path %s does not exist to make executable.", path)
 
 
 def find_slt_in_path():
@@ -85,10 +87,10 @@ def download_slt_cli():
     slt_cli_path = os.path.join(tools_folder_path, "slt")
 
     if os.path.isfile(slt_cli_path):
-        logging.info(f"SLT CLI already exists at {slt_cli_path}")
+        logger.info("SLT CLI already exists at %s", slt_cli_path)
         return slt_cli_path
 
-    logging.info("Downloading and unzipping slt-cli...")
+    logger.info("Downloading and unzipping slt-cli...")
     slt_zip_path = os.path.join(tools_folder_path, "slt.zip")
     try:
         dload.save(slt_cli_url, slt_zip_path)
@@ -96,10 +98,10 @@ def download_slt_cli():
             zObject.extractall(path=tools_folder_path)
         os.remove(slt_zip_path)
         make_executable(slt_cli_path)
-        logging.info(f"SLT CLI installed at {slt_cli_path}")
+        logger.info("SLT CLI installed at %s", slt_cli_path)
         return slt_cli_path
     except Exception as e:
-        logging.error(f"Failed to download/extract slt-cli: {e}")
+        logger.error("Failed to download/extract slt-cli: %s", e)
         sys.exit(1)
 
 
@@ -107,7 +109,7 @@ def ensure_slt_available():
     """Ensure SLT CLI is available, either from PATH or by downloading."""
     slt_in_path = find_slt_in_path()
     if slt_in_path:
-        logging.info(f"SLT already installed on system: {slt_in_path}")
+        logger.info("SLT already installed on system: %s", slt_in_path)
         return slt_in_path
     return download_slt_cli()
 
@@ -116,13 +118,13 @@ def update_slt_cli(slt_cli_path):
     """Update SLT CLI to latest version."""
     update_cmd = [slt_cli_path, "update", "--self"]
     try:
-        logging.info("Updating SLT CLI to latest version...")
+        logger.info("Updating SLT CLI to latest version...")
         subprocess.run(update_cmd, check=True)
-        logging.info("SLT CLI updated successfully")
+        logger.info("SLT CLI updated successfully")
     except subprocess.CalledProcessError as e:
-        logging.warning(f"Failed to update slt-cli: {e}")
+        logger.warning("Failed to update slt-cli: %s", e)
     except FileNotFoundError:
-        logging.warning(f"SLT CLI not found at {slt_cli_path}, skipping update")
+        logger.warning("SLT CLI not found at %s, skipping update", slt_cli_path)
 
 
 def get_sdk_pkg_path():
@@ -135,16 +137,16 @@ def install_sdk_packages(slt_cli_path):
     """Install packages from sdk-pkg.slt file."""
     sdk_pkg_path = get_sdk_pkg_path()
     if not os.path.isfile(sdk_pkg_path):
-        logging.error(f"sdk-pkg.slt not found at {sdk_pkg_path}")
+        logger.error("sdk-pkg.slt not found at %s", sdk_pkg_path)
         sys.exit(1)
 
     install_cmd = [slt_cli_path, "install", "-f", sdk_pkg_path]
     try:
-        logging.info("Installing packages from sdk-pkg.slt...")
+        logger.info("Installing packages from sdk-pkg.slt...")
         subprocess.run(install_cmd, check=True)
-        logging.info("Packages installed successfully")
+        logger.info("Packages installed successfully")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Failed to install packages: {e}")
+        logger.error("Failed to install packages: %s", e)
         sys.exit(1)
 
 
@@ -177,7 +179,7 @@ def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
 
     def create_symlink(target_path, link_name):
         if not target_path or not os.path.isdir(target_path):
-            logging.warning(f"Target path does not exist or is not a directory: {target_path}")
+            logger.warning("Target path does not exist or is not a directory: %s", target_path)
             return
         link_path = os.path.join(silabs_dir, link_name)
         try:
@@ -186,16 +188,16 @@ def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
                 if os.path.islink(link_path):
                     current = os.path.realpath(link_path)
                     if os.path.realpath(target_path) == current:
-                        logging.info(f"Symlink already up to date: {link_path}")
+                        logger.info("Symlink already up to date: %s", link_path)
                         return
                     os.remove(link_path)
                 else:
-                    logging.warning(f"Path exists and is not a symlink, skipping: {link_path}")
+                    logger.warning("Path exists and is not a symlink, skipping: %s", link_path)
                     return
             os.symlink(target_path, link_path)
-            logging.info(f"Created symlink {link_path} -> {target_path}")
+            logger.info("Created symlink %s -> %s", link_path, target_path)
         except OSError as e:
-            logging.warning(f"Could not create symlink {link_path}: {e}")
+            logger.warning("Could not create symlink %s: %s", link_path, e)
 
     create_symlink(simplicity_sdk_path, "simplicity_sdk")
     create_symlink(wiseconnect_path, "wifi_sdk")
@@ -228,8 +230,8 @@ def main():
     args = parser.parse_args()
 
     slt_path = setup_slt_environment(verbose=args.verbose)
-    logging.info(f"\nSLT CLI setup completed successfully")
-    logging.info(f"SLT CLI location: {slt_path}")
+    logger.info("\nSLT CLI setup completed successfully")
+    logger.info("SLT CLI location: %s", slt_path)
 
 
 if __name__ == "__main__":
