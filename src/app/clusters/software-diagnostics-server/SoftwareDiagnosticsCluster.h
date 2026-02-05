@@ -47,76 +47,18 @@ public:
     {}
 
     // software fault listener
-    void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
-    {
-        VerifyOrReturn(mContext != nullptr);
-        (void) mContext->interactionContext.eventsGenerator.GenerateEvent(softwareFault, kRootEndpointId);
-    }
+    void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override;
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override
-    {
-        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-        if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == nullptr)
-        {
-            SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(this);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    void Shutdown(ClusterShutdownType shutdownType) override
-    {
-        if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == this)
-        {
-            SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
-        }
-        DefaultServerCluster::Shutdown(shutdownType);
-    }
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override
-    {
-        switch (request.path.mAttributeId)
-        {
-        case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
-            uint64_t value;
-            CHIP_ERROR err = mLogic.GetCurrentHeapFree(value);
-            return EncodeValue(value, err, encoder);
-        }
-        case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
-            uint64_t value;
-            CHIP_ERROR err = mLogic.GetCurrentHeapUsed(value);
-            return EncodeValue(value, err, encoder);
-        }
-        case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
-            uint64_t value;
-            CHIP_ERROR err = mLogic.GetCurrentHighWatermark(value);
-            return EncodeValue(value, err, encoder);
-        }
-        case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
-            return mLogic.ReadThreadMetrics(encoder);
-        case Globals::Attributes::FeatureMap::Id:
-            return encoder.Encode(mLogic.GetFeatureMap());
-        case Globals::Attributes::ClusterRevision::Id:
-            return encoder.Encode(SoftwareDiagnostics::kRevision);
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-    }
+                                                AttributeValueEncoder & encoder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override
-    {
-        switch (request.path.mCommandId)
-        {
-        case SoftwareDiagnostics::Commands::ResetWatermarks::Id:
-            return mLogic.ResetWatermarks();
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedCommand;
-        }
-    }
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
@@ -134,18 +76,7 @@ private:
     // when the input `value` was read:
     //   - CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE results in a 0 being encoded
     //   - any other read error is just forwarded
-    CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
-    {
-        if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            value = 0;
-        }
-        else if (readError != CHIP_NO_ERROR)
-        {
-            return readError;
-        }
-        return encoder.Encode(value);
-    }
+    CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
 
     SoftwareDiagnosticsLogic mLogic;
 };
