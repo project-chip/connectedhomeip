@@ -696,7 +696,6 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEventNotGenerated)
     EXPECT_EQ(eventInfo, std::nullopt);
 }
 
-
 TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsAttribute)
 {
     chip::Testing::TestServerClusterContext context;
