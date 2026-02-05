@@ -239,69 +239,56 @@ public:
     Status SendFaultEvent(FaultStateEnum newFaultState);
 
     // ------------------------------------------------------------------
-    // Get attribute methods
-    StateEnum GetState() override;
-    CHIP_ERROR SetState(StateEnum);
+    // Attribute change callbacks - called by cluster after attribute is updated
+    void OnStateChanged(StateEnum newValue) override;
+    void OnSupplyStateChanged(SupplyStateEnum newValue) override;
+    void OnFaultStateChanged(FaultStateEnum newValue) override;
+    void OnChargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnCircuitCapacityChanged(int64_t newValue) override;
+    void OnMinimumChargeCurrentChanged(int64_t newValue) override;
+    void OnMaximumChargeCurrentChanged(int64_t newValue) override;
+    void OnMaximumDischargeCurrentChanged(int64_t newValue) override;
+    void OnUserMaximumChargeCurrentChanged(int64_t newValue) override;
+    void OnRandomizationDelayWindowChanged(uint32_t newValue) override;
+    void OnNextChargeStartTimeChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnNextChargeTargetTimeChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnNextChargeRequiredEnergyChanged(DataModel::Nullable<int64_t> newValue) override;
+    void OnNextChargeTargetSoCChanged(DataModel::Nullable<Percent> newValue) override;
+    void OnApproximateEVEfficiencyChanged(DataModel::Nullable<uint16_t> newValue) override;
+    void OnStateOfChargeChanged(DataModel::Nullable<Percent> newValue) override;
+    void OnBatteryCapacityChanged(DataModel::Nullable<int64_t> newValue) override;
+    void OnVehicleIDChanged(DataModel::Nullable<CharSpan> newValue) override;
+    void OnSessionIDChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue) override;
+    void OnSessionEnergyChargedChanged(DataModel::Nullable<int64_t> newValue) override;
+    void OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue) override;
 
-    SupplyStateEnum GetSupplyState() override;
-    CHIP_ERROR SetSupplyState(SupplyStateEnum);
-
-    FaultStateEnum GetFaultState() override;
-    CHIP_ERROR SetFaultState(FaultStateEnum);
-
-    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() override;
-    CHIP_ERROR SetChargingEnabledUntil(DataModel::Nullable<uint32_t>);
-
-    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() override;
-    CHIP_ERROR SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>);
-
-    int64_t GetCircuitCapacity() override;
-    CHIP_ERROR SetCircuitCapacity(int64_t);
-
-    int64_t GetMinimumChargeCurrent() override;
-    CHIP_ERROR SetMinimumChargeCurrent(int64_t);
-
-    int64_t GetMaximumChargeCurrent() override;
-    CHIP_ERROR SetMaximumChargeCurrent(int64_t);
-
-    int64_t GetMaximumDischargeCurrent() override;
-    CHIP_ERROR SetMaximumDischargeCurrent(int64_t);
-
-    int64_t GetUserMaximumChargeCurrent() override;
-    CHIP_ERROR SetUserMaximumChargeCurrent(int64_t) override;
-
-    uint32_t GetRandomizationDelayWindow() override;
-    CHIP_ERROR SetRandomizationDelayWindow(uint32_t) override;
-
-    /* PREF attributes */
-    DataModel::Nullable<uint32_t> GetNextChargeStartTime() override;
-    CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> newNextChargeStartTimeUtc);
-
-    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() override;
-    CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newNextChargeTargetTimeUtc);
-
-    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() override;
-    CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newNextChargeRequiredEnergyMilliWattH);
-
-    DataModel::Nullable<Percent> GetNextChargeTargetSoC() override;
-    CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue);
-
-    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() override;
-    CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t>) override;
-
-    /* SOC attributes */
-    DataModel::Nullable<Percent> GetStateOfCharge() override;
-    CHIP_ERROR SetStateOfCharge(DataModel::Nullable<Percent>);
-    DataModel::Nullable<int64_t> GetBatteryCapacity() override;
-    CHIP_ERROR SetBatteryCapacity(DataModel::Nullable<int64_t>);
-
-    /* PNC attributes*/
-    DataModel::Nullable<CharSpan> GetVehicleID() override;
-    /* Session SESS attributes */
-    DataModel::Nullable<uint32_t> GetSessionID() override;
-    DataModel::Nullable<uint32_t> GetSessionDuration() override;
-    DataModel::Nullable<int64_t> GetSessionEnergyCharged() override;
-    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() override;
+    // ------------------------------------------------------------------
+    // Local getters for internal delegate use
+    StateEnum GetState() const { return mState; }
+    SupplyStateEnum GetSupplyState() const { return mSupplyState; }
+    FaultStateEnum GetFaultState() const { return mFaultState; }
+    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() const { return mChargingEnabledUntil; }
+    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() const { return mDischargingEnabledUntil; }
+    int64_t GetCircuitCapacity() const { return mCircuitCapacity; }
+    int64_t GetMinimumChargeCurrent() const { return mMinimumChargeCurrent; }
+    int64_t GetMaximumChargeCurrent() const { return mMaximumChargeCurrent; }
+    int64_t GetMaximumDischargeCurrent() const { return mMaximumDischargeCurrent; }
+    int64_t GetUserMaximumChargeCurrent() const { return mUserMaximumChargeCurrent; }
+    uint32_t GetRandomizationDelayWindow() const { return mRandomizationDelayWindow; }
+    DataModel::Nullable<uint32_t> GetNextChargeStartTime() const { return mNextChargeStartTime; }
+    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() const { return mNextChargeTargetTime; }
+    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() const { return mNextChargeRequiredEnergy; }
+    DataModel::Nullable<Percent> GetNextChargeTargetSoC() const { return mNextChargeTargetSoC; }
+    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() const { return mApproximateEVEfficiency; }
+    DataModel::Nullable<Percent> GetStateOfCharge() const { return mStateOfCharge; }
+    DataModel::Nullable<int64_t> GetBatteryCapacity() const { return mBatteryCapacity; }
+    DataModel::Nullable<CharSpan> GetVehicleID() const { return mVehicleID; }
+    DataModel::Nullable<uint32_t> GetSessionID() const { return mSession.mSessionID; }
+    DataModel::Nullable<uint32_t> GetSessionDuration() const { return mSession.mSessionDuration; }
+    DataModel::Nullable<int64_t> GetSessionEnergyCharged() const { return mSession.mSessionEnergyCharged; }
+    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const { return mSession.mSessionEnergyDischarged; }
 
 private:
     /* Constants */

@@ -44,6 +44,238 @@ CHIP_ERROR EnergyEvseCluster::Startup(ServerClusterContext & context)
     return DefaultServerCluster::Startup(context);
 }
 
+CHIP_ERROR EnergyEvseCluster::SetState(StateEnum newValue)
+{
+    VerifyOrReturnError(mState != newValue, CHIP_NO_ERROR);
+    mState = newValue;
+    mDelegate.OnStateChanged(newValue);
+    NotifyAttributeChanged(State::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetSupplyState(SupplyStateEnum newValue)
+{
+    VerifyOrReturnError(mSupplyState != newValue, CHIP_NO_ERROR);
+    mSupplyState = newValue;
+    mDelegate.OnSupplyStateChanged(newValue);
+    NotifyAttributeChanged(SupplyState::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetFaultState(FaultStateEnum newValue)
+{
+    VerifyOrReturnError(mFaultState != newValue, CHIP_NO_ERROR);
+    mFaultState = newValue;
+    mDelegate.OnFaultStateChanged(newValue);
+    NotifyAttributeChanged(FaultState::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetChargingEnabledUntil(DataModel::Nullable<uint32_t> newValue)
+{
+    VerifyOrReturnError(mChargingEnabledUntil != newValue, CHIP_NO_ERROR);
+    mChargingEnabledUntil = newValue;
+    mDelegate.OnChargingEnabledUntilChanged(newValue);
+    NotifyAttributeChanged(ChargingEnabledUntil::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetDischargingEnabledUntil(DataModel::Nullable<uint32_t> newValue)
+{
+    VerifyOrReturnError(mDischargingEnabledUntil != newValue, CHIP_NO_ERROR);
+    mDischargingEnabledUntil = newValue;
+    mDelegate.OnDischargingEnabledUntilChanged(newValue);
+    NotifyAttributeChanged(DischargingEnabledUntil::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetCircuitCapacity(int64_t newValue)
+{
+    VerifyOrReturnError(mCircuitCapacity != newValue, CHIP_NO_ERROR);
+    mCircuitCapacity = newValue;
+    mDelegate.OnCircuitCapacityChanged(newValue);
+    NotifyAttributeChanged(CircuitCapacity::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetMinimumChargeCurrent(int64_t newValue)
+{
+    VerifyOrReturnError(mMinimumChargeCurrent != newValue, CHIP_NO_ERROR);
+    mMinimumChargeCurrent = newValue;
+    mDelegate.OnMinimumChargeCurrentChanged(newValue);
+    NotifyAttributeChanged(MinimumChargeCurrent::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetMaximumChargeCurrent(int64_t newValue)
+{
+    VerifyOrReturnError(mMaximumChargeCurrent != newValue, CHIP_NO_ERROR);
+    mMaximumChargeCurrent = newValue;
+    mDelegate.OnMaximumChargeCurrentChanged(newValue);
+    NotifyAttributeChanged(MaximumChargeCurrent::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetMaximumDischargeCurrent(int64_t newValue)
+{
+    VerifyOrReturnError(mMaximumDischargeCurrent != newValue, CHIP_NO_ERROR);
+    mMaximumDischargeCurrent = newValue;
+    mDelegate.OnMaximumDischargeCurrentChanged(newValue);
+    NotifyAttributeChanged(MaximumDischargeCurrent::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetUserMaximumChargeCurrent(int64_t newValue)
+{
+    VerifyOrReturnError(mUserMaximumChargeCurrent != newValue, CHIP_NO_ERROR);
+    mUserMaximumChargeCurrent = newValue;
+    mDelegate.OnUserMaximumChargeCurrentChanged(newValue);
+    NotifyAttributeChanged(UserMaximumChargeCurrent::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetRandomizationDelayWindow(uint32_t newValue)
+{
+    VerifyOrReturnError(mRandomizationDelayWindow != newValue, CHIP_NO_ERROR);
+    mRandomizationDelayWindow = newValue;
+    mDelegate.OnRandomizationDelayWindowChanged(newValue);
+    NotifyAttributeChanged(RandomizationDelayWindow::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue)
+{
+    VerifyOrReturnError(mNextChargeStartTime != newValue, CHIP_NO_ERROR);
+    mNextChargeStartTime = newValue;
+    mDelegate.OnNextChargeStartTimeChanged(newValue);
+    NotifyAttributeChanged(NextChargeStartTime::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue)
+{
+    VerifyOrReturnError(mNextChargeTargetTime != newValue, CHIP_NO_ERROR);
+    mNextChargeTargetTime = newValue;
+    mDelegate.OnNextChargeTargetTimeChanged(newValue);
+    NotifyAttributeChanged(NextChargeTargetTime::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue)
+{
+    VerifyOrReturnError(mNextChargeRequiredEnergy != newValue, CHIP_NO_ERROR);
+    mNextChargeRequiredEnergy = newValue;
+    mDelegate.OnNextChargeRequiredEnergyChanged(newValue);
+    NotifyAttributeChanged(NextChargeRequiredEnergy::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue)
+{
+    VerifyOrReturnError(mNextChargeTargetSoC != newValue, CHIP_NO_ERROR);
+    mNextChargeTargetSoC = newValue;
+    mDelegate.OnNextChargeTargetSoCChanged(newValue);
+    NotifyAttributeChanged(NextChargeTargetSoC::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetApproximateEVEfficiency(DataModel::Nullable<uint16_t> newValue)
+{
+    VerifyOrReturnError(mApproximateEVEfficiency != newValue, CHIP_NO_ERROR);
+    mApproximateEVEfficiency = newValue;
+    mDelegate.OnApproximateEVEfficiencyChanged(newValue);
+    NotifyAttributeChanged(ApproximateEVEfficiency::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetStateOfCharge(DataModel::Nullable<Percent> newValue)
+{
+    VerifyOrReturnError(mStateOfCharge != newValue, CHIP_NO_ERROR);
+    mStateOfCharge = newValue;
+    mDelegate.OnStateOfChargeChanged(newValue);
+    NotifyAttributeChanged(StateOfCharge::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetBatteryCapacity(DataModel::Nullable<int64_t> newValue)
+{
+    VerifyOrReturnError(mBatteryCapacity != newValue, CHIP_NO_ERROR);
+    mBatteryCapacity = newValue;
+    mDelegate.OnBatteryCapacityChanged(newValue);
+    NotifyAttributeChanged(BatteryCapacity::Id);
+    return CHIP_NO_ERROR;
+}
+
+DataModel::Nullable<CharSpan> EnergyEvseCluster::GetVehicleID() const
+{
+    if (mVehicleID.IsNull())
+    {
+        return DataModel::NullNullable;
+    }
+    return DataModel::MakeNullable(CharSpan(mVehicleIDBuffer, mVehicleID.Value().size()));
+}
+
+CHIP_ERROR EnergyEvseCluster::SetVehicleID(DataModel::Nullable<CharSpan> newValue)
+{
+    if (newValue.IsNull())
+    {
+        if (mVehicleID.IsNull())
+        {
+            return CHIP_NO_ERROR;
+        }
+        mVehicleID = DataModel::NullNullable;
+    }
+    else
+    {
+        VerifyOrReturnError(newValue.Value().size() <= kMaxVehicleIDBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        if (!mVehicleID.IsNull() && newValue.Value().data_equal(mVehicleID.Value()))
+        {
+            return CHIP_NO_ERROR;
+        }
+        memcpy(mVehicleIDBuffer, newValue.Value().data(), newValue.Value().size());
+        mVehicleID = DataModel::MakeNullable(CharSpan(mVehicleIDBuffer, newValue.Value().size()));
+    }
+    mDelegate.OnVehicleIDChanged(mVehicleID);
+    NotifyAttributeChanged(VehicleID::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetSessionID(DataModel::Nullable<uint32_t> newValue)
+{
+    VerifyOrReturnError(mSessionID != newValue, CHIP_NO_ERROR);
+    mSessionID = newValue;
+    mDelegate.OnSessionIDChanged(newValue);
+    NotifyAttributeChanged(SessionID::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetSessionDuration(DataModel::Nullable<uint32_t> newValue)
+{
+    VerifyOrReturnError(mSessionDuration != newValue, CHIP_NO_ERROR);
+    mSessionDuration = newValue;
+    mDelegate.OnSessionDurationChanged(newValue);
+    NotifyAttributeChanged(SessionDuration::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetSessionEnergyCharged(DataModel::Nullable<int64_t> newValue)
+{
+    VerifyOrReturnError(mSessionEnergyCharged != newValue, CHIP_NO_ERROR);
+    mSessionEnergyCharged = newValue;
+    mDelegate.OnSessionEnergyChargedChanged(newValue);
+    NotifyAttributeChanged(SessionEnergyCharged::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseCluster::SetSessionEnergyDischarged(DataModel::Nullable<int64_t> newValue)
+{
+    VerifyOrReturnError(mSessionEnergyDischarged != newValue, CHIP_NO_ERROR);
+    mSessionEnergyDischarged = newValue;
+    mDelegate.OnSessionEnergyDischargedChanged(newValue);
+    NotifyAttributeChanged(SessionEnergyDischarged::Id);
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus EnergyEvseCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
 {
@@ -54,51 +286,51 @@ DataModel::ActionReturnStatus EnergyEvseCluster::ReadAttribute(const DataModel::
     case ClusterRevision::Id:
         return encoder.Encode(kRevision);
     case State::Id:
-        return encoder.Encode(mDelegate.GetState());
+        return encoder.Encode(mState);
     case SupplyState::Id:
-        return encoder.Encode(mDelegate.GetSupplyState());
+        return encoder.Encode(mSupplyState);
     case FaultState::Id:
-        return encoder.Encode(mDelegate.GetFaultState());
+        return encoder.Encode(mFaultState);
     case ChargingEnabledUntil::Id:
-        return encoder.Encode(mDelegate.GetChargingEnabledUntil());
+        return encoder.Encode(mChargingEnabledUntil);
     case DischargingEnabledUntil::Id:
-        return encoder.Encode(mDelegate.GetDischargingEnabledUntil());
+        return encoder.Encode(mDischargingEnabledUntil);
     case CircuitCapacity::Id:
-        return encoder.Encode(mDelegate.GetCircuitCapacity());
+        return encoder.Encode(mCircuitCapacity);
     case MinimumChargeCurrent::Id:
-        return encoder.Encode(mDelegate.GetMinimumChargeCurrent());
+        return encoder.Encode(mMinimumChargeCurrent);
     case MaximumChargeCurrent::Id:
-        return encoder.Encode(mDelegate.GetMaximumChargeCurrent());
+        return encoder.Encode(mMaximumChargeCurrent);
     case MaximumDischargeCurrent::Id:
-        return encoder.Encode(mDelegate.GetMaximumDischargeCurrent());
+        return encoder.Encode(mMaximumDischargeCurrent);
     case UserMaximumChargeCurrent::Id:
-        return encoder.Encode(mDelegate.GetUserMaximumChargeCurrent());
+        return encoder.Encode(mUserMaximumChargeCurrent);
     case RandomizationDelayWindow::Id:
-        return encoder.Encode(mDelegate.GetRandomizationDelayWindow());
+        return encoder.Encode(mRandomizationDelayWindow);
     case NextChargeStartTime::Id:
-        return encoder.Encode(mDelegate.GetNextChargeStartTime());
+        return encoder.Encode(mNextChargeStartTime);
     case NextChargeTargetTime::Id:
-        return encoder.Encode(mDelegate.GetNextChargeTargetTime());
+        return encoder.Encode(mNextChargeTargetTime);
     case NextChargeRequiredEnergy::Id:
-        return encoder.Encode(mDelegate.GetNextChargeRequiredEnergy());
+        return encoder.Encode(mNextChargeRequiredEnergy);
     case NextChargeTargetSoC::Id:
-        return encoder.Encode(mDelegate.GetNextChargeTargetSoC());
+        return encoder.Encode(mNextChargeTargetSoC);
     case ApproximateEVEfficiency::Id:
-        return encoder.Encode(mDelegate.GetApproximateEVEfficiency());
+        return encoder.Encode(mApproximateEVEfficiency);
     case StateOfCharge::Id:
-        return encoder.Encode(mDelegate.GetStateOfCharge());
+        return encoder.Encode(mStateOfCharge);
     case BatteryCapacity::Id:
-        return encoder.Encode(mDelegate.GetBatteryCapacity());
+        return encoder.Encode(mBatteryCapacity);
     case VehicleID::Id:
-        return encoder.Encode(mDelegate.GetVehicleID());
+        return encoder.Encode(GetVehicleID());
     case SessionID::Id:
-        return encoder.Encode(mDelegate.GetSessionID());
+        return encoder.Encode(mSessionID);
     case SessionDuration::Id:
-        return encoder.Encode(mDelegate.GetSessionDuration());
+        return encoder.Encode(mSessionDuration);
     case SessionEnergyCharged::Id:
-        return encoder.Encode(mDelegate.GetSessionEnergyCharged());
+        return encoder.Encode(mSessionEnergyCharged);
     case SessionEnergyDischarged::Id:
-        return encoder.Encode(mDelegate.GetSessionEnergyDischarged());
+        return encoder.Encode(mSessionEnergyDischarged);
     default:
         return Status::UnsupportedAttribute;
     }
@@ -112,17 +344,20 @@ DataModel::ActionReturnStatus EnergyEvseCluster::WriteAttribute(const DataModel:
     case UserMaximumChargeCurrent::Id: {
         UserMaximumChargeCurrent::TypeInfo::DecodableType value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return mDelegate.SetUserMaximumChargeCurrent(value);
+        VerifyOrReturnValue(mUserMaximumChargeCurrent != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        return SetUserMaximumChargeCurrent(value);
     }
     case RandomizationDelayWindow::Id: {
         RandomizationDelayWindow::TypeInfo::DecodableType value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return mDelegate.SetRandomizationDelayWindow(value);
+        VerifyOrReturnValue(mRandomizationDelayWindow != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        return SetRandomizationDelayWindow(value);
     }
     case ApproximateEVEfficiency::Id: {
         ApproximateEVEfficiency::TypeInfo::DecodableType value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return mDelegate.SetApproximateEVEfficiency(value);
+        VerifyOrReturnValue(mApproximateEVEfficiency != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        return SetApproximateEVEfficiency(value);
     }
     default:
         return Status::UnsupportedAttribute;

@@ -71,6 +71,236 @@ bool Instance::SupportsOptCmd(OptionalCommands aOptionalCmds) const
     return mCluster.Cluster().OptionalCmds().Has(aOptionalCmds);
 }
 
+StateEnum Instance::GetState() const
+{
+    return mCluster.Cluster().GetState();
+}
+
+CHIP_ERROR Instance::SetState(StateEnum newValue)
+{
+    return mCluster.Cluster().SetState(newValue);
+}
+
+SupplyStateEnum Instance::GetSupplyState() const
+{
+    return mCluster.Cluster().GetSupplyState();
+}
+
+CHIP_ERROR Instance::SetSupplyState(SupplyStateEnum newValue)
+{
+    return mCluster.Cluster().SetSupplyState(newValue);
+}
+
+FaultStateEnum Instance::GetFaultState() const
+{
+    return mCluster.Cluster().GetFaultState();
+}
+
+CHIP_ERROR Instance::SetFaultState(FaultStateEnum newValue)
+{
+    return mCluster.Cluster().SetFaultState(newValue);
+}
+
+DataModel::Nullable<uint32_t> Instance::GetChargingEnabledUntil() const
+{
+    return mCluster.Cluster().GetChargingEnabledUntil();
+}
+
+CHIP_ERROR Instance::SetChargingEnabledUntil(DataModel::Nullable<uint32_t> newValue)
+{
+    return mCluster.Cluster().SetChargingEnabledUntil(newValue);
+}
+
+DataModel::Nullable<uint32_t> Instance::GetDischargingEnabledUntil() const
+{
+    return mCluster.Cluster().GetDischargingEnabledUntil();
+}
+
+CHIP_ERROR Instance::SetDischargingEnabledUntil(DataModel::Nullable<uint32_t> newValue)
+{
+    return mCluster.Cluster().SetDischargingEnabledUntil(newValue);
+}
+
+int64_t Instance::GetCircuitCapacity() const
+{
+    return mCluster.Cluster().GetCircuitCapacity();
+}
+
+CHIP_ERROR Instance::SetCircuitCapacity(int64_t newValue)
+{
+    return mCluster.Cluster().SetCircuitCapacity(newValue);
+}
+
+int64_t Instance::GetMinimumChargeCurrent() const
+{
+    return mCluster.Cluster().GetMinimumChargeCurrent();
+}
+
+CHIP_ERROR Instance::SetMinimumChargeCurrent(int64_t newValue)
+{
+    return mCluster.Cluster().SetMinimumChargeCurrent(newValue);
+}
+
+int64_t Instance::GetMaximumChargeCurrent() const
+{
+    return mCluster.Cluster().GetMaximumChargeCurrent();
+}
+
+CHIP_ERROR Instance::SetMaximumChargeCurrent(int64_t newValue)
+{
+    return mCluster.Cluster().SetMaximumChargeCurrent(newValue);
+}
+
+int64_t Instance::GetMaximumDischargeCurrent() const
+{
+    return mCluster.Cluster().GetMaximumDischargeCurrent();
+}
+
+CHIP_ERROR Instance::SetMaximumDischargeCurrent(int64_t newValue)
+{
+    return mCluster.Cluster().SetMaximumDischargeCurrent(newValue);
+}
+
+int64_t Instance::GetUserMaximumChargeCurrent() const
+{
+    return mCluster.Cluster().GetUserMaximumChargeCurrent();
+}
+
+CHIP_ERROR Instance::SetUserMaximumChargeCurrent(int64_t newValue)
+{
+    return mCluster.Cluster().SetUserMaximumChargeCurrent(newValue);
+}
+
+uint32_t Instance::GetRandomizationDelayWindow() const
+{
+    return mCluster.Cluster().GetRandomizationDelayWindow();
+}
+
+CHIP_ERROR Instance::SetRandomizationDelayWindow(uint32_t newValue)
+{
+    return mCluster.Cluster().SetRandomizationDelayWindow(newValue);
+}
+
+DataModel::Nullable<uint32_t> Instance::GetNextChargeStartTime() const
+{
+    return mCluster.Cluster().GetNextChargeStartTime();
+}
+
+CHIP_ERROR Instance::SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue)
+{
+    return mCluster.Cluster().SetNextChargeStartTime(newValue);
+}
+
+DataModel::Nullable<uint32_t> Instance::GetNextChargeTargetTime() const
+{
+    return mCluster.Cluster().GetNextChargeTargetTime();
+}
+
+CHIP_ERROR Instance::SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue)
+{
+    return mCluster.Cluster().SetNextChargeTargetTime(newValue);
+}
+
+DataModel::Nullable<int64_t> Instance::GetNextChargeRequiredEnergy() const
+{
+    return mCluster.Cluster().GetNextChargeRequiredEnergy();
+}
+
+CHIP_ERROR Instance::SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue)
+{
+    return mCluster.Cluster().SetNextChargeRequiredEnergy(newValue);
+}
+
+DataModel::Nullable<Percent> Instance::GetNextChargeTargetSoC() const
+{
+    return mCluster.Cluster().GetNextChargeTargetSoC();
+}
+
+CHIP_ERROR Instance::SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue)
+{
+    return mCluster.Cluster().SetNextChargeTargetSoC(newValue);
+}
+
+DataModel::Nullable<uint16_t> Instance::GetApproximateEVEfficiency() const
+{
+    return mCluster.Cluster().GetApproximateEVEfficiency();
+}
+
+CHIP_ERROR Instance::SetApproximateEVEfficiency(DataModel::Nullable<uint16_t> newValue)
+{
+    return mCluster.Cluster().SetApproximateEVEfficiency(newValue);
+}
+
+DataModel::Nullable<Percent> Instance::GetStateOfCharge() const
+{
+    return mCluster.Cluster().GetStateOfCharge();
+}
+
+CHIP_ERROR Instance::SetStateOfCharge(DataModel::Nullable<Percent> newValue)
+{
+    return mCluster.Cluster().SetStateOfCharge(newValue);
+}
+
+DataModel::Nullable<int64_t> Instance::GetBatteryCapacity() const
+{
+    return mCluster.Cluster().GetBatteryCapacity();
+}
+
+CHIP_ERROR Instance::SetBatteryCapacity(DataModel::Nullable<int64_t> newValue)
+{
+    return mCluster.Cluster().SetBatteryCapacity(newValue);
+}
+
+DataModel::Nullable<CharSpan> Instance::GetVehicleID() const
+{
+    return mCluster.Cluster().GetVehicleID();
+}
+
+CHIP_ERROR Instance::SetVehicleID(DataModel::Nullable<CharSpan> newValue)
+{
+    return mCluster.Cluster().SetVehicleID(newValue);
+}
+
+DataModel::Nullable<uint32_t> Instance::GetSessionID() const
+{
+    return mCluster.Cluster().GetSessionID();
+}
+
+CHIP_ERROR Instance::SetSessionID(DataModel::Nullable<uint32_t> newValue)
+{
+    return mCluster.Cluster().SetSessionID(newValue);
+}
+
+DataModel::Nullable<uint32_t> Instance::GetSessionDuration() const
+{
+    return mCluster.Cluster().GetSessionDuration();
+}
+
+CHIP_ERROR Instance::SetSessionDuration(DataModel::Nullable<uint32_t> newValue)
+{
+    return mCluster.Cluster().SetSessionDuration(newValue);
+}
+
+DataModel::Nullable<int64_t> Instance::GetSessionEnergyCharged() const
+{
+    return mCluster.Cluster().GetSessionEnergyCharged();
+}
+
+CHIP_ERROR Instance::SetSessionEnergyCharged(DataModel::Nullable<int64_t> newValue)
+{
+    return mCluster.Cluster().SetSessionEnergyCharged(newValue);
+}
+
+DataModel::Nullable<int64_t> Instance::GetSessionEnergyDischarged() const
+{
+    return mCluster.Cluster().GetSessionEnergyDischarged();
+}
+
+CHIP_ERROR Instance::SetSessionEnergyDischarged(DataModel::Nullable<int64_t> newValue)
+{
+    return mCluster.Cluster().SetSessionEnergyDischarged(newValue);
+}
+
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app

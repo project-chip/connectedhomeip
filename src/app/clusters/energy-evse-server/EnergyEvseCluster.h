@@ -81,6 +81,76 @@ public:
     const BitMask<EnergyEvse::OptionalAttributes> & OptionalAttrs() const { return mOptionalAttrs; }
     const BitMask<EnergyEvse::OptionalCommands> & OptionalCmds() const { return mOptionalCmds; }
 
+    // Attribute getters and setters - cluster owns the data
+    StateEnum GetState() const { return mState; }
+    CHIP_ERROR SetState(StateEnum newValue);
+
+    SupplyStateEnum GetSupplyState() const { return mSupplyState; }
+    CHIP_ERROR SetSupplyState(SupplyStateEnum newValue);
+
+    FaultStateEnum GetFaultState() const { return mFaultState; }
+    CHIP_ERROR SetFaultState(FaultStateEnum newValue);
+
+    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() const { return mChargingEnabledUntil; }
+    CHIP_ERROR SetChargingEnabledUntil(DataModel::Nullable<uint32_t> newValue);
+
+    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() const { return mDischargingEnabledUntil; }
+    CHIP_ERROR SetDischargingEnabledUntil(DataModel::Nullable<uint32_t> newValue);
+
+    int64_t GetCircuitCapacity() const { return mCircuitCapacity; }
+    CHIP_ERROR SetCircuitCapacity(int64_t newValue);
+
+    int64_t GetMinimumChargeCurrent() const { return mMinimumChargeCurrent; }
+    CHIP_ERROR SetMinimumChargeCurrent(int64_t newValue);
+
+    int64_t GetMaximumChargeCurrent() const { return mMaximumChargeCurrent; }
+    CHIP_ERROR SetMaximumChargeCurrent(int64_t newValue);
+
+    int64_t GetMaximumDischargeCurrent() const { return mMaximumDischargeCurrent; }
+    CHIP_ERROR SetMaximumDischargeCurrent(int64_t newValue);
+
+    int64_t GetUserMaximumChargeCurrent() const { return mUserMaximumChargeCurrent; }
+    CHIP_ERROR SetUserMaximumChargeCurrent(int64_t newValue);
+
+    uint32_t GetRandomizationDelayWindow() const { return mRandomizationDelayWindow; }
+    CHIP_ERROR SetRandomizationDelayWindow(uint32_t newValue);
+
+    DataModel::Nullable<uint32_t> GetNextChargeStartTime() const { return mNextChargeStartTime; }
+    CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue);
+
+    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() const { return mNextChargeTargetTime; }
+    CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue);
+
+    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() const { return mNextChargeRequiredEnergy; }
+    CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue);
+
+    DataModel::Nullable<Percent> GetNextChargeTargetSoC() const { return mNextChargeTargetSoC; }
+    CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue);
+
+    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() const { return mApproximateEVEfficiency; }
+    CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t> newValue);
+
+    DataModel::Nullable<Percent> GetStateOfCharge() const { return mStateOfCharge; }
+    CHIP_ERROR SetStateOfCharge(DataModel::Nullable<Percent> newValue);
+
+    DataModel::Nullable<int64_t> GetBatteryCapacity() const { return mBatteryCapacity; }
+    CHIP_ERROR SetBatteryCapacity(DataModel::Nullable<int64_t> newValue);
+
+    DataModel::Nullable<CharSpan> GetVehicleID() const;
+    CHIP_ERROR SetVehicleID(DataModel::Nullable<CharSpan> newValue);
+
+    DataModel::Nullable<uint32_t> GetSessionID() const { return mSessionID; }
+    CHIP_ERROR SetSessionID(DataModel::Nullable<uint32_t> newValue);
+
+    DataModel::Nullable<uint32_t> GetSessionDuration() const { return mSessionDuration; }
+    CHIP_ERROR SetSessionDuration(DataModel::Nullable<uint32_t> newValue);
+
+    DataModel::Nullable<int64_t> GetSessionEnergyCharged() const { return mSessionEnergyCharged; }
+    CHIP_ERROR SetSessionEnergyCharged(DataModel::Nullable<int64_t> newValue);
+
+    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const { return mSessionEnergyDischarged; }
+    CHIP_ERROR SetSessionEnergyDischarged(DataModel::Nullable<int64_t> newValue);
+
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -118,6 +188,32 @@ private:
     const BitMask<EnergyEvse::Feature> mFeatureFlags;
     const BitMask<EnergyEvse::OptionalAttributes> mOptionalAttrs;
     const BitMask<EnergyEvse::OptionalCommands> mOptionalCmds;
+
+    // Attribute storage - cluster owns the data
+    StateEnum mState                                         = StateEnum::kNotPluggedIn;
+    SupplyStateEnum mSupplyState                             = SupplyStateEnum::kDisabled;
+    FaultStateEnum mFaultState                               = FaultStateEnum::kNoError;
+    DataModel::Nullable<uint32_t> mChargingEnabledUntil      = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mDischargingEnabledUntil   = DataModel::NullNullable;
+    int64_t mCircuitCapacity                                 = 0;
+    int64_t mMinimumChargeCurrent                            = kMinimumChargeCurrent;
+    int64_t mMaximumChargeCurrent                            = 0;
+    int64_t mMaximumDischargeCurrent                         = 0;
+    int64_t mUserMaximumChargeCurrent                        = 0;
+    uint32_t mRandomizationDelayWindow                       = 600; // Default 600s per spec
+    DataModel::Nullable<uint32_t> mNextChargeStartTime       = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mNextChargeTargetTime      = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mNextChargeRequiredEnergy   = DataModel::NullNullable;
+    DataModel::Nullable<Percent> mNextChargeTargetSoC        = DataModel::NullNullable;
+    DataModel::Nullable<uint16_t> mApproximateEVEfficiency   = DataModel::NullNullable;
+    DataModel::Nullable<Percent> mStateOfCharge              = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mBatteryCapacity            = DataModel::NullNullable;
+    char mVehicleIDBuffer[kMaxVehicleIDBufSize]              = { 0 };
+    DataModel::Nullable<CharSpan> mVehicleID                 = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mSessionID                 = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mSessionDuration           = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mSessionEnergyCharged       = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mSessionEnergyDischarged    = DataModel::NullNullable;
 };
 
 } // namespace EnergyEvse

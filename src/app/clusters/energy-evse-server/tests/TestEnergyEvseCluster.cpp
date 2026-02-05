@@ -18,6 +18,7 @@
 
 #include "clusters/EnergyEvse/Enums.h"
 #include "pw_unit_test/framework.h"
+#include <app/clusters/energy-evse-server/Constants.h>
 #include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
 #include <app/clusters/energy-evse-server/tests/MockEvseDelegate.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -317,50 +318,46 @@ TEST_F(TestEnergyEvseCluster, TestAttributesMinimalConfig)
 
     ClusterTester tester(cluster);
 
-    // Read mandatory attributes and verify values
+    // Read mandatory attributes and verify values - cluster owns the data with defaults
     StateEnum state = StateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(State::Id, state), CHIP_NO_ERROR);
-    EXPECT_EQ(state, MockEvseDelegate::kMockState);
+    EXPECT_EQ(state, StateEnum::kNotPluggedIn); // Cluster default
 
     SupplyStateEnum supplyState = SupplyStateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(SupplyState::Id, supplyState), CHIP_NO_ERROR);
-    EXPECT_EQ(supplyState, MockEvseDelegate::kMockSupplyState);
+    EXPECT_EQ(supplyState, SupplyStateEnum::kDisabled); // Cluster default
 
     FaultStateEnum faultState = FaultStateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(FaultState::Id, faultState), CHIP_NO_ERROR);
-    EXPECT_EQ(faultState, MockEvseDelegate::kMockFaultState);
+    EXPECT_EQ(faultState, FaultStateEnum::kNoError); // Cluster default
 
     DataModel::Nullable<uint32_t> chargingEnabledUntil;
     ASSERT_EQ(tester.ReadAttribute(ChargingEnabledUntil::Id, chargingEnabledUntil), CHIP_NO_ERROR);
-    ASSERT_FALSE(chargingEnabledUntil.IsNull());
-    EXPECT_EQ(chargingEnabledUntil.Value(), MockEvseDelegate::kMockChargingEnabledUntil);
+    EXPECT_TRUE(chargingEnabledUntil.IsNull()); // Cluster default is null
 
-    int64_t circuitCapacity = 0;
+    int64_t circuitCapacity = -1;
     ASSERT_EQ(tester.ReadAttribute(CircuitCapacity::Id, circuitCapacity), CHIP_NO_ERROR);
-    EXPECT_EQ(circuitCapacity, MockEvseDelegate::kMockCircuitCapacity);
+    EXPECT_EQ(circuitCapacity, 0); // Cluster default
 
-    int64_t minimumChargeCurrent = 0;
+    int64_t minimumChargeCurrent = -1;
     ASSERT_EQ(tester.ReadAttribute(MinimumChargeCurrent::Id, minimumChargeCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(minimumChargeCurrent, MockEvseDelegate::kMockMinimumChargeCurrent);
+    EXPECT_EQ(minimumChargeCurrent, kMinimumChargeCurrent); // Cluster default (6000mA)
 
-    int64_t maximumChargeCurrent = 0;
+    int64_t maximumChargeCurrent = -1;
     ASSERT_EQ(tester.ReadAttribute(MaximumChargeCurrent::Id, maximumChargeCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(maximumChargeCurrent, MockEvseDelegate::kMockMaximumChargeCurrent);
+    EXPECT_EQ(maximumChargeCurrent, 0); // Cluster default
 
     DataModel::Nullable<uint32_t> sessionID;
     ASSERT_EQ(tester.ReadAttribute(SessionID::Id, sessionID), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionID.IsNull());
-    EXPECT_EQ(sessionID.Value(), MockEvseDelegate::kMockSessionID);
+    EXPECT_TRUE(sessionID.IsNull()); // Cluster default is null
 
     DataModel::Nullable<uint32_t> sessionDuration;
     ASSERT_EQ(tester.ReadAttribute(SessionDuration::Id, sessionDuration), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionDuration.IsNull());
-    EXPECT_EQ(sessionDuration.Value(), MockEvseDelegate::kMockSessionDuration);
+    EXPECT_TRUE(sessionDuration.IsNull()); // Cluster default is null
 
     DataModel::Nullable<int64_t> sessionEnergyCharged;
     ASSERT_EQ(tester.ReadAttribute(SessionEnergyCharged::Id, sessionEnergyCharged), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionEnergyCharged.IsNull());
-    EXPECT_EQ(sessionEnergyCharged.Value(), MockEvseDelegate::kMockSessionEnergyCharged);
+    EXPECT_TRUE(sessionEnergyCharged.IsNull()); // Cluster default is null
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -383,118 +380,104 @@ TEST_F(TestEnergyEvseCluster, TestAttributesFullConfig)
 
     ClusterTester tester(cluster);
 
-    // Read mandatory attributes
+    // Read mandatory attributes - cluster owns the data with defaults
     StateEnum state = StateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(State::Id, state), CHIP_NO_ERROR);
-    EXPECT_EQ(state, MockEvseDelegate::kMockState);
+    EXPECT_EQ(state, StateEnum::kNotPluggedIn); // Cluster default
 
     SupplyStateEnum supplyState = SupplyStateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(SupplyState::Id, supplyState), CHIP_NO_ERROR);
-    EXPECT_EQ(supplyState, MockEvseDelegate::kMockSupplyState);
+    EXPECT_EQ(supplyState, SupplyStateEnum::kDisabled); // Cluster default
 
     FaultStateEnum faultState = FaultStateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(FaultState::Id, faultState), CHIP_NO_ERROR);
-    EXPECT_EQ(faultState, MockEvseDelegate::kMockFaultState);
+    EXPECT_EQ(faultState, FaultStateEnum::kNoError); // Cluster default
 
     DataModel::Nullable<uint32_t> chargingEnabledUntil;
     ASSERT_EQ(tester.ReadAttribute(ChargingEnabledUntil::Id, chargingEnabledUntil), CHIP_NO_ERROR);
-    ASSERT_FALSE(chargingEnabledUntil.IsNull());
-    EXPECT_EQ(chargingEnabledUntil.Value(), MockEvseDelegate::kMockChargingEnabledUntil);
+    EXPECT_TRUE(chargingEnabledUntil.IsNull()); // Cluster default is null
 
-    int64_t circuitCapacity = 0;
+    int64_t circuitCapacity = -1;
     ASSERT_EQ(tester.ReadAttribute(CircuitCapacity::Id, circuitCapacity), CHIP_NO_ERROR);
-    EXPECT_EQ(circuitCapacity, MockEvseDelegate::kMockCircuitCapacity);
+    EXPECT_EQ(circuitCapacity, 0); // Cluster default
 
-    int64_t minimumChargeCurrent = 0;
+    int64_t minimumChargeCurrent = -1;
     ASSERT_EQ(tester.ReadAttribute(MinimumChargeCurrent::Id, minimumChargeCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(minimumChargeCurrent, MockEvseDelegate::kMockMinimumChargeCurrent);
+    EXPECT_EQ(minimumChargeCurrent, kMinimumChargeCurrent); // Cluster default (6000mA)
 
-    int64_t maximumChargeCurrent = 0;
+    int64_t maximumChargeCurrent = -1;
     ASSERT_EQ(tester.ReadAttribute(MaximumChargeCurrent::Id, maximumChargeCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(maximumChargeCurrent, MockEvseDelegate::kMockMaximumChargeCurrent);
+    EXPECT_EQ(maximumChargeCurrent, 0); // Cluster default
 
     // V2x feature attributes
     DataModel::Nullable<uint32_t> dischargingEnabledUntil;
     ASSERT_EQ(tester.ReadAttribute(DischargingEnabledUntil::Id, dischargingEnabledUntil), CHIP_NO_ERROR);
-    ASSERT_FALSE(dischargingEnabledUntil.IsNull());
-    EXPECT_EQ(dischargingEnabledUntil.Value(), MockEvseDelegate::kMockDischargingEnabledUntil);
+    EXPECT_TRUE(dischargingEnabledUntil.IsNull()); // Cluster default is null
 
-    int64_t maximumDischargeCurrent = 0;
+    int64_t maximumDischargeCurrent = -1;
     ASSERT_EQ(tester.ReadAttribute(MaximumDischargeCurrent::Id, maximumDischargeCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(maximumDischargeCurrent, MockEvseDelegate::kMockMaximumDischargeCurrent);
+    EXPECT_EQ(maximumDischargeCurrent, 0); // Cluster default
 
     DataModel::Nullable<int64_t> sessionEnergyDischarged;
     ASSERT_EQ(tester.ReadAttribute(SessionEnergyDischarged::Id, sessionEnergyDischarged), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionEnergyDischarged.IsNull());
-    EXPECT_EQ(sessionEnergyDischarged.Value(), MockEvseDelegate::kMockSessionEnergyDischarged);
+    EXPECT_TRUE(sessionEnergyDischarged.IsNull()); // Cluster default is null
 
     // ChargingPreferences feature attributes
     DataModel::Nullable<uint32_t> nextChargeStartTime;
     ASSERT_EQ(tester.ReadAttribute(NextChargeStartTime::Id, nextChargeStartTime), CHIP_NO_ERROR);
-    ASSERT_FALSE(nextChargeStartTime.IsNull());
-    EXPECT_EQ(nextChargeStartTime.Value(), MockEvseDelegate::kMockNextChargeStartTime);
+    EXPECT_TRUE(nextChargeStartTime.IsNull()); // Cluster default is null
 
     DataModel::Nullable<uint32_t> nextChargeTargetTime;
     ASSERT_EQ(tester.ReadAttribute(NextChargeTargetTime::Id, nextChargeTargetTime), CHIP_NO_ERROR);
-    ASSERT_FALSE(nextChargeTargetTime.IsNull());
-    EXPECT_EQ(nextChargeTargetTime.Value(), MockEvseDelegate::kMockNextChargeTargetTime);
+    EXPECT_TRUE(nextChargeTargetTime.IsNull()); // Cluster default is null
 
     DataModel::Nullable<int64_t> nextChargeRequiredEnergy;
     ASSERT_EQ(tester.ReadAttribute(NextChargeRequiredEnergy::Id, nextChargeRequiredEnergy), CHIP_NO_ERROR);
-    ASSERT_FALSE(nextChargeRequiredEnergy.IsNull());
-    EXPECT_EQ(nextChargeRequiredEnergy.Value(), MockEvseDelegate::kMockNextChargeRequiredEnergy);
+    EXPECT_TRUE(nextChargeRequiredEnergy.IsNull()); // Cluster default is null
 
     DataModel::Nullable<Percent> nextChargeTargetSoC;
     ASSERT_EQ(tester.ReadAttribute(NextChargeTargetSoC::Id, nextChargeTargetSoC), CHIP_NO_ERROR);
-    ASSERT_FALSE(nextChargeTargetSoC.IsNull());
-    EXPECT_EQ(nextChargeTargetSoC.Value(), MockEvseDelegate::kMockNextChargeTargetSoC);
+    EXPECT_TRUE(nextChargeTargetSoC.IsNull()); // Cluster default is null
 
     // SoCReporting feature attributes
     DataModel::Nullable<Percent> stateOfCharge;
     ASSERT_EQ(tester.ReadAttribute(StateOfCharge::Id, stateOfCharge), CHIP_NO_ERROR);
-    ASSERT_FALSE(stateOfCharge.IsNull());
-    EXPECT_EQ(stateOfCharge.Value(), MockEvseDelegate::kMockStateOfCharge);
+    EXPECT_TRUE(stateOfCharge.IsNull()); // Cluster default is null
 
     DataModel::Nullable<int64_t> batteryCapacity;
     ASSERT_EQ(tester.ReadAttribute(BatteryCapacity::Id, batteryCapacity), CHIP_NO_ERROR);
-    ASSERT_FALSE(batteryCapacity.IsNull());
-    EXPECT_EQ(batteryCapacity.Value(), MockEvseDelegate::kMockBatteryCapacity);
+    EXPECT_TRUE(batteryCapacity.IsNull()); // Cluster default is null
 
     // PlugAndCharge feature attributes
     DataModel::Nullable<CharSpan> vehicleID;
     ASSERT_EQ(tester.ReadAttribute(VehicleID::Id, vehicleID), CHIP_NO_ERROR);
-    ASSERT_FALSE(vehicleID.IsNull());
-    EXPECT_TRUE(vehicleID.Value().data_equal(CharSpan::fromCharString("MOCK-VIN-12345")));
+    EXPECT_TRUE(vehicleID.IsNull()); // Cluster default is null
 
-    // Optional attributes
-    int64_t userMaximumChargeCurrent = 0;
+    // Optional attributes - cluster owns the data with initial defaults
+    int64_t userMaximumChargeCurrent = -1;
     ASSERT_EQ(tester.ReadAttribute(UserMaximumChargeCurrent::Id, userMaximumChargeCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(userMaximumChargeCurrent, MockEvseDelegate::kMockUserMaximumChargeCurrent);
+    EXPECT_EQ(userMaximumChargeCurrent, 0); // Cluster's default initial value
 
     uint32_t randomizationDelayWindow = 0;
     ASSERT_EQ(tester.ReadAttribute(RandomizationDelayWindow::Id, randomizationDelayWindow), CHIP_NO_ERROR);
-    EXPECT_EQ(randomizationDelayWindow, MockEvseDelegate::kMockRandomizationDelayWindow);
+    EXPECT_EQ(randomizationDelayWindow, 600u); // Cluster's default initial value (600s per spec)
 
     DataModel::Nullable<uint16_t> approximateEVEfficiency;
     ASSERT_EQ(tester.ReadAttribute(ApproximateEVEfficiency::Id, approximateEVEfficiency), CHIP_NO_ERROR);
-    ASSERT_FALSE(approximateEVEfficiency.IsNull());
-    EXPECT_EQ(approximateEVEfficiency.Value(), MockEvseDelegate::kMockApproximateEVEfficiency);
+    EXPECT_TRUE(approximateEVEfficiency.IsNull()); // Cluster's default initial value is null
 
-    // Session attributes
+    // Session attributes - cluster owns the data with defaults
     DataModel::Nullable<uint32_t> sessionID;
     ASSERT_EQ(tester.ReadAttribute(SessionID::Id, sessionID), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionID.IsNull());
-    EXPECT_EQ(sessionID.Value(), MockEvseDelegate::kMockSessionID);
+    EXPECT_TRUE(sessionID.IsNull()); // Cluster default is null
 
     DataModel::Nullable<uint32_t> sessionDuration;
     ASSERT_EQ(tester.ReadAttribute(SessionDuration::Id, sessionDuration), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionDuration.IsNull());
-    EXPECT_EQ(sessionDuration.Value(), MockEvseDelegate::kMockSessionDuration);
+    EXPECT_TRUE(sessionDuration.IsNull()); // Cluster default is null
 
     DataModel::Nullable<int64_t> sessionEnergyCharged;
     ASSERT_EQ(tester.ReadAttribute(SessionEnergyCharged::Id, sessionEnergyCharged), CHIP_NO_ERROR);
-    ASSERT_FALSE(sessionEnergyCharged.IsNull());
-    EXPECT_EQ(sessionEnergyCharged.Value(), MockEvseDelegate::kMockSessionEnergyCharged);
+    EXPECT_TRUE(sessionEnergyCharged.IsNull()); // Cluster default is null
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -558,6 +541,53 @@ TEST_F(TestEnergyEvseCluster, TestWriteAttributes)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestEnergyEvseCluster, TestWriteAttributesNotifiesChange)
+{
+    // Test that writing to writable attributes generates attribute change notifications
+    TestServerClusterContext context;
+    MockEvseDelegate mockDelegate;
+    BitMask<Feature> allFeatures(Feature::kChargingPreferences, Feature::kV2x, Feature::kSoCReporting, Feature::kPlugAndCharge);
+    BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                                   OptionalAttributes::kSupportsRandomizationWindow,
+                                                   OptionalAttributes::kSupportsApproximateEvEfficiency);
+    BitMask<OptionalCommands> optionalCommands;
+
+    EnergyEvseCluster cluster(
+        EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    auto & dirtyList = context.ChangeListener().DirtyList();
+
+    // --- Test UserMaximumChargeCurrent ---
+    dirtyList.clear();
+    EXPECT_TRUE(tester.WriteAttribute(UserMaximumChargeCurrent::Id, static_cast<int64_t>(20000)).IsSuccess());
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, UserMaximumChargeCurrent::Id);
+
+    // --- Test RandomizationDelayWindow ---
+    dirtyList.clear();
+    EXPECT_TRUE(tester.WriteAttribute(RandomizationDelayWindow::Id, static_cast<uint32_t>(300)).IsSuccess());
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, RandomizationDelayWindow::Id);
+
+    // --- Test ApproximateEVEfficiency ---
+    dirtyList.clear();
+    EXPECT_TRUE(tester.WriteAttribute(ApproximateEVEfficiency::Id, DataModel::Nullable<uint16_t>(200)).IsSuccess());
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, ApproximateEVEfficiency::Id);
+
+    // Write same values again - should not generate notifications
+    dirtyList.clear();
+    EXPECT_TRUE(tester.WriteAttribute(UserMaximumChargeCurrent::Id, static_cast<int64_t>(20000)).IsSuccess());
+    EXPECT_TRUE(tester.WriteAttribute(RandomizationDelayWindow::Id, static_cast<uint32_t>(300)).IsSuccess());
+    EXPECT_TRUE(tester.WriteAttribute(ApproximateEVEfficiency::Id, DataModel::Nullable<uint16_t>(200)).IsSuccess());
+    EXPECT_TRUE(dirtyList.empty());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestEnergyEvseCluster, TestWriteReadOnlyAttributesFails)
 {
     // Test that writing to read-only attributes fails with UnsupportedWrite
@@ -615,6 +645,179 @@ TEST_F(TestEnergyEvseCluster, TestWriteReadOnlyAttributesFails)
     // Test writing to VehicleID (read-only, PlugAndCharge feature)
     EXPECT_FALSE(
         tester.WriteAttribute(VehicleID::Id, DataModel::Nullable<CharSpan>(CharSpan::fromCharString("NEW-VIN"))).IsSuccess());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// =============================================================================
+// Programmatic SetXxx() Method Tests
+// =============================================================================
+
+TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
+{
+    // Test setting attributes via cluster's SetXxx() methods (for read-only attributes)
+    TestServerClusterContext context;
+    MockEvseDelegate mockDelegate;
+    BitMask<Feature> allFeatures(Feature::kChargingPreferences, Feature::kV2x, Feature::kSoCReporting, Feature::kPlugAndCharge);
+    BitMask<OptionalAttributes> optionalAttributes(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                                   OptionalAttributes::kSupportsRandomizationWindow,
+                                                   OptionalAttributes::kSupportsApproximateEvEfficiency);
+    BitMask<OptionalCommands> optionalCommands;
+
+    EnergyEvseCluster cluster(
+        EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    auto & dirtyList = context.ChangeListener().DirtyList();
+
+    // --- Test SetState (read-only attribute) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetState(StateEnum::kPluggedInCharging), CHIP_NO_ERROR);
+
+    // Verify notification was generated
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, State::Id);
+
+    // Verify delegate callback was called
+    EXPECT_EQ(mockDelegate.GetState(), StateEnum::kPluggedInCharging);
+
+    // Verify cluster stores the value
+    StateEnum readState = StateEnum::kUnknownEnumValue;
+    ASSERT_EQ(tester.ReadAttribute(State::Id, readState), CHIP_NO_ERROR);
+    EXPECT_EQ(readState, StateEnum::kPluggedInCharging);
+
+    // --- Test SetSupplyState (read-only attribute) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kChargingEnabled), CHIP_NO_ERROR);
+
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, SupplyState::Id);
+    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+
+    SupplyStateEnum readSupplyState = SupplyStateEnum::kUnknownEnumValue;
+    ASSERT_EQ(tester.ReadAttribute(SupplyState::Id, readSupplyState), CHIP_NO_ERROR);
+    EXPECT_EQ(readSupplyState, SupplyStateEnum::kChargingEnabled);
+
+    // --- Test SetFaultState (read-only attribute) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetFaultState(FaultStateEnum::kGroundFault), CHIP_NO_ERROR);
+
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, FaultState::Id);
+    EXPECT_EQ(mockDelegate.GetFaultState(), FaultStateEnum::kGroundFault);
+
+    // --- Test SetCircuitCapacity (read-only attribute) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetCircuitCapacity(48000), CHIP_NO_ERROR);
+
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, CircuitCapacity::Id);
+    EXPECT_EQ(mockDelegate.GetCircuitCapacity(), 48000);
+
+    int64_t readCircuitCapacity = 0;
+    ASSERT_EQ(tester.ReadAttribute(CircuitCapacity::Id, readCircuitCapacity), CHIP_NO_ERROR);
+    EXPECT_EQ(readCircuitCapacity, 48000);
+
+    // --- Test SetMinimumChargeCurrent (read-only attribute) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetMinimumChargeCurrent(8000), CHIP_NO_ERROR);
+
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, MinimumChargeCurrent::Id);
+    EXPECT_EQ(mockDelegate.GetMinimumChargeCurrent(), 8000);
+
+    // --- Test SetMaximumChargeCurrent (read-only attribute) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetMaximumChargeCurrent(40000), CHIP_NO_ERROR);
+
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, MaximumChargeCurrent::Id);
+    EXPECT_EQ(mockDelegate.GetMaximumChargeCurrent(), 40000);
+
+    // --- Test SetStateOfCharge (read-only attribute, SoCReporting feature) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(75))), CHIP_NO_ERROR);
+
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, StateOfCharge::Id);
+    ASSERT_FALSE(mockDelegate.GetStateOfCharge().IsNull());
+    EXPECT_EQ(mockDelegate.GetStateOfCharge().Value(), 75);
+
+    // --- Test SetBatteryCapacity (read-only attribute, SoCReporting feature) ---
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetBatteryCapacity(DataModel::MakeNullable(static_cast<int64_t>(80000000))), CHIP_NO_ERROR);
+
+    EXPECT_EQ(dirtyList.size(), 1u);
+    EXPECT_EQ(dirtyList[0].mAttributeId, BatteryCapacity::Id);
+    ASSERT_FALSE(mockDelegate.GetBatteryCapacity().IsNull());
+    EXPECT_EQ(mockDelegate.GetBatteryCapacity().Value(), 80000000);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestEnergyEvseCluster, TestProgrammaticSetNoOpWhenSameValue)
+{
+    // Test that setting the same value doesn't generate notifications (no-op behavior)
+    TestServerClusterContext context;
+    MockEvseDelegate mockDelegate;
+    BitMask<Feature> allFeatures(Feature::kChargingPreferences, Feature::kV2x, Feature::kSoCReporting, Feature::kPlugAndCharge);
+    BitMask<OptionalAttributes> optionalAttributes;
+    BitMask<OptionalCommands> optionalCommands;
+
+    EnergyEvseCluster cluster(
+        EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    auto & dirtyList = context.ChangeListener().DirtyList();
+
+    // First set to a specific value
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetState(StateEnum::kPluggedInDemand), CHIP_NO_ERROR);
+    EXPECT_EQ(dirtyList.size(), 1u);
+
+    // Set to the same value - should not generate notification
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetState(StateEnum::kPluggedInDemand), CHIP_NO_ERROR);
+    EXPECT_TRUE(dirtyList.empty());
+
+    // Same test for SupplyState
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kEnabled), CHIP_NO_ERROR);
+    EXPECT_EQ(dirtyList.size(), 1u);
+
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kEnabled), CHIP_NO_ERROR);
+    EXPECT_TRUE(dirtyList.empty());
+
+    // Same test for CircuitCapacity
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetCircuitCapacity(32000), CHIP_NO_ERROR);
+    EXPECT_EQ(dirtyList.size(), 1u);
+
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetCircuitCapacity(32000), CHIP_NO_ERROR);
+    EXPECT_TRUE(dirtyList.empty());
+
+    // Same test for nullable attribute (StateOfCharge)
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(50))), CHIP_NO_ERROR);
+    EXPECT_EQ(dirtyList.size(), 1u);
+
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(50))), CHIP_NO_ERROR);
+    EXPECT_TRUE(dirtyList.empty());
+
+    // Test setting to null and then same null
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetStateOfCharge(DataModel::NullNullable), CHIP_NO_ERROR);
+    EXPECT_EQ(dirtyList.size(), 1u);
+
+    dirtyList.clear();
+    EXPECT_EQ(cluster.SetStateOfCharge(DataModel::NullNullable), CHIP_NO_ERROR);
+    EXPECT_TRUE(dirtyList.empty());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

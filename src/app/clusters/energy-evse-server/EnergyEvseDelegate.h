@@ -106,43 +106,31 @@ public:
     virtual Protocols::InteractionModel::Status ClearTargets() = 0;
 
     // ------------------------------------------------------------------
-    // Get attribute methods
-    virtual StateEnum GetState()                                       = 0;
-    virtual SupplyStateEnum GetSupplyState()                           = 0;
-    virtual FaultStateEnum GetFaultState()                             = 0;
-    virtual DataModel::Nullable<uint32_t> GetChargingEnabledUntil()    = 0;
-    virtual DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() = 0;
-    virtual int64_t GetCircuitCapacity()                               = 0;
-    virtual int64_t GetMinimumChargeCurrent()                          = 0;
-    virtual int64_t GetMaximumChargeCurrent()                          = 0;
-    virtual int64_t GetMaximumDischargeCurrent()                       = 0;
-    virtual int64_t GetUserMaximumChargeCurrent()                      = 0;
-    virtual uint32_t GetRandomizationDelayWindow()                     = 0;
-    /* PREF attributes */
-    virtual DataModel::Nullable<uint32_t> GetNextChargeStartTime()     = 0;
-    virtual DataModel::Nullable<uint32_t> GetNextChargeTargetTime()    = 0;
-    virtual DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() = 0;
-    virtual DataModel::Nullable<Percent> GetNextChargeTargetSoC()      = 0;
-    virtual DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() = 0;
-
-    /* SOC attributes */
-    virtual DataModel::Nullable<Percent> GetStateOfCharge()   = 0;
-    virtual DataModel::Nullable<int64_t> GetBatteryCapacity() = 0;
-
-    /* PNC attributes*/
-    virtual DataModel::Nullable<CharSpan> GetVehicleID() = 0;
-
-    /* Session SESS attributes */
-    virtual DataModel::Nullable<uint32_t> GetSessionID()              = 0;
-    virtual DataModel::Nullable<uint32_t> GetSessionDuration()        = 0;
-    virtual DataModel::Nullable<int64_t> GetSessionEnergyCharged()    = 0;
-    virtual DataModel::Nullable<int64_t> GetSessionEnergyDischarged() = 0;
-
-    // ------------------------------------------------------------------
-    // Set attribute methods
-    virtual CHIP_ERROR SetUserMaximumChargeCurrent(int64_t aNewValue)                      = 0;
-    virtual CHIP_ERROR SetRandomizationDelayWindow(uint32_t aNewValue)                     = 0;
-    virtual CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t> aNewValue) = 0;
+    // Attribute change callbacks - called by cluster after attribute is updated
+    // These allow the delegate to react to attribute changes (e.g., persist values, update app state)
+    virtual void OnStateChanged(StateEnum newValue)                                        = 0;
+    virtual void OnSupplyStateChanged(SupplyStateEnum newValue)                            = 0;
+    virtual void OnFaultStateChanged(FaultStateEnum newValue)                              = 0;
+    virtual void OnChargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue)     = 0;
+    virtual void OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue)  = 0;
+    virtual void OnCircuitCapacityChanged(int64_t newValue)                                = 0;
+    virtual void OnMinimumChargeCurrentChanged(int64_t newValue)                           = 0;
+    virtual void OnMaximumChargeCurrentChanged(int64_t newValue)                           = 0;
+    virtual void OnMaximumDischargeCurrentChanged(int64_t newValue)                        = 0;
+    virtual void OnUserMaximumChargeCurrentChanged(int64_t newValue)                       = 0;
+    virtual void OnRandomizationDelayWindowChanged(uint32_t newValue)                      = 0;
+    virtual void OnNextChargeStartTimeChanged(DataModel::Nullable<uint32_t> newValue)      = 0;
+    virtual void OnNextChargeTargetTimeChanged(DataModel::Nullable<uint32_t> newValue)     = 0;
+    virtual void OnNextChargeRequiredEnergyChanged(DataModel::Nullable<int64_t> newValue)  = 0;
+    virtual void OnNextChargeTargetSoCChanged(DataModel::Nullable<Percent> newValue)       = 0;
+    virtual void OnApproximateEVEfficiencyChanged(DataModel::Nullable<uint16_t> newValue)  = 0;
+    virtual void OnStateOfChargeChanged(DataModel::Nullable<Percent> newValue)             = 0;
+    virtual void OnBatteryCapacityChanged(DataModel::Nullable<int64_t> newValue)           = 0;
+    virtual void OnVehicleIDChanged(DataModel::Nullable<CharSpan> newValue)                = 0;
+    virtual void OnSessionIDChanged(DataModel::Nullable<uint32_t> newValue)                = 0;
+    virtual void OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue)          = 0;
+    virtual void OnSessionEnergyChargedChanged(DataModel::Nullable<int64_t> newValue)      = 0;
+    virtual void OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue)   = 0;
 
 protected:
     EndpointId mEndpointId = 0;
