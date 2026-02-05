@@ -325,7 +325,8 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             if parsed_service.cm == 3:
                 service_found = parsed_service
                 break
-        asserts.assert_is_not_none(service_found, "Failed to find a commissionable service with CM=3 (Joint Commissioning Method) being advertised.")
+        asserts.assert_is_not_none(
+            service_found, "Failed to find a commissionable service with CM=3 (Joint Commissioning Method) being advertised.")
         log.info(f"Successfully found service with CM={service_found.cm}, D={service_found.d}")
 
         self.step("5")
