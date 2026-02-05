@@ -10,7 +10,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Groupcast {
-namespace Events {} // namespace Events
+namespace Events {
+namespace GroupcastTesting {
+inline constexpr EventId Id = 0x00000000;
+} // namespace GroupcastTesting
+
+} // namespace Events
 } // namespace Groupcast
 } // namespace Clusters
 } // namespace app

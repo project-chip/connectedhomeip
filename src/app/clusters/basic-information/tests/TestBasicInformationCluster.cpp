@@ -131,10 +131,13 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestBasicInformationCluster : public ::testing::Test
 {
+    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
+    BasicInformationCluster::Context mContext = { .deviceInstanceInfoProvider = mDeviceInfoProvider,
+                                                  .configurationManager       = chip::DeviceLayer::ConfigurationMgr(),
+                                                  .platformManager            = chip::DeviceLayer::PlatformMgr() };
+
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
-    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
 };
 
 TEST_F(TestBasicInformationCluster, TestAttributes)
@@ -143,7 +146,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // check without optional attributes
     {
         const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, &mDeviceInfoProvider);
+        BasicInformationCluster cluster(optionalAttributeSet, mContext);
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(
             cluster,
@@ -161,7 +164,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // Check that disabling unique id works
     {
         const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, &mDeviceInfoProvider);
+        BasicInformationCluster cluster(optionalAttributeSet, mContext);
 
         // UniqueID is EXPLICITLY NOT SET
         cluster.OptionalAttributes() = BasicInformationCluster::OptionalAttributesSet();
@@ -199,7 +202,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                                                                                         .Set<ProductAppearance::Id>()
                                                                                         .Set<UniqueID::Id>();
 
-        BasicInformationCluster cluster(optionalAttributeSet, &mDeviceInfoProvider);
+        BasicInformationCluster cluster(optionalAttributeSet, mContext);
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster,
 

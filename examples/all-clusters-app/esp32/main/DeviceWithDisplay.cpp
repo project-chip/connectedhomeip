@@ -25,6 +25,7 @@
 // TODO: Ideally we should not depend on the codegen integration
 // It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
+#include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -217,8 +218,19 @@ public:
             else if (name == "Illuminance")
             {
                 // update the current illuminance here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Illuminance changed to : %d", n);
-                app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n));
+                auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
+                if (illuminanceMeasurement != nullptr)
+                {
+                    CHIP_ERROR err = illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(n));
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        ESP_LOGI(TAG, "Illuminance changed to : %d", n);
+                    }
+                    else
+                    {
+                        ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
+                }
             }
             else if (name == "Humidity")
             {
@@ -710,7 +722,12 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Illuminance Measurement");
     AddAttribute("Illuminance", "1000");
-    app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(1000));
+
+    auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
+    if (illuminanceMeasurement != nullptr)
+    {
+        LogErrorOnFailure(illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(1000)));
+    }
 
     AddDevice("Color Light");
     AddEndpoint("1");
