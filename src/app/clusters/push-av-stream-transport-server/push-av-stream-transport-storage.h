@@ -64,18 +64,22 @@ static constexpr size_t kTransportZoneOptionsSize =
 static constexpr size_t kTriggerOptionsStorageSize = TLV::EstimateStructOverhead(
     sizeof(uint8_t), kTransportZoneOptionsSize, sizeof(uint8_t), kMotionTimeControlSize, sizeof(uint16_t));
 
-static constexpr size_t kTransportOptionsStorageSize = TLV::EstimateStructOverhead(
-    sizeof(uint8_t),              // streamUsage
-    sizeof(uint16_t),             // videoStreamID
-    sizeof(uint16_t),             // audioStreamID
-    sizeof(uint16_t),             // TLSEndpointID
-    kMaxUrlLength,                // max url
-    sizeof(uint8_t),              // ingestMethod
-    sizeof(uint32_t),             // expiryTime
-    kTriggerOptionsStorageSize,   // triggerOptions
-    kContainerOptionsStorageSize, // containerOptions
-    2u /* Array Overhead */ + CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS * TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)),
-    2u /* Array Overhead */ + CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS * TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)));
+static constexpr size_t kTransportOptionsStorageSize =
+    TLV::EstimateStructOverhead(sizeof(uint8_t),              // streamUsage
+                                sizeof(uint16_t),             // videoStreamID
+                                sizeof(uint16_t),             // audioStreamID
+                                sizeof(uint16_t),             // TLSEndpointID
+                                kMaxUrlLength,                // max url
+                                sizeof(uint8_t),              // ingestMethod
+                                sizeof(uint32_t),             // expiryTime
+                                kTriggerOptionsStorageSize,   // triggerOptions
+                                kContainerOptionsStorageSize, // containerOptions
+                                2u /* Array Overhead */ +
+                                    CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS *
+                                        TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)),
+                                2u /* Array Overhead */ +
+                                    CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS *
+                                        TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)));
 
 /**
  * @brief Storage implementation for transport trigger options.
