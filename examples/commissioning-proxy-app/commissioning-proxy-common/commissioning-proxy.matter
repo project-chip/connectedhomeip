@@ -1992,11 +1992,11 @@ endpoint 1 {
   }
 
   server cluster CommissioningProxy {
-    ram      attribute transport;
-    ram      attribute scanMaxTime default = 120;
-    ram      attribute maxSessions default = 1;
-    ram      attribute maxCachedResults default = 0;
-    ram      attribute numCachedResults default = 120;
+    callback attribute transport;
+    callback attribute scanMaxTime;
+    callback attribute maxSessions;
+    callback attribute maxCachedResults;
+    callback attribute numCachedResults;
     callback attribute cacheTimeout;
     callback attribute cachedResults;
     callback attribute wiFiBand;

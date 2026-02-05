@@ -230,6 +230,15 @@
             "FeatureMap",
             "ClusterRevision"
         ],
+        "Commissioning Proxy": [
+            "Transport",
+            "ScanMaxTime",
+            "MaxSessions",
+            "MaxCachedResults",
+            "NumCachedResults",
+            "CacheTimeout",
+            "WiFiBand"
+        ],
         "Commodity Price": [
             "TariffUnit",
             "Currency",

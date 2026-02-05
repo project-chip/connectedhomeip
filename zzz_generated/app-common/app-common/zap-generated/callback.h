@@ -7605,42 +7605,6 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
 /**
- * @brief Commissioning Proxy Cluster ProxyConnectRequest Command callback (from client)
- */
-bool emberAfCommissioningProxyClusterProxyConnectRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::DecodableType & commandData);
-/**
- * @brief Commissioning Proxy Cluster ProxyDisconnectRequest Command callback (from client)
- */
-bool emberAfCommissioningProxyClusterProxyDisconnectRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::DecodableType & commandData);
-/**
- * @brief Commissioning Proxy Cluster ProxyScanRequest Command callback (from client)
- */
-bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyScanRequest::DecodableType & commandData);
-/**
- * @brief Commissioning Proxy Cluster ProxyBackGroundScanStartRequest Command callback (from client)
- */
-bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::DecodableType & commandData);
-/**
- * @brief Commissioning Proxy Cluster ProxyBackGroundScanStopRequest Command callback (from client)
- */
-bool emberAfCommissioningProxyClusterProxyBackGroundScanStopRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStopRequest::DecodableType & commandData);
-/**
- * @brief Commissioning Proxy Cluster ProxyMessageRequest Command callback (from client)
- */
-bool emberAfCommissioningProxyClusterProxyMessageRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyMessageRequest::DecodableType & commandData);
-/**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */
 bool emberAfChannelClusterChangeChannelCallback(

@@ -206,7 +206,8 @@ public:
     void ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     void ScanDiscoveryResult(GVariant * discov_info);
     CHIP_ERROR _WiFiPAFScan(chip::app::CommandHandler::Handle handle,
-                            const chip::app::ConcreteCommandPath & path);
+                            const chip::app::ConcreteCommandPath & path,
+                            uint8_t scan_max_time);
 private:
     std::set<NanPeerInfo> mNanScanPeers;
     uint32_t mNanScanSubscribeId       = 0;

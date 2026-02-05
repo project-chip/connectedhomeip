@@ -16,6 +16,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#if 0
 
 #pragma once
 
@@ -25,11 +26,15 @@
 #include <functional>
 
 #include <lib/core/CHIPError.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h>
 
 // The CommissioningProxyManager class primarily represents the state of the commissioning Proxy
-class CommissioningProxyManager
+//class CommissioningProxyManager
+class CommissioningProxyManager : public chip::app::Clusters::CommissioningProxy::Delegate
 {
 public:
+    CommissioningProxyManager() = default;
+    ~CommissioningProxyManager();
     enum Action_t
     {
         CONNECT_ACTION = 0,
@@ -57,9 +62,17 @@ public:
 
     // SetCPState() is used to set the state of the CP
     void SetCPState(uint8_t level);
-    
+
+    chip::Protocols::InteractionModel::Status
+    //NOT USED ProxyScanRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, 
+                     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands) override;
+ 
+    //void SetCommissioningProxyServer(chip::app::Clusters::CommissioningProxyCluster * server) override;
+
 private:
     friend CommissioningProxyManager & CommissioningProxyMgr(void);
+
+    // chip::app::Clusters::CommissioningProxyCluster * mServer = nullptr;
 
     // MainLightState is the on/off state of the main light
     State_t mMainCommissioningProxyState;
@@ -81,10 +94,10 @@ private:
     CommissioningProxyCallback_fn mActionCompleted_CB;
 
     // There is a single static instance of the CommissioningProxyManager
-    static CommissioningProxyManager sCommissioningProxy;
+    //static CommissioningProxyManager sCommissioningProxy;
 };
-
-inline CommissioningProxyManager & CommissioningProxyMgr(void)
-{
-    return CommissioningProxyManager::sCommissioningProxy;
-}
+#endif
+//inline CommissioningProxyManager & CommissioningProxyMgr(void)
+//{
+//    return CommissioningProxyManager::sCommissioningProxy;
+//}

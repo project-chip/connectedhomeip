@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2026 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,25 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
 
-config("config") {
-  include_dirs = [ "include" ]
-}
-
-chip_data_model("commissioning-proxy-common") {
-  zap_file = "commissioning-proxy.zap"
-  is_server = true
-}
-
-source_set("commissioning-proxy-manager") {
-  deps = [ "${chip_root}/src/lib" ]
-  public_configs = [ ":config" ]
+source_set("commissioning-proxy-server") {
   sources = [
-    "include/CommissioningProxyManager.h",
-    "src/CommissioningProxyManager.cpp",
-    "src/commissioning-proxy-delegate-impl.cpp",
+    "CommissioningProxyCluster.cpp",
+    "CommissioningProxyCluster.h",
+    "CommissioningProxyDelegate.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/CommissioningProxy",
   ]
 }

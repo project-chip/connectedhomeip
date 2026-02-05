@@ -36,6 +36,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Closure Control
     - Closure Dimension
     - Commissioner Control
+    - Commissioning Proxy
     - Commodity Price
     - Commodity Tariff
     - Descriptor
@@ -154,6 +155,7 @@ CodeDrivenClusters:
     - Boolean State
     - Boolean State Configuration
     - Chime
+    - Commissioning Proxy
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs

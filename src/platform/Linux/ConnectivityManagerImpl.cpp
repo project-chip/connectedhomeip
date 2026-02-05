@@ -2085,21 +2085,9 @@ void ConnectivityManagerImpl::ScanNanSubscribeTerminated(guint subscribe_id, gch
     //PlatformMgr().PostEventOrDie(&event);
 }
 
-static uint32_t ReadScanMaxTimeSeconds(chip::EndpointId ep, uint32_t fallbackSecs)
-{
-    namespace ScanMax = chip::app::Clusters::CommissioningProxy::Attributes::ScanMaxTime;
-    uint8_t raw = 0;
-    auto st = ScanMax::Get(ep, &raw);
-    if (st == chip::Protocols::InteractionModel::Status::Success)
-    {
-        return static_cast<uint32_t>(raw);
-    }
-
-    return fallbackSecs;
-}
-
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Handle handle,
-                                                 const chip::app::ConcreteCommandPath & path)
+                                                 const chip::app::ConcreteCommandPath & path,
+                                                 uint8_t scanMaxTime)
 {
     CHIP_ERROR result = StartWiFiManagementSync();
     VerifyOrReturnError(result == CHIP_NO_ERROR, result);
@@ -2175,9 +2163,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Hand
         this);
 
     // Allow the given scan timeout before returning results
-    uint32_t scanSecs = ReadScanMaxTimeSeconds(path.mEndpointId, 20);
+    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout in %d seconds",__func__, scanMaxTime);
     SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(scanSecs * 1000),
+        System::Clock::Milliseconds32(scanMaxTime * 1000),
         +[](System::Layer *, void * self) {
             static_cast<ConnectivityManagerImpl *>(self)->FinishWiFiPAFScanAndRespond();
         }, this);
@@ -2253,6 +2241,7 @@ void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(void)
 
     // Releasing the last Handle triggers sending the Invoke Response.
     mPendingProxyScanHandle.reset();
+    ChipLogProgress(DeviceLayer, "===SHM Leaving %s()",__func__);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 

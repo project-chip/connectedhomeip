@@ -48,10 +48,11 @@ namespace {
 NamedPipeCommands sChipNamedPipeCommands;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-CommissioningProxyAppCommandDelegate sCommissioningProxyAppCommandDelegate;
+//CommissioningProxyAppCommandDelegate sCommissioningProxyAppCommandDelegate;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 } // namespace
 
+#if 0
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
@@ -89,34 +90,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         }
     }
 }
+#endif
 
-/** @brief OnOff Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- * TODO Issue #3841
- * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
- * attributes to the default value.
- * The logic here expects something similar to the deprecated Plugins callback
- * emberAfPluginOnOffClusterServerPostInitCallback.
- *
- */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    // TODO: implement any additional Cluster Server init actions
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-void MatterCommissioningProxyPluginServerInitCallback()
-{
-    ChipLogError(NotSpecified, "=== %s() Entered", __func__);
-    // Needed for linking
-}
-
+#if 0
+#if 0
 bool emberAfCommissioningProxyClusterProxyConnectRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::DecodableType & commandData)
@@ -164,7 +141,7 @@ bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
     // Create a Handle and move it into ConnectivityManagerImpl
     // This keeps the ProxyScanRequest open, so the scan can complete before the ProxyScanResponse is sent
     CommandHandler::Handle handle(commandObj);
-    err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), commandPath);
+ bang1;   err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), commandPath);
     if (err != CHIP_NO_ERROR) {
         commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Failure);
         return true;
@@ -253,18 +230,45 @@ bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
     return true;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#endif // #if 0
+
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/clusters/device-energy-management-server/CodegenIntegration.h>
+#include "commissioning-proxy-delegate-impl.h"
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+// In a .cpp file
+// CommissioningProxyManager gCommissioningProxyManager;
+chip::app::Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
+
+chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature> gFeatures(
+    chip::app::Clusters::CommissioningProxy::Feature::kBackgroundScan,
+    chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
+);
+
+chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster> gCPCluster(
+    chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster::Config(
+        CommissioningProxyEndpoint, gFeatures, gMyCPDelegate)
+);
 
 void ApplicationInit()
 {
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
+    // Register the Commissioning Proxy Code Driven mechanism
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == 
+        CHIP_NO_ERROR);
+
+#if 0
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sCommissioningProxyAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
-
-    ChipLogProgress(AppServer, "%s: Main function is Proxy Commissioner on endpoint %u",
+#endif
+    ChipLogProgress(AppServer, "===SHM %s()", __func__);
+    ChipLogProgress(AppServer, "%s(): Main function is Proxy Commissioner on endpoint %u",
             __func__, CommissioningProxyEndpoint);
 }
 
@@ -275,6 +279,7 @@ void ApplicationShutdown()
         ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
     }
 }
+
 
 #ifdef __NuttX__
 // NuttX requires the main function to be defined with C-linkage. However, marking
@@ -290,13 +295,15 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    CHIP_ERROR err = CommissioningProxyMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to initialize Commissioning Proxy manager: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-        return -1;
-    }
+    // SHM Add the new Call in here
+
+    //CHIP_ERROR err = CommissioningProxyMgr().Init();
+    //if (err != CHIP_NO_ERROR)
+    //{
+    //    ChipLogError(AppServer, "Failed to initialize Commissioning Proxy manager: %" CHIP_ERROR_FORMAT, err.Format());
+    //    chip::DeviceLayer::PlatformMgr().Shutdown();
+    //    return -1;
+    //}
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
     example::Ui::ImguiUi ui;

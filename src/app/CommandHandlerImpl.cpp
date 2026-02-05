@@ -116,6 +116,8 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
 Status CommandHandlerImpl::OnInvokeCommandRequest(CommandHandlerExchangeInterface & commandResponder,
                                                   System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
+    ChipLogProgress(AppServer, "===SHM %s()", __func__);
+    
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 
     SetExchangeInterface(&commandResponder);
@@ -253,6 +255,7 @@ CHIP_ERROR CommandHandlerImpl::ValidateInvokeRequestMessageAndBuildRegistry(Invo
 
 Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
+    ChipLogProgress(AppServer, "===SHM %s()", __func__);
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
     InvokeRequestMessage::Parser invokeRequestMessage;
@@ -604,6 +607,7 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
                                                  const Protocols::InteractionModel::ClusterStatusCode & status,
                                                  const char * context)
 {
+    ChipLogProgress(DataManagement,"===SHM %s()", __func__);
     if (!status.IsSuccess())
     {
         if (context == nullptr)

@@ -28,6 +28,8 @@
 // should be available from endpoint_config.h
 const chip::EndpointId CommissioningProxyEndpoint = 1;
 
+#if 0
+
 class CommissioningProxyCommandHandler
 {
 public:
@@ -68,3 +70,4 @@ class CommissioningProxyAppCommandDelegate : public NamedPipeCommandDelegate
 public:
     void OnEventCommandReceived(const char * json) override;
 };
+#endif

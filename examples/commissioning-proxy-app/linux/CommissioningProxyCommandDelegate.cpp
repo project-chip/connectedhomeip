@@ -25,7 +25,92 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h>
+#include "commissioning-proxy-delegate-impl.h"
 
+using namespace chip::app::Clusters;
+
+chip::Protocols::InteractionModel::Status chip::app::Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(
+    chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, 
+    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+    chip::app::CommandHandler * commandObj,
+    const DataModel::InvokeRequest & request)
+{
+    ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBands:%d", __func__, (int)transport, (int)wiFiBands);
+    using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
+    std::vector<ScanResultT> results;
+
+    // Start PAF
+    CHIP_ERROR err = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissioning Proxy PAF Scan Request Failed");
+        return chip::Protocols::InteractionModel::Status::Failure;
+    }
+
+    ChipLogProgress(NotSpecified, "=== %s() Transport:0x%x WiFiBands:0x%x", __func__,
+        static_cast<uint16_t>(transport), static_cast<uint16_t>(wiFiBands));
+
+    // Create a Handle and move it into ConnectivityManagerImpl
+    // This keeps the ProxyScanRequest open, so the scan can complete before the ProxyScanResponse is sent
+    CommandHandler::Handle handle(commandObj);
+    uint8_t scanMaxTime = GetScanMaxTime();
+    err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), request.path, scanMaxTime);
+    if (err != CHIP_NO_ERROR) {
+        commandObj->AddStatus(request.path, chip::Protocols::InteractionModel::Status::Failure);
+        return chip::Protocols::InteractionModel::Status::Failure;
+    }
+
+    ChipLogProgress(Controller, "===SHM %s() Before", __func__);
+    // Ensure Response Timeout is greater than the ScanMaxTime
+    if (auto * ec = commandObj->GetExchangeContext())
+    {
+        ec->SetResponseTimeout(chip::System::Clock::Seconds16(scanMaxTime + 5));
+        ChipLogProgress(Controller, "===SHM %s() In", __func__);
+    }
+
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+#if 0 /* ORIGINAL CODE BELOW */
+
+
+#if 0
+    Protocols::InteractionModel::Status PowerAdjustRequest(int64_t power, uint32_t duration,
+                                                           AdjustmentCauseEnum cause) override
+    {
+        // lock the app task
+
+        // Implement power adjustment logic
+
+        // unlock the app task
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    Protocols::InteractionModel::Status CancelPowerAdjustRequest() override
+    {
+        // lock the app task
+
+        // Cancel ongoing power adjustment
+
+        // unlock the app task
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    // ... implement other required methods
+
+    ESATypeEnum GetESAType() override { return ESATypeEnum::kEvse; }
+    bool GetESACanGenerate() override { return false; }
+    ESAStateEnum GetESAState() override { return mESAState; }
+    // ... implement other getters
+#endif
+
+private:
+    //ESAStateEnum mESAState = ESAStateEnum::kOnline;
+};
+#endif
+
+#if 0
 #define SWITCH_RELEASED_POSITION 0
 
 using namespace chip;
@@ -235,6 +320,7 @@ void CommissioningProxyCommandHandler::OnSoftwareFaultEventHandler(uint32_t even
 
 void CommissioningProxyAppCommandDelegate::OnEventCommandReceived(const char * json)
 {
+    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
     auto handler = CommissioningProxyCommandHandler::FromJSON(json);
     if (nullptr == handler)
     {
@@ -245,3 +331,4 @@ void CommissioningProxyAppCommandDelegate::OnEventCommandReceived(const char * j
     TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(CommissioningProxyCommandHandler::HandleCommand,
                                                                            reinterpret_cast<intptr_t>(handler));
 }
+#endif

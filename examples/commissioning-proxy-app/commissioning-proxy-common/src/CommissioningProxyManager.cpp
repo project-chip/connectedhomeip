@@ -28,8 +28,10 @@
 #include <unistd.h>
 
 // Local includes
+#include <commissioning-proxy-delegate-impl.h>
 #include "CommissioningProxyManager.h"
-
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 // Location of the executable to use by default to power dumb USB light up and
@@ -40,35 +42,75 @@
 // specified
 #define UHUBCTL_ARGUMENT_ENV_NAME "MORSE_MICRO_MATTER_UHUBCTL_COMMAND"
 
-CommissioningProxyManager CommissioningProxyManager::sCommissioningProxy;
+#if 0
+// CommissioningProxyManager sCommissioningProxy;
+//CommissioningProxyManager CommissioningProxyManager::sCommissioningProxy;
+//CommissioningProxyManager::~CommissioningProxyManager() = default;
+
+void CommissioningProxyManager::SetCommissioningProxyServer(chip::app::Clusters::CommissioningProxyCluster * server)
+{
+    mServer = server;
+}
+
+// Code Driven
+// In a .cpp file
+MyDEMDelegate gMyDEMDelegate;
+
+chip::BitMask<chip::app::Clusters::DeviceEnergyManagement::Feature> gFeatures(
+    chip::app::Clusters::DeviceEnergyManagement::Feature::kPowerAdjustment,
+    chip::app::Clusters::DeviceEnergyManagement::Feature::kPowerForecastReporting
+);
+
+chip::app::RegisteredServerCluster<chip::app::Clusters::DeviceEnergyManagementCluster> gDEMCluster(
+    chip::app::Clusters::DeviceEnergyManagementCluster::Config(kYourEndpointId, gFeatures, &gMyDEMDelegate)
+);
+
+// In a .cpp file
+// CommissioningProxyManager gCommissioningProxyManager;
+chip::app::Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
+
+chip::BitMask<chip::app::Clusters::CommissioningProxy::Feature> gFeatures(
+    chip::app::Clusters::CommissioningProxy::Feature::kBackgroundScan,
+    chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
+);
+
+uint8_t chip::app::Clusters::CommissioningProxy::MyCPDelegate::GetScanMaxTime()
+{
+    return 30;
+}
 
 CHIP_ERROR CommissioningProxyManager::Init()
 {
+    ChipLogProgress(AppServer, "===SHM %s()", __func__);
+    chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxyCluster> gDEMCluster(
+        chip::app::Clusters::CommissioningProxyCluster::Config(1 /* SHM kYourEndpointId */, gFeatures, &gCommissioningProxyManager));
+
     mMainCommissioningProxyState = kState_CPDisconnected;
     return CHIP_NO_ERROR;
 }
 
 bool CommissioningProxyManager::IsCPConnected()
 {
+    ChipLogProgress(AppServer, "===SHM %s()", __func__);
     return mMainCommissioningProxyState == kState_CPConnected;
 }
 
-#if 0 
 void CommissioningProxyManager::SetCallbacks(CommissioningProxyCallback_fn aActionInitiated_CB, CommissioningProxyCallback_fn aActionCompleted_CB)
 {
     mActionInitiated_CB = aActionInitiated_CB;
     mActionCompleted_CB = aActionCompleted_CB;
 }
-#endif
 
 void CommissioningProxyManager::SetCPState(uint8_t level)
 {
+    ChipLogProgress(AppServer, "===SHM %s()", __func__);
    mMainCommissioningProxyState = kState_CPConnected;
     ChipLogDetail(AppServer, "%s: CP Connected", __func__);
 } 
 
 bool CommissioningProxyManager::InitiateAction(Action_t aAction)
 {
+    ChipLogProgress(AppServer, "===SHM %s()", __func__);
     // this function is called InitiateAction because we may want to implement some features such as ramping up here.
     bool action_initiated = false;
     //State_t new_state;
@@ -115,3 +157,4 @@ bool CommissioningProxyManager::InitiateAction(Action_t aAction)
 
     return action_initiated;
 }
+#endif
