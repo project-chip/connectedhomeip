@@ -38,7 +38,8 @@ import logging
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import generate_membership_entry_matcher, generate_membership_empty_matcher, get_feature_map, valid_endpoints_list
+from TC_GCAST_common import (generate_membership_empty_matcher, generate_membership_entry_matcher, get_feature_map,
+                             valid_endpoints_list)
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
