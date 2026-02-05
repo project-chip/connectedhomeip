@@ -147,7 +147,6 @@ void UnlockOpenThreadTask(void)
 // ================================================================================
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
-    ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
     ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
@@ -166,7 +165,6 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 
     TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 
-    ChipLogProgress(DeviceLayer, "Starting OpenThread task");
     return ThreadStackMgrImpl().StartThreadTask();
 }
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -191,7 +189,11 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
-    ChipLogProgress(DeviceLayer, "Starting App Task");
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     err = AppTask::GetAppTask().StartAppTask();
     if (err != CHIP_NO_ERROR)
         appError(err);
@@ -229,7 +231,7 @@ void SilabsMatterConfig::AppInit()
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     using namespace chip::DeviceLayer::Silabs;
-
+    CHIP_ERROR err;
     SILABS_LOG("=====%s starting=====", appName);
 
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
@@ -245,19 +247,27 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     //==============================================
 
 #ifdef SL_WIFI
-    ReturnErrorOnFailure(WifiInterface::GetInstance().InitWiFiStack());
+    err = WifiInterface::GetInstance().InitWiFiStack();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init WiFi Stack: %" CHIP_ERROR_FORMAT, err.Format()));
     // Needs to be done post InitWifiStack for 917.
     // TODO move it in InitWiFiStack
     TEMPORARY_RETURN_IGNORED GetPlatform().NvmInit();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    ReturnErrorOnFailure(WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance()));
+    err = WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance());
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init WiFi Sleep Manager: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
-    ReturnErrorOnFailure(PlatformMgr().InitChipStack());
+    err = PlatformMgr().InitChipStack();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init Chip Stack: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+    err = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Set BLE Device Name: %" CHIP_ERROR_FORMAT, err.Format()));
 
     // Provision Manager
     Provision::Manager & provision = Provision::Manager::GetInstance();
@@ -328,13 +338,13 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Init Matter Server and Start Event Loop
-    CHIP_ERROR err = chip::Server::GetInstance().Init(initParams);
+    err = chip::Server::GetInstance().Init(initParams);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    ReturnErrorOnFailure(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err,
+                        ChipLogError(DeviceLayer, "Failed to Init Matter Server: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    SILABS_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
 
 #ifdef ENABLE_CHIP_SHELL
