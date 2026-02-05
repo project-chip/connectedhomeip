@@ -27,8 +27,9 @@ using namespace Switch::Attributes;
 
 SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features,
                              const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Switch::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
-    mNumberOfPositions(config.numberOfPositions), mMultiPressMax(config.multiPressMax)
+    DefaultServerCluster({ endpointId, Switch::Id }),
+    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mNumberOfPositions(config.numberOfPositions),
+    mMultiPressMax(config.multiPressMax)
 {}
 
 DataModel::ActionReturnStatus SwitchCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
