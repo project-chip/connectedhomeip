@@ -18,6 +18,7 @@
 
 #include <app_options/AppOptions.h>
 #include <devices/device-factory/DeviceFactory.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -25,9 +26,11 @@ using namespace chip::ArgParser;
 // App custom argument handling
 constexpr uint16_t kOptionDeviceType = 0xffd0;
 constexpr uint16_t kOptionEndpoint   = 0xffd1;
+constexpr uint16_t kOptionWiFi       = 0xffd2;
 
 const char * AppOptions::mDeviceTypeName     = "contact-sensor"; // defaulting to contact sensor if not specified
 chip::EndpointId AppOptions::mDeviceEndpoint = 1;                // defaulting to endpoint 1 if not specified
+bool AppOptions::mEnableWiFi                 = false;
 
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
@@ -52,6 +55,10 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mDeviceEndpoint = static_cast<EndpointId>(atoi(value));
         ChipLogProgress(AppServer, "Using endpoint %d for the device.", mDeviceEndpoint);
         return true;
+    case kOptionWiFi:
+        mEnableWiFi = true;
+        ChipLogProgress(AppServer, "WiFi usage enabled");
+        return true;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
         return false;
@@ -65,12 +72,15 @@ OptionSet * AppOptions::GetOptions()
     static OptionDef sAllDevicesAppOptionDefs[] = {
         { "device", kArgumentRequired, kOptionDeviceType },
         { "endpoint", kArgumentRequired, kOptionEndpoint },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        { "wifi", kNoArgument, kOptionWiFi },
+#endif
         {}, // need empty terminator
     };
 
     static const std::string gHelpText = []() {
         // Device option - this is dynamic
-        std::string result = "--device <";
+        std::string result = "  --device <";
         for (auto & name : app::DeviceFactory::GetInstance().SupportedDeviceTypes())
         {
             result.append(name);
@@ -78,9 +88,17 @@ OptionSet * AppOptions::GetOptions()
         }
         result.replace(result.length() - 1, 1, ">");
         result += "\n";
+        result += "       Select the device to start up\n\n";
 
         // rest of the help
-        result += "--endpoint <endpoint-number>\n";
+        result += "  --endpoint <endpoint-number>\n";
+        result += "       Define the endpoint to start on (default 1)\n\n";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        result += "  --wifi\n";
+        result += "       Enable wifi support for commissioning\n\n";
+#endif
+
         return result;
     }();
 
