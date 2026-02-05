@@ -156,7 +156,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
@@ -176,7 +176,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
@@ -193,7 +193,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "nfc-thread":
         try:
@@ -209,7 +209,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "nfc-wifi":
         try:
@@ -228,7 +228,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
