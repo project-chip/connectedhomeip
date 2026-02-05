@@ -82,7 +82,7 @@ public:
     }
 
     // Encodes the thread metrics list, using the provided encoder.
-    CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder) const;
+    CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder);
 
     /// Determines the feature map based on the DiagnosticsProvider support.
     BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const

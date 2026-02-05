@@ -144,7 +144,7 @@ private:
 
 } // namespace
 
-CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEncoder & encoder) const
+CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEncoder & encoder)
 {
     AutoFreeThreadMetrics metrics(mDiagnosticDataProvider);
 
