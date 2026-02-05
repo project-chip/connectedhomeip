@@ -30,13 +30,13 @@ constexpr System::Clock::Seconds16 kOccupancyStateChangeIntervalSec = System::Cl
 
 TogglingOccupancySensorDevice::TogglingOccupancySensorDevice() :
     OccupancySensorDevice(
-                // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
-                // when Register() is called by the application with a valid endpoint ID.
-                OccupancySensingCluster::Config(kInvalidEndpointId)
-                    .WithFeatures(BitFlags(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kOccupancyEvent))
-                    .WithHoldTime(10,
-                                  {
-        
+        // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
+        // when Register() is called by the application with a valid endpoint ID.
+        OccupancySensingCluster::Config(kInvalidEndpointId)
+            .WithFeatures(BitFlags(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kOccupancyEvent))
+            .WithHoldTime(10,
+                          {
+
                               .holdTimeMin     = 1,
                               .holdTimeMax     = 300,
                               .holdTimeDefault = 10,
