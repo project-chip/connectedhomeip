@@ -70,7 +70,7 @@ class TC_GCAST_2_3(MatterBaseTest):
             TestStep(8, "Update Group G_UNKNOWN. (UpdateGroupKey GroupID=G_UNKNOWN, KeySetID=K4, Key=InputKey4)"),
             TestStep(9, "Update Group G1 with invalid Key length. (UpdateGroupKey GroupID=G1, KeySetID=K4, Key= Input with length !=16)"),
             TestStep(10, "Update Group G1 to use KeySetID already used by another group. (UpdateGroupKey (GroupID=G1, KeySetID=K1, Key omitted)"),
-            TestStep(11, "TH awaits subscription report showing new Membership within max interval. (G1 shows KeySetID=K1"),
+            TestStep(11, "TH awaits subscription report showing new Membership within max interval. (G1 shows KeySetID=K1)"),
         ]
 
     def pics_TC_GCAST_2_3(self) -> list[str]:
