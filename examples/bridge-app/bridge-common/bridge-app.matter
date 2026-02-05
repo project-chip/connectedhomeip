@@ -2709,10 +2709,10 @@ endpoint 2 {
   }
 
   server cluster Switch {
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
     ram      attribute multiPressMax default = 2;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 

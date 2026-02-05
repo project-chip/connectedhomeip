@@ -6885,9 +6885,9 @@ endpoint 1 {
   }
 
   server cluster Switch {
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 

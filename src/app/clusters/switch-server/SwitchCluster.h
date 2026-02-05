@@ -30,6 +30,7 @@ public:
 
     struct StartupConfiguration
     {
+        uint8_t numberOfPositions{};
         uint8_t multiPressMax{};
     };
 
@@ -95,8 +96,8 @@ public:
 protected:
     const BitFlags<Switch::Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
-    const StartupConfiguration mConfig;
     uint8_t mNumberOfPositions{};
+    uint8_t mMultiPressMax{};
     uint8_t mCurrentPosition{};
 };
 

@@ -1942,12 +1942,12 @@ endpoint 1 {
 
   server cluster Switch {
     emits event SwitchLatched;
-    callback attribute numberOfPositions;
+    persist  attribute numberOfPositions default = 5;
     callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 }

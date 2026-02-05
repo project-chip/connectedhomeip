@@ -43,7 +43,7 @@ namespace {
 
 void SetButtonPosition(EndpointId endpointId, uint8_t position)
 {
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
     (void) switchCluster->SetCurrentPosition(position);
@@ -51,7 +51,7 @@ void SetButtonPosition(EndpointId endpointId, uint8_t position)
 
 void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)
 {
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
     switchCluster->OnInitialPress(newPosition);
@@ -62,7 +62,7 @@ void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)
 
 void EmitLongPress(EndpointId endpointId, uint8_t newPosition)
 {
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
     switchCluster->OnLongPress(newPosition);
@@ -73,7 +73,7 @@ void EmitLongPress(EndpointId endpointId, uint8_t newPosition)
 
 void EmitLongRelease(EndpointId endpointId, uint8_t previousPosition)
 {
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
     switchCluster->OnLongRelease(previousPosition);
@@ -83,7 +83,7 @@ void EmitLongRelease(EndpointId endpointId, uint8_t previousPosition)
 
 void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
 {
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
     switchCluster->OnMultiPressComplete(previousPosition, count);
@@ -94,7 +94,7 @@ void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uin
 
 void EmitShortRelease(EndpointId endpointId, uint8_t previousPosition)
 {
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
     switchCluster->OnShortRelease(previousPosition);
@@ -104,7 +104,7 @@ void EmitShortRelease(EndpointId endpointId, uint8_t previousPosition)
 
 void EmitMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count)
 {
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
     switchCluster->OnMultiPressOngoing(newPosition, count);

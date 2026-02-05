@@ -168,7 +168,7 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
     case Switch::Events::InitialPress::Id: {
         uint8_t currentPosition = 1;
 
-        auto switchCluster = app::Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
         if (switchCluster != nullptr)
         {
             // Set new attribute value
@@ -183,7 +183,7 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
         uint8_t previousPosition = 1;
         uint8_t currentPosition  = 0;
 
-        auto switchCluster = app::Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
         if (switchCluster != nullptr)
         {
             // Set new attribute value

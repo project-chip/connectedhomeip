@@ -262,7 +262,7 @@ void LightingAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 0;
 
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(switchCluster != nullptr);
 
     CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
@@ -276,7 +276,7 @@ void LightingAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPositio
 {
     EndpointId endpoint = 0;
 
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(switchCluster != nullptr);
 
     CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
@@ -290,7 +290,7 @@ void LightingAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 0;
 
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(switchCluster != nullptr);
 
     CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
@@ -304,7 +304,7 @@ void LightingAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPos
 {
     EndpointId endpoint = 0;
 
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(switchCluster != nullptr);
 
     CHIP_ERROR status = switchCluster->SetCurrentPosition(0);
@@ -319,7 +319,7 @@ void LightingAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosi
 {
     EndpointId endpoint = 0;
 
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(switchCluster != nullptr);
 
     CHIP_ERROR status = switchCluster->SetCurrentPosition(0);
@@ -336,7 +336,7 @@ void LightingAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosi
 {
     EndpointId endpoint = 0;
 
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(switchCluster != nullptr);
 
     CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
@@ -352,7 +352,7 @@ void LightingAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previo
 {
     EndpointId endpoint = 0;
 
-    auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
     VerifyOrReturn(switchCluster != nullptr);
 
     CHIP_ERROR status = switchCluster->SetCurrentPosition(0);

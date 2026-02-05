@@ -144,7 +144,7 @@ void SwitchManager::GenericSwitchLongPressHandler(AppEvent * aEvent)
 
     ChipLogDetail(NotSpecified, "GenericSwitchLongPress new position %d", newPosition);
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newPosition] {
-        auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
         switchCluster->OnLongPress(newPosition);
@@ -206,7 +206,7 @@ void SwitchManager::GenericSwitchMultipressOngoingHandler(AppEvent * aEvent)
     ChipLogDetail(NotSpecified, "GenericSwitchMultiPressOngoing (%d)", multiPressCount);
 
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newPosition] {
-        auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
         switchCluster->OnMultiPressOngoing(newPosition, multiPressCount);
@@ -220,7 +220,7 @@ void SwitchManager::GenericSwitchMultipressCompleteHandler(AppEvent * aEvent)
     ChipLogProgress(NotSpecified, "GenericSwitchMultiPressComplete (%d)", multiPressCount);
 
     TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([previousPosition] {
-        auto switchCluster = chip::app::Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
         switchCluster->OnMultiPressComplete(previousPosition, multiPressCount);

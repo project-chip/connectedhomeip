@@ -25,16 +25,11 @@ namespace chip::app::Clusters {
 using namespace Switch;
 using namespace Switch::Attributes;
 
-// According to the spec, the minimum value is 2.
-constexpr uint8_t kMinNumberOfPositions = 2;
-
 SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features,
                              const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Switch::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
-{
-    mNumberOfPositions = kMinNumberOfPositions;
-}
+    DefaultServerCluster({ endpointId, Switch::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mNumberOfPositions(config.numberOfPositions), mMultiPressMax(config.multiPressMax)
+{}
 
 DataModel::ActionReturnStatus SwitchCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                            AttributeValueEncoder & encoder)
@@ -50,7 +45,7 @@ DataModel::ActionReturnStatus SwitchCluster::ReadAttribute(const DataModel::Read
     case CurrentPosition::Id:
         return encoder.Encode(mCurrentPosition);
     case MultiPressMax::Id:
-        return encoder.Encode(mConfig.multiPressMax);
+        return encoder.Encode(mMultiPressMax);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -70,7 +65,8 @@ CHIP_ERROR SwitchCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyB
 
 CHIP_ERROR SwitchCluster::SetNumberOfPositions(uint8_t numberOfPositions)
 {
-    VerifyOrReturnError(numberOfPositions >= kMinNumberOfPositions, CHIP_ERROR_INVALID_ARGUMENT);
+    // According to the spec, the minimum value is 2.
+    VerifyOrReturnError(numberOfPositions >= 2, CHIP_ERROR_INVALID_ARGUMENT);
 
     SetAttributeValue(mNumberOfPositions, numberOfPositions, NumberOfPositions::Id);
     return CHIP_NO_ERROR;
@@ -79,7 +75,7 @@ CHIP_ERROR SwitchCluster::SetNumberOfPositions(uint8_t numberOfPositions)
 CHIP_ERROR SwitchCluster::SetCurrentPosition(uint8_t currentPosition)
 {
     // According to the spec, the valid range is zero to NumberOfPositions - 1.
-    VerifyOrReturnError(currentPosition >= 0 && currentPosition <= mNumberOfPositions - 1, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(currentPosition <= mNumberOfPositions - 1, CHIP_ERROR_INVALID_ARGUMENT);
 
     SetAttributeValue(mCurrentPosition, currentPosition, CurrentPosition::Id);
     return CHIP_NO_ERROR;

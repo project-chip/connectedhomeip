@@ -45,6 +45,9 @@ public:
         SwitchCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
+        uint8_t numberOfPositions{};
+        VerifyOrDie(NumberOfPositions::Get(endpointId, &numberOfPositions) == Status::Success);
+
         uint8_t multiPressMax{};
         if (optionalAttributeSet.IsSet(MultiPressMax::Id))
         {
@@ -53,7 +56,8 @@ public:
 
         gServers[clusterInstanceIndex].Create(endpointId, BitFlags<Feature>(featureMap), optionalAttributeSet,
                                               SwitchCluster::StartupConfiguration{
-                                                  .multiPressMax = multiPressMax,
+                                                  .numberOfPositions = numberOfPositions,
+                                                  .multiPressMax     = multiPressMax,
                                               });
         return gServers[clusterInstanceIndex].Registration();
     }

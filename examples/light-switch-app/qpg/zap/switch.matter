@@ -3307,13 +3307,13 @@ endpoint 2 {
     emits event LongRelease;
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
     ram      attribute multiPressMax default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 30;
     callback attribute clusterRevision;
   }
 }

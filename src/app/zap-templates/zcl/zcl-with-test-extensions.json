@@ -415,8 +415,6 @@
         ],
         "Switch": [
             "ClusterRevision",
-            "FeatureMap",
-            "NumberOfPositions",
             "CurrentPosition"
         ],
         "Unit Testing": [

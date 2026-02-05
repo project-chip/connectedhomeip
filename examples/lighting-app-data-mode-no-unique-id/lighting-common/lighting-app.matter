@@ -2961,9 +2961,9 @@ endpoint 0 {
 
   server cluster Switch {
     emits event SwitchLatched;
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 

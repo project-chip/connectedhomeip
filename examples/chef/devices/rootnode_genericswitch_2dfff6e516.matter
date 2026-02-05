@@ -1945,12 +1945,12 @@ endpoint 1 {
     emits event LongPress;
     emits event ShortRelease;
     emits event LongRelease;
-    callback attribute numberOfPositions;
+    persist  attribute numberOfPositions default = 3;
     callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 0xE;
     callback attribute clusterRevision;
   }
 }

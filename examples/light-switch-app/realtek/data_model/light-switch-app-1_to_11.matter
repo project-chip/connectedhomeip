@@ -3222,12 +3222,12 @@ endpoint 10 {
 
   server cluster Switch {
     emits event InitialPress;
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 2;
     callback attribute clusterRevision;
   }
 }

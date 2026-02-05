@@ -8424,9 +8424,9 @@ endpoint 1 {
 
   server cluster Switch {
     emits event SwitchLatched;
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
@@ -9749,10 +9749,10 @@ endpoint 3 {
     emits event LongPress;
     emits event LongRelease;
     emits event MultiPressComplete;
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
     ram      attribute multiPressMax default = 3;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 58;
     callback attribute clusterRevision;
   }
 }
@@ -9784,10 +9784,10 @@ endpoint 4 {
   }
 
   server cluster Switch {
-    callback attribute numberOfPositions;
+    ram      attribute numberOfPositions default = 2;
     callback attribute currentPosition;
     ram      attribute multiPressMax default = 3;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 30;
     callback attribute clusterRevision;
   }
 }

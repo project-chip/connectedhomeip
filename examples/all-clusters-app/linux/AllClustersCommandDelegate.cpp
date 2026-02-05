@@ -64,7 +64,7 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     uint8_t numPositions = 0;
 
     // On failure, the numPositions won't be changed, so 0 returned.
-    auto switchCluster = app::Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     if (switchCluster != nullptr)
     {
         numPositions = switchCluster->GetNumberOfPositions();
