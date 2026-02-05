@@ -107,6 +107,8 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::EncodeValue(uint64_t value, CHIP_ER
     return encoder.Encode(value);
 }
 
+namespace {
+
 /// Wrapper around `DeviceLayer::GetDiagnosticDataProvider::GetThreadMetrics` that ensures
 /// that `ReleaseThreadMetrics` is always called on the underlying value.
 class AutoFreeThreadMetrics
@@ -138,6 +140,8 @@ private:
     DeviceLayer::ThreadMetrics * mMetrics = nullptr;
     DeviceLayer::DiagnosticDataProvider & mProvider;
 };
+
+} // namespace
 
 CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEncoder & encoder) const
 {
