@@ -124,7 +124,7 @@ void InitBindingHandlerInternal(intptr_t arg)
     auto & server = chip::Server::GetInstance();
     if (CHIP_NO_ERROR !=
         Binding::Manager::GetInstance().Init(
-            { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }))
+            { &Binding::Table::GetInstance(), &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }))
     {
         ChipLogError(NotSpecified, "InitBindingHandlerInternal failed");
     }

@@ -57,7 +57,12 @@ void CreateDefaultFullBindingTable(Binding::Table & table)
 
 TEST_F(TestPendingNotificationMap, TestEmptyMap)
 {
+<<<<<<< HEAD
     PendingNotificationMap pendingMap(Binding::Table::GetInstance());
+=======
+    PendingNotificationMap pendingMap;
+    pendingMap.SetBindingTable(Binding::Table::GetInstance());
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
     EXPECT_EQ(pendingMap.begin(), pendingMap.end());
     chip::ScopedNodeId peer;
     EXPECT_EQ(pendingMap.FindLRUConnectPeer(peer), CHIP_ERROR_NOT_FOUND);
@@ -65,7 +70,12 @@ TEST_F(TestPendingNotificationMap, TestEmptyMap)
 
 TEST_F(TestPendingNotificationMap, TestAddRemove)
 {
+<<<<<<< HEAD
     PendingNotificationMap pendingMap(Binding::Table::GetInstance());
+=======
+    PendingNotificationMap pendingMap;
+    pendingMap.SetBindingTable(Binding::Table::GetInstance());
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
     ClearBindingTable(Binding::Table::GetInstance());
     CreateDefaultFullBindingTable(Binding::Table::GetInstance());
     for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
@@ -113,7 +123,12 @@ TEST_F(TestPendingNotificationMap, TestAddRemove)
 
 TEST_F(TestPendingNotificationMap, TestLRUEntry)
 {
+<<<<<<< HEAD
     PendingNotificationMap pendingMap(Binding::Table::GetInstance());
+=======
+    PendingNotificationMap pendingMap;
+    pendingMap.SetBindingTable(Binding::Table::GetInstance());
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
     ClearBindingTable(Binding::Table::GetInstance());
     CreateDefaultFullBindingTable(Binding::Table::GetInstance());
     EXPECT_EQ(pendingMap.AddPendingNotification(0, nullptr), CHIP_NO_ERROR);

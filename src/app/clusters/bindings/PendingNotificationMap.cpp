@@ -27,6 +27,8 @@ namespace Binding {
 
 CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
 {
+    VerifyOrReturnError(mBindingTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     // When entries are added to PendingNotificationMap, they are appended to the end.
     // To find the LRU peer, we need to find the peer whose last entry in the map is closer
     // to the start of the list than the last entry of any other peer.
@@ -34,13 +36,21 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     // First, set up a way to easily track which entries correspond to the same peer.
     uint8_t bindingWithSamePeer[Table::kMaxBindingEntries];
 
+<<<<<<< HEAD
     for (auto iter = mBindingTable.begin(); iter != mBindingTable.end(); ++iter)
+=======
+    for (auto iter = mBindingTable->begin(); iter != mBindingTable->end(); ++iter)
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
     {
         if (iter->type != MATTER_UNICAST_BINDING)
         {
             continue;
         }
+<<<<<<< HEAD
         for (auto checkIter = mBindingTable.begin(); checkIter != mBindingTable.end(); ++checkIter)
+=======
+        for (auto checkIter = mBindingTable->begin(); checkIter != mBindingTable->end(); ++checkIter)
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
         {
             if (checkIter->type == MATTER_UNICAST_BINDING && checkIter->fabricIndex == iter->fabricIndex &&
                 checkIter->nodeId == iter->nodeId)
@@ -74,7 +84,11 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(ScopedNodeId & nodeId)
     }
     if (minLastAppearValue < UINT16_MAX)
     {
+<<<<<<< HEAD
         TableEntry entry = mBindingTable.GetAt(static_cast<uint8_t>(lruBindingEntryIndex));
+=======
+        TableEntry entry = mBindingTable->GetAt(static_cast<uint8_t>(lruBindingEntryIndex));
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
         nodeId           = ScopedNodeId(entry.nodeId, entry.fabricIndex);
         return CHIP_NO_ERROR;
     }
@@ -120,10 +134,16 @@ void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId)
 
 void PendingNotificationMap::RemoveAllEntriesForNode(const ScopedNodeId & nodeId)
 {
+    VerifyOrDie(mBindingTable != nullptr);
+
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
+<<<<<<< HEAD
         TableEntry entry = mBindingTable.GetAt(mPendingBindingEntries[i]);
+=======
+        TableEntry entry = mBindingTable->GetAt(mPendingBindingEntries[i]);
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
         if (entry.fabricIndex != nodeId.GetFabricIndex() || entry.nodeId != nodeId.GetNodeId())
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
@@ -140,10 +160,16 @@ void PendingNotificationMap::RemoveAllEntriesForNode(const ScopedNodeId & nodeId
 
 void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
 {
+    VerifyOrDie(mBindingTable != nullptr);
+
     uint8_t newEntryCount = 0;
     for (int i = 0; i < mNumEntries; i++)
     {
+<<<<<<< HEAD
         TableEntry entry = mBindingTable.GetAt(mPendingBindingEntries[i]);
+=======
+        TableEntry entry = mBindingTable->GetAt(mPendingBindingEntries[i]);
+>>>>>>> 2948c3da2b (Decouple `Binding::Manager` and `Binding::PendingNotificationMap`)
         if (entry.fabricIndex != fabric)
         {
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
