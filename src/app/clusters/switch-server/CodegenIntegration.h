@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2021-2026 Project CHIP Authors
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <app/clusters/switch-server/CodegenIntegration.h>
+#include <app/clusters/switch-server/SwitchCluster.h>
+
+namespace chip::app::Clusters::Switch {
+
+SwitchCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+} // namespace chip::app::Clusters::Switch

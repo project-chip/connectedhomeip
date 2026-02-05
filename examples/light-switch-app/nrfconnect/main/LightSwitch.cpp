@@ -95,9 +95,12 @@ void LightSwitch::GenericSwitchInitialPress()
         // Press moves Position from 0 (idle) to 1 (press)
         uint8_t newPosition = 1;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
-        // InitialPress event takes newPosition as event data
-        Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        (void) switchCluster->SetCurrentPosition(newPosition);
+
+        switchCluster->OnInitialPress(newPosition);
     });
 }
 
@@ -108,8 +111,11 @@ void LightSwitch::GenericSwitchReleasePress()
         uint8_t previousPosition = 1;
         uint8_t newPosition      = 0;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
-        // ShortRelease event takes previousPosition as event data
-        Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, previousPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        (void) switchCluster->SetCurrentPosition(newPosition);
+
+        switchCluster->OnShortRelease(previousPosition);
     });
 }

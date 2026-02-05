@@ -412,6 +412,12 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
+        "Switch": [
+            "ClusterRevision",
+            "FeatureMap",
+            "NumberOfPositions",
+            "CurrentPosition"
+        ],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",

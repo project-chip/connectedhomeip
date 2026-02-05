@@ -2872,13 +2872,13 @@ endpoint 2 {
 
   server cluster Switch {
     emits event InitialPress;
-    ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition default = 0;
+    callback attribute numberOfPositions;
+    callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 6;
-    ram      attribute clusterRevision default = 2;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 

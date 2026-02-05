@@ -2961,10 +2961,10 @@ endpoint 0 {
 
   server cluster Switch {
     emits event SwitchLatched;
-    ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute numberOfPositions;
+    callback attribute currentPosition;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster AdministratorCommissioning {
