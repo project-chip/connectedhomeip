@@ -3,7 +3,7 @@ Data models for the Push AV Server.
 """
 
 from enum import Enum
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict
 
 from pydantic import BaseModel
 
@@ -13,6 +13,22 @@ class SupportedIngestInterface(str, Enum):
     cmaf = "cmaf-ingest"  # Interface 1
     dash = "dash"  # Interface 2, DASH version
     hls = "hls"  # Interface 2, HLS version
+
+
+class TrackState(str, Enum):
+    """State of a track in the upload process."""
+    NOT_STARTED = "not_started"
+    INITIAL_PLAYLIST_UPLOADED = "initial_playlist_uploaded"  # HLS only
+    INIT_UPLOADED = "init_uploaded"
+    SEGMENTS_UPLOADING = "segments_uploading"
+    COMPLETED = "completed"
+
+
+class Track(BaseModel):
+    """Represents a track within a session with upload state tracking."""
+    name: str
+    state: TrackState = TrackState.NOT_STARTED
+    segment_count: int = 0
 
 
 class UploadError(BaseModel):
@@ -36,6 +52,8 @@ class Session(BaseModel):
     uploaded_segments: list[Tuple[str, str]] = []
     uploaded_manifests: list[Tuple[str, str]] = []
     complete: bool = False
+    # Track state management
+    tracks: Dict[str, Track] = {}
     # HLS-specific tracking attributes
     hls_expected_track_count: Optional[int] = None
     hls_completed_tracks: int = 0
