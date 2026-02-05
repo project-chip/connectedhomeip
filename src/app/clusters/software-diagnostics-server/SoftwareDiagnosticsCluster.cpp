@@ -164,7 +164,8 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEnc
     });
 }
 
-CHIP_ERROR SoftwareDiagnosticsServerCluster::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR SoftwareDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) && mDiagnosticDataProvider.SupportsWatermarks())
     {
@@ -176,7 +177,8 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::AcceptedCommands(ReadOnlyBufferBuil
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SoftwareDiagnosticsServerCluster::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR SoftwareDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
+                                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 

@@ -71,15 +71,9 @@ public:
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
-    {
-        return AcceptedCommands(builder);
-    }
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
-    {
-        return Attributes(builder);
-    }
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     // Encodes the thread metrics list, using the provided encoder.
     CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder);
@@ -94,14 +88,6 @@ public:
     }
 
     CHIP_ERROR ResetWatermarks() { return mDiagnosticDataProvider.ResetWatermarks(); }
-
-    /// Returns acceptable attributes for the given Diagnostics data provider:
-    ///   - ALWAYS includes global attributes
-    ///   - adds heap/watermark depending on feature flags and if the interface supports it.
-    CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
-
-    /// Determines what commands are supported
-    CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
 private:
     // Encodes the `value` in `encoder`, while handling a potential `readError` that occurred
