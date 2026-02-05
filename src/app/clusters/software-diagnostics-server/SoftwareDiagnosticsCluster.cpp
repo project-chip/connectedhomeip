@@ -15,11 +15,15 @@
  *    limitations under the License.
  */
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-void SoftwareDiagnosticsServerCluster::OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault)
+
+using namespace SoftwareDiagnostics;
+
+void SoftwareDiagnosticsServerCluster::OnSoftwareFaultDetect(const Events::SoftwareFault::Type & softwareFault)
 {
     VerifyOrReturn(mContext != nullptr);
     (void) mContext->interactionContext.eventsGenerator.GenerateEvent(softwareFault, kRootEndpointId);
@@ -29,9 +33,9 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::Startup(ServerClusterContext & cont
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == nullptr)
+    if (SoftwareFaultListener::GetGlobalListener() == nullptr)
     {
-        SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(this);
+        SoftwareFaultListener::SetGlobalListener(this);
     }
 
     return CHIP_NO_ERROR;
@@ -39,9 +43,9 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::Startup(ServerClusterContext & cont
 
 void SoftwareDiagnosticsServerCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == this)
+    if (SoftwareFaultListener::GetGlobalListener() == this)
     {
-        SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
+        SoftwareFaultListener::SetGlobalListener(nullptr);
     }
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -51,27 +55,27 @@ DataModel::ActionReturnStatus SoftwareDiagnosticsServerCluster::ReadAttribute(co
 {
     switch (request.path.mAttributeId)
     {
-    case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
+    case Attributes::CurrentHeapFree::Id: {
         uint64_t value;
-        CHIP_ERROR err = mLogic.GetCurrentHeapFree(value);
+        CHIP_ERROR err = GetCurrentHeapFree(value);
         return EncodeValue(value, err, encoder);
     }
-    case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
+    case Attributes::CurrentHeapUsed::Id: {
         uint64_t value;
-        CHIP_ERROR err = mLogic.GetCurrentHeapUsed(value);
+        CHIP_ERROR err = GetCurrentHeapUsed(value);
         return EncodeValue(value, err, encoder);
     }
-    case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
+    case Attributes::CurrentHeapHighWatermark::Id: {
         uint64_t value;
-        CHIP_ERROR err = mLogic.GetCurrentHighWatermark(value);
+        CHIP_ERROR err = GetCurrentHighWatermark(value);
         return EncodeValue(value, err, encoder);
     }
-    case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
-        return mLogic.ReadThreadMetrics(encoder);
+    case Attributes::ThreadMetrics::Id:
+        return ReadThreadMetrics(encoder);
     case Globals::Attributes::FeatureMap::Id:
-        return encoder.Encode(mLogic.GetFeatureMap());
+        return encoder.Encode(GetFeatureMap());
     case Globals::Attributes::ClusterRevision::Id:
-        return encoder.Encode(SoftwareDiagnostics::kRevision);
+        return encoder.Encode(kRevision);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -83,8 +87,8 @@ SoftwareDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest &
 {
     switch (request.path.mCommandId)
     {
-    case SoftwareDiagnostics::Commands::ResetWatermarks::Id:
-        return mLogic.ResetWatermarks();
+    case Commands::ResetWatermarks::Id:
+        return ResetWatermarks();
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -102,6 +106,86 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::EncodeValue(uint64_t value, CHIP_ER
     }
     return encoder.Encode(value);
 }
+
+/// Wrapper around `DeviceLayer::GetDiagnosticDataProvider::GetThreadMetrics` that ensures
+/// that `ReleaseThreadMetrics` is always called on the underlying value.
+class AutoFreeThreadMetrics
+{
+public:
+    AutoFreeThreadMetrics(DeviceLayer::DiagnosticDataProvider & provider) : mProvider(provider) {}
+    ~AutoFreeThreadMetrics()
+    {
+        if (mMetrics != nullptr)
+        {
+            mProvider.ReleaseThreadMetrics(mMetrics);
+        }
+    }
+
+    CHIP_ERROR ReadThreadMetrics()
+    {
+        VerifyOrReturnError(mMetrics == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        CHIP_ERROR err = mProvider.GetThreadMetrics(&mMetrics);
+        if (err != CHIP_NO_ERROR)
+        {
+            mMetrics = nullptr; // do not assume it is valid, so we do not try to free later
+        }
+        return err;
+    }
+
+    const DeviceLayer::ThreadMetrics * ThreadMetrics() const { return mMetrics; }
+
+private:
+    DeviceLayer::ThreadMetrics * mMetrics = nullptr;
+    DeviceLayer::DiagnosticDataProvider & mProvider;
+};
+
+CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEncoder & encoder) const
+{
+    AutoFreeThreadMetrics metrics(DeviceLayer::GetDiagnosticDataProvider());
+
+    if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR)
+    {
+        // TODO: silently dropping error is what we historically did. We may want to at least log this...
+        return encoder.EncodeEmptyList();
+    }
+
+    return encoder.EncodeList([&metrics](const auto & itemEncoder) -> CHIP_ERROR {
+        for (const DeviceLayer::ThreadMetrics * thread = metrics.ThreadMetrics(); thread != nullptr; thread = thread->Next)
+        {
+            ReturnErrorOnFailure(itemEncoder.Encode(*thread));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR SoftwareDiagnosticsServerCluster::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) &&
+        DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+    {
+        static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
+        return builder.ReferenceExisting(kAcceptedCommands);
+    }
+
+    // no commands supported
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SoftwareDiagnosticsServerCluster::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    static constexpr DataModel::AttributeEntry optionalEntries[] = {
+        //
+        Attributes::ThreadMetrics::kMetadataEntry,            //
+        Attributes::CurrentHeapFree::kMetadataEntry,          //
+        Attributes::CurrentHeapUsed::kMetadataEntry,          //
+        Attributes::CurrentHeapHighWatermark::kMetadataEntry, //
+    };
+
+    return listBuilder.Append(Span(Attributes::kMandatoryMetadata), Span(optionalEntries), mOptionalAttributeSet);
+}
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -117,7 +117,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
         SoftwareDiagnosticsServerCluster cluster(
-            SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>());
+            SoftwareDiagnosticsServerCluster::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>());
         chip::Testing::ClusterTester tester(cluster);
 
         ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { Commands::ResetWatermarks::kMetadataEntry }));
@@ -174,7 +174,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         };
 
         ScopedDiagnosticsProvider<AllProvider> allProvider;
-        SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsLogic::OptionalAttributeSet()
+        SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsServerCluster::OptionalAttributeSet()
                                                      .Set<Attributes::ThreadMetrics::Id>()
                                                      .Set<Attributes::CurrentHeapFree::Id>()
                                                      .Set<Attributes::CurrentHeapUsed::Id>()
