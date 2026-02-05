@@ -247,13 +247,13 @@ Out[2]: <matter.native.PyChipError object at 0x7f2432b16140>
 -   Step 4: (In matter-repl) Read WaterHeaterManagement attributes
 
 ```python
-    # Read from NodeID 1234, Endpoint 2, all attributes on WaterHeaterManagement cluster
-    await devCtrl.ReadAttribute(1234,[(2, matter.clusters.WaterHeaterManagement)])
+    # Read from NodeID 1234, Endpoint 1, all attributes on WaterHeaterManagement cluster
+    await devCtrl.ReadAttribute(1234,[(1, matter.clusters.WaterHeaterManagement)])
 ```
 
 ```
 {
-│   2: {
+│   1: {
 │   │   <class 'matter.clusters.Objects.WaterHeaterManagement'>: {
 │   │   │   <class 'matter.clusters.Attribute.DataVersion'>: 1234567890,
 │   │   │   <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.HeaterTypes'>: 1,
@@ -281,7 +281,7 @@ Out[2]: <matter.native.PyChipError object at 0x7f2432b16140>
 
 ```python
    reportingTimingParams = (3, 60) # MinInterval = 3s, MaxInterval = 60s
-   subscription = await devCtrl.ReadAttribute(1234,[(2, matter.clusters.WaterHeaterManagement)], reportInterval=reportingTimingParams)
+   subscription = await devCtrl.ReadAttribute(1234,[(1, matter.clusters.WaterHeaterManagement)], reportInterval=reportingTimingParams)
 ```
 
 -   Step 6: Send a `Boost` command which activates boost mode for 1800 seconds
@@ -290,7 +290,7 @@ Out[2]: <matter.native.PyChipError object at 0x7f2432b16140>
     reverting to the previous mode.
 
 ```python
-   await devCtrl.SendCommand(1234, 2, matter.clusters.WaterHeaterManagement.Commands.Boost(duration=1800))
+   await devCtrl.SendCommand(1234, 1, matter.clusters.WaterHeaterManagement.Commands.Boost(duration=1800))
 ```
 
 The output should look like:
@@ -298,7 +298,7 @@ The output should look like:
 ```
 Attribute Changed:
 {
-│   'Endpoint': 2,
+│   'Endpoint': 1,
 │   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.BoostState'>,
 │   'Value': <BoostStateEnum.kActive: 1>
 }
@@ -309,7 +309,7 @@ After 1800 seconds (30 minutes) the boost state should automatically revert:
 ```
 Attribute Changed:
 {
-│   'Endpoint': 2,
+│   'Endpoint': 1,
 │   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.BoostState'>,
 │   'Value': <BoostStateEnum.kInactive: 0>
 }
@@ -319,7 +319,7 @@ Note that you can cancel the boost state early by sending the `CancelBoost`
 command:
 
 ```python
-   await devCtrl.SendCommand(1234, 2, matter.clusters.WaterHeaterManagement.Commands.CancelBoost())
+   await devCtrl.SendCommand(1234, 1, matter.clusters.WaterHeaterManagement.Commands.CancelBoost())
 ```
 
 ### Using matter-repl to Fake a water heater installation
@@ -352,7 +352,7 @@ Now you can read the updated attributes to see the changes:
 
 ```python
     # Read the WaterHeaterManagement attributes
-    await devCtrl.ReadAttribute(1234,[(2, matter.clusters.WaterHeaterManagement)])
+    await devCtrl.ReadAttribute(1234,[(1, matter.clusters.WaterHeaterManagement)])
 ```
 
 You should see changes in attributes like `TankPercentage`,

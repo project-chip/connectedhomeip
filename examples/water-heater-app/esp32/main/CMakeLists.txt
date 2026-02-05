@@ -26,6 +26,8 @@ set(PRIV_INCLUDE_DIRS_LIST
   "${WATER_HEATER_COMMON_DIR}/include"
   "${ENERGY_MGMT_DIR}/device-energy-management/include"
   "${ENERGY_MGMT_DIR}/electrical-sensor/include"
+  "${ENERGY_MGMT_DIR}/utils/include"
+  "${ENERGY_MGMT_DIR}/energy-management-triggers"
   "${CMAKE_CURRENT_LIST_DIR}/include"
   "${CHIP_ROOT}/examples/platform/esp32"
 )
@@ -37,6 +39,8 @@ set(SRC_DIRS_LIST
   "${WATER_HEATER_COMMON_DIR}/src"
   "${ENERGY_MGMT_DIR}/device-energy-management/src"
   "${ENERGY_MGMT_DIR}/electrical-sensor/src"
+  "${ENERGY_MGMT_DIR}/utils/src"
+  "${ENERGY_MGMT_DIR}/energy-management-triggers"
   "${CHIP_ROOT}/examples/platform/esp32/ota"
   "${CHIP_ROOT}/examples/platform/esp32/common"
   "${CHIP_ROOT}/examples/platform/esp32/time"
