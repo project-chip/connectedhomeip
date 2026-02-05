@@ -132,14 +132,28 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
 
     if (it != mCurrentConnections.end())
     {
-        *it    = transportConfiguration;
-        result = UpsertResultEnum::kUpdated;
+        TransportConfigurationStorage oldValue = *it;
+        *it                                    = transportConfiguration;
+        result                                 = UpsertResultEnum::kUpdated;
+        CHIP_ERROR err                         = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store updated connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            *it = oldValue; // Revert
+            return UpsertResultEnum::kFailed;
+        }
     }
     else
     {
         mCurrentConnections.push_back(transportConfiguration);
-        result = UpsertResultEnum::kInserted;
-        LogErrorOnFailure(StoreCurrentConnections());
+        result         = UpsertResultEnum::kInserted;
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store new connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections.pop_back(); // Revert
+            return UpsertResultEnum::kFailed;
+        }
     }
 
     MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
@@ -150,23 +164,27 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
 
 void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
 {
-    size_t originalSize = mCurrentConnections.size();
+    auto it = std::find_if(
+        mCurrentConnections.begin(), mCurrentConnections.end(),
+        [transportConnectionId](const TransportConfigurationStorage & s) { return s.connectionID == transportConnectionId; });
 
-    // Erase-Remove idiom
-    mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
-                                             [transportConnectionId](const TransportConfigurationStorage & s) {
-                                                 return s.connectionID == transportConnectionId;
-                                             }),
-                              mCurrentConnections.end());
-
-    // If a connection was removed, the size will be smaller.
-    if (mCurrentConnections.size() < originalSize)
+    if (it != mCurrentConnections.end())
     {
-        LogErrorOnFailure(StoreCurrentConnections());
+        TransportConfigurationStorage removedValue = *it;
+        mCurrentConnections.erase(it);
 
-        // Notify the stack that the CurrentConnections attribute has changed.
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections.push_back(removedValue); // Revert
+        }
+        else
+        {
+            // Notify the stack that the CurrentConnections attribute has changed.
+            MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
+                                                   PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        }
     }
 }
 
@@ -1279,10 +1297,21 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
 
     if (status == Status::Success)
     {
+        auto oldTransportOptionsPtr = transportConfiguration->GetTransportOptionsPtr();
         transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
 
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store modified connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            transportConfiguration->SetTransportOptionsPtr(oldTransportOptionsPtr); // Revert
+            status = Status::Failure;                                               // Reflect storage failure
+        }
+        else
+        {
+            MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
+                                                   PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        }
     }
 
     handler.AddStatus(commandPath, status);
@@ -1340,6 +1369,8 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
     status = mDelegate->SetTransportStatus(connectionIDList, transportStatus);
     if (status == Status::Success)
     {
+        auto originalConnections = mCurrentConnections; // Keep a copy for potential revert
+
         for (auto & connID : connectionIDList)
         {
             for (auto & transportConnection : mCurrentConnections)
@@ -1351,8 +1382,18 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
             }
         }
 
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store status update, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections = originalConnections; // Revert
+            status              = Status::Failure;     // Reflect storage failure
+        }
+        else
+        {
+            MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
+                                                   PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        }
     }
     handler.AddStatus(commandPath, status);
 
@@ -1738,9 +1779,17 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 
 CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
 {
-    uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
+    Platform::ScopedMemoryBuffer<uint8_t> currentConns;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
+
+    if (!currentConns.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    bufferSpan = MutableByteSpan{ currentConns.Get(), maxBufferSize };
     TLV::TLVWriter writer;
-    writer.Init(buffer);
+    writer.Init(bufferSpan);
 
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
@@ -1753,10 +1802,10 @@ CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
-    size_t len = writer.GetLengthWritten();
+    bufferSpan.reduce_size(writer.GetLengthWritten());
 
     auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, ByteSpan(buffer, len)));
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan));
 
     ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
     return CHIP_NO_ERROR;
@@ -1764,12 +1813,19 @@ CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
 
 CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
 {
-    uint8_t buffer[kMaxCurrentConnectionsSerializedSize];
-    MutableByteSpan span(buffer);
+    Platform::ScopedMemoryBuffer<uint8_t> currentConns;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
+
+    if (!currentConns.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    bufferSpan = MutableByteSpan{ currentConns.Get(), maxBufferSize };
 
     auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
 
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, span);
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         mCurrentConnections.clear();
@@ -1779,7 +1835,7 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     ReturnErrorOnFailure(err);
 
     TLV::TLVReader reader;
-    reader.Init(span);
+    reader.Init(bufferSpan);
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;

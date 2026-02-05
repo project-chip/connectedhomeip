@@ -77,6 +77,7 @@ public:
     {
         kInserted = 0x00,
         kUpdated  = 0x01,
+        kFailed   = 0x02,
     };
 
     struct PushAVStreamTransportDeallocateCallbackContext
