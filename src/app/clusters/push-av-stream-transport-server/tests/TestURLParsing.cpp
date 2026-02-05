@@ -23,7 +23,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
-#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
@@ -185,10 +184,10 @@ public:
         std::string trackName        = "test-track";
         commandData.transportOptions = CreateTransportOptionsWithUrl(url, trackName);
 
-        server.GetLogic().SetDelegate(&mockDelegate);
-        server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+        server.SetDelegate(&mockDelegate);
+        server.SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
 
-        auto result = server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
+        auto result = server.HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
 
         // HandleAllocatePushTransport always returns std::nullopt.
         // On success, it sets a response via the handler.

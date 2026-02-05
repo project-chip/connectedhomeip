@@ -24,11 +24,13 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
-#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <functional>
 #include <protocols/interaction_model/StatusCode.h>
+#include <string>
+#include <uriparser/Uri.h>
 #include <vector>
 
 namespace chip {
@@ -70,7 +72,7 @@ public:
         mDelegate->SetPushAvStreamTransportServer(this);
     }
 
-    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
+    void SetTLSClientManagementDelegate(TLSClientManagementDelegate * delegate)
     {
         mTLSClientManagementDelegate = delegate;
         if (mTLSClientManagementDelegate == nullptr)
@@ -80,10 +82,10 @@ public:
         }
     }
 
-    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
+    void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
     {
-        mTlsCertificateManagementDelegate = delegate;
-        if (mTlsCertificateManagementDelegate == nullptr)
+        mTLSCertificateManagementDelegate = delegate;
+        if (mTLSCertificateManagementDelegate == nullptr)
         {
             ChipLogError(Zcl, "Push AV Stream Transport: Trying to set TLS Certificate Management delegate to null");
             return;
@@ -124,12 +126,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void Shutdown(ClusterShutdownType shutdownType) override
-    {
-        DefaultServerCluster::Shutdown(shutdownType);
-        mLogic.Shutdown();
-    }
-
+    void Shutdown(ClusterShutdownType shutdownType) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
@@ -169,6 +166,11 @@ public:
         const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions);
 
     std::optional<DataModel::ActionReturnStatus>
+    ValidateStreamParameters(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                             const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions,
+                             const std::shared_ptr<PushAvStreamTransport::TransportOptionsStorage> transportOptionsPtr);
+
+    std::optional<DataModel::ActionReturnStatus>
     HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                 const PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
 
@@ -195,14 +197,16 @@ public:
     // Send Push AV Stream Transport events
     Protocols::InteractionModel::Status
     GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason,
+                                    const PushAvStreamTransport::ContainerFormatEnum containerType,
+                                    const Optional<uint64_t> cmafSessionNumber);
     Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
     // Previous LOGIC state move to CLUSTER implementation
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
-    TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
-    TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
+    TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
+    TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
 
     // Helpers to read list items
     CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder, FabricIndex fabricIndex);
@@ -255,6 +259,13 @@ private:
     bool ValidateUrl(const std::string & url);
 };
 
+// Internal namespace for helper functions
+namespace Internal {
+
+std::string extractTextRange(const UriTextRangeA & range);
+std::string extractPath(const UriPathSegmentA * pathHead);
+
+} // namespace Internal
 } // namespace Clusters
 } // namespace app
 } // namespace chip
