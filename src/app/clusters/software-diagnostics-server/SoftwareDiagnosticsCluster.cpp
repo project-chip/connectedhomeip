@@ -167,6 +167,8 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEnc
 CHIP_ERROR SoftwareDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    (void) path;
+
     if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) && mDiagnosticDataProvider.SupportsWatermarks())
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
@@ -180,6 +182,8 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::AcceptedCommands(const ConcreteClus
 CHIP_ERROR SoftwareDiagnosticsServerCluster::Attributes(const ConcreteClusterPath & path,
                                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
+    (void) path;
+
     AttributeListBuilder listBuilder(builder);
 
     static constexpr DataModel::AttributeEntry optionalEntries[] = {
