@@ -358,7 +358,7 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    (void) switchCluster->SetCurrentPosition(0);
+    RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(0);
 }
 
 } // namespace

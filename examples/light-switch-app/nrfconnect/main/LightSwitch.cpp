@@ -98,7 +98,7 @@ void LightSwitch::GenericSwitchInitialPress()
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
         VerifyOrReturn(switchCluster != nullptr);
 
-        (void) switchCluster->SetCurrentPosition(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
         switchCluster->OnInitialPress(newPosition);
     });
@@ -114,7 +114,7 @@ void LightSwitch::GenericSwitchReleasePress()
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
         VerifyOrReturn(switchCluster != nullptr);
 
-        (void) switchCluster->SetCurrentPosition(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
         switchCluster->OnShortRelease(previousPosition);
     });

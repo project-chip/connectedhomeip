@@ -37,10 +37,9 @@ void SwitchEventHandler::OnSwitchLatched(EndpointId endpointId, uint8_t newPosit
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        switchCluster->OnSwitchLatch(newPosition);
-    }
+    VerifyOrReturn(switchCluster != nullptr);
+
+    switchCluster->OnSwitchLatch(newPosition);
 }
 
 void SwitchEventHandler::OnInitialPress(EndpointId endpointId, uint8_t newPosition)
@@ -48,10 +47,9 @@ void SwitchEventHandler::OnInitialPress(EndpointId endpointId, uint8_t newPositi
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        switchCluster->OnInitialPress(newPosition);
-    }
+    VerifyOrReturn(switchCluster != nullptr);
+
+    switchCluster->OnInitialPress(newPosition);
 }
 
 void SwitchEventHandler::OnLongPress(EndpointId endpointId, uint8_t newPosition)
@@ -59,10 +57,9 @@ void SwitchEventHandler::OnLongPress(EndpointId endpointId, uint8_t newPosition)
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        switchCluster->OnLongPress(newPosition);
-    }
+    VerifyOrReturn(switchCluster != nullptr);
+
+    switchCluster->OnLongPress(newPosition);
 }
 
 void SwitchEventHandler::OnShortRelease(EndpointId endpointId, uint8_t previousPosition)
@@ -70,10 +67,9 @@ void SwitchEventHandler::OnShortRelease(EndpointId endpointId, uint8_t previousP
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d", __func__, endpointId, previousPosition);
 
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        switchCluster->OnShortRelease(previousPosition);
-    }
+    VerifyOrReturn(switchCluster != nullptr);
+
+    switchCluster->OnShortRelease(previousPosition);
 }
 
 void SwitchEventHandler::OnLongRelease(EndpointId endpointId, uint8_t previousPosition)
@@ -81,10 +77,9 @@ void SwitchEventHandler::OnLongRelease(EndpointId endpointId, uint8_t previousPo
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d", __func__, endpointId, previousPosition);
 
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        switchCluster->OnLongRelease(previousPosition);
-    }
+    VerifyOrReturn(switchCluster != nullptr);
+
+    switchCluster->OnLongRelease(previousPosition);
 }
 
 void SwitchEventHandler::OnMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count)
@@ -92,10 +87,9 @@ void SwitchEventHandler::OnMultiPressOngoing(EndpointId endpointId, uint8_t newP
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d, count=%d", __func__, endpointId, newPosition, count);
 
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        switchCluster->OnMultiPressOngoing(newPosition, count);
-    }
+    VerifyOrReturn(switchCluster != nullptr);
+
+    switchCluster->OnMultiPressOngoing(newPosition, count);
 }
 
 void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
@@ -103,9 +97,8 @@ void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t pre
     ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d, count=%d", __func__, endpointId, previousPosition, count);
 
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        switchCluster->OnMultiPressComplete(previousPosition, count);
-    }
+    VerifyOrReturn(switchCluster != nullptr);
+
+    switchCluster->OnMultiPressComplete(previousPosition, count);
 }
 #endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0

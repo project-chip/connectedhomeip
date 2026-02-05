@@ -172,7 +172,7 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
         if (switchCluster != nullptr)
         {
             // Set new attribute value
-            (void) switchCluster->SetCurrentPosition(currentPosition);
+            RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(currentPosition);
 
             // Trigger event
             switchCluster->OnInitialPress(currentPosition);
@@ -187,7 +187,7 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
         if (switchCluster != nullptr)
         {
             // Set new attribute value
-            (void) switchCluster->SetCurrentPosition(currentPosition);
+            RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(currentPosition);
 
             // Trigger event
             switchCluster->OnShortRelease(previousPosition);

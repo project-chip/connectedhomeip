@@ -39,7 +39,7 @@ void SwitchManager::Init(void)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
     VerifyOrReturn(switchCluster != nullptr);
 
-    (void) switchCluster->SetMultiPressMax(multiPressMax);
+    RETURN_SAFELY_IGNORED switchCluster->SetMultiPressMax(multiPressMax);
 }
 
 void SwitchManager::ToggleHandler(AppEvent * aEvent)
@@ -134,7 +134,7 @@ void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        (void) switchCluster->SetCurrentPosition(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
         switchCluster->OnInitialPress(newPosition);
     });
@@ -177,7 +177,7 @@ void SwitchManager::GenericSwitchShortReleaseHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        (void) switchCluster->SetCurrentPosition(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
         switchCluster->OnShortRelease(previousPosition);
     });
@@ -200,7 +200,7 @@ void SwitchManager::GenericSwitchLongReleaseHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        (void) switchCluster->SetCurrentPosition(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
         switchCluster->OnLongRelease(previousPosition);
     });
