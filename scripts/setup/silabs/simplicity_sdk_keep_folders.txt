@@ -1,0 +1,76 @@
+# Top-level Simplicity SDK folders to keep when trimming (referenced by SiWx917_sdk.gni and efr32_sdk.gni).
+# One folder per line. Parse with: grep -v '^#' simplicity_sdk_keep_folders.txt | grep -v '^$'
+# Sections: SiWx917_sdk.gni, efr32_sdk.gni, then "all" (combined unique).
+
+# SiWx917_sdk.gni
+board_drivers
+cmsis
+cmsis_common
+freertos
+glib
+openthread_stack
+platform_common
+platform_core
+segger
+security_mbedtls
+security_mbedtls_source
+security_se_manager
+
+# efr32_sdk.gni
+app
+bgapi_protocol
+bluetooth_apploader
+bluetooth_le_controller
+bluetooth_le_host
+bluetooth_le_middleware
+bluetooth_mesh
+board_drivers
+boards
+bootloader
+bootloader_interface
+cmsis
+cmsis_common
+common_15_4
+devices
+freertos
+glib
+openthread
+openthread_stack
+platform
+platform_common
+platform_core
+rail_library
+security_mbedtls
+security_mbedtls_source
+security_se_manager
+segger
+util
+
+# all (combined unique, alphabetical)
+bgapi_protocol
+bluetooth_apploader
+bluetooth_le_controller
+bluetooth_le_host
+bluetooth_le_middleware
+bluetooth_mesh
+board_drivers
+boards
+bootloader
+bootloader_interface
+cmsis
+cmsis_common
+common_15_4
+devices
+freertos
+glib
+openthread
+openthread_stack
+platform
+platform_common
+platform_core
+rail_library
+segger
+security_mbedtls
+security_mbedtls_source
+security_se_manager
+util

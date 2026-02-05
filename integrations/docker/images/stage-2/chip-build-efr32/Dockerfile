@@ -12,8 +12,9 @@ RUN set -x \
     && chmod +x /tmp/slt_install/slt \
     && : # last line
 
-# Copy sdk-pkg.slt (build context must be repo root)
+# Copy sdk-pkg.slt and Simplicity SDK keep-list (build context must be repo root)
 COPY scripts/setup/silabs/sdk-pkg.slt /tmp/sdk-pkg.slt
+COPY scripts/setup/silabs/simplicity_sdk_keep_folders.txt /tmp/keep_folders.txt
 
 # Install packages via SLT (simplicity-sdk, wiseconnect, slc-cli) then copy to /tmp for final image
 RUN set -x \
@@ -25,8 +26,13 @@ RUN set -x \
     && rm -rf /tmp/slt_install /tmp/sdk-pkg.slt \
     && : # last line
 
-# Trim Simplicity SDK (from SLT install above) to save space
-RUN find /tmp/simplicity_sdk -depth -type d \( -name '*zwave*' -o -name '*zigbee*' -o -name '*wisun*' -o -name '*tensorflow*' -o -name '*sqlite*' -o -name '*ot-br-posix*' -o -name '*tflite*' -o -name '*unity_test_framework*' -o -name '*multiphy_configurator*' -o -name '*bluetooth*' -o -name '*_app' \) -exec rm -rf {} + \
+# Trim Simplicity SDK: keep only top-level folders listed in simplicity_sdk_keep_folders.txt
+RUN grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | sort -u > /tmp/keep_list.txt \
+    && for d in /tmp/simplicity_sdk/*/ ; do \
+         name=$(basename "$d"); \
+         grep -qFx "$name" /tmp/keep_list.txt || rm -rf "$d"; \
+       done \
+    && rm /tmp/keep_folders.txt /tmp/keep_list.txt \
     && find /tmp/simplicity_sdk/platform -name "*.a" -type f -delete \
     && find /tmp/simplicity_sdk/openthread -name "*efr32mg21*" -delete \
     && find /tmp/simplicity_sdk \( -name "libsl_platform_ftd_efr32mg2*" -o -name "libsl_ot_stack_mtd_efr32mg2*" \) -type f -delete \

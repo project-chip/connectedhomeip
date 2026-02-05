@@ -105,7 +105,7 @@ if (wifi_soc) {
 
     if (use_temp_sensor) {
       include_dirs += [
-        "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/inc,
+        "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/inc",
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht",
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht/config",
         "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/inc",

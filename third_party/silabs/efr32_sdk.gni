@@ -194,7 +194,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/config",
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform_core/platform/emlib/inc",
-      "${efr32_sdk_root}/platform/halconfig/inc/hal-config", # TODO: Cannot find replacement
       "${efr32_sdk_root}/platform_core/platform/peripheral/inc",
       "${efr32_sdk_root}/rail_library/common",
       "${efr32_sdk_root}/rail_library/chip/efr32",
@@ -245,7 +244,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/bluetooth_le_host/inc",
       "${efr32_sdk_root}/bluetooth_mesh/inc",
       "${efr32_sdk_root}/bluetooth_le_controller/inc",
-      "${efr32_sdk_root}/util/plugin/plugin-common/fem-control", # TODO: Cannot find replacement
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/graphics",
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/memory_manager", 
       "${efr32_sdk_root}/platform_core/util/silicon_labs/silabs_core/queue",
@@ -437,7 +435,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht",
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht/config",
         "${efr32_sdk_root}/board_drivers/hardware/driver/si70xx/inc",
-        "${efr32_sdk_root}/app/bluetooth/common/sensor_select",   # TODO: Cannot find replacement 
         "${efr32_sdk_root}/platform_common/platform/common/config",
       ]
     }
@@ -935,12 +932,6 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/platform_core/platform/emdrv/spidrv/src/spidrv.c",
         "${silabs_gen_folder}/autogen/sl_spidrv_init.c",
-      ]
-    }
-# TODO: Cannot find replacement
-    if (defined(enable_fem)) {
-      sources += [
-        "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c",
       ]
     }
 
