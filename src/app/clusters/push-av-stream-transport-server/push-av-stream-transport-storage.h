@@ -20,12 +20,62 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
+#include <lib/core/TLVTags.h>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
+
+// Size calculation for CMAFContainerStorage
+// CMAFInterface: 1 byte
+// segmentDuration: 2 bytes
+// chunkDuration: 2 bytes
+// sessionGroup: 1 byte
+// mTrackNameBuffer: ~32 bytes - padded
+// mCENCKeyBuffer: 16 bytes
+// mCENCKeyIDBuffer: 16 bytes
+// metadataEnabled: ~2 bytes (EstimateStructOverhead)
+static constexpr size_t kCMAFContainerStorageSize =
+    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t), kMaxTrackNameLength,
+                                sizeof(uint16_t), sizeof(uint16_t), sizeof(bool));
+
+// Size calculation for ContainerOptionsStorage
+// containerType: 1 byte
+// mCMAFContainerStorage: kCMAFContainerStorageSize
+static constexpr size_t kContainerOptionsStorageSize = TLV::EstimateStructOverhead(sizeof(uint8_t), kCMAFContainerStorageSize);
+
+// Size of MotionTimeControl struct
+static constexpr size_t kMotionTimeControlSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint32_t), sizeof(uint16_t));
+
+// Size calculation for TransportZoneOptions
+// Assuming CHIP_CONFIG_MAX_NUM_ZONES = 16
+static constexpr size_t kTransportZoneOptionsSize =
+    2 /* Array Overhead */ + (CHIP_CONFIG_MAX_NUM_ZONES * TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint8_t)));
+
+// Size calculation for TriggerOptionsStorage
+// triggerType: 1 byte
+// mTransportZoneOptions: kTransportZoneOptionsSize
+// motionSensitivity: 1 byte
+// motionTimeControl: kMotionTimeControlSize
+// maxPreRollLen: 2 bytes
+static constexpr size_t kTriggerOptionsStorageSize = TLV::EstimateStructOverhead(
+    sizeof(uint8_t), kTransportZoneOptionsSize, sizeof(uint8_t), kTransportZoneOptionsSize, sizeof(uint16_t));
+
+static constexpr size_t kTransportOptionsStorageSize = TLV::EstimateStructOverhead(
+    sizeof(uint8_t),              // streamUsage
+    sizeof(uint16_t),             // videoStreamID
+    sizeof(uint16_t),             // audioStreamID
+    sizeof(uint16_t),             // TLSEndpointID
+    kMaxUrlLength,                // max url
+    sizeof(uint8_t),              // ingestMethod
+    sizeof(uint32_t),             // expiryTime
+    kTriggerOptionsStorageSize,   // triggerOptions
+    kContainerOptionsStorageSize, // containerOptions
+    2u /* Array Overhead */ + 16u * TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)),
+    2u /* Array Overhead */ + 16u * TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)));
 
 /**
  * @brief Storage implementation for transport trigger options.

@@ -22,10 +22,13 @@
 #include <uriparser/Uri.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -173,6 +176,13 @@ public:
     bool TestUrlValidation(const std::string & urlInput, bool shouldSucceed)
     {
         PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
+        chip::Testing::ClusterTester clusterTester(server);
+        app::DefaultSafeAttributePersistenceProvider persistenceProvider;
+
+        VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&persistenceProvider);
+        EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
         TestValidateUrlDelegate mockDelegate;
         TestValidateUrlTLSDelegate tlsClientManagementDelegate;
 
@@ -187,6 +197,7 @@ public:
 
         server.GetLogic().SetDelegate(&mockDelegate);
         server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+        EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
 
         auto result = server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
 
