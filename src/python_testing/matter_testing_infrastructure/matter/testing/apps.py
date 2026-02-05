@@ -54,7 +54,7 @@ class AppServerSubprocess(Subprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None,
-                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer, capture_output: bool = False):
+                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
 
         if kvs_path is None:
             # Create a temporary KVS file in the specified storage directory. The underlying
@@ -76,10 +76,7 @@ class AppServerSubprocess(Subprocess):
 
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
-                         output_cb=lambda line, is_stderr: self.PREFIX + line,
-                         f_stdout=f_stdout,
-                         f_stderr=f_stderr,
-                         capture_output=capture_output)
+                         output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -118,8 +115,7 @@ class JFControllerSubprocess(Subprocess):
     PREFIX = b"[JF-CTRL]"
 
     def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
-                 vendor_id: int, extra_args: list[str] = [], f_stdout: BinaryIO = stdout.buffer,
-                 f_stderr: BinaryIO = stderr.buffer, capture_output: bool = False):
+                 vendor_id: int, extra_args: list[str] = []):
 
         # Build the command list
         command = [app]
@@ -134,10 +130,7 @@ class JFControllerSubprocess(Subprocess):
 
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
-                         output_cb=lambda line, is_stderr: self.PREFIX + line,
-                         f_stdout=f_stdout,
-                         f_stderr=f_stderr,
-                         capture_output=capture_output)
+                         output_cb=lambda line, is_stderr: self.PREFIX + line)
 
 
 class OTAProviderSubprocess(AppServerSubprocess):
