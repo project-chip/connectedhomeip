@@ -430,7 +430,8 @@ int NXPWiFiDriver::ScanWiFINetworkDoneFromMatterTaskContext(unsigned int count)
         response.channel  = (uint16_t) res.channel;
         response.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4; // TODO 5 GHz also possible, but results don't
                                                                                      // show this information
-        response.rssi = -static_cast<int8_t>(res.rssi);
+        response.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        response.signal.strength = -static_cast<int8_t>(res.rssi);
 
         response_list[valid] = response;
 
