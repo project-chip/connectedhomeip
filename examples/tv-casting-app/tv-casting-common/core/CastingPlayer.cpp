@@ -63,9 +63,7 @@ void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, Identificat
     // clear the UdcStatus to allow other UDC messages to be sent
     TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 exit:
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayer::SendUDC() failed with %" CHIP_ERROR_FORMAT, err.Format());
