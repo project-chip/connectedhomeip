@@ -98,6 +98,8 @@ chip::Access::DynamicProviderDeviceTypeResolver sDeviceTypeResolver([] {
 
 namespace chip {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
 namespace {
 
 /**
@@ -212,6 +214,7 @@ CHIP_ERROR InitTransportWithPortRetry(uint16_t basePort, uint16_t maxRetries, co
 }
 
 } // anonymous namespace
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
 
 Server Server::sServer;
 
@@ -342,6 +345,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // The logic below expects that the IPv6 transport is at index 0. Keep that logic in sync with
     // this code.
     //
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
     // Use helper function for automatic port selection with retry logic and overflow protection
     err = InitTransportWithPortRetry(
         mOperationalServicePort, initParams.portRetryCount, "transport",
@@ -392,6 +396,50 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             mTransports.Close();
         },
         mOperationalServicePort);
+#else // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Update TCP listen params if enabled
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    tcpListenParams.SetListenPort(mOperationalServicePort);
+#endif
+
+    // Initialize transports without port retry
+    err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort)
+                               .SetNativeParams(initParams.endpointNativeParams)
+#if INET_CONFIG_ENABLE_IPV4
+                               ,
+                           // The logic below expects that the IPv4 transport, if enabled, is at
+                           // index 1. Keep that logic in sync with this code.
+                           UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv4)
+                               .SetListenPort(mOperationalServicePort)
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+                               ,
+                           BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                               ,
+                           tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                           ,
+                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv4)
+                               .SetListenPort(mOperationalServicePort)
+#endif
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                               ,
+                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
+                               DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                               ,
+                           NfcListenParameters(nullptr)
+#endif
+    );
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
 
     SuccessOrExit(err);
     err = mListener.Init(this);
@@ -615,6 +663,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
     // Use helper function for UDC transport initialization with automatic port selection and overflow protection
     mUdcTransportMgr = Platform::New<UdcTransportMgr>();
     err              = InitTransportWithPortRetry(
@@ -633,6 +682,20 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             );
         },
         [&]() { mUdcTransportMgr->Close(); }, mCdcListenPort);
+#else // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Initialize UDC transport without port retry
+    mUdcTransportMgr = Platform::New<UdcTransportMgr>();
+    err              = mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                  .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                  .SetListenPort(mCdcListenPort)
+#if INET_CONFIG_ENABLE_IPV4
+                                     ,
+                                 Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                     .SetAddressType(Inet::IPAddressType::kIPv4)
+                                     .SetListenPort(mCdcListenPort)
+#endif // INET_CONFIG_ENABLE_IPV4
+    );
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
     SuccessOrExit(err);
 
     gUDCClient = Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
