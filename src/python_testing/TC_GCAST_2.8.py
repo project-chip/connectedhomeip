@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.runner import TestStep
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +98,7 @@ class TC_GCAST_2_8(MatterBaseTest):
             testOperation = Clusters.Groupcast.Enums.GroupcastTestingEnum.kEnableListenerTesting
         else:
             testOperation = Clusters.Groupcast.Enums.GroupcastTestingEnum.kEnableSenderTesting
-        
+
         await self.send_single_cmd(Clusters.Groupcast.Commands.GroupcastTesting(
             testOperation=testOperation)
         )
