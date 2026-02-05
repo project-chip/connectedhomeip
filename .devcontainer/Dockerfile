@@ -38,9 +38,12 @@ RUN apt-get update \
         dialog \
         docker.io \
         emacs \
+        fish \
+        gnupg2 \
         icecc \
         iputils-ping \
         lsb-release \
+        openssh-client \
         sudo \
         valgrind \
         vim \
