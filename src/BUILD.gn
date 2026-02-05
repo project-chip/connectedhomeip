@@ -64,6 +64,7 @@ if (chip_build_tests) {
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
+      "${chip_root}/src/app/server/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/lib/format/tests",

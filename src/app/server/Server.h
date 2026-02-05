@@ -153,6 +153,16 @@ struct ServerInitParams
     // Interface on which to run daemon
     Inet::InterfaceId interfaceId = Inet::InterfaceId::Null();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Number of sequential port retries if binding fails with "address in use"
+    // When > 0, if binding to operationalServicePort (or userDirectedCommissioningPort) fails,
+    // the system will automatically try portRetryCount additional sequential ports.
+    // For example: if operationalServicePort=5540 and portRetryCount=10, it will try
+    // ports 5540, 5541, 5542, ... up to 5550 until one succeeds.
+    // When set to 0 (default), no retry is attempted - implements single port behavior.
+    uint16_t portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
     // Persistent storage delegate: MUST be injected. Used to maintain storage by much common code.
     // Must be initialized before being provided.
     PersistentStorageDelegate * persistentStorageDelegate = nullptr;

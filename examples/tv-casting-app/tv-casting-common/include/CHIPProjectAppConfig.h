@@ -107,6 +107,10 @@
 // delay (in sec) before which we assume undiscovered cached players may be in STR mode
 #define CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC 5
 
+// Enable automatic port retry to handle port conflicts
+#define CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY 1
+#define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
+
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
 #ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN

@@ -184,6 +184,10 @@ int main(int argc, char * argv[])
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Enable automatic port retry for casting apps to handle port conflicts
+    initParams.portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
     if (argc > 1)
