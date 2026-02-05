@@ -1072,6 +1072,9 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
 {
     ChipLogProgress(Camera, "Connection state changed for session %u: %s", sessionId, connected ? "connected" : "disconnected");
 
+    // Cancel any pending connection timeout timer for this session
+    CancelConnectionTimer(sessionId);
+
     if (connected)
     {
         RegisterWebrtcTransport(sessionId);
@@ -1269,6 +1272,9 @@ CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams(uint16_t sessionId)
 
 void WebRTCProviderManager::StartConnectionTimer(uint16_t sessionId)
 {
+    // Cancel any existing timer for this session
+    CancelConnectionTimer(sessionId);
+
     auto * ctx     = chip::Platform::New<ConnectionTimeoutContext>();
     ctx->manager   = this;
     ctx->sessionId = sessionId;
@@ -1281,11 +1287,32 @@ void WebRTCProviderManager::StartConnectionTimer(uint16_t sessionId)
                      err.Format());
         chip::Platform::Delete(ctx);
     }
+    else
+    {
+        // Store the context for potential cancellation
+        mConnectionTimerContexts[sessionId] = ctx;
+    }
+}
+
+void WebRTCProviderManager::CancelConnectionTimer(uint16_t sessionId)
+{
+    auto it = mConnectionTimerContexts.find(sessionId);
+    if (it != mConnectionTimerContexts.end())
+    {
+        ConnectionTimeoutContext * ctx = it->second;
+        DeviceLayer::SystemLayer().CancelTimer(OnConnectionTimeoutCallback, ctx);
+        chip::Platform::Delete(ctx);
+        mConnectionTimerContexts.erase(it);
+        ChipLogProgress(Camera, "Cancelled connection timeout timer for session %u", sessionId);
+    }
 }
 
 void WebRTCProviderManager::OnConnectionTimeoutCallback(chip::System::Layer * systemLayer, void * context)
 {
     auto * ctx = static_cast<ConnectionTimeoutContext *>(context);
+
+    // Remove from the map before handling timeout (timer already fired)
+    ctx->manager->mConnectionTimerContexts.erase(ctx->sessionId);
     ctx->manager->HandleConnectionTimeout(ctx->sessionId);
     chip::Platform::Delete(ctx);
 }
@@ -1296,12 +1323,6 @@ void WebRTCProviderManager::HandleConnectionTimeout(uint16_t sessionId)
     if (transport == nullptr)
     {
         // Session was already cleaned up
-        return;
-    }
-
-    if (transport->IsConnected())
-    {
-        // Connection was established, no timeout needed
         return;
     }
 

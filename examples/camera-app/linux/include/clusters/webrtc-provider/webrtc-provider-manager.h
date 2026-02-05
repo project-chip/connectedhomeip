@@ -143,6 +143,8 @@ private:
 
     void StartConnectionTimer(uint16_t sessionId);
 
+    void CancelConnectionTimer(uint16_t sessionId);
+
     void HandleConnectionTimeout(uint16_t sessionId);
 
     static void OnConnectionTimeoutCallback(chip::System::Layer * systemLayer, void * context);
@@ -171,6 +173,9 @@ private:
         WebRTCProviderManager * manager;
         uint16_t sessionId;
     };
+
+    // Map to track active connection timeout timers for cancellation
+    std::unordered_map<uint16_t, ConnectionTimeoutContext *> mConnectionTimerContexts;
 };
 
 } // namespace WebRTCTransportProvider

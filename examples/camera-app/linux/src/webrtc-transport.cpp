@@ -195,7 +195,6 @@ void WebrtcTransport::Start()
         return;
     }
 
-    mConnected      = false;
     mPeerConnection = CreateWebRTCPeerConnection();
 
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
@@ -274,7 +273,6 @@ void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
 
 void WebrtcTransport::OnConnectionStateChanged(bool connected)
 {
-    mConnected = connected;
     ChipLogProgress(Camera, "Connection state changed for sessionID: %u", mRequestArgs.sessionId);
     if (mOnConnectionState)
         mOnConnectionState(connected, mRequestArgs.sessionId);
