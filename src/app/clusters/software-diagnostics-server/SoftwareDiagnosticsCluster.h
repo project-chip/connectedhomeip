@@ -49,9 +49,11 @@ namespace app {
                 SoftwareDiagnostics::Attributes::ThreadMetrics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
                 SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
 
-            SoftwareDiagnosticsServerCluster(const OptionalAttributeSet & optionalAttributeSet)
+            SoftwareDiagnosticsServerCluster(const OptionalAttributeSet & optionalAttributeSet,
+                DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider)
                 : DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id })
                 , mOptionalAttributeSet(optionalAttributeSet)
+                , mDiagnosticDataProvider(diagnosticDataProvider)
             {
             }
 
@@ -80,11 +82,11 @@ namespace app {
                 return Attributes(builder);
             }
 
-            CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapFree(out); }
-            CHIP_ERROR GetCurrentHeapUsed(uint64_t & out) const { return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapUsed(out); }
+            CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return mDiagnosticDataProvider.GetCurrentHeapFree(out); }
+            CHIP_ERROR GetCurrentHeapUsed(uint64_t & out) const { return mDiagnosticDataProvider.GetCurrentHeapUsed(out); }
             CHIP_ERROR GetCurrentHighWatermark(uint64_t & out) const
             {
-                return DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapHighWatermark(out);
+                return mDiagnosticDataProvider.GetCurrentHeapHighWatermark(out);
             }
 
             // Encodes the thread metrics list, using the provided encoder.
@@ -95,10 +97,10 @@ namespace app {
             {
                 return BitFlags<SoftwareDiagnostics::Feature>().Set(
                     SoftwareDiagnostics::Feature::kWatermarks,
-                    mOptionalAttributeSet.IsSet(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id) && DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks());
+                    mOptionalAttributeSet.IsSet(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id) && mDiagnosticDataProvider.SupportsWatermarks());
             }
 
-            CHIP_ERROR ResetWatermarks() { return DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks(); }
+            CHIP_ERROR ResetWatermarks() { return mDiagnosticDataProvider.ResetWatermarks(); }
 
             /// Returns acceptable attributes for the given Diagnostics data provider:
             ///   - ALWAYS includes global attributes
@@ -116,6 +118,7 @@ namespace app {
             CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
 
             const OptionalAttributeSet mOptionalAttributeSet;
+            DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
         };
 
     } // namespace Clusters

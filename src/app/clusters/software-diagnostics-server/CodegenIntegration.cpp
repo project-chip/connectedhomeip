@@ -20,6 +20,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -43,7 +44,8 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(SoftwareDiagnosticsServerCluster::OptionalAttributeSet(optionalAttributeBits));
+        gServer.Create(SoftwareDiagnosticsServerCluster::OptionalAttributeSet(optionalAttributeBits),
+                       DeviceLayer::GetDiagnosticDataProvider());
         return gServer.Registration();
     }
 

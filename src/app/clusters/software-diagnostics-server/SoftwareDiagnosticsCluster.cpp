@@ -141,7 +141,7 @@ private:
 
 CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEncoder & encoder) const
 {
-    AutoFreeThreadMetrics metrics(DeviceLayer::GetDiagnosticDataProvider());
+    AutoFreeThreadMetrics metrics(mDiagnosticDataProvider);
 
     if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR)
     {
@@ -160,8 +160,7 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEnc
 
 CHIP_ERROR SoftwareDiagnosticsServerCluster::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) &&
-        DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
+    if (mOptionalAttributeSet.IsSet(Attributes::CurrentHeapHighWatermark::Id) && mDiagnosticDataProvider.SupportsWatermarks())
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);
