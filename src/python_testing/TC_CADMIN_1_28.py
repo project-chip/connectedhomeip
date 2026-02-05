@@ -317,15 +317,16 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             asserts.assert_true(False, f'Exception {e} occured during OJCW')
 
         self.step("4")
-        service_found = [False, None]
+        service_found = None
         discovery = mdns_discovery.MdnsDiscovery()
         raw_services = await discovery.get_commissionable_services(discovery_timeout_sec=240, log_output=True)
         services = [self.ParsedService(service) for service in raw_services]
         for parsed_service in services:
             if parsed_service.cm == 3:
-                service_found = [True, parsed_service]
+                service_found = parsed_service
                 break
-        asserts.assert_true(service_found[0], f"Successfully found service with CM={service_found[1].cm}, D={service_found[1].d}")
+        asserts.assert_is_not_none(service_found, "Failed to find a commissionable service with CM=3 (Joint Commissioning Method) being advertised.")
+        log.info(f"Successfully found service with CM={service_found.cm}, D={service_found.d}")
 
         self.step("5")
         _nodeID = 15
