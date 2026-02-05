@@ -397,12 +397,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         },
         mOperationalServicePort);
 #else // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Initialize transports without port retry
+
     // Update TCP listen params if enabled
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     tcpListenParams.SetListenPort(mOperationalServicePort);
 #endif
 
-    // Initialize transports without port retry
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
@@ -682,19 +683,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             );
         },
         [&]() { mUdcTransportMgr->Close(); }, mCdcListenPort);
-#else // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+#else  // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
     // Initialize UDC transport without port retry
     mUdcTransportMgr = Platform::New<UdcTransportMgr>();
     err              = mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                                  .SetAddressType(Inet::IPAddressType::kIPv6)
-                                                  .SetListenPort(mCdcListenPort)
+                                                           .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                           .SetListenPort(mCdcListenPort)
 #if INET_CONFIG_ENABLE_IPV4
-                                     ,
-                                 Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                     .SetAddressType(Inet::IPAddressType::kIPv4)
-                                     .SetListenPort(mCdcListenPort)
+                                                  ,
+                                              Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                  .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                  .SetListenPort(mCdcListenPort)
 #endif // INET_CONFIG_ENABLE_IPV4
-    );
+                 );
 #endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
     SuccessOrExit(err);
 
