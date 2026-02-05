@@ -36,84 +36,84 @@
 
 namespace chip {
 namespace app {
-    namespace Clusters {
+namespace Clusters {
 
-        /// Integration of Software diagnostics logic within the Matter data model
-        ///
-        /// Translates between matter calls and Software Diagnostics logic
-        ///
-        /// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
-        class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener {
-        public:
-            using OptionalAttributeSet = chip::app::OptionalAttributeSet<
-                SoftwareDiagnostics::Attributes::ThreadMetrics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
-                SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
+/// Integration of Software diagnostics logic within the Matter data model
+///
+/// Translates between matter calls and Software Diagnostics logic
+///
+/// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
+class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener
+{
+public:
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        SoftwareDiagnostics::Attributes::ThreadMetrics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
+        SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
 
-            SoftwareDiagnosticsServerCluster(const OptionalAttributeSet & optionalAttributeSet,
-                DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider)
-                : DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id })
-                , mOptionalAttributeSet(optionalAttributeSet)
-                , mDiagnosticDataProvider(diagnosticDataProvider)
-            {
-            }
+    SoftwareDiagnosticsServerCluster(const OptionalAttributeSet & optionalAttributeSet,
+                                     DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }),
+        mOptionalAttributeSet(optionalAttributeSet), mDiagnosticDataProvider(diagnosticDataProvider)
+    {}
 
-            // software fault listener
-            void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override;
+    // software fault listener
+    void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override;
 
-            CHIP_ERROR Startup(ServerClusterContext & context) override;
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-            void Shutdown(ClusterShutdownType shutdownType) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
-            // Server cluster implementation
-            DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                AttributeValueEncoder & encoder) override;
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
 
-            std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-            CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
-            {
-                return AcceptedCommands(builder);
-            }
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        return AcceptedCommands(builder);
+    }
 
-            CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
-            {
-                return Attributes(builder);
-            }
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
+    {
+        return Attributes(builder);
+    }
 
-            // Encodes the thread metrics list, using the provided encoder.
-            CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder) const;
+    // Encodes the thread metrics list, using the provided encoder.
+    CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder) const;
 
-            /// Determines the feature map based on the DiagnosticsProvider support.
-            BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
-            {
-                return BitFlags<SoftwareDiagnostics::Feature>().Set(
-                    SoftwareDiagnostics::Feature::kWatermarks,
-                    mOptionalAttributeSet.IsSet(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id) && mDiagnosticDataProvider.SupportsWatermarks());
-            }
+    /// Determines the feature map based on the DiagnosticsProvider support.
+    BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
+    {
+        return BitFlags<SoftwareDiagnostics::Feature>().Set(
+            SoftwareDiagnostics::Feature::kWatermarks,
+            mOptionalAttributeSet.IsSet(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id) &&
+                mDiagnosticDataProvider.SupportsWatermarks());
+    }
 
-            CHIP_ERROR ResetWatermarks() { return mDiagnosticDataProvider.ResetWatermarks(); }
+    CHIP_ERROR ResetWatermarks() { return mDiagnosticDataProvider.ResetWatermarks(); }
 
-            /// Returns acceptable attributes for the given Diagnostics data provider:
-            ///   - ALWAYS includes global attributes
-            ///   - adds heap/watermark depending on feature flags and if the interface supports it.
-            CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
+    /// Returns acceptable attributes for the given Diagnostics data provider:
+    ///   - ALWAYS includes global attributes
+    ///   - adds heap/watermark depending on feature flags and if the interface supports it.
+    CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
-            /// Determines what commands are supported
-            CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
+    /// Determines what commands are supported
+    CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
-        private:
-            // Encodes the `value` in `encoder`, while handling a potential `readError` that occurred
-            // when the input `value` was read:
-            //   - CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE results in a 0 being encoded
-            //   - any other read error is just forwarded
-            CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
+private:
+    // Encodes the `value` in `encoder`, while handling a potential `readError` that occurred
+    // when the input `value` was read:
+    //   - CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE results in a 0 being encoded
+    //   - any other read error is just forwarded
+    CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
 
-            const OptionalAttributeSet mOptionalAttributeSet;
-            DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
-        };
+    const OptionalAttributeSet mOptionalAttributeSet;
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
+};
 
-    } // namespace Clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip
