@@ -22,6 +22,7 @@
 #include <platform/PlatformManager.h>
 
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -49,6 +50,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/NetworkRecoveryDataProvider.h>
 #include <platform/RuntimeOptionsProvider.h>
 
 #include <AllClustersExampleDeviceInfoProviderImpl.h>
@@ -129,6 +131,7 @@
 
 #include "AppMain.h"
 #include "CommissionableInit.h"
+#include "LinuxNetworkRecoveryDataProvider.h"
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include "ExampleAccessRestrictionProvider.h"
@@ -331,6 +334,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
+LinuxNetworkRecoveryDataProvider gNetworkRecoveryDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
@@ -338,14 +342,36 @@ chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleD
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
-    if (event->Type == DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished)
+    using namespace chip::DeviceLayer;
+    switch (event->Type)
     {
-        ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
+    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
+        ChipLogProgress(DeviceLayer, "DeviceEventCallback: Received kCHIPoBLEConnectionEstablished");
+        break;
     }
-    else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
-    {
+    case DeviceEventType::kInternetConnectivityChange: {
         // Restart the server on connectivity change
+        ChipLogProgress(DeviceLayer, "DeviceEventCallback: kInternetConnectivityChange %u", event->Type);
         app::DnssdServer::Instance().StartServer();
+        break;
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    case DeviceEventType::kWiFiConnectivityChange: {
+        ChipLogProgress(DeviceLayer, "DeviceEventCallback: kWiFiConnectivityChange %u", event->Type);
+        auto change = event->WiFiConnectivityChange.Result;
+        WifiConnectivityChanged(change);
+        break;
+    }
+    case DeviceEventType::kThreadConnectivityChange: {
+        // TODO handle thread connectivity changes
+        ChipLogError(DeviceLayer, "DeviceEventCallback:%u ThreadConnectivityChange is not yet supported", event->Type);
+        break;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    default: {
+        ChipLogProgress(DeviceLayer, "DeviceEventCallback: %u ignored", event->Type);
+        break;
+    }
     }
 }
 
@@ -641,6 +667,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     err = chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
+    // Network Recovery Data Provider
+    DeviceLayer::SetNetworkRecoveryDataProvider(&gNetworkRecoveryDataProvider);
 
     err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
                                                    LinuxDeviceOptions::GetInstance());
@@ -1076,9 +1104,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
@@ -1120,3 +1148,87 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 
     Cleanup();
 }
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+void AdvertiseNetworkRecovery(bool shouldAdvertise)
+{
+    bool isDeviceNotCommissioned = Server::GetInstance().GetFabricTable().FabricCount() == 0;
+    if (isDeviceNotCommissioned)
+    {
+        ChipLogError(DeviceLayer, "Device is not commissioned. Not advertising for Network recovery");
+        return;
+    }
+
+    // Device is commissioned. Network recovery possible.
+    gNetworkRecoveryDataProvider.SetShouldAdvertise(shouldAdvertise);
+    if (shouldAdvertise)
+    {
+        // Start ble advertising
+        int reason = ConnectivityMgrImpl().GetDisconnectReason();
+        ChipLogProgress(DeviceLayer, "Network disconnection reason=%d", reason);
+        // TODO Map reason with NetworkRecoveryReasonEnum
+        // Set reason as kAuth
+        GeneralCommissioning::Instance()->SetNetworkRecoveryReasonValue(
+            chip::app::DataModel::MakeNullable(GeneralCommissioning::NetworkRecoveryReasonEnum::kAuth));
+        TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        ChipLogProgress(DeviceLayer, "Network Recovery BLE Advertising started");
+        return;
+    }
+    else
+    {
+        // Stop the advertisement
+        // Reset the recovery reason
+        GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type reason;
+        reason.SetNull();
+        GeneralCommissioning::Instance()->SetNetworkRecoveryReasonValue(reason);
+        TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        ChipLogProgress(DeviceLayer, "Network Recovery BLE Advertising stopped");
+        return;
+    }
+}
+
+void WifiConnectivityChanged(chip::DeviceLayer::ConnectivityChange change)
+{
+    using namespace chip::DeviceLayer;
+    switch (change)
+    {
+    case ConnectivityChange::kConnectivity_NoChange: {
+        ChipLogProgress(DeviceLayer, "No Change in WiFi connectivity. Event ignored");
+        break;
+    }
+    case ConnectivityChange::kConnectivity_Established: {
+        ChipLogProgress(DeviceLayer, "Connectivity Established to Wifi Network");
+        chip::DeviceLayer::SystemLayer().CancelTimer(CheckNetworkConnectivity, nullptr);
+        // Stop Ble advertisements on any successfull operational network connectivity.
+
+        AdvertiseNetworkRecovery(false);
+        break;
+    }
+    case ConnectivityChange::kConnectivity_Lost: {
+        // platform retries connecting to configured wifi network
+        // schedule call to recheck connectivity status after 120s as per spec
+        ChipLogProgress(DeviceLayer, "Network connectivity lost, scheduling network recovery advertisement");
+        chip::DeviceLayer::SystemLayer().CancelTimer(CheckNetworkConnectivity, nullptr);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(120000), CheckNetworkConnectivity, nullptr);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void CheckNetworkConnectivity(chip::System::Layer * systemLayer, void * appState)
+{
+    bool isWifiConnected = ConnectivityMgr().IsWiFiStationConnected();
+    if (!isWifiConnected)
+    {
+        // Network is still not connected back
+        // Start the Network recovery advertisement
+        AdvertiseNetworkRecovery(true);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "Device is connected to the Network. Ignoring network recovery advertisement request");
+    }
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY

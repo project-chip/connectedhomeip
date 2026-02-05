@@ -82,3 +82,12 @@ void ApplicationInit();
 
 // For extra shutdown calls, the function will be called before any of the core Matter objects are shut down.
 void ApplicationShutdown();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+// Advertise Network Recovery over BLE
+void AdvertiseNetworkRecovery(bool shouldAdvertise);
+
+void WifiConnectivityChanged(chip::DeviceLayer::ConnectivityChange change);
+
+void CheckNetworkConnectivity(chip::System::Layer * systemLayer, void * appState);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY

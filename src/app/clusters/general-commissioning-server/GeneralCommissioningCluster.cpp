@@ -698,7 +698,7 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
 void GeneralCommissioningCluster::SetNetworkRecoveryReasonValue(
-    GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type & value)
+    GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type value)
 {
     mNetworkRecoveryReasonValue = value;
 }
