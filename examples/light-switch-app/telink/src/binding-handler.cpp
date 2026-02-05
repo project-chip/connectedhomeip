@@ -435,8 +435,9 @@ static void RegisterSwitchCommands()
 void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init(
-        { &Binding::Table::GetInstance(), &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init({ &Binding::Table::GetInstance(), &server.GetFabricTable(),
+                                                                    server.GetCASESessionManager(),
+                                                                    &server.GetPersistentStorage() });
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
