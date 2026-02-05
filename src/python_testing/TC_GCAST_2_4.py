@@ -129,7 +129,7 @@ class TC_GCAST_2_4(MatterBaseTest):
 
         self.step(3)
         if not ln_enabled:
-            self.mark_step_range_skipped("4a", "4f") 
+            self.mark_step_range_skipped("4a", "4f")
 
 
         self.step("4a")
@@ -142,12 +142,12 @@ class TC_GCAST_2_4(MatterBaseTest):
 
         self.step("4b")
         if len(endpoints_list) == 1:
-            self.mark_step_range_skipped("4c", "4d") 
+            self.mark_step_range_skipped("4c", "4d")
 
         self.step("4c")
         endpoint_2 = [endpoints_list[1]]
         resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(
-            groupID=groupID3, 
+            groupID=groupID3,
             endpoints=endpoint_2)
         )
         asserts.assert_is_not_none(resp.endpoints, "LeaveGroupResponse endpoints should not be None")
@@ -158,7 +158,7 @@ class TC_GCAST_2_4(MatterBaseTest):
         sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID3, endpoints=[endpoints_list[0]])
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
-        
+
         self.step("4e")
         endpoint_1 = [endpoints_list[0]]
         resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(

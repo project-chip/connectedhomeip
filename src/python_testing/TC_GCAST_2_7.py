@@ -179,7 +179,7 @@ class TC_GCAST_2_7(MatterBaseTest):
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        
+
         # Open commissioning window on TH1
         params = await self.th1.OpenCommissioningWindow(
             nodeId=self.dut_node_id,

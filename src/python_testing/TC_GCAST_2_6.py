@@ -96,7 +96,7 @@ class TC_GCAST_2_6(MatterBaseTest):
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-        
+
         # Open commissioning window on TH1
         params = await self.th1.OpenCommissioningWindow(
             nodeId=self.dut_node_id,
@@ -129,7 +129,7 @@ class TC_GCAST_2_6(MatterBaseTest):
             keySetID=keySetID1,
             key=inputKey1)
         )
-        
+
         self.step(3)
         f1MaxMembershipCount = math.floor(M_max / 2)
         for membership in range(1, f1MaxMembershipCount):
