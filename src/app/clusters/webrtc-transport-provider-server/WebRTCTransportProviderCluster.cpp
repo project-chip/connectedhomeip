@@ -273,6 +273,15 @@ CHIP_ERROR WebRTCTransportProviderCluster::AcceptedCommands(const ConcreteCluste
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
+CHIP_ERROR WebRTCTransportProviderCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                          ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return builder.AppendElements({
+        Commands::SolicitOfferResponse::Id,
+        Commands::ProvideOfferResponse::Id,
+    });
+}
+
 CHIP_ERROR WebRTCTransportProviderCluster::Attributes(const ConcreteClusterPath & path,
                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
