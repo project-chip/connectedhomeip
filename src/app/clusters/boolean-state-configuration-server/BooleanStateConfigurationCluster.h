@@ -131,9 +131,6 @@ private:
     SensorFaultBitMask mSensorFault{ 0 };
 
     void GenerateAlarmsStateChangedEvent();
-
-    // Does NotifyAttributeChanged and also calls the delegate attribute changed callback
-    void OnClusterAttributeChanged(AttributeId attributeId);
 };
 
 } // namespace chip::app::Clusters

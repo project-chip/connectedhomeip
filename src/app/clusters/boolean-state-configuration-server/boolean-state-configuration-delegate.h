@@ -43,12 +43,25 @@ public:
     virtual CHIP_ERROR HandleSuppressAlarm(BooleanStateConfiguration::AlarmModeBitmap alarmToSuppress)             = 0;
     virtual CHIP_ERROR HandleEnableDisableAlarms(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms) = 0;
 
-    // Optional handler of when an attribute changed inside the cluster
-    // either as a result of a command or as a result of a attribute write.
-    //
-    // Callback will be called for boolean state configuration cluster attributes such as
-    // CurrentSensitivityLevel::Id, AlarmsActive::Id, AlarmsSuppressed::Id, AlarmsEnabled::Id and SensorFault::Id
-    virtual void OnAttributeChanged(AttributeId att, BooleanStateConfigurationCluster * cluster) {}
+    // These methods are called when specific attributes are updated via WriteAttribute or InvokeCommand.
+    // Default implementations are empty - override only the callbacks you need.
+
+    // TODO: If application want to return error on attribute change, should we have mechanism to fallback?
+
+    // Called when CurrentSensitivityLevel attribute changes
+    virtual void OnCurrentSensitivityLevelChanged(uint8_t newValue) {}
+
+    // Called when AlarmsActive attribute changes
+    virtual void OnAlarmsActiveChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
+
+    // Called when AlarmsSuppressed attribute changes
+    virtual void OnAlarmsSuppressedChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
+
+    // Called when AlarmsEnabled attribute changes
+    virtual void OnAlarmsEnabledChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
+
+    // Called when SensorFault attribute changes
+    virtual void OnSensorFaultChanged(chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> newValue) {}
 };
 
 } // namespace BooleanStateConfiguration
