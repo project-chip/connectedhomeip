@@ -48,7 +48,7 @@ public:
     {
         Config(EndpointId endpointId) : mEndpointId(endpointId) {}
 
-        Config & WithFeatures(OccupancySensing::Feature featureMap)
+        Config & WithFeatures(BitMask<OccupancySensing::Feature> featureMap)
         {
             mFeatureMap = featureMap;
             return *this;
@@ -76,7 +76,7 @@ public:
         }
 
         EndpointId mEndpointId;
-        BitMask<OccupancySensing::Feature> mFeatureMap = 0;
+        BitMask<OccupancySensing::Feature> mFeatureMap = OccupancySensing::Feature::kOccupancyEvent;
         bool mShowDeprecatedAttributes                 = true;
         uint16_t mHoldTime;
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
