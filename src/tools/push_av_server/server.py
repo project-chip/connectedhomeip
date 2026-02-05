@@ -392,7 +392,7 @@ class CAHierarchy:
             if cert_path.exists() and key_path.exists():
                 cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
 
-                if datetime.datetime.now() > cert.not_valid_after:
+                if datetime.datetime.now(datetime.timezone.utc) < cert.not_valid_after:
                     # We only reuse the certificate/key if the cert is still valid
                     return (key_path, cert_path, True)
 
@@ -697,7 +697,7 @@ class PushAvServer:
                 if not path_regex.match(file_path):
                     errors.append("DASH manifest must be uploaded as session_X/index.mpd")
 
-                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
+                session.uploaded_manifests.append((file_path_with_ext, file_path_with_ext + ".crt"))
             elif ext == "m3u8":
                 # HLS manifest files
                 if stream.interface != SupportedIngestInterface.hls:
@@ -708,7 +708,7 @@ class PushAvServer:
 
                 # TODO Lifecycle validation for HLS manifests
 
-                session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
+                session.uploaded_manifests.append((file_path_with_ext, file_path_with_ext + ".crt"))
             elif ext == "m4s" or ext == "init":
                 # Segmented video files
 
