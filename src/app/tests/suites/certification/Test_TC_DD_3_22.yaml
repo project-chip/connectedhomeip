@@ -15,20 +15,20 @@
 name: 3.3.22 [TC-DD-3.22] NFC-based commissioning [DUT as Commissioner]
 
 PICS:
-  - MCORE.ROLE.COMMISSIONER
-  - MCORE.DD.NFC
-  - MCORE.DD.NTL
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.NFC
+    - MCORE.DD.NTL
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic Information"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
 
 tests:
-  - label: "Step 1: Commission DUT to TH"
-    cluster: "DelayCommands"
-    command: "WaitForCommissionee"
-    arguments:
-      values:
-        - name: "nodeId"
-          value: nodeId
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
