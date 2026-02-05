@@ -27,9 +27,8 @@ using namespace Switch::Attributes;
 
 SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features,
                              const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Switch::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mNumberOfPositions(config.numberOfPositions),
-    mMultiPressMax(config.multiPressMax)
+    DefaultServerCluster({ endpointId, Switch::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mNumberOfPositions(config.numberOfPositions), mMultiPressMax(config.multiPressMax)
 {}
 
 DataModel::ActionReturnStatus SwitchCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -70,6 +69,15 @@ CHIP_ERROR SwitchCluster::SetNumberOfPositions(uint8_t numberOfPositions)
     VerifyOrReturnError(numberOfPositions >= 2, CHIP_ERROR_INVALID_ARGUMENT);
 
     SetAttributeValue(mNumberOfPositions, numberOfPositions, NumberOfPositions::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SwitchCluster::SetMultiPressMax(uint8_t multiPressMax)
+{
+    // According to the spec, the minimum value is 2.
+    VerifyOrReturnError(multiPressMax >= 2, CHIP_ERROR_INVALID_ARGUMENT);
+
+    SetAttributeValue(mMultiPressMax, multiPressMax, MultiPressMax::Id);
     return CHIP_NO_ERROR;
 }
 

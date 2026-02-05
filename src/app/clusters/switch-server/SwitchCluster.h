@@ -45,6 +45,9 @@ public:
     CHIP_ERROR SetNumberOfPositions(uint8_t numberOfPositions);
     uint8_t GetNumberOfPositions() const { return mNumberOfPositions; }
 
+    CHIP_ERROR SetMultiPressMax(uint8_t multiPressMax);
+    uint8_t GetMultiPressMax() const { return mMultiPressMax; }
+
     CHIP_ERROR SetCurrentPosition(uint8_t currentPosition);
     uint8_t GetCurrentPosition() const { return mCurrentPosition; }
 

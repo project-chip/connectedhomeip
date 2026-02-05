@@ -22,15 +22,24 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-SwitchManager SwitchManager::sSwitch;
-using namespace ::chip;
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Switch;
 using namespace chip::DeviceLayer;
+
+SwitchManager SwitchManager::sSwitch;
+
 static uint8_t multiPressCount = 1;
 
 void SwitchManager::Init(void)
 {
     uint8_t multiPressMax = 2;
-    chip::app::Clusters::Switch::Attributes::MultiPressMax::Set(GENERICSWITCH_ENDPOINT_ID, multiPressMax);
+
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    (void) switchCluster->SetMultiPressMax(multiPressMax);
 }
 
 void SwitchManager::ToggleHandler(AppEvent * aEvent)
