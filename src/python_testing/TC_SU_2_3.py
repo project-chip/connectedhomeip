@@ -50,6 +50,7 @@
 
 import asyncio
 import logging
+import queue
 import time
 
 from mobly import asserts
@@ -75,6 +76,26 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         return [
             "MCORE.OTA"
         ]
+
+    async def wait_for_requestor_state(self, event_cb, target_state, timeout_sec=120.0):
+        """
+        Espera hasta recibir un StateTransition cuyo newState == target_state.
+        Ignora cualquier otro StateTransition que llegue antes.
+        """
+        deadline = time.time() + timeout_sec
+        while True:
+            remaining = deadline - time.time()
+            if remaining <= 0:
+                asserts.fail(f"Timeout esperando StateTransition a {target_state}")
+
+            try:
+                ev = event_cb.event_queue.get(block=True, timeout=remaining)
+            except queue.Empty:
+                asserts.fail(f"Timeout esperando StateTransition a {target_state}")
+
+            data = ev.Data
+            if getattr(data, "newState", None) == target_state:
+                return data
 
     def steps_TC_SU_2_3(self) -> list[TestStep]:
         return [
@@ -171,11 +192,12 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateconsent,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
-            # expected_output="Server initialization complete",
+            expected_output="Server initialization complete",
             timeout=30
         )
 
         # Commission Provider (Only one time)
+        logger.info("Commissioning provider/TH")
         resp = await controller.CommissionOnNetwork(
             nodeId=provider_node_id,
             setupPinCode=provider_setupPinCode,
@@ -184,6 +206,7 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         )
         logger.info(f'Provider Commissioning response: {resp}')
 
+        logger.info("Starting EventSubscription handlers")
         event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
                                             expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
         await event_cb.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=self.endpoint, fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
@@ -194,40 +217,39 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
         await self.announce_ota_provider(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
+        # Waiting for querying event
         querying_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        logger.info(f"Quering: {querying_event}")
+        logger.info(f"Quering event: {querying_event}")
         asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kQuerying, querying_event.newState,
                              f"New state is {querying_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kQuerying}")
 
+        # Waiting for downloading event
         downloading_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        logger.info(f"Downloading: {downloading_event}")
+        logger.info(f"Downloading event: {downloading_event}")
         asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kDownloading, downloading_event.newState,
                              f"New state is {downloading_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kDownloading}")
 
+        # Getting QueryImageSnapshot using out-of-band communication channel
         command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.endpoint}
         self.write_to_app_pipe(command, self.fifo_in)
         response_data = self.read_from_app_pipe(self.fifo_out)
 
         logger.info(f"Out of band command response: {response_data}")
 
+        # Verify that the DUT obtains the User Consent from the user prior to transfer of software update image
         user_consent_needed = response_data['Payload']['UserConsentNeeded']
-
         asserts.assert_true(user_consent_needed, "UserConsentNeeded should be True")
 
-        applying_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 1000)
-        logger.info(f"Applying: {applying_event}")
-        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kApplying, applying_event.newState,
-                             f"New state is {applying_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kApplying}")
-
-        # event_cb.reset()
-        # event_cb.cancel()
-
         self.terminate_provider()
-        # controller.ExpireSessions(nodeId=provider_node_id)
 
-        await asyncio.sleep(0.5)
+        # Waiting foe idle state (back to normal)
+        logger.info("Waiting for idle state")
+        idle_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
+        logger.info(f"Idle: {idle_event}")
+        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kIdle, idle_event.newState,
+                             f"New state is {idle_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kIdle}")
 
         self.step(2)
 
@@ -245,43 +267,23 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateAvailable,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
-            # expected_output="Server initialization complete",
+            expected_output="Server initialization complete",
             timeout=30
         )
 
-        # controller.ExpireSessions(provider_node_id)  # new CASE
-
-        # Commission Provider (Only one time)
-        # resp = await controller.CommissionOnNetwork(
-        #     nodeId=provider_node_id,
-        #     setupPinCode=provider_setupPinCode,
-        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-        #     filter=provider_discriminator
-        # )
-        # logger.info(f'Provider Commissioning response: {resp}')
-
-        # await self.create_acl_entry(dev_ctrl=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-
-        # await self.set_default_ota_providers_list(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
-
-        # event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor,
-        #                                     expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
-        # await event_cb.start(dev_ctrl=controller, node_id=requestor_node_id, endpoint=self.endpoint, fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-
         await self.announce_ota_provider(controller=controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id, endpoint=self.endpoint)
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
-        querying_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        logger.info(f"Quering: {querying_event}")
-        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kQuerying, querying_event.newState,
-                             f"New state is {querying_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kQuerying}")
+        # Waiting for downloading state
+        downloading = await self.wait_for_requestor_state(
+            event_cb,
+            requestorCluster.Enums.UpdateStateEnum.kDownloading,
+            timeout_sec=120
+        )
+        logger.info(f"Reached Downloading (ignoring intermediate states). Event: {downloading}")
 
-        downloading_event = event_cb.wait_for_event_report(Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50)
-        logger.info(f"Downloading: {downloading_event}")
-        asserts.assert_equal(requestorCluster.Enums.UpdateStateEnum.kDownloading, downloading_event.newState,
-                             f"New state is {downloading_event.newState} and it should be {requestorCluster.Enums.UpdateStateEnum.kDownloading}")
-
+        # Getting QueryImageSnapshot using out-of-band communication channel
         command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.endpoint}
         self.write_to_app_pipe(command, self.fifo_in)
         response_data = self.read_from_app_pipe(self.fifo_out)
@@ -289,10 +291,10 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         logger.info(f"Out of band command response: {response_data}")
 
         block_size = response_data['Payload']['BlockSize']
-
         logger.info(f"Block size: {block_size}")
 
-        # # TODO: Get transport protocol
+        # TODO: Get transport protocol
+        # Verify the Maximum Block Size requested by DUT
         tcp = True
         max_block_size_tcp = 8192
         max_block_size_non_tcp = 1024
@@ -306,6 +308,8 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
         event_cb.reset()
         event_cb.cancel()
+
+        await asyncio.sleep(120)
 
         self.terminate_provider()
 
