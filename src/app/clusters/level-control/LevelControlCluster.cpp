@@ -322,7 +322,7 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnError(IsValidLevel(level), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(IsValidLevel(level), Status::ConstraintError);
 
     if (IsWithOnOffCommand(commandId))
     {
