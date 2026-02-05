@@ -100,17 +100,18 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
             }
         }
         auto firstPtsIt = self->mVideoStreamFirstPts.find(videoStreamID);
+        auto now        = std::chrono::steady_clock::now().time_since_epoch();
         if (firstPtsIt == self->mVideoStreamFirstPts.end())
         {
-            self->mVideoStreamFirstPts[videoStreamID] = rawPts;
+
+            int64_t nowMs                             = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                             = static_cast<int64_t>(rawPts / 1000000);
+            self->mVideoStreamFirstPts[videoStreamID] = nowMs - rawMs;
         }
-        GstClockTime offsetNs = 0;
-        int64_t startEpoch    = self->mVideoStreamStartEpochs[videoStreamID];
-        int64_t ts            = 0;
-        if (rawPts >= self->mVideoStreamFirstPts[videoStreamID])
+        int64_t ts = self->mVideoStreamFirstPts[videoStreamID] + (rawPts / 1000000);
+        if (ts >= self->mVideoStreamFirstPts[videoStreamID])
         {
-            offsetNs = rawPts - self->mVideoStreamFirstPts[videoStreamID];
-            ts       = startEpoch + (offsetNs / 1000000); // Convert ns to ms
+
             // Forward raw H.264 encoded frames to media controller with timestamp
             // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
             // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
@@ -174,15 +175,14 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         auto firstPtsIt = self->mAudioStreamFirstPts.find(audioStreamID);
         if (firstPtsIt == self->mAudioStreamFirstPts.end())
         {
-            self->mAudioStreamFirstPts[audioStreamID] = rawPts;
+            auto now                                  = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                             = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                             = static_cast<int64_t>(rawPts / 1000000);
+            self->mAudioStreamFirstPts[audioStreamID] = nowMs - rawMs;
         }
-        GstClockTime offsetNs = 0;
-        int64_t startEpoch    = self->mAudioStreamStartEpochs[audioStreamID];
-        int64_t ts            = 0;
-        if (rawPts >= self->mAudioStreamFirstPts[audioStreamID])
+        int64_t ts = self->mAudioStreamFirstPts[audioStreamID] + (rawPts / 1000000);
+        if (ts >= self->mAudioStreamFirstPts[audioStreamID])
         {
-            offsetNs = rawPts - self->mAudioStreamFirstPts[audioStreamID];
-            ts       = startEpoch + (offsetNs / 1000000); // Convert ns to ms
             // Forward raw Opus encoded frames to media controller with timestamp
             // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
             // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
@@ -552,6 +552,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     {
         source = gst_element_factory_make("v4l2src", "source");
         g_object_set(source, "device", device.c_str(), nullptr);
+        ChipLogProgress(Camera, "Video pipeline: using V4L2 source");
     }
 
     // Check for any nullptr among the created elements
@@ -963,10 +964,6 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    mVideoStreamFirstPts.erase(streamID);
-    auto now                          = std::chrono::steady_clock::now().time_since_epoch();
-    mVideoStreamStartEpochs[streamID] = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-
     // Store in stream context
     it->videoContext = videoPipeline;
 
@@ -1000,6 +997,7 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
             return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
         }
     }
+    mVideoStreamFirstPts.erase(streamID);
 
     return CameraError::SUCCESS;
 }
@@ -1066,10 +1064,6 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
 
-    mAudioStreamFirstPts.erase(streamID);
-    auto now                          = std::chrono::steady_clock::now().time_since_epoch();
-    mAudioStreamStartEpochs[streamID] = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-
     // Store in stream context
     it->audioContext = audioPipeline;
 
@@ -1120,6 +1114,8 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
                          static_cast<int>(playbackError));
         }
     }
+
+    mAudioStreamFirstPts.erase(streamID);
 
     return CameraError::SUCCESS;
 }

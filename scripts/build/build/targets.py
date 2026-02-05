@@ -234,6 +234,7 @@ def BuildEsp32Target():
         TargetPart('m5stack', board=Esp32Board.M5Stack),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
+        TargetPart('p4functionev', board=Esp32Board.P4FunctionEV),
         TargetPart('qemu', board=Esp32Board.QEMU).OnlyIfRe('-tests'),
     ])
 
