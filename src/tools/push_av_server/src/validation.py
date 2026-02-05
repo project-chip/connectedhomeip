@@ -7,7 +7,7 @@ import re
 import xml.etree.ElementTree
 from typing import Optional
 
-from models import Session, Stream, SupportedIngestInterface
+from models import Session, Stream, SupportedIngestInterface, Track, TrackState
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ class ValidationService:
         self.hls_multi_variant_path_regex = re.compile(r"^session_\d+/index$")
         self.hls_media_playlist_path_regex = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/index$")
         self.segment_path_regex = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$")
+        # TODO: Init segment's name must be same as track's.
         self.init_path_regex = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/[^/]+")
 
     def validate_upload(
@@ -71,11 +72,14 @@ class ValidationService:
         if mpd_type == "dynamic" and len(session.uploaded_segments) > 0:
             errors.append("Dynamic MPD cannot be uploaded after segments have been uploaded")
 
-        if mpd_type == "static" and len(session.uploaded_segments) == 0:
-            errors.append("Static MPD cannot be uploaded before segments have been uploaded")
-
         if mpd_type == "static":
-            session.complete = True
+            if len(session.uploaded_segments) == 0:
+                errors.append("Static MPD cannot be uploaded before segments have been uploaded")
+                # Mark all tracks as completed when static MPD is uploaded
+                if not session.complete:
+                    for _, track in session.tracks.items():
+                        track.state = TrackState.COMPLETED
+                    session.complete = True
 
         if not self.dash_manifest_path_regex.match(file_path):
             errors.append("DASH manifest must be uploaded as session_X/index.mpd")
@@ -185,6 +189,12 @@ class ValidationService:
         if not hasattr(session, 'hls_expected_track_count'):
             errors.append("Multi-variant playlist must be uploaded before media playlists")
 
+        # Get or create track
+        if track_name_in_path not in session.tracks:
+            session.tracks[track_name_in_path] = Track(name=track_name_in_path)
+        
+        track = session.tracks[track_name_in_path]
+
         if has_ext_x_endlist:
             # Final media playlist
             if not has_ext_x_playlist_type:
@@ -195,6 +205,15 @@ class ValidationService:
                 errors.append("Final media playlist must contain #EXTINF tags")
             if not has_segment_lines:
                 errors.append("Final media playlist must contain segment lines")
+
+            # Validate track state: must have uploaded segments before final playlist
+            if track.state == TrackState.NOT_STARTED:
+                errors.append(f"Final media playlist uploaded for track '{track_name_in_path}' before any segments were uploaded")
+            elif track.state == TrackState.INITIAL_PLAYLIST_UPLOADED:
+                errors.append(f"Final media playlist uploaded for track '{track_name_in_path}' before init segment and segments were uploaded")
+            
+            # Mark track as completed
+            track.state = TrackState.COMPLETED
 
             # Track completion
             if not hasattr(session, 'hls_completed_tracks'):
@@ -214,6 +233,13 @@ class ValidationService:
                 errors.append("Initial media playlist must NOT contain #EXTINF tags")
             if has_segment_lines:
                 errors.append("Initial media playlist must NOT contain segment lines")
+
+            # Validate track state: initial playlist must be first upload for this track
+            if track.state != TrackState.NOT_STARTED:
+                errors.append(f"Initial media playlist already uploaded for track '{track_name_in_path}', duplicate upload not allowed")
+            
+            # Mark track as having uploaded initial playlist
+            track.state = TrackState.INITIAL_PLAYLIST_UPLOADED
 
         return errors, session
 
@@ -245,6 +271,7 @@ class ValidationService:
         else:
             # Validate track name
             track_name_in_path = match.group("trackName")
+            # TODO: Track name must be one of allocated audio/video stream struct
             track_name = stream.track_name
             if track_name and track_name != track_name_in_path:
                 errors.append(
@@ -252,6 +279,60 @@ class ValidationService:
                     f"{track_name_in_path} != {track_name}, "
                     "must match TrackName provided in ContainerOptions"
                 )
+
+            # Get or create track for state validation
+            if session and track_name_in_path not in session.tracks:
+                session.tracks[track_name_in_path] = Track(name=track_name_in_path)
+            
+            if session:
+                track = session.tracks[track_name_in_path]
+                
+                # Validate upload order based on interface type
+                if stream.interface == SupportedIngestInterface.dash:
+                    if ext == "init":
+                        # For DASH, init must be uploaded first for the track
+                        if track.state not in (TrackState.NOT_STARTED, TrackState.INIT_UPLOADED):
+                            errors.append(f"Init segment for track '{track_name_in_path}' must be uploaded before any segments")
+                        elif track.state == TrackState.INIT_UPLOADED:
+                            errors.append(f"Init segment for track '{track_name_in_path}' already uploaded, duplicate upload not allowed")
+                        else:
+                            track.state = TrackState.INIT_UPLOADED
+                    elif ext == "m4s":
+                        # For DASH, m4s segments must be uploaded after init
+                        if track.state == TrackState.NOT_STARTED:
+                            errors.append(f"Media segment for track '{track_name_in_path}' uploaded before init segment")
+                        
+                        # Update segment count and state
+                        track.segment_count += 1
+                        if track.state != TrackState.SEGMENTS_UPLOADING:
+                            track.state = TrackState.SEGMENTS_UPLOADING
+                
+                elif stream.interface == SupportedIngestInterface.hls:
+                    if ext == "init":
+                        # For HLS, init must be uploaded after initial media playlist
+                        if track.state == TrackState.NOT_STARTED:
+                            errors.append(f"Init segment for track '{track_name_in_path}' uploaded before initial media playlist")
+                        elif track.state == TrackState.INIT_UPLOADED:
+                            errors.append(f"Init segment for track '{track_name_in_path}' already uploaded, duplicate upload not allowed")
+                        elif track.state == TrackState.SEGMENTS_UPLOADING:
+                            errors.append(f"Init segment for track '{track_name_in_path}' uploaded after segments started")
+                        elif track.state == TrackState.COMPLETED:
+                            errors.append(f"Init segment for track '{track_name_in_path}' uploaded after track was completed")
+                        else:
+                            track.state = TrackState.INIT_UPLOADED
+                    elif ext == "m4s":
+                        # For HLS, m4s segments must be uploaded after initial playlist and init
+                        if track.state == TrackState.NOT_STARTED:
+                            errors.append(f"Media segment for track '{track_name_in_path}' uploaded before initial media playlist")
+                        elif track.state == TrackState.INITIAL_PLAYLIST_UPLOADED:
+                            errors.append(f"Media segment for track '{track_name_in_path}' uploaded before init segment")
+                        elif track.state == TrackState.COMPLETED:
+                            errors.append(f"Media segment for track '{track_name_in_path}' uploaded after track was completed")
+                        
+                        # Update segment count and state
+                        track.segment_count += 1
+                        if track.state != TrackState.SEGMENTS_UPLOADING:
+                            track.state = TrackState.SEGMENTS_UPLOADING
 
             # HLS-specific validation for media segments
             if stream.interface == SupportedIngestInterface.hls and ext == "m4s":

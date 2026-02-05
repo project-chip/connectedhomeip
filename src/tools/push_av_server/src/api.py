@@ -174,9 +174,6 @@ class PushAvServer:
             else:
                 self.stream_service.add_valid_upload(stream, session_id, file_path_with_ext)
             
-            # Update stream state
-            self.stream_service.update_stream(stream)
-            
             if stream.strict_mode and len(errors) > 0:
                 log.warning(f"Upload validation failed: {errors}")
                 return JSONResponse(status_code=400, content={"errors": errors})
