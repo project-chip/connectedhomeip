@@ -16,6 +16,7 @@
  */
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -147,9 +148,10 @@ CHIP_ERROR SoftwareDiagnosticsServerCluster::ReadThreadMetrics(AttributeValueEnc
 {
     AutoFreeThreadMetrics metrics(mDiagnosticDataProvider);
 
-    if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR)
+    CHIP_ERROR err = metrics.ReadThreadMetrics();
+    if (err != CHIP_NO_ERROR)
     {
-        // TODO: silently dropping error is what we historically did. We may want to at least log this...
+        ChipLogError(Zcl, "SoftwareDiagnostics: Failed to read thread metrics: %" CHIP_ERROR_FORMAT, err.Format());
         return encoder.EncodeEmptyList();
     }
 
