@@ -15,34 +15,29 @@ RUN set -x \
 # Copy sdk-pkg.slt (build context must be repo root)
 COPY scripts/setup/silabs/sdk-pkg.slt /tmp/sdk-pkg.slt
 
-# Install packages via SLT (simplicity-sdk, wiseconnect) then copy to /tmp for final image
+# Install packages via SLT (simplicity-sdk, wiseconnect, slc-cli) then copy to /tmp for final image
 RUN set -x \
     && /tmp/slt_install/slt install -f /tmp/sdk-pkg.slt \
+    && /tmp/slt_install/slt install slc-cli \
     && cp -a $(/tmp/slt_install/slt where simplicity-sdk) /tmp/simplicity_sdk \
     && cp -a $(/tmp/slt_install/slt where wiseconnect) /tmp/wifi_sdk \
+    && cp -a $(/tmp/slt_install/slt where slc-cli) /tmp/slc_cli \
     && rm -rf /tmp/slt_install /tmp/sdk-pkg.slt \
     && : # last line
 
 # Trim Simplicity SDK (from SLT install above) to save space
-RUN find /tmp/simplicity_sdk -depth -type d \( -name '*zwave*' -o -name '*zigbee*' -o -name '*wisun*' -o -name '*tensorflow*' -o -name '*sqlite*' -o -name '*ot-br-posix*' -o -name '*tflite*' -o -name '*unity_test_framework*' -o -name '*multiphy_configurator*' -o -name '*bluetooth*' \) -exec rm -rf {} + \
+RUN find /tmp/simplicity_sdk -depth -type d \( -name '*zwave*' -o -name '*zigbee*' -o -name '*wisun*' -o -name '*tensorflow*' -o -name '*sqlite*' -o -name '*ot-br-posix*' -o -name '*tflite*' -o -name '*unity_test_framework*' -o -name '*multiphy_configurator*' -o -name '*bluetooth*' -o -name '*_app' \) -exec rm -rf {} + \
     && find /tmp/simplicity_sdk/platform -name "*.a" -type f -delete \
     && find /tmp/simplicity_sdk/openthread -name "*efr32mg21*" -delete \
     && find /tmp/simplicity_sdk \( -name "libsl_platform_ftd_efr32mg2*" -o -name "libsl_ot_stack_mtd_efr32mg2*" \) -type f -delete \
     && find /tmp/simplicity_sdk/boards/hardware/board/config -mindepth 1 -maxdepth 1 -type d ! \( -name '*brd4186c*' -o -name '*brd4187c*' -o -name '*brd4186a*' -o -name '*brd4187a*' -o -name '*brd2601b*' -o -name '*brd2703a*' -o -name '*brd2704a*' -o -name '*component*' \
-    -o -name '*brd4316a*' -o -name '*brd4317a*' -o -name '*brd4318a*' -o -name '*brd4319a*' -o -name '*brd4116a*' -o -name '*brd4117a*' -o -name '*brd4118a*' -o -name '*brd2608a*' -o -name '*brd4350a*' -o -name '*brd4351a*' -o -name '*brd2709a*' \) -exec rm -rf {} + \
-    && find /tmp/simplicity_sdk/devices/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' \) -exec rm -rf {} + \
+    -o -name '*brd4316a*' -o -name '*brd4317a*' -o -name '*brd4318a*' -o -name '*brd4319a*' -o -name '*brd4116a*' -o -name '*brd4117a*' -o -name '*brd4118a*' -o -name '*brd2608a*' -o -name '*brd4350a*' -o -name '*brd4351a*' -o -name '*brd2709a*' \
+    -o -name '*brd1019a*' -o -name '*brd2719a*' -o -name '*brd4407a*' -o -name '*brd4408a*' \) -exec rm -rf {} + \
+    && find /tmp/simplicity_sdk/devices/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' -o -name 'SIMG301' \) -exec rm -rf {} + \
     && : # last line
 
 # Trim WiSeConnect SDK (from SLT install above) to save space
 RUN rm -rf /tmp/wifi_sdk/.git /tmp/wifi_sdk/examples /tmp/wifi_sdk/components/device/stm32 \
-    && : # last line
-
-# SLC-cli install
-# TODO: figure out a way to make this a fixed version. Currently a moving target.
-
-RUN wget https://www.silabs.com/documents/public/software/slc_cli_linux.zip && \
-    unzip ./slc_cli_linux.zip -d /tmp && \
-    rm ./slc_cli_linux.zip \
     && : # last line
 
 # Final SDK container for compiling using Silabs SDK
