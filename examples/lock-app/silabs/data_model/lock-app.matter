@@ -2263,7 +2263,7 @@ cluster IcdManagement = 70 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
-  revision 7;
+  revision 10;
 
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
@@ -2913,7 +2913,7 @@ cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 4;
   device type ma_powersource = 17, version 1;
   device type ma_otarequestor = 18, version 1;
 
@@ -3269,7 +3269,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_doorlock = 10, version 1;
+  device type ma_doorlock = 10, version 3;
 
 
   server cluster Identify {

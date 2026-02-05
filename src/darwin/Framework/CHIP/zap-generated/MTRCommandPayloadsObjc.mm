@@ -15599,6 +15599,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         _useAuxiliaryACL = nil;
 
         _replaceEndpoints = nil;
+
+        _mcastAddrPolicy = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15615,6 +15617,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.key = self.key;
     other.useAuxiliaryACL = self.useAuxiliaryACL;
     other.replaceEndpoints = self.replaceEndpoints;
+    other.mcastAddrPolicy = self.mcastAddrPolicy;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15623,7 +15626,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; key:%@; useAuxiliaryACL:%@; replaceEndpoints:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, [_key base64EncodedStringWithOptions:0], _useAuxiliaryACL, _replaceEndpoints];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; key:%@; useAuxiliaryACL:%@; replaceEndpoints:%@; mcastAddrPolicy:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, [_key base64EncodedStringWithOptions:0], _useAuxiliaryACL, _replaceEndpoints, _mcastAddrPolicy];
     return descriptionString;
 }
 
@@ -15682,6 +15685,12 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         if (self.replaceEndpoints != nil) {
             auto & definedValue_0 = encodableStruct.replaceEndpoints.Emplace();
             definedValue_0 = self.replaceEndpoints.boolValue;
+        }
+    }
+    {
+        if (self.mcastAddrPolicy != nil) {
+            auto & definedValue_0 = encodableStruct.mcastAddrPolicy.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mcastAddrPolicy.unsignedCharValue);
         }
     }
 
@@ -16081,6 +16090,94 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         encodableStruct.useAuxiliaryACL = self.useAuxiliaryACL.boolValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRGroupcastClusterGroupcastTestingParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _testOperation = @(0);
+
+        _durationSeconds = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRGroupcastClusterGroupcastTestingParams alloc] init];
+
+    other.testOperation = self.testOperation;
+    other.durationSeconds = self.durationSeconds;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: testOperation:%@; durationSeconds:%@; >", NSStringFromClass([self class]), _testOperation, _durationSeconds];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRGroupcastClusterGroupcastTestingParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Groupcast::Commands::GroupcastTesting::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.testOperation = static_cast<std::remove_reference_t<decltype(encodableStruct.testOperation)>>(self.testOperation.unsignedCharValue);
+    }
+    {
+        if (self.durationSeconds != nil) {
+            auto & definedValue_0 = encodableStruct.durationSeconds.Emplace();
+            definedValue_0 = self.durationSeconds.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

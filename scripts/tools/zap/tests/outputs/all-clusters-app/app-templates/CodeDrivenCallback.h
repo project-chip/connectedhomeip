@@ -72,6 +72,10 @@ void MatterSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterThreadNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -140,6 +144,10 @@ void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpoi
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
