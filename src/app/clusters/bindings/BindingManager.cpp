@@ -21,33 +21,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
-namespace {
-
-class BindingFabricTableDelegate : public chip::FabricTable::Delegate
-{
-    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
-    {
-        auto & bindingTable = chip::app::Clusters::Binding::Table::GetInstance();
-        auto iter           = bindingTable.begin();
-        while (iter != bindingTable.end())
-        {
-            if (iter->fabricIndex == fabricIndex)
-            {
-                TEMPORARY_RETURN_IGNORED bindingTable.RemoveAt(iter);
-            }
-            else
-            {
-                ++iter;
-            }
-        }
-        chip::app::Clusters::Binding::Manager::GetInstance().FabricRemoved(fabricIndex);
-    }
-};
-
-BindingFabricTableDelegate gFabricTableDelegate;
-
-} // namespace
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -69,12 +42,16 @@ CHIP_ERROR Manager::UnicastBindingRemoved(uint8_t bindingEntryId)
 CHIP_ERROR Manager::Init(const ManagerInitParams & params)
 {
     VerifyOrReturnError(params.mCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mInitParams = params;
-    TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(&gFabricTableDelegate);
-    Table::GetInstance().SetPersistentStorage(params.mStorage);
-    CHIP_ERROR error = Table::GetInstance().LoadFromStorage();
+    params.mBindingTable->SetPersistentStorage(params.mStorage);
+    mPendingNotificationMap.SetBindingTable(*params.mBindingTable);
+    mFabricTableDelegate.SetBindingTable(*params.mBindingTable);
+    TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(&mFabricTableDelegate);
+
+    CHIP_ERROR error = params.mBindingTable->LoadFromStorage();
     if (error != CHIP_NO_ERROR)
     {
         // This can happen during first boot of the device.
@@ -87,7 +64,7 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
         // to false.
         if (params.mEstablishConnectionOnInit)
         {
-            for (const TableEntry & entry : Table::GetInstance())
+            for (const TableEntry & entry : *mInitParams.mBindingTable)
             {
                 if (entry.type == MATTER_UNICAST_BINDING)
                 {
@@ -132,6 +109,8 @@ CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
 
 void Manager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
+    VerifyOrDie(mInitParams.mBindingTable != nullptr);
+
     FabricIndex fabricToRemove = kUndefinedFabricIndex;
     NodeId nodeToRemove        = kUndefinedNodeId;
 
@@ -139,7 +118,7 @@ void Manager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, co
     // iterator returns things by value anyway.
     for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
     {
-        TableEntry entry = Table::GetInstance().GetAt(pendingNotification.mBindingEntryId);
+        TableEntry entry = mInitParams.mBindingTable->GetAt(pendingNotification.mBindingEntryId);
 
         if (sessionHandle->GetPeer() == ScopedNodeId(entry.nodeId, entry.fabricIndex))
         {
@@ -166,6 +145,8 @@ void Manager::HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ER
 
 void Manager::FabricRemoved(FabricIndex fabricIndex)
 {
+    VerifyOrDie(mInitParams.mCASESessionManager != nullptr);
+
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
 
     // TODO(#18436): NOC cluster should handle fabric removal without needing binding manager
@@ -176,6 +157,7 @@ void Manager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mInitParams.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
 
     CHIP_ERROR error      = CHIP_NO_ERROR;
@@ -184,7 +166,7 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
 
     bindingContext->IncrementConsumersNumber();
 
-    for (auto iter = Table::GetInstance().begin(); iter != Table::GetInstance().end(); ++iter)
+    for (auto iter = mInitParams.mBindingTable->begin(); iter != mInitParams.mBindingTable->end(); ++iter)
     {
         if (iter->local == endpoint && (iter->clusterId.value_or(cluster) == cluster))
         {
@@ -208,11 +190,11 @@ exit:
     return error;
 }
 
-} // namespace Binding
-
-CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
+CHIP_ERROR Manager::AddBindingEntry(const Binding::TableEntry & entry)
 {
-    CHIP_ERROR err = Binding::Table::GetInstance().Add(entry);
+    VerifyOrReturnError(mInitParams.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR err = mInitParams.mBindingTable->Add(entry);
     if (err == CHIP_ERROR_NO_MEMORY)
     {
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
@@ -225,7 +207,7 @@ CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
 
     if (entry.type == Binding::MATTER_UNICAST_BINDING)
     {
-        err = Binding::Manager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        err = UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
         if (err != CHIP_NO_ERROR)
         {
             // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
@@ -236,6 +218,13 @@ CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
     }
 
     return CHIP_NO_ERROR;
+}
+
+} // namespace Binding
+
+CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
+{
+    return Binding::Manager::GetInstance().AddBindingEntry(entry);
 }
 
 } // namespace Clusters

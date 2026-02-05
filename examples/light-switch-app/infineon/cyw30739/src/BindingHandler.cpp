@@ -262,7 +262,7 @@ void BindingHandler::InitInternal(intptr_t aArg)
     auto & server  = Server::GetInstance();
 
     ret = Binding::Manager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+        { &Binding::Table::GetInstance(), &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     if (CHIP_NO_ERROR != ret)
     {
         printf("BindingHandler::InitInternal() run fail, err_code: 0x%" CHIP_ERROR_FORMAT, ret.Format());

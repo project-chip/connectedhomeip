@@ -255,7 +255,7 @@ void BindingHandler::InitInternal(intptr_t arg)
     ChipLogProgress(NotSpecified, "Initialize binding Handler");
     auto & server = chip::Server::GetInstance();
     Binding::Manager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+        { &Binding::Table::GetInstance(), &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }

@@ -103,6 +103,8 @@ public:
 
     Iterator end() { return Iterator(this, mNumEntries); }
 
+    void SetBindingTable(Table & table) { mBindingTable = &table; }
+
     CHIP_ERROR FindLRUConnectPeer(ScopedNodeId & nodeId);
 
     CHIP_ERROR AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context);
@@ -127,6 +129,8 @@ private:
     uint8_t mPendingBindingEntries[kMaxPendingNotifications];
     PendingNotificationContext * mPendingContexts[kMaxPendingNotifications];
     PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
+
+    Table * mBindingTable = nullptr;
 
     uint8_t mNumEntries = 0;
 };

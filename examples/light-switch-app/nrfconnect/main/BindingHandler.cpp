@@ -244,7 +244,7 @@ void BindingHandler::InitInternal(intptr_t aArg)
     auto & server = Server::GetInstance();
     if (CHIP_NO_ERROR !=
         Binding::Manager::GetInstance().Init(
-            { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }))
+            { &Binding::Table::GetInstance(), &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }))
     {
         LOG_ERR("BindingHandler::InitInternal failed");
     }
