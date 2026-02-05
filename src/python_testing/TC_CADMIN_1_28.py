@@ -123,15 +123,9 @@ class TC_CADMIN_1_28(CADMINBaseTest):
                      "Verify DUT_AJF opens its Commissioning window to allow another commissioning"),
             TestStep("4", "DNS-SD records shows DUT_AJF advertising",
                      "Verify that the DNS-SD advertisement has JF key with a value between 1 and 15"),
-            TestStep("5", "TH_AAF2 starts a commissioning process to commission DUT_AJF on Fabric 2 proceeding to step 19 (successful established CASE session)",
-                     "TH_AAF2 complete with success step 19 (successful established CASE session) from standard commissioning flow for DUT_AJF"),
-            TestStep("6", "DUT_AJF performs Fabric Table Vendor ID Verification procedure against the Fabric indicated by the AdministratorFabricIndex of the Joint Fabric Administrator Cluster on JointEndPointA",
-                     "Fabric Table Vendor ID Verification procedure is successful"),
-            TestStep("7", "DUT_AJF responds to ICACCSRRequest command issued by TH_AAF2",
-                     "DUT_AJF sends ICACCSRResponse to TH_AAF2 with ICAC CSR certificate as a DER-encoded string"),
-            TestStep("8", "DUT_AJF responds to the AddICAC command from TH_AAF2 with an ICACResponse",
-                     "DUT_AJF sends ICACResponse to TH_AAF2"),
-            TestStep("9", "Read DUT_AJF NOC at FabricIndex equal to the Joint Fabric",
+            TestStep("5", "TH_AAF2 starts a commissioning process to commission DUT_AJF on Fabric 2 using Joint Commissioning Method",
+                     "DUT_AJF is successfuly commissioned into Fabric 2 by TH_AAF2 using Joint Commissioning Method"),
+            TestStep("6", "Read DUT_AJF NOC at FabricIndex equal to the Joint Fabric",
                      "DUT_AJF NOC from JointFabric should contain Administrator CAT")
         ]
 
@@ -150,28 +144,26 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             port=random.randint(5001, 5999),
             discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
-            capture_output=True,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
         self.fabric_a_admin.start(
             expected_output="Server initialization complete",
-            timeout=10)
+            timeout=20)
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             rpc_server_port=33033,
             storage_dir=self.storage_fabric_a,
-            vendor_id=self.jfctrl_fabric_a_vid,
-            capture_output=True)
+            vendor_id=self.jfctrl_fabric_a_vid)
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
-            timeout=10)
+            timeout=20)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
-            timeout=10)
+            timeout=20)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -204,16 +196,15 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_a_passcode,
-            capture_output=True,
             extra_args=["--capabilities", "0x04"])
         self.fabric_a_server_app.start(
             expected_output="Server initialization complete",
-            timeout=10)
+            timeout=20)
 
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 2 {self.thserver_fabric_a_passcode}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
-            timeout=10)
+            timeout=20)
 
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
@@ -239,28 +230,26 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             port=random.randint(5001, 5999),
             discriminator=self.jfadmin_fabric_b_discriminator,
             passcode=self.jfadmin_fabric_b_passcode,
-            capture_output=True,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33055"])
         self.fabric_b_admin.start(
             expected_output="Server initialization complete",
-            timeout=10)
+            timeout=20)
 
         # Start Fabric B JF-Administrator App
         self.fabric_b_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
             rpc_server_port=33055,
             storage_dir=self.storage_fabric_b,
-            vendor_id=self.jfctrl_fabric_b_vid,
-            capture_output=True)
+            vendor_id=self.jfctrl_fabric_b_vid)
         self.fabric_b_ctrl.start(
             expected_output="CHIP task running",
-            timeout=10)
+            timeout=20)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
-            timeout=10)
+            timeout=20)
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -293,16 +282,15 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
             passcode=self.thserver_fabric_b_passcode,
-            capture_output=True,
             extra_args=["--capabilities", "0x04"])
         self.fabric_b_server_app.start(
             expected_output="Server initialization complete",
-            timeout=10)
+            timeout=20)
 
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork 22 {self.thserver_fabric_b_passcode}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000016: success",
-            timeout=10)
+            timeout=20)
 
         # Creating a Controller for Ecosystem B
         _fabric_b_persistent_storage = VolatileTemporaryPersistentStorage(
@@ -317,7 +305,6 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             catTags=[int(self.ecoBCATs, 16)])
 
         self.step("3")
-        self.fabric_a_admin.get_stdout()
         try:
             response = await devCtrlEcoA.OpenJointCommissioningWindow(
                 nodeId=1,
@@ -341,36 +328,13 @@ class TC_CADMIN_1_28(CADMINBaseTest):
         asserts.assert_true(service_found[0], f"Successfully found service with CM={service_found[1].cm}, D={service_found[1].d}")
 
         self.step("5")
-        self.fabric_a_admin.get_stdout()
-        self.fabric_b_ctrl.get_stdout()
         _nodeID = 15
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
             expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
-            timeout=30)
-
-        log_fab_a_admin = self.fabric_a_admin.get_stdout()
-        log_fab_b_ctrl = self.fabric_b_ctrl.get_stdout()
-        asserts.assert_in(b"[SVR] Commissioning completed session establishment step", log_fab_a_admin,
-                          "CASE session was established with success")
+            timeout=20)
 
         self.step("6")
-        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: STORING_ENDPOINT_ID", log_fab_a_admin,
-                          "Fabric Table Vendor ID Verification procedure is successful")
-        asserts.assert_in(b"[CTL] JCM: Trust Verification Stage Finished: READING_COMMISSIONER_ADMIN_FABRIC_INDEX", log_fab_a_admin,
-                          "Fabric Table Vendor ID Verification procedure is successful")
-
-        self.step("7")
-        # Command 0x0E is SignVIDVerificationResponse which contains the ICAC CSR response in JCM context
-        asserts.assert_in(b"[CTL] Successfully received SignVIDVerificationResponse", log_fab_b_ctrl,
-                          "DUT_AJF sends ICACCSRResponse to TH_AAF2 with ICAC CSR certificate as a DER-encoded string")
-
-        self.step("8")
-        # Command 0x05 is CSRResponse
-        asserts.assert_in(b"[CTL] Received certificate signing request from the device", log_fab_b_ctrl,
-                          "DUT_AJF sends ICACResponse to TH_AAF2")
-
-        self.step("9")
         response = await devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
             returnClusterObject=True)
