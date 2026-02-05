@@ -19,7 +19,7 @@
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(EVSE_COMMON_DIR ${CHIP_ROOT}/examples/evse-app/evse-common REALPATH)
 get_filename_component(ENERGY_MGMT_DIR ${CHIP_ROOT}/examples/energy-management REALPATH)
-get_filename_component(EVSE_TRIGGERS_DIR ${CHIP_ROOT}/examples/evse-app/energy-management-triggers REALPATH)
+get_filename_component(EVSE_TRIGGERS_DIR ${CHIP_ROOT}/examples/energy-management/energy-management-triggers REALPATH)
 get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST
