@@ -261,8 +261,8 @@ void BindingHandler::InitInternal(intptr_t aArg)
     CHIP_ERROR ret = CHIP_NO_ERROR;
     auto & server  = Server::GetInstance();
 
-    ret = Binding::Manager::GetInstance().Init({ &server.GetFabricTable(),
-                                                 server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    ret = Binding::Manager::GetInstance().Init(
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     if (CHIP_NO_ERROR != ret)
     {
         printf("BindingHandler::InitInternal() run fail, err_code: 0x%" CHIP_ERROR_FORMAT, ret.Format());

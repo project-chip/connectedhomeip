@@ -214,8 +214,8 @@ static void LightSwitchContextReleaseHandler(void * context)
 void InitBindingManager(intptr_t context)
 {
     auto & server                            = chip::Server::GetInstance();
-    Binding::ManagerInitParams bindingParams = { &server.GetFabricTable(),
-                                                 server.GetCASESessionManager(), &server.GetPersistentStorage() };
+    Binding::ManagerInitParams bindingParams = { &server.GetFabricTable(), server.GetCASESessionManager(),
+                                                 &server.GetPersistentStorage() };
     CHIP_ERROR error                         = Binding::Manager::GetInstance().Init(bindingParams);
     if (error != CHIP_NO_ERROR)
     {

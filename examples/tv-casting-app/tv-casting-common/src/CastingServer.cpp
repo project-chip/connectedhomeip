@@ -112,8 +112,7 @@ CHIP_ERROR CastingServer::InitBindingHandlers()
 {
     auto & server = chip::Server::GetInstance();
     TEMPORARY_RETURN_IGNORED app::Clusters::Binding::Manager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(),
-          &server.GetPersistentStorage() });
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     return CHIP_NO_ERROR;
 }
 
