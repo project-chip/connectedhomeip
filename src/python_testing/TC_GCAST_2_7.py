@@ -94,13 +94,12 @@ class TC_GCAST_2_7(MatterBaseTest):
 
         self.step("1a")
         ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
-        endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        if len(endpoints_list) > 1:
-            endpoints_list = [endpoints_list[0]]
-
         if not pga_enabled:
             logger.info("PerGroup feature is not enabled, skip remaining steps.")
             self.mark_all_remaining_steps_skipped("1b")
+        endpoints_list = await valid_endpoints_list(self, ln_enabled)
+        if len(endpoints_list) > 1:
+            endpoints_list = [endpoints_list[0]]
 
         self.step("1b")
         groupID0 = 0
