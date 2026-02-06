@@ -15,7 +15,7 @@
  */
 
 #pragma once
-#include "FabricTestFixture.h"
+
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -24,13 +24,16 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <clusters/shared/Attributes.h>
 #include <credentials/FabricTable.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -40,6 +43,9 @@
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <algorithm>
 #include <memory>
 #include <optional>
 #include <type_traits>
@@ -47,6 +53,7 @@
 
 namespace chip {
 namespace Testing {
+
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
@@ -84,6 +91,7 @@ public:
         mCluster(cluster), mFabricTestFixture(fabricHelper)
     {}
 
+    TestServerClusterContext & GetTestContext() { return mTestServerClusterContext; }
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
     // Read attribute into `out` parameter.
@@ -92,10 +100,16 @@ public:
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
+    // @returns `CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)` if the attribute is not present in AttributeList.
     template <typename T>
     app::DataModel::ActionReturnStatus ReadAttribute(AttributeId attr_id, T & out)
     {
         VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
+
+        // Verify that the attribute is present in AttributeList before attempting to read it.
+        // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
+        VerifyOrReturnError(IsAttributeInAttributeList(attr_id), Protocols::InteractionModel::Status::UnsupportedAttribute);
+
         auto path = mCluster.GetPaths()[0];
 
         // Store the read operation in a vector<std::unique_ptr<...>> to ensure its lifetime
@@ -106,6 +120,9 @@ public:
 
         mReadOperations.push_back(std::move(readOperation));
         chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
+
+        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        readOperationRef.SetSubjectDescriptor(subjectDescriptor);
 
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
         app::DataModel::ActionReturnStatus status           = mCluster.ReadAttribute(readOperationRef.GetRequest(), *encoder);
@@ -125,6 +142,7 @@ public:
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
+    // @returns `CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)` if the attribute is not present in AttributeList.
     template <typename T>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const T & value)
     {
@@ -132,11 +150,15 @@ public:
 
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
+        // Verify that the attribute is present in AttributeList before attempting to write it.
+        // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
+        VerifyOrReturnError(IsAttributeInAttributeList(attr), Protocols::InteractionModel::Status::UnsupportedAttribute);
+
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         chip::Testing::WriteOperation writeOp(path);
 
         // Create a stable object on the stack
-        Access::SubjectDescriptor subjectDescriptor{ mHandler.GetAccessingFabricIndex() };
+        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
         uint8_t buffer[1024];
@@ -201,7 +223,21 @@ public:
         mHandler.ClearResponses();
         mHandler.ClearStatuses();
 
-        const app::DataModel::InvokeRequest invokeRequest = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        // Verify that the command is present in AcceptedCommands before attempting to invoke it.
+        // This ensures tests match real-world behavior where the Interaction Model checks AcceptedCommands first.
+        if (!IsCommandAnAcceptedCommand(commandId))
+        {
+            result.status = Protocols::InteractionModel::Status::UnsupportedCommand;
+            return result;
+        }
+
+        const Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const app::DataModel::InvokeRequest invokeRequest = [&]() {
+            app::DataModel::InvokeRequest req;
+            req.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
+            req.subjectDescriptor = &subjectDescriptor;
+            return req;
+        }();
 
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
@@ -295,6 +331,40 @@ private:
         return true;
     }
 
+    bool IsAttributeInAttributeList(AttributeId attr_id)
+    {
+        // Attributes are listed by path, so this is only correct for single-path clusters.
+        VerifyOrDie(mCluster.GetPaths().size() == 1);
+
+        ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
+        if (CHIP_ERROR err = mCluster.Attributes(mCluster.GetPaths()[0], builder); err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "Failed to get attribute list: %" CHIP_ERROR_FORMAT, err.Format());
+            return false;
+        }
+
+        ReadOnlyBuffer<app::DataModel::AttributeEntry> attributeEntries = builder.TakeBuffer();
+        return std::any_of(attributeEntries.begin(), attributeEntries.end(),
+                           [&](const app::DataModel::AttributeEntry & entry) { return entry.attributeId == attr_id; });
+    }
+
+    bool IsCommandAnAcceptedCommand(CommandId commandId)
+    {
+        // Commands are listed by path, so this is only correct for single-path clusters.
+        VerifyOrDie(mCluster.GetPaths().size() == 1);
+
+        ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> builder;
+        if (CHIP_ERROR err = mCluster.AcceptedCommands(mCluster.GetPaths()[0], builder); err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "Failed to get accepted commands: %" CHIP_ERROR_FORMAT, err.Format());
+            return false;
+        }
+
+        ReadOnlyBuffer<app::DataModel::AcceptedCommandEntry> commandEntries = builder.TakeBuffer();
+        return std::any_of(commandEntries.begin(), commandEntries.end(),
+                           [&](const app::DataModel::AcceptedCommandEntry & entry) { return entry.commandId == commandId; });
+    }
+
     TestServerClusterContext mTestServerClusterContext{};
     app::ServerClusterInterface & mCluster;
 
@@ -302,7 +372,8 @@ private:
     // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
     // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
     // If protocol or test requirements change, this value may need to be increased.
-    static constexpr size_t kTlvBufferSize = 256;
+    // Increased to 1024 to support certificate management commands which include X.509 certificates (~400+ bytes)
+    static constexpr size_t kTlvBufferSize = 1024;
 
     chip::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];

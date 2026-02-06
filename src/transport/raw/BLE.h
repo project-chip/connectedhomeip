@@ -120,6 +120,12 @@ public:
     CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint) override;
 
     /**
+     * Close the BLE transport and reset its state.
+     * This ensures proper cleanup during transport reinitialization scenarios.
+     */
+    void Close() override;
+
+    /**
      * Change BLE transport to this
      *
      * This is relevant when there is more than one TransportMgr,

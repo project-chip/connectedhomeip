@@ -43,8 +43,9 @@ from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                           run_if_endpoint_matches)
+from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
@@ -194,6 +195,9 @@ class TC_PAVST_2_4(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aModifiedTransportOptions = aTransportOptions.expiryTime
         aModifiedTransportOptions = aModifiedTransportOptions + 120
         aTransportOptions.expiryTime = aModifiedTransportOptions
+        aTransportOptions.videoStreams = []
+        aTransportOptions.audioStreams = []
+
         cmd = pvcluster.Commands.ModifyPushTransport(
             connectionID=aConnectionID,
             transportOptions=aTransportOptions,

@@ -502,6 +502,40 @@ Fabric admin for default controller:
   second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 ```
 
+Reboot the DUT during testing:
+
+```python
+# Simple reboot - device state persists
+await self.request_device_reboot()
+
+# Factory reset - clears device state (removes KVS)
+await self.request_device_factory_reset()
+```
+
+```shell
+# Example Command w/ run_python_test.py test runner:
+scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1" --script src/python_testing/TC_ACL_2_10.py --app-ready-pattern "APP STATUS: Starting event loop"
+```
+
+The `request_device_reboot()` and `request_device_factory_reset()` methods work
+differently depending on the environment. When the test is started with
+`run_python_test.py` as it is in the CI, need to make sure to import
+MatterBaseTest and have your test module inherit from it to make this
+functionality accessible during your test, the device is automatically rebooted
+and possibly factory reset during the test depending on test implementation
+using the restart_flag_file. When the test is started by some other means (e.g.,
+during certification testing), you'll be prompted to manually reboot or factory
+reset the device using the device-specific mechanism.
+
+If reboot utilized automatically expires existing controller sessions to device
+to force reconnection once device is back up and stable or if factory reset
+utilized the device will automatically re-enter commissioning mode to allow new
+commissioning once the device is back up and stable.
+
+See
+[TC-ACL-2.10](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_ACL_2_10.py)
+for an example testing ACL persistence across reboots.
+
 ## Automating manual steps
 
 Some test plans have manual steps that require the tester to manually change the

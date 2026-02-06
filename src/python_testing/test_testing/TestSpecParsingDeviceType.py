@@ -23,8 +23,8 @@ from jinja2 import Template
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.conformance import conformance_allowed
-from matter.testing.matter_testing import default_matter_test_main
+from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, conformance_allowed
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
                                          parse_single_device_type)
 from matter.tlv import uint
@@ -444,7 +444,7 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
             expected_problems = 0
             self.create_good_device(id)
             for cluster_id, cluster in dt.server_clusters.items():
-                if not conformance_allowed(cluster.conformance(0, [], []), False):
+                if not conformance_allowed(cluster.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES), False):
                     self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList].append(cluster_id)
                     expected_problems += 1
             if expected_problems == 0:
@@ -462,12 +462,14 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         one_four_one, one_four_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_1)
         one_four_two, one_four_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_2)
         one_five, one_five_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        one_five_one, one_five_one_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_5_1)
         self.problems.extend(one_two_problems)
         self.problems.extend(one_three_problems)
         self.problems.extend(one_four_problems)
         self.problems.extend(one_four_one_problems)
         self.problems.extend(one_four_two_problems)
         self.problems.extend(one_five_problems)
+        self.problems.extend(one_five_one_problems)
 
         asserts.assert_equal(len(one_two_problems), 0, "Problems found when parsing 1.2 spec")
         asserts.assert_equal(len(one_three_problems), 0, "Problems found when parsing 1.3 spec")
@@ -475,6 +477,7 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         asserts.assert_equal(len(one_four_one_problems), 0, "Problems found when parsing 1.4.1 spec")
         asserts.assert_equal(len(one_four_two_problems), 0, "Problems found when parsing 1.4.2 spec")
         asserts.assert_equal(len(one_five_problems), 0, "Problems found when parsing 1.5 spec")
+        asserts.assert_equal(len(one_five_one_problems), 0, "Problems found when parsing 1.5.1 spec")
 
         # Current ballot has a bunch of problems related to IDs being allocated for closures and TBR. These should all
         # mention ID-TBD as the id, so let's pull those out for now and make sure there are no UNKNOWN problems.
@@ -506,6 +509,8 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
                              set(), "There are some 1.3 device types that are unexpectedly not included in the 1.4.2 spec")
         asserts.assert_equal(set(one_four_two.keys())-set(one_five.keys()),
                              set(), "There are some 1.4.2 device types that are unexpectedly not included in the 1.5 spec")
+        asserts.assert_equal(set(one_five.keys())-set(one_five_one.keys()),
+                             set(), "There are some 1.5 device types that are unexpectedly not included in the 1.5.1 spec")
 
     @run_against_all_spec_revisions
     def test_application_device_type_on_root(self):

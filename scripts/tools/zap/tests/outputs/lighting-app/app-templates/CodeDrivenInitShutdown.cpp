@@ -58,6 +58,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::SoftwareDiagnostics::Id:
         MatterSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
+        MatterThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         MatterWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -78,6 +81,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::UserLabel::Id:
         MatterUserLabelClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::ScenesManagement::Id:
+        MatterScenesManagementClusterInitCallback(endpoint);
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterInitCallback(endpoint);
@@ -119,6 +125,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::SoftwareDiagnostics::Id:
         MatterSoftwareDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
         break;
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
+        MatterThreadNetworkDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::WiFiNetworkDiagnostics::Id:
         MatterWiFiNetworkDiagnosticsClusterShutdownCallback(endpoint, shutdownType);
         break;
@@ -139,6 +148,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::UserLabel::Id:
         MatterUserLabelClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::ScenesManagement::Id:
+        MatterScenesManagementClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::OccupancySensing::Id:
         MatterOccupancySensingClusterShutdownCallback(endpoint, shutdownType);
