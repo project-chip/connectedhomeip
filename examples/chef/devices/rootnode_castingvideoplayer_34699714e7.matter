@@ -2406,67 +2406,6 @@ cluster AudioOutput = 1291 {
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
-/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
-cluster ApplicationLauncher = 1292 {
-  revision 2;
-
-  enum StatusEnum : enum8 {
-    kSuccess = 0;
-    kAppNotAvailable = 1;
-    kSystemBusy = 2;
-    kPendingUserApproval = 3;
-    kDownloading = 4;
-    kInstalling = 5;
-  }
-
-  bitmap Feature : bitmap32 {
-    kApplicationPlatform = 0x1;
-  }
-
-  struct ApplicationStruct {
-    int16u catalogVendorID = 0;
-    char_string applicationID = 1;
-  }
-
-  struct ApplicationEPStruct {
-    ApplicationStruct application = 0;
-    optional endpoint_no endpoint = 1;
-  }
-
-  readonly attribute optional int16u catalogList[] = 0;
-  readonly attribute optional nullable ApplicationEPStruct currentApp = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct LaunchAppRequest {
-    optional ApplicationStruct application = 0;
-    optional octet_string data = 1;
-  }
-
-  request struct StopAppRequest {
-    optional ApplicationStruct application = 0;
-  }
-
-  request struct HideAppRequest {
-    optional ApplicationStruct application = 0;
-  }
-
-  response struct LauncherResponse = 3 {
-    StatusEnum status = 0;
-    optional octet_string data = 1;
-  }
-
-  /** Upon receipt of this command, the server SHALL launch the application with optional data. */
-  command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
-  /** Upon receipt of this command, the server SHALL stop the application if it is running. */
-  command StopApp(StopAppRequest): LauncherResponse = 1;
-  /** Upon receipt of this command, the server SHALL hide the application. */
-  command HideApp(HideAppRequest): LauncherResponse = 2;
-}
-
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
   revision 2;
@@ -2840,18 +2779,6 @@ endpoint 1 {
 
     handle command SelectOutput;
     handle command RenameOutput;
-  }
-
-  server cluster ApplicationLauncher {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 2;
-
-    handle command LaunchApp;
-    handle command StopApp;
-    handle command HideApp;
   }
 
   server cluster AccountLogin {
