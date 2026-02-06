@@ -59,6 +59,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         super().setup_class()
 
         self.fabric_a_ctrl = None
+        self.fabric_a_admin = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
 
         self.jfc_server_app = self.user_params.get("jfc_server_app", None)
@@ -177,7 +178,8 @@ class TC_JFADMIN_2_1(MatterBaseTest):
                 nodeId=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
                 returnClusterObject=True)
             attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
-            asserts.assert_true(attributeAdminFabricIndex in range(1, 255), f"AdministratorFabricIndex={attributeAdminFabricIndex} not in expected range [1..254]")
+            asserts.assert_true(attributeAdminFabricIndex in range(1, 255), 
+                                f"AdministratorFabricIndex={attributeAdminFabricIndex} not in expected range [1..254]")
 
             # Step 3 is under same PICS guard as Step 2 becasue it relies on attributeAdminFabricIndex
             self.step("3")
@@ -191,7 +193,8 @@ class TC_JFADMIN_2_1(MatterBaseTest):
                     fabricid_found = True
                     log.info( f"Found matching fabricIndex={attributeAdminFabricIndex} on fabricID={fabric.fabricID}")
                     break
-            asserts.assert_true(fabricid_found, "No FabricDescriptorStruct with fabricIndex = AdministratorFabricIndex found in Operational Cluster Fabrics attribute on EP0")
+            asserts.assert_true(fabricid_found, 
+                                "No FabricDescriptorStruct with fabricIndex = AdministratorFabricIndex found in Operational Cluster Fabrics attribute on EP0")
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
