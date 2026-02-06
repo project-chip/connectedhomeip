@@ -3179,3 +3179,13 @@ WEBRTCR.S.C00.Rsp=1  # Offer
 WEBRTCR.S.C01.Rsp=1  # Answer  
 WEBRTCR.S.C02.Rsp=1  # ICECandidates
 WEBRTCR.S.C03.Rsp=1  # End
+
+# Joint Fabric Administrator Cluster
+# Server
+JFADMIN.S=1
+
+# Client
+JFADMIN.C=1
+
+# Attributes
+JFADMIN.S.A0000=1 #AdministratorFabricIndex
