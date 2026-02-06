@@ -269,12 +269,19 @@ void PushAvStreamTransportServer::RemoveTimerAppState(const uint16_t connectionI
 
 void PushAvStreamTransportServer::LoadPersistentAttributes()
 {
-    // Load currentConnections
-    ChipLogFailure(mDelegate->LoadCurrentConnections(mCurrentConnections), Zcl,
-                   "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
+    if (mDelegate != nullptr)
+    {
+        // Load currentConnections
+        ChipLogFailure(mDelegate->LoadCurrentConnections(mCurrentConnections), Zcl,
+                       "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
 
-    // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+        // Signal delegate that all persistent configuration attributes have been loaded.
+        TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+    }
+    else
+    {
+        ChipLogError(Zcl, "PushAVStreamTransport: Delegate must be set before loading the persistent attributes.");
+    }
 }
 
 TransportConfigurationStorage * PushAvStreamTransportServer::FindStreamTransportConnection(const uint16_t connectionID)
@@ -1809,15 +1816,6 @@ Status PushAvStreamTransportServer::NotifyTransportStarted(uint16_t connectionID
 
     // Generate the PushTransportBegin event
     return GeneratePushTransportBeginEvent(connectionID, triggerType, activationReason, containerType, cmafSessionNumber);
-}
-
-void PushAvStreamTransportServer::Shutdown(ClusterShutdownType shutdownType)
-{
-    DefaultServerCluster::Shutdown(shutdownType);
-    for (const auto & timerContext : mTimerContexts)
-    {
-        DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback, static_cast<void *>(timerContext.get()));
-    }
 }
 
 Status PushAvStreamTransportServer::NotifyTransportStopped(uint16_t connectionID, TransportTriggerTypeEnum triggerType)

@@ -74,22 +74,22 @@ public:
 
     void SetTLSClientManagementDelegate(TLSClientManagementDelegate * delegate)
     {
-        mTLSClientManagementDelegate = delegate;
-        if (mTLSClientManagementDelegate == nullptr)
+        if (delegate == nullptr)
         {
             ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
             return;
         }
+        mTLSClientManagementDelegate = delegate;
     }
 
     void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
     {
-        mTLSCertificateManagementDelegate = delegate;
-        if (mTLSCertificateManagementDelegate == nullptr)
+        if (delegate == nullptr)
         {
             ChipLogError(Zcl, "Push AV Stream Transport: Trying to set TLS Certificate Management delegate to null");
             return;
         }
+        mTLSCertificateManagementDelegate = delegate;
     }
 
     /**
@@ -119,14 +119,27 @@ public:
      */
     Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
                                                                PushAvStreamTransport::TransportTriggerTypeEnum triggerType);
-
+    /**
+     * @brief Initializes the Push AV Stream Transport cluster.
+     * * @note SetDelegate() MUST be called before calling Init(). This is required
+     * to load persistent attributes (e.g., CurrentConnections) from storage.
+     */
     CHIP_ERROR Init()
     {
         LoadPersistentAttributes();
         return CHIP_NO_ERROR;
     }
 
-    void Shutdown(ClusterShutdownType shutdownType) override;
+    void Shutdown(ClusterShutdownType shutdownType) override
+    {
+        DefaultServerCluster::Shutdown(shutdownType);
+        for (const auto & timerContext : mTimerContexts)
+        {
+            DeviceLayer::SystemLayer().CancelTimer(PushAVStreamTransportDeallocateCallback,
+                                                   static_cast<void *>(timerContext.get()));
+        }
+    }
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
