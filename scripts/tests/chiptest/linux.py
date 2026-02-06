@@ -181,13 +181,14 @@ class NetworkNamespace(NetworkCmdHandler):
 
 
 class NetworkLink(NetworkCmdHandler):
-    def __init__(self, link_name: str, ipv4: str, ipv6: str, cmd_history: deque[NetworkCmd]) -> None:
+    def __init__(self, link_name: str, ipv4: str, ipv6: str, ipv6_ula: str | None, cmd_history: deque[NetworkCmd]) -> None:
         super().__init__(cmd_history)
 
         self._link_name = link_name
         self._switch_name = switch_name = f"{link_name}-sw"
         self._ipv4 = ipv4
         self._ipv6 = ipv6
+        self._ipv6_ula = ipv6_ula
 
         self._setup_cmds.append(
             NetworkCmd(f"ip link add {link_name} type veth peer name {switch_name}", f"ip link delete {switch_name}")
@@ -197,14 +198,17 @@ class NetworkLink(NetworkCmdHandler):
             NetworkCmd(f"ip link set dev {link_name} up", f"ip link set dev {link_name} down", ns_wrapper=True),
             NetworkCmd(f"ip link set dev {switch_name} up", f"ip link set dev {switch_name} down", ns_wrapper=False),
 
-            # Force IPv6 to use ULAs that we control.
             NetworkCmd(f"ip -6 addr flush {link_name}", ns_wrapper=True),
             NetworkCmd(f"ip -6 a add {ipv6} dev {link_name}", ns_wrapper=True),
 
             NetworkCmd("sysctl -w net.ipv6.conf.all.forwarding=1", ns_wrapper=True),
             NetworkCmd("sysctl -w net.ipv6.conf.default.forwarding=1", ns_wrapper=True),
+            NetworkCmd(f"sysctl -w net.ipv6.conf.{link_name}.accept_ra=2", ns_wrapper=True),
             NetworkCmd(f"sysctl -w net.ipv6.conf.{link_name}.accept_ra_rt_info_max_plen=64", ns_wrapper=True),
         ))
+
+        if ipv6_ula is not None:
+            self._activate_cmds.append(NetworkCmd(f"ip -6 a add {ipv6_ula} dev {link_name}", ns_wrapper=True))
 
     @property
     def link_name(self) -> str:
@@ -221,6 +225,10 @@ class NetworkLink(NetworkCmdHandler):
     @property
     def ipv6(self) -> str:
         return self._ipv6
+
+    @property
+    def ipv6_ula(self) -> str | None:
+        return self._ipv6_ula
 
     def activate(self, wait_for_dad: bool = True) -> None:
         super().activate()
@@ -264,7 +272,7 @@ class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
 
     def __init__(self, index: int = 0, mgmt_name: str = 'eth-mgmt', ctrl_name: str = 'eth-ctrl', app_name: str = 'eth-app',
-                 mgmt_link_up: bool = True, ctrl_link_up: bool = True, app_link_up: bool = True):
+                 mgmt_link_up: bool = True, ctrl_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True):
         """Initialize isolated network namespaces.
 
         - mgmt -- management network for the RPC server.
@@ -278,15 +286,18 @@ class IsolatedNetworkNamespace:
 
         self.bridge = NetworkBridge(f"br-{index}", self._cmd_history)
 
-        self.mgmt_link = NetworkLink(f"{mgmt_name}-{index}", "10.10.10.5/24", "fd00:0:1:1::5/64", self._cmd_history)
+        self.mgmt_link = NetworkLink(f"{mgmt_name}-{index}", "10.10.10.5/24", "fe80::5/64",
+                                     "fd00:0:1:1::5/64" if add_ula else None, self._cmd_history)
         self.mgmt_link.register_dependencies(self.bridge)
 
         self.ctrl_ns = NetworkNamespace(f"ns-{ctrl_name}-{index}", self._cmd_history)
-        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", "10.10.10.2/24", "fd00:0:1:1::2/64", self._cmd_history)
+        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", "10.10.10.2/24", "fe80::2/64 dev",
+                                     "fd00:0:1:1::2/64" if add_ula else None, self._cmd_history)
         self.ctrl_link.register_dependencies(self.bridge, self.ctrl_ns)
 
         self.app_ns = NetworkNamespace(f"ns-{app_name}-{index}", self._cmd_history)
-        self.app_link = NetworkLink(f"{app_name}-{index}", "10.10.10.1/24", "fd00:0:1:1::1/64", self._cmd_history)
+        self.app_link = NetworkLink(f"{app_name}-{index}", "10.10.10.1/24", "fe80::1/64 dev",
+                                    "fd00:0:1:1::1/64" if add_ula else None, self._cmd_history)
         self.app_link.register_dependencies(self.bridge, self.app_ns)
 
         try:
@@ -395,15 +406,20 @@ class ThreadBorderRouter:
         self._event.set()
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
-        args = [
-            'ip', 'netns', 'exec', ns.app_ns.name, 'otbr-agent', '-d7', '-v', f'-B{ns.app_link.link_name}', radio_url
-        ]
+        args = shlex.split(ns.app_ns.netns_cmd_wrapper) + ['otbr-agent', '-d7', '-v', f'-B{ns.app_link.link_name}', radio_url]
 
         self._otbr = subprocess.Popen(args,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT,
                                       text=True,
                                       encoding='UTF-8')
+
+        sniffer_cmd = f'{ns.app_ns.netns_cmd_wrapper} tcpdump -ilo -U -Zroot -wthread.pcap udp port 9000'
+
+        self._sniffer = subprocess.Popen(sniffer_cmd,
+                                         stdout=sys.stdout,
+                                         stderr=subprocess.STDOUT,
+                                         shell=True)
 
         threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
 
@@ -450,6 +466,10 @@ class ThreadBorderRouter:
         if self._otbr:
             self._otbr.terminate()
             self._otbr.wait()
+
+        if self._sniffer:
+            self._sniffer.terminate()
+            self._sniffer.wait()
 
 
 DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"],
