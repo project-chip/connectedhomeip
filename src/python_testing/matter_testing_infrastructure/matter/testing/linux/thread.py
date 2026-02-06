@@ -21,7 +21,6 @@ import subprocess
 import threading
 from typing import Optional, Pattern
 
-from chiptest.test_definition import TEST_THREAD_DATASET
 from chiptest.linux import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
@@ -32,7 +31,7 @@ class ThreadBorderRouter:
     # The Thread radio simulation node id, choose other if there is a conflict.
     NODE_ID = 9
 
-    def __init__(self, ns: IsolatedNetworkNamespace):
+    def __init__(self, ns: IsolatedNetworkNamespace, test_thread_dataset):
         self._event = threading.Event()
         self._pattern: Optional[Pattern[str]] = None
         self._event.set()
@@ -55,7 +54,7 @@ class ThreadBorderRouter:
         threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
 
         self.expect(r'Co-processor version:', timeout=20)
-        self.join_network(TEST_THREAD_DATASET)
+        self.join_network(test_thread_dataset)
 
     def join_network(self, dataset):
         status = os.system(

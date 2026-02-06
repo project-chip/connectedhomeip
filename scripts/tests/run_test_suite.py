@@ -33,6 +33,7 @@ from chiptest.runner import Executor, SubprocessKind
 from chiptest import linux
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
+from chiptest.test_definition import TEST_THREAD_DATASET
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -500,7 +501,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             elif commissioning_method == 'ble-thread':
                 to_terminate.append(linux.DBusTestSystemBus())
                 to_terminate.append(linux.BluetoothMock())
-                to_terminate.append(linux.ThreadBorderRouter(ns))
+                to_terminate.append(linux.ThreadBorderRouter(ns, TEST_THREAD_DATASET))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 
