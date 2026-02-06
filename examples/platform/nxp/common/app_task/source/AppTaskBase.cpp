@@ -207,7 +207,7 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #endif
 
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
-    
+
 #if CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
     TEMPORARY_RETURN_IGNORED chip::NXP::App::OperationalKeystore::Init(persistentStorage);
