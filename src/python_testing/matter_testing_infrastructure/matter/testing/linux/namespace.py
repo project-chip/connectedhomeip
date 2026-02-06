@@ -62,6 +62,7 @@ def ensure_private_state():
         log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
+
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
 
@@ -202,6 +203,7 @@ class IsolatedNetworkNamespace:
                 self._run(cmd)
             except Exception as e:
                 log.warning("Encountered error during namespace termination: %s", e)
+
 
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: IsolatedNetworkNamespace):
