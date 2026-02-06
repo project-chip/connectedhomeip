@@ -38,6 +38,8 @@
 #define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 #define MBEDTLS_HAVE_ASM
+#define MBEDTLS_AES_ROM_TABLES
+#define MBEDTLS_SHA256_SMALLER
 
 // Added from autogen file for tinycrypt
 #define MBEDTLS_ECDH_C
@@ -71,7 +73,6 @@
 // TODO: Optimize these configurations for SL_MATTER_ENABLE_AWS codebase.
 #define MBEDTLS_CIPHER_MODE_CBC
 #define MBEDTLS_CIPHER_MODE_WITH_PADDING
-#define MBEDTLS_ECDHE_ECDSA_ENABLED
 #define MBEDTLS_GCM_C
 #define MBEDTLS_RSA_C
 #define MBEDTLS_RSA_NO_CRT
