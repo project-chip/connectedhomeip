@@ -23,8 +23,9 @@ import subprocess
 import threading
 from typing import Optional, Pattern
 
-from .namespace import IsolatedNetworkNamespace
 from chiptest.test_definition import TEST_THREAD_DATASET
+
+from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 
