@@ -19,7 +19,7 @@
 namespace chip::app::Clusters::EnergyEvse {
 
 constexpr int64_t kMinimumChargeCurrentLimit       = 0;
-constexpr int64_t kMinimumChargeCurrent            = 6000;  // 6A in mA, spec default
+constexpr int64_t kMinimumChargeCurrent            = 6000; // 6A in mA, spec default
 constexpr uint32_t kMaxRandomizationDelayWindowSec = 86400;
 constexpr uint8_t kEvseTargetsMaxNumberOfDays      = 7;
 constexpr uint8_t kEvseTargetsMaxTargetsPerDay     = 10;

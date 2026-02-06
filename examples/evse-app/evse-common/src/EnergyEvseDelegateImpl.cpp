@@ -1751,7 +1751,8 @@ void EnergyEvseDelegate::OnSessionDurationChanged(DataModel::Nullable<uint32_t> 
     }
     else
     {
-        ChipLogDetail(AppServer, "SessionDuration updated to %lu", static_cast<unsigned long int>(mSession.mSessionDuration.Value()));
+        ChipLogDetail(AppServer, "SessionDuration updated to %lu",
+                      static_cast<unsigned long int>(mSession.mSessionDuration.Value()));
     }
 }
 

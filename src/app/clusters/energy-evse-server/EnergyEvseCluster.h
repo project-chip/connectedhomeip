@@ -190,30 +190,30 @@ private:
     const BitMask<EnergyEvse::OptionalCommands> mOptionalCmds;
 
     // Attribute storage - cluster owns the data
-    StateEnum mState                                         = StateEnum::kNotPluggedIn;
-    SupplyStateEnum mSupplyState                             = SupplyStateEnum::kDisabled;
-    FaultStateEnum mFaultState                               = FaultStateEnum::kNoError;
-    DataModel::Nullable<uint32_t> mChargingEnabledUntil      = DataModel::NullNullable;
-    DataModel::Nullable<uint32_t> mDischargingEnabledUntil   = DataModel::NullNullable;
-    int64_t mCircuitCapacity                                 = 0;
-    int64_t mMinimumChargeCurrent                            = kMinimumChargeCurrent;
-    int64_t mMaximumChargeCurrent                            = 0;
-    int64_t mMaximumDischargeCurrent                         = 0;
-    int64_t mUserMaximumChargeCurrent                        = 0;
-    uint32_t mRandomizationDelayWindow                       = 600; // Default 600s per spec
-    DataModel::Nullable<uint32_t> mNextChargeStartTime       = DataModel::NullNullable;
-    DataModel::Nullable<uint32_t> mNextChargeTargetTime      = DataModel::NullNullable;
-    DataModel::Nullable<int64_t> mNextChargeRequiredEnergy   = DataModel::NullNullable;
-    DataModel::Nullable<Percent> mNextChargeTargetSoC        = DataModel::NullNullable;
-    DataModel::Nullable<uint16_t> mApproximateEVEfficiency   = DataModel::NullNullable;
-    DataModel::Nullable<Percent> mStateOfCharge              = DataModel::NullNullable;
-    DataModel::Nullable<int64_t> mBatteryCapacity            = DataModel::NullNullable;
-    char mVehicleIDBuffer[kMaxVehicleIDBufSize]              = { 0 };
-    DataModel::Nullable<CharSpan> mVehicleID                 = DataModel::NullNullable;
-    DataModel::Nullable<uint32_t> mSessionID                 = DataModel::NullNullable;
-    DataModel::Nullable<uint32_t> mSessionDuration           = DataModel::NullNullable;
-    DataModel::Nullable<int64_t> mSessionEnergyCharged       = DataModel::NullNullable;
-    DataModel::Nullable<int64_t> mSessionEnergyDischarged    = DataModel::NullNullable;
+    StateEnum mState                                       = StateEnum::kNotPluggedIn;
+    SupplyStateEnum mSupplyState                           = SupplyStateEnum::kDisabled;
+    FaultStateEnum mFaultState                             = FaultStateEnum::kNoError;
+    DataModel::Nullable<uint32_t> mChargingEnabledUntil    = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mDischargingEnabledUntil = DataModel::NullNullable;
+    int64_t mCircuitCapacity                               = 0;
+    int64_t mMinimumChargeCurrent                          = kMinimumChargeCurrent;
+    int64_t mMaximumChargeCurrent                          = 0;
+    int64_t mMaximumDischargeCurrent                       = 0;
+    int64_t mUserMaximumChargeCurrent                      = 0;
+    uint32_t mRandomizationDelayWindow                     = 600; // Default 600s per spec
+    DataModel::Nullable<uint32_t> mNextChargeStartTime     = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mNextChargeTargetTime    = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mNextChargeRequiredEnergy = DataModel::NullNullable;
+    DataModel::Nullable<Percent> mNextChargeTargetSoC      = DataModel::NullNullable;
+    DataModel::Nullable<uint16_t> mApproximateEVEfficiency = DataModel::NullNullable;
+    DataModel::Nullable<Percent> mStateOfCharge            = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mBatteryCapacity          = DataModel::NullNullable;
+    char mVehicleIDBuffer[kMaxVehicleIDBufSize]            = { 0 };
+    DataModel::Nullable<CharSpan> mVehicleID               = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mSessionID               = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mSessionDuration         = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mSessionEnergyCharged     = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mSessionEnergyDischarged  = DataModel::NullNullable;
 };
 
 } // namespace EnergyEvse
