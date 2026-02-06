@@ -530,13 +530,13 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
             ChipLogDetail(Camera, "Successfully deleted file: %s", data.first.c_str());
         }
     }
-}
 
-cleanup : if (upload.mData)
-{
-    std::free(upload.mData);
-    upload.mData = nullptr;
-}
-curl_easy_cleanup(curl);
-curl_slist_free_all(headers);
+cleanup:
+    if (upload.mData)
+    {
+        std::free(upload.mData);
+        upload.mData = nullptr;
+    }
+    curl_easy_cleanup(curl);
+    curl_slist_free_all(headers);
 }
