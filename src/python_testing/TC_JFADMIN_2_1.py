@@ -191,7 +191,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
                 log.info(f"Checking fabricIndex from fabricID={fabric.fabricID}")
                 if fabric.fabricIndex == attributeAdminFabricIndex:
                     fabricid_found = True
-                    log.info( f"Found matching fabricIndex={attributeAdminFabricIndex} on fabricID={fabric.fabricID}")
+                    log.info(f"Found matching fabricIndex={attributeAdminFabricIndex} on fabricID={fabric.fabricID}")
                     break
             asserts.assert_true(fabricid_found,
                                 "No FabricDescriptorStruct with fabricIndex = AdministratorFabricIndex found in Operational Cluster Fabrics attribute on EP0")
