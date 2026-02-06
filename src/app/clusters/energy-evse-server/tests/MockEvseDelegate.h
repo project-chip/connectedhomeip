@@ -148,7 +148,9 @@ private:
     DataModel::Nullable<uint16_t> mApproximateEVEfficiency = DataModel::Nullable<uint16_t>(kMockApproximateEVEfficiency);
     DataModel::Nullable<Percent> mStateOfCharge            = DataModel::Nullable<Percent>(kMockStateOfCharge);
     DataModel::Nullable<int64_t> mBatteryCapacity          = DataModel::Nullable<int64_t>(kMockBatteryCapacity);
-    DataModel::Nullable<CharSpan> mVehicleID           = DataModel::Nullable<CharSpan>(CharSpan::fromCharString("MOCK-VIN-12345"));
+    static constexpr size_t kVehicleIdBufferSize           = 32;
+    char mVehicleIdBuffer[kVehicleIdBufferSize]            = "MOCK-VIN-12345";
+    DataModel::Nullable<CharSpan> mVehicleID           = DataModel::Nullable<CharSpan>(CharSpan::fromCharString(mVehicleIdBuffer));
     DataModel::Nullable<uint32_t> mSessionID           = DataModel::Nullable<uint32_t>(kMockSessionID);
     DataModel::Nullable<uint32_t> mSessionDuration     = DataModel::Nullable<uint32_t>(kMockSessionDuration);
     DataModel::Nullable<int64_t> mSessionEnergyCharged = DataModel::Nullable<int64_t>(kMockSessionEnergyCharged);
