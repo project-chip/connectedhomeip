@@ -36,9 +36,9 @@ class IcdAppServerSubprocess(AppServerSubprocess):
     def terminate(self) -> None: ...
 
 
-class JFControllerSubprocess(Subprocess):
+class JFSubprocess(Subprocess):
     PREFIX: bytes
-    def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
+    def __init__(self, app: str, prefix: str, rpc_server_port: int, storage_dir: str,
                  vendor_id: int, extra_args: List[str] = ...) -> None: ...
 
 
