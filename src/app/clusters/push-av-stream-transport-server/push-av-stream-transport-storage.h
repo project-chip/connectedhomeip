@@ -81,6 +81,17 @@ static constexpr size_t kTransportOptionsStorageSize =
                                     CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS *
                                         TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)));
 
+static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t),             // connectionID
+                                sizeof(uint8_t),              // transportStatus
+                                kTransportOptionsStorageSize, // estimated transportOptions
+                                sizeof(FabricIndex)           // fabricIndex
+    );
+
+// Max size for the TLV-encoded array of CurrentConnection structs
+static constexpr size_t kMaxCurrentConnectionsSerializedSize =
+    2 /* ArrayTlvOverhead */ + (CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
+
 /**
  * @brief Storage implementation for transport trigger options.
  * Provides deep copy functionality and internal storage for motion zones.

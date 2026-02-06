@@ -24,10 +24,12 @@
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/data-model/WrappedStructEncoder.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/util/util.h>
 #include <assert.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -156,8 +158,7 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
         }
     }
 
-    MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                           PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
     return result;
 }
@@ -182,8 +183,7 @@ void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uin
         else
         {
             // Notify the stack that the CurrentConnections attribute has changed.
-            MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                                   PushAvStreamTransport::Attributes::CurrentConnections::Id);
+            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
         }
     }
 }
@@ -1309,8 +1309,7 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
         }
         else
         {
-            MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                                   PushAvStreamTransport::Attributes::CurrentConnections::Id);
+            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
         }
     }
 
@@ -1391,8 +1390,7 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
         }
         else
         {
-            MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                                   PushAvStreamTransport::Attributes::CurrentConnections::Id);
+            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
         }
     }
     handler.AddStatus(commandPath, status);

@@ -21,6 +21,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+class PushAvStreamTransportServer;
+
 // Internal namespace for helper functions
 namespace Internal {
 
@@ -64,6 +66,8 @@ public:
             return;
         }
     }
+
+    void SetCluster(PushAvStreamTransportServer * cluster) { mCluster = cluster; }
 
     Protocols::InteractionModel::Status
     NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
@@ -146,17 +150,7 @@ private:
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
-
-    static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
-        TLV::EstimateStructOverhead(sizeof(uint16_t),                                    // connectionID
-                                    sizeof(uint8_t),                                     // transportStatus
-                                    PushAvStreamTransport::kTransportOptionsStorageSize, // estimated transportOptions
-                                    sizeof(FabricIndex)                                  // fabricIndex
-        );
-
-    // Max size for the TLV-encoded array of CurrentConnection structs
-    static constexpr size_t kMaxCurrentConnectionsSerializedSize =
-        2 /* ArrayTlvOverhead */ + (CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
+    PushAvStreamTransportServer * mCluster                               = nullptr;
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true

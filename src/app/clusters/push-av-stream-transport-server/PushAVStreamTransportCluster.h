@@ -46,7 +46,9 @@ public:
      */
     PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
         DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mLogic(aEndpointId, aFeatures)
-    {}
+    {
+        mLogic.SetCluster(this);
+    }
 
     PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
 
@@ -64,6 +66,11 @@ public:
     void SetTLSCertificateManagementDelegate(TLSCertificateManagementDelegate * delegate)
     {
         mLogic.SetTLSCertificateManagementDelegate(delegate);
+    }
+
+    void ReportAttributeChange(AttributeId attributeId)
+    {
+        NotifyAttributeChanged(attributeId);
     }
 
     /**
