@@ -23,8 +23,8 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/data-model/WrappedStructEncoder.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>

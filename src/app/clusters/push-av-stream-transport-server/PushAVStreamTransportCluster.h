@@ -68,10 +68,7 @@ public:
         mLogic.SetTLSCertificateManagementDelegate(delegate);
     }
 
-    void ReportAttributeChange(AttributeId attributeId)
-    {
-        NotifyAttributeChanged(attributeId);
-    }
+    void ReportAttributeChange(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
 
     /**
      * @brief API for application layer to notify when transport has started
