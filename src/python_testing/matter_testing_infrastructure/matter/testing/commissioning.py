@@ -549,6 +549,9 @@ async def is_commissioned(
     Uses DNS-SD to check if the device is operational on this fabric, avoiding long timeouts.
     Then reads the TrustedRootCertificates attribute.
 
+    Note: This function attempts a fast DNS-SD check first. If the device is found
+    operational on the current fabric via DNS-SD, it returns True.
+
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
@@ -574,9 +577,6 @@ async def is_commissioned(
             LOGGER.info(f"Device {node_id} is operational via DNS-SD - confirmed commissioned")
             return True
 
-        # Device not operational on this fabric via DNS-SD - could be:
-        # 1. Not commissioned at all (factory fresh) - PASE will work
-        # 2. Commissioned to other fabrics but not this one - need to read via PASE
         # Device not found via DNS-SD on this fabric. This could mean:
         # - Factory fresh device (PASE will work if commissioning window is open)
         # - Commissioned to other fabric(s) without open commissioning window (both will fail)

@@ -401,14 +401,14 @@ async def assert_is_commissioned_to_any_fabric(
 
     Example:
         # Verify device is commissioned before running multi-fabric test
-        await assert_is_commissioned(controller, node_id=1234, "DUT")
+        await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT")
 
         # Check that device has been successfully commissioned in previous step
-        await assert_is_commissioned(controller, node_id=1234, "Newly commissioned device")
+        await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="Newly commissioned device")
 
         # Verify device is commissioned (establishes PASE if needed)
         pase_params = {'discriminator': 1234, 'passcode': 20202021}
-        await assert_is_commissioned(controller, node_id=1234, "DUT", pase_params=pase_params)
+        await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT", pase_params=pase_params)
     """
     from matter.testing.commissioning import is_commissioned
 
