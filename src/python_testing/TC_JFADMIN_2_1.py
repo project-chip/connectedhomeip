@@ -59,6 +59,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         super().setup_class()
 
         self.fabric_a_ctrl = None
+        self.fabric_a_admin = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
 
         self.jfc_server_app = self.user_params.get("jfc_server_app", None)
