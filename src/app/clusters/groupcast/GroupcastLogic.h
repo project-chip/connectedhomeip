@@ -16,43 +16,66 @@
  */
 #pragma once
 
-#include <app/AttributeValueDecoder.h>
+#include "GroupcastContext.h"
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/server/Server.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/ClusterId.h>
 #include <clusters/Groupcast/CommandIds.h>
 #include <clusters/Groupcast/Commands.h>
 #include <clusters/Groupcast/Enums.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
+using Status = chip::Protocols::InteractionModel::Status;
+
 /**
  * @brief Implements the Matter specifications for the Groupcast cluster
  */
+
 class GroupcastLogic
 {
 public:
-    GroupcastLogic(BitFlags<Groupcast::Feature> features) : mFeatures(features) {}
+    static constexpr uint16_t kMaxMembershipEndpoints = 255;
+    static constexpr uint16_t kMaxCommandEndpoints    = 20;
+
+    struct EndpointList
+    {
+        EndpointId entries[kMaxMembershipEndpoints];
+        uint16_t count = 0;
+    };
+
+    GroupcastLogic(GroupcastContext & context) : mContext(context) {}
+    GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features) : mContext(context), mFeatures(features) {}
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
-    CHIP_ERROR ReadMembership(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
+                              AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
-    CHIP_ERROR JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
-    CHIP_ERROR LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                          Groupcast::Commands::LeaveGroupResponse::Type & response);
-    CHIP_ERROR UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
-    CHIP_ERROR ConfigureAuxiliaryACL(FabricIndex fabric_index,
-                                     const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
+    Status JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
+    Status LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                      EndpointList & endpoints);
+    Status UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
+    Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
 private:
-    CHIP_ERROR RegisterAccessControl(FabricIndex fabric_index, GroupId group_id);
+    Credentials::GroupDataProvider & Provider() { return mContext.provider; }
+    chip::FabricTable & Fabrics() { return mContext.fabrics; }
 
+    Status SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key);
+    Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                       EndpointList & endpoints);
+    Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList & endpoints);
+
+    GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;
 };
 

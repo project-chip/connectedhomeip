@@ -26,7 +26,7 @@ get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/pla
 # This must be called before find_package(Zephyr)
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nxp/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
@@ -40,6 +40,11 @@ project(chip-nxp-all-clusters-app-example)
 
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+
+# This is required to include Mbedtls user config file for NXP platform.
+# We use zephyr_include_directories to ensure the include is propagated to
+# the Zephyr Mbedtls module.
+zephyr_include_directories(${CHIP_ROOT}/src)
 
 target_include_directories(app
     PRIVATE

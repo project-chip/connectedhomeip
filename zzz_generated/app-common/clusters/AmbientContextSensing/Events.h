@@ -42,7 +42,41 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace AmbientContextSensing {
-namespace Events {} // namespace Events
+namespace Events {
+namespace AmbientContextDetected {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kAmbientContextType = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AmbientContextDetected::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const Structs::AmbientContextTypeStruct::Type> ambientContextType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AmbientContextDetected::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AmbientContextSensing::Id; }
+
+    DataModel::DecodableList<Structs::AmbientContextTypeStruct::DecodableType> ambientContextType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AmbientContextDetected
+} // namespace Events
 } // namespace AmbientContextSensing
 } // namespace Clusters
 } // namespace app

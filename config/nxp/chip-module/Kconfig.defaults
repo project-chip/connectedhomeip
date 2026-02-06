@@ -18,11 +18,18 @@
 # This file only changes defaults and thus all symbols here must be promptless
 # and safeguarded so that they only are applied when building Matter.
 
+if SOC_FAMILY_NXP_RW
+
 if CHIP
+
+rsource "Kconfig.features"
 
 # See config/common/cmake/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "NXP Semiconductors"
+
+config CHIP_ZEPHYR_USE_POSIX_DEFAULT_SOURCE
+	default n
 
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	default 1
@@ -68,6 +75,27 @@ config CHIP_DEVICE_PRODUCT_ID
 	default 41510 if SOC_SERIES_RW6XX
 
 endif # CHIP_FACTORY_DATA
+
+config CHIP_MALLOC_SYS_HEAP
+	default y if !ARCH_POSIX
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+	bool
+	default y
+
+config CHIP_OTA_REQUESTOR
+	bool
+	select BOOTLOADER_MCUBOOT
+
+config BOOTLOADER_MCUBOOT
+	bool
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select STREAM_FLASH_ERASE
+
+config NET_L2_OPENTHREAD
+	default n
 
 config LOG
 	default y
@@ -425,7 +453,7 @@ config MBEDTLS_USER_CONFIG_ENABLE
     default y
 
 config MBEDTLS_USER_CONFIG_FILE
-    default "nxp-zephyr-mbedtls-config.h"
+    default "platform/nxp/zephyr/nxp-zephyr-mbedtls-config.h"
 
 config MBEDTLS_ENTROPY_C
 	default y
@@ -541,4 +569,6 @@ choice POSIX_AEP_CHOICE
 	default POSIX_AEP_CHOICE_NONE
 endchoice
 
-endif
+endif # CHIP
+
+endif # SOC_FAMILY_NXP_RW

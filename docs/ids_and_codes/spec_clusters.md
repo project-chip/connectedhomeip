@@ -9,145 +9,145 @@ The following markers are used in this document (matches the ID master list):
 | C     | Certifiable                    |
 | P     | Provisional                    |
 
-| ID (Decimal) | ID (hex) | Name                                                     | PICS Code     |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|
-|--------------|----------|----------------------------------------------------------|---------------|---|---|---|---|---|-----|-----------|---|
-|3             |0x0003    |Identify                                                  |I              |C  |C  |C  |C  |C  |C    |C          |C  |
-|4             |0x0004    |Groups                                                    |G              |C  |C  |C  |C  |C  |C    |C          |C  |
-|5             |0x0005    |Scenes                                                    |S              |C  |C  |C  |   |   |     |           |   |
-|6             |0x0006    |On/Off                                                    |OO             |C  |C  |C  |C  |C  |C    |C          |C  |
-|8             |0x0008    |Level Control                                             |LVL            |C  |C  |C  |C  |C  |C    |C          |C  |
-|28            |0x001C    |Pulse Width Modulation                                    |PWM            |C  |C  |C  |P  |   |     |           |   |
-|29            |0x001D    |Descriptor                                                |DESC           |C  |C  |C  |C  |C  |C    |C          |C  |
-|30            |0x001E    |Binding                                                   |BIND           |C  |C  |C  |C  |C  |C    |C          |C  |
-|31            |0x001F    |Access Control                                            |ACL            |C  |C  |C  |C  |C  |C    |C          |C  |
-|37            |0x0025    |Actions                                                   |ACT            |C  |C  |C  |C  |C  |C    |C          |C  |
-|40            |0x0028    |Basic Information                                         |BINFO          |C  |C  |C  |C  |C  |C    |C          |C  |
-|41            |0x0029    |OTA Software Update Provider                              |OTAP           |C  |C  |C  |C  |C  |C    |C          |C  |
-|42            |0x002A    |OTA Software Update Requestor                             |OTAR           |C  |C  |C  |C  |C  |C    |C          |C  |
-|43            |0x002B    |Localization Configuration                                |LCFG           |C  |C  |C  |C  |C  |C    |C          |C  |
-|44            |0x002C    |Time Format Localization                                  |LTIME          |C  |C  |C  |C  |C  |C    |C          |C  |
-|45            |0x002D    |Unit Localization                                         |LUNIT          |C  |C  |C  |C  |C  |C    |C          |C  |
-|46            |0x002E    |Power Source Configuration                                |PSCFG          |C  |C  |C  |C  |C  |C    |C          |C  |
-|47            |0x002F    |Power Source                                              |PS             |C  |C  |C  |C  |C  |C    |C          |C  |
-|48            |0x0030    |General Commissioning                                     |CGEN           |C  |C  |C  |C  |C  |C    |C          |C  |
-|49            |0x0031    |Network Commissioning                                     |CNET           |C  |C  |C  |C  |C  |C    |C          |C  |
-|50            |0x0032    |Diagnostic Logs                                           |DLOG           |C  |C  |C  |C  |C  |C    |C          |C  |
-|51            |0x0033    |General Diagnostics                                       |DGGEN          |C  |C  |C  |C  |C  |C    |C          |C  |
-|52            |0x0034    |Software Diagnostics                                      |DGSW           |C  |C  |C  |C  |C  |C    |C          |C  |
-|53            |0x0035    |Thread Network Diagnostics                                |DGTHREAD       |C  |C  |C  |C  |C  |C    |C          |C  |
-|54            |0x0036    |Wi-Fi Network Diagnostics                                 |DGWIFI         |C  |C  |C  |C  |C  |C    |C          |C  |
-|55            |0x0037    |Ethernet Network Diagnostics                              |DGETH          |C  |C  |C  |C  |C  |C    |C          |C  |
-|56            |0x0038    |Time Synchronization                                      |TIMESYNC       |C  |C  |C  |C  |C  |C    |C          |C  |
-|57            |0x0039    |Bridged Device Basic Information                          |BRBINFO        |C  |C  |C  |C  |C  |C    |C          |C  |
-|59            |0x003B    |Switch                                                    |SWTCH          |C  |C  |C  |C  |C  |C    |C          |C  |
-|60            |0x003C    |Administrator Commissioning                               |CADMIN         |C  |C  |C  |C  |C  |C    |C          |C  |
-|62            |0x003E    |Operational Credentials                                   |OPCREDS        |C  |C  |C  |C  |C  |C    |C          |C  |
-|63            |0x003F    |Group Key Management                                      |GRPKEY         |C  |C  |C  |C  |C  |C    |C          |C  |
-|64            |0x0040    |Fixed Label                                               |FLABEL         |C  |C  |C  |C  |C  |C    |C          |C  |
-|65            |0x0041    |User Label                                                |ULABEL         |C  |C  |C  |C  |C  |C    |C          |C  |
-|66            |0x0042    |Proxy Configuration                                       |PXCFG          |C  |C  |C  |P  |P  |P    |           |   |
-|67            |0x0043    |Proxy Discovery                                           |PXDSC          |C  |C  |C  |P  |P  |P    |           |   |
-|68            |0x0044    |Valid Proxies                                             |PXVALID        |C  |C  |C  |P  |P  |P    |           |   |
-|69            |0x0045    |Boolean State                                             |BOOL           |C  |C  |C  |C  |C  |C    |C          |C  |
-|70            |0x0046    |ICD Management                                            |ICDM           |   |   |C  |C  |C  |C    |C          |C  |
-|72            |0x0048    |Oven Cavity Operational State                             |OVENOPSTATE    |   |   |   |C  |C  |C    |C          |C  |
-|73            |0x0049    |Oven Mode                                                 |OTCCM          |   |   |   |C  |C  |C    |C          |C  |
-|74            |0x004A    |Laundry Dryer Controls                                    |DRYERCTRL      |   |   |   |C  |C  |C    |C          |C  |
-|80            |0x0050    |Mode Select                                               |MOD            |C  |C  |C  |C  |C  |C    |C          |C  |
-|81            |0x0051    |Laundry Washer Mode                                       |LWM            |   |   |C  |C  |C  |C    |C          |C  |
-|82            |0x0052    |Refrigerator And Temperature Controlled Cabinet Mode      |TCCM           |   |   |C  |C  |C  |C    |C          |C  |
-|83            |0x0053    |Laundry Washer Controls                                   |WASHERCTRL     |   |   |C  |C  |C  |C    |C          |C  |
-|84            |0x0054    |RVC Run Mode                                              |RVCRUNM        |   |   |C  |C  |C  |C    |C          |C  |
-|85            |0x0055    |RVC Clean Mode                                            |RVCCLEANM      |   |   |C  |C  |C  |C    |C          |C  |
-|86            |0x0056    |Temperature Control                                       |TCTL           |   |   |C  |C  |C  |C    |C          |C  |
-|87            |0x0057    |Refrigerator Alarm                                        |REFALM         |   |   |C  |C  |C  |C    |C          |C  |
-|89            |0x0059    |Dishwasher Mode                                           |DISHM          |   |   |C  |C  |C  |C    |C          |C  |
-|91            |0x005B    |Air Quality                                               |AIRQUAL        |   |   |C  |C  |C  |C    |C          |C  |
-|92            |0x005C    |Smoke CO Alarm                                            |SMOKECO        |   |   |C  |C  |C  |C    |C          |C  |
-|93            |0x005D    |Dishwasher Alarm                                          |DISHALM        |   |   |C  |C  |C  |C    |C          |C  |
-|94            |0x005E    |Microwave Oven Mode                                       |MWOM           |   |   |   |C  |C  |C    |C          |C  |
-|95            |0x005F    |Microwave Oven Control                                    |MWOCTRL        |   |   |   |C  |C  |C    |C          |C  |
-|96            |0x0060    |Operational State                                         |OPSTATE        |   |   |C  |C  |C  |C    |C          |C  |
-|97            |0x0061    |RVC Operational State                                     |RVCOPSTATE     |   |   |C  |C  |C  |C    |C          |C  |
-|98            |0x0062    |Scenes Management                                         |S              |   |   |   |P  |P  |P    |C          |C  |
-|113           |0x0071    |HEPA Filter Monitoring                                    |HEPAFREMON     |   |   |C  |C  |C  |C    |C          |C  |
-|114           |0x0072    |Activated Carbon Filter Monitoring                        |ACFREMON       |   |   |C  |C  |C  |C    |C          |C  |
-|121           |0x0079    |Water Tank Level Monitoring                               |REPM           |   |   |   |   |C  |C    |C          |C  |
-|128           |0x0080    |Boolean State Configuration                               |BOOLCFG        |   |   |   |C  |C  |C    |C          |C  |
-|129           |0x0081    |Valve Configuration and Control                           |VALCC          |   |   |   |C  |C  |C    |C          |C  |
-|144           |0x0090    |Electrical Power Measurement                              |EPM            |   |   |   |C  |C  |C    |C          |C  |
-|145           |0x0091    |Electrical Energy Measurement                             |EEM            |   |   |   |C  |C  |C    |C          |C  |
-|148           |0x0094    |Water Heater Management                                   |EWATERHTR      |   |   |   |   |C  |C    |C          |C  |
-|149           |0x0095    |Commodity Price                                           |SEPR           |   |   |   |   |   |     |           |C  |
-|151           |0x0097    |Messages                                                  |MESS           |   |   |   |C  |C  |C    |C          |C  |
-|152           |0x0098    |Device Energy Management                                  |DEM            |   |   |   |P  |C  |C    |C          |C  |
-|153           |0x0099    |Energy EVSE                                               |EEVSE          |   |   |   |C  |C  |C    |C          |C  |
-|155           |0x009B    |Energy Preference                                         |EPREF          |   |   |   |P  |P  |P    |P          |P  |
-|156           |0x009C    |Power Topology                                            |PWRTL          |   |   |   |C  |C  |C    |C          |C  |
-|157           |0x009D    |Energy EVSE Mode                                          |EEVSEM         |   |   |   |C  |C  |C    |C          |C  |
-|158           |0x009E    |Water Heater Mode                                         |WHM            |   |   |   |   |C  |C    |C          |C  |
-|159           |0x009F    |Device Energy Management Mode                             |DEMM           |   |   |   |P  |C  |C    |C          |C  |
-|160           |0x00A0    |Electrical Grid Conditions                                |EGC            |   |   |   |   |   |     |           |C  |
-|257           |0x0101    |Door Lock                                                 |DRLK           |C  |C  |C  |C  |C  |C    |C          |C  |
-|258           |0x0102    |Window Covering                                           |WNCV           |C  |C  |C  |C  |C  |C    |C          |C  |
-|260           |0x0104    |Closure Control                                           |CLCTRL         |   |   |   |   |   |     |           |C  |
-|261           |0x0105    |Closure Dimension                                         |CLDIM          |   |   |   |   |   |     |           |C  |
-|336           |0x0150    |Service Area                                              |SEAR           |   |   |   |   |C  |C    |C          |C  |
-|512           |0x0200    |Pump Configuration and Control                            |PCC            |C  |C  |C  |C  |C  |C    |C          |C  |
-|513           |0x0201    |Thermostat                                                |TSTAT          |C  |C  |C  |C  |C  |C    |C          |C  |
-|514           |0x0202    |Fan Control                                               |FAN            |C  |C  |C  |C  |C  |C    |C          |C  |
-|516           |0x0204    |Thermostat User Interface Configuration                   |TSUIC          |C  |C  |C  |C  |C  |C    |C          |C  |
-|768           |0x0300    |Color Control                                             |CC             |C  |C  |C  |C  |C  |C    |C          |C  |
-|769           |0x0301    |Ballast Configuration                                     |BC             |C  |C  |C  |P  |P  |P    |           |   |
-|1024          |0x0400    |Illuminance Measurement                                   |ILL            |C  |C  |C  |C  |C  |C    |C          |C  |
-|1026          |0x0402    |Temperature Measurement                                   |TMP            |C  |C  |C  |C  |C  |C    |C          |C  |
-|1027          |0x0403    |Pressure Measurement                                      |PRS            |C  |C  |C  |C  |C  |C    |C          |C  |
-|1028          |0x0404    |Flow Measurement                                          |FLW            |C  |C  |C  |C  |C  |C    |C          |C  |
-|1029          |0x0405    |Relative Humidity Measurement                             |RH             |C  |C  |C  |C  |C  |C    |C          |C  |
-|1030          |0x0406    |Occupancy Sensing                                         |OCC            |C  |C  |C  |C  |C  |C    |C          |C  |
-|1031          |0x0407    |Leaf Wetness Measurement                                  |RH             |C  |C  |C  |   |   |     |           |   |
-|1032          |0x0408    |Soil Moisture Measurement                                 |RH             |C  |C  |C  |   |   |     |           |   |
-|1036          |0x040C    |Carbon Monoxide Concentration Measurement                 |CMOCONC        |   |   |C  |C  |C  |C    |C          |C  |
-|1037          |0x040D    |Carbon Dioxide Concentration Measurement                  |CDOCONC        |   |   |C  |C  |C  |C    |C          |C  |
-|1043          |0x0413    |Nitrogen Dioxide Concentration Measurement                |NDOCONC        |   |   |C  |C  |C  |C    |C          |C  |
-|1045          |0x0415    |Ozone Concentration Measurement                           |OZCONC         |   |   |C  |C  |C  |C    |C          |C  |
-|1066          |0x042A    |PM2.5 Concentration Measurement                           |PMICONC        |   |   |C  |C  |C  |C    |C          |C  |
-|1067          |0x042B    |Formaldehyde Concentration Measurement                    |FLDCONC        |   |   |C  |C  |C  |C    |C          |C  |
-|1068          |0x042C    |PM1 Concentration Measurement                             |PMHCONC        |   |   |C  |C  |C  |C    |C          |C  |
-|1069          |0x042D    |PM10 Concentration Measurement                            |PMKCONC        |   |   |C  |C  |C  |C    |C          |C  |
-|1070          |0x042E    |Total Volatile Organic Compounds Concentration Measurement|TVOCCONC       |   |   |C  |C  |C  |C    |C          |C  |
-|1071          |0x042F    |Radon Concentration Measurement                           |RNCONC         |   |   |C  |C  |C  |C    |C          |C  |
-|1072          |0x0430    |Soil Measurement                                          |SOIL           |   |   |   |   |   |     |           |C  |
-|1105          |0x0451    |Wi-Fi Network Management                                  |WIFINM         |   |   |   |   |C  |C    |C          |C  |
-|1106          |0x0452    |Thread Border Router Management                           |TBRM           |   |   |   |   |C  |C    |C          |C  |
-|1107          |0x0453    |Thread Network Directory                                  |THNETDIR       |   |   |   |   |C  |C    |C          |C  |
-|1283          |0x0503    |Wake On LAN                                               |WAKEONLAN      |C  |C  |C  |C  |C  |C    |C          |C  |
-|1284          |0x0504    |Channel                                                   |CHANNEL        |C  |C  |C  |C  |C  |C    |C          |C  |
-|1285          |0x0505    |Target Navigator                                          |TGTNAV         |C  |C  |C  |C  |C  |C    |C          |C  |
-|1286          |0x0506    |Media Playback                                            |MEDIAPLAYBACK  |C  |C  |C  |C  |C  |C    |C          |C  |
-|1287          |0x0507    |Media Input                                               |MEDIAINPUT     |C  |C  |C  |C  |C  |C    |C          |C  |
-|1288          |0x0508    |Low Power                                                 |LOWPOWER       |C  |C  |C  |C  |C  |C    |C          |C  |
-|1289          |0x0509    |Keypad Input                                              |KEYPADINPUT    |C  |C  |C  |C  |C  |C    |C          |C  |
-|1290          |0x050A    |Content Launcher                                          |CONTENTLAUNCHER|C  |C  |C  |C  |C  |C    |C          |C  |
-|1291          |0x050B    |Audio Output                                              |AUDIOOUTPUT    |C  |C  |C  |C  |C  |C    |C          |C  |
-|1292          |0x050C    |Application Launcher                                      |APPLAUNCHER    |C  |C  |C  |C  |C  |C    |C          |C  |
-|1293          |0x050D    |Application Basic                                         |APBSC          |C  |C  |C  |C  |C  |C    |C          |C  |
-|1294          |0x050E    |Account Login                                             |ALOGIN         |C  |C  |C  |C  |C  |C    |C          |C  |
-|1295          |0x050F    |Content Control                                           |CONCON         |   |   |   |P  |P  |P    |P          |P  |
-|1296          |0x0510    |Content App Observer                                      |APPOBSERVER    |   |   |   |C  |C  |C    |C          |C  |
-|1360          |0x0550    |Zone Management                                           |ZONEMGMT       |   |   |   |   |   |     |           |C  |
-|1361          |0x0551    |Camera AV Stream Management                               |AVSM           |   |   |   |   |   |     |           |C  |
-|1362          |0x0552    |Camera AV Settings User Level Management                  |AVSUM          |   |   |   |   |   |     |           |C  |
-|1363          |0x0553    |WebRTC Transport Provider                                 |WEBRTCP        |   |   |   |   |   |     |           |C  |
-|1364          |0x0554    |WebRTC Transport Requestor                                |WEBRTCR        |   |   |   |   |   |     |           |C  |
-|1365          |0x0555    |Push AV Stream Transport                                  |PAVST          |   |   |   |   |   |     |           |C  |
-|1366          |0x0556    |Chime                                                     |CHIME          |   |   |   |   |   |     |           |C  |
-|1792          |0x0700    |Commodity Tariff                                          |SETRF          |   |   |   |   |   |     |           |C  |
-|1872          |0x0750    |Ecosystem Information                                     |ECOINFO        |   |   |   |   |C  |C    |C          |C  |
-|1873          |0x0751    |Commissioner Control                                      |CCTRL          |   |   |   |   |C  |C    |C          |C  |
-|1874          |0x0752    |Joint Fabric Datastore                                    |JFDS           |   |   |   |   |P  |P    |P          |P  |
-|1875          |0x0753    |Joint Fabric Administrator                                |JFPKI          |   |   |   |   |P  |P    |P          |P  |
-|2049          |0x0801    |TLS Certificate Management                                |TLSCERT        |   |   |   |   |   |     |           |C  |
-|2050          |0x0802    |TLS Client Management                                     |TLSCLIENT      |   |   |   |   |   |     |           |C  |
-|2822          |0x0B06    |Meter Identification                                      |MTRID          |   |   |   |   |   |     |           |C  |
-|2823          |0x0B07    |Commodity Metering                                        |COMMTR         |   |   |   |   |   |     |           |C  |
+| ID (Decimal) | ID (hex) | Name                                                     | PICS Code     |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|0.9-winter-2026|
+|--------------|----------|----------------------------------------------------------|---------------|---|---|---|---|---|-----|-----------|---|---------------|
+|3             |0x0003    |Identify                                                  |I              |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|4             |0x0004    |Groups                                                    |G              |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|5             |0x0005    |Scenes                                                    |S              |C  |C  |C  |   |   |     |           |   |               |
+|6             |0x0006    |On/Off                                                    |OO             |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|8             |0x0008    |Level Control                                             |LVL            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|28            |0x001C    |Pulse Width Modulation                                    |PWM            |C  |C  |C  |P  |   |     |           |   |               |
+|29            |0x001D    |Descriptor                                                |DESC           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|30            |0x001E    |Binding                                                   |BIND           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|31            |0x001F    |Access Control                                            |ACL            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|37            |0x0025    |Actions                                                   |ACT            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|40            |0x0028    |Basic Information                                         |BINFO          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|41            |0x0029    |OTA Software Update Provider                              |OTAP           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|42            |0x002A    |OTA Software Update Requestor                             |OTAR           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|43            |0x002B    |Localization Configuration                                |LCFG           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|44            |0x002C    |Time Format Localization                                  |LTIME          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|45            |0x002D    |Unit Localization                                         |LUNIT          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|46            |0x002E    |Power Source Configuration                                |PSCFG          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|47            |0x002F    |Power Source                                              |PS             |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|48            |0x0030    |General Commissioning                                     |CGEN           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|49            |0x0031    |Network Commissioning                                     |CNET           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|50            |0x0032    |Diagnostic Logs                                           |DLOG           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|51            |0x0033    |General Diagnostics                                       |DGGEN          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|52            |0x0034    |Software Diagnostics                                      |DGSW           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|53            |0x0035    |Thread Network Diagnostics                                |DGTHREAD       |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|54            |0x0036    |Wi-Fi Network Diagnostics                                 |DGWIFI         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|55            |0x0037    |Ethernet Network Diagnostics                              |DGETH          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|56            |0x0038    |Time Synchronization                                      |TIMESYNC       |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|57            |0x0039    |Bridged Device Basic Information                          |BRBINFO        |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|59            |0x003B    |Switch                                                    |SWTCH          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|60            |0x003C    |Administrator Commissioning                               |CADMIN         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|62            |0x003E    |Operational Credentials                                   |OPCREDS        |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|63            |0x003F    |Group Key Management                                      |GRPKEY         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|64            |0x0040    |Fixed Label                                               |FLABEL         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|65            |0x0041    |User Label                                                |ULABEL         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|66            |0x0042    |Proxy Configuration                                       |PXCFG          |C  |C  |C  |P  |P  |P    |           |   |               |
+|67            |0x0043    |Proxy Discovery                                           |PXDSC          |C  |C  |C  |P  |P  |P    |           |   |               |
+|68            |0x0044    |Valid Proxies                                             |PXVALID        |C  |C  |C  |P  |P  |P    |           |   |               |
+|69            |0x0045    |Boolean State                                             |BOOL           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|70            |0x0046    |ICD Management                                            |ICDM           |   |   |C  |C  |C  |C    |C          |C  |C              |
+|72            |0x0048    |Oven Cavity Operational State                             |OVENOPSTATE    |   |   |   |C  |C  |C    |C          |C  |C              |
+|73            |0x0049    |Oven Mode                                                 |OTCCM          |   |   |   |C  |C  |C    |C          |C  |C              |
+|74            |0x004A    |Laundry Dryer Controls                                    |DRYERCTRL      |   |   |   |C  |C  |C    |C          |C  |C              |
+|80            |0x0050    |Mode Select                                               |MOD            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|81            |0x0051    |Laundry Washer Mode                                       |LWM            |   |   |C  |C  |C  |C    |C          |C  |C              |
+|82            |0x0052    |Refrigerator And Temperature Controlled Cabinet Mode      |TCCM           |   |   |C  |C  |C  |C    |C          |C  |C              |
+|83            |0x0053    |Laundry Washer Controls                                   |WASHERCTRL     |   |   |C  |C  |C  |C    |C          |C  |C              |
+|84            |0x0054    |RVC Run Mode                                              |RVCRUNM        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|85            |0x0055    |RVC Clean Mode                                            |RVCCLEANM      |   |   |C  |C  |C  |C    |C          |C  |C              |
+|86            |0x0056    |Temperature Control                                       |TCTL           |   |   |C  |C  |C  |C    |C          |C  |C              |
+|87            |0x0057    |Refrigerator Alarm                                        |REFALM         |   |   |C  |C  |C  |C    |C          |C  |C              |
+|89            |0x0059    |Dishwasher Mode                                           |DISHM          |   |   |C  |C  |C  |C    |C          |C  |C              |
+|91            |0x005B    |Air Quality                                               |AIRQUAL        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|92            |0x005C    |Smoke CO Alarm                                            |SMOKECO        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|93            |0x005D    |Dishwasher Alarm                                          |DISHALM        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|94            |0x005E    |Microwave Oven Mode                                       |MWOM           |   |   |   |C  |C  |C    |C          |C  |C              |
+|95            |0x005F    |Microwave Oven Control                                    |MWOCTRL        |   |   |   |C  |C  |C    |C          |C  |C              |
+|96            |0x0060    |Operational State                                         |OPSTATE        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|97            |0x0061    |RVC Operational State                                     |RVCOPSTATE     |   |   |C  |C  |C  |C    |C          |C  |C              |
+|98            |0x0062    |Scenes Management                                         |S              |   |   |   |P  |P  |P    |C          |C  |C              |
+|113           |0x0071    |HEPA Filter Monitoring                                    |HEPAFREMON     |   |   |C  |C  |C  |C    |C          |C  |C              |
+|114           |0x0072    |Activated Carbon Filter Monitoring                        |ACFREMON       |   |   |C  |C  |C  |C    |C          |C  |C              |
+|121           |0x0079    |Water Tank Level Monitoring                               |REPM           |   |   |   |   |C  |C    |C          |C  |C              |
+|128           |0x0080    |Boolean State Configuration                               |BOOLCFG        |   |   |   |C  |C  |C    |C          |C  |C              |
+|129           |0x0081    |Valve Configuration and Control                           |VALCC          |   |   |   |C  |C  |C    |C          |C  |C              |
+|144           |0x0090    |Electrical Power Measurement                              |EPM            |   |   |   |C  |C  |C    |C          |C  |C              |
+|145           |0x0091    |Electrical Energy Measurement                             |EEM            |   |   |   |C  |C  |C    |C          |C  |C              |
+|148           |0x0094    |Water Heater Management                                   |EWATERHTR      |   |   |   |   |C  |C    |C          |C  |C              |
+|149           |0x0095    |Commodity Price                                           |SEPR           |   |   |   |   |   |     |           |C  |C              |
+|151           |0x0097    |Messages                                                  |MESS           |   |   |   |C  |C  |C    |C          |C  |C              |
+|152           |0x0098    |Device Energy Management                                  |DEM            |   |   |   |P  |C  |C    |C          |C  |C              |
+|153           |0x0099    |Energy EVSE                                               |EEVSE          |   |   |   |C  |C  |C    |C          |C  |C              |
+|155           |0x009B    |Energy Preference                                         |EPREF          |   |   |   |P  |P  |P    |P          |P  |P              |
+|156           |0x009C    |Power Topology                                            |PWRTL          |   |   |   |C  |C  |C    |C          |C  |C              |
+|157           |0x009D    |Energy EVSE Mode                                          |EEVSEM         |   |   |   |C  |C  |C    |C          |C  |C              |
+|158           |0x009E    |Water Heater Mode                                         |WHM            |   |   |   |   |C  |C    |C          |C  |C              |
+|159           |0x009F    |Device Energy Management Mode                             |DEMM           |   |   |   |P  |C  |C    |C          |C  |C              |
+|160           |0x00A0    |Electrical Grid Conditions                                |EGC            |   |   |   |   |   |     |           |C  |C              |
+|257           |0x0101    |Door Lock                                                 |DRLK           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|258           |0x0102    |Window Covering                                           |WNCV           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|260           |0x0104    |Closure Control                                           |CLCTRL         |   |   |   |   |   |     |           |C  |C              |
+|261           |0x0105    |Closure Dimension                                         |CLDIM          |   |   |   |   |   |     |           |C  |C              |
+|336           |0x0150    |Service Area                                              |SEAR           |   |   |   |   |C  |C    |C          |C  |C              |
+|512           |0x0200    |Pump Configuration and Control                            |PCC            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|513           |0x0201    |Thermostat                                                |TSTAT          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|514           |0x0202    |Fan Control                                               |FAN            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|516           |0x0204    |Thermostat User Interface Configuration                   |TSUIC          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|768           |0x0300    |Color Control                                             |CC             |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|769           |0x0301    |Ballast Configuration                                     |BC             |C  |C  |C  |P  |P  |P    |           |   |               |
+|1024          |0x0400    |Illuminance Measurement                                   |ILL            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1026          |0x0402    |Temperature Measurement                                   |TMP            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1027          |0x0403    |Pressure Measurement                                      |PRS            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1028          |0x0404    |Flow Measurement                                          |FLW            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1029          |0x0405    |Relative Humidity Measurement                             |RH             |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1030          |0x0406    |Occupancy Sensing                                         |OCC            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1031          |0x0407    |Leaf Wetness Measurement                                  |RH             |C  |C  |C  |   |   |     |           |   |               |
+|1032          |0x0408    |Soil Moisture Measurement                                 |RH             |C  |C  |C  |   |   |     |           |   |               |
+|1036          |0x040C    |Carbon Monoxide Concentration Measurement                 |CMOCONC        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1037          |0x040D    |Carbon Dioxide Concentration Measurement                  |CDOCONC        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1043          |0x0413    |Nitrogen Dioxide Concentration Measurement                |NDOCONC        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1045          |0x0415    |Ozone Concentration Measurement                           |OZCONC         |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1066          |0x042A    |PM2.5 Concentration Measurement                           |PMICONC        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1067          |0x042B    |Formaldehyde Concentration Measurement                    |FLDCONC        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1068          |0x042C    |PM1 Concentration Measurement                             |PMHCONC        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1069          |0x042D    |PM10 Concentration Measurement                            |PMKCONC        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1070          |0x042E    |Total Volatile Organic Compounds Concentration Measurement|TVOCCONC       |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1071          |0x042F    |Radon Concentration Measurement                           |RNCONC         |   |   |C  |C  |C  |C    |C          |C  |C              |
+|1072          |0x0430    |Soil Measurement                                          |SOIL           |   |   |   |   |   |     |           |C  |C              |
+|1105          |0x0451    |Wi-Fi Network Management                                  |WIFINM         |   |   |   |   |C  |C    |C          |C  |C              |
+|1106          |0x0452    |Thread Border Router Management                           |TBRM           |   |   |   |   |C  |C    |C          |C  |C              |
+|1107          |0x0453    |Thread Network Directory                                  |THNETDIR       |   |   |   |   |C  |C    |C          |C  |C              |
+|1283          |0x0503    |Wake On LAN                                               |WAKEONLAN      |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1284          |0x0504    |Channel                                                   |CHANNEL        |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1285          |0x0505    |Target Navigator                                          |TGTNAV         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1286          |0x0506    |Media Playback                                            |MEDIAPLAYBACK  |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1287          |0x0507    |Media Input                                               |MEDIAINPUT     |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1288          |0x0508    |Low Power                                                 |LOWPOWER       |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1289          |0x0509    |Keypad Input                                              |KEYPADINPUT    |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1290          |0x050A    |Content Launcher                                          |CONTENTLAUNCHER|C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1291          |0x050B    |Audio Output                                              |AUDIOOUTPUT    |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1292          |0x050C    |Application Launcher                                      |APPLAUNCHER    |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1293          |0x050D    |Application Basic                                         |APBSC          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1294          |0x050E    |Account Login                                             |ALOGIN         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|1295          |0x050F    |Content Control                                           |CONCON         |   |   |   |P  |P  |P    |P          |P  |P              |
+|1296          |0x0510    |Content App Observer                                      |APPOBSERVER    |   |   |   |C  |C  |C    |C          |C  |C              |
+|1360          |0x0550    |Zone Management                                           |ZONEMGMT       |   |   |   |   |   |     |           |C  |C              |
+|1361          |0x0551    |Camera AV Stream Management                               |AVSM           |   |   |   |   |   |     |           |C  |C              |
+|1362          |0x0552    |Camera AV Settings User Level Management                  |AVSUM          |   |   |   |   |   |     |           |C  |C              |
+|1363          |0x0553    |WebRTC Transport Provider                                 |WEBRTCP        |   |   |   |   |   |     |           |C  |C              |
+|1364          |0x0554    |WebRTC Transport Requestor                                |WEBRTCR        |   |   |   |   |   |     |           |C  |C              |
+|1365          |0x0555    |Push AV Stream Transport                                  |PAVST          |   |   |   |   |   |     |           |C  |C              |
+|1366          |0x0556    |Chime                                                     |CHIME          |   |   |   |   |   |     |           |C  |C              |
+|1792          |0x0700    |Commodity Tariff                                          |SETRF          |   |   |   |   |   |     |           |C  |C              |
+|1872          |0x0750    |Ecosystem Information                                     |ECOINFO        |   |   |   |   |C  |C    |C          |C  |C              |
+|1873          |0x0751    |Commissioner Control                                      |CCTRL          |   |   |   |   |C  |C    |C          |C  |C              |
+|1874          |0x0752    |Joint Fabric Datastore                                    |JFDS           |   |   |   |   |P  |P    |P          |P  |P              |
+|1875          |0x0753    |Joint Fabric Administrator                                |JFPKI          |   |   |   |   |P  |P    |P          |P  |P              |
+|2049          |0x0801    |TLS Certificate Management                                |TLSCERT        |   |   |   |   |   |     |           |C  |C              |
+|2050          |0x0802    |TLS Client Management                                     |TLSCLIENT      |   |   |   |   |   |     |           |C  |C              |
+|2822          |0x0B06    |Meter Identification                                      |MTRID          |   |   |   |   |   |     |           |C  |C              |
+|2823          |0x0B07    |Commodity Metering                                        |COMMTR         |   |   |   |   |   |     |           |C  |C              |

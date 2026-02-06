@@ -28,4 +28,8 @@ TimeSynchronizationCluster * GetClusterInstance();
 void SetDefaultDelegate(Delegate * delegate);
 Delegate * GetDefaultDelegate();
 
+// Force a specific time source value. Overrides ember setting.
+// MAY only be called before the cluster instance was created.
+void ForceTimeSource(std::optional<TimeSourceEnum> value);
+
 } // namespace chip::app::Clusters::TimeSynchronization

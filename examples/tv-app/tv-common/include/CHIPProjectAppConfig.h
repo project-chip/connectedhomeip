@@ -74,9 +74,17 @@
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 20
 
 // Change port to make it easy to run against tv-casting-app
-#define CHIP_PORT 5640
+// #define CHIP_PORT 5640 - not needed due to CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
+// Enable automatic port retry to handle port conflicts
+#define CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY 1
+#define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
 
 #define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
 
+#ifndef CHIP_DEVICE_LAYER_TARGET_DARWIN
+// Increase memory pools for better attribute reading performance
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 500 // Default is 15
 // Include the CHIPProjectConfig from platform implementation config
 #include <CHIPProjectConfig.h>
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN

@@ -3682,19 +3682,19 @@ endpoint 1 {
 
   server cluster CameraAvSettingsUserLevelManagement {
     callback attribute MPTZPosition;
-    ram      attribute maxPresets default = 5;
+    callback attribute maxPresets;
     callback attribute MPTZPresets;
     callback attribute DPTZStreams;
-    ram      attribute zoomMax default = 100;
-    ram      attribute tiltMin default = -90;
-    ram      attribute tiltMax default = 90;
-    ram      attribute panMin default = -180;
-    ram      attribute panMax default = 180;
-    ram      attribute movementState;
+    callback attribute zoomMax;
+    callback attribute tiltMin;
+    callback attribute tiltMax;
+    callback attribute panMin;
+    callback attribute panMax;
+    callback attribute movementState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 31;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
     handle command MPTZSetPosition;
