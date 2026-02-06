@@ -67,7 +67,7 @@ class ThreadBorderRouter:
             'ot-ctl ifconfig up &&'
             'ot-ctl routerselectionjitter 1 &&'
             'ot-ctl thread start &&'
-            'ot-ctl state leader &&'ThreadBorderRouter
+            'ot-ctl state leader &&'
             'while ! ot-ctl state | grep -q leader; do sleep 1; done &&'
             'ot-ctl netdata show &&'
             'ot-ctl srp server enable &&'
