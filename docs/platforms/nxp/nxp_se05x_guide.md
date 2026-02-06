@@ -334,8 +334,10 @@ gn gen out --args="chip_se05x_spake_verifier=true chip_se05x_spake_verifier_use_
 
 **CMake Build:**
 
+**Note:** Factory data must be provisioned first to use Trust provisioned values. Refer to [NXP Manufacturing Flow](nxp_manufacturing_flow.md).
+
 ```bash
-west build -d <out_dir> -b <board> <example_path> -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO=1 -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT=1000
+west build -d <out_dir> -b <board> <example_path> -DCONF_FILE_NAME=prj_wifi_fdata.conf -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO=1 -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITTER_CNT=1000
 ```
 
 **Running the Example:**

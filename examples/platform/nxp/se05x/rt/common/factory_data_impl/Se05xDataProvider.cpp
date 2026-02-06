@@ -38,11 +38,9 @@ static Se05xDataProviderImpl sInstance;
 
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
 static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
-
 constexpr size_t kSpake2p_PBKDF_Salt_Length_SE05x = 32;
 constexpr size_t kSpake2p_Passcode_Length_SE05x   = 4;
 constexpr uint32_t kSpake2p_Pwd_Salt_Bin_File_id  = 0x7FFF2000;
-uint32_t setUpPINCode_se05x                       = 0;
 
 #define BCD_TO_DEC(x) (x - 6 * (x >> 4))
 #endif
@@ -54,28 +52,29 @@ uint32_t setUpPINCode_se05x                       = 0;
 #endif
 
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-CHIP_ERROR GeneratePaseSaltSe05x(char * buf, uint16_t bufLen, uint16_t * outLen)
+CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(char * buf, uint16_t bufLen, uint16_t * outLen)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     constexpr size_t kSaltLen = kSpake2p_PBKDF_Salt_Length_SE05x;
-    uint8_t cert[128]         = {
-        0,
-    };
-    size_t certLen = sizeof(cert);
+
     /* 3 set of verifiers are provisioned in se05x. Each with 4 bytes passcode and 32 bytes salt */
     uint8_t offset = (SE05X_SPAKE_VERIFIER_TP_SET_NO - 1) * (kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x);
 
-    err = se05x_get_certificate(kSpake2p_Pwd_Salt_Bin_File_id, cert, &certLen);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    if (certLen == 0) {
+        certLen = sizeof(cert);
+
+        err = se05x_get_certificate(kSpake2p_Pwd_Salt_Bin_File_id, cert, &certLen);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    }
 
     VerifyOrReturnError(certLen >= (offset + kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x),
                         CHIP_ERROR_INTERNAL);
 
-    VerifyOrReturnError(bufLen >= kSaltLen, CHIP_ERROR_INTERNAL);
-    memcpy(buf, cert + offset + kSpake2p_Passcode_Length_SE05x, kSaltLen);
-    *outLen            = kSaltLen;
-    setUpPINCode_se05x = (BCD_TO_DEC(cert[offset + 3])) + (100 * BCD_TO_DEC(cert[offset + 2])) +
-        (10000 * BCD_TO_DEC(cert[offset + 1])) + (1000000 * BCD_TO_DEC(cert[offset]));
+    if (buf != NULL && outLen != NULL){
+        VerifyOrReturnError(bufLen >= kSaltLen, CHIP_ERROR_INTERNAL);
+        memcpy(buf, cert + offset + kSpake2p_Passcode_Length_SE05x, kSaltLen);
+        *outLen            = kSaltLen;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -86,7 +85,7 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSalt(MutableByteSpan & saltBuf)
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
     uint16_t saltB64Len                     = 0;
-    err                                     = GeneratePaseSaltSe05x(saltB64, sizeof(saltB64), &saltB64Len);
+    err                                     = GetSpake2pSaltBuffer(saltB64, sizeof(saltB64), &saltB64Len);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
@@ -101,15 +100,22 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSalt(MutableByteSpan & saltBuf)
 CHIP_ERROR Se05xDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
-    char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
-    uint16_t saltB64Len                     = 0;
-    err                                     = GeneratePaseSaltSe05x(saltB64, sizeof(saltB64), &saltB64Len);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+
+    if (certLen == 0){
+        // Call GetSpake2pSaltBuffer to read the certificate 
+        err                                     = GetSpake2pSaltBuffer(NULL, 0, NULL);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
     }
-    setupPasscode = setUpPINCode_se05x;
+
+    /* 3 set of verifiers are provisioned in se05x. Each with 4 bytes passcode and 32 bytes salt */
+    uint8_t offset = (SE05X_SPAKE_VERIFIER_TP_SET_NO - 1) * (kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x);
+
+    setupPasscode = (BCD_TO_DEC(cert[offset + 3])) + (100 * BCD_TO_DEC(cert[offset + 2])) +
+        (10000 * BCD_TO_DEC(cert[offset + 1])) + (1000000 * BCD_TO_DEC(cert[offset]));
     return err;
 }
 

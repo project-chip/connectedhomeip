@@ -39,6 +39,10 @@ class Se05xDataProviderImpl : public FactoryDataProviderImpl
 {
 public:
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+    uint8_t cert[128];
+    size_t certLen;
+
+    CHIP_ERROR GetSpake2pSaltBuffer(char * buf, uint16_t bufLen, uint16_t * outLen);
     CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override;
     CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override;
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override;
