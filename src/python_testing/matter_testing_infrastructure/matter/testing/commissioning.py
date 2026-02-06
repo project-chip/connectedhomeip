@@ -577,8 +577,13 @@ async def is_commissioned(
         # Device not operational on this fabric via DNS-SD - could be:
         # 1. Not commissioned at all (factory fresh) - PASE will work
         # 2. Commissioned to other fabrics but not this one - need to read via PASE
-        # 3. Commissioned to this fabric but DNS-SD failed - CASE will work
-        # Try both PASE and CASE in parallel for fastest response
+        # Device not found via DNS-SD on this fabric. This could mean:
+        # - Factory fresh device (PASE will work if commissioning window is open)
+        # - Commissioned to other fabric(s) without open commissioning window (both will fail)
+        # - DNS-SD timing issue on our fabric (CASE may work if there's a cached address)
+        #
+        # Try both PASE and CASE in parallel - whichever succeeds first is used.
+        # If both fail, commissioning status cannot be determined.
 
         if pase_params is None:
             # No PASE params and not operational via DNS-SD - can't safely proceed
