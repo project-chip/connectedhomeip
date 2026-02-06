@@ -1,8 +1,8 @@
-import contextlib
-
 __all__: list[str] = []
 
-with contextlib.suppress(ImportError):
+try:
     from . import linux
-
+except ModuleNotFoundError:
+    pass
+else:
     __all__ += ["linux"]
