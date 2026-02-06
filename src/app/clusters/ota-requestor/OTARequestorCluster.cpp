@@ -149,6 +149,8 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
     switch (request.path.mCommandId)
     {
     case OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id: {
+        VerifyOrReturnError(handler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
         OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
 

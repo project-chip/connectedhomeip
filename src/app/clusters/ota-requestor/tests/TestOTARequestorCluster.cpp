@@ -65,6 +65,10 @@ public:
                               const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
     {
         mLastAnnounceCommandPayload = commandData;
+        if (commandObj)
+        {
+            commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+        }
     }
     CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex = kUndefinedFabricIndex) override { return CHIP_NO_ERROR; }
     void TriggerImmediateQueryInternal() override {}
@@ -202,10 +206,10 @@ TEST_F(TestOTARequestorCluster, UpdatePossibleIsModifiable)
 
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
 {
-    chip::Testing::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
     OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Construct the payload.
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
@@ -214,22 +218,9 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
     payload.endpoint           = 5;
 
-    app::DataModel::InvokeRequest request = { .path = { kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                                        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id } };
-
-    uint8_t payloadBuffer[1024];
-    TLV::TLVWriter writer;
-    writer.Init(payloadBuffer);
-    ASSERT_EQ(payload.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
-    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    TLV::TLVReader reader;
-    reader.Init(payloadBuffer, writer.GetLengthWritten());
-    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
-
     // Invoke the command.
-    auto result = cluster.InvokeCommand(request, reader, nullptr);
-    EXPECT_FALSE(result.has_value());
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_TRUE(result.IsSuccess());
 
     // Check that the payload was decoded correctly.
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType forwarded_payload =
@@ -242,10 +233,10 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
 
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
 {
-    chip::Testing::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
     OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Construct the payload.
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
@@ -257,23 +248,11 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     uint8_t bytes[513]      = { '\0' };
     payload.metadataForNode = MakeOptional(ByteSpan(bytes));
 
-    app::DataModel::InvokeRequest request = { .path = { kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                                        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id } };
-
-    uint8_t payloadBuffer[1024];
-    TLV::TLVWriter writer;
-    writer.Init(payloadBuffer);
-    ASSERT_EQ(payload.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
-    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
-
-    TLV::TLVReader reader;
-    reader.Init(payloadBuffer, writer.GetLengthWritten());
-    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
-
     // Invoke the command.
-    auto result = cluster.InvokeCommand(request, reader, nullptr);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), // NOLINT(bugprone-unchecked-optional-access)
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    ASSERT_FALSE(result.IsSuccess());
+    EXPECT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status, // NOLINT(bugprone-unchecked-optional-access)
               DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
 }
 
