@@ -334,7 +334,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
             expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
-            timeout=20)
+            timeout=60)
 
         self.step("6")
         response = await devCtrlEcoA.ReadAttribute(

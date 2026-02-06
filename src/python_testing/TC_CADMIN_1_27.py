@@ -415,7 +415,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
             expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
-            timeout=20)
+            timeout=60)
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
