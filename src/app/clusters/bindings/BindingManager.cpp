@@ -42,16 +42,13 @@ CHIP_ERROR Manager::UnicastBindingRemoved(uint8_t bindingEntryId)
 CHIP_ERROR Manager::Init(const ManagerInitParams & params)
 {
     VerifyOrReturnError(params.mCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(params.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mInitParams = params;
-    params.mBindingTable->SetPersistentStorage(params.mStorage);
-    mPendingNotificationMap.SetBindingTable(*params.mBindingTable);
-    mFabricTableDelegate.SetBindingTable(*params.mBindingTable);
+    mBindingTable.SetPersistentStorage(params.mStorage);
     TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(&mFabricTableDelegate);
 
-    CHIP_ERROR error = params.mBindingTable->LoadFromStorage();
+    CHIP_ERROR error = mBindingTable.LoadFromStorage();
     if (error != CHIP_NO_ERROR)
     {
         // This can happen during first boot of the device.
@@ -64,7 +61,7 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
         // to false.
         if (params.mEstablishConnectionOnInit)
         {
-            for (const TableEntry & entry : *mInitParams.mBindingTable)
+            for (const TableEntry & entry : mBindingTable)
             {
                 if (entry.type == MATTER_UNICAST_BINDING)
                 {
@@ -109,8 +106,6 @@ CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
 
 void Manager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    VerifyOrDie(mInitParams.mBindingTable != nullptr);
-
     FabricIndex fabricToRemove = kUndefinedFabricIndex;
     NodeId nodeToRemove        = kUndefinedNodeId;
 
@@ -118,7 +113,7 @@ void Manager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, co
     // iterator returns things by value anyway.
     for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
     {
-        TableEntry entry = mInitParams.mBindingTable->GetAt(pendingNotification.mBindingEntryId);
+        TableEntry entry = mBindingTable.GetAt(pendingNotification.mBindingEntryId);
 
         if (sessionHandle->GetPeer() == ScopedNodeId(entry.nodeId, entry.fabricIndex))
         {
@@ -157,7 +152,6 @@ void Manager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mInitParams.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
 
     CHIP_ERROR error      = CHIP_NO_ERROR;
@@ -166,7 +160,7 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
 
     bindingContext->IncrementConsumersNumber();
 
-    for (auto iter = mInitParams.mBindingTable->begin(); iter != mInitParams.mBindingTable->end(); ++iter)
+    for (auto iter = mBindingTable.begin(); iter != mBindingTable.end(); ++iter)
     {
         if (iter->local == endpoint && (iter->clusterId.value_or(cluster) == cluster))
         {
@@ -192,9 +186,7 @@ exit:
 
 CHIP_ERROR Manager::AddBindingEntry(const Binding::TableEntry & entry)
 {
-    VerifyOrReturnError(mInitParams.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    CHIP_ERROR err = mInitParams.mBindingTable->Add(entry);
+    CHIP_ERROR err = mBindingTable.Add(entry);
     if (err == CHIP_ERROR_NO_MEMORY)
     {
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);

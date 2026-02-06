@@ -72,6 +72,8 @@ class PendingNotificationMap
 public:
     static constexpr uint8_t kMaxPendingNotifications = Table::kMaxBindingEntries;
 
+    PendingNotificationMap(Table & bindingTable): mBindingTable(bindingTable) {}
+
     friend class Iterator;
 
     class Iterator
@@ -103,8 +105,6 @@ public:
 
     Iterator end() { return Iterator(this, mNumEntries); }
 
-    void SetBindingTable(Table & table) { mBindingTable = &table; }
-
     CHIP_ERROR FindLRUConnectPeer(ScopedNodeId & nodeId);
 
     CHIP_ERROR AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context);
@@ -130,7 +130,7 @@ private:
     PendingNotificationContext * mPendingContexts[kMaxPendingNotifications];
     PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
 
-    Table * mBindingTable = nullptr;
+    Table & mBindingTable;
 
     uint8_t mNumEntries = 0;
 };

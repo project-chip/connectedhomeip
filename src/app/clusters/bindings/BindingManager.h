@@ -52,7 +52,6 @@ using BoundDeviceContextReleaseHandler = PendingNotificationContextReleaseHandle
 
 struct ManagerInitParams
 {
-    Table * mBindingTable                    = nullptr;
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
     PersistentStorageDelegate * mStorage     = nullptr;
@@ -134,6 +133,8 @@ public:
      */
     CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry);
 
+    Table & GetBindingTable() { return mBindingTable; }
+
     static Manager & GetInstance() { return sBindingManager; }
 
 private:
@@ -181,21 +182,18 @@ private:
     struct BindingFabricTableDelegate : public chip::FabricTable::Delegate
     {
         Manager & bindingManager;
-        Table * bindingTable{ nullptr };
+        Table & bindingTable;
 
         BindingFabricTableDelegate(Manager & manager) : bindingManager(manager) {}
 
-        void SetBindingTable(Table & table) { bindingTable = &table; }
-
         void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
-            VerifyOrDie(bindingTable != nullptr);
-            auto iter = bindingTable->begin();
-            while (iter != bindingTable->end())
+            auto iter = bindingTable.begin();
+            while (iter != bindingTable.end())
             {
                 if (iter->fabricIndex == fabricIndex)
                 {
-                    TEMPORARY_RETURN_IGNORED bindingTable->RemoveAt(iter);
+                    TEMPORARY_RETURN_IGNORED bindingTable.RemoveAt(iter);
                 }
                 else
                 {
@@ -213,6 +211,7 @@ private:
     PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     ManagerInitParams mInitParams;
+    Table mBindingTable;
     BindingFabricTableDelegate mFabricTableDelegate;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
