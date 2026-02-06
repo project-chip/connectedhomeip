@@ -725,7 +725,7 @@ void LevelControlCluster::TransitionHandler::TimerFired()
     if (now < mTransitionStartTimeMs)
     {
         mTransitionStartTimeMs = now; // Default to restart reference
-        uint32_t remainingMs = static_cast<uint32_t>(mCluster.GetRemainingTime()) * 100;
+        uint32_t remainingMs   = static_cast<uint32_t>(mCluster.GetRemainingTime()) * 100;
         // Try to recover start time based on remaining time if available
         if (mCluster.mFeatureMap.Has(Feature::kLighting) && (remainingMs < mTransitionTimeMs))
         {
