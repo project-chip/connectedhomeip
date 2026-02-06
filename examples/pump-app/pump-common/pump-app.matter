@@ -2128,7 +2128,7 @@ cluster OccupancySensing = 1030 {
     percent confidence = 3;
   }
 
-  provisional info event OccupancyChanged = 0 {
+  info event OccupancyChanged = 0 {
     OccupancyBitmap occupancy = 0;
   }
 
