@@ -43,8 +43,8 @@ void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const uint8
         auto & queue = mBuffers[streamKey]; // Get or create the queue for this stream key
         queue.push_back(frame);
         mContentBufferSize += size; // Track total bytes in buffer for all streams
-    } // lock_guard released here
-    PushBufferToTransport(); // Automatically flush after each frame push
+    }                               // lock_guard released here
+    PushBufferToTransport();        // Automatically flush after each frame push
 }
 
 void PreRollBuffer::PushBufferToTransport()
