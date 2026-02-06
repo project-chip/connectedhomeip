@@ -46,14 +46,15 @@ static constexpr size_t kOtaRequestorFixedClusterCount =
 static_assert(kOtaRequestorFixedClusterCount == 0 || kOtaRequestorFixedClusterCount == 1,
               "OTA requestor is a node-scoped utility cluster, so only one may be created");
 
-// OTA requestor clusters may be registered by the application before the OTA requestor singleton instance is set.
-// A fallback OTA requestor cluster is registered when the OTA requestor singleton hasn't been set. The fallback
-// is unregistered when the singleton is set.
+// The OTA requestor cluster may be registered by the application before the OTA requestor singleton instance is set.
+// Since the OTA requestor cluster uses the singleton as its data source, this means the cluster won't have meaningful
+// data to return for attributes, nor can it properly handle commands. When this happens, an empty OTA requestor cluster
+// is registered that returns default values. A real cluster object replaces the empty one when the singleton is set.
 
-class FallbackOtaRequestorCluster : public DefaultServerCluster
+class EmptyOtaRequestorCluster : public DefaultServerCluster
 {
 public:
-    FallbackOtaRequestorCluster(EndpointId endpointId) :
+    EmptyOtaRequestorCluster(EndpointId endpointId) :
         DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id))
     {}
 
@@ -87,7 +88,7 @@ public:
 };
 
 LazyRegisteredServerCluster<OTARequestorCluster> gServer;
-LazyRegisteredServerCluster<FallbackOtaRequestorCluster> gFallbackServer;
+LazyRegisteredServerCluster<EmptyOtaRequestorCluster> gFallbackServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
