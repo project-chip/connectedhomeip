@@ -423,9 +423,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
-    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)
-    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.TOOL)
-    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.CTRL)
+    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.CTRL)
+    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.CTRL)
 
     # New-style options override the deprecated ones
     for p in app_path:
@@ -435,7 +435,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             raise click.BadOptionUsage("app-path", f"Invalid app path specifier '{p}': {e}")
     for p in tool_path:
         try:
-            subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
+            subproc_info_repo.addSpec(p, kind=SubprocessKind.CTRL)
         except ValueError as e:
             raise click.BadOptionUsage("tool-path", f"Invalid tool path specifier '{p}': {e}")
 

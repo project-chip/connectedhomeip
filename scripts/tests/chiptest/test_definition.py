@@ -276,12 +276,12 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     'water-leak-detector': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='water-leak-detector-app'),
 
     # Tools
-    'chip-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
-    'darwin-framework-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='darwin-framework-tool'),
-    'matter-repl-yaml-tester': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='yamltest_with_matter_repl_tester.py'),
+    'chip-tool': KnownSubprocessEntry(kind=SubprocessKind.CTRL, target_name='chip-tool'),
+    'darwin-framework-tool': KnownSubprocessEntry(kind=SubprocessKind.CTRL, target_name='darwin-framework-tool'),
+    'matter-repl-yaml-tester': KnownSubprocessEntry(kind=SubprocessKind.CTRL, target_name='yamltest_with_matter_repl_tester.py'),
 
     # No target_name as this is either chiptool.py or darwinframework.py depending on the selected TestRunTime
-    'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.TOOL)
+    'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.CTRL)
 })
 
 
@@ -493,7 +493,7 @@ class TestDefinition:
             if not dry_run:
                 for key, subproc in subproc_info_repo.items():
                     # Do not add tools to the register
-                    if subproc.kind == SubprocessKind.TOOL:
+                    if subproc.kind == SubprocessKind.CTRL:
                         continue
 
                     # For the app indicated by target, give it the 'default' key to add to the register

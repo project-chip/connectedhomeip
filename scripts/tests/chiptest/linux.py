@@ -222,24 +222,24 @@ class NetworkNamespace(NetworkLink):
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
 
-    def __init__(self, index: int = 0, rpc_link_name: str = 'eth-rpc', tool_link_name: str = 'eth-tool',
-                 app_link_name: str = 'eth-app', rpc_link_up: bool = True, app_link_up: bool = True, tool_link_up: bool = True):
+    def __init__(self, index: int = 0, mgmt_link_name: str = 'link-mgmt', ctrl_link_name: str = 'link-ctrl',
+                 app_link_name: str = 'link-app', mgmt_link_up: bool = True, app_link_up: bool = True, ctrl_link_up: bool = True):
 
         self.index = index
         self._bridge = NetworkBridge(f"br-{index}")
-        self._rpc = NetworkLink(f"{rpc_link_name}-{index}", self._bridge, "10.10.10.5/24", "fd00:0:1:1::5/64")
         self._app = NetworkNamespace(f"{app_link_name}-{index}", self._bridge, "10.10.10.1/24", "fd00:0:1:1::1/64", "app")
-        self._tool = NetworkNamespace(f"{tool_link_name}-{index}", self._bridge, "10.10.10.2/24", "fd00:0:1:1::2/64", "tool")
-        self._links = (self._rpc, self._app, self._tool)  # _bridge is handled separately
+        self._ctrl = NetworkNamespace(f"{ctrl_link_name}-{index}", self._bridge, "10.10.10.2/24", "fd00:0:1:1::2/64", "tool")
+        self._mgmt = NetworkLink(f"{mgmt_link_name}-{index}", self._bridge, "10.10.10.5/24", "fd00:0:1:1::5/64")
+        self._links = (self._app, self._ctrl, self._mgmt)  # _bridge is handled separately
 
         try:
             self._setup_links()
-            if rpc_link_up:
-                self.rpc_link_up(wait_for_dad=False)
+            if mgmt_link_up:
+                self.mgmt_link_up(wait_for_dad=False)
             if app_link_up:
                 self.app_link_up(wait_for_dad=False)
-            if tool_link_up:
-                self.tool_link_up(wait_for_dad=False)
+            if ctrl_link_up:
+                self.ctrl_link_up(wait_for_dad=False)
             NetworkLink.wait_for_duplicate_address_detection()
         except BaseException:
             # Ensure that we leave a clean state on any exception.
@@ -251,15 +251,15 @@ class IsolatedNetworkNamespace:
         return self._app
 
     @property
-    def tool_ns(self) -> NetworkNamespace:
-        return self._tool
+    def ctrl_ns(self) -> NetworkNamespace:
+        return self._ctrl
 
     def netns_for_subprocess_kind(self, kind: SubprocessKind) -> str:
         match kind:
             case SubprocessKind.APP:
                 return self.app_ns.ns_name
-            case SubprocessKind.TOOL:
-                return self.tool_ns.ns_name
+            case SubprocessKind.CTRL:
+                return self.ctrl_ns.ns_name
             case _:
                 raise ValueError("Unknown subprocess kind.")
 
@@ -270,14 +270,14 @@ class IsolatedNetworkNamespace:
         for link in self._links:
             link.setup()
 
-    def rpc_link_up(self, wait_for_dad: bool = True):
-        self._rpc.link_up(wait_for_dad)
+    def mgmt_link_up(self, wait_for_dad: bool = True):
+        self._mgmt.link_up(wait_for_dad)
 
     def app_link_up(self, wait_for_dad: bool = True):
         self._app.link_up(wait_for_dad)
 
-    def tool_link_up(self, wait_for_dad: bool = True):
-        self._tool.link_up(wait_for_dad)
+    def ctrl_link_up(self, wait_for_dad: bool = True):
+        self._ctrl.link_up(wait_for_dad)
 
     def terminate(self):
         """Execute all down commands in reverse order, gracefully omitting errors."""

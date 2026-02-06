@@ -154,7 +154,7 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
 
     targets.append(
         ApplicationTarget(
-            kind=SubprocessKind.TOOL,
+            kind=SubprocessKind.CTRL,
             env_key="CHIP_TOOL",
             cli_key="chip-tool",
             target=f"{target_prefix}-chip-tool-{suffix}",
