@@ -147,7 +147,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
         self.fabric_a_admin.start(
             expected_output="Server initialization complete",
-            timeout=20)
+            timeout=30)
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
