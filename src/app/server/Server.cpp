@@ -680,9 +680,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // INET_CONFIG_ENABLE_IPV4
                                                     ));
 
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
     gUDCClient = Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
     mUdcTransportMgr->SetSessionManager(gUDCClient);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
