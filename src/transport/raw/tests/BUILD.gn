@@ -48,6 +48,10 @@ chip_test_suite("tests") {
     test_sources += [ "TestTCP.cpp" ]
   }
 
+  if (chip_config_network_layer_ble) {
+    test_sources += [ "TestBLEReinitialization.cpp" ]
+  }
+
   sources = [ "TCPBaseTestAccess.h" ]
 
   public_deps = [

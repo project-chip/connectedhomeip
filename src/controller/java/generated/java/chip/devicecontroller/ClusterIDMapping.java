@@ -8484,6 +8484,9 @@ public class ClusterIDMapping {
         public enum Attribute {
             Membership(0L),
             MaxMembershipCount(1L),
+            MaxMcastAddrCount(2L),
+            UsedMcastAddrCount(3L),
+            FabricUnderTest(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -8508,7 +8511,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            GroupcastTesting(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -8532,7 +8536,8 @@ public class ClusterIDMapping {
             JoinGroup(0L),
             LeaveGroup(1L),
             UpdateGroupKey(3L),
-            ConfigureAuxiliaryACL(4L),;
+            ConfigureAuxiliaryACL(4L),
+            GroupcastTesting(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8550,7 +8555,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeySetID(2),Key(3),UseAuxiliaryACL(4),ReplaceEndpoints(5),;
+        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeySetID(2),Key(3),UseAuxiliaryACL(4),ReplaceEndpoints(5),McastAddrPolicy(6),;
                     private final int id;
                     JoinGroupCommandField(int id) {
                         this.id = id;
@@ -8612,6 +8617,23 @@ public class ClusterIDMapping {
                     }
                     public static ConfigureAuxiliaryACLCommandField value(int id) throws NoSuchFieldError {
                         for (ConfigureAuxiliaryACLCommandField field : ConfigureAuxiliaryACLCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupcastTestingCommandField {TestOperation(0),DurationSeconds(1),;
+                    private final int id;
+                    GroupcastTestingCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupcastTestingCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupcastTestingCommandField field : GroupcastTestingCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
