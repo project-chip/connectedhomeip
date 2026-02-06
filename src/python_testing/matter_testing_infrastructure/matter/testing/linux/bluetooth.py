@@ -20,6 +20,7 @@ import threading
 
 log = logging.getLogger(__name__)
 
+
 class BluetoothMock(subprocess.Popen[str]):
     """Run a BlueZ mock server in a subprocess."""
 
