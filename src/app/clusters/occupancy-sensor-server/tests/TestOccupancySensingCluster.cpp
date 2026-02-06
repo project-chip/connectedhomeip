@@ -112,8 +112,12 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-        EXPECT_EQ(featureMap, featureMapPir);
-        EXPECT_EQ(cluster.GetFeatureMap(), BitMask<OccupancySensing::Feature>(featureMapPir));
+
+        BitMask<OccupancySensing::Feature> expectedFeatures(featureMapPir);
+        expectedFeatures.Set(Feature::kOccupancyEvent);
+
+        EXPECT_EQ(featureMap, expectedFeatures.Raw());
+        EXPECT_EQ(cluster.GetFeatureMap(), expectedFeatures);
     }
 
     {
@@ -123,8 +127,12 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-        EXPECT_EQ(featureMap, featureMapUltrasonic);
-        EXPECT_EQ(cluster.GetFeatureMap(), BitMask<OccupancySensing::Feature>(featureMapUltrasonic));
+
+        BitMask<OccupancySensing::Feature> expectedFeatures(featureMapUltrasonic);
+        expectedFeatures.Set(Feature::kOccupancyEvent);
+
+        EXPECT_EQ(featureMap, expectedFeatures.Raw());
+        EXPECT_EQ(cluster.GetFeatureMap(), expectedFeatures);
     }
 }
 
@@ -676,24 +684,36 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEvent)
     }
 }
 
-TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEventNotGenerated)
+TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEventAlwaysGenerated)
 {
     chip::Testing::TestServerClusterContext context;
-    // Event should NOT be generated if the feature kOccupancyEvent is disabled.
-    // We explicitly set features to empty, which overwrites the default.
+    // Event SHOULD be generated even if we try to disable kOccupancyEvent.
+    // We explicitly set features to empty, but the cluster should force it on.
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
         BitMask<OccupancySensing::Feature>()) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // Set to occupied and verify NO event
+    OccupancySensing::Events::OccupancyChanged::DecodableType decodedEvent;
+
+    // Set to occupied and verify event
     cluster.SetOccupancy(true);
     auto eventInfo = context.EventsGenerator().GetNextEvent();
-    EXPECT_EQ(eventInfo, std::nullopt);
+    ASSERT_NE(eventInfo, std::nullopt);
+    if (eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
+    {
+        EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.occupancy, OccupancySensing::OccupancyBitmap::kOccupied);
+    }
 
-    // Set to unoccupied and verify NO event
+    // Set to unoccupied and verify event
     cluster.SetOccupancy(false);
     eventInfo = context.EventsGenerator().GetNextEvent();
-    EXPECT_EQ(eventInfo, std::nullopt);
+    ASSERT_NE(eventInfo, std::nullopt);
+    if (eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
+    {
+        EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.occupancy, kOccupancyUnoccupied);
+    }
 }
 
 TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsAttribute)

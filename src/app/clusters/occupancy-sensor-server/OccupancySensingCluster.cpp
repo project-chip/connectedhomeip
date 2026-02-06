@@ -294,7 +294,7 @@ void OccupancySensingCluster::DoSetOccupancy(bool occupied)
         mDelegate->OnOccupancyChanged(occupied);
     }
 
-    if (mContext != nullptr && mFeatureMap.Has(Feature::kOccupancyEvent))
+    if (mContext != nullptr)
     {
         Events::OccupancyChanged::Type event;
         event.occupancy = mOccupancy;

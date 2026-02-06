@@ -51,6 +51,7 @@ public:
         Config & WithFeatures(BitMask<OccupancySensing::Feature> featureMap)
         {
             mFeatureMap = featureMap;
+            mFeatureMap.Set(OccupancySensing::Feature::kOccupancyEvent);
             return *this;
         }
 

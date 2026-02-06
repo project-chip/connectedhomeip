@@ -50,9 +50,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         OccupancySensingCluster::Config config(endpointId);
-        // Force the kOccupancyEvent feature bit to be set for legacy applications to ensure that the
-        // OccupancyChanged event is generated, maintaining existing behavior.
-        config.WithFeatures(BitMask<Feature>(featureMap).Set(Feature::kOccupancyEvent));
+        config.WithFeatures(BitMask<Feature>(featureMap));
 
         // If the optional HoldTime attribute is enabled, enable the HoldTime logic.
         // The delay attributes are required if the corresponding sensor feature is present.

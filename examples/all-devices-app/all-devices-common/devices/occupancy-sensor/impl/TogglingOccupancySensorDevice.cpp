@@ -33,7 +33,7 @@ TogglingOccupancySensorDevice::TogglingOccupancySensorDevice() :
         // Initialize with kInvalidEndpointId. The actual endpoint ID will be set
         // when Register() is called by the application with a valid endpoint ID.
         OccupancySensingCluster::Config(kInvalidEndpointId)
-            .WithFeatures(BitFlags(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kOccupancyEvent))
+            .WithFeatures(BitFlags(OccupancySensing::Feature::kPassiveInfrared))
             .WithHoldTime(10,
                           {
 
