@@ -40,7 +40,7 @@ def ensure_network_namespace_availability():
         return
 
     os.execvpe(
-        "unshare", ["unshare", "--map-root-user", "-n", "-m", "python3",
+        "unshare", ["unshare", "--map-root-user", "-n", "-m", sys.executable,
                     sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
         test_environ)
 
