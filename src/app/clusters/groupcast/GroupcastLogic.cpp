@@ -1,5 +1,5 @@
 #include "GroupcastLogic.h"
-#include <app/server/Server.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/GroupDataProvider.h>
 
 namespace chip {
@@ -18,12 +18,10 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
     VerifyOrReturnError(nullptr != subject, CHIP_ERROR_INVALID_ARGUMENT);
     FabricIndex fabric_index = subject->fabricIndex;
 
-    GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INCORRECT_STATE);
+    GroupDataProvider * groups = &Provider();
 
-    EndpointId * endpoints = mEndpoints;
-
-    CHIP_ERROR err = aEncoder.EncodeList([fabric_index, groups, endpoints](const auto & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([fabric_index, groups](const auto & encoder) -> CHIP_ERROR {
+        EndpointList endpoints;
         CHIP_ERROR status              = CHIP_NO_ERROR;
         GroupInfoIterator * group_iter = groups->IterateGroupInfo(fabric_index);
         VerifyOrReturnError(nullptr != group_iter, CHIP_ERROR_NO_MEMORY);
@@ -43,20 +41,30 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
                 break;
             }
 
+            // Return endpoints in kMaxMembershipEndpoints chunks or less
+            size_t group_total = end_iter->Count();
+            size_t group_count = 0;
+            size_t split_count = 0;
             GroupEndpoint mapping;
-            size_t endpoint_count = 0;
             while (end_iter->Next(mapping) && (CHIP_NO_ERROR == status))
             {
-                endpoints[endpoint_count++] = mapping.endpoint_id;
+                group_count++;
+                endpoints.entries[split_count++] = mapping.endpoint_id;
+                if ((group_count == group_total) || (split_count == kMaxMembershipEndpoints))
+                {
+                    Groupcast::Structs::MembershipStruct::Type group;
+                    group.fabricIndex     = fabric_index;
+                    group.groupID         = info.group_id;
+                    group.keySetID        = keyset_id;
+                    group.hasAuxiliaryACL = MakeOptional(info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL));
+                    group.mcastAddrPolicy = (info.flags & chip::to_underlying(GroupInfo::Flags::kMcastAddrPolicy)
+                                                 ? Groupcast::MulticastAddrPolicyEnum::kPerGroup
+                                                 : Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+                    group.endpoints       = MakeOptional(DataModel::List<const chip::EndpointId>(endpoints.entries, split_count));
+                    status                = encoder.Encode(group);
+                    split_count           = 0;
+                }
             }
-
-            Groupcast::Structs::MembershipStruct::Type group;
-            group.fabricIndex     = fabric_index;
-            group.groupID         = info.group_id;
-            group.keySetID        = keyset_id;
-            group.hasAuxiliaryACL = info.use_aux_acl;
-            group.endpoints       = DataModel::List<const chip::EndpointId>(endpoints, endpoint_count);
-            status                = encoder.Encode(group);
             end_iter->Release();
         }
         group_iter->Release();
@@ -69,164 +77,281 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
 
 CHIP_ERROR GroupcastLogic::ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INCORRECT_STATE);
-    return aEncoder.Encode(kMaxMembershipCount);
+    GroupDataProvider & groups = Provider();
+    return aEncoder.Encode(groups.getMaxMembershipCount());
 }
 
-CHIP_ERROR GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data)
+Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data)
 {
-    GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    VerifyOrReturnValue(nullptr != groups, CHIP_ERROR_INCORRECT_STATE);
+    GroupDataProvider & groups = Provider();
+    CHIP_ERROR err             = CHIP_NO_ERROR;
 
-    // The fabric cannot user more than half of the membership entries
+    // Check groupID
+    VerifyOrReturnError(data.groupID != kUndefinedGroupId, Status::ConstraintError);
+
+    // Check useAuxiliaryACL
+    if (data.useAuxiliaryACL.HasValue())
+    {
+        // AuxiliaryACL can only be present if LN feature is supported
+        VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
+    }
+
+    // Check endpoints
+    size_t endpoint_count = 0;
+    err                   = data.endpoints.ComputeSize(&endpoint_count);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+    if (mFeatures.Has(Groupcast::Feature::kListener) && !mFeatures.Has(Groupcast::Feature::kSender))
+    {
+        // Listener only, endpoints cannot be empty
+        VerifyOrReturnError(endpoint_count > 0 && endpoint_count <= kMaxCommandEndpoints, Status::ConstraintError);
+    }
+    else if (!mFeatures.Has(Groupcast::Feature::kListener) && mFeatures.Has(Groupcast::Feature::kSender))
+    {
+        // Sender only, endpoints must be empty
+        VerifyOrReturnError(0 == endpoint_count, Status::ConstraintError);
+    }
+    // Verify endpoint values
+    {
+        auto iter = data.endpoints.begin();
+        while (iter.Next())
+        {
+            EndpointId ep = iter.GetValue();
+            VerifyOrReturnError((ep > 0) && (kInvalidEndpointId != ep), Status::ConstraintError);
+            // VerifyOrReturnError(nullptr != emberAfFindEndpointType(ep), Status::ConstraintError);
+        }
+    }
+
+    // Check fabric membership entries limit
     GroupDataProvider::GroupInfo info;
-    CHIP_ERROR err = groups->GetGroupInfo(fabric_index, data.groupID, info);
-    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND == err || CHIP_NO_ERROR == err, err);
+    err = groups.GetGroupInfo(fabric_index, data.groupID, info);
+    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND == err || CHIP_NO_ERROR == err, Status::Failure);
     // If the group is new, the fabric entries will increase
-    uint16_t new_count = (CHIP_ERROR_NOT_FOUND == err) ? info.count + 1 : info.count;
-    uint16_t limit     = static_cast<uint16_t>(kMaxMembershipCount / 2);
-    VerifyOrReturnError(new_count <= limit, CHIP_ERROR_NO_MEMORY);
+    uint16_t new_count              = (CHIP_ERROR_NOT_FOUND == err) ? info.count + 1 : info.count;
+    uint16_t max_fabric_memberships = static_cast<uint16_t>(groups.getMaxMembershipCount() / 2);
+    VerifyOrReturnError(new_count <= max_fabric_memberships, Status::ResourceExhausted);
 
-    // Key handing
+    // Key handling
     if (data.key.HasValue())
     {
         // Create a new keyset
-        ReturnErrorOnFailure(SetKeySet(fabric_index, data.keySetID, data.key.Value()));
+        Status stat = SetKeySet(fabric_index, data.keySetID, data.key.Value());
+        VerifyOrReturnError(Status::Success == stat, stat);
+    }
+    else
+    {
+        // The keyset must exist
+        GroupDataProvider::KeySet ks;
+        err = groups.GetKeySet(fabric_index, data.keySetID, ks);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
     }
     // Assign keyset to group
-    ReturnErrorOnFailure(groups->SetGroupKey(fabric_index, data.groupID, data.keySetID));
+    err = groups.SetGroupKey(fabric_index, data.groupID, data.keySetID);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
     // Add/update entry in the group table
-    info.group_id    = data.groupID;
-    info.use_aux_acl = data.useAuxiliaryACL.HasValue() && data.useAuxiliaryACL.Value();
-    ReturnErrorOnFailure(groups->SetGroupInfo(fabric_index, info));
-
-    // Add Endpoints
-    auto iter          = data.endpoints.begin();
-    size_t group_count = 0;
-    while (iter.Next() && (group_count++ < kMaxCommandEndpoints))
+    info.group_id = data.groupID;
+    info.flags    = 0;
+    if (data.useAuxiliaryACL.HasValue() && data.useAuxiliaryACL.Value())
     {
-        ReturnErrorOnFailure(groups->AddEndpoint(fabric_index, data.groupID, iter.GetValue()));
+        info.flags |= chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
     }
 
-    // Join multicast
-    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetTransportManager().MulticastGroupJoinLeave(
-        Transport::PeerAddress::Groupcast(), true);
-    return CHIP_NO_ERROR;
+    if (data.mcastAddrPolicy.HasValue() && (Groupcast::MulticastAddrPolicyEnum::kPerGroup == data.mcastAddrPolicy.Value()))
+    {
+        info.flags |= chip::to_underlying(GroupInfo::Flags::kMcastAddrPolicy);
+    }
+
+    err = groups.SetGroupInfo(fabric_index, info);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
+    if (data.replaceEndpoints.HasValue() && data.replaceEndpoints.Value())
+    {
+        // Replace endpoints
+        err = groups.RemoveEndpoints(fabric_index, data.groupID);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+    }
+
+    // Add Endpoints
+    {
+        size_t group_count = 0;
+        auto iter          = data.endpoints.begin();
+        while (iter.Next() && (group_count++ < kMaxCommandEndpoints))
+        {
+            err = groups.AddEndpoint(fabric_index, data.groupID, iter.GetValue());
+            VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+        }
+    }
+
+    return Status::Success;
 }
 
-CHIP_ERROR GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                                      Groupcast::Commands::LeaveGroupResponse::Type & response)
+Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                                  EndpointList & endpoints)
 {
-    GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INCORRECT_STATE);
+    GroupDataProvider & groups = Provider();
+    Status err                 = Status::Success;
 
-    size_t endpoint_count = 0;
+    endpoints.count = 0;
+    if (kUndefinedGroupId == data.groupID)
+    {
+        // Apply changes to all groups
+        GroupInfoIterator * iter = groups.IterateGroupInfo(fabric_index);
+        VerifyOrReturnError(nullptr != iter, Status::ResourceExhausted);
+
+        GroupInfo info;
+        while (iter->Next(info) && (Status::Success == err))
+        {
+            err = RemoveGroup(fabric_index, info.group_id, data, endpoints);
+        }
+        iter->Release();
+    }
+    else
+    {
+        // Modify specific group
+        err = RemoveGroup(fabric_index, data.groupID, data, endpoints);
+    }
+
+    return err;
+}
+
+Status GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
+{
+    GroupDataProvider & groups = Provider();
+
+    // Key handling
+    if (data.key.HasValue())
+    {
+        // Create a new keyset
+        Status stat = SetKeySet(fabric_index, data.keySetID, data.key.Value());
+        VerifyOrReturnError(Status::Success == stat, stat);
+    }
+    // Assign keyset to group
+    CHIP_ERROR err = groups.SetGroupKey(fabric_index, data.groupID, data.keySetID);
+    return CHIP_NO_ERROR == err ? Status::Success : Status::Failure;
+}
+
+Status GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
+                                             const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data)
+{
+    GroupDataProvider & groups = Provider();
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+
+    // Get group info
+    GroupDataProvider::GroupInfo info;
+    err = groups.GetGroupInfo(fabric_index, data.groupID, info);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
+
+    // Update group info
+    if (data.useAuxiliaryACL)
+    {
+        info.flags |= chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
+    }
+    else
+    {
+        info.flags &= ~chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
+    }
+    err = groups.SetGroupInfo(fabric_index, info);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
+    return Status::Success;
+}
+
+Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key)
+{
+    GroupDataProvider & groups = Provider();
+    GroupDataProvider::KeySet ks;
+
+    CHIP_ERROR err = groups.GetKeySet(fabric_index, keyset_id, ks);
+    if (CHIP_ERROR_NOT_FOUND == err)
+    {
+        // New key
+        const FabricInfo * fabric = Fabrics().FindFabricWithIndex(fabric_index);
+        VerifyOrReturnValue(nullptr != fabric, Status::NotFound);
+
+        ks.keyset_id     = keyset_id;
+        ks.policy        = GroupDataProvider::SecurityPolicy::kTrustFirst;
+        ks.num_keys_used = 1;
+
+        GroupDataProvider::EpochKey & epoch = ks.epoch_keys[0];
+        VerifyOrReturnValue(key.size() == GroupDataProvider::EpochKey::kLengthBytes, Status::ConstraintError);
+        memcpy(epoch.key, key.data(), GroupDataProvider::EpochKey::kLengthBytes);
+
+        {
+            // Get compressed fabric
+            uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
+            MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
+            err = fabric->GetCompressedFabricIdBytes(compressed_fabric_id);
+            VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+            // Set keys
+            err = groups.SetKeySet(fabric_index, compressed_fabric_id, ks);
+            VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+        }
+    }
+    else if (CHIP_NO_ERROR == err)
+    {
+        // Cannot set an existing key
+        return Status::AlreadyExists;
+    }
+    return Status::Success;
+}
+
+Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
+                                   const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints)
+{
+    GroupDataProvider & groups = Provider();
+    Status stat                = Status::Success;
+
     if (data.endpoints.HasValue())
     {
         // Remove endpoints
         auto iter = data.endpoints.Value().begin();
-        while (iter.Next() && (endpoint_count < kMaxCommandEndpoints))
+        while (iter.Next() && (endpoints.count < kMaxCommandEndpoints))
         {
             auto endpoint_id = iter.GetValue();
-            if (groups->HasEndpoint(fabric_index, data.groupID, endpoint_id))
+            if (groups.HasEndpoint(fabric_index, group_id, endpoint_id))
             {
-                ReturnErrorOnFailure(groups->RemoveEndpoint(fabric_index, data.groupID, endpoint_id));
-                mEndpoints[endpoint_count++] = endpoint_id;
+                stat = RemoveGroupEndpoint(fabric_index, group_id, endpoint_id, endpoints);
+                VerifyOrReturnError(Status::Success == stat, stat);
             }
         }
     }
     else
     {
-        // Remove whole group
-        EndpointIterator * iter2 = groups->IterateEndpoints(fabric_index, data.groupID);
-        VerifyOrReturnError(nullptr != iter2, CHIP_ERROR_NO_MEMORY);
+        // Remove whole group (with all endpoints)
+        EndpointIterator * iter = groups.IterateEndpoints(fabric_index, data.groupID);
+        VerifyOrReturnError(nullptr != iter, Status::ResourceExhausted);
         GroupEndpoint mapping;
-        while (iter2->Next(mapping) && (endpoint_count < kMaxMembershipEndpoints))
+        while (iter->Next(mapping) && (endpoints.count < kMaxMembershipEndpoints))
         {
-            mEndpoints[endpoint_count++] = mapping.endpoint_id;
+            stat = RemoveGroupEndpoint(fabric_index, group_id, mapping.endpoint_id, endpoints);
+            VerifyOrReturnError(Status::Success == stat, stat);
         }
-        iter2->Release();
-        ReturnErrorOnFailure(groups->RemoveGroupInfo(fabric_index, data.groupID));
+        iter->Release();
+        CHIP_ERROR err = groups.RemoveGroupInfo(fabric_index, data.groupID);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     }
 
-    response.endpoints = DataModel::List<const chip::EndpointId>(mEndpoints, endpoint_count);
-    return CHIP_NO_ERROR;
+    return Status::Success;
 }
 
-CHIP_ERROR GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
+Status GroupcastLogic::RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                                           EndpointList & endpoints)
 {
-    GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    VerifyOrReturnValue(nullptr != groups, CHIP_ERROR_INCORRECT_STATE);
+    GroupDataProvider & groups = Provider();
 
-    // Key handing
-    if (data.key.HasValue())
+    CHIP_ERROR err = groups.RemoveEndpoint(fabric_index, group_id, endpoint_id);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
+    bool found = false;
+    for (size_t i = 0; !found && i < endpoints.count; ++i)
     {
-        // Create a new keyset
-        ReturnErrorOnFailure(SetKeySet(fabric_index, data.keySetID, data.key.Value()));
+        found = (endpoints.entries[i] == endpoint_id);
     }
-    // Assign keyset to group
-    ReturnErrorOnFailure(groups->SetGroupKey(fabric_index, data.groupID, data.keySetID));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
-                                                 const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data)
-{
-    GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INCORRECT_STATE);
-
-    // Get group info
-    GroupDataProvider::GroupInfo info;
-    ReturnErrorOnFailure(groups->GetGroupInfo(fabric_index, data.groupID, info));
-
-    // Update group info
-    info.use_aux_acl = data.useAuxiliaryACL;
-    ReturnErrorOnFailure(groups->SetGroupInfo(fabric_index, info));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key)
-{
-    GroupDataProvider * groups = Credentials::GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INCORRECT_STATE);
-
-    GroupDataProvider::KeySet ks;
-
-    CHIP_ERROR err = groups->GetKeySet(fabric_index, static_cast<KeysetId>(keyset_id), ks);
-    if (CHIP_ERROR_NOT_FOUND == err)
+    if (!found)
     {
-        // New key
-        const FabricInfo * fabric = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabric_index);
-        VerifyOrReturnValue(nullptr != fabric, CHIP_ERROR_INTERNAL);
-
-        ks.keyset_id     = static_cast<KeysetId>(keyset_id);
-        ks.policy        = GroupDataProvider::SecurityPolicy::kTrustFirst;
-        ks.num_keys_used = 1;
-
-        // Translate HEX key to binary
-        GroupDataProvider::EpochKey & epoch = ks.epoch_keys[0];
-        VerifyOrReturnValue(key.size() == 2 * GroupDataProvider::EpochKey::kLengthBytes, CHIP_ERROR_INTERNAL);
-        size_t key_size =
-            chip::Encoding::HexToBytes((char *) key.data(), key.size(), epoch.key, GroupDataProvider::EpochKey::kLengthBytes);
-        VerifyOrReturnValue(key_size == GroupDataProvider::EpochKey::kLengthBytes, CHIP_ERROR_INTERNAL);
-        {
-            // Get compressed fabric
-            uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
-            MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
-            ReturnErrorOnFailure(fabric->GetCompressedFabricIdBytes(compressed_fabric_id));
-            // Set keys
-            err = groups->SetKeySet(fabric_index, compressed_fabric_id, ks);
-        }
+        endpoints.entries[endpoints.count++] = endpoint_id;
     }
-    else if (CHIP_NO_ERROR == err)
-    {
-        // Existing key
-        return CHIP_ERROR_DUPLICATE_KEY_ID;
-    }
-    return err;
+    return Status::Success;
 }
 
 } // namespace Clusters
