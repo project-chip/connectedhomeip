@@ -138,11 +138,13 @@ static bool PrintFaultInjectionMaxArgCbFn(nl::FaultInjection::Manager & mgr, nl:
 {
     const char * faultName = mgr.GetFaultNames()[aId];
 
+#if defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
     if (gFaultInjectionOptions.PrintFaultCounters && aFaultRecord->mNumArguments)
     {
         printf("FI_instance_params: %s_%s_s%" PRIu32 " maxArg: %" PRIi32 ";\n", mgr.GetName(), faultName,
                aFaultRecord->mNumTimesChecked, aFaultRecord->mArguments[0]);
     }
+#endif // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
 
     return false;
 }

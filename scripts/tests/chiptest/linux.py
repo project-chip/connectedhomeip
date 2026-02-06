@@ -25,16 +25,18 @@ import dataclasses
 import logging
 import os
 import pathlib
+import re
 import shlex
 import subprocess
 import sys
 import threading
 import time
-from typing import IO, Any, Union
+from typing import IO, Any, Pattern, Union
 
 import sdbus
 
 from .runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
+from .test_definition import TEST_THREAD_DATASET
 
 log = logging.getLogger(__name__)
 
@@ -169,6 +171,8 @@ class NetworkLink(NetworkLinkBase):
             NetworkLinkCmd(f"ip link add {self.link_name} type veth peer name {self.switch_name}",
                            f"ip link delete {self.switch_name}"),
             NetworkLinkCmd(f"ip link set {self.switch_name} master {self.bridge.name}"),
+            NetworkLinkCmd(f"sysctl -w net.ipv6.conf.all.forwarding=1"),
+            NetworkLinkCmd(f"sysctl -w net.ipv6.conf.default.forwarding=1"),
         )
 
     @property
@@ -234,6 +238,9 @@ class NetworkNamespace(NetworkLink):
             # Force IPv6 to use ULAs that we control.
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip -6 addr flush {self.link_name}"),
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip -6 a add {self.ipv6} dev {self.link_name}"),
+            NetworkLinkCmd(f"ip netns exec {self.ns_name} sysctl -w net.ipv6.conf.{self.link_name}.accept_ra_rt_info_max_plen=64"),
+            NetworkLinkCmd(f"ip netns exec {self.ns_name} sysctl -w net.ipv6.conf.all.forwarding=1"),
+            NetworkLinkCmd(f"ip netns exec {self.ns_name} sysctl -w net.ipv6.conf.default.forwarding=1"),
         )
 
 
@@ -265,19 +272,19 @@ class IsolatedNetworkNamespace:
             raise
 
     @property
-    def app_ns(self):
-        return self._app.ns_name
+    def app_ns(self) -> NetworkNamespace:
+        return self._app
 
     @property
-    def tool_ns(self):
-        return self._tool.ns_name
+    def tool_ns(self) -> NetworkNamespace:
+        return self._tool
 
     def netns_for_subprocess_kind(self, kind: SubprocessKind) -> str:
         match kind:
             case SubprocessKind.APP:
-                return self.app_ns
+                return self.app_ns.ns_name
             case SubprocessKind.TOOL:
-                return self.tool_ns
+                return self.tool_ns.ns_name
             case _:
                 raise ValueError("Unknown subprocess kind.")
 
@@ -361,8 +368,79 @@ class BluetoothMock(subprocess.Popen[str]):
         self.wait()
 
 
-DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
+DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"],
+                 tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
 DictVariantT = dict[str, tuple[str, DbusAnyT]]
+
+
+class ThreadBorderRouter:
+
+    # The Thread radio simulation node id, choose other if there is a conflict.
+    NODE_ID = 9
+
+    def __init__(self, ns: IsolatedNetworkNamespace):
+        self._event = threading.Event()
+        self._pattern: Pattern[str] | None = None
+        self._event.set()
+        self._netns_app = ns.app_ns.ns_name
+        self._link_name_app = ns.app_ns.link_name
+
+        radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
+        args = [
+            'ip', 'netns', 'exec', self._netns_app, 'otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url
+        ]
+
+        self._otbr = subprocess.Popen(args,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.STDOUT,
+                                      text=True,
+                                      encoding='UTF-8')
+
+        threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
+
+        self.expect(r'Co-processor version:', timeout=20)
+        self.join_network(TEST_THREAD_DATASET)
+
+    def join_network(self, dataset):
+        status = os.system(
+            f'ot-ctl dataset init tlvs {dataset} &&'
+            'ot-ctl dataset commit active &&'
+            'ot-ctl ifconfig up &&'
+            'ot-ctl routerselectionjitter 1 &&'
+            'ot-ctl thread start &&'
+            'ot-ctl state leader &&'
+            'while ! ot-ctl state | grep -q leader; do sleep 1; done &&'
+            'ot-ctl netdata show &&'
+            'ot-ctl srp server enable &&'
+            'while ! ot-ctl br state | grep -q running; do sleep 1; done &&'
+            'echo TBR ready'
+        )
+        if status != 0:
+            raise RuntimeError("Failed to control Thread Border Router")
+
+        self.expect(r'Sent RA on infra netif', timeout=15)
+
+    def expect(self, pattern: str, timeout=10):
+        self._pattern = re.compile(pattern)
+        self._event.clear()
+        if not self._event.wait(timeout):
+            raise TimeoutError(f'Failed to expect: {pattern}')
+
+    def _otbr_read_stdout(self):
+        assert self._otbr.stdout is not None
+        while (line := self._otbr.stdout.readline()):
+            log.info(line)
+            if self._event.is_set():
+                continue
+            if not self._pattern:
+                continue
+            if self._pattern.search(line):
+                self._event.set()
+
+    def terminate(self):
+        if self._otbr:
+            self._otbr.terminate()
+            self._otbr.wait()
 
 
 class WpaSupplicantMock(threading.Thread):

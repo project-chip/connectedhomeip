@@ -149,3 +149,12 @@
 #ifndef CHIP_SHELL_MAX_TOKENS
 #define CHIP_SHELL_MAX_TOKENS 40
 #endif // CHIP_SHELL_MAX_TOKENS
+
+// ==================== Platform-Specific Overrides ====================
+// Define chipDie before CodeUtils.h includes it
+// This allows Silabs to provide custom chipDie implementation
+// The #ifndef check in CodeUtils.h will prevent the inline definition if this is declared
+#ifndef chipDie
+extern "C" void chipDie(void) __attribute((noreturn));
+#define chipDie chipDie
+#endif

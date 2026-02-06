@@ -27,8 +27,8 @@
 struct Connection
 {
     Transport * transport;
-    uint16_t videoStreamID;
-    uint16_t audioStreamID;
+    std::vector<uint16_t> videoStreams;
+    std::vector<uint16_t> audioStreams;
 };
 
 // Media Controller
@@ -38,8 +38,9 @@ public:
     MediaController() {}
     virtual ~MediaController() {}
     // Transports register themselves with the media-controller for receiving
-    // media from stream sources.
-    virtual void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
+    // media from stream sources. Supports multiple video and audio streams per transport.
+    virtual void RegisterTransport(Transport * transport, const std::vector<uint16_t> & videoStreams,
+                                   const std::vector<uint16_t> & audioStreams) = 0;
     // Transports must first unregister from the media-controller when they are
     // getting destroyed.
     virtual void UnregisterTransport(Transport * transport) = 0;
@@ -48,7 +49,7 @@ public:
     virtual Transport * GetTransportForAudioStream(uint16_t audioStreamID) = 0;
     // Media controller goes through registered transports and dispatches media
     // if the transport is ready.
-    virtual void DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID) = 0;
-    virtual void DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID) = 0;
-    virtual void SetPreRollLength(Transport * transport, uint16_t PreRollBufferLength)      = 0;
+    virtual void DistributeVideo(const uint8_t * data, size_t size, uint16_t videoStreamID, int64_t timestamp) = 0;
+    virtual void DistributeAudio(const uint8_t * data, size_t size, uint16_t audioStreamID, int64_t timestamp) = 0;
+    virtual void SetPreRollLength(Transport * transport, uint16_t PreRollBufferLength)                         = 0;
 };

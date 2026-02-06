@@ -2567,6 +2567,15 @@ static BOOL AttributeIsSpecifiedInGroupcastCluster(AttributeId aAttributeId)
     case Attributes::MaxMembershipCount::Id: {
         return YES;
     }
+    case Attributes::MaxMcastAddrCount::Id: {
+        return YES;
+    }
+    case Attributes::UsedMcastAddrCount::Id: {
+        return YES;
+    }
+    case Attributes::FabricUnderTest::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5359,13 +5368,7 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::SimultaneousDetectionLimit::Id: {
         return YES;
     }
-    case Attributes::CountThresholdReached::Id: {
-        return YES;
-    }
-    case Attributes::CountThreshold::Id: {
-        return YES;
-    }
-    case Attributes::ObjectCount::Id: {
+    case Attributes::ObjectCountReached::Id: {
         return YES;
     }
     case Attributes::HoldTime::Id: {
@@ -5375,9 +5378,6 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
         return YES;
     }
     case Attributes::PredictedActivity::Id: {
-        return YES;
-    }
-    case Attributes::PrivacyModeEnabled::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

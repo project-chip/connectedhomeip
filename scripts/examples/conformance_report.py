@@ -15,7 +15,7 @@ DEFAULT_TARGETS = [
     "linux-x64-bridge-no-ble-clang-boringssl",
     "linux-x64-contact-sensor-no-ble",
     "linux-x64-dishwasher-no-ble",
-    "linux-x64-energy-management-no-ble-clang-boringssl",
+    "linux-x64-evse-no-ble-clang-boringssl",
     "linux-x64-light-data-model-no-unique-id-no-ble",
     "linux-x64-light-no-ble",
     "linux-x64-lit-icd-no-ble",

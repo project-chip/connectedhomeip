@@ -22,7 +22,9 @@ import logging
 import os
 import queue
 import random
+import select
 import shlex
+import subprocess
 import textwrap
 import time
 import typing
@@ -48,6 +50,7 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
@@ -1024,13 +1027,109 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
+    def read_from_app_pipe(
+        self,
+        app_pipe_out: Optional[str] = None,
+        timeout: float = 2.0,
+        max_bytes: int = 66536,
+        chunk: int = 4096,
+        ip_env_var: Optional[str] = None,
+    ) -> Any:
+        """
+        Read an out-of-band command from a Matter app.
+
+        Args:
+            app_pipe_out: Name of the cluster pipe file (e.g. /tmp/..._out). If None, uses value from config (--app-pipe-out).
+            ip_env_var: Name of the environment variable containing the DUT IP. If not provided (or None), forces local FIFO read.
+
+        Environment variables used when reading remotely:
+            - <ip_env_var> (typically LINUX_DUT_IP): if set, the FIFO is read on the remote DUT via SSH.
+            - LINUX_DUT_USER: required when <ip_env_var> is set.
+        """
+        if app_pipe_out is None:
+            app_pipe_out = self.matter_test_config.pipe_name_out
+
+        if not isinstance(app_pipe_out, str):
+            raise TypeError("The named pipe must be provided as a string value")
+
+        if not os.path.exists(app_pipe_out):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe_out)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
+        if dut_ip is None:
+            # Use manual chunked reads instead of readline(): FIFO is opened non-blocking
+            # and we need explicit timeout handling and a hard size limit for safety. We also
+            # preserve any extra bytes (e.g. multiple queued messages) across calls.
+            if not hasattr(self, "_app_pipe_out_buf"):
+                self._app_pipe_out_buf = bytearray()
+
+            fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+            try:
+                buf: bytearray = self._app_pipe_out_buf
+
+                while True:
+                    if b"\n" in buf:
+                        line, _, rest = buf.partition(b"\n")
+                        self._app_pipe_out_buf = bytearray(rest)
+
+                        line = line.strip()
+                        if not line:
+                            continue
+                        return json.loads(line.decode("utf-8"))
+
+                    if buf:
+                        try:
+                            obj = json.loads(buf.decode("utf-8"))
+                            self._app_pipe_out_buf = bytearray()
+                            return obj
+                        except json.JSONDecodeError:
+                            pass
+
+                    r, _, _ = select.select([fd], [], [], timeout)
+                    if not r:
+                        raise TimeoutError(f"No data within {timeout}")
+
+                    chunk_bytes = os.read(fd, chunk)
+                    if not chunk_bytes:
+                        if buf:
+                            try:
+                                obj = json.loads(buf.decode("utf-8"))
+                                self._app_pipe_out_buf = bytearray()
+                                return obj
+                            except json.JSONDecodeError as ex:
+                                raise EOFError(f"Incomplete JSON response: {ex}") from ex
+                        raise EOFError("Empty command response")
+
+                    buf += chunk_bytes
+                    if len(buf) > max_bytes:
+                        raise ValueError("Command too large")
+            finally:
+                os.close(fd)
+
+        LOGGER.info("Using DUT IP address: %s", dut_ip)
+
+        dut_uname = os.getenv("LINUX_DUT_USER")
+        asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+        LOGGER.info("Using DUT user name: %s", dut_uname)
+
+        # `cat` returns the remote FIFO contents. Parse as JSON for consistency with local behavior.
+        out = subprocess.check_output(["ssh", f"{dut_uname}@{dut_ip}", "cat", app_pipe_out])
+        out_str = out.decode("utf-8").strip()
+        return json.loads(out_str)
+
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, ip_env_var: Optional[str] = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
             command_dict (dict): dictionary with the command and data.
             app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
+            ip_env_var: Optional[str]: is an optional argument. Name of the environment variable containing the DUT IP.
 
         This method uses the following environment variables:
 
@@ -1045,24 +1144,26 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
-        # If is not empty from the args, verify if the fifo file exists.
-        if app_pipe is not None and not os.path.exists(app_pipe):
-            LOGGER.error("Named pipe %r does NOT exist" % app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
-
         if app_pipe is None:
             app_pipe = self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
 
+        if not os.path.exists(app_pipe):
+            LOGGER.error("Named pipe %r does NOT exist", app_pipe)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
+
         if not isinstance(command_dict, dict):
             raise TypeError("The command must be passed as a dictionary value")
 
         command = json.dumps(command_dict)
-        dut_ip = os.getenv('LINUX_DUT_IP')
 
-        # Checks for concatenate app_pipe and app_pid
+        dut_ip: Optional[str] = os.getenv(ip_env_var) if ip_env_var else None
+
+        # If no DUT IP is provided, the Matter app is assumed to be local and the command
+        # is read directly from the named pipe. If a DUT IP is present, the pipe is read
+        # remotely via SSH from the target device.
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
                 LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
@@ -1365,6 +1466,97 @@ class MatterBaseTest(base_test.BaseTestClass):
             validation_name='Push AV Stream Validation',
             error_message='Push AV Stream validation failed'
         )
+
+    def _expire_sessions_on_all_controllers(self):
+        """Helper method to expire sessions on all active controllers via the fabric admin interface.
+
+        This method iterates through all certificate authorities and their fabric admins to expire
+        sessions on all active controllers. This ensures all controllers can reconnect after a device
+        reboot or factory reset.
+        """
+        LOGGER.info("Expiring sessions on all active controllers")
+        for ca in self.matter_stack.certificate_authorities:
+            for fabric_admin in ca.adminList:
+                for controller in fabric_admin._activeControllers:
+                    if controller.isActive:
+                        try:
+                            controller.ExpireSessions(self.dut_node_id)
+                            LOGGER.info(f"Expired sessions on controller with nodeId {controller.nodeId}")
+                        except ChipStackError as e:  # chipstack-ok
+                            LOGGER.warning(f"Failed to expire sessions on controller {controller.nodeId}: {e}")
+
+    async def request_device_reboot(self):
+        """Request a reboot of the Device Under Test (DUT).
+
+        This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
+        to the DUT after the reboot.
+
+        Returns:
+            None
+        """
+        # Check if restart flag file is available (indicates test runner supports app restart)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                LOGGER.info("Created restart flag file to signal app reboot")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+
+                # Expire sessions and re-establish connections
+                self._expire_sessions_on_all_controllers()
+                LOGGER.info("App restart completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to reboot app: {e}")
+                asserts.fail(f"App reboot failed: {e}")
+
+    async def request_device_factory_reset(self):
+        """Request a factory reset of the Device Under Test (DUT).
+
+        This method handles factory resets in both CI and development environments (via run_python_test.py test runner script)
+        and also manual testing scenarios (via user input).
+        It will expire existing sessions to allow for controllers to reconnect to the DUT after the factory reset.
+        """
+        # Check if restart flag file is available (indicates test runner supports app reboot)
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually factory reset
+            self.wait_for_user_input(prompt_msg="Factory reset the DUT. Press Enter when ready.\n")
+
+            # After manual factory reset, expire previous sessions so that we can re-establish connections
+            self._expire_sessions_on_all_controllers()
+            LOGGER.info("Manual device factory reset completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("reset")
+                    LOGGER.info("Created restart flag file to signal app factory reset")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+
+                # Expire sessions and re-establish connections
+                self._expire_sessions_on_all_controllers()
+                LOGGER.info("App factory reset completed successfully")
+
+            except Exception as e:
+                LOGGER.error(f"Failed to factory reset app: {e}")
+                asserts.fail(f"App factory reset failed: {e}")
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):

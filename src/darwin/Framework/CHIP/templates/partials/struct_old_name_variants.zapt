@@ -1,0 +1,22 @@
+{{! Arguments: clusterName (canonicalized), originalClusterName, structName, oldStructName (may be undefined) }}
+{{! This partial generates old name variants for structs, handling deprecation. }}
+
+{{#*inline "oldNameDecl"}}
+{{> struct_interface_decl cluster=(compatClusterNameRemapping originalClusterName)
+                  originalCluster=originalClusterName
+                           struct=structNameParam
+                         baseName=(concat "MTR" clusterName "Cluster" structName)
+               deprecationMessage=(concat "Please use MTR" clusterName "Cluster" structName)}}
+{{/inline}}
+
+{{#*inline "oldNameCheck"}}
+{{#if (or oldStructName (hasOldName clusterName))}}
+{{#if oldStructName}}
+{{> oldNameDecl structNameParam=oldStructName}}
+{{else}}
+{{> oldNameDecl structNameParam=structName}}
+{{/if}}
+{{/if}}
+{{/inline}}
+
+{{> oldNameCheck oldStructName=oldStructName}}

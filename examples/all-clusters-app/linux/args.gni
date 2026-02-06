@@ -32,3 +32,17 @@ chip_enable_boolean_state_configuration_trigger = true
 chip_enable_software_diagnostics_trigger = true
 chip_enable_wifi_diagnostics_trigger = true
 chip_minmdns_high_verbosity = true
+
+openthread_config_ecdsa_enable = true
+openthread_config_ip6_slaac_enable = true
+openthread_config_full_logs = true
+openthread_config_joiner_enable = true
+openthread_config_log_output = "platform_defined"
+openthread_config_srp_client_enable = true
+openthread_config_tcp_enable = false
+openthread_config_tmf_netdata_service_enable = true
+openthread_enable_core_config_args = true
+openthread_project_core_config_file = rebase_path(
+        get_path_info(
+            "${chip_root}/third_party/openthread/repo/examples/platforms/simulation/openthread-core-simulation-config.h",
+            "abspath"))

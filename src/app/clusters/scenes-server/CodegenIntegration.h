@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include <app/clusters/scenes-server/Constants.h>
 #include <app/clusters/scenes-server/ScenesManagementCluster.h>
 
 // most ember implementations will want access to these
@@ -25,8 +26,8 @@ namespace chip::app::Clusters::ScenesManagement {
 class ScenesServer
 {
 public:
-    static constexpr SceneId kGlobalSceneId      = 0x00;
-    static constexpr GroupId kGlobalSceneGroupId = 0x0000;
+    static constexpr SceneId kGlobalSceneId      = chip::scenes::kGlobalSceneId;
+    static constexpr GroupId kGlobalSceneGroupId = chip::scenes::kGlobalSceneGroupId;
 
     ScenesServer()  = default;
     ~ScenesServer() = default;

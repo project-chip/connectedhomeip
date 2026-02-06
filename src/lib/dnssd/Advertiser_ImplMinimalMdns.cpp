@@ -27,6 +27,7 @@
 #include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/ResponseSender.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
@@ -39,7 +40,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/StringBuilder.h>
-#include <minmdns/MinMdnsConfig.h>
 
 namespace chip {
 namespace Dnssd {
