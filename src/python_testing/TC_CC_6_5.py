@@ -166,22 +166,9 @@ class TC_CC_6_5(MatterBaseTest):
                              "Startup color temperature should match target value")
 
         self.step("3a")
-        # Restart file check/creation sequence
-        restart_flag_file = self.get_restart_flag_file()
-        if self.is_pics_sdk_ci_only and restart_flag_file is not None:
-            with open(restart_flag_file, "w") as f:
-                f.write("restart")
-            log.info("Created restart flag file to signal app restart")
-            await asyncio.sleep(1)
-            self.TH1.ExpireSessions(self.dut_node_id)
-        else:
-            self.wait_for_user_input("Power Off the device under test.")
-
         self.step("3b")
-        # On CI Restart has the PowerOn
-        if not (self.is_pics_sdk_ci_only and restart_flag_file is not None):
-            self.wait_for_user_input("Power On the device under test.")
-            self.TH1.ExpireSessions(self.dut_node_id)
+        # Restart the device PowerOn and then Power Off
+        await self.request_device_reboot()
 
         self.step("4a")
         startup_color_temp_mireds = await self.read_single_attribute_check_success(
