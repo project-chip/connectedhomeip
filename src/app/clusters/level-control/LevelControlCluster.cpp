@@ -81,7 +81,6 @@ LevelControlCluster::LevelControlCluster(const Config & config) :
     VerifyOrDie(!mFeatureMap.Has(Feature::kOnOff) || mOnOffCluster != nullptr);
 }
 
-
 void LevelControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mTransitionHandler.StopTransition();
@@ -749,8 +748,8 @@ void LevelControlCluster::TransitionHandler::TimerFired()
     else if (mTransitionTimeMs > 0)
     {
         // Interpolate
-        // Use 64-bit math for the intermediate multiplication to avoid overflow, though with uint8 levels it's unlikely to overflow 32-bit.
-        // We avoid floating point to stick to integer arithmetic.
+        // Use 64-bit math for the intermediate multiplication to avoid overflow, though with uint8 levels it's unlikely to overflow
+        // 32-bit. We avoid floating point to stick to integer arithmetic.
         const int32_t initial = mInitialLevel;
         const int32_t target  = mTargetLevel;
         const int32_t delta   = target - initial;
