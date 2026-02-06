@@ -55,22 +55,22 @@ details.
 
 ## Commandline arguments
 
-- `--wifi`
+-   `--wifi`
 
     Enables WiFi management feature. Required for WiFi commissioning.
 
-- `--thread`
+-   `--thread`
 
     Enables Thread management feature, requires ot-br-posix dbus daemon running.
     Required for Thread commissioning.
 
-- `--ble-controller <selector>`
+-   `--ble-controller <selector>`
 
     Use the specific Bluetooth controller for BLE advertisement and connections.
     For details on controller selection refer to
     [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-- `--featureSet <feature map for Device Energy Management e.g. 0x7a>`
+-   `--featureSet <feature map for Device Energy Management e.g. 0x7a>`
 
     Sets the run-time FeatureMap value for the Device Energy Management cluster.
     This allows the DEM cluster to support `PFR` or `SFR` so that the full range
@@ -87,6 +87,7 @@ details.
 >     ninja -C out/debug
 
 -   Prerequisites
+
     1. A Raspberry Pi 4 board
     2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
        which will block CHIP from connecting via BLE. On Ubuntu server, you need
@@ -98,10 +99,12 @@ details.
     Follow [Building](#building) section of this document.
 
 -   Running
+
     -   [Optional] Plug USB Bluetooth dongle
-        - Plug USB Bluetooth dongle and find its bluetooth controller selector
-          as described in
-          [Linux BLE Settings](/platforms/linux/ble_settings.md).
+
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
     -   Run Linux Water Heater Example App
 
@@ -162,14 +165,14 @@ Step-by-step:
 
 1. Set the default TestEventTrigger (`0x0094000000000000`):
 
-- `0x0094000000000000` corresponds to
-  [`kBasicInstallationTestEvent`](https://github.com/project-chip/connectedhomeip/blob/5e3127f5ac61e13c572a968199280d90a9c19dce/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h#L47)
-  from `WaterHeadermanagementTestEventTriggerHandler.h`
-- `hex:00010203...0e0f` is the `--enable-key` passed to the startup of
-  chip-energy-management-app
-- `0x12344321` is the node-id that the app was commissioned on
-- final `0` is the endpoint on which the `GeneralDiagnostics` cluster exists to
-  call the `TestEventTrigger` command
+-   `0x0094000000000000` corresponds to
+    [`kBasicInstallationTestEvent`](https://github.com/project-chip/connectedhomeip/blob/5e3127f5ac61e13c572a968199280d90a9c19dce/src/app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h#L47)
+    from `WaterHeadermanagementTestEventTriggerHandler.h`
+-   `hex:00010203...0e0f` is the `--enable-key` passed to the startup of
+    chip-energy-management-app
+-   `0x12344321` is the node-id that the app was commissioned on
+-   final `0` is the endpoint on which the `GeneralDiagnostics` cluster exists
+    to call the `TestEventTrigger` command
     ```
     ./out/linux-x64-chip-tool-no-ble/chip-tool generaldiagnostics test-event-trigger hex:000102030405060708090a0b0c0d0e0f 0x0094000000000000 0x12344321 0
     ```
@@ -183,9 +186,10 @@ Step-by-step:
     ```
 
 1. Set boost state:
-    -   `durationIndicates` the time period in seconds for which the BOOST state
-        is activated before it automatically reverts to the previous mode (e.g.
-        OFF, MANUAL or TIMED).
+
+    - `durationIndicates` the time period in seconds for which the BOOST state
+      is activated before it automatically reverts to the previous mode (e.g.
+      OFF, MANUAL or TIMED).
 
     ```
     ./out/linux-x64-chip-tool-no-ble/chip-tool waterheatermanagement boost '{ "duration": 1800 }' 0x12344321 2
@@ -280,10 +284,10 @@ Out[2]: <matter.native.PyChipError object at 0x7f2432b16140>
    subscription = await devCtrl.ReadAttribute(1234,[(1, matter.clusters.WaterHeaterManagement)], reportInterval=reportingTimingParams)
 ```
 
--   Step 6: Send a `Boost` command which activates boost mode for 1800 seconds (30
-    minutes). The `Boost` command takes a `duration` parameter which specifies how
-    long the boost state should remain active before automatically reverting to
-    the previous mode.
+-   Step 6: Send a `Boost` command which activates boost mode for 1800 seconds
+    (30 minutes). The `Boost` command takes a `duration` parameter which
+    specifies how long the boost state should remain active before automatically
+    reverting to the previous mode.
 
 ```python
    await devCtrl.SendCommand(1234, endpoint=1,
