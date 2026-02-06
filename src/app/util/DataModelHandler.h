@@ -21,3 +21,8 @@
  * data model messages.
  */
 void InitDataModelHandler();
+
+/**
+ * Shutdown the data model, cleaning up all clusters and endpoints.
+ */
+void ShutdownDataModelHandler();

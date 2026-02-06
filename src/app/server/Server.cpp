@@ -709,6 +709,11 @@ void Server::Shutdown()
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+    // Destroy event management to allow re-initialization
+    app::EventManagement::DestroyEventManagement();
+#endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

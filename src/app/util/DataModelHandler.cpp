@@ -28,3 +28,17 @@ void InitDataModelHandler()
     emberAfEndpointConfigure();
     emberAfInit();
 }
+
+void ShutdownDataModelHandler()
+{
+    ChipLogProgress(Zcl, "Shutting down data model...");
+    // Shutdown all endpoints and their clusters
+    for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+    {
+        if (emberAfEndpointIndexIsEnabled(index))
+        {
+            // Disable the endpoint which will trigger cluster shutdown callbacks
+            emberAfEndpointEnableDisable(emberAfEndpointFromIndex(index), false, MatterClusterShutdownType::kClusterShutdown);
+        }
+    }
+}

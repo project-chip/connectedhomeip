@@ -129,6 +129,10 @@ CHIP_ERROR CodegenDataModelProvider::Shutdown()
     Reset();
     mContext.reset();
     mRegistry.ClearContext();
+
+    // Shutdown the data model handler to clean up all clusters
+    ShutdownDataModelHandler();
+
     return DataModel::Provider::Shutdown();
 }
 

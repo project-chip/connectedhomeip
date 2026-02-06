@@ -169,7 +169,8 @@ bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access
 class AutoReleaseSubscriptionInfoIterator
 {
 public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) :
+        mIterator(iterator) {};
     ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
 
     SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
@@ -282,6 +283,17 @@ void InteractionModelEngine::Shutdown()
     mEventPathPool.ReleaseAll();
     mDataVersionFilterPool.ReleaseAll();
     TEMPORARY_RETURN_IGNORED mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
+
+    // Shutdown the data model provider if one is set
+    if (mDataModelProvider != nullptr)
+    {
+        CHIP_ERROR err = mDataModelProvider->Shutdown();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel, "Failure on data model provider shutdown: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        mDataModelProvider = nullptr;
+    }
 
     mpCASESessionMgr = nullptr;
 
