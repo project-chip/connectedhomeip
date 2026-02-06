@@ -1242,6 +1242,7 @@ Realtek
 rebase
 recommand
 recommanded
+reconnections
 recurse
 refrigeratoralarm
 regen
