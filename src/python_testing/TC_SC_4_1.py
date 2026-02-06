@@ -318,7 +318,7 @@ class TC_SC_4_1(MatterBaseTest):
         if is_long_discriminator:
             # Derive the short discriminator subtype from the long discriminator
             short_discriminator = (int(discriminator) >> 8) & 0x0F
-            short_discriminator_subtype = f"'_S'{short_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+            short_discriminator_subtype = f"_S{short_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
             # Performs PTR record query
             ptr_records = await MdnsDiscovery().get_ptr_records(
@@ -643,13 +643,17 @@ class TC_SC_4_1(MatterBaseTest):
         assert_valid_ph_pi_relationship(txt_record.txt)
 
     def verify_t_key(self, txt_record) -> None:
-        # If 'supports_tcp' is False and T key is not present, nothing to check
-        if (not self.supports_tcp) and ('T' not in txt_record.txt):
+
+        # If the 'T' key is not present in the TXT record, nothing to
+        # verify. MRP support only is assumed as a transport protocol
+        if 'T' not in txt_record.txt:
             return
 
-        # Verify that if 'supports_tcp' is True, the 'T' key is present
-        if self.supports_tcp:
-            asserts.assert_in('T', txt_record.txt, "'T' key must be present.")
+        # If the 'T' key is present in the TXT record, then TCP is supported by the DUT
+
+        # Verify that TCP is supported in the PICS
+        asserts.assert_true(self.supports_tcp,
+                            "TCP must be supported in the PICS if the 'T' key is present (TCP supported by the DUT).")
 
         # Verify that the 'T' key is non-empty
         t_key = txt_record.txt.get('T')
@@ -665,12 +669,11 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify that bit 0 is clear
         asserts.assert_true((T_int & 0x01) == 0, f"T key ({t_key}) bit 0 must be clear.")
 
-        # Verify that the value encodes TCP capability per PICS:
-        #   - If 'supports_tcp' is True, T key allowed values are (4, 6)
-        #   - If 'supports_tcp' is False, T key allowed values are (0)
-        allowed = {4, 6} if self.supports_tcp else {0}
+        # Verify that the T key encodes the allowed TCP
+        # capabilities. T key allowed values are (4, 6)
+        allowed = {4, 6}
         asserts.assert_true(T_int in allowed,
-                            f"T value ({t_key}) is not in allowed set {sorted(allowed)}.")
+                            f"T value ({t_key}) is not in allowed set ({sorted(allowed)}).")
 
     @staticmethod
     async def _verify_aaaa_records(srv_hostname: str) -> None:
