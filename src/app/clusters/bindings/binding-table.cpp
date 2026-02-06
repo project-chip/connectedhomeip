@@ -19,8 +19,8 @@
  * @file Basic implementation of a binding table.
  */
 
-#include <app/clusters/bindings/binding-table.h>
 #include <app/clusters/bindings/BindingManager.h>
+#include <app/clusters/bindings/binding-table.h>
 
 namespace chip {
 namespace app {

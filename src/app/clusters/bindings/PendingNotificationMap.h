@@ -72,7 +72,7 @@ class PendingNotificationMap
 public:
     static constexpr uint8_t kMaxPendingNotifications = Table::kMaxBindingEntries;
 
-    PendingNotificationMap(Table & bindingTable): mBindingTable(bindingTable) {}
+    PendingNotificationMap(Table & bindingTable) : mBindingTable(bindingTable) {}
 
     friend class Iterator;
 
