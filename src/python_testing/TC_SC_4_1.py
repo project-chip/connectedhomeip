@@ -318,8 +318,7 @@ class TC_SC_4_1(MatterBaseTest):
         if is_long_discriminator:
             # Derive the short discriminator subtype from the long discriminator
             short_discriminator = (int(discriminator) >> 8) & 0x0F
-            short_discriminator_prefix = '_S'
-            short_discriminator_subtype = f"{short_discriminator_prefix}{short_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
+            short_discriminator_subtype = f"'_S'{short_discriminator}._sub.{MdnsServiceType.COMMISSIONABLE.value}"
 
             # Performs PTR record query
             ptr_records = await MdnsDiscovery().get_ptr_records(
