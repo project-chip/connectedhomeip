@@ -187,7 +187,7 @@ Configure the SE05x product variant by updating the feature file at
 
 **Default Configuration:** SE051H is enabled by default.
 
-```c:third_party/simw-top-mini/repo/fsl_sss_ftr.h
+```c
 /** Compiling without any Applet Support */
 #define SSS_HAVE_APPLET_NONE 0
 

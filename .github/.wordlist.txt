@@ -270,6 +270,8 @@ CMS
 CMSIS
 CMVH
 cn
+CNT
+cnt
 COAP
 codeaurora
 codebase
@@ -550,6 +552,7 @@ EvalCode
 EvalCodeWithName
 EvalFrameDefault
 EVB
+EVKBMIMXRT
 EventLogging
 evk
 EVSE
@@ -608,6 +611,7 @@ fsl
 fstab
 fsync
 ftd
+ftr
 fullclean
 fuzzer
 fuzzers
@@ -772,6 +776,8 @@ isHexString
 isLowerCase
 isort
 isUpperCase
+ITER
+iter
 itemName
 iterable
 itsfoss
@@ -1118,6 +1124,7 @@ params
 PartNumber
 PASE
 Passcode
+passcodes
 passRetained
 passwd
 Pausable
@@ -1368,6 +1375,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+simw
 SiWx
 sizedb
 sl
@@ -1522,6 +1530,8 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TP
+tp
 TPK
 trackAlloc
 trackFree
