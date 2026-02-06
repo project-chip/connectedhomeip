@@ -146,7 +146,7 @@ public:
     };
 
     LevelControlCluster(const Config & config);
-    ~LevelControlCluster();
+    ~LevelControlCluster() = default;
 
     // ServerClusterInterface Implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -258,6 +258,7 @@ private:
     {
     public:
         TransitionHandler(LevelControlCluster & cluster) : mCluster(cluster) {}
+        ~TransitionHandler();
 
         void StartTransition(CommandId commandId, uint8_t initialLevel, uint8_t targetLevel, uint32_t transitionTimeMs,
                              uint32_t stepDurationMs);

@@ -81,15 +81,16 @@ LevelControlCluster::LevelControlCluster(const Config & config) :
     VerifyOrDie(!mFeatureMap.Has(Feature::kOnOff) || mOnOffCluster != nullptr);
 }
 
-LevelControlCluster::~LevelControlCluster()
-{
-    mTransitionHandler.StopTransition();
-}
 
 void LevelControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mTransitionHandler.StopTransition();
     DefaultServerCluster::Shutdown(shutdownType);
+}
+
+LevelControlCluster::TransitionHandler::~TransitionHandler()
+{
+    mCluster.mTimerDelegate.CancelTimer(this);
 }
 
 CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
@@ -748,10 +749,17 @@ void LevelControlCluster::TransitionHandler::TimerFired()
     else if (mTransitionTimeMs > 0)
     {
         // Interpolate
-        int32_t delta = static_cast<int32_t>(mTargetLevel) - static_cast<int32_t>(mInitialLevel);
-        int32_t change =
-            static_cast<int32_t>((static_cast<int64_t>(delta) * static_cast<int64_t>(mElapsedTimeMs)) / mTransitionTimeMs);
-        currentLevel = static_cast<uint8_t>(static_cast<int32_t>(mInitialLevel) + change);
+        // Use 64-bit math for the intermediate multiplication to avoid overflow, though with uint8 levels it's unlikely to overflow 32-bit.
+        // We avoid floating point to stick to integer arithmetic.
+        const int32_t initial = mInitialLevel;
+        const int32_t target  = mTargetLevel;
+        const int32_t delta   = target - initial;
+
+        // change = delta * (elapsed / total)
+        // Reordered to: (delta * elapsed) / total
+        const int32_t change = static_cast<int32_t>((static_cast<int64_t>(delta) * mElapsedTimeMs) / mTransitionTimeMs);
+
+        currentLevel = static_cast<uint8_t>(initial + change);
     }
 
     // End of transition
@@ -783,6 +791,10 @@ void LevelControlCluster::TransitionHandler::TimerFired()
 
     // Intermediate tick
     RETURN_SAFELY_IGNORED mCluster.SetCurrentLevel(currentLevel, LevelControlCluster::ReportingMode::kQuietReport);
+
+    // StartTimer is safe here because this method is called when the timer has already fired (and thus is not active),
+    // and if we are here it means we are continuing the same transition. If a new transition starts via StartTransition,
+    // it will cancel any existing timer first.
     SuccessOrDie(mCluster.mTimerDelegate.StartTimer(this, System::Clock::Milliseconds64(mTickDurationMs)));
 }
 
