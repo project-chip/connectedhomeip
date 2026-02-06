@@ -663,16 +663,10 @@ class TC_SC_4_1(MatterBaseTest):
         # text without any leading zeros, and less than or equal to 6
         assert_valid_t_key(t_key, enforce_provisional=False)
 
-        # Convert to bitmap
-        T_int = int(t_key)
-
-        # Verify that bit 0 is clear
-        asserts.assert_true((T_int & 0x01) == 0, f"T key ({t_key}) bit 0 must be clear.")
-
         # Verify that the T key encodes the allowed TCP
         # capabilities. T key allowed values are (4, 6)
         allowed = {4, 6}
-        asserts.assert_true(T_int in allowed,
+        asserts.assert_true(int(t_key) in allowed,
                             f"T value ({t_key}) is not in allowed set ({sorted(allowed)}).")
 
     @staticmethod
