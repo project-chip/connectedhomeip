@@ -21,13 +21,18 @@
 #include <AppRootNode.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
+#include <app/DeviceLoadStatusProvider.h>
+#include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
@@ -80,10 +85,14 @@ public:
         Access::AccessControl & accessControl;
         PersistentStorageDelegate & persistentStorage;
         FailSafeContext & failSafeContext;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
+        DeviceLoadStatusProvider & deviceLoadStatusProvider;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        TestEventTriggerDelegate * testEventTriggerDelegate;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -94,17 +103,21 @@ public:
         mContext(context), mDataModelProvider(mContext.storageDelegate, mAttributePersistence),
         mRootNode(
             {
-                .commissioningWindowManager = mContext.commissioningWindowManager, //
-                    .configurationManager   = mContext.configurationManager,       //
-                    .deviceControlServer    = mContext.deviceControlServer,        //
-                    .fabricTable            = mContext.fabricTable,                //
-                    .accessControl          = mContext.accessControl,              //
-                    .persistentStorage      = mContext.persistentStorage,          //
-                    .failSafeContext        = mContext.failSafeContext,            //
-                    .platformManager        = mContext.platformManager,            //
-                    .groupDataProvider      = mContext.groupDataProvider,          //
-                    .sessionManager         = mContext.sessionManager,             //
-                    .dnssdServer            = mContext.dnssdServer,                //
+                .commissioningWindowManager     = mContext.commissioningWindowManager, //
+                    .configurationManager       = mContext.configurationManager,       //
+                    .deviceControlServer        = mContext.deviceControlServer,        //
+                    .fabricTable                = mContext.fabricTable,                //
+                    .accessControl              = mContext.accessControl,              //
+                    .persistentStorage          = mContext.persistentStorage,          //
+                    .failSafeContext            = mContext.failSafeContext,            //
+                    .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider, //
+                    .platformManager            = mContext.platformManager,            //
+                    .groupDataProvider          = mContext.groupDataProvider,          //
+                    .sessionManager             = mContext.sessionManager,             //
+                    .dnssdServer                = mContext.dnssdServer,                //
+                    .deviceLoadStatusProvider   = mContext.deviceLoadStatusProvider,   //
+                    .diagnosticDataProvider     = mContext.diagnosticDataProvider,     //
+                    .testEventTriggerDelegate   = mContext.testEventTriggerDelegate,   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
@@ -172,6 +185,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to get the DeviceInstanceInfoProvifer.");
+        chipDie();
+    }
+
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                 //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
@@ -181,10 +201,14 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .accessControl              = Server::GetInstance().GetAccessControl(),              //
             .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
             .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .deviceInstanceInfoProvider = *provider,                                             //
             .platformManager            = DeviceLayer::PlatformMgr(),                            //
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
             .dnssdServer                = DnssdServer::Instance(),                               //
+            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
+            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
+            .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

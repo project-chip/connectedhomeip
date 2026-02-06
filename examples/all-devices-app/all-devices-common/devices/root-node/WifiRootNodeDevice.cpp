@@ -34,7 +34,13 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));
 
-    mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver, mGeneralCommissioningCluster.Cluster());
+    mNetworkCommissioningCluster.Create(endpointId, &mWifiContext.wifiDriver,
+                                        NetworkCommissioningCluster::Context{
+                                            .breadcrumbTracker   = mGeneralCommissioningCluster.Cluster(),
+                                            .failSafeContext     = mContext.failSafeContext,
+                                            .platformManager     = mContext.platformManager,
+                                            .deviceControlServer = mContext.deviceControlServer,
+                                        });
     ReturnErrorOnFailure(mNetworkCommissioningCluster.Cluster().Init());
     ReturnErrorOnFailure(provider.AddCluster(mNetworkCommissioningCluster.Registration()));
 
