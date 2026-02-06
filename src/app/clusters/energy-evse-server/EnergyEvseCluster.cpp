@@ -47,6 +47,7 @@ CHIP_ERROR EnergyEvseCluster::Startup(ServerClusterContext & context)
 CHIP_ERROR EnergyEvseCluster::SetState(StateEnum newValue)
 {
     VerifyOrReturnError(mState != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(newValue < StateEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mState = newValue;
     mDelegate.OnStateChanged(newValue);
     NotifyAttributeChanged(State::Id);
@@ -56,6 +57,7 @@ CHIP_ERROR EnergyEvseCluster::SetState(StateEnum newValue)
 CHIP_ERROR EnergyEvseCluster::SetSupplyState(SupplyStateEnum newValue)
 {
     VerifyOrReturnError(mSupplyState != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(newValue < SupplyStateEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mSupplyState = newValue;
     mDelegate.OnSupplyStateChanged(newValue);
     NotifyAttributeChanged(SupplyState::Id);
@@ -65,6 +67,7 @@ CHIP_ERROR EnergyEvseCluster::SetSupplyState(SupplyStateEnum newValue)
 CHIP_ERROR EnergyEvseCluster::SetFaultState(FaultStateEnum newValue)
 {
     VerifyOrReturnError(mFaultState != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(newValue < FaultStateEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mFaultState = newValue;
     mDelegate.OnFaultStateChanged(newValue);
     NotifyAttributeChanged(FaultState::Id);
@@ -92,6 +95,7 @@ CHIP_ERROR EnergyEvseCluster::SetDischargingEnabledUntil(DataModel::Nullable<uin
 CHIP_ERROR EnergyEvseCluster::SetCircuitCapacity(int64_t newValue)
 {
     VerifyOrReturnError(mCircuitCapacity != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(mCircuitCapacity >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mCircuitCapacity = newValue;
     mDelegate.OnCircuitCapacityChanged(newValue);
     NotifyAttributeChanged(CircuitCapacity::Id);
@@ -101,6 +105,7 @@ CHIP_ERROR EnergyEvseCluster::SetCircuitCapacity(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetMinimumChargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mMinimumChargeCurrent != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(mMinimumChargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mMinimumChargeCurrent = newValue;
     mDelegate.OnMinimumChargeCurrentChanged(newValue);
     NotifyAttributeChanged(MinimumChargeCurrent::Id);
@@ -110,6 +115,7 @@ CHIP_ERROR EnergyEvseCluster::SetMinimumChargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetMaximumChargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mMaximumChargeCurrent != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(mMaximumChargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mMaximumChargeCurrent = newValue;
     mDelegate.OnMaximumChargeCurrentChanged(newValue);
     NotifyAttributeChanged(MaximumChargeCurrent::Id);
@@ -119,6 +125,7 @@ CHIP_ERROR EnergyEvseCluster::SetMaximumChargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetMaximumDischargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mMaximumDischargeCurrent != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(mMaximumDischargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mMaximumDischargeCurrent = newValue;
     mDelegate.OnMaximumDischargeCurrentChanged(newValue);
     NotifyAttributeChanged(MaximumDischargeCurrent::Id);
@@ -128,6 +135,7 @@ CHIP_ERROR EnergyEvseCluster::SetMaximumDischargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetUserMaximumChargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mUserMaximumChargeCurrent != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(mUserMaximumChargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mUserMaximumChargeCurrent = newValue;
     mDelegate.OnUserMaximumChargeCurrentChanged(newValue);
     NotifyAttributeChanged(UserMaximumChargeCurrent::Id);
@@ -137,6 +145,7 @@ CHIP_ERROR EnergyEvseCluster::SetUserMaximumChargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetRandomizationDelayWindow(uint32_t newValue)
 {
     VerifyOrReturnError(mRandomizationDelayWindow != newValue, CHIP_NO_ERROR);
+    VerifyOrReturnError(mRandomizationDelayWindow <= kMaxRandomizationDelayWindowSec, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mRandomizationDelayWindow = newValue;
     mDelegate.OnRandomizationDelayWindowChanged(newValue);
     NotifyAttributeChanged(RandomizationDelayWindow::Id);
