@@ -24,10 +24,8 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
-#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
-#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <functional>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <uriparser/Uri.h>
