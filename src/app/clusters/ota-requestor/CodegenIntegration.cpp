@@ -42,7 +42,9 @@ namespace {
 
 static constexpr size_t kOtaRequestorFixedClusterCount =
     OtaSoftwareUpdateRequestor::StaticApplicationConfig::kFixedClusterConfig.size();
-static constexpr size_t kOtaRequestorMaxClusterCount = kOtaRequestorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+static_assert(kOtaRequestorFixedClusterCount == 0 || kOtaRequestorFixedClusterCount == 1,
+              "OTA requestor is a node-scoped utility cluster, so only one may be created");
 
 // OTA requestor clusters may be registered by the application before the OTA requestor singleton instance is set.
 // A fallback OTA requestor cluster is registered when the OTA requestor singleton hasn't been set. The fallback
@@ -84,8 +86,8 @@ public:
     }
 };
 
-LazyRegisteredServerCluster<OTARequestorCluster> gServers[kOtaRequestorMaxClusterCount];
-LazyRegisteredServerCluster<FallbackOtaRequestorCluster> gFallbackServers[kOtaRequestorMaxClusterCount];
+LazyRegisteredServerCluster<OTARequestorCluster> gServer;
+LazyRegisteredServerCluster<FallbackOtaRequestorCluster> gFallbackServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -96,13 +98,13 @@ public:
         ServerClusterRegistration * result = nullptr;
         if (GetRequestorInstance())
         {
-            gServers[clusterInstanceIndex].Create(endpointId, *GetRequestorInstance());
-            result = &gServers[clusterInstanceIndex].Registration();
+            gServer.Create(endpointId, *GetRequestorInstance());
+            result = &gServer.Registration();
         }
         else
         {
-            gFallbackServers[clusterInstanceIndex].Create(endpointId);
-            result = &gFallbackServers[clusterInstanceIndex].Registration();
+            gFallbackServer.Create(endpointId);
+            result = &gFallbackServer.Registration();
         }
         return *result;
     }
@@ -110,26 +112,26 @@ public:
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
         ServerClusterInterface * result = nullptr;
-        if (gServers[clusterInstanceIndex].IsConstructed())
+        if (gServer.IsConstructed())
         {
-            result = &gServers[clusterInstanceIndex].Cluster();
+            result = &gServer.Cluster();
         }
-        else if (gFallbackServers[clusterInstanceIndex].IsConstructed())
+        else if (gFallbackServer.IsConstructed())
         {
-            result = &gFallbackServers[clusterInstanceIndex].Cluster();
+            result = &gFallbackServer.Cluster();
         }
         return result;
     }
 
     void ReleaseRegistration(unsigned clusterInstanceIndex) override
     {
-        if (gServers[clusterInstanceIndex].IsConstructed())
+        if (gServer.IsConstructed())
         {
-            gServers[clusterInstanceIndex].Destroy();
+            gServer.Destroy();
         }
         else
         {
-            gFallbackServers[clusterInstanceIndex].Destroy();
+            gFallbackServer.Destroy();
         }
     }
 };
@@ -143,7 +145,7 @@ void RegisterCluster(EndpointId endpointId)
             .endpointId                = endpointId,
             .clusterId                 = OtaSoftwareUpdateRequestor::Id,
             .fixedClusterInstanceCount = kOtaRequestorFixedClusterCount,
-            .maxClusterInstanceCount   = kOtaRequestorMaxClusterCount,
+            .maxClusterInstanceCount   = 1, // This is a node utility cluster so only 1 is supported.
             .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = false,
         },
@@ -159,31 +161,24 @@ void UnregisterCluster(EndpointId endpointId, MatterClusterShutdownType shutdown
             .endpointId                = endpointId,
             .clusterId                 = OtaSoftwareUpdateRequestor::Id,
             .fixedClusterInstanceCount = kOtaRequestorFixedClusterCount,
-            .maxClusterInstanceCount   = kOtaRequestorMaxClusterCount,
+            .maxClusterInstanceCount   = 1, // This is a node utility cluster so only 1 is supported.
         },
         integrationDelegate, shutdownType);
 }
 
 void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
 {
-    // Re-register non-fallback servers first, or otherwise they would get re-registered a second time.
-    for (auto & server : gServers)
+    if (gServer.IsConstructed())
     {
-        if (server.IsConstructed())
-        {
-            EndpointId endpoint = server.Cluster().GetPaths()[0].mEndpointId;
-            UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
-            RegisterCluster(endpoint);
-        }
+        EndpointId endpoint = gServer.Cluster().GetPaths()[0].mEndpointId;
+        UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
+        RegisterCluster(endpoint);
     }
-    for (auto & server : gFallbackServers)
+    else if (gFallbackServer.IsConstructed())
     {
-        if (server.IsConstructed())
-        {
-            EndpointId endpoint = server.Cluster().GetPaths()[0].mEndpointId;
-            UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
-            RegisterCluster(endpoint);
-        }
+        EndpointId endpoint = gFallbackServer.Cluster().GetPaths()[0].mEndpointId;
+        UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
+        RegisterCluster(endpoint);
     }
 }
 

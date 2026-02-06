@@ -98,6 +98,10 @@ static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & re
 
 void SetRequestorInstance(OTARequestorInterface * instance)
 {
+    if (instance == globalOTARequestorInstance)
+    {
+        return;
+    }
     globalOTARequestorInstance = instance;
     if (internalOnSetRequestorInstance != nullptr)
     {
