@@ -40,8 +40,8 @@ if sys.platform == 'linux':
     from python_path import PythonPath
 
     with PythonPath(os.path.join(DEFAULT_CHIP_ROOT, 'src/python_testing/matter_testing_infrastructure/matter/testing'), relative_to=__file__):
-        from linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, LinuxNamespacedExecutor, WpaSupplicantMock,
-                           ThreadBorderRouter, ensure_network_namespace_availability, ensure_private_state)
+        from linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, LinuxNamespacedExecutor, ThreadBorderRouter,
+                           WpaSupplicantMock, ensure_network_namespace_availability, ensure_private_state)
 
 if sys.platform == 'darwin':
     import chiptest.darwin
