@@ -321,8 +321,8 @@ public:
     CameraError StopAudioPlaybackStream();
 
     // Timestamp handling for video and audio streams
-    std::map<uint16_t, int64_t> mVideoStreamFirstPts;
-    std::map<uint16_t, int64_t> mAudioStreamFirstPts;
+    std::map<uint16_t, int64_t> mVideoStreamPtsOffsetMs;
+    std::map<uint16_t, int64_t> mAudioStreamPtsOffsetMs;
 
 private:
     int videoDeviceFd            = -1;
