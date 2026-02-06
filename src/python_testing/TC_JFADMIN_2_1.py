@@ -178,7 +178,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
                 nodeId=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
                 returnClusterObject=True)
             attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
-            asserts.assert_true(attributeAdminFabricIndex in range(1, 255), 
+            asserts.assert_true(attributeAdminFabricIndex in range(1, 255),
                                 f"AdministratorFabricIndex={attributeAdminFabricIndex} not in expected range [1..254]")
 
             # Step 3 is under same PICS guard as Step 2 becasue it relies on attributeAdminFabricIndex
@@ -193,7 +193,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
                     fabricid_found = True
                     log.info( f"Found matching fabricIndex={attributeAdminFabricIndex} on fabricID={fabric.fabricID}")
                     break
-            asserts.assert_true(fabricid_found, 
+            asserts.assert_true(fabricid_found,
                                 "No FabricDescriptorStruct with fabricIndex = AdministratorFabricIndex found in Operational Cluster Fabrics attribute on EP0")
 
         # Shutdown the Python Controllers started at the beginning of this script
