@@ -148,7 +148,7 @@ private:
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
-    std::vector<ICEServerInfo> mIceServers;
+    std::vector<ICEServerInfo> mICEServers;
 
     std::mutex mTrackStatusLock;
 };

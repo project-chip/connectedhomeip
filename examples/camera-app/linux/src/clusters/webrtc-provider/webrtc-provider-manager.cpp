@@ -107,12 +107,12 @@ bool ValidateSdpFields(const std::string & sdp)
  * @brief Converts Matter ICE server structures to the internal ICEServerInfo format.
  *
  * @param matterIceServers The Matter protocol ICE server list
- * @return std::vector<ICEServerInfo> The converted ICE server info list
+ * @param[out] iceServers The converted ICE server info list
+ * @return CHIP_ERROR CHIP_NO_ERROR on success, or an error from iterator parsing
  */
 template <typename T>
-std::vector<ICEServerInfo> ConvertICEServers(const T & matterIceServers)
+CHIP_ERROR ConvertICEServers(const T & matterIceServers, std::vector<ICEServerInfo> & iceServers)
 {
-    std::vector<ICEServerInfo> iceServers;
     for (const auto & server : matterIceServers)
     {
         ICEServerInfo info;
@@ -121,6 +121,7 @@ std::vector<ICEServerInfo> ConvertICEServers(const T & matterIceServers)
         {
             info.urls.emplace_back(urlsIter.GetValue().data(), urlsIter.GetValue().size());
         }
+        ReturnErrorOnFailure(urlsIter.GetStatus());
         if (server.username.HasValue())
         {
             info.username = std::string(server.username.Value().data(), server.username.Value().size());
@@ -134,7 +135,7 @@ std::vector<ICEServerInfo> ConvertICEServers(const T & matterIceServers)
             iceServers.push_back(std::move(info));
         }
     }
-    return iceServers;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -245,7 +246,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     if (args.iceServers.HasValue())
     {
-        transport->SetICEServers(ConvertICEServers(args.iceServers.Value()));
+        std::vector<ICEServerInfo> iceServers;
+        ReturnErrorOnFailure(ConvertICEServers(args.iceServers.Value(), iceServers));
+        transport->SetICEServers(iceServers);
+    }
+    else
+    {
+        ChipLogProgress(Camera, "No ICE servers provided; ICE negotiation will be limited to host candidates");
     }
 
     // Check resource availability before proceeding
@@ -459,7 +466,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     if (args.iceServers.HasValue())
     {
-        transport->SetICEServers(ConvertICEServers(args.iceServers.Value()));
+        std::vector<ICEServerInfo> iceServers;
+        ReturnErrorOnFailure(ConvertICEServers(args.iceServers.Value(), iceServers));
+        transport->SetICEServers(iceServers);
+    }
+    else
+    {
+        ChipLogProgress(Camera, "No ICE servers provided; ICE negotiation will be limited to host candidates");
     }
 
     transport->Start();

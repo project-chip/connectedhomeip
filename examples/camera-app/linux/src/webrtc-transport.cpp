@@ -64,7 +64,7 @@ void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
 
 void WebrtcTransport::SetICEServers(const std::vector<ICEServerInfo> & servers)
 {
-    mIceServers = servers;
+    mICEServers = servers;
 }
 
 WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
@@ -200,7 +200,7 @@ void WebrtcTransport::Start()
         return;
     }
 
-    mPeerConnection = CreateWebRTCPeerConnection(mIceServers);
+    mPeerConnection = CreateWebRTCPeerConnection(mICEServers);
 
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
                                   [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },
