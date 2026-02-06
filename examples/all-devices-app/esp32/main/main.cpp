@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -29,6 +30,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -181,7 +183,8 @@ void DeviceEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg
              static_cast<unsigned int>(heap_caps_get_total_size(MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM)));
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate,
+                                                                     TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     // Initialize the attribute persistence provider with the storage delegate
     CHIP_ERROR err = gAttributePersistenceProvider.Init(delegate);
@@ -196,19 +199,30 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to get DeviceInstanceInfoProvider.");
+        return nullptr;
+    }
+
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
         RootNodeDevice::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .accessControl          = Server::GetInstance().GetAccessControl(),              //
-                .persistentStorage      = Server::GetInstance().GetPersistentStorage(),          //
-                .failSafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
-                .groupDataProvider      = gGropupDataProvider,                                   //
-                .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
-                .dnssdServer            = DnssdServer::Instance(),                               //
+            .commissioningWindowManager     = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+                .accessControl              = Server::GetInstance().GetAccessControl(),              //
+                .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+                .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+                .deviceInstanceInfoProvider = *provider,                                             //
+                .platformManager            = DeviceLayer::PlatformMgr(),                            //
+                .groupDataProvider          = gGroupDataProvider,                                    //
+                .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+                .dnssdServer                = DnssdServer::Instance(),                               //
+                .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
+                .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
+                .testEventTriggerDelegate   = testEventTriggerDelegate,                              //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -260,7 +274,8 @@ void InitServer(intptr_t context)
         return;
     }
 
-    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider =
+        PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 

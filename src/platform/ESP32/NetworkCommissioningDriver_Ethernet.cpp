@@ -54,7 +54,7 @@ CHIP_ERROR ESPEthernetDriver::Init(NetworkStatusChangeCallback * networkStatusCh
     phy_config.phy_addr         = CONFIG_ETH_PHY_ADDR;
     phy_config.reset_gpio_num   = CONFIG_ETH_PHY_RST_GPIO;
 
-#if CONFIG_ETH_USE_OPENETH
+#ifdef CONFIG_ETH_USE_OPENETH
     esp_eth_mac_t * mac = esp_eth_mac_new_openeth(&mac_config);
     esp_eth_phy_t * phy = esp_eth_phy_new_dp83848(&phy_config);
 #else // Default ethernet board configuration

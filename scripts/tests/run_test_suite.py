@@ -488,6 +488,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                 setup_app_link_up=not wifi_required,
+                add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
                 app_link_name='wlx-app' if wifi_required else 'eth-app'))
@@ -541,6 +542,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         test_end = time.monotonic()
                         log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
                 except Exception:
+                    if os.path.exists('thread.pcap'):
+                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                     observed_failures += 1

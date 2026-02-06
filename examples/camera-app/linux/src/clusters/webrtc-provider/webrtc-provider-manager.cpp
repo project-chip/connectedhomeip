@@ -22,6 +22,7 @@
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <webrtc-transport.h>
 
@@ -36,6 +37,7 @@ namespace {
 
 // Constants
 constexpr uint16_t kMaxConcurrentWebRTCSessions = 5;
+constexpr uint32_t kConnectionTimeoutSeconds    = 30;
 
 /**
  * @brief Validates that an SDP contains the minimum required fields for WebRTC.
@@ -99,6 +101,41 @@ bool ValidateSdpFields(const std::string & sdp)
     }
 
     return true;
+}
+
+/**
+ * @brief Converts Matter ICE server structures to the internal ICEServerInfo format.
+ *
+ * @param matterIceServers The Matter protocol ICE server list
+ * @param[out] iceServers The converted ICE server info list
+ * @return CHIP_ERROR CHIP_NO_ERROR on success, or an error from iterator parsing
+ */
+template <typename T>
+CHIP_ERROR ConvertICEServers(const T & matterIceServers, std::vector<ICEServerInfo> & iceServers)
+{
+    for (const auto & server : matterIceServers)
+    {
+        ICEServerInfo info;
+        auto urlsIter = server.URLs.begin();
+        while (urlsIter.Next())
+        {
+            info.urls.emplace_back(urlsIter.GetValue().data(), urlsIter.GetValue().size());
+        }
+        ReturnErrorOnFailure(urlsIter.GetStatus());
+        if (server.username.HasValue())
+        {
+            info.username = std::string(server.username.Value().data(), server.username.Value().size());
+        }
+        if (server.credential.HasValue())
+        {
+            info.credential = std::string(server.credential.Value().data(), server.credential.Value().size());
+        }
+        if (!info.urls.empty())
+        {
+            iceServers.push_back(std::move(info));
+        }
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -207,6 +244,17 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
         ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
     }
 
+    if (args.iceServers.HasValue())
+    {
+        std::vector<ICEServerInfo> iceServers;
+        ReturnErrorOnFailure(ConvertICEServers(args.iceServers.Value(), iceServers));
+        transport->SetICEServers(iceServers);
+    }
+    else
+    {
+        ChipLogProgress(Camera, "No ICE servers provided; ICE negotiation will be limited to host candidates");
+    }
+
     // Check resource availability before proceeding
     // If we cannot allocate resources, send End command with OutOfResources reason
     if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
@@ -232,6 +280,9 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
     transport->MoveToState(WebrtcTransport::State::SendingOffer);
+
+    // Start a connection timeout timer to clean up stale sessions that never reach Connected state
+    StartConnectionTimer(args.sessionId);
 
     ChipLogProgress(Camera, "Generate and set the SDP");
     if (transport->GetPeerConnection())
@@ -413,6 +464,17 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
     }
 
+    if (args.iceServers.HasValue())
+    {
+        std::vector<ICEServerInfo> iceServers;
+        ReturnErrorOnFailure(ConvertICEServers(args.iceServers.Value(), iceServers));
+        transport->SetICEServers(iceServers);
+    }
+    else
+    {
+        ChipLogProgress(Camera, "No ICE servers provided; ICE negotiation will be limited to host candidates");
+    }
+
     transport->Start();
     auto peerConnection  = transport->GetPeerConnection();
     std::string audioMid = ExtractMidFromSdp(args.sdp, "audio");
@@ -431,6 +493,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
     transport->MoveToState(WebrtcTransport::State::SendingAnswer);
+
+    // Start a connection timeout timer to clean up stale sessions that never reach Connected state
+    StartConnectionTimer(args.sessionId);
 
     if (peerConnection != nullptr)
     {
@@ -529,25 +594,9 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         ChipLogError(Camera, "Session ID %u does not match the current sessions", sessionId);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (transport != nullptr)
-    {
-        ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
 
-        // Release the Video and Audio Streams from the CameraAVStreamManagement
-        // cluster and update the reference counts.
-        // TODO: Lookup the sessionID to get the Video/Audio StreamID
-        TEMPORARY_RETURN_IGNORED ReleaseAudioVideoStreams(sessionId);
-
-        UnregisterWebrtcTransport(sessionId);
-        mWebrtcTransportMap.erase(sessionId);
-        WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-        mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
-    }
-
-    if (transport->ClosePeerConnection())
-    {
-        ChipLogProgress(Camera, "Closing peer connection: %u", sessionId);
-    }
+    ChipLogProgress(Camera, "EndSession for session: %u, reason: %u", sessionId, static_cast<unsigned>(reasonCode));
+    CleanupSession(sessionId);
 
     return CHIP_NO_ERROR;
 }
@@ -919,18 +968,7 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
         }
 
         err = self->SendEndCommand(exchangeMgr, sessionHandle, sessionId, endReason);
-        // Release the Video and Audio Streams from the CameraAVStreamManagement
-        // cluster and update the reference counts.
-        TEMPORARY_RETURN_IGNORED self->ReleaseAudioVideoStreams(sessionId);
-        self->UnregisterWebrtcTransport(sessionId);
-        WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-        self->mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
-
-        transport->MoveToState(WebrtcTransport::State::Idle);
-
-        // remove from current sessions list
-        self->mWebRTCTransportProvider->RemoveSession(sessionId);
-        self->mWebrtcTransportMap.erase(sessionId);
+        self->CleanupSession(sessionId);
         break;
     }
     default:
@@ -949,6 +987,37 @@ void WebRTCProviderManager::OnDeviceConnectionFailure(void * context, const Scop
     LogErrorOnFailure(err);
     WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnectionFailure: context is null"));
+}
+
+void WebRTCProviderManager::CleanupSession(uint16_t sessionId)
+{
+    WebrtcTransport * transport = GetTransport(sessionId);
+    if (transport == nullptr)
+    {
+        ChipLogProgress(Camera, "Transport not found for session %u; session may have already been cleaned up", sessionId);
+        return;
+    }
+
+    // Release the Video and Audio Streams from the CameraAVStreamManagement
+    // cluster and update the reference counts.
+    TEMPORARY_RETURN_IGNORED ReleaseAudioVideoStreams(sessionId);
+
+    // Capture args before cleanup in case the transport is invalidated
+    WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
+
+    // Unregister the transport from the media controller
+    UnregisterWebrtcTransport(sessionId);
+
+    // Close the peer connection
+    transport->ClosePeerConnection();
+
+    // Remove from session maps
+    mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
+
+    // Finally, remove and destroy the transport
+    mWebrtcTransportMap.erase(sessionId);
+
+    ChipLogProgress(Camera, "Session %u cleanup completed", sessionId);
 }
 
 WebrtcTransport * WebRTCProviderManager::GetTransport(uint16_t sessionId)
@@ -1060,6 +1129,11 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
 {
     ChipLogProgress(Camera, "Connection state changed for session %u: %s", sessionId, connected ? "connected" : "disconnected");
 
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+        // Cancel any pending connection timeout timer for this session
+        CancelConnectionTimer(sessionId);
+    });
+
     if (connected)
     {
         RegisterWebrtcTransport(sessionId);
@@ -1070,30 +1144,8 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
         // Safe to capture 'this' by value: WebRTCProviderManager is a member of the global CameraDevice
         // object which has static storage duration and lives for the entire program lifetime.
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
-            WebrtcTransport * transport = GetTransport(sessionId);
-            if (transport == nullptr)
-            {
-                ChipLogProgress(Camera,
-                                "Transport not found for session %u during disconnect; session may have already been cleaned up",
-                                sessionId);
-                return;
-            }
-
-            // Connection was closed/disconnected by the peer - clean up the session
             ChipLogProgress(Camera, "Peer connection closed for session %u, cleaning up resources", sessionId);
-
-            // Release the Video and Audio Streams from the CameraAVStreamManagement
-            // cluster and update the reference counts.
-            TEMPORARY_RETURN_IGNORED ReleaseAudioVideoStreams(sessionId);
-
-            // Capture args before unregistering in case the transport is invalidated
-            WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
-
-            // Unregister the transport from the media controller
-            UnregisterWebrtcTransport(sessionId);
-
-            // Remove from session maps
-            mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
+            CleanupSession(sessionId);
 
             // Remove from current sessions list in the WebRTC Transport Provider
             // This MUST be called on the Matter thread with the stack lock held
@@ -1101,11 +1153,6 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
             {
                 mWebRTCTransportProvider->RemoveSession(sessionId);
             }
-
-            // Finally, remove and destroy the transport
-            mWebrtcTransportMap.erase(sessionId);
-
-            ChipLogProgress(Camera, "Session %u cleanup completed", sessionId);
         });
     }
 }
@@ -1280,4 +1327,65 @@ CHIP_ERROR WebRTCProviderManager::ReleaseAudioVideoStreams(uint16_t sessionId)
 
     return mCameraDevice->GetCameraAVStreamMgmtController().OnTransportReleaseAudioVideoStreams(args.audioStreams,
                                                                                                 args.videoStreams);
+}
+
+void WebRTCProviderManager::StartConnectionTimer(uint16_t sessionId)
+{
+    // Cancel any existing timer for this session
+    CancelConnectionTimer(sessionId);
+
+    auto * ctx     = chip::Platform::New<ConnectionTimeoutContext>();
+    ctx->manager   = this;
+    ctx->sessionId = sessionId;
+
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kConnectionTimeoutSeconds),
+                                                           OnConnectionTimeoutCallback, ctx);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "Failed to start connection timeout timer for session %u: %" CHIP_ERROR_FORMAT, sessionId,
+                     err.Format());
+        chip::Platform::Delete(ctx);
+    }
+    else
+    {
+        // Store the context for potential cancellation
+        mConnectionTimerContexts[sessionId] = ctx;
+    }
+}
+
+void WebRTCProviderManager::CancelConnectionTimer(uint16_t sessionId)
+{
+    auto it = mConnectionTimerContexts.find(sessionId);
+    if (it != mConnectionTimerContexts.end())
+    {
+        ConnectionTimeoutContext * ctx = it->second;
+        DeviceLayer::SystemLayer().CancelTimer(OnConnectionTimeoutCallback, ctx);
+        chip::Platform::Delete(ctx);
+        mConnectionTimerContexts.erase(it);
+        ChipLogProgress(Camera, "Cancelled connection timeout timer for session %u", sessionId);
+    }
+}
+
+void WebRTCProviderManager::OnConnectionTimeoutCallback(chip::System::Layer * systemLayer, void * context)
+{
+    auto * ctx = static_cast<ConnectionTimeoutContext *>(context);
+
+    // Remove from the map before handling timeout (timer already fired)
+    ctx->manager->mConnectionTimerContexts.erase(ctx->sessionId);
+    ctx->manager->HandleConnectionTimeout(ctx->sessionId);
+    chip::Platform::Delete(ctx);
+}
+
+void WebRTCProviderManager::HandleConnectionTimeout(uint16_t sessionId)
+{
+    WebrtcTransport * transport = GetTransport(sessionId);
+    if (transport == nullptr)
+    {
+        ChipLogProgress(Camera, "Session: %u was already cleaned up", sessionId);
+        return;
+    }
+
+    ChipLogError(Camera, "Connection timeout for session %u after %u seconds, cleaning up stale session", sessionId,
+                 kConnectionTimeoutSeconds);
+    CleanupSession(sessionId);
 }
