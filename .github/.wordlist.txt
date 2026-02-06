@@ -711,6 +711,7 @@ ICD
 ICDs
 iCloud
 ICMP
+idempotency
 IDF
 IDL
 IDLs
@@ -956,6 +957,7 @@ MLD
 mmevk
 moal
 Mobly
+Mockito
 ModeSelect
 modprobe
 Modustoolbox
@@ -1243,6 +1245,8 @@ Realtek
 rebase
 recommand
 recommanded
+Reconnection
+reconnection
 recurse
 refrigeratoralarm
 regen
