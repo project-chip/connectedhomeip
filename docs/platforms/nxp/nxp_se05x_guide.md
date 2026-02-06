@@ -115,8 +115,9 @@ and all-clusters-app examples.
 **Prerequisites:** Refer to [RT1060](nxp_rt1060_guide.md) to set up the build
 environment.
 
-Refer to [RW61x and SE05x](./nxp_rt1060_guide.md#se05x_secure_element_with_rt1060)
-for detailed hardware connections and build instructions.
+Refer to
+[RW61x and SE05x](./nxp_rt1060_guide.md#se05x_secure_element_with_rt1060) for
+detailed hardware connections and build instructions.
 
 Refer to [SE05x Crypto Configurations](#se05x_crypto_configurations) to control
 which crypto operations are offloaded to SE05x.
@@ -334,7 +335,8 @@ gn gen out --args="chip_se05x_spake_verifier=true chip_se05x_spake_verifier_use_
 
 **CMake Build:**
 
-**Note:** Factory data must be provisioned first to use Trust provisioned values. Refer to [NXP Manufacturing Flow](nxp_manufacturing_flow.md).
+**Note:** Factory data must be provisioned first to use Trust provisioned
+values. Refer to [NXP Manufacturing Flow](nxp_manufacturing_flow.md).
 
 ```bash
 west build -d <out_dir> -b <board> <example_path> -DCONF_FILE_NAME=prj_wifi_fdata.conf -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO=1 -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITTER_CNT=1000

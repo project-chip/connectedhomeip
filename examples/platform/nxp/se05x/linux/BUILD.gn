@@ -19,8 +19,8 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
-import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
+import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
 if (current_os != "nuttx") {
@@ -108,8 +108,8 @@ source_set("commodity-metering-test-event-trigger") {
 
 source_set("linux-commissionable-data-provider") {
   sources = [
-    "LinuxCommissionableDataProvider_se05x.cpp",
     "../../../linux/LinuxCommissionableDataProvider.h",
+    "LinuxCommissionableDataProvider_se05x.cpp",
   ]
   public_deps = [
     "${chip_root}/src/lib/core",
@@ -193,12 +193,12 @@ source_set("app-main") {
   ]
 
   sources = [
-    "AppMain.cpp",
     "../../../linux/AppMain.h",
     "../../../linux/CommissionableInit.cpp",
     "../../../linux/CommissionableInit.h",
     "../../../linux/NamedPipeCommands.cpp",
     "../../../linux/NamedPipeCommands.h",
+    "AppMain.cpp",
   ]
 
   public_deps = [

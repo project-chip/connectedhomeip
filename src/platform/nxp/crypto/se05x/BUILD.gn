@@ -37,9 +37,9 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_p256.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_pbkdf.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_spake2p.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
-    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_spake2p.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.cpp",
   ]
 
@@ -95,7 +95,9 @@ static_library("nxp_crypto_lib") {
       "SE05X_SPAKE_VERIFIER_TP_SET_NO=$chip_se05x_spake_verifier_tp_set_no",
     ]
 
-    defines += [ "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt" ]
+    defines += [
+      "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt",
+    ]
   }
 
   external_mbedtls = current_os == "zephyr" || nxp_external_sdk
@@ -111,7 +113,7 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/third_party/inipp",
   ]
 
-  if ((nxp_platform != "rt/rw61x") && (nxp_platform != "rt/rt1060")) {
+  if (nxp_platform != "rt/rw61x" && nxp_platform != "rt/rt1060") {
     public_deps += [ "${chip_root}/src/platform" ]
     public_deps += [ "${chip_root}/src/app/server" ]
   }

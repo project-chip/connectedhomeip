@@ -23,8 +23,8 @@ namespace chip {
 
 using namespace chip::Crypto;
 
-#define CHIP_SE05x_NODE_OP_KEY_INDEX            (SE051H_NODE_OP_KEY_ID - 1)
-#define NUM_NODE_OP_KEY_INDEXES                 (5)                                                                                      \
+#define CHIP_SE05x_NODE_OP_KEY_INDEX (SE051H_NODE_OP_KEY_ID - 1)
+#define NUM_NODE_OP_KEY_INDEXES (5)
 
 #define CHIP_SE05x_NODE_OP_REF_KEY_TEMPLATE                                                                                        \
     {                                                                                                                              \

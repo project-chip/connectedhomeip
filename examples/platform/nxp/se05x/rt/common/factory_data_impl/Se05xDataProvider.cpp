@@ -60,7 +60,8 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(char * buf, uint16_t bufL
     /* 3 set of verifiers are provisioned in se05x. Each with 4 bytes passcode and 32 bytes salt */
     uint8_t offset = (SE05X_SPAKE_VERIFIER_TP_SET_NO - 1) * (kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x);
 
-    if (certLen == 0) {
+    if (certLen == 0)
+    {
         certLen = sizeof(cert);
 
         err = se05x_get_certificate(kSpake2p_Pwd_Salt_Bin_File_id, cert, &certLen);
@@ -70,10 +71,11 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(char * buf, uint16_t bufL
     VerifyOrReturnError(certLen >= (offset + kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x),
                         CHIP_ERROR_INTERNAL);
 
-    if (buf != NULL && outLen != NULL){
+    if (buf != NULL && outLen != NULL)
+    {
         VerifyOrReturnError(bufLen >= kSaltLen, CHIP_ERROR_INTERNAL);
         memcpy(buf, cert + offset + kSpake2p_Passcode_Length_SE05x, kSaltLen);
-        *outLen            = kSaltLen;
+        *outLen = kSaltLen;
     }
 
     return CHIP_NO_ERROR;
@@ -99,11 +101,12 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSalt(MutableByteSpan & saltBuf)
 
 CHIP_ERROR Se05xDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (certLen == 0){
-        // Call GetSpake2pSaltBuffer to read the certificate 
-        err                                     = GetSpake2pSaltBuffer(NULL, 0, NULL);
+    if (certLen == 0)
+    {
+        // Call GetSpake2pSaltBuffer to read the certificate
+        err = GetSpake2pSaltBuffer(NULL, 0, NULL);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
@@ -114,8 +117,8 @@ CHIP_ERROR Se05xDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
     /* 3 set of verifiers are provisioned in se05x. Each with 4 bytes passcode and 32 bytes salt */
     uint8_t offset = (SE05X_SPAKE_VERIFIER_TP_SET_NO - 1) * (kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x);
 
-    setupPasscode = (BCD_TO_DEC(cert[offset + 3])) + (100 * BCD_TO_DEC(cert[offset + 2])) +
-        (10000 * BCD_TO_DEC(cert[offset + 1])) + (1000000 * BCD_TO_DEC(cert[offset]));
+    setupPasscode = (BCD_TO_DEC(cert[offset + 3])) + (100 * BCD_TO_DEC(cert[offset + 2])) + (10000 * BCD_TO_DEC(cert[offset + 1])) +
+        (1000000 * BCD_TO_DEC(cert[offset]));
     return err;
 }
 
@@ -136,11 +139,10 @@ CHIP_ERROR Se05xDataProviderImpl::GetDeviceAttestationCert(MutableByteSpan & out
     out_dac_buffer.reduce_size(buflen);
     out_dac_buffer = out_dac_buffer.SubSpan(4); // ignoring TLV of DA certificate
     return CHIP_NO_ERROR;
-
 }
 
 CHIP_ERROR Se05xDataProviderImpl::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
-                                                                 MutableByteSpan & out_signature_buffer)
+                                                               MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
