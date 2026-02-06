@@ -345,10 +345,14 @@ PICS:
     # Joint Fabric Administrator
     #
 
-    - label: "Does the device implement Joint Fabric Administrator cluster as server?"
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          server?"
       id: JFADMIN.S
 
-    - label: "Does the device implement Joint Fabric Administrator cluster as client?"
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          client?"
       id: JFADMIN.C
 
     - label: "Does the device implement AdministratorFabricIndex attribute?"
