@@ -492,7 +492,7 @@ class TestDefinition:
                             target.command, self.name)
             if not dry_run:
                 for key, subproc in subproc_info_repo.items():
-                    # Do not add tools to the register
+                    # Do not add controller tools to the register
                     if subproc.kind == SubprocessKind.CTRL:
                         continue
 
