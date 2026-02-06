@@ -28,6 +28,7 @@ from chiptest.test_definition import TEST_THREAD_DATASET
 
 log = logging.getLogger(__name__)
 
+
 class ThreadBorderRouter:
 
     # The Thread radio simulation node id, choose other if there is a conflict.
