@@ -33,7 +33,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 
 from mobly import asserts
