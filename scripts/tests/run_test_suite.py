@@ -41,7 +41,7 @@ if sys.platform == 'linux':
 
     with PythonPath(os.path.join(DEFAULT_CHIP_ROOT, 'src/python_testing/matter_testing_infrastructure/matter/testing'), relative_to=__file__):
         from linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, LinuxNamespacedExecutor, WpaSupplicantMock,
-                           ensure_network_namespace_availability, ensure_private_state)
+                           ThreadBorderRouter, ensure_network_namespace_availability, ensure_private_state)
 
 if sys.platform == 'darwin':
     import chiptest.darwin
@@ -498,9 +498,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
             elif commissioning_method == 'ble-thread':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.ThreadBorderRouter(ns))
+                to_terminate.append(DBusTestSystemBus())
+                to_terminate.append(BluetoothMock())
+                to_terminate.append(ThreadBorderRouter(ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 

@@ -57,6 +57,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/linux/bluetooth.py",
     "matter/testing/linux/dbus.py",
     "matter/testing/linux/namespace.py",
+    "matter/testing/linux/thread.py",
     "matter/testing/linux/wifi.py",
     "matter/testing/matchers.py",
     "matter/testing/matter_asserts.py",
