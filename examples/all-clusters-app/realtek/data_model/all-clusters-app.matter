@@ -6652,7 +6652,7 @@ cluster OccupancySensing = 1030 {
     percent confidence = 3;
   }
 
-  info event OccupancyChanged = 0 {
+  provisional info event OccupancyChanged = 0 {
     OccupancyBitmap occupancy = 0;
   }
 
@@ -6661,7 +6661,7 @@ cluster OccupancySensing = 1030 {
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) optional int16u holdTime = 3;
   readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
-  readonly attribute optional PredictedOccupancyStruct predictedOccupancy[] = 5;
+  provisional readonly attribute optional PredictedOccupancyStruct predictedOccupancy[] = 5;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
