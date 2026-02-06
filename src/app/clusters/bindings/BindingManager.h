@@ -182,13 +182,13 @@ private:
     struct BindingFabricTableDelegate : public chip::FabricTable::Delegate
     {
         Manager & bindingManager;
-        Table & bindingTable;
 
         BindingFabricTableDelegate(Manager & manager) : bindingManager(manager) {}
 
         void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
         {
-            auto iter = bindingTable.begin();
+            auto & bindingTable = bindingManager.GetBindingTable();
+            auto iter           = bindingTable.begin();
             while (iter != bindingTable.end())
             {
                 if (iter->fabricIndex == fabricIndex)
@@ -208,10 +208,10 @@ private:
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
-    PendingNotificationMap mPendingNotificationMap;
+    Table mBindingTable;
+    PendingNotificationMap mPendingNotificationMap{ mBindingTable };
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     ManagerInitParams mInitParams;
-    Table mBindingTable;
     BindingFabricTableDelegate mFabricTableDelegate;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
