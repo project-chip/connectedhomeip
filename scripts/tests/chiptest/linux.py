@@ -94,6 +94,9 @@ class NetworkLinkBase:
     def __post_init__(self) -> None:
         self._executed_commands: list[NetworkLinkCmd] = []
 
+        self._setup_cmds: tuple[NetworkLinkCmd,...] = ()
+        self._link_up_cmds: tuple[NetworkLinkCmd,...] = ()
+
     def _run_up(self, *commands: NetworkLinkCmd) -> None:
         for c in commands:
             c.up()
@@ -101,14 +104,14 @@ class NetworkLinkBase:
 
     def setup(self) -> None:
         """Set up the link without bringing the link up."""
-        self._run_up(*self.setup_cmds)
+        self._run_up(*self._setup_cmds)
 
     def link_up(self, *args: Any, **kwargs: Any) -> None:
         """Bring the link up.
 
         Subclasses might add additional arguments.
         """
-        self._run_up(*self.link_up_cmds)
+        self._run_up(*self._link_up_cmds)
 
     def terminate(self) -> None:
         """Deconstruct the link by executing down commands for all executed commands."""
@@ -118,15 +121,6 @@ class NetworkLinkBase:
             except Exception as e:
                 log.warning("Encountered error during network link termination: %r", e)
 
-    @property
-    def setup_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        """Commands used to set up the link."""
-        return ()
-
-    @property
-    def link_up_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        """Commands used to bring up the link."""
-        return ()
 
 
 @dataclasses.dataclass
@@ -138,13 +132,8 @@ class NetworkBridge(NetworkLinkBase):
         super().__post_init__()
         self.name = f"{self.name}-{self.index}"
 
-    @property
-    def setup_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (NetworkLinkCmd(f"ip link add {self.name} type bridge", f"ip link delete {self.name}"),)
-
-    @property
-    def link_up_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (NetworkLinkCmd(f"ip link set {self.name} up", f"ip link set {self.name} down"),)
+        self._setup_cmds = (NetworkLinkCmd(f"ip link add {self.name} type bridge", f"ip link delete {self.name}"),)
+        self._link_up_cmds = (NetworkLinkCmd(f"ip link set {self.name} up", f"ip link set {self.name} down"),)
 
 
 @dataclasses.dataclass
@@ -160,24 +149,15 @@ class NetworkLink(NetworkLinkBase):
         self.switch_name = f"{self.link_name}-sw-{self.index}"
         self.link_name = f"{self.link_name}-{self.index}"
 
-    def link_up(self, wait_for_dad: bool = True) -> None:
-        super().link_up()
-        if wait_for_dad:
-            self.wait_for_duplicate_address_detection()
-
-    @property
-    def setup_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (
+        self._setup_cmds = (
             NetworkLinkCmd(f"ip link add {self.link_name} type veth peer name {self.switch_name}",
                            f"ip link delete {self.switch_name}"),
             NetworkLinkCmd(f"ip link set {self.switch_name} master {self.bridge.name}"),
             NetworkLinkCmd(f"sysctl -w net.ipv6.conf.all.forwarding=1"),
             NetworkLinkCmd(f"sysctl -w net.ipv6.conf.default.forwarding=1"),
+            NetworkLinkCmd(f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra_rt_info_max_plen=64"),
         )
-
-    @property
-    def link_up_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (
+        self._link_up_cmds = (
             NetworkLinkCmd(f"ip addr add {self.ipv4} dev {self.link_name}", f"ip addr del {self.ipv4} dev {self.link_name}"),
             NetworkLinkCmd(f"ip link set dev {self.link_name} up", f"ip link set dev {self.link_name} down"),
             NetworkLinkCmd(f"ip link set dev {self.switch_name} up", f"ip link set dev {self.switch_name} down"),
@@ -186,6 +166,11 @@ class NetworkLink(NetworkLinkBase):
             NetworkLinkCmd(f"ip -6 addr flush {self.link_name}"),
             NetworkLinkCmd(f"ip -6 a add {self.ipv6} dev {self.link_name}"),
         )
+
+    def link_up(self, wait_for_dad: bool = True) -> None:
+        super().link_up()
+        if wait_for_dad:
+            self.wait_for_duplicate_address_detection()
 
     @staticmethod
     def wait_for_duplicate_address_detection() -> bool:
@@ -210,9 +195,7 @@ class NetworkNamespace(NetworkLink):
         super().__post_init__()
         self.ns_name = f"{self.ns_name}-{self.index}"
 
-    @property
-    def setup_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (
+        self._setup_cmds = (
             # The namespace itself.
             NetworkLinkCmd(f"ip netns add {self.ns_name}", f"ip netns del {self.ns_name}"),
 
@@ -226,10 +209,7 @@ class NetworkNamespace(NetworkLink):
             # Attach link to the bridge interface.
             NetworkLinkCmd(f"ip link set {self.switch_name} master {self.bridge.name}")
         )
-
-    @property
-    def link_up_cmds(self) -> tuple[NetworkLinkCmd, ...]:
-        return (
+        self._link_up_cmds = (
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip addr add {self.ipv4} dev {self.link_name}"),
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip link set dev {self.link_name} up"),
             NetworkLinkCmd(f"ip netns exec {self.ns_name} ip link set dev lo up"),
