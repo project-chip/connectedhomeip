@@ -131,7 +131,7 @@ class NetworkCmdHandler:
             cmd.up()
 
     def setup(self) -> None:
-        """Set up the network resource without bringing the it up."""
+        """Set up the network resource without bringing it up."""
         for dep in self._dependencies:
             dep.setup()
         self._run_up(self._setup_cmds)
