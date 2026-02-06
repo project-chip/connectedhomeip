@@ -486,7 +486,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 app_link_up=not wifi_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if wifi_required else 'eth-app'))
+                app_name='wlx-app' if wifi_required else 'eth-app'))
 
             if commissioning_method == 'ble-wifi':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
