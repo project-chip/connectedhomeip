@@ -531,8 +531,8 @@ CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId,
         ChipLogError(AppServer, "Failed to allocate memory for EPM Delegate");
         return CHIP_ERROR_NO_MEMORY;
     }
-    aInstance = std::make_unique<ElectricalPowerMeasurementInstance>(endpointId, *aDelegate, aFeature, aOptionalAttributes);
 
+    aInstance = std::make_unique<ElectricalPowerMeasurementInstance>(endpointId, *aDelegate, aFeature, aOptionalAttributes);
     if (!aInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EPM Instance");

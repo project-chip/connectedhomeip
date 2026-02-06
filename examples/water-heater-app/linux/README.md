@@ -290,7 +290,8 @@ Out[2]: <matter.native.PyChipError object at 0x7f2432b16140>
     reverting to the previous mode.
 
 ```python
-   await devCtrl.SendCommand(1234, 1, matter.clusters.WaterHeaterManagement.Commands.Boost(duration=1800))
+   await devCtrl.SendCommand(1234, endpoint=1, payload=matter.clusters.WaterHeaterManagement.Commands.Boost(boostInfo=matter.clusters.WaterHeaterManag
+       ⋮ ement.Structs.WaterHeaterBoostInfoStruct(duration=1800, targetPercentage=80)))
 ```
 
 The output should look like:
@@ -301,6 +302,12 @@ Attribute Changed:
 │   'Endpoint': 1,
 │   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.BoostState'>,
 │   'Value': <BoostStateEnum.kActive: 1>
+}
+Attribute Changed:
+{
+│   'Endpoint': 1,
+│   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.HeatDemand'>,
+│   'Value': 1
 }
 ```
 
@@ -313,6 +320,12 @@ Attribute Changed:
 │   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.BoostState'>,
 │   'Value': <BoostStateEnum.kInactive: 0>
 }
+Attribute Changed:
+{
+│   'Endpoint': 1,
+│   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.HeatDemand'>,
+│   'Value': 0
+}
 ```
 
 Note that you can cancel the boost state early by sending the `CancelBoost`
@@ -320,6 +333,23 @@ command:
 
 ```python
    await devCtrl.SendCommand(1234, 1, matter.clusters.WaterHeaterManagement.Commands.CancelBoost())
+```
+
+result:
+
+```python
+Attribute Changed:
+{
+│   'Endpoint': 1,
+│   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.BoostState'>,
+│   'Value': <BoostStateEnum.kInactive: 0>
+}
+Attribute Changed:
+{
+│   'Endpoint': 1,
+│   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.HeatDemand'>,
+│   'Value': 0
+}
 ```
 
 ### Using matter-repl to Fake a water heater installation
@@ -342,6 +372,19 @@ matter-repl):
 ```python
     # send 1st event trigger to simulate basic installation
     await devCtrl.SendCommand(1234, 0, matter.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0094000000000000))
+
+Attribute Changed:
+{
+│   'Endpoint': 1,
+│   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.TankVolume'>,
+│   'Value': 100
+}
+Attribute Changed:
+{
+│   'Endpoint': 1,
+│   'Attribute': <class 'matter.clusters.Objects.WaterHeaterManagement.Attributes.HeaterTypes'>,
+│   'Value': 3
+}
 
     # send 2nd event trigger to simulate drawing hot water
     await devCtrl.SendCommand(1234, 0, matter.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0094000000000001))
