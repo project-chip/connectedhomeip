@@ -27,13 +27,12 @@ from typing import Protocol
 import chiptest
 import click
 import coloredlogs
+from chiptest import linux
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessKind
-from chiptest import linux
-from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
+from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
-from chiptest.test_definition import TEST_THREAD_DATASET
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))

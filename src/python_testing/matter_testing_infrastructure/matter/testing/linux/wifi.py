@@ -27,7 +27,6 @@ import threading
 from typing import Union
 
 import sdbus
-
 from chiptest.linux import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
