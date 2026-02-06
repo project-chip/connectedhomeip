@@ -14,14 +14,11 @@
 #    limitations under the License.
 #
 
-from __future__ import annotations
-
 import logging
 import subprocess
 import threading
 
 log = logging.getLogger(__name__)
-
 
 class BluetoothMock(subprocess.Popen[str]):
     """Run a BlueZ mock server in a subprocess."""

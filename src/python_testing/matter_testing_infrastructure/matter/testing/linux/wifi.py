@@ -28,7 +28,7 @@ from typing import Union
 
 import sdbus
 
-from .namespace import IsolatedNetworkNamespace
+from chiptest.linux import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 

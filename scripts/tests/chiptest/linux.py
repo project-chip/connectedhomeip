@@ -18,8 +18,6 @@
 Handles linux-specific functionality for running test cases
 """
 
-from __future__ import annotations
-
 import logging
 import os
 import shlex

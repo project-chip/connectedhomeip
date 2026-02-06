@@ -14,8 +14,6 @@
 #    limitations under the License.
 #
 
-from __future__ import annotations
-
 import logging
 import os
 import re
@@ -24,8 +22,7 @@ import threading
 from typing import Optional, Pattern
 
 from chiptest.test_definition import TEST_THREAD_DATASET
-
-from .namespace import IsolatedNetworkNamespace
+from chiptest.linux import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 

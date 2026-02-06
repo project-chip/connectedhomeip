@@ -30,6 +30,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessKind
+from chiptest import linux
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
@@ -169,9 +170,9 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     if sys.platform == "linux":
         if not internal_inside_unshare:
             # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
-            linux.ensure_network_namespace_availability()
+            chiptest.linux.ensure_network_namespace_availability()
         else:
-            linux.ensure_private_state()
+            chiptest.linux.ensure_private_state()
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
@@ -482,7 +483,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            to_terminate.append(ns := linux.IsolatedNetworkNamespace(
+            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                 setup_app_link_up=not wifi_required,
@@ -503,7 +504,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 
-            to_terminate.append(executor := linux.LinuxNamespacedExecutor(ns))
+            to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
             to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
         else:
