@@ -491,11 +491,6 @@ Status PushAvStreamTransportServer::ValidateIncomingTransportOptions(
                                      "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
                                      mPath.mEndpointId));
 
-    VerifyOrReturnValue(transportOptions.TLSEndpointID <= kMaxEndpointId, Status::ConstraintError,
-                        ChipLogError(Zcl,
-                                     "Transport Options verification from command data[ep=%d]: EndpointID field Constraint Error",
-                                     mPath.mEndpointId));
-
     VerifyOrReturnValue(transportOptions.url.size() >= kMinUrlLength && transportOptions.url.size() <= kMaxUrlLength,
                         Status::ConstraintError,
                         ChipLogError(Zcl,
@@ -1370,7 +1365,7 @@ PushAvStreamTransportServer::HandleModifyPushTransport(CommandHandler & handler,
 
     if (validateStreamStatus != Status::Success)
     {
-        ChipLogError(Camera, "HandleAllocatePushTransport[ep=%d]: Stream validation failed", mPath.mEndpointId);
+        ChipLogError(Camera, "HandleModifyPushTransport[ep=%d]: Stream validation failed", mPath.mEndpointId);
         return validateStreamStatus;
     }
 
