@@ -5,6 +5,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
+#include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
 
 using chip::app::DataModel::Nullable;
@@ -566,11 +567,11 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
  */
 void GenericSwitchInit()
 {
-    if (DeviceTypes::EndpointHasDeviceType(1, DeviceTypes::kGenericSwitchDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId))
     {
         LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::kEp1TagList)));
     }
-    if (DeviceTypes::EndpointHasDeviceType(2, DeviceTypes::kGenericSwitchDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId))
     {
         LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kEp2TagList)));
     }
