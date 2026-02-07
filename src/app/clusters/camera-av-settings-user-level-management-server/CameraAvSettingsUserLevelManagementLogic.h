@@ -25,6 +25,7 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -47,12 +48,15 @@ public:
     /**
      * Creates a server instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
+     * @param aAttributePersistenceProvider The persistence provider used for storing and loading attributes.
+     *                                     Note: the caller must ensure that the provided AttributePersistenceProvider
+     *                                     outlives this instance.
      * @param aEndpointId       The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures         The bitflags value that identifies which features are supported by this instance.
 
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
+    CameraAvSettingsUserLevelMgmtServerLogic(AttributePersistenceProvider & aAttributePersistenceProvider, EndpointId aEndpointId,
                                              BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures, uint8_t aMaxPresets);
     ~CameraAvSettingsUserLevelMgmtServerLogic();
 
@@ -216,6 +220,7 @@ public:
 
 private:
     CameraAvSettingsUserLevelManagementDelegate * mDelegate = nullptr;
+    AttributePersistenceProvider & mAttributePersistenceProvider;
     MarkDirtyCallback mMarkDirtyCallback;
 
     // Holding variables for values subject to successful physical movement

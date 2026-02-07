@@ -21,7 +21,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
@@ -42,11 +41,11 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
-                                                                                   BitFlags<Feature> aFeatures,
-                                                                                   uint8_t aMaxPresets) :
+CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(
+    AttributePersistenceProvider & aAttributePersistenceProvider, EndpointId aEndpointId, BitFlags<Feature> aFeatures,
+    uint8_t aMaxPresets) :
     mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mMaxPresets(aMaxPresets)
+    mFeatures(aFeatures), mMaxPresets(aMaxPresets), mAttributePersistenceProvider(aAttributePersistenceProvider)
 {}
 
 CameraAvSettingsUserLevelMgmtServerLogic::~CameraAvSettingsUserLevelMgmtServerLogic() {}
@@ -148,7 +147,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
-    return GetAttributePersistenceProvider()->WriteValue(path, bufferSpan);
+    return mAttributePersistenceProvider.WriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
@@ -158,7 +157,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
-    ReturnErrorOnFailure(GetAttributePersistenceProvider()->ReadValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributePersistenceProvider.ReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
 
@@ -205,7 +204,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
-    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributePersistenceProvider.WriteValue(path, bufferSpan));
 
     return CHIP_NO_ERROR;
 }
@@ -223,7 +222,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
     bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
 
     auto path      = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
-    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, bufferSpan);
+    CHIP_ERROR err = mAttributePersistenceProvider.ReadValue(path, bufferSpan);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -279,7 +278,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreDPTZStreams()
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::DPTZStreams::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
-    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributePersistenceProvider.WriteValue(path, bufferSpan));
 
     return CHIP_NO_ERROR;
 }
@@ -291,7 +290,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadDPTZStreams()
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::DPTZStreams::Id);
 
-    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, bufferSpan);
+    CHIP_ERROR err = mAttributePersistenceProvider.ReadValue(path, bufferSpan);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {

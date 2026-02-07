@@ -20,7 +20,7 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
-#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -99,7 +99,7 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     TestCameraAvSettingsUserLevelManagementCluster() :
-        mServer(kTestEndpointId,
+        mServer(CameraAvSettingsUserLevelManagementCluster::Context{ mPersistenceProvider }, kTestEndpointId,
                 chip::BitFlags<Feature>(Feature::kDigitalPTZ, Feature::kMechanicalPan, Feature::kMechanicalTilt,
                                         Feature::kMechanicalZoom, Feature::kMechanicalPresets),
                 testMaxPresets),
@@ -109,21 +109,16 @@ struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
     void SetUp() override
     {
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-        SetAttributePersistenceProvider(&mPersistenceProvider);
         mServer.SetDelegate(&mMockDelegate);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override
-    {
-        SetAttributePersistenceProvider(nullptr);
-        mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
+    void TearDown() override { mServer.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     MockCameraAvSettingsUserLevelManagementDelegate mMockDelegate;
+    DefaultAttributePersistenceProvider mPersistenceProvider;
     CameraAvSettingsUserLevelManagementCluster mServer;
     ClusterTester mClusterTester;
-    DefaultAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, TestAttributes)
