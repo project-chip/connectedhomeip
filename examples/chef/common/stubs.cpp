@@ -569,7 +569,7 @@ void GenericSwitchInit()
     if (DeviceTypes::EndpointHasDeviceType(1, DeviceTypes::kGenericSwitchDeviceId))
     {
         CHIP_ERROR err =
-            SetTagList(1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(GenericSwitch::kEp1TagList));
+            SetTagList(1, Span(GenericSwitch::kEp1TagList));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Error setting tag list for generic switch on endpoint 1 %" CHIP_ERROR_FORMAT, err.Format());
