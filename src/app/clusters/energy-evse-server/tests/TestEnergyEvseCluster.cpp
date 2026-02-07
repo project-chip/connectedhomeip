@@ -44,30 +44,6 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
-// Mock test values - used for verification in tests
-constexpr StateEnum kMockState                   = StateEnum::kPluggedInNoDemand;
-constexpr SupplyStateEnum kMockSupplyState       = SupplyStateEnum::kChargingEnabled;
-constexpr FaultStateEnum kMockFaultState         = FaultStateEnum::kNoError;
-constexpr uint32_t kMockChargingEnabledUntil     = 1000;
-constexpr uint32_t kMockDischargingEnabledUntil  = 2000;
-constexpr int64_t kMockCircuitCapacity           = 32000;    // 32A in mA
-constexpr int64_t kMockMinimumChargeCurrent      = 6000;     // 6A in mA
-constexpr int64_t kMockMaximumChargeCurrent      = 32000;    // 32A in mA
-constexpr int64_t kMockMaximumDischargeCurrent   = 16000;    // 16A in mA (V2x)
-constexpr int64_t kMockUserMaximumChargeCurrent  = 24000;    // 24A in mA
-constexpr uint32_t kMockRandomizationDelayWindow = 600;      // 10 minutes
-constexpr uint32_t kMockNextChargeStartTime      = 3600;     // 1 hour from now
-constexpr uint32_t kMockNextChargeTargetTime     = 7200;     // 2 hours from now
-constexpr int64_t kMockNextChargeRequiredEnergy  = 20000000; // 20 kWh in mWh
-constexpr Percent kMockNextChargeTargetSoC       = 80;
-constexpr uint16_t kMockApproximateEVEfficiency  = 150; // 150 Wh/km
-constexpr Percent kMockStateOfCharge             = 45;
-constexpr int64_t kMockBatteryCapacity           = 60000000; // 60 kWh in mWh
-constexpr uint32_t kMockSessionID                = 12345;
-constexpr uint32_t kMockSessionDuration          = 1800;    // 30 minutes
-constexpr int64_t kMockSessionEnergyCharged      = 5000000; // 5 kWh in mWh
-constexpr int64_t kMockSessionEnergyDischarged   = 1000000; // 1 kWh in mWh
-
 struct TestEnergyEvseCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
