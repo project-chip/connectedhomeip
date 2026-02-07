@@ -97,9 +97,7 @@ void MatterTlsClientManagementClusterInitCallback(EndpointId endpointId)
 
     LogErrorOnFailure(gCertificateTable->SetEndpoint(endpointId));
 
-    TLSClientManagementCluster::Context context = {
-        .fabricTable = Server::GetInstance().GetFabricTable(),
-    };
+    TLSClientManagementCluster::Context context{ Server::GetInstance().GetFabricTable() };
     gClusterInstance.Create(context, endpointId, *gDelegate, *gCertificateTable, kDefaultMaxProvisionedEndpoints);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gClusterInstance.Registration());
     if (err != CHIP_NO_ERROR)
