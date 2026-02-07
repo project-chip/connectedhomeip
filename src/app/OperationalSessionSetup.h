@@ -470,8 +470,12 @@ private:
 
 #if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
     /**
-     * Timer callback that fires when address resolution times out.
-     * Cancels the address lookup and uses the fallback result instead.
+     * Timer callback invoked when DNS-SD resolution doesn't complete within the configured timeout.
+     *
+     * When this fires:
+     * - Cancels the ongoing DNS-SD lookup to prevent race conditions
+     * - Uses the cached IP/port from the successful PASE session seconds ago
+     * - Assumes the cached address is still valid (IP hasn't changed)
      */
     static void OnFallbackTimeout(System::Layer * systemLayer, void * appState);
 

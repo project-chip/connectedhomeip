@@ -987,6 +987,9 @@ void OperationalSessionSetup::OnFallbackTimeout(System::Layer * systemLayer, voi
     // Cancel the ongoing address lookup
     if (self->mAddressLookupHandle.IsActive())
     {
+        // Cancel the ongoing DNS-SD lookup using FailureCallback::Skip to prevent double error handling.
+        // If cancellation fails (logged below), we proceed with fallback anyway since the timer has expired.
+        // This is safe because we have a known-good address from the PASE session.
         CHIP_ERROR err = Resolver::Instance().CancelLookup(self->mAddressLookupHandle, Resolver::FailureCallback::Skip);
         if (err != CHIP_NO_ERROR)
         {
@@ -994,19 +997,14 @@ void OperationalSessionSetup::OnFallbackTimeout(System::Layer * systemLayer, voi
         }
     }
 
-    // Use the fallback result
-    if (self->mFallbackResolveResult.HasValue())
-    {
-        self->UpdateDeviceData(self->mFallbackResolveResult.Value());
-        // Do not touch `self` instance anymore; it might have been destroyed in UpdateDeviceData.
-    }
-    else
-    {
-        // This should not happen, but handle it gracefully
-        ChipLogError(Discovery, "Fallback timer fired but no fallback result available");
-        self->DequeueConnectionCallbacks(CHIP_ERROR_INTERNAL);
-        // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
-    }
+    // Use the fallback result. This must have a value because StartFallbackTimer only starts
+    // the timer when mFallbackResolveResult has a value. If this fails, it indicates memory
+    // corruption or a serious programming error.
+    VerifyOrDie(self->mFallbackResolveResult.HasValue());
+    self->UpdateDeviceData(self->mFallbackResolveResult.Value());
+    // Do not touch `self` instance anymore; it might have been destroyed in UpdateDeviceData.
+    // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+}
 }
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 

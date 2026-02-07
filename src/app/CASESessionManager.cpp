@@ -40,13 +40,13 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 TransportPayloadCapability transportPayloadCapability,
-                                                const Optional<AddressResolve::ResolveResult> & fallbackResult)
+                                                const Optional<AddressResolve::ResolveResult> & fallbackResolveResult)
 {
     FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                  attemptCount, onRetry,
 #endif
-                                 transportPayloadCapability, fallbackResult);
+                                 transportPayloadCapability, fallbackResolveResult);
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
@@ -96,7 +96,7 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
                                                       uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif
                                                       TransportPayloadCapability transportPayloadCapability,
-                                                      const Optional<AddressResolve::ResolveResult> & fallbackResult)
+                                                      const Optional<AddressResolve::ResolveResult> & fallbackResolveResult)
 {
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
@@ -134,10 +134,10 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
 #if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
-    // Set fallback result if provided
-    if (fallbackResult.HasValue())
+    // Set fallback resolve result if provided
+    if (fallbackResolveResult.HasValue())
     {
-        session->SetFallbackResolveResult(fallbackResult.Value());
+        session->SetFallbackResolveResult(fallbackResolveResult.Value());
     }
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 

@@ -3768,10 +3768,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             // Store the address we are using for PASE as a fallback for operational discovery
             ResolveResult result;
-            result.address           = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
-            result.mrpRemoteConfig   = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
-            result.supportsTcpClient = result.address.GetTransportType() == Transport::Type::kTcp;
-            result.supportsTcpServer = result.address.GetTransportType() == Transport::Type::kTcp;
+            result.address         = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
+            result.mrpRemoteConfig = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
+            // Note: supportsTcpClient and supportsTcpServer are device capabilities from DNS-SD TXT records,
+            // not derivable from the transport type. They remain false (default) here.
+            // TODO: Consider passing these through RendezvousParameters if available from SetUpCodePairer.
             mFallbackOperationalResolveResult.SetValue(result);
         }
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
