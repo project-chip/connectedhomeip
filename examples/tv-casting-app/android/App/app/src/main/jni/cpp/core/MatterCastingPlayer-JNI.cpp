@@ -128,7 +128,7 @@ JNI_METHOD(jobject, sendUDC)
         MatterCastingPlayerJNI::getInstance().getCommissionerDeclarationCallback();
 
     castingPlayer->SendUDC(connectionCallbacks, idOptions);
-    
+
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
