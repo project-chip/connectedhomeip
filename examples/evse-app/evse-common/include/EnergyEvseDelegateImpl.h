@@ -266,35 +266,35 @@ public:
     void OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue) override;
 
     // ------------------------------------------------------------------
-    // Instance management for codegen approach
+    // Instance management for codegen integration
     void SetInstance(Instance * aInstance) { mInstance = aInstance; }
     Instance * GetInstance() { return mInstance; }
 
     // ------------------------------------------------------------------
     // Local getters for internal delegate use - delegates to cluster instance
-    StateEnum GetState() const { return mInstance->GetState(); }
-    SupplyStateEnum GetSupplyState() const { return mInstance->GetSupplyState(); }
-    FaultStateEnum GetFaultState() const { return mInstance->GetFaultState(); }
-    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() const { return mInstance->GetChargingEnabledUntil(); }
-    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() const { return mInstance->GetDischargingEnabledUntil(); }
-    int64_t GetCircuitCapacity() const { return mInstance->GetCircuitCapacity(); }
-    int64_t GetMinimumChargeCurrent() const { return mInstance->GetMinimumChargeCurrent(); }
-    int64_t GetMaximumChargeCurrent() const { return mInstance->GetMaximumChargeCurrent(); }
-    int64_t GetMaximumDischargeCurrent() const { return mInstance->GetMaximumDischargeCurrent(); }
-    int64_t GetUserMaximumChargeCurrent() const { return mInstance->GetUserMaximumChargeCurrent(); }
-    uint32_t GetRandomizationDelayWindow() const { return mInstance->GetRandomizationDelayWindow(); }
-    DataModel::Nullable<uint32_t> GetNextChargeStartTime() const { return mInstance->GetNextChargeStartTime(); }
-    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() const { return mInstance->GetNextChargeTargetTime(); }
-    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() const { return mInstance->GetNextChargeRequiredEnergy(); }
-    DataModel::Nullable<Percent> GetNextChargeTargetSoC() const { return mInstance->GetNextChargeTargetSoC(); }
-    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() const { return mInstance->GetApproximateEVEfficiency(); }
-    DataModel::Nullable<Percent> GetStateOfCharge() const { return mInstance->GetStateOfCharge(); }
-    DataModel::Nullable<int64_t> GetBatteryCapacity() const { return mInstance->GetBatteryCapacity(); }
-    DataModel::Nullable<CharSpan> GetVehicleID() const { return mInstance->GetVehicleID(); }
-    DataModel::Nullable<uint32_t> GetSessionID() const { return mInstance->GetSessionID(); }
-    DataModel::Nullable<uint32_t> GetSessionDuration() const { return mInstance->GetSessionDuration(); }
-    DataModel::Nullable<int64_t> GetSessionEnergyCharged() const { return mInstance->GetSessionEnergyCharged(); }
-    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const { return mInstance->GetSessionEnergyDischarged(); }
+    StateEnum GetState() const;
+    SupplyStateEnum GetSupplyState() const;
+    FaultStateEnum GetFaultState() const;
+    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() const;
+    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() const;
+    int64_t GetCircuitCapacity() const;
+    int64_t GetMinimumChargeCurrent() const;
+    int64_t GetMaximumChargeCurrent() const;
+    int64_t GetMaximumDischargeCurrent() const;
+    int64_t GetUserMaximumChargeCurrent() const;
+    uint32_t GetRandomizationDelayWindow() const;
+    DataModel::Nullable<uint32_t> GetNextChargeStartTime() const;
+    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() const;
+    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() const;
+    DataModel::Nullable<Percent> GetNextChargeTargetSoC() const;
+    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() const;
+    DataModel::Nullable<Percent> GetStateOfCharge() const;
+    DataModel::Nullable<int64_t> GetBatteryCapacity() const;
+    DataModel::Nullable<CharSpan> GetVehicleID() const;
+    DataModel::Nullable<uint32_t> GetSessionID() const;
+    DataModel::Nullable<uint32_t> GetSessionDuration() const;
+    DataModel::Nullable<int64_t> GetSessionEnergyCharged() const;
+    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const;
 
 private:
     /* Constants */

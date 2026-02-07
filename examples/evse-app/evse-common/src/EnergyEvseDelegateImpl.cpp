@@ -1535,7 +1535,7 @@ void EnergyEvseDelegate::OnChargingEnabledUntilChanged(DataModel::Nullable<uint3
         ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, newValue);
 }
 
 void EnergyEvseDelegate::OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue)
@@ -1549,7 +1549,7 @@ void EnergyEvseDelegate::OnDischargingEnabledUntilChanged(DataModel::Nullable<ui
         ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, newValue);
 }
 
 void EnergyEvseDelegate::OnCircuitCapacityChanged(int64_t newValue)
@@ -1577,14 +1577,14 @@ void EnergyEvseDelegate::OnUserMaximumChargeCurrentChanged(int64_t newValue)
     ChipLogDetail(AppServer, "UserMaximumChargeCurrent updated to %ld", static_cast<long>(newValue));
     ComputeMaxChargeCurrentLimit();
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, newValue);
 }
 
 void EnergyEvseDelegate::OnRandomizationDelayWindowChanged(uint32_t newValue)
 {
     ChipLogDetail(AppServer, "RandomizationDelayWindow updated to %lu", static_cast<unsigned long int>(newValue));
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, RandomizationDelayWindow::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, newValue);
 }
 
 void EnergyEvseDelegate::OnNextChargeStartTimeChanged(DataModel::Nullable<uint32_t> newValue)
@@ -1646,7 +1646,7 @@ void EnergyEvseDelegate::OnApproximateEVEfficiencyChanged(DataModel::Nullable<ui
         ChipLogDetail(AppServer, "ApproximateEVEfficiency updated to %d", newValue.Value());
     }
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, newValue);
 }
 
 void EnergyEvseDelegate::OnStateOfChargeChanged(DataModel::Nullable<Percent> newValue)
@@ -1698,7 +1698,7 @@ void EnergyEvseDelegate::OnSessionIDChanged(DataModel::Nullable<uint32_t> newVal
     }
     // Write value to persistent storage.
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, SessionID::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSession.mSessionID);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mSession.mSessionID);
 }
 
 void EnergyEvseDelegate::OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue)
@@ -1799,7 +1799,7 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
 
     // Write values to persistent storage.
     ConcreteAttributePath path = ConcreteAttributePath(endpointId, EnergyEvse::Id, SessionID::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider() -> WriteScalarValue(path, mSessionID);
 
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart
@@ -1868,4 +1868,146 @@ void EvseSession::UpdateEnergyDischarged(EndpointId endpointId, int64_t discharg
 {
     mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
     MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+}
+
+// ------------------------------------------------------------------
+// Local getters for internal delegate use - delegates to cluster instance
+// ------------------------------------------------------------------
+
+StateEnum EnergyEvseDelegate::GetState() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetState();
+}
+
+SupplyStateEnum EnergyEvseDelegate::GetSupplyState() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetSupplyState();
+}
+
+FaultStateEnum EnergyEvseDelegate::GetFaultState() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetFaultState();
+}
+
+DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetChargingEnabledUntil() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetChargingEnabledUntil();
+}
+
+DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetDischargingEnabledUntil() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetDischargingEnabledUntil();
+}
+
+int64_t EnergyEvseDelegate::GetCircuitCapacity() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetCircuitCapacity();
+}
+
+int64_t EnergyEvseDelegate::GetMinimumChargeCurrent() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetMinimumChargeCurrent();
+}
+
+int64_t EnergyEvseDelegate::GetMaximumChargeCurrent() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetMaximumChargeCurrent();
+}
+
+int64_t EnergyEvseDelegate::GetMaximumDischargeCurrent() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetMaximumDischargeCurrent();
+}
+
+int64_t EnergyEvseDelegate::GetUserMaximumChargeCurrent() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetUserMaximumChargeCurrent();
+}
+
+uint32_t EnergyEvseDelegate::GetRandomizationDelayWindow() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetRandomizationDelayWindow();
+}
+
+DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeStartTime() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetNextChargeStartTime();
+}
+
+DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeTargetTime() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetNextChargeTargetTime();
+}
+
+DataModel::Nullable<int64_t> EnergyEvseDelegate::GetNextChargeRequiredEnergy() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetNextChargeRequiredEnergy();
+}
+
+DataModel::Nullable<Percent> EnergyEvseDelegate::GetNextChargeTargetSoC() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetNextChargeTargetSoC();
+}
+
+DataModel::Nullable<uint16_t> EnergyEvseDelegate::GetApproximateEVEfficiency() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetApproximateEVEfficiency();
+}
+
+DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetStateOfCharge();
+}
+
+DataModel::Nullable<int64_t> EnergyEvseDelegate::GetBatteryCapacity() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetBatteryCapacity();
+}
+
+DataModel::Nullable<CharSpan> EnergyEvseDelegate::GetVehicleID() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetVehicleID();
+}
+
+DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetSessionID() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetSessionID();
+}
+
+DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetSessionDuration() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetSessionDuration();
+}
+
+DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyCharged() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetSessionEnergyCharged();
+}
+
+DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyDischarged() const
+{
+    VerifyOrDie(mInstance != nullptr);
+    return mInstance->GetSessionEnergyDischarged();
 }
