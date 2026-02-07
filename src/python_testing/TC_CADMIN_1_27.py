@@ -421,7 +421,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         self.step("4")
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork-long 15 {response.setupPinCode} {discriminator} --jcm true",
-            expected_output=f"[CTL] Commissioning complete for node ID 0x000000000000000F: success",
+            expected_output="[CTL] Commissioning complete for node ID 0x000000000000000F: success",
             timeout=60)
 
         log.info("Waiting for transfer of ownership from the commissioner(controller) to the administrator and completion of commissioning")
