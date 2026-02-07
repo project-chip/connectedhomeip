@@ -95,20 +95,31 @@ JNI_METHOD(jobject, sendUDC)
         idOptions->LogDetail();
     }
 
-    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
-    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
+    MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
+    MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
 
-    // jCommissionerDeclarationCallback is optional
-    if (jCommissionerDeclarationCallback == nullptr)
+    // jIdentificationDeclarationOptions is optional
+    matter::casting::core::IdentificationDeclarationOptions idOptions;
+    if (jIdentificationDeclarationOptions != nullptr)
     {
-        ChipLogProgress(AppServer,
-                        "MatterCastingPlayer-JNI::sendUDC() optional jCommissionerDeclarationCallback was not "
-                        "provided by the client");
+        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::sendUDC() jIdentificationDeclarationOptions was provided by client");
+        std::unique_ptr<matter::casting::core::IdentificationDeclarationOptions> idOptionsCpp(
+            support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions));
+        if (idOptionsCpp == nullptr)
+        {
+            ChipLogError(AppServer,
+                         "MatterCastingPlayer-JNI::sendUDC() "
+                         "convertIdentificationDeclarationOptionsFromJavaToCpp() error");
+            return support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        idOptions = *idOptionsCpp;
+        idOptions.LogDetail();
     }
     else
     {
-        TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(
-            env, jCommissionerDeclarationCallback);
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::sendUDC() Optional jIdentificationDeclarationOptions not "
+                        "provided by the client");
     }
 
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
@@ -116,8 +127,8 @@ JNI_METHOD(jobject, sendUDC)
     connectionCallbacks.mCommissionerDeclarationCallback =
         MatterCastingPlayerJNI::getInstance().getCommissionerDeclarationCallback();
 
-    castingPlayer->SendUDC(connectionCallbacks, *idOptions);
-
+    castingPlayer->SendUDC(connectionCallbacks, idOptions);
+    
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 

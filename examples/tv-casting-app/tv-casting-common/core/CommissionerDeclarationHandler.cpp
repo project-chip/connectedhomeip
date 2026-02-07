@@ -65,7 +65,7 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         ChipLogProgress(AppServer,
                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() "
                         "needs passcode - This is likely an App Check response");
-        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+        support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
     // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
