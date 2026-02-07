@@ -162,11 +162,17 @@ jobs:
                 scripts/examples/esp_example.sh energy-gateway-app sdkconfig.defaults
                 rm -rf examples/energy-gateway-app/esp32/{build,managed_components}
 
-            - name: Build example Energy Management App
-              if: steps.changed_paths.outputs.energy_management == 'true'
+            - name: Build example EVSE App
+              if: steps.changed_paths.outputs.evse == 'true'
               run: |
                 scripts/examples/esp_example.sh evse-app sdkconfig.defaults
                 rm -rf examples/evse-app/esp32/{build,managed_components}
+
+            - name: Build example Water Heater App
+              if: steps.changed_paths.outputs.water_heater == 'true'
+              run: |
+                scripts/examples/esp_example.sh water-heater-app sdkconfig.defaults
+                rm -rf examples/water-heater-app/esp32/{build,managed_components}
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
