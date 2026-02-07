@@ -29,8 +29,7 @@ namespace EnergyEvse {
 Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
                    OptionalCommands aOptionalCmds) :
     mCluster(EnergyEvseCluster::Config(aEndpointId, aDelegate, aFeature, aOptionalAttrs, aOptionalCmds))
-{
-}
+{}
 
 CHIP_ERROR Instance::Init()
 {

@@ -63,8 +63,8 @@ public:
 
         Config(EndpointId aEndpointId, EnergyEvse::Delegate & aDelegate, BitMask<EnergyEvse::Feature> aFeature,
                BitMask<EnergyEvse::OptionalAttributes> aOptionalAttrs, BitMask<EnergyEvse::OptionalCommands> aOptionalCmds) :
-            endpointId(aEndpointId), delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds),
-            optionalAttrs(aOptionalAttrs)
+            endpointId(aEndpointId),
+            delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds), optionalAttrs(aOptionalAttrs)
         {}
     };
     // We don't want to allow the default constructor as this cluster requires a delegate to be set
@@ -193,14 +193,14 @@ private:
     StateEnum mState                                       = StateEnum::kNotPluggedIn;
     SupplyStateEnum mSupplyState                           = SupplyStateEnum::kDisabled;
     FaultStateEnum mFaultState                             = FaultStateEnum::kNoError;
-    DataModel::Nullable<uint32_t> mChargingEnabledUntil    = DataModel::NullNullable;    // TODO Default to 0 to indicate disabled
-    DataModel::Nullable<uint32_t> mDischargingEnabledUntil = DataModel::NullNullable;    // TODO Default to 0 to indicate disabled
+    DataModel::Nullable<uint32_t> mChargingEnabledUntil    = DataModel::NullNullable; // TODO Default to 0 to indicate disabled
+    DataModel::Nullable<uint32_t> mDischargingEnabledUntil = DataModel::NullNullable; // TODO Default to 0 to indicate disabled
     int64_t mCircuitCapacity                               = 0;
     int64_t mMinimumChargeCurrent                          = kMinimumChargeCurrent;
     int64_t mMaximumChargeCurrent                          = 0;
     int64_t mMaximumDischargeCurrent                       = 0;
-    int64_t mUserMaximumChargeCurrent                      = 0;                           // TODO update spec
-    uint32_t mRandomizationDelayWindow                     = 600;                         // Default 600s per spec
+    int64_t mUserMaximumChargeCurrent                      = 0;   // TODO update spec
+    uint32_t mRandomizationDelayWindow                     = 600; // Default 600s per spec
     // PREF attributes
     DataModel::Nullable<uint32_t> mNextChargeStartTime     = DataModel::NullNullable;
     DataModel::Nullable<uint32_t> mNextChargeTargetTime    = DataModel::NullNullable;
@@ -208,16 +208,16 @@ private:
     DataModel::Nullable<Percent> mNextChargeTargetSoC      = DataModel::NullNullable;
     DataModel::Nullable<uint16_t> mApproximateEVEfficiency = DataModel::NullNullable;
     // SOC attributes
-    DataModel::Nullable<Percent> mStateOfCharge            = DataModel::NullNullable;
-    DataModel::Nullable<int64_t> mBatteryCapacity          = DataModel::NullNullable;
+    DataModel::Nullable<Percent> mStateOfCharge   = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mBatteryCapacity = DataModel::NullNullable;
     // PNC attributes
-    char mVehicleIDBuffer[kMaxVehicleIDBufSize]            = { 0 };
-    DataModel::Nullable<CharSpan> mVehicleID               = DataModel::NullNullable;
+    char mVehicleIDBuffer[kMaxVehicleIDBufSize] = { 0 };
+    DataModel::Nullable<CharSpan> mVehicleID    = DataModel::NullNullable;
     // Session attributes
-    DataModel::Nullable<uint32_t> mSessionID               = DataModel::NullNullable;
-    DataModel::Nullable<uint32_t> mSessionDuration         = DataModel::NullNullable;
-    DataModel::Nullable<int64_t> mSessionEnergyCharged     = DataModel::NullNullable;
-    DataModel::Nullable<int64_t> mSessionEnergyDischarged  = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mSessionID              = DataModel::NullNullable;
+    DataModel::Nullable<uint32_t> mSessionDuration        = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mSessionEnergyCharged    = DataModel::NullNullable;
+    DataModel::Nullable<int64_t> mSessionEnergyDischarged = DataModel::NullNullable;
 };
 
 } // namespace EnergyEvse
