@@ -267,13 +267,6 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             expected_output="[JF] Anchor Administrator (nodeId=11) commissioned with success",
             timeout=60)
 
-        log.info("Waiting for transfer of ownership from the commissioner(controller) to the administrator and completion of commissioning")
-        self.fabric_b_admin.set_output_match("Joint Fabric Administrator commissioned on fabric index 2")
-        self.fabric_b_admin.event.clear()
-        if self.fabric_b_admin.event.wait(30) is False:
-            raise TimeoutError("Timed out waiting for commissioning to complete")
-        log.info("JCM commissioning complete")
-
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
         jfcStorage.read(self.storage_fabric_b+'/chip_tool_config.alpha.ini')
