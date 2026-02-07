@@ -100,9 +100,7 @@ async def is_dut_tcp_supported(instance_qname: str):
     try:
         # Get the operational service TXT record
         txt_record = await MdnsDiscovery().get_txt_record(
-            service_name=instance_qname,
-            service_type=MdnsServiceType.OPERATIONAL.value,
-            log_output=True
+            service_name=instance_qname, service_type=MdnsServiceType.OPERATIONAL.value
         )
     except Exception as e:
         raise Exception(
