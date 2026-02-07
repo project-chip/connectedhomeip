@@ -73,6 +73,7 @@ from mdns_discovery.utils.asserts import (assert_is_commissionable_type, assert_
                                           assert_valid_sai_key, assert_valid_sat_key, assert_valid_short_discriminator_subtype,
                                           assert_valid_sii_key, assert_valid_t_key, assert_valid_vendor_subtype,
                                           assert_valid_vp_key)
+from mdns_discovery.utils.network import is_dut_tcp_supported
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -120,6 +121,9 @@ class TC_SC_4_1(MatterBaseTest):
                         """If supports_icd is True:
                             - TH checks for support of the LITS feature by reading from the DUT the FeatureMap attribute from the ICD Management cluster on EP0
                                 - Set supports_lit to True if supported, otherwise, to False"""),
+
+            TestStep(3.5, """Check if the DUT supports TCP""",
+                     """Set supports_tcp to True if supported, otherwise, to False"""),
 
             TestStep(4, """Check if TCP is supported""",
                         """Set supports_tcp to True if supported, otherwise, to False"""),
@@ -250,6 +254,14 @@ class TC_SC_4_1(MatterBaseTest):
             cluster=Clusters.IcdManagement,
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
+
+    def get_dut_instance_name(self, log_result: bool = False) -> str:
+        node_id = self.dut_node_id
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        if log_result:
+            log.info(f"\n\n\tDUT Instance Name: {instance_name}\n")
+        return instance_name
 
     def get_discriminator_subtype(self, is_obcw: bool = False) -> Optional[tuple[str, str]]:
         # TH constructs the Discriminator Subtype using the DUT's Long or Short Discriminator
@@ -561,7 +573,9 @@ class TC_SC_4_1(MatterBaseTest):
             assert_valid_vp_key(vp_key)
 
         # *** T KEY ***
-        self.verify_t_key(txt_record)
+        t_key_present = 'T' in txt_record.txt
+        t_key = txt_record.txt.get('T', None)
+        assert_valid_t_key(t_key, t_key_present, self.supports_tcp_dut, self.supports_tcp_pics, enforce_provisional=False)
 
         # *** CM KEY ***
         # If the 'CM' key is present
@@ -642,33 +656,6 @@ class TC_SC_4_1(MatterBaseTest):
         # Verify the relationship between PH and PI keys
         assert_valid_ph_pi_relationship(txt_record.txt)
 
-    def verify_t_key(self, txt_record) -> None:
-
-        # If the 'T' key is not present in the TXT record, nothing to
-        # verify. MRP support only is assumed as a transport protocol
-        if 'T' not in txt_record.txt:
-            return
-
-        # If the 'T' key is present in the TXT record, then TCP is supported by the DUT
-
-        # Verify that TCP is supported in the PICS
-        asserts.assert_true(self.supports_tcp,
-                            "TCP must be supported in the PICS if the 'T' key is present (TCP supported by the DUT).")
-
-        # Verify that the 'T' key is non-empty
-        t_key = txt_record.txt.get('T')
-        asserts.assert_true(t_key, "'T' key is present but has no value.")
-
-        # Verify that the 'T' key is a decimal number encoded as ASCII
-        # text without any leading zeros, and less than or equal to 6
-        assert_valid_t_key(t_key, enforce_provisional=False)
-
-        # Verify that the T key encodes the allowed TCP
-        # capabilities. T key allowed values are (4, 6)
-        allowed = {4, 6}
-        asserts.assert_true(int(t_key) in allowed,
-                            f"T value ({t_key}) is not in allowed set ({sorted(allowed)}).")
-
     @staticmethod
     async def _verify_aaaa_records(srv_hostname: str) -> None:
         # TH performs a AAAA record query against the target 'hostname'
@@ -728,10 +715,19 @@ class TC_SC_4_1(MatterBaseTest):
             self.supports_lit = bool(feature_map & LITS == LITS)
             log.info(f"\n\n\t** supports_lit: {self.supports_lit}\n")
 
+        # *** STEP 3.5 ***
+        # Check if the DUT supports TCP
+        self.step(3.5)
+        instance_name = self.get_dut_instance_name(log_result=True)
+        instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+        self.supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
+        log.info(f"\n\n\t** supports_tcp_dut: {self.supports_tcp_dut}\n")
+
         # *** STEP 4 ***
         # Check if the DUT supports TCP
         self.step(4)
-        self.supports_tcp = self.check_pics(TCP_PICS_STR)
+        self.supports_tcp_pics = self.check_pics(TCP_PICS_STR)
+        log.info(f"\n\n\t** supports_tcp_pics: {self.supports_tcp_pics}\n")
 
         # *** STEP 5 ***
         # Check the setup code type used during commissioning (QR or Manual)
