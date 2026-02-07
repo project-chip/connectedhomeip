@@ -105,7 +105,7 @@ CHIP_ERROR EnergyEvseCluster::SetCircuitCapacity(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetMinimumChargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mMinimumChargeCurrent != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(mMinimumChargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(newValue >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mMinimumChargeCurrent = newValue;
     mDelegate.OnMinimumChargeCurrentChanged(newValue);
     NotifyAttributeChanged(MinimumChargeCurrent::Id);
@@ -115,7 +115,7 @@ CHIP_ERROR EnergyEvseCluster::SetMinimumChargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetMaximumChargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mMaximumChargeCurrent != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(mMaximumChargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(newValue >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mMaximumChargeCurrent = newValue;
     mDelegate.OnMaximumChargeCurrentChanged(newValue);
     NotifyAttributeChanged(MaximumChargeCurrent::Id);
@@ -125,7 +125,7 @@ CHIP_ERROR EnergyEvseCluster::SetMaximumChargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetMaximumDischargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mMaximumDischargeCurrent != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(mMaximumDischargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(newValue >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mMaximumDischargeCurrent = newValue;
     mDelegate.OnMaximumDischargeCurrentChanged(newValue);
     NotifyAttributeChanged(MaximumDischargeCurrent::Id);
