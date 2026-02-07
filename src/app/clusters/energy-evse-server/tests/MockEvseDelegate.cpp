@@ -27,9 +27,12 @@ namespace EnergyEvse {
 
 Protocols::InteractionModel::Status MockEvseDelegate::Disable()
 {
-    mChargingEnabledUntil    = DataModel::Nullable<uint32_t>(0);
-    mDischargingEnabledUntil = DataModel::Nullable<uint32_t>(0);
-    mSupplyState             = SupplyStateEnum::kDisabled;
+    VerifyOrReturnValue(mCluster != nullptr, Protocols::InteractionModel::Status::Failure);
+
+    DataModel::Nullable<uint32_t> disableTime(0);
+    TEMPORARY_RETURN_IGNORED mCluster->SetChargingEnabledUntil(disableTime);
+    TEMPORARY_RETURN_IGNORED mCluster->SetDischargingEnabledUntil(disableTime);
+    TEMPORARY_RETURN_IGNORED mCluster->SetSupplyState(SupplyStateEnum::kDisabled);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -37,14 +40,16 @@ Protocols::InteractionModel::Status MockEvseDelegate::EnableCharging(const DataM
                                                                      const int64_t & minimumChargeCurrent,
                                                                      const int64_t & maximumChargeCurrent)
 {
+    VerifyOrReturnValue(mCluster != nullptr, Protocols::InteractionModel::Status::Failure);
+
     // If there is currently an error present on the EVSE, return FAILURE
-    if (mFaultState != FaultStateEnum::kNoError)
+    if (mCluster->GetFaultState() != FaultStateEnum::kNoError)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
 
     // If Diagnostics are currently active, return FAILURE
-    if (mSupplyState == SupplyStateEnum::kDisabledDiagnostics)
+    if (mCluster->GetSupplyState() == SupplyStateEnum::kDisabledDiagnostics)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
@@ -52,22 +57,23 @@ Protocols::InteractionModel::Status MockEvseDelegate::EnableCharging(const DataM
     // Update SupplyState based on previous state:
     // - If previously Disabled -> ChargingEnabled
     // - If previously DischargingEnabled -> Enabled (both charging and discharging)
-    if (mSupplyState == SupplyStateEnum::kDisabled || mSupplyState == SupplyStateEnum::kDisabledError)
+    SupplyStateEnum currentSupplyState = mCluster->GetSupplyState();
+    if (currentSupplyState == SupplyStateEnum::kDisabled || currentSupplyState == SupplyStateEnum::kDisabledError)
     {
-        mSupplyState = SupplyStateEnum::kChargingEnabled;
+        TEMPORARY_RETURN_IGNORED mCluster->SetSupplyState(SupplyStateEnum::kChargingEnabled);
     }
-    else if (mSupplyState == SupplyStateEnum::kDischargingEnabled)
+    else if (currentSupplyState == SupplyStateEnum::kDischargingEnabled)
     {
-        mSupplyState = SupplyStateEnum::kEnabled;
+        TEMPORARY_RETURN_IGNORED mCluster->SetSupplyState(SupplyStateEnum::kEnabled);
     }
     // If already ChargingEnabled or Enabled, keep the current state
 
     // Update ChargingEnabledUntil to the provided timestamp (can be null for indefinite)
-    mChargingEnabledUntil = enableChargeTime;
+    TEMPORARY_RETURN_IGNORED mCluster->SetChargingEnabledUntil(enableChargeTime);
 
     // Store the charge current limits
-    mMinimumChargeCurrent = minimumChargeCurrent;
-    mMaximumChargeCurrent = maximumChargeCurrent;
+    TEMPORARY_RETURN_IGNORED mCluster->SetMinimumChargeCurrent(minimumChargeCurrent);
+    TEMPORARY_RETURN_IGNORED mCluster->SetMaximumChargeCurrent(maximumChargeCurrent);
 
     return Protocols::InteractionModel::Status::Success;
 }
@@ -75,14 +81,16 @@ Protocols::InteractionModel::Status MockEvseDelegate::EnableCharging(const DataM
 Protocols::InteractionModel::Status MockEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
                                                                         const int64_t & maximumDischargeCurrent)
 {
+    VerifyOrReturnValue(mCluster != nullptr, Protocols::InteractionModel::Status::Failure);
+
     // If there is currently an error present on the EVSE, return FAILURE
-    if (mFaultState != FaultStateEnum::kNoError)
+    if (mCluster->GetFaultState() != FaultStateEnum::kNoError)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
 
     // If Diagnostics are currently active, return FAILURE
-    if (mSupplyState == SupplyStateEnum::kDisabledDiagnostics)
+    if (mCluster->GetSupplyState() == SupplyStateEnum::kDisabledDiagnostics)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
@@ -90,35 +98,38 @@ Protocols::InteractionModel::Status MockEvseDelegate::EnableDischarging(const Da
     // Update SupplyState based on previous state:
     // - If previously Disabled -> DischargingEnabled
     // - If previously ChargingEnabled -> Enabled (both charging and discharging)
-    if (mSupplyState == SupplyStateEnum::kDisabled || mSupplyState == SupplyStateEnum::kDisabledError)
+    SupplyStateEnum currentSupplyState = mCluster->GetSupplyState();
+    if (currentSupplyState == SupplyStateEnum::kDisabled || currentSupplyState == SupplyStateEnum::kDisabledError)
     {
-        mSupplyState = SupplyStateEnum::kDischargingEnabled;
+        TEMPORARY_RETURN_IGNORED mCluster->SetSupplyState(SupplyStateEnum::kDischargingEnabled);
     }
-    else if (mSupplyState == SupplyStateEnum::kChargingEnabled)
+    else if (currentSupplyState == SupplyStateEnum::kChargingEnabled)
     {
-        mSupplyState = SupplyStateEnum::kEnabled;
+        TEMPORARY_RETURN_IGNORED mCluster->SetSupplyState(SupplyStateEnum::kEnabled);
     }
     // If already DischargingEnabled or Enabled, keep the current state
 
     // Update DischargingEnabledUntil to the provided timestamp (can be null for indefinite)
-    mDischargingEnabledUntil = enableDischargeTime;
+    TEMPORARY_RETURN_IGNORED mCluster->SetDischargingEnabledUntil(enableDischargeTime);
 
     // Store the discharge current limit
-    mMaximumDischargeCurrent = maximumDischargeCurrent;
+    TEMPORARY_RETURN_IGNORED mCluster->SetMaximumDischargeCurrent(maximumDischargeCurrent);
 
     return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status MockEvseDelegate::StartDiagnostics()
 {
+    VerifyOrReturnValue(mCluster != nullptr, Protocols::InteractionModel::Status::Failure);
+
     // EVSE SHALL enter Diagnostics state only if SupplyState is Disabled
-    if (mSupplyState != SupplyStateEnum::kDisabled)
+    if (mCluster->GetSupplyState() != SupplyStateEnum::kDisabled)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
 
     // Set SupplyState to DisabledDiagnostics
-    mSupplyState = SupplyStateEnum::kDisabledDiagnostics;
+    TEMPORARY_RETURN_IGNORED mCluster->SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
 
     return Protocols::InteractionModel::Status::Success;
 }

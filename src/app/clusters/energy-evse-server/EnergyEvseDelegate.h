@@ -32,7 +32,6 @@ namespace EnergyEvse {
 /** @brief
  *    Defines methods for implementing application-specific logic for the EVSE Management Cluster.
  */
-class Instance;
 
 class Delegate
 {
@@ -41,8 +40,6 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     EndpointId GetEndpointId() { return mEndpointId; }
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
-    Instance * GetInstance() { return mInstance; }
 
     /**
      * @brief Delegate should implement a handler to disable the EVSE.
@@ -134,7 +131,6 @@ public:
 
 protected:
     EndpointId mEndpointId = 0;
-    Instance * mInstance   = nullptr;
 };
 
 } // namespace EnergyEvse

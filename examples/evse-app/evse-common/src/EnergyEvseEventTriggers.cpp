@@ -52,8 +52,8 @@ EnergyEvseDelegate * GetEvseDelegate()
 
 void SetTestEventTrigger_BasicFunctionality()
 {
-    EnergyEvseDelegate * dg = GetEvseDelegate();
-    Instance * instance     = dg->GetInstance();
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
     sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit    = dg->HwGetMaxHardwareChargeCurrentLimit();
@@ -70,8 +70,8 @@ void SetTestEventTrigger_BasicFunctionality()
 }
 void SetTestEventTrigger_BasicFunctionalityClear()
 {
-    EnergyEvseDelegate * dg = GetEvseDelegate();
-    Instance * instance     = dg->GetInstance();
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
     dg->HwSetMaxHardwareChargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit);
@@ -149,8 +149,8 @@ void SetTestEventTrigger_EVSEDiagnosticsComplete()
 void SetTestEventTrigger_EVSESetSoCLow()
 {
     // Set SoC 20%, 70kWh BatterySize
-    EnergyEvseDelegate * dg = GetEvseDelegate();
-    Instance * instance     = dg->GetInstance();
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
     TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(20)));
@@ -159,8 +159,8 @@ void SetTestEventTrigger_EVSESetSoCLow()
 void SetTestEventTrigger_EVSESetSoCHigh()
 {
     // Set SoC 95%, 70kWh BatterySize
-    EnergyEvseDelegate * dg = GetEvseDelegate();
-    Instance * instance     = dg->GetInstance();
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
     TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(95)));
@@ -169,8 +169,8 @@ void SetTestEventTrigger_EVSESetSoCHigh()
 void SetTestEventTrigger_EVSESetSoCClear()
 {
     // Set SoC null, BatterySize null
-    EnergyEvseDelegate * dg = GetEvseDelegate();
-    Instance * instance     = dg->GetInstance();
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
     VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
     TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::NullNullable);

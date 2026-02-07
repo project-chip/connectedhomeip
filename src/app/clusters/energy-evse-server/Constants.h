@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
 namespace chip::app::Clusters::EnergyEvse {
 
 constexpr int64_t kMinimumChargeCurrentLimit       = 0;

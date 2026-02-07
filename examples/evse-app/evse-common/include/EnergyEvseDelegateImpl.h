@@ -21,6 +21,7 @@
 #include <EVSECallbacks.h>
 #include <EnergyEvseTargetsStore.h>
 #include <EvseTargetsConfig.h>
+#include <app/clusters/energy-evse-server/CodegenIntegration.h>
 #include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
 
 #include <app/util/config.h>
@@ -239,7 +240,7 @@ public:
     Status SendFaultEvent(FaultStateEnum newFaultState);
 
     // ------------------------------------------------------------------
-    // Attribute change callbacks - called by cluster after attribute is updated
+    // Attribute methods - called by cluster to propagate attribute changes to the delegate
     void OnStateChanged(StateEnum newValue) override;
     void OnSupplyStateChanged(SupplyStateEnum newValue) override;
     void OnFaultStateChanged(FaultStateEnum newValue) override;
@@ -265,30 +266,35 @@ public:
     void OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue) override;
 
     // ------------------------------------------------------------------
-    // Local getters for internal delegate use
-    StateEnum GetState() const { return mState; }
-    SupplyStateEnum GetSupplyState() const { return mSupplyState; }
-    FaultStateEnum GetFaultState() const { return mFaultState; }
-    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() const { return mChargingEnabledUntil; }
-    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() const { return mDischargingEnabledUntil; }
-    int64_t GetCircuitCapacity() const { return mCircuitCapacity; }
-    int64_t GetMinimumChargeCurrent() const { return mMinimumChargeCurrent; }
-    int64_t GetMaximumChargeCurrent() const { return mMaximumChargeCurrent; }
-    int64_t GetMaximumDischargeCurrent() const { return mMaximumDischargeCurrent; }
-    int64_t GetUserMaximumChargeCurrent() const { return mUserMaximumChargeCurrent; }
-    uint32_t GetRandomizationDelayWindow() const { return mRandomizationDelayWindow; }
-    DataModel::Nullable<uint32_t> GetNextChargeStartTime() const { return mNextChargeStartTime; }
-    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() const { return mNextChargeTargetTime; }
-    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() const { return mNextChargeRequiredEnergy; }
-    DataModel::Nullable<Percent> GetNextChargeTargetSoC() const { return mNextChargeTargetSoC; }
-    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() const { return mApproximateEVEfficiency; }
-    DataModel::Nullable<Percent> GetStateOfCharge() const { return mStateOfCharge; }
-    DataModel::Nullable<int64_t> GetBatteryCapacity() const { return mBatteryCapacity; }
-    DataModel::Nullable<CharSpan> GetVehicleID() const { return mVehicleID; }
-    DataModel::Nullable<uint32_t> GetSessionID() const { return mSession.mSessionID; }
-    DataModel::Nullable<uint32_t> GetSessionDuration() const { return mSession.mSessionDuration; }
-    DataModel::Nullable<int64_t> GetSessionEnergyCharged() const { return mSession.mSessionEnergyCharged; }
-    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const { return mSession.mSessionEnergyDischarged; }
+    // Instance management for codegen approach
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+    Instance * GetInstance() { return mInstance; }
+
+    // ------------------------------------------------------------------
+    // Local getters for internal delegate use - delegates to cluster instance
+    StateEnum GetState() const { return mInstance->GetState(); }
+    SupplyStateEnum GetSupplyState() const { return mInstance->GetSupplyState(); }
+    FaultStateEnum GetFaultState() const { return mInstance->GetFaultState(); }
+    DataModel::Nullable<uint32_t> GetChargingEnabledUntil() const { return mInstance->GetChargingEnabledUntil(); }
+    DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() const { return mInstance->GetDischargingEnabledUntil(); }
+    int64_t GetCircuitCapacity() const { return mInstance->GetCircuitCapacity(); }
+    int64_t GetMinimumChargeCurrent() const { return mInstance->GetMinimumChargeCurrent(); }
+    int64_t GetMaximumChargeCurrent() const { return mInstance->GetMaximumChargeCurrent(); }
+    int64_t GetMaximumDischargeCurrent() const { return mInstance->GetMaximumDischargeCurrent(); }
+    int64_t GetUserMaximumChargeCurrent() const { return mInstance->GetUserMaximumChargeCurrent(); }
+    uint32_t GetRandomizationDelayWindow() const { return mInstance->GetRandomizationDelayWindow(); }
+    DataModel::Nullable<uint32_t> GetNextChargeStartTime() const { return mInstance->GetNextChargeStartTime(); }
+    DataModel::Nullable<uint32_t> GetNextChargeTargetTime() const { return mInstance->GetNextChargeTargetTime(); }
+    DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() const { return mInstance->GetNextChargeRequiredEnergy(); }
+    DataModel::Nullable<Percent> GetNextChargeTargetSoC() const { return mInstance->GetNextChargeTargetSoC(); }
+    DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() const { return mInstance->GetApproximateEVEfficiency(); }
+    DataModel::Nullable<Percent> GetStateOfCharge() const { return mInstance->GetStateOfCharge(); }
+    DataModel::Nullable<int64_t> GetBatteryCapacity() const { return mInstance->GetBatteryCapacity(); }
+    DataModel::Nullable<CharSpan> GetVehicleID() const { return mInstance->GetVehicleID(); }
+    DataModel::Nullable<uint32_t> GetSessionID() const { return mInstance->GetSessionID(); }
+    DataModel::Nullable<uint32_t> GetSessionDuration() const { return mInstance->GetSessionDuration(); }
+    DataModel::Nullable<int64_t> GetSessionEnergyCharged() const { return mInstance->GetSessionEnergyCharged(); }
+    DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const { return mInstance->GetSessionEnergyDischarged(); }
 
 private:
     /* Constants */
@@ -349,39 +355,18 @@ private:
      */
     static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
 
-    /* Attributes */
-    StateEnum mState             = StateEnum::kNotPluggedIn;
-    SupplyStateEnum mSupplyState = SupplyStateEnum::kDisabled;
-    FaultStateEnum mFaultState   = FaultStateEnum::kNoError;
-    DataModel::Nullable<uint32_t> mChargingEnabledUntil;    // TODO Default to 0 to indicate disabled
-    DataModel::Nullable<uint32_t> mDischargingEnabledUntil; // TODO Default to 0 to indicate disabled
-    int64_t mCircuitCapacity           = 0;
-    int64_t mMinimumChargeCurrent      = kDefaultMinChargeCurrent_mA;
-    int64_t mMaximumChargeCurrent      = 0;
-    int64_t mMaximumDischargeCurrent   = 0;
-    int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent_mA; // TODO update spec
-    uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow_sec;
-    /* PREF attributes */
-    DataModel::Nullable<uint32_t> mNextChargeStartTime;
-    DataModel::Nullable<uint32_t> mNextChargeTargetTime;
-    DataModel::Nullable<int64_t> mNextChargeRequiredEnergy;
-    DataModel::Nullable<Percent> mNextChargeTargetSoC;
-    DataModel::Nullable<uint16_t> mApproximateEVEfficiency;
+    /* Instance pointer for accessing cluster */
+    Instance * mInstance = nullptr;
 
-    /* SOC attributes */
-    DataModel::Nullable<Percent> mStateOfCharge;
-    DataModel::Nullable<int64_t> mBatteryCapacity;
-
-    /* PNC attributes*/
-    DataModel::Nullable<CharSpan> mVehicleID;
-    char mVehicleIDBuf[kMaxVehicleIDBufSize];
-
-    /* Session Object */
+    /* Session Object - delegate owns session state management */
     EvseSession mSession = EvseSession();
 
     /* Helper variables to hold meter val since last EnergyTransferStarted event */
-    int64_t mImportedMeterValueAtEnergyTransferStart; // Charging
-    int64_t mExportedMeterValueAtEnergyTransferStart; // Discharging
+    int64_t mImportedMeterValueAtEnergyTransferStart;
+    int64_t mExportedMeterValueAtEnergyTransferStart;
+
+    /* VehicleID buffer for delegate use */
+    char mVehicleIDBuf[kMaxVehicleIDBufSize];
 
     /* Targets Delegate */
     EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;

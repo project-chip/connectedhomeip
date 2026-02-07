@@ -30,7 +30,6 @@ Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeatur
                    OptionalCommands aOptionalCmds) :
     mCluster(EnergyEvseCluster::Config(aEndpointId, aDelegate, aFeature, aOptionalAttrs, aOptionalCmds))
 {
-    aDelegate.SetInstance(this);
 }
 
 CHIP_ERROR Instance::Init()

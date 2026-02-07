@@ -44,6 +44,30 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
+// Mock test values - used for verification in tests
+constexpr StateEnum kMockState                   = StateEnum::kPluggedInNoDemand;
+constexpr SupplyStateEnum kMockSupplyState       = SupplyStateEnum::kChargingEnabled;
+constexpr FaultStateEnum kMockFaultState         = FaultStateEnum::kNoError;
+constexpr uint32_t kMockChargingEnabledUntil     = 1000;
+constexpr uint32_t kMockDischargingEnabledUntil  = 2000;
+constexpr int64_t kMockCircuitCapacity           = 32000;    // 32A in mA
+constexpr int64_t kMockMinimumChargeCurrent      = 6000;     // 6A in mA
+constexpr int64_t kMockMaximumChargeCurrent      = 32000;    // 32A in mA
+constexpr int64_t kMockMaximumDischargeCurrent   = 16000;    // 16A in mA (V2x)
+constexpr int64_t kMockUserMaximumChargeCurrent  = 24000;    // 24A in mA
+constexpr uint32_t kMockRandomizationDelayWindow = 600;      // 10 minutes
+constexpr uint32_t kMockNextChargeStartTime      = 3600;     // 1 hour from now
+constexpr uint32_t kMockNextChargeTargetTime     = 7200;     // 2 hours from now
+constexpr int64_t kMockNextChargeRequiredEnergy  = 20000000; // 20 kWh in mWh
+constexpr Percent kMockNextChargeTargetSoC       = 80;
+constexpr uint16_t kMockApproximateEVEfficiency  = 150; // 150 Wh/km
+constexpr Percent kMockStateOfCharge             = 45;
+constexpr int64_t kMockBatteryCapacity           = 60000000; // 60 kWh in mWh
+constexpr uint32_t kMockSessionID                = 12345;
+constexpr uint32_t kMockSessionDuration          = 1800;    // 30 minutes
+constexpr int64_t kMockSessionEnergyCharged      = 5000000; // 5 kWh in mWh
+constexpr int64_t kMockSessionEnergyDischarged   = 1000000; // 1 kWh in mWh
+
 struct TestEnergyEvseCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -70,6 +94,7 @@ TEST_F(TestEnergyEvseCluster, TestFeatures)
 
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, minimumFeatures, optionalAttributes, optionalCommands));
+        mockDelegate.SetCluster(cluster);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -118,6 +143,7 @@ TEST_F(TestEnergyEvseCluster, TestFeatures)
 
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+        mockDelegate.SetCluster(cluster);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -179,6 +205,7 @@ TEST_F(TestEnergyEvseCluster, TestFeatures)
 
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+        mockDelegate.SetCluster(cluster);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
@@ -254,6 +281,7 @@ TEST_F(TestEnergyEvseCluster, TestStartupFailsWithMismatchedEndpointId)
     // Create cluster with one endpoint ID
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kClusterEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     // Set delegate to a different endpoint ID
     mockDelegate.SetEndpointId(kDelegateEndpointId);
@@ -274,6 +302,7 @@ TEST_F(TestEnergyEvseCluster, TestStartupSucceedsWithMatchingEndpointId)
     // Create cluster with endpoint ID
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     // Delegate endpoint ID is set in constructor, so they should match
     EXPECT_EQ(mockDelegate.GetEndpointId(), kEndpointId);
@@ -299,6 +328,7 @@ TEST_F(TestEnergyEvseCluster, TestAttributesMinimalConfig)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -375,6 +405,7 @@ TEST_F(TestEnergyEvseCluster, TestAttributesFullConfig)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -495,6 +526,7 @@ TEST_F(TestEnergyEvseCluster, TestWriteAttributes)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -554,6 +586,7 @@ TEST_F(TestEnergyEvseCluster, TestWriteAttributesNotifiesChange)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -601,6 +634,7 @@ TEST_F(TestEnergyEvseCluster, TestWriteReadOnlyAttributesFails)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -666,6 +700,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -681,7 +716,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
     EXPECT_EQ(dirtyList[0].mAttributeId, State::Id);
 
     // Verify delegate callback was called
-    EXPECT_EQ(mockDelegate.GetState(), StateEnum::kPluggedInCharging);
+    EXPECT_EQ(cluster.GetState(), StateEnum::kPluggedInCharging);
 
     // Verify cluster stores the value
     StateEnum readState = StateEnum::kUnknownEnumValue;
@@ -694,7 +729,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EXPECT_EQ(dirtyList.size(), 1u);
     EXPECT_EQ(dirtyList[0].mAttributeId, SupplyState::Id);
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
 
     SupplyStateEnum readSupplyState = SupplyStateEnum::kUnknownEnumValue;
     ASSERT_EQ(tester.ReadAttribute(SupplyState::Id, readSupplyState), CHIP_NO_ERROR);
@@ -706,7 +741,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EXPECT_EQ(dirtyList.size(), 1u);
     EXPECT_EQ(dirtyList[0].mAttributeId, FaultState::Id);
-    EXPECT_EQ(mockDelegate.GetFaultState(), FaultStateEnum::kGroundFault);
+    EXPECT_EQ(cluster.GetFaultState(), FaultStateEnum::kGroundFault);
 
     // --- Test SetCircuitCapacity (read-only attribute) ---
     dirtyList.clear();
@@ -714,7 +749,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EXPECT_EQ(dirtyList.size(), 1u);
     EXPECT_EQ(dirtyList[0].mAttributeId, CircuitCapacity::Id);
-    EXPECT_EQ(mockDelegate.GetCircuitCapacity(), 48000);
+    EXPECT_EQ(cluster.GetCircuitCapacity(), 48000);
 
     int64_t readCircuitCapacity = 0;
     ASSERT_EQ(tester.ReadAttribute(CircuitCapacity::Id, readCircuitCapacity), CHIP_NO_ERROR);
@@ -726,7 +761,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EXPECT_EQ(dirtyList.size(), 1u);
     EXPECT_EQ(dirtyList[0].mAttributeId, MinimumChargeCurrent::Id);
-    EXPECT_EQ(mockDelegate.GetMinimumChargeCurrent(), 8000);
+    EXPECT_EQ(cluster.GetMinimumChargeCurrent(), 8000);
 
     // --- Test SetMaximumChargeCurrent (read-only attribute) ---
     dirtyList.clear();
@@ -734,7 +769,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EXPECT_EQ(dirtyList.size(), 1u);
     EXPECT_EQ(dirtyList[0].mAttributeId, MaximumChargeCurrent::Id);
-    EXPECT_EQ(mockDelegate.GetMaximumChargeCurrent(), 40000);
+    EXPECT_EQ(cluster.GetMaximumChargeCurrent(), 40000);
 
     // --- Test SetStateOfCharge (read-only attribute, SoCReporting feature) ---
     dirtyList.clear();
@@ -742,8 +777,8 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EXPECT_EQ(dirtyList.size(), 1u);
     EXPECT_EQ(dirtyList[0].mAttributeId, StateOfCharge::Id);
-    ASSERT_FALSE(mockDelegate.GetStateOfCharge().IsNull());
-    EXPECT_EQ(mockDelegate.GetStateOfCharge().Value(), 75);
+    ASSERT_FALSE(cluster.GetStateOfCharge().IsNull());
+    EXPECT_EQ(cluster.GetStateOfCharge().Value(), 75);
 
     // --- Test SetBatteryCapacity (read-only attribute, SoCReporting feature) ---
     dirtyList.clear();
@@ -751,8 +786,8 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetAttributes)
 
     EXPECT_EQ(dirtyList.size(), 1u);
     EXPECT_EQ(dirtyList[0].mAttributeId, BatteryCapacity::Id);
-    ASSERT_FALSE(mockDelegate.GetBatteryCapacity().IsNull());
-    EXPECT_EQ(mockDelegate.GetBatteryCapacity().Value(), 80000000);
+    ASSERT_FALSE(cluster.GetBatteryCapacity().IsNull());
+    EXPECT_EQ(cluster.GetBatteryCapacity().Value(), 80000000);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -768,6 +803,7 @@ TEST_F(TestEnergyEvseCluster, TestProgrammaticSetNoOpWhenSameValue)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, allFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -836,6 +872,7 @@ TEST_F(TestEnergyEvseCluster, TestDisable)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -843,9 +880,9 @@ TEST_F(TestEnergyEvseCluster, TestDisable)
     Commands::Disable::Type command;
     EXPECT_TRUE(tester.Invoke(Commands::Disable::Id, command).IsSuccess());
 
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDisabled);
-    EXPECT_EQ(mockDelegate.GetChargingEnabledUntil().Value(), 0u);
-    EXPECT_EQ(mockDelegate.GetDischargingEnabledUntil().Value(), 0u);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.GetChargingEnabledUntil().Value(), 0u);
+    EXPECT_EQ(cluster.GetDischargingEnabledUntil().Value(), 0u);
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -863,6 +900,7 @@ TEST_F(TestEnergyEvseCluster, TestEnableCharging)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -889,62 +927,62 @@ TEST_F(TestEnergyEvseCluster, TestEnableCharging)
 
     // --- Failure with FaultState ---
 
-    mockDelegate.SetFaultState(FaultStateEnum::kGroundFault);
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.SetFaultState(FaultStateEnum::kGroundFault), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
     command.chargingEnabledUntil = 5000;
     command.minimumChargeCurrent = 6000;
     command.maximumChargeCurrent = 32000;
     EXPECT_FALSE(tester.Invoke(Commands::EnableCharging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDisabled);
 
     // --- Failure with DiagnosticsActive ---
 
-    mockDelegate.SetFaultState(FaultStateEnum::kNoError);
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
+    EXPECT_EQ(cluster.SetFaultState(FaultStateEnum::kNoError), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabledDiagnostics), CHIP_NO_ERROR);
     EXPECT_FALSE(tester.Invoke(Commands::EnableCharging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDisabledDiagnostics);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDisabledDiagnostics);
 
     // --- Success from Disabled state -> ChargingEnabled ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
     command.chargingEnabledUntil = 5000;
     command.minimumChargeCurrent = 8000;
     command.maximumChargeCurrent = 40000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableCharging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
-    EXPECT_EQ(mockDelegate.GetChargingEnabledUntil().Value(), 5000u);
-    EXPECT_EQ(mockDelegate.GetMinimumChargeCurrent(), 8000);
-    EXPECT_EQ(mockDelegate.GetMaximumChargeCurrent(), 40000);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+    EXPECT_EQ(cluster.GetChargingEnabledUntil().Value(), 5000u);
+    EXPECT_EQ(cluster.GetMinimumChargeCurrent(), 8000);
+    EXPECT_EQ(cluster.GetMaximumChargeCurrent(), 40000);
 
     // --- Success from DisabledError state -> ChargingEnabled ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabledError);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabledError), CHIP_NO_ERROR);
     command.chargingEnabledUntil = 6000;
     command.minimumChargeCurrent = 6000;
     command.maximumChargeCurrent = 32000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableCharging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
-    EXPECT_EQ(mockDelegate.GetChargingEnabledUntil().Value(), 6000u);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+    EXPECT_EQ(cluster.GetChargingEnabledUntil().Value(), 6000u);
 
     // --- Success from DischargingEnabled state -> Enabled (both) ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDischargingEnabled), CHIP_NO_ERROR);
     command.chargingEnabledUntil = 7000;
     command.minimumChargeCurrent = 6000;
     command.maximumChargeCurrent = 24000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableCharging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kEnabled);
-    EXPECT_EQ(mockDelegate.GetChargingEnabledUntil().Value(), 7000u);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kEnabled);
+    EXPECT_EQ(cluster.GetChargingEnabledUntil().Value(), 7000u);
 
     // --- Success with null timestamp (indefinite charging) ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
     command.chargingEnabledUntil.SetNull();
     command.minimumChargeCurrent = 6000;
     command.maximumChargeCurrent = 32000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableCharging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
-    EXPECT_TRUE(mockDelegate.GetChargingEnabledUntil().IsNull());
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+    EXPECT_TRUE(cluster.GetChargingEnabledUntil().IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -963,6 +1001,7 @@ TEST_F(TestEnergyEvseCluster, TestEnableDischarging)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, features, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
@@ -978,56 +1017,56 @@ TEST_F(TestEnergyEvseCluster, TestEnableDischarging)
 
     // --- Failure with FaultState ---
 
-    mockDelegate.SetFaultState(FaultStateEnum::kGroundFault);
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.SetFaultState(FaultStateEnum::kGroundFault), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
     command.dischargingEnabledUntil = 5000;
     command.maximumDischargeCurrent = 16000;
     EXPECT_FALSE(tester.Invoke(Commands::EnableDischarging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDisabled);
 
     // --- Failure with DiagnosticsActive ---
 
-    mockDelegate.SetFaultState(FaultStateEnum::kNoError);
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
+    EXPECT_EQ(cluster.SetFaultState(FaultStateEnum::kNoError), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabledDiagnostics), CHIP_NO_ERROR);
     EXPECT_FALSE(tester.Invoke(Commands::EnableDischarging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDisabledDiagnostics);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDisabledDiagnostics);
 
     // --- Success from Disabled state -> DischargingEnabled ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
     command.dischargingEnabledUntil = 5000;
     command.maximumDischargeCurrent = 16000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableDischarging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
-    EXPECT_EQ(mockDelegate.GetDischargingEnabledUntil().Value(), 5000u);
-    EXPECT_EQ(mockDelegate.GetMaximumDischargeCurrent(), 16000);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
+    EXPECT_EQ(cluster.GetDischargingEnabledUntil().Value(), 5000u);
+    EXPECT_EQ(cluster.GetMaximumDischargeCurrent(), 16000);
 
     // --- Success from DisabledError state -> DischargingEnabled ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabledError);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabledError), CHIP_NO_ERROR);
     command.dischargingEnabledUntil = 6000;
     command.maximumDischargeCurrent = 12000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableDischarging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
-    EXPECT_EQ(mockDelegate.GetDischargingEnabledUntil().Value(), 6000u);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
+    EXPECT_EQ(cluster.GetDischargingEnabledUntil().Value(), 6000u);
 
     // --- Success from ChargingEnabled state -> Enabled (both) ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kChargingEnabled);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kChargingEnabled), CHIP_NO_ERROR);
     command.dischargingEnabledUntil = 7000;
     command.maximumDischargeCurrent = 10000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableDischarging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kEnabled);
-    EXPECT_EQ(mockDelegate.GetDischargingEnabledUntil().Value(), 7000u);
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kEnabled);
+    EXPECT_EQ(cluster.GetDischargingEnabledUntil().Value(), 7000u);
 
     // --- Success with null timestamp (indefinite discharging) ---
 
-    mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+    EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
     command.dischargingEnabledUntil.SetNull();
     command.maximumDischargeCurrent = 16000;
     EXPECT_TRUE(tester.Invoke(Commands::EnableDischarging::Id, command).IsSuccess());
-    EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
-    EXPECT_TRUE(mockDelegate.GetDischargingEnabledUntil().IsNull());
+    EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
+    EXPECT_TRUE(cluster.GetDischargingEnabledUntil().IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -1047,19 +1086,20 @@ TEST_F(TestEnergyEvseCluster, TestStartDiagnostics)
         BitMask<OptionalCommands> optionalCommands(OptionalCommands::kSupportsStartDiagnostics);
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
+        mockDelegate.SetCluster(cluster);
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
         Commands::StartDiagnostics::Type command;
 
-        mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+        EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
         EXPECT_TRUE(tester.Invoke(Commands::StartDiagnostics::Id, command).IsSuccess());
-        EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDisabledDiagnostics);
+        EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDisabledDiagnostics);
 
         // --- Failure with DiagnosticsActive ---
 
-        mockDelegate.SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
+        EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabledDiagnostics), CHIP_NO_ERROR);
         EXPECT_FALSE(tester.Invoke(Commands::StartDiagnostics::Id, command).IsSuccess());
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -1069,14 +1109,15 @@ TEST_F(TestEnergyEvseCluster, TestStartDiagnostics)
         BitMask<OptionalCommands> optionalCommands;
         EnergyEvseCluster cluster(
             EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, noFeatures, optionalAttributes, optionalCommands));
+        mockDelegate.SetCluster(cluster);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
         Commands::StartDiagnostics::Type command;
 
-        mockDelegate.SetSupplyState(SupplyStateEnum::kDisabled);
+        EXPECT_EQ(cluster.SetSupplyState(SupplyStateEnum::kDisabled), CHIP_NO_ERROR);
         EXPECT_FALSE(tester.Invoke(Commands::StartDiagnostics::Id, command).IsSuccess());
-        EXPECT_EQ(mockDelegate.GetSupplyState(), SupplyStateEnum::kDisabled);
+        EXPECT_EQ(cluster.GetSupplyState(), SupplyStateEnum::kDisabled);
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -1098,6 +1139,7 @@ TEST_F(TestEnergyEvseCluster, TestTargetsCommands)
 
     EnergyEvseCluster cluster(
         EnergyEvseCluster::Config(kTestEndpointId, mockDelegate, features, optionalAttributes, optionalCommands));
+    mockDelegate.SetCluster(cluster);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);

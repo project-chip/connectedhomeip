@@ -123,6 +123,9 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         return err;
     }
 
+    // Link the delegate to the instance for attribute access
+    gEvseDelegate->SetInstance(gEvseInstance.get());
+
     err = gEvseTargetsDelegate->LoadTargets();
     if (err != CHIP_NO_ERROR)
     {
