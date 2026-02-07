@@ -64,7 +64,7 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
     return it.GetStatus();
 }
 
-chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
+chip::FabricIndex kTestFabricIndex = Testing::kTestFabricIndex;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestGroupcastCluster : public ::testing::Test

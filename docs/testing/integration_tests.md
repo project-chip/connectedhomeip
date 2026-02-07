@@ -98,6 +98,8 @@ scripts/tests/run_test_suite.py run --help-paths
   kind: app
 - key: evse
   kind: app
+- key: water-heater
+  kind: app
 - key: fabric-bridge
   kind: app
 - key: fabric-admin

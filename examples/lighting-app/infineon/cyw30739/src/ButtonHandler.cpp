@@ -21,6 +21,7 @@
 #include <ButtonHandler.h>
 #include <LightingManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <cycfg_pins.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <stdio.h>
@@ -77,7 +78,6 @@ wiced_result_t app_button_init(void)
 void app_button_event_handler(const button_manager_button_t * button_mgr, button_manager_event_t event,
                               button_manager_button_state_t state)
 {
-    chip::BitMask<OccupancySensing::OccupancyBitmap> attributeValue;
     if (button_mgr[0].configuration->gpio == PLATFORM_BUTTON_USER)
     {
         if (event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
@@ -96,11 +96,17 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
         else if (event == BUTTON_LONG_DURATION_EVENT && state == BUTTON_STATE_RELEASED)
         {
             // update the current occupancy here for hardcoded endpoint 1
-            OccupancySensing::Attributes::Occupancy::Get(1, &attributeValue);
-            uint8_t bitValue = attributeValue.Raw();
+            auto occupancy = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
+            if (occupancy == nullptr)
+            {
+                printf("No occupancy cluster found on endpoint 1\n");
+                return;
+            }
+
+            bool occupied    = occupancy->IsOccupied();
+            uint8_t bitValue = occupied ? 1 : 0;
             printf("Button Holding Toggle: %d -> %d\n", bitValue, !bitValue);
-            attributeValue.SetRaw(!bitValue);
-            OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
+            occupancy->SetOccupancy(!occupied);
         }
         else if (event == BUTTON_HOLDING_EVENT)
         {

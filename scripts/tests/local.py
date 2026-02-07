@@ -191,6 +191,15 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     targets.append(
         ApplicationTarget(
             kind=SubprocessKind.APP,
+            env_key="WATER_HEATER_APP",
+            cli_key="water-heater",
+            target=f"{target_prefix}-water-heater-{suffix}",
+            binary="matter-water-heater-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
             env_key="EVSE_APP",
             cli_key="evse",
             target=f"{target_prefix}-evse-{suffix}",
