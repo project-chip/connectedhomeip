@@ -104,9 +104,6 @@ public:
 #endif
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    template <class AdvertisingParams>
-    void AddTCPKeyToAdvertisement(AdvertisingParams & advParams);
-
     void SetTCPServerEnabled(bool serverEnabled) { mTCPServerEnabled = serverEnabled; };
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
