@@ -126,8 +126,6 @@ CHIP_ERROR StoredServerName::Set(SerializedQNameIterator value)
 
     if (!writer.Fit())
     {
-        ChipLogError(Discovery, "StoredServerName: Buffer too small. Needed %u, available %u",
-                     static_cast<unsigned>(output.Needed()), static_cast<unsigned>(sizeof(mNameBuffer)));
         Clear();
         return CHIP_ERROR_NO_MEMORY;
     }
