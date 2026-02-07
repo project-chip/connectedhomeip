@@ -21,7 +21,6 @@ import ipaddress
 import re
 
 from mdns_discovery.mdns_discovery import MdnsServiceType
-from mdns_discovery.utils.network import is_dut_tcp_supported
 from mobly import asserts
 from mobly.signals import TestFailure
 
