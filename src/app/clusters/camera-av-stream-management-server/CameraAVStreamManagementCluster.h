@@ -397,6 +397,8 @@ public:
      * to be registered and called by the interaction model at the appropriate times.
      *
      * @param aContext                          Context providing injected dependencies (e.g., SafeAttributePersistenceProvider).
+     *                                          Note: the caller must ensure that the provided SafeAttributePersistenceProvider
+     *                                          outlives this instance.
      *
      * @param aDelegate                         A pointer to the delegate to be used by this server.
      *                                          Note: the caller must ensure that the delegate lives throughout the instance's

@@ -308,8 +308,6 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     }
 
-    void TearDown() override {}
-
     std::vector<VideoStreamStruct> mVideoStreams;
     std::vector<AudioStreamStruct> mAudioStreams;
     std::vector<SnapshotStreamStruct> mSnapshotStreams;
