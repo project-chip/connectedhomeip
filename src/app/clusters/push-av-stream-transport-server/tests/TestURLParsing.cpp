@@ -177,10 +177,22 @@ public:
     {
         PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
         chip::Testing::ClusterTester clusterTester(server);
+
+        // Save the previous global SafeAttributePersistenceProvider so we can restore
+        // it after this test helper completes.
+        app::SafeAttributePersistenceProvider * previousProvider = app::GetSafeAttributePersistenceProvider();
         app::DefaultSafeAttributePersistenceProvider persistenceProvider;
 
         VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         app::SetSafeAttributePersistenceProvider(&persistenceProvider);
+
+        struct ProviderRestorer
+        {
+            app::SafeAttributePersistenceProvider * mPrevious;
+            ~ProviderRestorer() { app::SetSafeAttributePersistenceProvider(mPrevious); }
+        };
+
+        ProviderRestorer restorer{ previousProvider };
         EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
         TestValidateUrlDelegate mockDelegate;

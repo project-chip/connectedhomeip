@@ -76,10 +76,12 @@ static constexpr size_t kTransportOptionsStorageSize =
                                 kContainerOptionsStorageSize, // containerOptions
                                 2u /* Array Overhead */ +
                                     CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS *
-                                        TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)),
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */,
+                                                                     sizeof(uint16_t)),
                                 2u /* Array Overhead */ +
                                     CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS *
-                                        TLV::EstimateStructOverhead(sizeof(uint32_t) /* stream name */, sizeof(uint16_t)));
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */,
+                                                                     sizeof(uint16_t)));
 
 static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t),             // connectionID
