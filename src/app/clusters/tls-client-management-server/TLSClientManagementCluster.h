@@ -48,7 +48,7 @@ public:
      * Creates a TLSClientManagement server instance.
      * @param context The context containing injected dependencies.
      *                           Note: the caller must ensure that the provided dependencies
-     *                           outlives this instance.
+     *                           outlive this instance.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
      * @param certificateTable A reference to the certificate table for looking up certificates
