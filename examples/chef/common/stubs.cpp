@@ -343,7 +343,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, Device::kPumpDeviceTypeId))
         {
             chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
         }
@@ -358,7 +358,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
-        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, Device::kPumpDeviceTypeId))
         {
             chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
         }
@@ -460,14 +460,14 @@ void RefrigeratorTemperatureControlledCabinetInit()
     EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
     EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
     EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
-    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
+    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, Device::kRefrigeratorDeviceTypeId))
     {
         return;
     }
     ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
     TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kRefEndpointId);
 
-    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
@@ -475,7 +475,7 @@ void RefrigeratorTemperatureControlledCabinetInit()
             kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
     }
 
-    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
@@ -496,11 +496,11 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
     switch (kCooktopEpId)
     {
     case DeviceTypes::ExpectedEndpointId::kCooktopStandAlone:
-        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, Device::kCooktopDeviceTypeId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktop;
-            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, Device::kCookSurfaceDeviceTypeId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -512,13 +512,13 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
         break;
     case DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven:
         EndpointId kOvenEpId = DeviceTypes::ExpectedEndpointId::kOven;
-        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
-            DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, Device::kCooktopDeviceTypeId) &&
+            DeviceTypes::EndpointHasDeviceType(kOvenEpId, Device::kOvenDeviceTypeId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
             EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktopOven;
-            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, Device::kCookSurfaceDeviceTypeId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -539,7 +539,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
     EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
     EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
-    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, Device::kOvenDeviceTypeId))
     {
         return;
     }
@@ -547,7 +547,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
     TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kOvenEpId);
 
-    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
