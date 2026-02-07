@@ -19,12 +19,13 @@
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <app/reporting/reporting.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::DataModel;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ElectricalPowerMeasurement;
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ElectricalPowerMeasurement {
+
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
 
 CHIP_ERROR ElectricalPowerMeasurementInstance::Init()
@@ -510,3 +511,69 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::SetNeutralCurrent(DataModel::Null
 
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId,
+                                          std::unique_ptr<ElectricalPowerMeasurementDelegate> & aDelegate,
+                                          std::unique_ptr<ElectricalPowerMeasurementInstance> & aInstance, Feature aFeature,
+                                          OptionalAttributes aOptionalAttributes)
+{
+    CHIP_ERROR err;
+
+    if (aDelegate || aInstance)
+    {
+        ChipLogError(AppServer, "EPM Instance or Delegate already exist.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    aDelegate = std::make_unique<ElectricalPowerMeasurementDelegate>();
+    if (!aDelegate)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for EPM Delegate");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    aInstance = std::make_unique<ElectricalPowerMeasurementInstance>(endpointId, *aDelegate, aFeature, aOptionalAttributes);
+    if (!aInstance)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for EPM Instance");
+        aDelegate.reset();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    err = aInstance->Init(); /* Register Attribute & Command handlers */
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Init failed on aInstance");
+        aInstance.reset();
+        aDelegate.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ElectricalPowerMeasurementShutdown(std::unique_ptr<ElectricalPowerMeasurementInstance> & aInstance,
+                                              std::unique_ptr<ElectricalPowerMeasurementDelegate> & aDelegate)
+{
+    /* Do this in the order Instance first, then delegate
+     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
+     */
+    if (aInstance)
+    {
+        /* deregister attribute & command handlers */
+        aInstance->Shutdown();
+        aInstance.reset();
+    }
+
+    if (aDelegate)
+    {
+        aDelegate.reset();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ElectricalPowerMeasurement
+} // namespace Clusters
+} // namespace app
+} // namespace chip

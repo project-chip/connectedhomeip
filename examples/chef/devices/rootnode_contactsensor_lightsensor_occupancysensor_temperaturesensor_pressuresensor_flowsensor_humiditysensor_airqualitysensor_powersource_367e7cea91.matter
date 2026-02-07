@@ -2728,15 +2728,15 @@ endpoint 2 {
   }
 
   server cluster IlluminanceMeasurement {
-    ram      attribute measuredValue default = 0xC351;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 1;
     ram      attribute maxMeasuredValue default = 0xfffe;
     ram      attribute lightSensorType default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {

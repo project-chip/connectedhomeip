@@ -706,17 +706,17 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             print("error: Duplicate values in node id list")
             return False
 
-    wifi_args = ['ble-wifi']
+    wifi_args = ['ble-wifi', 'nfc-wifi']
     thread_args = ['ble-thread', 'nfc-thread']
     if commissioning_method in wifi_args:
         if args.wifi_ssid is None:
             print("error: missing --wifi-ssid <SSID> for --commissioning-method "
-                  "or --in-test-commissioning-method ble-wifi!")
+                  "or --in-test-commissioning-method ble-wifi or nfc-wifi!")
             return False
 
         if args.wifi_passphrase is None:
             print("error: missing --wifi-passphrase <passphrase> for --commissioning-method or "
-                  "--in-test-commissioning-method ble-wifi!")
+                  "--in-test-commissioning-method ble-wifi or nfc-wifi!")
             return False
 
         config.wifi_ssid = args.wifi_ssid
@@ -874,11 +874,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',

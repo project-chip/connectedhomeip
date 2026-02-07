@@ -24,6 +24,48 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {} // namespace Clusters
+namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(Groupcast::GroupcastTestResultEnum val)
+{
+    using EnumType = Groupcast::GroupcastTestResultEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kGeneralError:
+    case EnumType::kMessageReplay:
+    case EnumType::kFailedAuth:
+    case EnumType::kNoAvailableKey:
+    case EnumType::kSendFailure:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Groupcast::GroupcastTestingEnum val)
+{
+    using EnumType = Groupcast::GroupcastTestingEnum;
+    switch (val)
+    {
+    case EnumType::kDisableTesting:
+    case EnumType::kEnableListenerTesting:
+    case EnumType::kEnableSenderTesting:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Groupcast::MulticastAddrPolicyEnum val)
+{
+    using EnumType = Groupcast::MulticastAddrPolicyEnum;
+    switch (val)
+    {
+    case EnumType::kIanaAddr:
+    case EnumType::kPerGroup:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+} // namespace Clusters
 } // namespace app
 } // namespace chip

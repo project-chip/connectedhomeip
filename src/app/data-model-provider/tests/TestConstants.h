@@ -22,23 +22,23 @@
 namespace chip {
 namespace Testing {
 
-constexpr FabricIndex kTestFabrixIndex = kMinValidFabricIndex;
+constexpr FabricIndex kTestFabricIndex = kMinValidFabricIndex;
 constexpr NodeId kTestNodeId           = 0xFFFF'1234'ABCD'4321;
 
 constexpr Access::SubjectDescriptor kAdminSubjectDescriptor{
-    .fabricIndex = kTestFabrixIndex,
+    .fabricIndex = kTestFabricIndex,
     .authMode    = Access::AuthMode::kCase,
     .subject     = kTestNodeId,
 };
 
 constexpr Access::SubjectDescriptor kViewSubjectDescriptor{
-    .fabricIndex = kTestFabrixIndex + 1,
+    .fabricIndex = kTestFabricIndex + 1,
     .authMode    = Access::AuthMode::kCase,
     .subject     = kTestNodeId,
 };
 
 constexpr Access::SubjectDescriptor kDenySubjectDescriptor{
-    .fabricIndex = kTestFabrixIndex + 2,
+    .fabricIndex = kTestFabricIndex + 2,
     .authMode    = Access::AuthMode::kCase,
     .subject     = kTestNodeId,
 };
