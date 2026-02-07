@@ -111,8 +111,7 @@ JNI_METHOD(jobject, sendUDC)
     }
     else
     {
-        TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(
-            env, jCommissionerDeclarationCallback);
+        MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(env, jCommissionerDeclarationCallback);
     }
 
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
