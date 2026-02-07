@@ -110,13 +110,17 @@ class IsolatedNetworkNamespace:
         "ip netns exec app-{index} ip link set dev {app_link_name}-{index} up",
         "ip netns exec app-{index} ip link set dev lo up",
         "ip link set dev {app_link_name}-sw-{index} up",
-        # Force IPv6 to use ULAs that we control.
         "ip netns exec app-{index} ip -6 addr flush {app_link_name}-{index}",
-        "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
         "ip netns exec app-{index} ip -6 a add fe80::1/64 dev {app_link_name}-{index}",
+        "ip netns exec app-{index} sysctl -w net.ipv6.conf.{app_link_name}-{index}.accept_ra=2",
         "ip netns exec app-{index} sysctl -w net.ipv6.conf.{app_link_name}-{index}.accept_ra_rt_info_max_plen=64",
         'ip netns exec app-{index} sysctl -w net.ipv6.conf.all.forwarding=1',
         'ip netns exec app-{index} sysctl -w net.ipv6.conf.default.forwarding=1',
+    ]
+
+    COMMANDS_APP_LINK_ULA = [
+        # Force IPv6 to use ULAs that we control.
+        "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
     ]
 
     # Bring up tool (controller) connection link.
@@ -125,11 +129,15 @@ class IsolatedNetworkNamespace:
         "ip netns exec tool-{index} ip link set dev {tool_link_name}-{index} up",
         "ip netns exec tool-{index} ip link set dev lo up",
         "ip link set dev {tool_link_name}-sw-{index} up",
-        # Force IPv6 to use ULAs that we control.
         "ip netns exec tool-{index} ip -6 addr flush {tool_link_name}-{index}",
-        "ip netns exec tool-{index} ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}-{index}",
         "ip netns exec tool-{index} ip -6 a add fe80::2/64 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} sysctl -w net.ipv6.conf.{tool_link_name}-{index}.accept_ra=2",
         "ip netns exec tool-{index} sysctl -w net.ipv6.conf.{tool_link_name}-{index}.accept_ra_rt_info_max_plen=64",
+    ]
+
+    COMMANDS_TOOL_LINK_ULA = [
+        # Force IPv6 to use ULAs that we control.
+        "ip netns exec tool-{index} ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}-{index}",
     ]
 
     # Commands for removing namespaces previously created.
@@ -150,7 +158,7 @@ class IsolatedNetworkNamespace:
     ]
 
     def __init__(self, index: int = 0, setup_app_link_up: bool = True, setup_tool_link_up: bool = True,
-                 app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool'):
+                 app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool', add_ula: bool = True):
         self.index = index
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
@@ -158,9 +166,9 @@ class IsolatedNetworkNamespace:
         try:
             self._setup()
             if setup_app_link_up:
-                self.setup_app_link_up(wait_for_dad=False)
+                self.setup_app_link_up(add_ula, wait_for_dad=False)
             if setup_tool_link_up:
-                self._setup_tool_link_up(wait_for_dad=False)
+                self._setup_tool_link_up(add_ula, wait_for_dad=False)
             self._wait_for_duplicate_address_detection()
         except BaseException:
             # Ensure that we leave a clean state on any exception.
@@ -186,13 +194,17 @@ class IsolatedNetworkNamespace:
     def _setup(self):
         self._run(*self.COMMANDS_SETUP)
 
-    def setup_app_link_up(self, wait_for_dad: bool = True):
+    def setup_app_link_up(self, add_ula: bool = True, wait_for_dad: bool = True):
         self._run(*self.COMMANDS_APP_LINK_UP)
+        if add_ula:
+            self._run(*self.COMMANDS_APP_LINK_ULA)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def _setup_tool_link_up(self, wait_for_dad: bool = True):
+    def _setup_tool_link_up(self, add_ula: bool = True, wait_for_dad: bool = True):
         self._run(*self.COMMANDS_TOOL_LINK_UP)
+        if add_ula:
+            self._run(*self.COMMANDS_TOOL_LINK_ULA)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
@@ -300,6 +312,13 @@ class ThreadBorderRouter:
                                       text=True,
                                       encoding='UTF-8')
 
+        sniffer_cmd = f'ip netns exec {self._netns_app} tcpdump -ilo -U -Zroot -wthread.pcap udp port 9000'
+
+        self._sniffer = subprocess.Popen(sniffer_cmd,
+                                         stdout=sys.stdout,
+                                         stderr=subprocess.STDOUT,
+                                         shell=True)
+
         threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
 
         self.expect(r'Co-processor version:', timeout=20)
@@ -345,6 +364,10 @@ class ThreadBorderRouter:
         if self._otbr:
             self._otbr.terminate()
             self._otbr.wait()
+
+        if self._sniffer:
+            self._sniffer.terminate()
+            self._sniffer.wait()
 
 
 class WpaSupplicantMock(threading.Thread):

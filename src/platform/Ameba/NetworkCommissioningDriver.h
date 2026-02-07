@@ -43,10 +43,11 @@ public:
 
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
         item.security.SetRaw(mpScanResults[mIternum].security);
-        item.ssidLen  = mpScanResults[mIternum].SSID.len;
-        item.channel  = mpScanResults[mIternum].channel;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults[mIternum].signal_strength;
+        item.ssidLen         = mpScanResults[mIternum].SSID.len;
+        item.channel         = mpScanResults[mIternum].channel;
+        item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        item.signal.strength = mpScanResults[mIternum].signal_strength;
         memcpy(item.ssid, mpScanResults[mIternum].SSID.val, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID.octet, 6);
 

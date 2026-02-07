@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <clusters/push-av-stream-transport/push-av-stream-manager.h>
 #include <ctime>
 #include <filesystem>
 #include <pushav-transport.h>
@@ -196,8 +197,8 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     {
         if (audioStreamParams.sampleRate == 0)
         {
-            ChipLogError(Camera, "Invalid sample rate: 0. Using fallback 48000 Hz.");
             audioStreamParams.sampleRate = 48000; // Fallback value for invalid sample rate
+            ChipLogError(Camera, "Invalid sample rate: 0. Using fallback 48000 Hz.");
         }
         mAudioInfo.mAudioCodecId  = AV_CODEC_ID_OPUS;
         mAudioInfo.mAudioTimeBase = { 1, static_cast<int>(audioStreamParams.sampleRate) };
@@ -297,7 +298,11 @@ PushAVTransport::~PushAVTransport()
 
     std::filesystem::path uniqueDirPath(mClipInfo.mOutputPath);
 
-    if (std::filesystem::exists(uniqueDirPath) && std::filesystem::is_directory(uniqueDirPath))
+    if (uniqueDirPath.empty())
+    {
+        ChipLogDetail(Camera, "Output path is empty, skipping directory removal");
+    }
+    else if (std::filesystem::exists(uniqueDirPath) && std::filesystem::is_directory(uniqueDirPath))
     {
         std::error_code ec;
         std::filesystem::remove_all(uniqueDirPath, ec);
@@ -398,6 +403,12 @@ bool PushAVTransport::HandleTriggerDetected()
 
 void PushAVTransport::StartRecordingAndStreaming()
 {
+    // Notify manager to reset transport sink state before starting recording
+    if (mManager != nullptr)
+    {
+        mManager->ResetTransportSinkStateForTransport(this);
+    }
+
     mRecorder->mClipInfo.mSessionNumber = mClipInfo.mSessionNumber;
     mRecorder->Start();
     mStreaming = true;
