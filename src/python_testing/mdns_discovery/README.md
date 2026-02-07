@@ -31,32 +31,31 @@ These methods perform discovery for Matter and non-Matter services. Each one
 browses for mDNS advertisements and then resolves the discovered services to
 retrieve complete service information.
 
--   `get_operational_services()`: Discover operational Matter nodes.
--   `get_commissioner_services()`: Discover Matter commissioners.
--   `get_commissionable_services()`: Discover commissionable Matter devices.
--   `get_border_router_services()`: Discover Thread border routers.
--   `get_all_services()`: Discover services of any kind on the network.
--   `discover()`: The mDNS discovery engine powering the discovery methods.
+- `get_operational_services()`: Discover operational Matter nodes.
+- `get_commissioner_services()`: Discover Matter commissioners.
+- `get_commissionable_services()`: Discover commissionable Matter devices.
+- `get_border_router_services()`: Discover Thread border routers.
+- `get_all_services()`: Discover services of any kind on the network.
+- `discover()`: The mDNS discovery engine powering the discovery methods.
 
 ### Record Query Methods
 
 These methods perform direct queries for specific DNS record types (PTR, SRV,
 TXT, A, AAAA) for a given service or host and return their detailed information.
 
--   `get_ptr_records(service_type)`
--   `get_srv_record(service_name)`
--   `get_txt_record(service_name)`
--   `get_quada_records(hostname)`
+- `get_ptr_records(service_type)`
+- `get_srv_record(service_name)`
+- `get_txt_record(service_name)`
+- `get_quada_records(hostname)`
 
 ### Service Type Discovery Methods
 
 These methods identify the types of services advertised on the local network,
 including both non-Matter services and Matter commissionable services.
 
--   `get_all_service_types()`: Discover service types of any kind on the
-    network.
--   `get_commissionable_subtypes()`: Discovers Matter commissionable subtypes
-    advertised during an open commissioning window.
+- `get_all_service_types()`: Discover service types of any kind on the network.
+- `get_commissionable_subtypes()`: Discovers Matter commissionable subtypes
+  advertised during an open commissioning window.
 
 ## 🧪 Example Usage
 
@@ -239,7 +238,7 @@ exact failing constraint obvious.
 
 You can import them from the following file: `mdns_discovery/utils/asserts.py`
 
-```
+```python
 from mdns_discovery.utils.asserts import assert_valid_dn_key
 
 assert_valid_dn_key("Kitchen")
@@ -263,6 +262,29 @@ assert_valid_dn_key("Kitchen")
 | `assert_valid_sat_key` | `assert_valid_product_id`                   |
 | `assert_valid_t_key`   | `assert_valid_vendor_id`                    |
 | `assert_valid_icd_key` | `assert_valid_hostname`                     |
+
+## 🛜 Network Utilities
+
+This module contains network utility functions to support mDNS-related test
+cases.
+
+You can import them from the following file: `mdns_discovery/utils/network.py`
+
+```python
+from mdns_discovery.utils.network import get_host_ipv6_addresses
+
+addr_list = get_host_ipv6_addresses()
+
+for addr in addr_list:
+    print(addr)
+```
+
+### ✅ Available network utility functions
+
+|                           |
+| ------------------------- |
+| `get_host_ipv6_addresses` |
+| `is_dut_tcp_supported`    |
 
 ## 📌 General Information
 
