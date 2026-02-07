@@ -138,6 +138,11 @@ class TC_CADMIN_1_28(CADMINBaseTest):
         _fabric_a_persistent_storage = None
         _fabric_b_persistent_storage = None
 
+        _devCtrlEcoA = None
+        _devCtrlEcoB = None
+        _fabric_a_persistent_storage = None
+        _fabric_b_persistent_storage = None
+
         self.step("1")
         self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
         self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
