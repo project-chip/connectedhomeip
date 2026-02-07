@@ -133,7 +133,6 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
     @async_test_body
     async def test_TC_CADMIN_1_28(self):
-
         _devCtrlEcoA = None
         _devCtrlEcoB = None
         _fabric_a_persistent_storage = None

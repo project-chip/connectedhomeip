@@ -46,7 +46,7 @@ import matter.clusters as Clusters
 from matter import CertificateAuthority
 from matter.interaction_model import InteractionModelError
 from matter.storage import VolatileTemporaryPersistentStorage
-from matter.testing.apps import AppServerSubprocess, JFSubprocess
+from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -103,7 +103,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             timeout=10)
 
         # Start Fabric A JF-Controller App
-        self.fabric_a_ctrl = JFSubprocess(
+        self.fabric_a_ctrl = JFControllerSubprocess(
             jfc_server_app,
             rpc_server_port=33033,
             storage_dir=self.storage_fabric_a,
