@@ -45,7 +45,7 @@ import matter.clusters as Clusters
 import matter.tlv
 from matter import CertificateAuthority
 from matter.storage import VolatileTemporaryPersistentStorage
-from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.apps import AppServerSubprocess, JFSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -147,6 +147,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
+            "JFC-A",
             rpc_server_port=33033,
             storage_dir=self.storage_fabric_a,
             vendor_id=self.jfctrl_fabric_a_vid)
@@ -274,6 +275,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         # Start Fabric B JF-Administrator App
         self.fabric_b_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
+            "JFC-B",
             rpc_server_port=33055,
             storage_dir=self.storage_fabric_b,
             vendor_id=self.jfctrl_fabric_b_vid)

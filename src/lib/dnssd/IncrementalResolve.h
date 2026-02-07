@@ -59,7 +59,7 @@ private:
     //
     // This does not try to optimize out ".local" suffix which is always expected
     // since comparisons are easier when suffix is still present.
-    static constexpr size_t kMaxStoredNameLength = 64;
+    static constexpr size_t kMaxStoredNameLength = 256;
 
     uint8_t mNameBuffer[kMaxStoredNameLength] = {};
 };
