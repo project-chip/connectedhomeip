@@ -241,7 +241,7 @@ void JFAManager::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onCo
     }
 
     // Set the action to take once connection is successfully established
-    mNodeId = scopedNodeId.GetNodeId();
+    mNodeId            = scopedNodeId.GetNodeId();
     mOnConnectedAction = onConnectedAction;
 
     ChipLogDetail(JointFabric, "Establishing session to node ID 0x" ChipLogFormatX64 " on fabric index %d",
@@ -388,24 +388,21 @@ void JFAManager::OnCommissioningCompleteResponse(
 
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
-        ChipLogProgress(JointFabric, "Commssioning Failed (nodeId=%ld, isJCM = %d), Code=%u",
-            jfaManager->mNodeId,
-            jfaManager->mOnConnectedAction == kJCMCommissioning,
-            to_underlying(data.errorCode)
-        );
+        ChipLogProgress(JointFabric, "Commssioning Failed (nodeId=%ld, isJCM = %d), Code=%u", jfaManager->mNodeId,
+                        jfaManager->mOnConnectedAction == kJCMCommissioning, to_underlying(data.errorCode));
     }
     else
     {
         switch (jfaManager->mOnConnectedAction)
         {
-            case kStandardCommissioningComplete: {
-                ChipLogProgress(JointFabric, "Standard Commissioning (nodeId=%ld) success", jfaManager->mNodeId);
-                break;
-            }
-            case kJCMCommissioning: {
-                ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", jfaManager->mNodeId);
-                break;
-            }
+        case kStandardCommissioningComplete: {
+            ChipLogProgress(JointFabric, "Standard Commissioning (nodeId=%ld) success", jfaManager->mNodeId);
+            break;
+        }
+        case kJCMCommissioning: {
+            ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", jfaManager->mNodeId);
+            break;
+        }
         }
     }
 
