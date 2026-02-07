@@ -95,7 +95,7 @@ CHIP_ERROR EnergyEvseCluster::SetDischargingEnabledUntil(DataModel::Nullable<uin
 CHIP_ERROR EnergyEvseCluster::SetCircuitCapacity(int64_t newValue)
 {
     VerifyOrReturnError(mCircuitCapacity != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(mCircuitCapacity >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(newValue >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mCircuitCapacity = newValue;
     mDelegate.OnCircuitCapacityChanged(newValue);
     NotifyAttributeChanged(CircuitCapacity::Id);
@@ -135,7 +135,7 @@ CHIP_ERROR EnergyEvseCluster::SetMaximumDischargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetUserMaximumChargeCurrent(int64_t newValue)
 {
     VerifyOrReturnError(mUserMaximumChargeCurrent != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(mUserMaximumChargeCurrent >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(newValue >= 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mUserMaximumChargeCurrent = newValue;
     mDelegate.OnUserMaximumChargeCurrentChanged(newValue);
     NotifyAttributeChanged(UserMaximumChargeCurrent::Id);
@@ -145,7 +145,7 @@ CHIP_ERROR EnergyEvseCluster::SetUserMaximumChargeCurrent(int64_t newValue)
 CHIP_ERROR EnergyEvseCluster::SetRandomizationDelayWindow(uint32_t newValue)
 {
     VerifyOrReturnError(mRandomizationDelayWindow != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(mRandomizationDelayWindow <= kMaxRandomizationDelayWindowSec, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(newValue <= kMaxRandomizationDelayWindowSec, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mRandomizationDelayWindow = newValue;
     mDelegate.OnRandomizationDelayWindowChanged(newValue);
     NotifyAttributeChanged(RandomizationDelayWindow::Id);

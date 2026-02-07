@@ -134,6 +134,7 @@ TEST_F(TestEnergyEvseCluster, TestFeatures)
                                                    {
                                                        GetTargetsResponse::Id,
                                                    }));
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
     // Test with all features and no optional attributes & no optional commands
     {
