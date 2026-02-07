@@ -388,7 +388,7 @@ void JFAManager::OnCommissioningCompleteResponse(
 
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
-        ChipLogProgress(JointFabric, "Commssioning Failed (nodeId=%ld, isJCM = %d), Code=%u", 
+        ChipLogProgress(JointFabric, "Commssioning Failed (nodeId=%ld, isJCM = %d), Code=%u",
             jfaManager->mNodeId,
             jfaManager->mOnConnectedAction == kJCMCommissioning,
             to_underlying(data.errorCode)
