@@ -29,6 +29,7 @@
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/reporting/Generations.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -46,6 +47,7 @@ class InteractionModelEngine;
 class TestReadInteraction;
 
 namespace reporting {
+
 /*
  *  @class Engine
  *
@@ -123,7 +125,7 @@ public:
 
     uint32_t GetNumReportsInFlight() const { return mNumReportsInFlight; }
 
-    uint64_t GetDirtySetGeneration() const { return mDirtyGeneration; }
+    AttributeGeneration GetDirtySetGeneration() const { return mDirtyGeneration; }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     size_t GetGlobalDirtySetSize() { return mGlobalDirtySet.Allocated(); }
@@ -145,9 +147,11 @@ private:
 
     struct AttributePathParamsWithGeneration : public AttributePathParams
     {
-        AttributePathParamsWithGeneration() {}
+        AttributePathParamsWithGeneration() = default;
         AttributePathParamsWithGeneration(const AttributePathParams aPath) : AttributePathParams(aPath) {}
-        uint64_t mGeneration = 0;
+
+        // AttributePathParams is 32-bit aligned, so u32 seems reasonable since we do not use packed structs.
+        AttributeGeneration mGeneration;
     };
 
     /**
@@ -233,7 +237,7 @@ private:
 
     CHIP_ERROR InsertPathIntoDirtySet(const AttributePathParams & aAttributePath);
 
-    inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
+    inline void BumpDirtySetGeneration() { mDirtyGeneration.Increment(); }
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
@@ -282,7 +286,7 @@ private:
      * Count it from 1, so 0 can be used in ReadHandler to indicate "the read handler has never
      * completed a report".
      */
-    uint64_t mDirtyGeneration = 1;
+    AttributeGeneration mDirtyGeneration{ 1 };
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint32_t mReservedSize          = 0;

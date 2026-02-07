@@ -59,7 +59,13 @@ public:
 
         BasicInformationCluster::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
 
-        gServer.Create(optionalAttributeSet);
+        DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+        VerifyOrDie(provider != nullptr);
+
+        BasicInformationCluster::Context context = { .deviceInstanceInfoProvider = *provider,
+                                                     .configurationManager       = DeviceLayer::ConfigurationMgr(),
+                                                     .platformManager            = DeviceLayer::PlatformMgr() };
+        gServer.Create(optionalAttributeSet, context);
 
         // This disabling of the unique id attribute is here only for test purposes. The uniqe id attribute
         // is mandatory, but was optional in previous versions. It is forced to be enabled in the basic information

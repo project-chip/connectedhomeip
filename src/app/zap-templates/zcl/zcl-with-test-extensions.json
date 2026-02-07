@@ -360,6 +360,11 @@
             "IdentifyTime",
             "IdentifyType"
         ],
+        "Illuminance Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -769,7 +774,17 @@
         ],
         "Power Topology": ["FeatureMap"],
         "Power Source": ["ClusterRevision"],
-        "Valve Configuration and Control": ["RemainingDuration"],
+        "Valve Configuration and Control": [
+            "OpenDuration",
+            "AutoCloseTime",
+            "RemainingDuration",
+            "CurrentState",
+            "TargetState",
+            "CurrentLevel",
+            "TargetLevel",
+            "ValveFault",
+            "ClusterRevision"
+        ],
         "Boolean State Configuration": [
             "AlarmsActive",
             "AlarmsEnabled",

@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:183
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -72,14 +72,14 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             # To use act like:
             #   act -j test_suites_linux
             #
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules & Bootstrap
@@ -297,7 +297,9 @@ jobs:
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target linux-x64-all-devices-${BUILD_VARIANT} \
                         --target linux-x64-evse-${BUILD_VARIANT} \
+                        --target linux-x64-water-heater-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -312,6 +314,7 @@ jobs:
                    -DCMAKE_BUILD_TYPE=Debug \
                    -DOTBR_BORDER_ROUTING=ON \
                    -DOTBR_MDNS=openthread \
+                   -DOT_POSIX_SETTINGS_PATH='\"tmp\"' \
                    -DOT_FIREWALL=OFF \
                    -DOT_LOG_LEVEL=INFO \
                    -DOT_TREL=OFF \
@@ -357,6 +360,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -372,11 +376,13 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -388,6 +394,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -398,6 +405,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
@@ -420,6 +428,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -442,10 +451,12 @@ jobs:
                      --exclude-tags EXTRA_SLOW \
                      --exclude-tags SLOW \
                      --exclude-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -457,6 +468,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
             - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
@@ -466,10 +478,12 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner matter_repl_python \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -481,6 +495,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v6
@@ -542,7 +557,7 @@ jobs:
               run: |
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -595,7 +610,9 @@ jobs:
                         --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-evse-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -618,11 +635,13 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      --app-path all-clusters:./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-devices:./objdir-clone/darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT}/all-devices-app \
                      --app-path lock:./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --app-path ota-provider:./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --app-path ota-requestor:./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
@@ -634,6 +653,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/darwin-${{matrix.arch}}-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -646,6 +666,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
@@ -728,7 +749,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -778,7 +799,7 @@ jobs:
             - name: Build linux-x64-all-devices
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-all-devices-tsan-clang-test
+                  --target linux-x64-all-devices-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-all-devices-tsan-clang-test"
 
@@ -802,6 +823,13 @@ jobs:
                   --target linux-x64-evse-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-evse-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-water-heater
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-network-manager
               run: >-
@@ -971,7 +999,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:182
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -990,7 +1018,7 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
@@ -1010,7 +1038,7 @@ jobs:
                   # keep-sorted: start
                   echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
-                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-tsan-clang-test/all-devices-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-tsan-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
@@ -1034,6 +1062,7 @@ jobs:
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
                   echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   # keep-sorted: end
 
@@ -1121,7 +1150,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
