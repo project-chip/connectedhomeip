@@ -89,12 +89,12 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         # Create a temporary storage directory for both ecosystems to keep KVS files if not already provided by user.
         if self.storage_fabric_a is None:
-            self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
-            self.storage_fabric_a = self.storage_directory_ecosystem_a.name
+            self.storage_directory_ecosystem_a = tempfile.mkdtemp(prefix=self.__class__.__name__+"_A_")
+            self.storage_fabric_a = self.storage_directory_ecosystem_a
             log.info("Temporary storage directory: %s", self.storage_fabric_a)
         if self.storage_fabric_b is None:
-            self.storage_directory_ecosystem_b = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_B_")
-            self.storage_fabric_b = self.storage_directory_ecosystem_b.name
+            self.storage_directory_ecosystem_b = tempfile.mkdtemp(prefix=self.__class__.__name__+"_B_")
+            self.storage_fabric_b = self.storage_directory_ecosystem_b
             log.info("Temporary storage directory: %s", self.storage_fabric_b)
 
     def teardown_class(self):
@@ -134,6 +134,11 @@ class TC_CADMIN_1_28(CADMINBaseTest):
     @async_test_body
     async def test_TC_CADMIN_1_28(self):
 
+        _devCtrlEcoA = None
+        _devCtrlEcoB = None
+        _fabric_a_persistent_storage = None
+        _fabric_b_persistent_storage = None
+
         self.step("1")
         self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
         self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
@@ -141,7 +146,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         # Start Fabric A JF-Administrator App
         self.fabric_a_admin = JFAdministratorSubprocess(
-            jfa_server_app,
+            self.jfa_server_app,
             prefix="JFA-A",
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
@@ -154,7 +159,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
-            jfc_server_app,
+            self.jfc_server_app,
             prefix="JFC-A",
             rpc_server_port=33033,
             storage_dir=self.storage_fabric_a,
@@ -209,7 +214,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork-long 2 {self.thserver_fabric_a_passcode} {self.thserver_fabric_a_discriminator}",
             expected_output="[CTL] Commissioning complete for node ID 0x0000000000000002: success",
-            timeout=20)
+            timeout=30)
 
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
@@ -218,7 +223,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
         _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+        _devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16), int('fffe0001', 16)])
@@ -230,7 +235,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         # Start Fabric B JF-Administrator App
         self.fabric_b_admin = JFAdministratorSubprocess(
-            jfa_server_app,
+            self.jfa_server_app,
             prefix="JFA-B",
             storage_dir=self.storage_fabric_b,
             port=random.randint(5001, 5999),
@@ -243,7 +248,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         # Start Fabric B JF-Administrator App
         self.fabric_b_ctrl = JFControllerSubprocess(
-            jfc_server_app,
+            self.jfc_server_app,
             prefix="JFC-B",
             rpc_server_port=33055,
             storage_dir=self.storage_fabric_b,
@@ -259,9 +264,9 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             timeout=60)
 
         log.info("Waiting for transfer of ownership from the commissioner(controller) to the administrator and completion of commissioning")
-        self.fabric_a_admin.set_output_match("OnCommissioningCompleteResponse")
-        self.fabric_a_admin.event.clear()
-        if self.fabric_a_admin.event.wait(30) is False:
+        self.fabric_b_admin.set_output_match("Joint Fabric Administrator commissioned on fabric index 2")
+        self.fabric_b_admin.event.clear()
+        if self.fabric_b_admin.event.wait(30) is False:
             raise TimeoutError("Timed out waiting for commissioning to complete")
         log.info("JCM commissioning complete")
 
@@ -314,28 +319,23 @@ class TC_CADMIN_1_28(CADMINBaseTest):
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_b_persistent_storage)
         _certAuthorityManagerB.LoadAuthoritiesFromStorage()
-        devCtrlEcoB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
+        _devCtrlEcoB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
             nodeId=201,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoBCATs, 16)])
 
         self.step("3")
+        response = None  # Initialize the response variable to be used outside of the try block
+        discriminator = random.randint(0, 4095)
+
         try:
-            discriminator = random.randint(0, 4095)
-            response = await devCtrlEcoB.OpenJointCommissioningWindow(
+            response = await _devCtrlEcoB.OpenJointCommissioningWindow(
                 nodeId=11,
                 endpointId=1,
                 timeout=400,
                 iteration=random.randint(1000, 100000),
                 discriminator=discriminator
             )
-
-            self.step("2")
-            _nodeID = 15
-            self.fabric_a_ctrl.send(
-                message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
-                expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
-                timeout=30)
 
         except Exception as e:
             asserts.assert_true(False, f'Exception {e} occured during OJCW')
@@ -354,14 +354,20 @@ class TC_CADMIN_1_28(CADMINBaseTest):
         log.info(f"Successfully found service with CM={service_found.cm}, D={service_found.d}")
 
         self.step("5")
-        _nodeID = 15
-        self.fabric_b_ctrl.send(
-            message=f"pairing onnetwork {_nodeID} {response.setupPinCode} --jcm true",
-            expected_output=f"[JF] Joint Commissioning Method (nodeId={_nodeID}) success",
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork-long 15 {response.setupPinCode} {discriminator} --jcm true",
+            expected_output=f"[CTL] Commissioning complete for node ID 0x000000000000000F: success",
             timeout=60)
 
+        log.info("Waiting for transfer of ownership from the commissioner(controller) to the administrator and completion of commissioning")
+        self.fabric_a_admin.set_output_match("[JF] Joint Commissioning Method (nodeId=15) success")
+        self.fabric_a_admin.event.clear()
+        if self.fabric_a_admin.event.wait(30) is False:
+            raise TimeoutError("Timed out waiting for commissioning to complete")
+        log.info("JCM commissioning complete")
+
         self.step("6")
-        response = await devCtrlEcoA.ReadAttribute(
+        response = await _devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
             returnClusterObject=True)
 
@@ -380,8 +386,14 @@ class TC_CADMIN_1_28(CADMINBaseTest):
                 break
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
 
-        devCtrlEcoA.Shutdown()
-        devCtrlEcoB.Shutdown()
+        if _devCtrlEcoA is not None:
+            _devCtrlEcoA.Shutdown()
+        if _devCtrlEcoB is not None:
+            _devCtrlEcoB.Shutdown()
+        if _fabric_a_persistent_storage is not None:
+            _fabric_a_persistent_storage.Shutdown()
+        if _fabric_b_persistent_storage is not None:
+            _fabric_b_persistent_storage.Shutdown()
 
 
 if __name__ == "__main__":
