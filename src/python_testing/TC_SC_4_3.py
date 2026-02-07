@@ -30,6 +30,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run2:
@@ -42,6 +43,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -51,6 +53,7 @@ import logging
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
                                           assert_valid_sai_key, assert_valid_sat_key, assert_valid_sii_key, assert_valid_t_key)
+from mdns_discovery.utils.network import is_dut_tcp_supported
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -347,8 +350,11 @@ class TC_SC_4_3(MatterBaseTest):
                 asserts.assert_equal(int(txt_record.txt['SAT']), active_mode_threshold_ms)
 
         # T TXT KEY
-        result, message = self.verify_t_value(txt_record)
-        asserts.assert_true(result, message)
+        supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
+        supports_tcp_pics = self.check_pics(TCP_PICS_STR)
+        t_key_present = 'T' in txt_record.txt
+        t_key = txt_record.txt.get('T', None)
+        assert_valid_t_key(t_key, t_key_present, supports_tcp_dut, supports_tcp_pics, enforce_provisional=False)
 
         # Verify the AAAA records contain a valid IPv6 address
         log.info("Verify the AAAA record contains a valid IPv6 address")
