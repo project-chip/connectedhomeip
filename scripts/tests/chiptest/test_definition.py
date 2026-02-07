@@ -273,6 +273,7 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     'rvc': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-rvc-app'),
     'terms-and-conditions': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-terms-and-conditions-app'),
     'tv': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-tv-app'),
+    'water-heater': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='matter-water-heater-app'),
     'water-leak-detector': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='water-leak-detector-app'),
 
     # Tools

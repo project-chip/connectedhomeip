@@ -68,192 +68,6 @@ std::unique_ptr<EnergyEvseManager> gEvseInstance;
 std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 
 /*
- *  @brief  Creates a Delegate and Instance for PowerTopology cluster
- */
-CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId)
-{
-    CHIP_ERROR err;
-
-    if (gPTDelegate || gPTInstance)
-    {
-        ChipLogError(AppServer, "PowerTopology Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gPTDelegate = std::make_unique<PowerTopologyDelegate>();
-    if (!gPTDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for PowerTopology Delegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    gPTInstance = std::make_unique<PowerTopologyInstance>(
-        EndpointId(endpointId), *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology));
-
-    if (!gPTInstance)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for PowerTopology Instance");
-        gPTDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    err = gPTInstance->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gPTInstance");
-        gPTInstance.reset();
-        gPTDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerTopologyShutdown()
-{
-    if (gPTInstance)
-    {
-        gPTInstance->Shutdown();
-        gPTInstance.reset();
-    }
-    if (gPTDelegate)
-    {
-        gPTDelegate.reset();
-    }
-    return CHIP_NO_ERROR;
-}
-
-/*
- *  @brief  Creates a Delegate and Instance for Electrical Power Measurement cluster
- */
-CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId)
-{
-    CHIP_ERROR err;
-
-    if (gEPMDelegate || gEPMInstance)
-    {
-        ChipLogError(AppServer, "EPM Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gEPMDelegate = std::make_unique<ElectricalPowerMeasurementDelegate>();
-    if (!gEPMDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for EPM Delegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
-        EndpointId(endpointId), *gEPMDelegate,
-        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
-            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
-            ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
-            ElectricalPowerMeasurement::Feature::kPowerQuality),
-        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
-
-    if (!gEPMInstance)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for EPM Instance");
-        gEPMDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    err = gEPMInstance->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gEPMInstance");
-        gEPMInstance.reset();
-        gEPMDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ElectricalPowerMeasurementShutdown()
-{
-    if (gEPMInstance)
-    {
-        gEPMInstance->Shutdown();
-        gEPMInstance.reset();
-    }
-    if (gEPMDelegate)
-    {
-        gEPMDelegate.reset();
-    }
-    return CHIP_NO_ERROR;
-}
-
-/*
- *  @brief  Creates a Delegate and Instance for Device Energy Management cluster
- */
-CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId)
-{
-    if (gDEMDelegate || gDEMInstance)
-    {
-        ChipLogError(AppServer, "DEM Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gDEMDelegate = std::make_unique<DeviceEnergyManagementDelegate>();
-    if (!gDEMDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementDelegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
-
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(endpointId, *gDEMDelegate, featureMap);
-
-    if (!gDEMInstance)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementManager");
-        gDEMDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    gDEMDelegate->SetDeviceEnergyManagementInstance(*gDEMInstance);
-
-    CHIP_ERROR err = gDEMInstance->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gDEMInstance");
-        gDEMInstance.reset();
-        gDEMDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void DeviceEnergyManagementShutdown()
-{
-    if (gDEMInstance)
-    {
-        gDEMInstance->Shutdown();
-        gDEMInstance.reset();
-    }
-    if (gDEMDelegate)
-    {
-        gDEMDelegate.reset();
-    }
-}
-
-/*
  *  @brief  Creates a Delegate and Instance for Energy EVSE cluster
  */
 CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
@@ -392,9 +206,31 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 {
     if (!gCommonClustersInitialized)
     {
-        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId);
-        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(endpointId);
-        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId);
+        chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
+        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap);
+        // These features and optional attributes are used to make the app pass certification
+        // We recommend implementers of the app to modify these to fit their needs
+        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(
+            endpointId, gEPMDelegate, gEPMInstance,
+            BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
+                ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
+                ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
+                ElectricalPowerMeasurement::Feature::kPowerQuality),
+            BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
+        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId, gPTDelegate, gPTInstance);
     }
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(gEPMDelegate && gEPMInstance, CHIP_ERROR_INCORRECT_STATE);
@@ -408,11 +244,6 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 
 void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpointId)
 {
-    if (endpointId != GetEnergyDeviceEndpointId())
-    {
-        return;
-    }
-
     VerifyOrDie(!gEEMAttrAccess);
 
     gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
@@ -478,10 +309,10 @@ void EvseApplicationShutdown()
 
     /* Shutdown in reverse order that they were created */
     TEMPORARY_RETURN_IGNORED EVSEManufacturerShutdown();
-    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown();
-    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown();
+    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown(gPTInstance, gPTDelegate);
+    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(gEPMInstance, gEPMDelegate);
     TEMPORARY_RETURN_IGNORED EnergyEvseShutdown();
-    DeviceEnergyManagementShutdown();
+    DeviceEnergyManagementShutdown(gDEMInstance, gDEMDelegate);
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
