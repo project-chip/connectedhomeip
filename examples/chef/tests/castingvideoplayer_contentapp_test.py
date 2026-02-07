@@ -39,7 +39,12 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         return [TestStep(1, "[TC_CASTINGVIDEOPLAYER] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[TC_CASTINGVIDEOPLAYER] Test media playback."),
                 TestStep(3, "[TC_CASTINGVIDEOPLAYER] Test wake on lan."),
-                TestStep(4, "[TC_CASTINGVIDEOPLAYER] Test channel.")]
+                TestStep(4, "[TC_CASTINGVIDEOPLAYER] Test channel."),
+                TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off.")]
+
+    async def _read_on_off(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
 
     async def _read_media_playback_current_state(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -64,6 +69,28 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
     async def _read_channel_channel_list(self, endpoint):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Objects.Channel, attribute=Clusters.Objects.Channel.Attributes.ChannelList)
+
+    async def on_off_test(self, endpoint):
+        # Set initial state to On
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.OnOff.Commands.On(),
+            endpoint=endpoint,
+        )
+        asserts.assert_true(await self._read_on_off(endpoint), "OnOff attribute should be True after On command.")
+
+        # Send Off command and verify
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.OnOff.Commands.Off(),
+            endpoint=endpoint,
+        )
+        asserts.assert_false(await self._read_on_off(endpoint), "OnOff attribute should be False after Off command.")
+
+        # Send On command and verify
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.OnOff.Commands.On(),
+            endpoint=endpoint,
+        )
+        asserts.assert_true(await self._read_on_off(endpoint), "OnOff attribute should be True after On command.")
 
     async def media_playback_test(self, endpoint):
         # Play
@@ -233,6 +260,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(4)
         await self.channel_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+
+        self.step(5)
+        await self.on_off_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
 
 if __name__ == "__main__":
