@@ -1212,6 +1212,7 @@ subsequent connections to that TV.
    is similar to item (3) - the pin code flow will be attempted and fail, the
    cached credential will be deleted which allows the next attempt to succeed.
    Some middleware providers may handle this scenario differently.
+
 ### Detecting App Presence on Casting Player (Optional)
 
 Before establishing a full commissioning session, a Casting Client can use the
