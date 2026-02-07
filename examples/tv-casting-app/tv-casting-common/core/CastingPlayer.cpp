@@ -35,10 +35,8 @@ void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, Identificat
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(
-        connectionCallbacks.mOnConnectionComplete != nullptr,
-        ChipLogError(AppServer,
-                     "CastingPlayer::VerifyOrEstablishConnection() ConnectionCallbacks.mOnConnectionComplete was not provided"));
+    VerifyOrExit(connectionCallbacks.mOnConnectionComplete != nullptr,
+                 ChipLogError(AppServer, "CastingPlayer::SendUDC() ConnectionCallbacks.mOnConnectionComplete was not provided"));
 
     mOnCompleted         = connectionCallbacks.mOnConnectionComplete;
     mTargetCastingPlayer = weak_from_this();
@@ -219,7 +217,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             //
                             // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                             support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
-                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance()->Load();
+                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance() -> Load();
                         },
                         [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                             ChipLogError(AppServer,
