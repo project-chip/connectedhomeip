@@ -77,28 +77,6 @@ JNI_METHOD(jobject, sendUDC)
         ChipLogError(AppServer, "MatterCastingPlayer-JNI::sendUDC() jFailureCallback == nullptr but is mandatory "));
 
     // jIdentificationDeclarationOptions is optional
-    matter::casting::core::IdentificationDeclarationOptions * idOptions = nullptr;
-    if (jIdentificationDeclarationOptions == nullptr)
-    {
-        ChipLogProgress(AppServer,
-                        "MatterCastingPlayer-JNI::sendUDC() Optional jIdentificationDeclarationOptions not "
-                        "provided by the client");
-    }
-    else
-    {
-        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::sendUDC() jIdentificationDeclarationOptions was provided by client");
-        idOptions = support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions);
-        VerifyOrReturnValue(idOptions != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
-                            ChipLogError(AppServer,
-                                         "MatterCastingPlayer-JNI::sendUDC() "
-                                         "convertIdentificationDeclarationOptionsFromJavaToCpp() error"));
-        idOptions->LogDetail();
-    }
-
-    MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
-    MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
-
-    // jIdentificationDeclarationOptions is optional
     matter::casting::core::IdentificationDeclarationOptions idOptions;
     if (jIdentificationDeclarationOptions != nullptr)
     {
@@ -120,6 +98,21 @@ JNI_METHOD(jobject, sendUDC)
         ChipLogProgress(AppServer,
                         "MatterCastingPlayer-JNI::sendUDC() Optional jIdentificationDeclarationOptions not "
                         "provided by the client");
+    }
+    MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
+    MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
+
+    // jCommissionerDeclarationCallback is optional
+    if (jCommissionerDeclarationCallback == nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::sendUDC() optional jCommissionerDeclarationCallback was not "
+                        "provided by the client");
+    }
+    else
+    {
+        TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(
+            env, jCommissionerDeclarationCallback);
     }
 
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
