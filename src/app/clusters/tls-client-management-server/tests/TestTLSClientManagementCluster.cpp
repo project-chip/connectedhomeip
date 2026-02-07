@@ -21,6 +21,7 @@
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -287,8 +288,8 @@ struct TestTLSClientManagementCluster : public ::testing::Test
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
 
-        // Add some test root certificates for the test fabric index (151)
-        constexpr FabricIndex kMockTestFabric = static_cast<FabricIndex>(151);
+        // Add some test root certificates for the test fabric index.
+        constexpr FabricIndex kMockTestFabric = Testing::kTestFabricIndex;
         mMockCertTable.rootCerts.push_back({ kMockTestFabric, 1 });
         mMockCertTable.rootCerts.push_back({ kMockTestFabric, 2 });
 
