@@ -883,6 +883,13 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
+    if (mCurrentConnections.size() >= CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Maximum number of connections reached", mEndpointId);
+        handler.AddStatus(commandPath, Status::ResourceExhausted);
+        return std::nullopt;
+    }
+
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
@@ -1172,7 +1179,11 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         outTransportConfiguration.SetFabricIndex(accessingFabricIndex);
 
-        UpsertStreamTransportConnection(outTransportConfiguration);
+        if (UpsertStreamTransportConnection(outTransportConfiguration) == UpsertResultEnum::kFailed)
+        {
+            handler.AddStatus(commandPath, Status::Failure);
+            return std::nullopt;
+        }
 
         response.transportConfiguration = outTransportConfiguration;
 

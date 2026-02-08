@@ -33,7 +33,7 @@ namespace PushAvStreamTransport {
 // segmentDuration: 2 bytes
 // chunkDuration: 2 bytes
 // sessionGroup: 1 byte
-// mTrackNameBuffer: ~32 bytes - padded
+// mTrackNameBuffer: 16 bytes
 // mCENCKeyBuffer: 16 bytes
 // mCENCKeyIDBuffer: 16 bytes
 // metadataEnabled: ~2 bytes (EstimateStructOverhead)
