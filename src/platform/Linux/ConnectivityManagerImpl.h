@@ -255,6 +255,13 @@ private:
     std::mutex mWpaSupplicantMutex;
 
 #endif
+    // Network Commissioning Action Delegation Methods
+
+    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
+                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
+    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
+    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
+                        Optional<int32_t> inConnectStatus) noexcept;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     // ==================== ConnectivityManager Private Methods ====================

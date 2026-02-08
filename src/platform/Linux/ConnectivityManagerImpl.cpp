@@ -179,5 +179,35 @@ ConnectivityManagerImpl & ConnectivityMgrImpl(void)
     return ConnectivityManagerImpl::GetDefaultInstance();
 }
 
+// Network Commissioning Action Delegation Methods
+
+void ConnectivityManagerImpl::OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
+                                             NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept
+{
+    VerifyOrReturn(mpOneShotScanCallback != nullptr);
+
+    mpOneShotScanCallback->OnFinished(inStatus, inDebugText, inNetworks);
+
+    mpOneShotScanCallback = nullptr;
+}
+
+void ConnectivityManagerImpl::OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText,
+                                              int32_t inConnectStatus) noexcept
+{
+    VerifyOrReturn(mpOneShotConnectCallback != nullptr);
+
+    mpOneShotConnectCallback->OnResult(inCommissioningError, inDebugText, inConnectStatus);
+
+    mpOneShotConnectCallback = nullptr;
+}
+
+void ConnectivityManagerImpl::OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
+                                             Optional<int32_t> inConnectStatus) noexcept
+{
+    VerifyOrReturn(mpStatusChangeCallback != nullptr);
+
+    mpStatusChangeCallback->OnNetworkingStatusChange(inCommissioningError, inNetworkId, inConnectStatus);
+}
+
 } // namespace DeviceLayer
 } // namespace chip
