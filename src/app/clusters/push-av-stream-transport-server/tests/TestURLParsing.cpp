@@ -181,10 +181,6 @@ public:
         // Save the previous global SafeAttributePersistenceProvider so we can restore
         // it after this test helper completes.
         app::SafeAttributePersistenceProvider * previousProvider = app::GetSafeAttributePersistenceProvider();
-        app::DefaultSafeAttributePersistenceProvider persistenceProvider;
-
-        VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&persistenceProvider);
 
         struct ProviderRestorer
         {
@@ -192,8 +188,22 @@ public:
             ~ProviderRestorer() { app::SetSafeAttributePersistenceProvider(mPrevious); }
         };
 
-        ProviderRestorer restorer{ previousProvider };
-        EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        // Only install a stack-local provider if there was already a valid provider
+        // installed. This avoids leaving the global pointing at a destroyed object
+        // in environments where no provider was previously configured.
+        chip::Optional<ProviderRestorer> restorer;
+        if (previousProvider != nullptr)
+        {
+            app::DefaultSafeAttributePersistenceProvider persistenceProvider;
+            VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
+            app::SetSafeAttributePersistenceProvider(&persistenceProvider);
+            restorer.Emplace(ProviderRestorer{ previousProvider });
+            EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        }
+        else
+        {
+            EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        }
 
         TestValidateUrlDelegate mockDelegate;
         TestValidateUrlTLSDelegate tlsClientManagementDelegate;
