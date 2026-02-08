@@ -96,6 +96,8 @@ PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
+    VerifyOrDie(mCluster != nullptr);
+
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
 }
@@ -163,7 +165,7 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
     return result;
 }
 
-void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
+CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
 {
     auto it = std::find_if(
         mCurrentConnections.begin(), mCurrentConnections.end(),
@@ -179,6 +181,7 @@ void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uin
         {
             ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
             mCurrentConnections.push_back(removedValue); // Revert
+            return err;
         }
         else
         {
@@ -186,6 +189,7 @@ void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uin
             mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
         }
     }
+    return CHIP_NO_ERROR;
 }
 
 void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connectionID)
@@ -275,7 +279,11 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
         ChipLogProgress(Zcl, "Push AV Stream Transport Deallocate timer expired. %s", "Deallocating");
 
         // Remove connection from CurrentConnections
-        transportDeallocateContext->instance->RemoveStreamTransportConnection(connectionID);
+        CHIP_ERROR err = transportDeallocateContext->instance->RemoveStreamTransportConnection(connectionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to remove transport connection: %" CHIP_ERROR_FORMAT, err.Format());
+        }
         transportDeallocateContext->instance->RemoveTimerAppState(connectionID);
     }
     else
@@ -883,9 +891,20 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
-    if (mCurrentConnections.size() >= CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS)
+    // Enforce CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS as a per-fabric limit.
+    size_t numConnectionsForFabric = 0;
+    for (const auto & entry : mCurrentConnections)
     {
-        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Maximum number of connections reached", mEndpointId);
+        // Each entry is keyed by connection ID; the value stores the fabric index.
+        if (entry.GetFabricIndex() == handler.GetAccessingFabricIndex())
+        {
+            ++numConnectionsForFabric;
+        }
+    }
+
+    if (numConnectionsForFabric >= CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Maximum number of connections reached for fabric", mEndpointId);
         handler.AddStatus(commandPath, Status::ResourceExhausted);
         return std::nullopt;
     }
@@ -1236,7 +1255,12 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     if (delegateStatus.IsSuccess())
     {
         // Remove connection from CurrentConnections
-        RemoveStreamTransportConnection(connectionID);
+        CHIP_ERROR err = RemoveStreamTransportConnection(connectionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::Failure);
+            return std::nullopt;
+        }
         RemoveTimerAppState(connectionID);
     }
 

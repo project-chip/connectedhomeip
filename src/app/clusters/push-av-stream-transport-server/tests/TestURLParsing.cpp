@@ -142,9 +142,18 @@ public:
     {
         CHIP_ERROR err = chip::Platform::MemoryInit();
         assert(err == CHIP_NO_ERROR);
+
+        chip::Testing::ClusterTester clusterTester(mServer);
+        ASSERT_EQ(mPersistenceProvider.Init(&clusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        mPreviousPersistenceProvider = app::GetSafeAttributePersistenceProvider();
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
     }
 
-    void TearDown() override { chip::Platform::MemoryShutdown(); }
+    void TearDown() override
+    {
+        app::SetSafeAttributePersistenceProvider(mPreviousPersistenceProvider);
+        chip::Platform::MemoryShutdown();
+    }
 
     TransportOptionsDecodableStruct CreateTransportOptionsWithUrl(const std::string & urlInput, const std::string & trackName)
     {
@@ -175,36 +184,8 @@ public:
 
     bool TestUrlValidation(const std::string & urlInput, bool shouldSucceed)
     {
-        PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
-        chip::Testing::ClusterTester clusterTester(server);
-
-        // Save the previous global SafeAttributePersistenceProvider so we can restore
-        // it after this test helper completes.
-        app::SafeAttributePersistenceProvider * previousProvider = app::GetSafeAttributePersistenceProvider();
-
-        struct ProviderRestorer
-        {
-            app::SafeAttributePersistenceProvider * mPrevious;
-            ~ProviderRestorer() { app::SetSafeAttributePersistenceProvider(mPrevious); }
-        };
-
-        // Only install a stack-local provider if there was already a valid provider
-        // installed. This avoids leaving the global pointing at a destroyed object
-        // in environments where no provider was previously configured.
-        chip::Optional<ProviderRestorer> restorer;
-        if (previousProvider != nullptr)
-        {
-            app::DefaultSafeAttributePersistenceProvider persistenceProvider;
-            VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-            app::SetSafeAttributePersistenceProvider(&persistenceProvider);
-            restorer.Emplace(ProviderRestorer{ previousProvider });
-            EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-        }
-        else
-        {
-            EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-        }
-
+        chip::Testing::ClusterTester clusterTester(mServer);
+        EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         TestValidateUrlDelegate mockDelegate;
         TestValidateUrlTLSDelegate tlsClientManagementDelegate;
 
@@ -217,11 +198,11 @@ public:
         std::string trackName        = "test-track";
         commandData.transportOptions = CreateTransportOptionsWithUrl(url, trackName);
 
-        server.GetLogic().SetDelegate(&mockDelegate);
-        server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-        EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+        mServer.GetLogic().SetDelegate(&mockDelegate);
+        mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+        EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
-        auto result = server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
+        auto result = mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
 
         // HandleAllocatePushTransport always returns std::nullopt.
         // On success, it sets a response via the handler.
@@ -238,6 +219,11 @@ public:
 
         return commandHandler.HasStatus();
     }
+
+protected:
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
+    app::SafeAttributePersistenceProvider * mPreviousPersistenceProvider = nullptr;
+    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
 };
 
 TEST_F(TestUriExtractionHelpers, ExtractTextRange_ValidRange)

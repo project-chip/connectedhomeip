@@ -44,6 +44,9 @@
 namespace chip {
 namespace app {
 
+using namespace Clusters;
+using namespace Clusters::PushAvStreamTransport;
+
 static uint8_t gDebugEventBuffer[120];
 static uint8_t gInfoEventBuffer[120];
 static uint8_t gCritEventBuffer[120];
@@ -66,16 +69,25 @@ public:
 
         EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources), gCircularEventBuffer,
                                                logStorageResources, &mEventCounter);
+
+        chip::Testing::ClusterTester clusterTester(mServer);
+        ASSERT_EQ(mPersistenceProvider.Init(&clusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        mPreviousPersistenceProvider = app::GetSafeAttributePersistenceProvider();
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
     }
 
     void TearDown() override
     {
+        app::SetSafeAttributePersistenceProvider(mPreviousPersistenceProvider);
         EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
 
-private:
+protected:
     MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
+    app::SafeAttributePersistenceProvider * mPreviousPersistenceProvider = nullptr;
+    Clusters::PushAvStreamTransportServer mServer{ 1, BitFlags<Clusters::PushAvStreamTransport::Feature>(1) };
 };
 
 static void CheckLogState(EventManagement & aLogMgmt, size_t expectedNumEvents, PriorityLevel aPriority)
@@ -372,6 +384,21 @@ class TestPushAVStreamTransportServerLogic : public ::testing::Test
 public:
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    void SetUp() override
+    {
+        chip::Testing::ClusterTester clusterTester(mServer);
+        ASSERT_EQ(mPersistenceProvider.Init(&clusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        mPreviousPersistenceProvider = app::GetSafeAttributePersistenceProvider();
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
+    }
+
+    void TearDown() override { app::SetSafeAttributePersistenceProvider(mPreviousPersistenceProvider); }
+
+protected:
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
+    app::SafeAttributePersistenceProvider * mPreviousPersistenceProvider = nullptr;
+    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
 };
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
@@ -595,13 +622,8 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
-    chip::Testing::ClusterTester clusterTester(server);
-    app::DefaultSafeAttributePersistenceProvider persistenceProvider;
-
-    VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
-    EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester clusterTester(mServer);
+    EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     TestTLSClientManagementDelegate tlsClientManagementDelegate;
@@ -613,16 +635,16 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     commandData.transportOptions = transportOptions;
 
     // Without a delegate, command is unsupported.
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(&mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
 
     /*
      * Test AllocatePushTransportResponse
@@ -741,7 +763,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion, true);
 
     // Read the CurrentConnections attribute using the cluster's Read function
-    DataModel::ActionReturnStatus status = server.ReadAttribute(request, encoder);
+    DataModel::ActionReturnStatus status = mServer.ReadAttribute(request, encoder);
     EXPECT_TRUE(status.IsSuccess());
 
     TLV::TLVReader reader;
@@ -861,10 +883,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     deallocateCommandData.connectionID = allocatedConnectionID;
 
     EXPECT_EQ(
-        server.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
+        mServer.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
         std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_DeallocateTransport)
@@ -963,16 +985,12 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
-    chip::Testing::ClusterTester clusterTester(server);
-    app::DefaultSafeAttributePersistenceProvider persistenceProvider;
+    chip::Testing::ClusterTester clusterTester(mServer);
 
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     TestTLSClientManagementDelegate tlsClientManagementDelegate;
 
-    VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
-    EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     Testing::MockCommandHandler commandHandler;
     commandHandler.SetFabricIndex(1);
@@ -981,26 +999,26 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     commandData.transportOptions = transportOptions;
 
     // Without a delegate, command is unsupported.
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(&mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
 
     // Shutdown the Server
-    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     // Start the Server back up
-    EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
-    auto currentConnection = server.GetLogic().mCurrentConnections[0];
+    auto currentConnection = mServer.GetLogic().mCurrentConnections[0];
     // Validate persisted fields
     EXPECT_EQ(currentConnection.connectionID, allocatedConnectionID);
     EXPECT_EQ(currentConnection.transportStatus, TransportStatusEnum::kInactive);
@@ -1087,21 +1105,21 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_Persistence_
     deallocateCommandData.connectionID = allocatedConnectionID;
 
     EXPECT_EQ(
-        server.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
+        mServer.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
         std::nullopt);
 
     // Restart the server once again to read currentConnections from persisted
     // storage
     // Shutdown the Server
-    server.Shutdown(ClusterShutdownType::kClusterShutdown);
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     // Start the Server back up
-    EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
     // The number of currentConnections in persisted storage should be 0.
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
 }
 
 TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_FindTransportResponse)
@@ -1200,9 +1218,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
-    chip::Testing::ClusterTester clusterTester(server);
-    app::DefaultSafeAttributePersistenceProvider persistenceProvider;
+    chip::Testing::ClusterTester clusterTester(mServer);
 
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     TestTLSClientManagementDelegate tlsClientManagementDelegate;
@@ -1213,19 +1229,17 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
-    VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
-    EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(&mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
 
     /*
      * Test ModifyPushTransport
@@ -1317,9 +1331,9 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     modifyCommandData.connectionID     = allocatedConnectionID;
     modifyCommandData.transportOptions = transportOptions;
 
-    server.GetLogic().HandleModifyPushTransport(modifyCommandHandler, kModifyCommandPath, modifyCommandData);
+    mServer.GetLogic().HandleModifyPushTransport(modifyCommandHandler, kModifyCommandPath, modifyCommandData);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
 
     /*
      * Test FindPushTransport
@@ -1333,7 +1347,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     // As connectionID is static, the new allocated connectionID will be 2.
     findCommandData.connectionID.SetNonNull(allocatedConnectionID);
 
-    server.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
+    mServer.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
 
     // Check the response
     EXPECT_TRUE(findCommandHandler.HasResponse());
@@ -1517,9 +1531,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     transportOptions.containerOptions = containerOptions;
     transportOptions.expiryTime.ClearValue();
 
-    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
-    chip::Testing::ClusterTester clusterTester(server);
-    app::DefaultSafeAttributePersistenceProvider persistenceProvider;
+    chip::Testing::ClusterTester clusterTester(mServer);
 
     TestPushAVStreamTransportDelegateImpl mockDelegate;
     TestTLSClientManagementDelegate tlsClientManagementDelegate;
@@ -1530,18 +1542,16 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
-    VerifyOrDie(persistenceProvider.Init(&clusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
-    EXPECT_EQ(server.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    server.GetLogic().SetDelegate(&mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.Init(), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
 
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    uint16_t allocatedConnectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
 
     /*
      * Test SetTransportStatus
@@ -1555,9 +1565,9 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     setCommandData.connectionID.SetNonNull(allocatedConnectionID);
     setCommandData.transportStatus = TransportStatusEnum::kActive;
-    server.GetLogic().HandleSetTransportStatus(setCommandHandler, kSetCommandPath, setCommandData);
+    mServer.GetLogic().HandleSetTransportStatus(setCommandHandler, kSetCommandPath, setCommandData);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections[0].transportStatus, TransportStatusEnum::kActive);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].transportStatus, TransportStatusEnum::kActive);
 
     Testing::MockCommandHandler triggerCommandHandler;
     triggerCommandHandler.SetFabricIndex(1);
@@ -1567,7 +1577,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     triggerCommandData.connectionID     = allocatedConnectionID;
     triggerCommandData.activationReason = TriggerActivationReasonEnum::kUserInitiated;
 
-    server.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
+    mServer.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
 
     EventManagement & logMgmt = EventManagement::GetInstance();
 

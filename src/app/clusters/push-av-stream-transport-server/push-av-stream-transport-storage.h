@@ -76,12 +76,10 @@ static constexpr size_t kTransportOptionsStorageSize =
                                 kContainerOptionsStorageSize, // containerOptions
                                 2u /* Array Overhead */ +
                                     CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS *
-                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */,
-                                                                     sizeof(uint16_t)),
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */, sizeof(uint16_t)),
                                 2u /* Array Overhead */ +
                                     CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS *
-                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */,
-                                                                     sizeof(uint16_t)));
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */, sizeof(uint16_t)));
 
 static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
     TLV::EstimateStructOverhead(sizeof(uint16_t),             // connectionID
@@ -91,8 +89,8 @@ static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
     );
 
 // Max size for the TLV-encoded array of CurrentConnection structs
-static constexpr size_t kMaxCurrentConnectionsSerializedSize =
-    2 /* ArrayTlvOverhead */ + (CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
+static constexpr size_t kMaxCurrentConnectionsSerializedSize = 2 /* ArrayTlvOverhead */ +
+    (CHIP_CONFIG_MAX_FABRICS * CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
 
 /**
  * @brief Storage implementation for transport trigger options.
