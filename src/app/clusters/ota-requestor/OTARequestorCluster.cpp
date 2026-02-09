@@ -158,7 +158,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
         {
             ChipLogError(Zcl, "Metadata size %u exceeds max %u", static_cast<unsigned>(metadataForNode.Value().size()),
                          static_cast<unsigned>(kMaxMetadataLen));
-            return Protocols::InteractionModel::Status::InvalidCommand;
+            return Protocols::InteractionModel::Status::ConstraintError;
         }
         mOtaRequestor.HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;

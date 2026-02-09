@@ -253,7 +253,7 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     ASSERT_FALSE(result.IsSuccess());
     EXPECT_TRUE(result.status.has_value());
     EXPECT_EQ(result.status, // NOLINT(bugprone-unchecked-optional-access)
-              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
+              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
 }
 
 TEST_F(TestOTARequestorCluster, ReadAttributesTest)
