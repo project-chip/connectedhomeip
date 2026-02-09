@@ -699,7 +699,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle
     auto windowSize = std::min(req.mWindowSize, static_cast<uint8_t>(PAF_MAX_RECEIVE_WINDOW_SIZE));
     if (windowSize < PAF_MIN_RECEIVE_WINDOW_SIZE)
     {
-        // The Window size should be greater than 2 to ensure PAF stability or avoid the underflows problem.
+        // The Window size should be at least PAF_MIN_RECEIVE_WINDOW_SIZE to ensure PAF stability and avoid underflow problems.
         ChipLogError(WiFiPAF, "Small window size: %u, reject due to stability requirement", windowSize);
         mState = kState_Aborting;
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -775,7 +775,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandl
     // Select local and remote max receive window size based on local resources available for both incoming indications
     if (resp.mWindowSize < PAF_MIN_RECEIVE_WINDOW_SIZE)
     {
-        // The Window size should be greater than 2 to ensure PAF stability or avoid the underflows problem.
+        // The Window size should be at least PAF_MIN_RECEIVE_WINDOW_SIZE to ensure PAF stability and avoid underflow problems.
         ChipLogError(WiFiPAF, "Small window size: %u, reject due to stability requirement", resp.mWindowSize);
         mState = kState_Aborting;
         return CHIP_ERROR_INVALID_ARGUMENT;
