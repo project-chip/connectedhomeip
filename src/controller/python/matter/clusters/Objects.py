@@ -14288,6 +14288,10 @@ class BooleanState(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kChangeEvent = 0x1
+
     class Attributes:
         @dataclass
         class StateValue(ClusterAttributeDescriptor):
@@ -21900,6 +21904,7 @@ class BooleanStateConfiguration(Cluster):
             kAudible = 0x2
             kAlarmSuppress = 0x4
             kSensitivityLevel = 0x8
+            kFaultEvents = 0x10
 
         class SensorFaultBitmap(IntFlag):
             kGeneralFault = 0x1
