@@ -233,8 +233,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
-    # Handle app factory reset if requested
-    handle_factory_reset(factory_reset, factory_reset_app_only, app_args, script_args)
+    # Remove app config and storage if factory reset is requested
+    factory_reset_config_removal(factory_reset, factory_reset_app_only, app_args, script_args)
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
@@ -349,7 +349,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
-def handle_factory_reset(factory_reset: bool, factory_reset_app_only: bool, app_args: str, script_args: str):
+def factory_reset_config_removal(factory_reset: bool, factory_reset_app_only: bool, app_args: str, script_args: str):
     """Handles app factory reset requests by removing configuration and storage files."""
     if factory_reset or factory_reset_app_only:
         # Remove native app config
@@ -391,27 +391,38 @@ def monitor_app_restart_requests(
 
         # Successfully read the flag file, remove to prevent multiple restarts
         os.unlink(restart_flag_file)
+        is_restart_only = (flag_file_content == "restart")
         is_factory_reset = (flag_file_content == "factory reset")
         is_factory_reset_app_only = (flag_file_content == "factory reset app only")
         log.info("%s requested by test script", flag_file_content.capitalize())
 
-        # Handle app factory reset if requested
-        handle_factory_reset(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
-
         # Restart the app
         log.info("Restarting app '%s'...", app)
-        with app_manager_lock:
-
-            # Stop the app
-            log.info("Stopping app...")
-            app_manager_ref[0].stop()
-
-            # Start the app
+        if is_restart_only:
             new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
             new_app_manager.start()
-            app_manager_ref[0] = new_app_manager
+            with app_manager_lock:
+                app_manager_ref[0].stop()
+                app_manager_ref[0] = new_app_manager
 
-        # Restart complete, continue monitoring for additional restart requests
+        elif is_factory_reset or is_factory_reset_app_only:
+            # Remove app config and storage if factory reset is requested
+            factory_reset_config_removal(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
+
+            with app_manager_lock:
+                # Stop the app
+                log.info("Stopping app...")
+                app_manager_ref[0].stop()
+
+                # Start the app
+                new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+                new_app_manager.start()
+                app_manager_ref[0] = new_app_manager
+
+        else:
+            log.info("Unknown restart flag file content: '%s', no action taken", flag_file_content)
+
+        # Action complete, continue monitoring for additional restart requests
         log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
 
         # Sleep to prevent tight loop
