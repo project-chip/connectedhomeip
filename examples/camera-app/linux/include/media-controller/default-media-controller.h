@@ -48,6 +48,8 @@ public:
     // Get transport registered for a specific stream ID
     Transport * GetTransportForVideoStream(uint16_t videoStreamID) override;
     Transport * GetTransportForAudioStream(uint16_t audioStreamID) override;
+    // Reset the transport's sink state for proper preroll buffering before starting transmission
+    void ResetTransportSinkState(Transport * transport) override;
 
 private:
     PreRollBuffer mPreRollBuffer;

@@ -68,6 +68,10 @@ if(CONFIG_CHIP)
     if(CONFIG_MBEDTLS)
         zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
         zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
+
+        if(CONFIG_SOC_FAMILY_NXP_RW AND CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC)
+            zephyr_compile_definitions(PSA_CRYPTO_DRIVER_ELS_PKC)
+        endif()
     endif()
 
     zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
