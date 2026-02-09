@@ -150,9 +150,9 @@ class TC_IDM_2_3(BasicCompositionTests):
                 try:
                     paths[:] = paths[:num_paths_reduced]
                     response = await request_function(paths)
-                except ChipStackError as e:
+                except ChipStackError as e: # chipstack-ok: This check is needed to try and build a request until it's a valid size
                     # Check for CHIP Error 0x0000000B No memory - Thrown when request is too large for 1 MTU
-                    if e.err == 11:
+                    if e.err == 0x0000000B:
                         num_paths_reduced -= 1
                     else:
                         raise e
