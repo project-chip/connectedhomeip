@@ -242,19 +242,21 @@ TEST_F(TestBooleanStateConfigurationCluster, TestFeatureMap)
         ClusterTester tester(cluster);
 
         uint32_t features;
-                EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, features), Protocols::InteractionModel::Status::Success);
-                EXPECT_EQ(features, to_underlying(Feature::kFaultEvents));
-            }
-        
-                // Check that the FeatureMap includes the FAULTEV bit when other features are also set
-                {
-                    BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {}, DefaultConfig());
-                    ClusterTester tester(cluster);        
-                uint32_t features;
-                EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, features), Protocols::InteractionModel::Status::Success);
-                EXPECT_EQ(features, to_underlying(Feature::kVisual) | to_underlying(Feature::kFaultEvents));
-            }
-        }
+        EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, features),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(features, to_underlying(Feature::kFaultEvents));
+    }
+
+    // Check that the FeatureMap includes the FAULTEV bit when other features are also set
+    {
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {}, DefaultConfig());
+        ClusterTester tester(cluster);
+        uint32_t features;
+        EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, features),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(features, to_underlying(Feature::kVisual) | to_underlying(Feature::kFaultEvents));
+    }
+}
 
 TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
 {
