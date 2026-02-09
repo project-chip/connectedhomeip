@@ -37,21 +37,17 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import queue
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AttributePath
-from matter.interaction_model import InteractionModelError
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.ChipDeviceCtrl import TransportPayloadCapability
-from TC_SC_3_6 import AttributeChangeAccumulator
 from matter.exceptions import ChipStackError
 
 
@@ -66,7 +62,7 @@ class TC_IDM_2_3(BasicCompositionTests):
     @property
     def default_timeout(self) -> int:
         return 600
-    
+
     def steps_TC_IDM_2_3(self) -> list[TestStep]:
         return [
             TestStep(1, "TH reads from the DUT the CapabilityMinima attribute from the Basic Information Cluster."),
@@ -81,12 +77,12 @@ class TC_IDM_2_3(BasicCompositionTests):
             endpoint_id = path.EndpointId
             cluster_id = path.ClusterId
             attribute_id = path.AttributeId
-            
-            asserts.assert_in(endpoint_id, response_tlv, 
+
+            asserts.assert_in(endpoint_id, response_tlv,
                               f"Endpoint {endpoint_id} missing in response")
-            asserts.assert_in(cluster_id, response_tlv[endpoint_id], 
+            asserts.assert_in(cluster_id, response_tlv[endpoint_id],
                               f"Cluster {cluster_id} missing in response for endpoint {endpoint_id}")
-            asserts.assert_in(attribute_id, response_tlv[endpoint_id][cluster_id], 
+            asserts.assert_in(attribute_id, response_tlv[endpoint_id][cluster_id],
                               f"Attribute {attribute_id} missing in response for endpoint {endpoint_id}, cluster {cluster_id}")
 
     def get_paths(self, count, all_paths):
@@ -97,7 +93,7 @@ class TC_IDM_2_3(BasicCompositionTests):
             path_index = i % num_available_paths
             path_list.append(all_paths[path_index])
         return path_list
-    
+
     @async_test_body
     async def test_TC_IDM_2_3(self):
         # Setup class helper performs wildcard read and populates self.endpoints_tlv
@@ -106,14 +102,14 @@ class TC_IDM_2_3(BasicCompositionTests):
         # Step 1: CapabilityMinima
         self.step(1)
         capability_minima = await self.read_single_attribute_check_success(
-            cluster=Clusters.BasicInformation, 
+            cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.CapabilityMinima
         )
-        
+
         # Extract values, providing defaults if optional fields are missing
         num_read_paths_supported = capability_minima.readPathsSupported if capability_minima.readPathsSupported is not None else 1
         num_subscribe_paths_supported = capability_minima.subscribePathsSupported if capability_minima.subscribePathsSupported is not None else 1
-        
+
         log.info(f"CapabilityMinima: readPathsSupported={num_read_paths_supported}, "
                  f"subscribePathsSupported={num_subscribe_paths_supported}")
 
@@ -129,7 +125,7 @@ class TC_IDM_2_3(BasicCompositionTests):
                 if attr_list:
                     for attr_id in attr_list:
                         all_paths.append(AttributePath(EndpointId=endpoint_id, ClusterId=cluster_id, AttributeId=attr_id))
-        
+
         if not all_paths:
             # Fallback for empty devices (unlikely)
             all_paths = [AttributePath(EndpointId=0, ClusterId=Clusters.BasicInformation.id, AttributeId=Clusters.BasicInformation.Attributes.NodeLabel.attribute_id)]
@@ -143,8 +139,8 @@ class TC_IDM_2_3(BasicCompositionTests):
             return await self.default_controller.Read(self.dut_node_id, paths)
 
         # Read requests must fit into 1 MTU, as reads cannot be chained acrross multiple packets. If a device reports
-        # a number of read paths (or subscription paths) larger than what is possible on the controller side, we need to 
-        # reduce the number of paths here to be as much as can fit in the request. This requires some trial and error to 
+        # a number of read paths (or subscription paths) larger than what is possible on the controller side, we need to
+        # reduce the number of paths here to be as much as can fit in the request. This requires some trial and error to
         # see what size works. AttributePath objects can vary slightly in size, so this isn't a fixed number of paths.
         async def conduct_request_with_potential_path_size_reduction(paths, num_paths, request_function):
             num_paths_reduced = num_paths
@@ -154,7 +150,7 @@ class TC_IDM_2_3(BasicCompositionTests):
                     paths[:] = paths[:num_paths_reduced]
                     response = await request_function(paths)
                 except ChipStackError as e:
-                    # Check for CHIP Error 0x0000000B No memory - Thrown when request is too large for 1 MTU 
+                    # Check for CHIP Error 0x0000000B No memory - Thrown when request is too large for 1 MTU
                     if e.err == 11:
                         num_paths_reduced -= 1
                     else:
@@ -170,7 +166,7 @@ class TC_IDM_2_3(BasicCompositionTests):
         read_response = await conduct_request_with_potential_path_size_reduction(read_paths, num_read_paths_supported, read_request)
         asserts.assert_is_not_none(read_response, "No response returned from read request. Ensure the number of paths in request is valid.")
         self.verify_paths_in_response(read_paths, read_response.tlvAttributes)
-        log.info(f"Successfully completed read request")
+        log.info("Successfully completed read request")
 
         # Step 4: Subscribe with max paths in a single request
         self.step(4)
@@ -224,7 +220,7 @@ class TC_IDM_2_3(BasicCompositionTests):
             timeout_sec=10
         )
 
-        log.info(f"Successfully subscribed and verified report sequence.")
-        
+        log.info("Successfully subscribed and verified report sequence.")
+
 if __name__ == "__main__":
     default_matter_test_main()
