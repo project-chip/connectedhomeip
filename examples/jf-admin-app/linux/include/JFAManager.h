@@ -75,6 +75,7 @@ private:
     SessionHolder mSessionHolder;
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    NodeId mNodeId                               = kUndefinedNodeId;
     OnConnectedAction mOnConnectedAction         = kStandardCommissioningComplete;
     FabricId jfFabricIndex                       = kUndefinedFabricId;
     EndpointId peerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
