@@ -53,6 +53,7 @@ from matter.exceptions import ChipStackError
 
 log = logging.getLogger(__name__)
 
+
 class TC_IDM_2_3(BasicCompositionTests):
 
     def __init__(self, *args, **kwargs):
@@ -128,7 +129,8 @@ class TC_IDM_2_3(BasicCompositionTests):
 
         if not all_paths:
             # Fallback for empty devices (unlikely)
-            all_paths = [AttributePath(EndpointId=0, ClusterId=Clusters.BasicInformation.id, AttributeId=Clusters.BasicInformation.Attributes.NodeLabel.attribute_id)]
+            all_paths = [AttributePath(EndpointId=0, ClusterId=Clusters.BasicInformation.id,
+                                       AttributeId=Clusters.BasicInformation.Attributes.NodeLabel.attribute_id)]
 
         # Step 3: Read max number of paths
         self.step(3)
@@ -160,11 +162,13 @@ class TC_IDM_2_3(BasicCompositionTests):
                 else:
                     break
             if num_paths_reduced < num_paths:
-                log.info(f"Reduced number of paths from maximum reported of {num_paths} to {num_paths_reduced} to fit the request in one MTU")
+                log.info(
+                    f"Reduced number of paths from maximum reported of {num_paths} to {num_paths_reduced} to fit the request in one MTU")
             return response
 
         read_response = await conduct_request_with_potential_path_size_reduction(read_paths, num_read_paths_supported, read_request)
-        asserts.assert_is_not_none(read_response, "No response returned from read request. Ensure the number of paths in request is valid.")
+        asserts.assert_is_not_none(
+            read_response, "No response returned from read request. Ensure the number of paths in request is valid.")
         self.verify_paths_in_response(read_paths, read_response.tlvAttributes)
         log.info("Successfully completed read request")
 
@@ -177,7 +181,8 @@ class TC_IDM_2_3(BasicCompositionTests):
         )
 
         sub_paths = self.get_paths(num_subscribe_paths_supported, all_paths)
-        sub_paths[0] = AttributePath(EndpointId=0, ClusterId=Clusters.BasicInformation.id, AttributeId=Clusters.BasicInformation.Attributes.NodeLabel.attribute_id)
+        sub_paths[0] = AttributePath(EndpointId=0, ClusterId=Clusters.BasicInformation.id,
+                                     AttributeId=Clusters.BasicInformation.Attributes.NodeLabel.attribute_id)
 
         handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
@@ -194,7 +199,8 @@ class TC_IDM_2_3(BasicCompositionTests):
             )
 
         sub_transaction = await conduct_request_with_potential_path_size_reduction(sub_paths, num_subscribe_paths_supported, subscribe_request)
-        asserts.assert_is_not_none(sub_transaction, "No response returned from subscribe request. Ensure the number of paths in request is valid.")
+        asserts.assert_is_not_none(
+            sub_transaction, "No response returned from subscribe request. Ensure the number of paths in request is valid.")
         log.info("Successfully completed subscribe request")
         sub_transaction.SetAttributeUpdateCallback(handler)
 
@@ -221,6 +227,7 @@ class TC_IDM_2_3(BasicCompositionTests):
         )
 
         log.info("Successfully subscribed and verified report sequence.")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
