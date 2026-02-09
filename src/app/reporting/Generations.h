@@ -56,8 +56,8 @@ static_assert(AreGenerationsInOrder(0x80000000 + 0x12345, 0x12344));
 ///       from AttributePathParams, it is already 32-bit aligned, however if this were 64-bit
 ///       (and then not need to worry about wrap-around) then that structure size would increase
 ///       including an extra 4 bytes for 64-bit alignment padding.
-///       It also turns out that for most devices, 32-bit code results in smaller flash compared
-///       to 64-bit handling.
+///       On typical 32-bit MCU targets used by this stack, using 32-bit arithmetic instead of
+///       64-bit handling often results in smaller generated code, helping reduce flash usage.
 class AttributeGeneration
 {
 public:
