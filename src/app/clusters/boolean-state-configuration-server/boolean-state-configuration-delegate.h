@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <clusters/BooleanStateConfiguration/Events.h>
 #include <clusters/BooleanStateConfiguration/Enums.h>
+#include <clusters/BooleanStateConfiguration/Events.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitMask.h>
 
