@@ -105,7 +105,7 @@
 #endif
 
 #if (PAF_MAX_RECEIVE_WINDOW_SIZE < PAF_MIN_RECEIVE_WINDOW_SIZE)
-#error "PAF_MAX_RECEIVE_WINDOW_SIZE must be greater than 2 for PAF transport protocol stability."
+#error "PAF_MAX_RECEIVE_WINDOW_SIZE must not be smaller than PAF_MIN_RECEIVE_WINDOW_SIZE for PAF transport protocol stability."
 #endif
 
 /**
