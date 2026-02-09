@@ -257,7 +257,7 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     'camera-controller': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-camera-controller'),
     'closure': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='closure-app'),
     'energy-gateway': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-energy-gateway-app'),
-    'energy-management': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-energy-management-app'),
+    'evse': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-evse-app'),
     'fabric-bridge': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-bridge-app'),
     'fabric-admin': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-admin'),
     'fabric-sync': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='fabric-sync'),
@@ -273,6 +273,7 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
     'rvc': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-rvc-app'),
     'terms-and-conditions': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-terms-and-conditions-app'),
     'tv': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-tv-app'),
+    'water-heater': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='matter-water-heater-app'),
     'water-leak-detector': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='water-leak-detector-app'),
 
     # Tools

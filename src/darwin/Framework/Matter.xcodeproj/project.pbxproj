@@ -418,7 +418,7 @@
 		9BD2142B2F21653B0044946F /* MTRBaseClusters_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BD214282F21653B0044946F /* MTRBaseClusters_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9BD214302F21666E0044946F /* MTRClusters_Private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BD2142D2F21666E0044946F /* MTRClusters_Private.mm */; };
 		9BD214312F21666E0044946F /* MTRCommandPayloadsObjc_Private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BD2142F2F21666E0044946F /* MTRCommandPayloadsObjc_Private.mm */; };
-		9BD214322F21666E0044946F /* MTRCommandPayloads_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BD2142E2F21666E0044946F /* MTRCommandPayloads_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		9BD214322F21666E0044946F /* MTRCommandPayloads_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BD2142E2F21666E0044946F /* MTRCommandPayloads_Private.h */; };
 		9BD214332F21666E0044946F /* MTRClusters_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BD2142C2F21666E0044946F /* MTRClusters_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9BDA2A062C5D9AF800A32BDD /* MTRDevice_Concrete.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BDA2A052C5D9AF800A32BDD /* MTRDevice_Concrete.mm */; };
 		9BDA2A082C5D9AFB00A32BDD /* MTRDevice_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */; };

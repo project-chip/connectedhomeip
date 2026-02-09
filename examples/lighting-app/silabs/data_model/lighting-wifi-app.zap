@@ -61,7 +61,7 @@
         }
       ],
       "deviceVersions": [
-        3,
+        4,
         1
       ],
       "deviceIdentifiers": [
@@ -2986,7 +2986,7 @@
         }
       ],
       "deviceVersions": [
-        1,
+        3,
         1
       ],
       "deviceIdentifiers": [
@@ -4531,10 +4531,10 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

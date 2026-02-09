@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -538,11 +539,15 @@ void AppTask::OccupancyEventHandler(AppEvent * aEvent)
         return;
     }
 
-    uint8_t attributeValue = aEvent->OccupancytEvent.Present ? 1 : 0;
+    auto cluster = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
+    if (!cluster)
+    {
+        MT793X_LOG("Cannot find occupancy cluster on endpoint 1");
+        return;
+    }
 
-    MT793X_LOG("Lighting occupancy: %u", attributeValue);
-
-    OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
+    MT793X_LOG("Lighting occupancy: %u", aEvent->OccupancytEvent.Present);
+    cluster->SetOccupancy(aEvent->OccupancytEvent.Present);
 }
 
 void AppTask::SingleButtonEventHandler(AppEvent * aEvent)

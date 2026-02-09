@@ -71,10 +71,10 @@ class AmbientContextSensingCluster(
     object SubscriptionEstablished : AmbientContextTypeSupportedAttributeSubscriptionState()
   }
 
-  class HoldTimeLimitsAttribute(val value: AmbientContextSensingClusterHoldTimeLimitsStruct?)
+  class HoldTimeLimitsAttribute(val value: AmbientContextSensingClusterHoldTimeLimitsStruct)
 
   sealed class HoldTimeLimitsAttributeSubscriptionState {
-    data class Success(val value: AmbientContextSensingClusterHoldTimeLimitsStruct?) :
+    data class Success(val value: AmbientContextSensingClusterHoldTimeLimitsStruct) :
       HoldTimeLimitsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : HoldTimeLimitsAttributeSubscriptionState()
@@ -751,7 +751,7 @@ class AmbientContextSensingCluster(
     }
   }
 
-  suspend fun readCountThresholdReachedAttribute(): Boolean? {
+  suspend fun readObjectCountReachedAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 6u
 
     val attributePath =
@@ -773,7 +773,7 @@ class AmbientContextSensingCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Countthresholdreached attribute not found in response" }
+    requireNotNull(attributeData) { "Objectcountreached attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -787,7 +787,7 @@ class AmbientContextSensingCluster(
     return decodedValue
   }
 
-  suspend fun subscribeCountThresholdReachedAttribute(
+  suspend fun subscribeObjectCountReachedAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
@@ -823,7 +823,7 @@ class AmbientContextSensingCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Countthresholdreached attribute not found in Node State update"
+            "Objectcountreached attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -844,232 +844,8 @@ class AmbientContextSensingCluster(
     }
   }
 
-  suspend fun readCountThresholdAttribute(): UShort? {
+  suspend fun readHoldTimeAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 7u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Countthreshold attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeCountThresholdAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 7u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeCountThresholdAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 7u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UShortSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Countthreshold attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUShort(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UShortSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readObjectCountAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 8u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Objectcount attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeObjectCountAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 8u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UShortSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Objectcount attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUShort(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UShortSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readHoldTimeAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 9u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1094,18 +870,13 @@ class AmbientContextSensingCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
     return decodedValue
   }
 
   suspend fun writeHoldTimeAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 9u
+    val ATTRIBUTE_ID: UInt = 7u
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1148,7 +919,7 @@ class AmbientContextSensingCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 9u
+    val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1183,14 +954,9 @@ class AmbientContextSensingCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUShort(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
-          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
+          emit(UShortSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UShortSubscriptionState.SubscriptionEstablished)
@@ -1200,7 +966,7 @@ class AmbientContextSensingCluster(
   }
 
   suspend fun readHoldTimeLimitsAttribute(): HoldTimeLimitsAttribute {
-    val ATTRIBUTE_ID: UInt = 10u
+    val ATTRIBUTE_ID: UInt = 8u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1225,12 +991,8 @@ class AmbientContextSensingCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: AmbientContextSensingClusterHoldTimeLimitsStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        AmbientContextSensingClusterHoldTimeLimitsStruct.fromTlv(AnonymousTag, tlvReader)
-      } else {
-        null
-      }
+    val decodedValue: AmbientContextSensingClusterHoldTimeLimitsStruct =
+      AmbientContextSensingClusterHoldTimeLimitsStruct.fromTlv(AnonymousTag, tlvReader)
 
     return HoldTimeLimitsAttribute(decodedValue)
   }
@@ -1239,7 +1001,7 @@ class AmbientContextSensingCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<HoldTimeLimitsAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 10u
+    val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1276,14 +1038,10 @@ class AmbientContextSensingCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: AmbientContextSensingClusterHoldTimeLimitsStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              AmbientContextSensingClusterHoldTimeLimitsStruct.fromTlv(AnonymousTag, tlvReader)
-            } else {
-              null
-            }
+          val decodedValue: AmbientContextSensingClusterHoldTimeLimitsStruct =
+            AmbientContextSensingClusterHoldTimeLimitsStruct.fromTlv(AnonymousTag, tlvReader)
 
-          decodedValue?.let { emit(HoldTimeLimitsAttributeSubscriptionState.Success(it)) }
+          emit(HoldTimeLimitsAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(HoldTimeLimitsAttributeSubscriptionState.SubscriptionEstablished)
@@ -1293,7 +1051,7 @@ class AmbientContextSensingCluster(
   }
 
   suspend fun readPredictedActivityAttribute(): PredictedActivityAttribute {
-    val ATTRIBUTE_ID: UInt = 11u
+    val ATTRIBUTE_ID: UInt = 9u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1340,7 +1098,7 @@ class AmbientContextSensingCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<PredictedActivityAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 11u
+    val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1399,99 +1157,6 @@ class AmbientContextSensingCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(PredictedActivityAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readPrivacyModeEnabledAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 12u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Privacymodeenabled attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribePrivacyModeEnabledAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 12u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Privacymodeenabled attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
         }
       }
     }

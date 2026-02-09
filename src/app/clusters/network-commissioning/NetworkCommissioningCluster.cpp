@@ -29,7 +29,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server/Server.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
 #include <clusters/NetworkCommissioning/Commands.h>
@@ -46,8 +45,6 @@
 #include <optional>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/DeviceControlServer.h>
-#include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
@@ -150,10 +147,8 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
     }
 }
 
-std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FabricIndex fabricIndex)
+std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FailSafeContext & failSafeContext, FabricIndex fabricIndex)
 {
-    auto & failSafeContext = chip::Server::GetInstance().GetFailSafeContext();
-
     if (!failSafeContext.IsFailSafeArmed(fabricIndex))
     {
         return Protocols::InteractionModel::Status::FailsafeRequired;
@@ -166,35 +161,31 @@ std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FabricIndex fabricIndex)
 /// is not armed for the given fabric index.
 ///
 /// This just wraps EnsureFailsafeIsArmed with a one-liner for check & return.
-#define RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(fabricIndex)                                                                     \
-    if (std::optional<ActionReturnStatus> status = EnsureFailsafeIsArmed(fabricIndex); status.has_value())                         \
+#define RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(failSafeContext, fabricIndex)                                                    \
+    if (std::optional<ActionReturnStatus> status = EnsureFailsafeIsArmed(failSafeContext, fabricIndex); status.has_value())        \
     {                                                                                                                              \
         return status;                                                                                                             \
     }                                                                                                                              \
     (void) 0
 } // namespace
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker) :
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, const Context & context) :
     DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId), mFeatureFlags(WiFiFeatures(driver)),
-    mpWirelessDriver(driver), mpBaseDriver(driver), mBreadcrumbTracker(tracker)
+    mpWirelessDriver(driver), mpBaseDriver(driver), mClusterContext(context)
 {
     mpDriver.Set<WiFiDriver *>(driver);
 }
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver,
-                                                         BreadCrumbTracker & tracker) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-    mEndpointId(endpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver),
-    mBreadcrumbTracker(tracker)
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, const Context & context) :
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId),
+    mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver), mClusterContext(context)
 {
     mpDriver.Set<ThreadDriver *>(driver);
 }
 
-NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver,
-                                                         BreadCrumbTracker & tracker) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
-    mEndpointId(endpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(driver),
-    mBreadcrumbTracker(tracker)
+NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, const Context & context) :
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId),
+    mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(driver), mClusterContext(context)
 {}
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -203,7 +194,7 @@ NetworkCommissioningCluster::NetworkInstanceList NetworkCommissioningCluster::sI
 
 CHIP_ERROR NetworkCommissioningCluster::Init()
 {
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
     ReturnErrorOnFailure(mpBaseDriver->Init(this));
     mLastNetworkingStatusValue.SetNull();
     mLastConnectErrorValue.SetNull();
@@ -378,7 +369,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetwork(CommandHandler & handl
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
 
-    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(mClusterContext.failSafeContext, handler.GetAccessingFabricIndex());
 
     if (req.ssid.empty() || req.ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
     {
@@ -566,7 +557,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateThreadNetwork(CommandHandler & han
 
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
 
-    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(mClusterContext.failSafeContext, handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -590,7 +581,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateThreadNetwork(CommandHandler & han
 void NetworkCommissioningCluster::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    mBreadcrumbTracker.SetBreadCrumb(breadcrumb.Value());
+    mClusterContext.breadcrumbTracker.SetBreadCrumb(breadcrumb.Value());
 }
 
 void NetworkCommissioningCluster::CommitSavedBreadcrumb()
@@ -607,7 +598,7 @@ NetworkCommissioningCluster::HandleRemoveNetwork(CommandHandler & handler, const
 {
     MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
 
-    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(mClusterContext.failSafeContext, handler.GetAccessingFabricIndex());
 
     Commands::NetworkConfigResponse::Type response;
     DebugTextStorage debugTextBuffer;
@@ -642,7 +633,7 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(handler.GetAccessingFabricIndex());
+    RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(mClusterContext.failSafeContext, handler.GetAccessingFabricIndex());
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
@@ -837,7 +828,7 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     }
     if (commissioningError == Status::kSuccess)
     {
-        TEMPORARY_RETURN_IGNORED DeviceLayer::DeviceControlServer::DeviceControlSvr().PostConnectedToOperationalNetworkEvent(
+        TEMPORARY_RETURN_IGNORED mClusterContext.deviceControlServer.PostConnectedToOperationalNetworkEvent(
             ByteSpan(mLastNetworkID, mLastNetworkIDLen));
         SetLastConnectErrorValue(NullNullable);
     }
