@@ -16,6 +16,7 @@
  */
 
 #import "MTRCommandPayloadsObjc_Private.h"
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRCommandPayloadsObjc.h>

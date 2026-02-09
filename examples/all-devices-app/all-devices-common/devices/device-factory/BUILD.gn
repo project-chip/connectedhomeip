@@ -23,6 +23,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/occupancy-sensor/impl:toggling",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/on-off-light",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker/impl:logging",
     "${chip_root}/src/lib/support",
   ]
 }

@@ -17,12 +17,13 @@
 import enum
 import logging
 import os
+import random
 import sys
 import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import chiptest
 import click
@@ -84,6 +85,20 @@ class DeprecatedOption(click.Option):
         super().__init__(*args, **kwargs, callback=deprecation_warning)
 
 
+def validate_test_order(ctx: click.Context, param: click.Parameter, value: Any) -> str | None:
+    if not isinstance(value, str):
+        raise click.BadParameter("Test order needs to be a string.")
+    if value == "alphabetic":
+        return None
+    if (value_split := value.split(":", maxsplit=1))[0] == "random":
+        if len(value_split) == 1:
+            return str(time.time_ns())
+        if not value_split[1]:
+            raise click.BadParameter("Random seed not specified. Should be: 'random[:seed]'.")
+        return value_split[1]
+    raise click.BadParameter("Wrong format of test order. Should be: 'alphabetic' or 'random[:seed]'.")
+
+
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 
 
@@ -139,6 +154,14 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--test-order', 'test_order_seed',
+    type=click.UNPROCESSED,
+    callback=validate_test_order,
+    default="alphabetic",
+    show_default=True,
+    help="Order in which tests should be executed. Possible values: 'alphabetic', 'random[:seed]'."
+)
+@click.option(
     '--find-path',
     default=[DEFAULT_CHIP_ROOT],
     multiple=True,
@@ -156,7 +179,8 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.pass_context
 def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], find_path: list[str], runner: str, chip_tool: Path | None) -> None:
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
+         chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
@@ -239,7 +263,13 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
 
         tests_filtered.append(test)
 
-    tests_filtered.sort(key=lambda x: x.name)
+    if test_order_seed is None:
+        log.info('Executing the tests in alphabetic order')
+        tests_filtered.sort(key=lambda x: x.name)
+    else:
+        log.info('Using the following seed for test order randomization: %s', test_order_seed)
+        random.seed(test_order_seed)
+        random.shuffle(tests_filtered)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
                              runtime=runtime, find_path=find_path)
@@ -319,6 +349,9 @@ class Terminable(Protocol):
     '--energy-gateway-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-gateway:<path>',
     help='what energy-gateway app to use')
 @click.option(
+    '--water-heater-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path water-heater:<path>',
+    help='what water-heater app to use')
+@click.option(
     '--evse-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path evse:<path>',
     help='what evse app to use')
 @click.option(
@@ -385,7 +418,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
-            evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
+            water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
             chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
             expected_failures: int, commissioning_method: str | None) -> None:
     assert isinstance(context.obj, RunContext)
@@ -420,6 +453,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     handle_deprecated_pathopt('rvc', rvc_app, SubprocessKind.APP)
     handle_deprecated_pathopt('network-manager', network_manager_app, SubprocessKind.APP)
     handle_deprecated_pathopt('energy-gateway', energy_gateway_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('water-heater', water_heater_app, SubprocessKind.APP)
     handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
@@ -484,6 +518,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                 setup_app_link_up=not wifi_required,
+                add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
                 app_link_name='wlx-app' if wifi_required else 'eth-app'))
@@ -537,6 +572,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         test_end = time.monotonic()
                         log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
                 except Exception:
+                    if os.path.exists('thread.pcap'):
+                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                     observed_failures += 1

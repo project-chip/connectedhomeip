@@ -44,6 +44,7 @@ class CmdLineArgs:
     templateFile: str
     outputDir: str
     runBootstrap: bool
+    retries: int
     parallel: bool = True
     prettify_output: bool = True
     version_check: bool = True
@@ -146,6 +147,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('--version-check', action='store_true')
     parser.add_argument('--no-version-check',
                         action='store_false', dest='version_check')
+    parser.add_argument('--retries', help='Retry running zap-cli in case of failure', default=1, type=int)
     parser.add_argument('--keep-output-dir', action='store_true',
                         help='Keep any created output directory. Useful for temporary directories.')
     parser.set_defaults(parallel=True)
@@ -191,6 +193,7 @@ def runArgumentsParser() -> CmdLineArgs:
         lock_file=args.lock_file,
         delete_output_dir=delete_output_dir,
         matter_file_name=matter_file_name,
+        retries=args.retries,
     )
 
 
@@ -242,7 +245,17 @@ def runGeneration(cmdLineArgs):
         # Parallel-compatible runs will need separate state
         args.append('--tempState')
 
-    tool.run('generate', *args)
+    for i in range(cmdLineArgs.retries):
+        try:
+            tool.run('generate', *args)
+            break
+        except subprocess.CalledProcessError:
+            if i < cmdLineArgs.retries - 1:
+                log.exception("Failure to generate, retrying (%d retries left)", cmdLineArgs.retries - i - 1)
+                continue
+            if cmdLineArgs.retries > 1:
+                log.error("Zap execution failure after %d retries", cmdLineArgs.retries)
+            raise
 
     if cmdLineArgs.matter_file_name:
         matter_name = cmdLineArgs.matter_file_name
