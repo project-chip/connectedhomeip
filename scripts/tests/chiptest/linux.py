@@ -35,12 +35,12 @@ if sys.platform == 'linux':
         from testing import linux
 
 
-class LinuxNamespacedExecutor(Executor):
-    def __init__(self, ns: linux.IsolatedNetworkNamespace):
-        super().__init__()
-        self.ns = ns
+    class LinuxNamespacedExecutor(Executor):
+        def __init__(self, ns: linux.IsolatedNetworkNamespace):
+            super().__init__()
+            self.ns = ns
 
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
-            stderr: IO[Any] | LogPipe | None = None):
-        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind.name.lower()))
-        return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
+        def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
+                stderr: IO[Any] | LogPipe | None = None):
+            wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind.name.lower()))
+            return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
