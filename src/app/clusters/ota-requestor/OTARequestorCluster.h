@@ -28,6 +28,8 @@ class OTARequestorCluster : public DefaultServerCluster
 public:
     OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
 
+    // Only the UpdatePossible attribute can be configured through this class. The source of the other attributes is the
+    // OTARequestorInterface passed into the constructor, so use that object instead to change those attributes.
     void SetUpdatePossible(bool updatePossible) { mUpdatePossible = updatePossible; }
     bool GetUpdatePossible() const { return mUpdatePossible; }
 
