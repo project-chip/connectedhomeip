@@ -705,7 +705,7 @@ CHIP_ERROR WiFiPAFEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mRemoteReceiveWindowSize = mLocalReceiveWindowSize = mReceiveWindowMaxSize = windowSize;
-    resp.mWindowSize = mReceiveWindowMaxSize;
+    resp.mWindowSize                                                           = mReceiveWindowMaxSize;
     ChipLogProgress(WiFiPAF, "local and remote recv window sizes = %u", resp.mWindowSize);
 
     // Select PAF transport protocol version from those supported by central, or none if no supported version found.
@@ -959,7 +959,7 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
         }
         // Consume the saved packets
         ChipLogProgress(WiFiPAF, "Rx processing from the re-order queue [%u]", qidx);
-        err                = RxPacketProcess(std::move(ReorderQueue[qidx]));
+        err = RxPacketProcess(std::move(ReorderQueue[qidx]));
         ItemsInReorderQueue--;
     }
     // Has reached the 1st hole in the queue => move the rest items forward
