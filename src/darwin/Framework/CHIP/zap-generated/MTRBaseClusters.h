@@ -6701,13 +6701,13 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 /**
  * Command SuppressAlarm
  *
- * This command is used to suppress the specified alarm mode.
+ * This command will suppress the alarm modes specified.
  */
 - (void)suppressAlarmWithParams:(MTRBooleanStateConfigurationClusterSuppressAlarmParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 /**
  * Command EnableDisableAlarm
  *
- * This command is used to enable or disable the specified alarm mode.
+ * This command allows setting the enable or disable value for the specified alarm modes.
  */
 - (void)enableDisableAlarmWithParams:(MTRBooleanStateConfigurationClusterEnableDisableAlarmParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
@@ -19330,6 +19330,10 @@ typedef NS_OPTIONS(uint32_t, MTRGroupKeyManagementFeature) {
     MTRGroupKeyManagementFeatureCacheAndSync MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_OPTIONS(uint32_t, MTRBooleanStateFeature) {
+    MTRBooleanStateFeatureChangeEvent MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRICDManagementClientType) {
     MTRICDManagementClientTypePermanent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRICDManagementClientTypeEphemeral MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
@@ -19822,6 +19826,7 @@ typedef NS_OPTIONS(uint32_t, MTRBooleanStateConfigurationFeature) {
     MTRBooleanStateConfigurationFeatureAudible MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x2,
     MTRBooleanStateConfigurationFeatureAlarmSuppress MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x4,
     MTRBooleanStateConfigurationFeatureSensitivityLevel MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x8,
+    MTRBooleanStateConfigurationFeatureFaultEvents MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 typedef NS_OPTIONS(uint16_t, MTRBooleanStateConfigurationSensorFaultBitmap) {

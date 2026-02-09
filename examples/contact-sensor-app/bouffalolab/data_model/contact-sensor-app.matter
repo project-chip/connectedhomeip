@@ -1867,7 +1867,11 @@ cluster UserLabel = 65 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
-  revision 1;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kChangeEvent = 0x1;
+  }
 
   info event StateChange = 0 {
     boolean stateValue = 0;
