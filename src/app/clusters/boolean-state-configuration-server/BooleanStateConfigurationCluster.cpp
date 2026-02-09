@@ -26,6 +26,7 @@
 #include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 
 #include <algorithm>
 
@@ -216,7 +217,7 @@ ActionReturnStatus BooleanStateConfigurationCluster::ReadAttribute(const ReadAtt
     case ClusterRevision::Id:
         return encoder.Encode(BooleanStateConfiguration::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(mFeatures);
+        return encoder.Encode(mFeatures.Raw() | to_underlying(Feature::kFaultEvents));
     case CurrentSensitivityLevel::Id:
         return encoder.Encode(mCurrentSensitivityLevel);
     case SupportedSensitivityLevels::Id:

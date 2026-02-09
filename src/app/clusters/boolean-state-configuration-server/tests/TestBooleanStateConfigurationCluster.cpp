@@ -27,6 +27,7 @@
 #include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/TypeTraits.h>
 
 namespace {
 
@@ -230,6 +231,19 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAcceptedCommandList)
                                                       Commands::EnableDisableAlarm::kMetadataEntry,
                                                       Commands::SuppressAlarm::kMetadataEntry,
                                                   }));
+    }
+}
+
+TEST_F(TestBooleanStateConfigurationCluster, TestFeatureMap)
+{
+    // Check that the FeatureMap includes the FAULTEV bit even when no other features are set
+    {
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, {}, {}, DefaultConfig());
+        ClusterTester tester(cluster);
+
+        uint32_t features;
+        EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, features), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(features, to_underlying(Feature::kFaultEvents));
     }
 }
 
