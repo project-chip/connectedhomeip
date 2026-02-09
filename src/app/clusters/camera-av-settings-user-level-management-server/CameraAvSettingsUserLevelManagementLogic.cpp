@@ -528,7 +528,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::UpdateMoveCapableVideoStreams(Glo
     }
 
     CHIP_ERROR err = StoreDPTZStreams();
-    if (err != CHIP_NO_ERROR) 
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[wp=%d]: Failed to persist updated DPTZStreams entry on global viewport update, rolling back.",
                      mEndpointId);
@@ -1102,7 +1102,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
 
     if (err != CHIP_NO_ERROR)
     {
-        if (updatingExistingPreset) 
+        if (updatingExistingPreset)
         {
             *it = currentMptzPresetHelper;
         }
