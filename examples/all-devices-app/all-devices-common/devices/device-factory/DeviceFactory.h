@@ -38,13 +38,11 @@ namespace chip::app {
  * Create devices by fetching the instance of this class and passing in the device type argument
  * i.e. DeviceFactory::GetInstance().Create(deviceTypeName)
  */
-class DeviceFactory
-{
+class DeviceFactory {
 public:
     using DeviceCreator = std::function<std::unique_ptr<DeviceInterface>()>;
 
-    struct Context
-    {
+    struct Context {
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
@@ -62,8 +60,7 @@ public:
 
     std::unique_ptr<DeviceInterface> Create(const std::string & deviceTypeArg)
     {
-        if (IsValidDevice(deviceTypeArg))
-        {
+        if (IsValidDevice(deviceTypeArg)) {
             return mRegistry.find(deviceTypeArg)->second();
         }
         ChipLogError(
@@ -76,8 +73,7 @@ public:
     std::vector<std::string> SupportedDeviceTypes() const
     {
         std::vector<std::string> result;
-        for (auto & item : mRegistry)
-        {
+        for (auto & item : mRegistry) {
             result.push_back(item.first);
         }
         return result;
@@ -103,19 +99,19 @@ private:
                 &mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
         };
         mRegistry["occupancy-sensor"] = []() { return std::make_unique<TogglingOccupancySensorDevice>(); };
-        mRegistry["chime"]            = []() { return std::make_unique<LoggingChimeDevice>(); };
-        mRegistry["on-off-light"]     = [this]() {
+        mRegistry["chime"] = []() { return std::make_unique<LoggingChimeDevice>(); };
+        mRegistry["on-off-light"] = [this]() {
             VerifyOrDie(mContext.has_value());
-            return std::make_unique<LoggingOnOffLightDevice>(LoggingOnOffLightDevice::Context{
-                    .groupDataProvider = mContext->groupDataProvider,
-                    .fabricTable       = mContext->fabricTable,
-                    .timerDelegate     = mContext->timerDelegate,
+            return std::make_unique<LoggingOnOffLightDevice>(LoggingOnOffLightDevice::Context {
+                .groupDataProvider = mContext->groupDataProvider,
+                .fabricTable = mContext->fabricTable,
+                .timerDelegate = mContext->timerDelegate,
             });
         };
         mRegistry["speaker"] = [this]() {
             VerifyOrDie(mContext.has_value());
             return std::make_unique<LoggingSpeakerDevice>(
-                LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
+                LoggingSpeakerDevice::Context { .timerDelegate = mContext->timerDelegate });
         };
     }
 };
