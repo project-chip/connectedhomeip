@@ -40,7 +40,11 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 if sys.platform == 'linux':
     from python_path import PythonPath
 
-    with PythonPath(os.path.join(DEFAULT_CHIP_ROOT, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
+    root_dir = os.path.dirname(
+        os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+    with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
         from testing import linux
 
 if sys.platform == 'darwin':
@@ -170,9 +174,9 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     if sys.platform == "linux":
         if not internal_inside_unshare:
             # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
-            chiptest.linux.ensure_network_namespace_availability()
+            linux.namespace.ensure_network_namespace_availability()
         else:
-            chiptest.linux.ensure_private_state()
+            linux.namespace.ensure_private_state()
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
@@ -483,7 +487,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
+            to_terminate.append(ns := linux.namespace.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                 setup_app_link_up=not wifi_required,

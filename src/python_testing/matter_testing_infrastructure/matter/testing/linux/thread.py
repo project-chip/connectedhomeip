@@ -21,7 +21,7 @@ import subprocess
 import threading
 from typing import Optional, Pattern
 
-from chiptest.linux import IsolatedNetworkNamespace
+from  .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 

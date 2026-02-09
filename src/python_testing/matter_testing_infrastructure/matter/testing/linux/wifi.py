@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2021 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -22,16 +22,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
 import threading
 from typing import Union
 
 import sdbus
-from chiptest.linux import IsolatedNetworkNamespace
+from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
-
-test_environ = os.environ.copy()
 
 DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
 DictVariantT = dict[str, tuple[str, DbusAnyT]]
