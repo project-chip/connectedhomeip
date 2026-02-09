@@ -23,6 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
+#include <utility>
 
 namespace chip::app::Clusters {
 
@@ -142,7 +143,7 @@ private:
         NotifyAttributeChanged(attributeId);
         if (mDelegate != nullptr)
         {
-            callback(mDelegate);
+            std::forward<CallbackType>(callback)(mDelegate);
         }
     }
 };

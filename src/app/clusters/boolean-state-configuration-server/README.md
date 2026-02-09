@@ -38,6 +38,8 @@ Usage Notes:
     requirement that the API calls _MUST_ be called only after server
     initialization (i.e. after the clusters have been created.)
 -   The `Delegate` provides type-safe per-attribute change callbacks (e.g.
-    `OnCurrentSensitivityLevelChanged()`) that are called when attributes change
-    via WriteAttribute or InvokeCommand. Use these instead of implementing
-    functionality in `PostAttributeChangeCallback`.
+    `OnCurrentSensitivityLevelChanged(uint8_t)`) that are called whenever the
+    corresponding attributes change, whether via attribute writes, command
+    handlers, or server APIs such as `SetAlarmsActive()` or
+    `GenerateSensorFault()`. Use these instead of implementing functionality in
+    `PostAttributeChangeCallback`.
