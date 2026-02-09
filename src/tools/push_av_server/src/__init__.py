@@ -1,5 +1,3 @@
 """
-Push AV Server - Media ingestion and validation service for Matter's Push AV capabilities.
+Push AV Server - Media ingestion and validation service.
 """
-
-__version__ = "1.0.0"

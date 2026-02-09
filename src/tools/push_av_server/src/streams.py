@@ -2,15 +2,13 @@
 Stream management service for handling media streams and sessions.
 """
 
+import contextlib
 import json
 import logging
-import contextlib
-from pathlib import Path
 from typing import Optional
 
-from models import Session, Stream, SupportedIngestInterface, UploadError, ValidUpload
+from models import Stream, SupportedIngestInterface, UploadError, ValidUpload
 from utils import WorkingDirectory
-from fastapi import HTTPException
 
 log = logging.getLogger(__name__)
 
@@ -26,10 +24,10 @@ class StreamService:
         """Load all streams from disk."""
         streams: dict[str, Stream] = {}
         streams_dir = self.wd.path("streams")
-        
+
         if not streams_dir.exists():
             return streams
-            
+
         for stream_path in streams_dir.iterdir():
             if stream_path.is_dir():
                 stream_file = stream_path / "stream.json"
@@ -42,17 +40,17 @@ class StreamService:
     def create_stream(self, stream_id: int, interface: SupportedIngestInterface, strict_mode: bool) -> Stream:
         """Create a new stream with the given configuration."""
         stream_id_str = str(stream_id)
-        
+
         stream = Stream(
             id=stream_id,
             strict_mode=strict_mode,
             interface=interface,
         )
-        
+
         self.streams[stream_id_str] = stream
         self.wd.mkdir("streams", str(stream_id))
         self._save_stream(stream)
-        
+
         log.info(f"Stream created: id={stream_id}, interface={interface}")
         return stream
 
