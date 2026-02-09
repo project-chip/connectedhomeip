@@ -97,7 +97,14 @@
 #define PAF_MAX_RECEIVE_WINDOW_SIZE 6
 #endif
 
-#if (PAF_MAX_RECEIVE_WINDOW_SIZE < 3)
+/*
+    Minimum receive window for stability requirement
+*/
+#ifndef PAF_MIN_RECEIVE_WINDOW_SIZE
+#define PAF_MIN_RECEIVE_WINDOW_SIZE 3
+#endif
+
+#if (PAF_MAX_RECEIVE_WINDOW_SIZE < PAF_MIN_RECEIVE_WINDOW_SIZE)
 #error "PAF_MAX_RECEIVE_WINDOW_SIZE must be greater than 2 for PAF transport protocol stability."
 #endif
 
