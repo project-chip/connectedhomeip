@@ -579,15 +579,16 @@ DataModel::ActionReturnStatus EnergyEvseCluster::HandleSetTargets(const DataMode
     return mDelegate.SetTargets(chargingTargetSchedules);
 }
 
-DataModel::ActionReturnStatus EnergyEvseCluster::HandleGetTargets(const DataModel::InvokeRequest & request,
-                                                                  TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> EnergyEvseCluster::HandleGetTargets(const DataModel::InvokeRequest & request,
+                                                                                 TLV::TLVReader & input_arguments,
+                                                                                 CommandHandler * handler)
 {
     Commands::GetTargetsResponse::Type response;
     Status status = mDelegate.GetTargets(response.chargingTargetSchedules);
     VerifyOrReturnValue(status == Status::Success, status);
 
     handler->AddResponse(request.path, response);
-    return Status::Success;
+    return std::nullopt;
 }
 
 DataModel::ActionReturnStatus EnergyEvseCluster::HandleClearTargets(const DataModel::InvokeRequest & request,
