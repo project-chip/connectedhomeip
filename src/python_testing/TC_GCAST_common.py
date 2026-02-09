@@ -49,12 +49,11 @@ async def get_feature_map(test) -> tuple:
     )
     ln_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener)
     sd_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kSender)
-    pga_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kPerGroup)
+    pga_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.PGA)
     asserts.assert_true(sd_enabled or ln_enabled,
                         "At least one of the following features must be enabled: Listener or Sender.")
-    logger.info(
-        f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled} | PGA supported: {pga_enabled}")
-    return ln_enabled, sd_enabled, pga_enabled
+    logger.info(f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled}")
+    return ln_enabled, sd_enabled
 
 
 async def valid_endpoints_list(test, ln_enabled: bool) -> list:
@@ -86,20 +85,20 @@ async def valid_endpoints_list(test, ln_enabled: bool) -> list:
 
 def generate_membership_entry_matcher(
     group_id: int,
+    ln_enabled: bool,  # Added ln_enabled
     key_set_id: Optional[int] = None,
-    has_auxiliary_acl: Optional[str] = None,
+    has_auxiliary_acl: Optional[bool] = None,  # Changed to bool
     endpoints: Optional[list] = None,
-    mcastAddrPolicy: Optional[Clusters.Groupcast.Enums.MulticastAddrPolicyEnum] = None,
     test_for_exists: bool = True,
 ) -> AttributeMatcher:
     """Create a matcher that checks if Membership attribute contains (or does not contain) an entry matching the specified criteria.
 
     Args:
         group_id: The groupID to match (required)
+        ln_enabled: Boolean indicating if the Listener feature is enabled (required)
         key_set_id: The keySetID to match (optional)
         has_auxiliary_acl: The HasAuxiliaryACL value to match (optional)
-        endpoints: The endpoints list to match (optional)
-        mcastAddrPolicy: The multicast address policy to match (optional)
+        endpoints: The endpoints list to match (optional, only checked if ln_enabled is True)
         test_for_exists: If True, membership entry exists. (default: True)
 
     Returns:
@@ -116,17 +115,22 @@ def generate_membership_entry_matcher(
         for entry in report.value:
             if entry.groupID != group_id:
                 continue
-            if key_set_id is not None and entry.keySetID != key_set_id:
+            if key_set_id is not None and entry.keySetID != key_set_id:  # Updated to keySetID
                 continue
             if has_auxiliary_acl is not None:
-                if entry.hasAuxiliaryACL is None or entry.hasAuxiliaryACL != has_auxiliary_acl:
+                if entry.hasAuxiliaryACL != has_auxiliary_acl:
                     continue
-            if endpoints is not None:
-                if entry.endpoints is None or entry.endpoints != endpoints:
+
+            if ln_enabled:
+                if endpoints is not None:
+                    if sorted(entry.endpoints) != sorted(endpoints):
+                        continue
+                elif entry.endpoints:  # Should be empty if not specified
                     continue
-            if mcastAddrPolicy is not None:
-                if entry.mcastAddrPolicy is None or entry.mcastAddrPolicy != mcastAddrPolicy:
-                    continue
+            elif entry.endpoints and len(entry.endpoints) > 0:
+                # If LN is not enabled, endpoints field must be empty or not present
+                continue
+
             found_match = True
             break
         return found_match if test_for_exists else not found_match
@@ -136,10 +140,15 @@ def generate_membership_entry_matcher(
         desc_parts.append(f"keySetID={key_set_id}")
     if has_auxiliary_acl is not None:
         desc_parts.append(f"hasAuxiliaryACL={has_auxiliary_acl}")
-    if endpoints is not None:
-        desc_parts.append(f"endpoints={endpoints}")
-    if mcastAddrPolicy is not None:
-        desc_parts.append(f"mcastAddrPolicy={mcastAddrPolicy}")
+
+    if ln_enabled:
+        if endpoints is not None:
+            desc_parts.append(f"endpoints={endpoints}")
+        else:
+            desc_parts.append("endpoints=[]")
+    else:
+        desc_parts.append("endpoints must be empty/absent")
+
     if test_for_exists:
         description = f"Membership has entry with {', '.join(desc_parts)}"
     else:
@@ -161,42 +170,4 @@ def generate_membership_empty_matcher() -> AttributeMatcher:
         return len(report.value) == 0
 
     description = "Membership list is empty (no groups present)"
-    return AttributeMatcher.from_callable(description=description, matcher=predicate)
-
-
-def generate_fabric_under_test_matcher(expected_fabric_index: int) -> AttributeMatcher:
-    """Create a matcher that checks if FabricUnderTest attribute has the expected value.
-
-    Args:
-        expected_fabric_index: The expected fabric index value.
-
-    Returns:
-        An AttributeMatcher that returns True when FabricUnderTest equals the expected value.
-    """
-
-    def predicate(report) -> bool:
-        if report.attribute != Clusters.Groupcast.Attributes.FabricUnderTest:
-            return False
-        return report.value == expected_fabric_index
-
-    description = f"FabricUnderTest == {expected_fabric_index}"
-    return AttributeMatcher.from_callable(description=description, matcher=predicate)
-
-
-def generate_usedMcastAddrCount_entry_matcher(expected_count: int) -> AttributeMatcher:
-    """Create a matcher that checks if UsedMcastAddrCount attribute has the expected value.
-
-    Args:
-        expected_count: The expected UsedMcastAddrCount value.
-
-    Returns:
-        An AttributeMatcher that returns True when UsedMcastAddrCount equals the expected value.
-    """
-
-    def predicate(report) -> bool:
-        if report.attribute != Clusters.Groupcast.Attributes.UsedMcastAddrCount:
-            return False
-        return report.value == expected_count
-
-    description = f"UsedMcastAddrCount == {expected_count}"
     return AttributeMatcher.from_callable(description=description, matcher=predicate)
