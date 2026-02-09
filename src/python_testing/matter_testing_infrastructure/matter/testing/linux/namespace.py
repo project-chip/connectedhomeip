@@ -26,6 +26,7 @@ log = logging.getLogger(__name__)
 
 test_environ = os.environ.copy()
 
+
 def ensure_network_namespace_availability():
     if os.getuid() == 0:
         log.debug("Current user is root")

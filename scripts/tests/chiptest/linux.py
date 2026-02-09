@@ -34,6 +34,7 @@ if sys.platform == 'linux':
     with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
         from testing import linux
 
+
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: linux.IsolatedNetworkNamespace):
         super().__init__()
