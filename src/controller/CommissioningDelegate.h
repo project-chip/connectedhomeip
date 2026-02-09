@@ -633,6 +633,13 @@ public:
         return *this;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+    void SetBorderAgentAddress(const Inet::IPAddress & ipAddr) { mBorderAgentAddress.SetValue(ipAddr); }
+    Optional<Inet::IPAddress> GetBorderAgentAddress() const { return mBorderAgentAddress; }
+    void SetBorderAgentPort(uint16_t port) { mBorderAgentPort.SetValue(port); }
+    Optional<uint16_t> GetBorderAgentPort() const { return mBorderAgentPort; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -708,6 +715,11 @@ private:
     Span<const app::AttributePathParams> mExtraReadPaths;
 
     Optional<bool> mUseJCM;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+    Optional<Inet::IPAddress> mBorderAgentAddress;
+    Optional<uint16_t> mBorderAgentPort;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
 };
 
 struct RequestedCertificate

@@ -142,6 +142,9 @@ declare_args() {
       chip_device_platform == "linux" &&
       chip_system_config_use_openthread_inet_endpoints &&
       current_cpu == host_cpu && current_os == host_os
+
+  # Enable OpenThread Commissioner
+  chip_device_config_enable_ot_commissioner = false
 }
 
 declare_args() {

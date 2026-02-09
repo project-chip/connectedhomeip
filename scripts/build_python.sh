@@ -127,6 +127,15 @@ while (($#)); do
             wifi_paf_config="chip_device_config_enable_wifipaf=$wifi_paf_arg"
             shift
             ;;
+        --enable_ot_commissioner | -p)
+            declare ot_commissioner_arg="$2"
+            if [[ "$ot_commissioner_arg" != "true" && "$ot_commissioner_arg" != "false" ]]; then
+                echo "Error: --enable_ot_commissioner/-p should have a true/false value, not '$ot_commissioner_arg'" >&2
+                exit 1
+            fi
+            ot_commissioner_config="chip_device_config_enable_ot_commissioner=$ot_commissioner_arg"
+            shift
+            ;;
         --enable_ipv4 | -4)
             enable_ipv4=$2
             if [[ "$enable_ipv4" != "true" && "$enable_ipv4" != "false" ]]; then
@@ -233,6 +242,9 @@ echo "  enable_nfc=\"$enable_nfc\""
 if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
+if [[ -n $ot_commissioner_config ]]; then
+    echo "  $ot_commissioner_config"
+fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
 echo "  chip_support_webrtc_python_bindings=\"$enable_webrtc\""
@@ -308,6 +320,9 @@ if [[ -n "$pregen_dir" ]]; then
 fi
 if [[ -n $wifi_paf_config ]]; then
     gn_args+=("$wifi_paf_config")
+fi
+if [[ -n $ot_commissioner_config ]]; then
+    gn_args+=("$ot_commissioner_config")
 fi
 # Append extra arguments provided by the user.
 gn_args+=("${extra_gn_args[@]}")

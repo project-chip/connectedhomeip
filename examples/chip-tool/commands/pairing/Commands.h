@@ -53,6 +53,16 @@ public:
     {}
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+class PairThreadMeshcop : public PairingCommand
+{
+public:
+    PairThreadMeshcop(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("thread-meshcop", PairingMode::ThreadMeshcop, PairingNetworkType::Thread, credsIssuerConfig)
+    {}
+};
+#endif
+
 class PairCodeWifi : public PairingCommand
 {
 public:
@@ -277,6 +287,9 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairSoftAP>(credsIssuerConfig),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         make_unique<PairWiFiPAF>(credsIssuerConfig),
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+        make_unique<PairThreadMeshcop>(credsIssuerConfig),
 #endif
         make_unique<PairAlreadyDiscovered>(credsIssuerConfig),
         make_unique<PairAlreadyDiscoveredByIndex>(credsIssuerConfig),

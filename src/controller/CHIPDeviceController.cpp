@@ -703,10 +703,62 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     return errorCode;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+CHIP_ERROR DeviceCommissioner::PairThreadMeshcop(RendezvousParameters & rendezvousParams,
+                                                 CommissioningParameters & commissioningParams)
+{
+    VerifyOrReturnError(rendezvousParams.GetSetupDiscriminator().has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commissioningParams.GetThreadOperationalDataset().HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commissioningParams.GetBorderAgentAddress().HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commissioningParams.GetBorderAgentPort().HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    auto discriminator = rendezvousParams.GetSetupDiscriminator().value();
+    Thread::DiscoveryCode code;
+    if (rendezvousParams.GetSetupDiscriminator().value().IsShortDiscriminator())
+    {
+        code = Thread::DiscoveryCode(discriminator.GetShortValue());
+        ChipLogProgress(Controller, "Discovery code from short discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+    else
+    {
+        code = Thread::DiscoveryCode(discriminator.GetLongValue());
+        ChipLogProgress(Controller, "Discovery code from long discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+
+    uint8_t pskcBuffer[Thread::kSizePSKc];
+    ByteSpan pskc(pskcBuffer);
+    {
+        Thread::OperationalDatasetView dataset;
+        ReturnErrorOnFailure(dataset.Init(commissioningParams.GetThreadOperationalDataset().Value()));
+
+        ReturnErrorOnFailure(dataset.GetPSKc(pskcBuffer));
+    }
+
+    {
+        Dnssd::DiscoveredNodeData discoveredNodeData;
+        char borderAgentAddrStr[Inet::IPAddress::kMaxStringLength];
+        commissioningParams.GetBorderAgentAddress().Value().ToString(borderAgentAddrStr);
+        ReturnErrorOnFailure(mThreadMeshcopCommissionProxy.Discover(pskc, borderAgentAddrStr,
+                                                                    commissioningParams.GetBorderAgentPort().Value(), code,
+                                                                    discriminator, discoveredNodeData, 30));
+
+        ChipLogProgress(Controller, "Joiner discovered");
+        OnNodeDiscovered(discoveredNodeData);
+    }
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
                                           CommissioningParameters & commissioningParams)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
+#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+    if (commissioningParams.GetBorderAgentAddress().HasValue() && commissioningParams.GetBorderAgentPort().HasValue() &&
+        commissioningParams.GetThreadOperationalDataset().HasValue() && rendezvousParams.GetSetupDiscriminator().has_value())
+    {
+        return PairThreadMeshcop(rendezvousParams, commissioningParams);
+    }
+#endif
     ReturnErrorOnFailureWithMetric(kMetricDeviceCommissionerCommission, EstablishPASEConnection(remoteDeviceId, rendezvousParams));
     auto errorCode = Commission(remoteDeviceId, commissioningParams);
     VerifyOrDoWithMetric(kMetricDeviceCommissionerCommission, CHIP_NO_ERROR == errorCode, errorCode);
