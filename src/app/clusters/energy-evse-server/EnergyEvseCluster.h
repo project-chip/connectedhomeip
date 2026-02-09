@@ -63,8 +63,8 @@ public:
 
         Config(EndpointId aEndpointId, EnergyEvse::Delegate & aDelegate, BitMask<EnergyEvse::Feature> aFeature,
                BitMask<EnergyEvse::OptionalAttributes> aOptionalAttrs, BitMask<EnergyEvse::OptionalCommands> aOptionalCmds) :
-            endpointId(aEndpointId), delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds),
-            optionalAttrs(aOptionalAttrs)
+            endpointId(aEndpointId),
+            delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds), optionalAttrs(aOptionalAttrs)
         {}
     };
     // We don't want to allow the default constructor as this cluster requires a delegate to be set
