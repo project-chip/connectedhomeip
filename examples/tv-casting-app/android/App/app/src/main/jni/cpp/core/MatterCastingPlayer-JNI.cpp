@@ -162,24 +162,27 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
                      "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jFailureCallback == nullptr but is mandatory "));
 
     // jIdentificationDeclarationOptions is optional
-    matter::casting::core::IdentificationDeclarationOptions * idOptions = nullptr;
-    if (jIdentificationDeclarationOptions == nullptr)
+    matter::casting::core::IdentificationDeclarationOptions idOptions;
+    if (jIdentificationDeclarationOptions != nullptr)
     {
-        ChipLogProgress(AppServer,
-                        "MatterCastingPlayer-JNI::verifyOrEstablishConnection() Optional jIdentificationDeclarationOptions not "
-                        "provided by the client");
+        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::sendUDC() jIdentificationDeclarationOptions was provided by client");
+        std::unique_ptr<matter::casting::core::IdentificationDeclarationOptions> idOptionsCpp(
+            support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions));
+        if (idOptionsCpp == nullptr)
+        {
+            ChipLogError(AppServer,
+                         "MatterCastingPlayer-JNI::sendUDC() "
+                         "convertIdentificationDeclarationOptionsFromJavaToCpp() error");
+            return support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        idOptions = *idOptionsCpp;
+        idOptions.LogDetail();
     }
     else
     {
-        ChipLogProgress(
-            AppServer,
-            "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jIdentificationDeclarationOptions was provided by client");
-        idOptions = support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions);
-        VerifyOrReturnValue(idOptions != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
-                            ChipLogError(AppServer,
-                                         "MatterCastingPlayer-JNI::verifyOrEstablishConnection() "
-                                         "convertIdentificationDeclarationOptionsFromJavaToCpp() error"));
-        idOptions->LogDetail();
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::sendUDC() Optional jIdentificationDeclarationOptions not "
+                        "provided by the client");
     }
 
     MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
@@ -203,7 +206,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
         MatterCastingPlayerJNI::getInstance().getCommissionerDeclarationCallback();
 
     castingPlayer->VerifyOrEstablishConnection(connectionCallbacks, static_cast<uint16_t>(commissioningWindowTimeoutSec),
-                                               *idOptions);
+                                               idOptions);
 
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
