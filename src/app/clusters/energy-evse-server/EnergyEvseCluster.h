@@ -78,8 +78,8 @@ public:
     }
 
     const BitFlags<EnergyEvse::Feature> & Features() const { return mFeatureFlags; }
-    const BitMask<EnergyEvse::OptionalAttributes> & OptionalAttrs() const { return mOptionalAttrs; }
-    const BitMask<EnergyEvse::OptionalCommands> & OptionalCmds() const { return mOptionalCmds; }
+    const BitFlags<EnergyEvse::OptionalAttributes> & OptionalAttrs() const { return mOptionalAttrs; }
+    const BitFlags<EnergyEvse::OptionalCommands> & OptionalCmds() const { return mOptionalCmds; }
 
     // Attribute getters and setters - cluster owns the data
     StateEnum GetState() const { return mState; }
@@ -185,9 +185,9 @@ private:
     ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 
     EnergyEvse::Delegate & mDelegate;
-    const BitMask<EnergyEvse::Feature> mFeatureFlags;
-    const BitMask<EnergyEvse::OptionalAttributes> mOptionalAttrs;
-    const BitMask<EnergyEvse::OptionalCommands> mOptionalCmds;
+    const BitFlags<EnergyEvse::Feature> mFeatureFlags;
+    const BitFlags<EnergyEvse::OptionalAttributes> mOptionalAttrs;
+    const BitFlags<EnergyEvse::OptionalCommands> mOptionalCmds;
 
     // Attribute storage
     StateEnum mState                                       = StateEnum::kNotPluggedIn;
