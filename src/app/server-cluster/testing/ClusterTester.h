@@ -91,6 +91,7 @@ public:
         mCluster(cluster), mFabricTestFixture(fabricHelper)
     {}
 
+    TestServerClusterContext & GetTestContext() { return mTestServerClusterContext; }
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
     // Read attribute into `out` parameter.
@@ -120,7 +121,7 @@ public:
         mReadOperations.push_back(std::move(readOperation));
         chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
 
-        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         readOperationRef.SetSubjectDescriptor(subjectDescriptor);
 
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
@@ -157,7 +158,7 @@ public:
         chip::Testing::WriteOperation writeOp(path);
 
         // Create a stable object on the stack
-        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
         uint8_t buffer[1024];
@@ -230,7 +231,7 @@ public:
             return result;
         }
 
-        const Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         const app::DataModel::InvokeRequest invokeRequest = [&]() {
             app::DataModel::InvokeRequest req;
             req.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
@@ -315,6 +316,10 @@ public:
     std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
 
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
+    void SetSubjectDescriptor(const Access::SubjectDescriptor & subjectDescriptor)
+    {
+        mHandler.SetSubjectDescriptor(subjectDescriptor);
+    }
 
     FabricTestFixture * GetFabricHelper() { return mFabricTestFixture; }
 

@@ -29,8 +29,8 @@ source_set("certificate-table") {
 
 source_set("tls-certificate-management-server") {
   sources = [
-    "TlsCertificateManagementCluster.cpp",
-    "TlsCertificateManagementCluster.h",
+    "TLSCertificateManagementCluster.cpp",
+    "TLSCertificateManagementCluster.h",
   ]
 
   deps = [

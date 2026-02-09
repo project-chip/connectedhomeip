@@ -553,6 +553,11 @@ DataModel::ActionReturnStatus CameraAVStreamManagementCluster::ReadAttribute(con
     case FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mEnabledFeatures));
         break;
+
+    case ClusterRevision::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(CameraAvStreamManagement::kRevision));
+        break;
+
     case MaxConcurrentEncoders::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
@@ -1224,7 +1229,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::SetMicrophoneAGCEnabled(bool aMicrop
 
 CHIP_ERROR CameraAVStreamManagementCluster::SetImageRotation(uint16_t aImageRotation)
 {
-    if (mImageRotation > kMaxImageRotationDegrees)
+    if (aImageRotation > kMaxImageRotationDegrees)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -1755,7 +1760,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::StoreAllocatedStreams()
     size_t len = writer.GetLengthWritten();
 
     auto path = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
-    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, ByteSpan(buffer, len)));
 
     ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(Traits::kStreamType));
     return CHIP_NO_ERROR;
@@ -1772,7 +1777,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     auto path      = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
     auto & streams = (*this).*Traits::kStreamVectorMember;
 
-    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, span);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         streams.clear();
@@ -2059,6 +2064,13 @@ CameraAVStreamManagementCluster::HandleVideoStreamAllocate(CommandHandler & hand
 
     VerifyOrReturnError(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1, Status::ConstraintError);
 
+    if (commandData.minResolution.width > commandData.maxResolution.width ||
+        commandData.minResolution.height > commandData.maxResolution.height)
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: minResolution cannot be greater than maxResolution", mPath.mEndpointId);
+        return Status::ConstraintError;
+    }
+
     VerifyOrReturnError(commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate &&
                             commandData.maxBitRate >= 1,
                         Status::ConstraintError);
@@ -2343,6 +2355,13 @@ CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(CommandHandler & h
     VerifyOrReturnError(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1, Status::ConstraintError);
 
     VerifyOrReturnError(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1, Status::ConstraintError);
+
+    if (commandData.minResolution.width > commandData.maxResolution.width ||
+        commandData.minResolution.height > commandData.maxResolution.height)
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: minResolution cannot be greater than maxResolution", mPath.mEndpointId);
+        return Status::ConstraintError;
+    }
 
     if (!(commandData.quality > 0 && commandData.quality <= kMaxImageQualityMetric))
     {

@@ -327,12 +327,6 @@ void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
     FabricTableImpl::SetTableSize(endpointSceneTableSize, static_cast<uint16_t>((endpointSceneTableSize - 1) / 2));
 }
 
-namespace {
-
-static DefaultSceneTableImpl gSceneTableImpl;
-
-} // namespace
-
 template <>
 CHIP_ERROR Serializer::SerializeId(TLV::TLVWriter & writer, const SceneStorageId & id)
 {
@@ -397,6 +391,7 @@ CHIP_ERROR Serializer::DeserializeData(TLV::TLVReader & reader, SceneData & data
 /// @return Default global scene table implementation
 DefaultSceneTableImpl * chip::scenes::GetSceneTableImpl(EndpointId endpoint, uint16_t endpointTableSize)
 {
+    static DefaultSceneTableImpl gSceneTableImpl;
     gSceneTableImpl.SetEndpoint(endpoint);
     gSceneTableImpl.SetTableSize(endpointTableSize);
 

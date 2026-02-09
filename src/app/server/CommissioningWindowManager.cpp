@@ -605,6 +605,15 @@ void CommissioningWindowManager::ExpireFailSafeIfArmed()
     }
 }
 
+void CommissioningWindowManager::ExpireFailSafeIfHeldByOpenPASESession()
+{
+    if (GetPASESession().HasValue())
+    {
+        ChipLogProgress(AppServer, "Active PASE session detected; expiring the fail-safe held by it (if still armed)");
+        ExpireFailSafeIfArmed();
+    }
+}
+
 void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnum aNewStatus)
 {
     CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();

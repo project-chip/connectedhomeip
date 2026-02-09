@@ -33,6 +33,7 @@ should be present on a device based on the device's implemented features, attrib
 commands.
 """
 
+import operator
 import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -52,11 +53,13 @@ AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
 GREATER_TERM = 'greaterTerm'
+GREATER_EQUAL_TERM = 'greaterOrEqualTerm'
 FEATURE_TAG = 'feature'
 ATTRIBUTE_TAG = 'attribute'
 COMMAND_TAG = 'command'
 CONDITION_TAG = 'condition'
 LITERAL_TAG = 'literal'
+REVISION_TAG = 'revision'
 ZIGBEE_CONDITION = 'zigbee'
 
 
@@ -225,19 +228,46 @@ class provisional(Conformance):
         return 'P'
 
 
-class literal(Conformance):
+class ValueConformance(Conformance):
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData):
+        # This should never be called
+        raise ConformanceException('Value conformance function should not be called - this is simply a value holder')
+
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        raise ConformanceException('Base get_value function should not be called directly')
+
+
+class literal(ValueConformance):
     def __init__(self, value: str):
         # base=0 allows automatic detection of number format from string prefix:
         # "10" -> 10 (decimal), "0x10" -> 16 (hex), "0o10" -> 8 (octal), "0b10" -> 2 (binary)
         # This is needed because XML literal values can be in different formats
         self.value = int(value, 0)
 
-    def __call__(self, conformance_assessment_data: ConformanceAssessmentData):
-        # This should never be called
-        raise ConformanceException('Literal conformance function should not be called - this is simply a value holder')
-
     def __str__(self):
         return str(self.value)
+
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        return self.value
+
+
+class revision(ValueConformance):
+    def __init__(self, value: str):
+        self.value: Optional[int]
+        if value.lower() == 'current':
+            self.value = None
+        else:
+            self.value = int(value, 0)
+
+    def __str__(self):
+        if self.value is None:
+            return "Rev"
+        return f'v{str(self.value)}'
+
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        if self.value is None:
+            return conformance_assessment_data.cluster_revision
+        return self.value
 
 
 # Conformance options that apply regardless of the element set of the cluster or device
@@ -421,24 +451,50 @@ class or_operation(Conformance):
         return f'({" | ".join(op_strs)})'
 
 
-class greater_operation(Conformance):
-    def _type_ok(self, op: Conformance):
-        return type(op) == attribute or type(op) == literal
+class ArithmeticConformance(Conformance):
+    ''' Base class for arithmetic operations - do not use directly.'''
+
+    def _type_ok(self, op1: Conformance, op2: Conformance):
+        def _is_valid_operand(op: Conformance) -> bool:
+            return issubclass(type(op), ValueConformance) or type(op) == attribute
+        return _is_valid_operand(op1) and _is_valid_operand(op2)
 
     def __init__(self, op1: Conformance, op2: Conformance):
-        if not self._type_ok(op1) or not self._type_ok(op2):
-            raise ConformanceException('Arithmetic operations can only have attribute or literal value children')
+        if not self._type_ok(op1, op2):
+            raise ConformanceException('Arithmetic operations can only have attribute + literal or revision children')
         self.op1 = op1
         self.op2 = op2
+        self.operator = operator.gt
+        self.opstr = "???"
 
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        # If there are any non-value ops, return optional, as it represents an attribute comparison and we don't have the data
+        # for that currently.
         # For now, this is fully optional, need to implement this properly later, but it requires access to the actual attribute values
         # We need to reach into the attribute, but can't use it directly because the attribute callable is an EXISTENCE check and
         # the arithmetic functions require a value.
+        if hasattr(self.op1, 'get_value') and hasattr(self.op2, 'get_value'):
+            if self.operator(self.op1.get_value(conformance_assessment_data), self.op2.get_value(conformance_assessment_data)):
+                return ConformanceDecisionWithChoice(ConformanceDecision.MANDATORY)
+            return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
         return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
 
     def __str__(self):
-        return f'{str(self.op1)} > {str(self.op2)}'
+        return f'{str(self.op1)} {self.opstr} {str(self.op2)}'
+
+
+class greater_operation(ArithmeticConformance):
+    def __init__(self, op1: Conformance, op2: Conformance):
+        super().__init__(op1, op2)
+        self.operator = operator.gt
+        self.opstr = '>'
+
+
+class greater_equal_operation(ArithmeticConformance):
+    def __init__(self, op1: Conformance, op2: Conformance):
+        super().__init__(op1, op2)
+        self.operator = operator.ge
+        self.opstr = '>='
 
 
 class otherwise(Conformance):
@@ -509,6 +565,12 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
                 raise ConformanceException(
                     f"Literal tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
             return literal(literal_value)
+        if element.tag == REVISION_TAG:
+            value = element.get('value')
+            if value is None:
+                raise ConformanceException(
+                    f"Revision tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            return revision(value)
         raise BasicConformanceException(
             f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
 
@@ -563,6 +625,10 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Conf
         if len(ops) != 2:
             raise ConformanceException(f'Greater than term found with more than two subelements {list(element)}')
         return greater_operation(ops[0], ops[1])
+    if element.tag == GREATER_EQUAL_TERM:
+        if len(ops) != 2:
+            raise ConformanceException(f'Greater than term found with more than two subelements {list(element)}')
+        return greater_equal_operation(ops[0], ops[1])
     raise ConformanceException(f'Unexpected conformance tag with children {element}')
 
 

@@ -9,97 +9,97 @@ The following markers are used in this document (matches the ID master list):
 | C     | Certifiable                    |
 | P     | Provisional                    |
 
-| ID (Decimal) | ID (hex) | Name                         |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|
-|--------------|----------|------------------------------|---|---|---|---|---|-----|-----------|---|
-|10            |0x000A    |Door Lock                     |C  |C  |C  |C  |C  |C    |C          |C  |
-|11            |0x000B    |Door Lock Controller          |C  |C  |C  |C  |C  |C    |C          |C  |
-|14            |0x000E    |Aggregator                    |C  |C  |C  |C  |C  |C    |C          |C  |
-|15            |0x000F    |Generic Switch                |C  |C  |C  |C  |C  |C    |C          |C  |
-|17            |0x0011    |Power Source                  |C  |C  |C  |C  |C  |C    |C          |C  |
-|18            |0x0012    |OTA Requestor                 |C  |C  |C  |C  |C  |C    |C          |C  |
-|19            |0x0013    |Bridged Node                  |C  |C  |C  |C  |C  |C    |C          |C  |
-|20            |0x0014    |OTA Provider                  |C  |C  |C  |C  |C  |C    |C          |C  |
-|21            |0x0015    |Contact Sensor                |C  |C  |C  |C  |C  |C    |C          |C  |
-|22            |0x0016    |Root Node                     |C  |C  |C  |C  |C  |C    |C          |C  |
-|23            |0x0017    |Solar Power                   |   |   |   |   |C  |C    |C          |C  |
-|24            |0x0018    |Battery Storage               |   |   |   |   |C  |C    |C          |C  |
-|25            |0x0019    |Secondary Network Interface   |   |   |   |   |C  |C    |C          |C  |
-|34            |0x0022    |Speaker                       |C  |C  |C  |C  |C  |C    |C          |C  |
-|35            |0x0023    |Casting Video Player          |C  |C  |C  |C  |C  |C    |C          |C  |
-|36            |0x0024    |Content App                   |C  |C  |C  |C  |C  |C    |C          |C  |
-|39            |0x0027    |Mode Select                   |C  |C  |C  |C  |C  |C    |C          |C  |
-|40            |0x0028    |Basic Video Player            |C  |C  |C  |C  |C  |C    |C          |C  |
-|41            |0x0029    |Casting Video Client          |C  |C  |C  |C  |C  |C    |C          |C  |
-|42            |0x002A    |Video Remote Control          |C  |C  |C  |C  |C  |C    |C          |C  |
-|43            |0x002B    |Fan                           |C  |C  |C  |C  |C  |C    |C          |C  |
-|44            |0x002C    |Air Quality Sensor            |   |   |C  |C  |C  |C    |C          |C  |
-|45            |0x002D    |Air Purifier                  |   |   |C  |C  |C  |C    |C          |C  |
-|64            |0x0040    |Irrigation System             |   |   |   |   |   |     |           |C  |
-|65            |0x0041    |Water Freeze Detector         |   |   |   |C  |C  |C    |C          |C  |
-|66            |0x0042    |Water Valve                   |   |   |   |C  |C  |C    |C          |C  |
-|67            |0x0043    |Water Leak Detector           |   |   |   |C  |C  |C    |C          |C  |
-|68            |0x0044    |Rain Sensor                   |   |   |   |C  |C  |C    |C          |C  |
-|69            |0x0045    |Soil Sensor                   |   |   |   |   |   |     |           |C  |
-|112           |0x0070    |Refrigerator                  |   |   |C  |C  |C  |C    |C          |C  |
-|113           |0x0071    |Temperature Controlled Cabinet|   |   |C  |C  |C  |C    |C          |C  |
-|114           |0x0072    |Room Air Conditioner          |   |   |C  |C  |C  |C    |C          |C  |
-|115           |0x0073    |Laundry Washer                |   |   |C  |C  |C  |C    |C          |C  |
-|116           |0x0074    |Robotic Vacuum Cleaner        |   |   |C  |C  |C  |C    |C          |C  |
-|117           |0x0075    |Dishwasher                    |   |   |C  |C  |C  |C    |C          |C  |
-|118           |0x0076    |Smoke CO Alarm                |   |   |C  |C  |C  |C    |C          |C  |
-|119           |0x0077    |Cook Surface                  |   |   |   |C  |C  |C    |C          |C  |
-|120           |0x0078    |Cooktop                       |   |   |   |C  |C  |C    |C          |C  |
-|121           |0x0079    |Microwave Oven                |   |   |   |C  |C  |C    |C          |C  |
-|122           |0x007A    |Extractor Hood                |   |   |   |C  |C  |C    |C          |C  |
-|123           |0x007B    |Oven                          |   |   |   |C  |C  |C    |C          |C  |
-|124           |0x007C    |Laundry Dryer                 |   |   |   |C  |C  |C    |C          |C  |
-|144           |0x0090    |Network Infrastructure Manager|   |   |   |   |C  |C    |C          |C  |
-|145           |0x0091    |Thread Border Router          |   |   |   |   |C  |C    |C          |C  |
-|256           |0x0100    |On/Off Light                  |C  |C  |C  |C  |C  |C    |C          |C  |
-|257           |0x0101    |Dimmable Light                |C  |C  |C  |C  |C  |C    |C          |C  |
-|259           |0x0103    |On/Off Light Switch           |C  |C  |C  |C  |C  |C    |C          |C  |
-|260           |0x0104    |Dimmer Switch                 |C  |C  |C  |C  |C  |C    |C          |C  |
-|261           |0x0105    |Color Dimmer Switch           |C  |C  |C  |C  |C  |C    |C          |C  |
-|262           |0x0106    |Light Sensor                  |C  |C  |C  |C  |C  |C    |C          |C  |
-|263           |0x0107    |Occupancy Sensor              |C  |C  |C  |C  |C  |C    |C          |C  |
-|266           |0x010A    |On/Off Plug-in Unit           |C  |C  |C  |C  |C  |C    |C          |C  |
-|267           |0x010B    |Dimmable Plug-In Unit         |C  |C  |C  |C  |C  |C    |C          |C  |
-|268           |0x010C    |Color Temperature Light       |C  |C  |C  |C  |C  |C    |C          |C  |
-|269           |0x010D    |Extended Color Light          |C  |C  |C  |C  |C  |C    |C          |C  |
-|271           |0x010F    |Mounted On/Off Control        |   |   |   |   |C  |C    |C          |C  |
-|272           |0x0110    |Mounted Dimmable Load Control |   |   |   |   |C  |C    |C          |C  |
-|304           |0x0130    |Joint Fabric Administrator    |   |   |   |   |P  |P    |P          |P  |
-|320           |0x0140    |Intercom                      |   |   |   |   |   |     |           |C  |
-|321           |0x0141    |Audio Doorbell                |   |   |   |   |   |     |           |C  |
-|322           |0x0142    |Camera                        |   |   |   |   |   |     |           |C  |
-|323           |0x0143    |Video Doorbell                |   |   |   |   |   |     |           |C  |
-|324           |0x0144    |Floodlight Camera             |   |   |   |   |   |     |           |C  |
-|325           |0x0145    |Snapshot Camera               |   |   |   |   |   |     |           |C  |
-|326           |0x0146    |Chime                         |   |   |   |   |   |     |           |C  |
-|327           |0x0147    |Camera Controller             |   |   |   |   |   |     |           |C  |
-|328           |0x0148    |Doorbell                      |   |   |   |   |   |     |           |C  |
-|514           |0x0202    |Window Covering               |C  |C  |C  |C  |C  |C    |C          |C  |
-|515           |0x0203    |Window Covering Controller    |C  |C  |C  |C  |C  |C    |C          |C  |
-|560           |0x0230    |Closure                       |   |   |   |   |   |     |           |C  |
-|561           |0x0231    |Closure Panel                 |   |   |   |   |   |     |           |C  |
-|574           |0x023E    |Closure Controller            |   |   |   |   |   |     |           |C  |
-|768           |0x0300    |Heating/Cooling Unit          |C  |C  |C  |   |   |     |           |   |
-|769           |0x0301    |Thermostat                    |C  |C  |C  |C  |C  |C    |C          |C  |
-|770           |0x0302    |Temperature Sensor            |C  |C  |C  |C  |C  |C    |C          |C  |
-|771           |0x0303    |Pump                          |C  |C  |C  |C  |C  |C    |C          |C  |
-|772           |0x0304    |Pump Controller               |C  |C  |C  |C  |C  |C    |C          |C  |
-|773           |0x0305    |Pressure Sensor               |C  |C  |C  |C  |C  |C    |C          |C  |
-|774           |0x0306    |Flow Sensor                   |C  |C  |C  |C  |C  |C    |C          |C  |
-|775           |0x0307    |Humidity Sensor               |C  |C  |C  |C  |C  |C    |C          |C  |
-|777           |0x0309    |Heat Pump                     |   |   |   |   |C  |C    |C          |C  |
-|778           |0x030A    |Thermostat Controller         |   |   |   |   |   |     |C          |C  |
-|1292          |0x050C    |Energy EVSE                   |   |   |   |C  |C  |C    |C          |C  |
-|1293          |0x050D    |Device Energy Management      |   |   |   |C  |C  |C    |C          |C  |
-|1295          |0x050F    |Water Heater                  |   |   |   |   |C  |C    |C          |C  |
-|1296          |0x0510    |Electrical Sensor             |   |   |   |C  |C  |C    |C          |C  |
-|1297          |0x0511    |Electrical Utility Meter      |   |   |   |   |   |     |           |C  |
-|1298          |0x0512    |Meter Reference Point         |   |   |   |   |   |     |           |C  |
-|1299          |0x0513    |Electrical Energy Tariff      |   |   |   |   |   |     |           |C  |
-|1300          |0x0514    |Electrical Meter              |   |   |   |   |   |     |           |C  |
-|2112          |0x0840    |Control Bridge                |C  |C  |C  |C  |C  |C    |C          |C  |
-|2128          |0x0850    |On/Off Sensor                 |C  |C  |C  |C  |C  |C    |C          |C  |
+| ID (Decimal) | ID (hex) | Name                         |1.0|1.1|1.2|1.3|1.4|1.4.1|1.4.2-mve-1|1.5|0.9-winter-2026|
+|--------------|----------|------------------------------|---|---|---|---|---|-----|-----------|---|---------------|
+|10            |0x000A    |Door Lock                     |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|11            |0x000B    |Door Lock Controller          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|14            |0x000E    |Aggregator                    |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|15            |0x000F    |Generic Switch                |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|17            |0x0011    |Power Source                  |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|18            |0x0012    |OTA Requestor                 |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|19            |0x0013    |Bridged Node                  |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|20            |0x0014    |OTA Provider                  |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|21            |0x0015    |Contact Sensor                |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|22            |0x0016    |Root Node                     |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|23            |0x0017    |Solar Power                   |   |   |   |   |C  |C    |C          |C  |C              |
+|24            |0x0018    |Battery Storage               |   |   |   |   |C  |C    |C          |C  |C              |
+|25            |0x0019    |Secondary Network Interface   |   |   |   |   |C  |C    |C          |C  |C              |
+|34            |0x0022    |Speaker                       |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|35            |0x0023    |Casting Video Player          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|36            |0x0024    |Content App                   |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|39            |0x0027    |Mode Select                   |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|40            |0x0028    |Basic Video Player            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|41            |0x0029    |Casting Video Client          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|42            |0x002A    |Video Remote Control          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|43            |0x002B    |Fan                           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|44            |0x002C    |Air Quality Sensor            |   |   |C  |C  |C  |C    |C          |C  |C              |
+|45            |0x002D    |Air Purifier                  |   |   |C  |C  |C  |C    |C          |C  |C              |
+|64            |0x0040    |Irrigation System             |   |   |   |   |   |     |           |C  |C              |
+|65            |0x0041    |Water Freeze Detector         |   |   |   |C  |C  |C    |C          |C  |C              |
+|66            |0x0042    |Water Valve                   |   |   |   |C  |C  |C    |C          |C  |C              |
+|67            |0x0043    |Water Leak Detector           |   |   |   |C  |C  |C    |C          |C  |C              |
+|68            |0x0044    |Rain Sensor                   |   |   |   |C  |C  |C    |C          |C  |C              |
+|69            |0x0045    |Soil Sensor                   |   |   |   |   |   |     |           |C  |C              |
+|112           |0x0070    |Refrigerator                  |   |   |C  |C  |C  |C    |C          |C  |C              |
+|113           |0x0071    |Temperature Controlled Cabinet|   |   |C  |C  |C  |C    |C          |C  |C              |
+|114           |0x0072    |Room Air Conditioner          |   |   |C  |C  |C  |C    |C          |C  |C              |
+|115           |0x0073    |Laundry Washer                |   |   |C  |C  |C  |C    |C          |C  |C              |
+|116           |0x0074    |Robotic Vacuum Cleaner        |   |   |C  |C  |C  |C    |C          |C  |C              |
+|117           |0x0075    |Dishwasher                    |   |   |C  |C  |C  |C    |C          |C  |C              |
+|118           |0x0076    |Smoke CO Alarm                |   |   |C  |C  |C  |C    |C          |C  |C              |
+|119           |0x0077    |Cook Surface                  |   |   |   |C  |C  |C    |C          |C  |C              |
+|120           |0x0078    |Cooktop                       |   |   |   |C  |C  |C    |C          |C  |C              |
+|121           |0x0079    |Microwave Oven                |   |   |   |C  |C  |C    |C          |C  |C              |
+|122           |0x007A    |Extractor Hood                |   |   |   |C  |C  |C    |C          |C  |C              |
+|123           |0x007B    |Oven                          |   |   |   |C  |C  |C    |C          |C  |C              |
+|124           |0x007C    |Laundry Dryer                 |   |   |   |C  |C  |C    |C          |C  |C              |
+|144           |0x0090    |Network Infrastructure Manager|   |   |   |   |C  |C    |C          |C  |C              |
+|145           |0x0091    |Thread Border Router          |   |   |   |   |C  |C    |C          |C  |C              |
+|256           |0x0100    |On/Off Light                  |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|257           |0x0101    |Dimmable Light                |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|259           |0x0103    |On/Off Light Switch           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|260           |0x0104    |Dimmer Switch                 |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|261           |0x0105    |Color Dimmer Switch           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|262           |0x0106    |Light Sensor                  |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|263           |0x0107    |Occupancy Sensor              |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|266           |0x010A    |On/Off Plug-in Unit           |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|267           |0x010B    |Dimmable Plug-In Unit         |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|268           |0x010C    |Color Temperature Light       |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|269           |0x010D    |Extended Color Light          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|271           |0x010F    |Mounted On/Off Control        |   |   |   |   |C  |C    |C          |C  |C              |
+|272           |0x0110    |Mounted Dimmable Load Control |   |   |   |   |C  |C    |C          |C  |C              |
+|304           |0x0130    |Joint Fabric Administrator    |   |   |   |   |P  |P    |P          |P  |P              |
+|320           |0x0140    |Intercom                      |   |   |   |   |   |     |           |C  |C              |
+|321           |0x0141    |Audio Doorbell                |   |   |   |   |   |     |           |C  |C              |
+|322           |0x0142    |Camera                        |   |   |   |   |   |     |           |C  |C              |
+|323           |0x0143    |Video Doorbell                |   |   |   |   |   |     |           |C  |C              |
+|324           |0x0144    |Floodlight Camera             |   |   |   |   |   |     |           |C  |C              |
+|325           |0x0145    |Snapshot Camera               |   |   |   |   |   |     |           |C  |C              |
+|326           |0x0146    |Chime                         |   |   |   |   |   |     |           |C  |C              |
+|327           |0x0147    |Camera Controller             |   |   |   |   |   |     |           |C  |C              |
+|328           |0x0148    |Doorbell                      |   |   |   |   |   |     |           |C  |C              |
+|514           |0x0202    |Window Covering               |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|515           |0x0203    |Window Covering Controller    |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|560           |0x0230    |Closure                       |   |   |   |   |   |     |           |C  |C              |
+|561           |0x0231    |Closure Panel                 |   |   |   |   |   |     |           |C  |C              |
+|574           |0x023E    |Closure Controller            |   |   |   |   |   |     |           |C  |C              |
+|768           |0x0300    |Heating/Cooling Unit          |C  |C  |C  |   |   |     |           |   |               |
+|769           |0x0301    |Thermostat                    |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|770           |0x0302    |Temperature Sensor            |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|771           |0x0303    |Pump                          |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|772           |0x0304    |Pump Controller               |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|773           |0x0305    |Pressure Sensor               |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|774           |0x0306    |Flow Sensor                   |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|775           |0x0307    |Humidity Sensor               |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|777           |0x0309    |Heat Pump                     |   |   |   |   |C  |C    |C          |C  |C              |
+|778           |0x030A    |Thermostat Controller         |   |   |   |   |   |     |C          |C  |C              |
+|1292          |0x050C    |Energy EVSE                   |   |   |   |C  |C  |C    |C          |C  |C              |
+|1293          |0x050D    |Device Energy Management      |   |   |   |C  |C  |C    |C          |C  |C              |
+|1295          |0x050F    |Water Heater                  |   |   |   |   |C  |C    |C          |C  |C              |
+|1296          |0x0510    |Electrical Sensor             |   |   |   |C  |C  |C    |C          |C  |C              |
+|1297          |0x0511    |Electrical Utility Meter      |   |   |   |   |   |     |           |C  |C              |
+|1298          |0x0512    |Meter Reference Point         |   |   |   |   |   |     |           |C  |C              |
+|1299          |0x0513    |Electrical Energy Tariff      |   |   |   |   |   |     |           |C  |C              |
+|1300          |0x0514    |Electrical Meter              |   |   |   |   |   |     |           |C  |C              |
+|2112          |0x0840    |Control Bridge                |C  |C  |C  |C  |C  |C    |C          |C  |C              |
+|2128          |0x0850    |On/Off Sensor                 |C  |C  |C  |C  |C  |C    |C          |C  |C              |
