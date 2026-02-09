@@ -54,12 +54,11 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             ProviderLocationList::Iterator providerIterator = mOtaRequestor.GetDefaultOTAProviderListIterator();
-            CHIP_ERROR error                                = CHIP_NO_ERROR;
-            while (error == CHIP_NO_ERROR && providerIterator.Next())
+            while (providerIterator.Next())
             {
-                error = listEncoder.Encode(providerIterator.GetValue());
+                ReturnErrorOnFailure(listEncoder.Encode(providerIterator.GetValue()));
             }
-            return error;
+            return CHIP_NO_ERROR;
         });
     }
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
