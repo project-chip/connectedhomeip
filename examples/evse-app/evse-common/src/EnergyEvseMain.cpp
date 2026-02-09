@@ -308,7 +308,7 @@ void EvseApplicationInit()
 
 void EvseApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App (EVSE): EvseApplicationShutdown()");
+    ChipLogDetail(AppServer, "Evse App: EvseApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
     TEMPORARY_RETURN_IGNORED EVSEManufacturerShutdown();

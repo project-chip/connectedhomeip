@@ -63,8 +63,8 @@ public:
 
         Config(EndpointId aEndpointId, EnergyEvse::Delegate & aDelegate, BitMask<EnergyEvse::Feature> aFeature,
                BitMask<EnergyEvse::OptionalAttributes> aOptionalAttrs, BitMask<EnergyEvse::OptionalCommands> aOptionalCmds) :
-            endpointId(aEndpointId),
-            delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds), optionalAttrs(aOptionalAttrs)
+            endpointId(aEndpointId), delegate(aDelegate), feature(aFeature), optionalCmds(aOptionalCmds),
+            optionalAttrs(aOptionalAttrs)
         {}
     };
     // We don't want to allow the default constructor as this cluster requires a delegate to be set
@@ -199,7 +199,7 @@ private:
     int64_t mMinimumChargeCurrent                          = kMinimumChargeCurrent;
     int64_t mMaximumChargeCurrent                          = 0;
     int64_t mMaximumDischargeCurrent                       = 0;
-    int64_t mUserMaximumChargeCurrent                      = 0;   // TODO update spec
+    int64_t mUserMaximumChargeCurrent                      = 0;
     uint32_t mRandomizationDelayWindow                     = 600; // Default 600s per spec
     // PREF attributes
     DataModel::Nullable<uint32_t> mNextChargeStartTime     = DataModel::NullNullable;
