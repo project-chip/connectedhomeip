@@ -131,6 +131,20 @@ private:
     SensorFaultBitMask mSensorFault{ 0 };
 
     void GenerateAlarmsStateChangedEvent();
+
+    /// Helper method to notify attribute change and call delegate callback
+    /// @tparam CallbackType The type of the callback function/lambda
+    /// @param attributeId The attribute ID that changed
+    /// @param callback A callable that takes the delegate pointer and calls the appropriate callback method
+    template <typename CallbackType>
+    void NotifyAttributeChangedAndCallDelegate(AttributeId attributeId, CallbackType && callback)
+    {
+        NotifyAttributeChanged(attributeId);
+        if (mDelegate != nullptr)
+        {
+            callback(mDelegate);
+        }
+    }
 };
 
 } // namespace chip::app::Clusters

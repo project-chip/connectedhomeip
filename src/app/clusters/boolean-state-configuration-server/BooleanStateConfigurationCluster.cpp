@@ -170,11 +170,8 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
             {
                 ChipLogError(DataManagement, "Failed to persist alarms enabled: %" CHIP_ERROR_FORMAT, err.Format());
             }
-            NotifyAttributeChanged(AlarmsEnabled::Id);
-            if (mDelegate != nullptr)
-            {
-                mDelegate->OnAlarmsEnabledChanged(mAlarmsEnabled);
-            }
+            NotifyAttributeChangedAndCallDelegate(AlarmsEnabled::Id,
+                                                  [this](auto * delegate) { delegate->OnAlarmsEnabledChanged(mAlarmsEnabled); });
         }
 
         if (mDelegate != nullptr)
@@ -193,21 +190,15 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
         if (mAlarmsActive.HasAny(alarmsToDisable))
         {
             mAlarmsActive.Clear(alarmsToDisable);
-            NotifyAttributeChanged(AlarmsActive::Id);
-            if (mDelegate != nullptr)
-            {
-                mDelegate->OnAlarmsActiveChanged(mAlarmsActive);
-            }
+            NotifyAttributeChangedAndCallDelegate(AlarmsActive::Id,
+                                                  [this](auto * delegate) { delegate->OnAlarmsActiveChanged(mAlarmsActive); });
             generateEvent = true;
         }
         if (mAlarmsSuppressed.HasAny(alarmsToDisable))
         {
             mAlarmsSuppressed.Clear(alarmsToDisable);
-            NotifyAttributeChanged(AlarmsSuppressed::Id);
-            if (mDelegate != nullptr)
-            {
-                mDelegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed);
-            }
+            NotifyAttributeChangedAndCallDelegate(AlarmsSuppressed::Id,
+                                                  [this](auto * delegate) { delegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed); });
             generateEvent = true;
         }
 
@@ -311,11 +302,8 @@ void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fa
     if (mOptionalAttributes.IsSet(SensorFault::Id) && (mSensorFault != fault))
     {
         mSensorFault = fault;
-        NotifyAttributeChanged(SensorFault::Id);
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnSensorFaultChanged(mSensorFault);
-        }
+        NotifyAttributeChangedAndCallDelegate(SensorFault::Id,
+                                              [this](auto * delegate) { delegate->OnSensorFaultChanged(mSensorFault); });
     }
 }
 
@@ -325,11 +313,8 @@ CHIP_ERROR BooleanStateConfigurationCluster::SetCurrentSensitivityLevel(uint8_t 
     VerifyOrReturnError(mCurrentSensitivityLevel != level, CHIP_NO_ERROR);
 
     mCurrentSensitivityLevel = level;
-    NotifyAttributeChanged(CurrentSensitivityLevel::Id);
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnCurrentSensitivityLevelChanged(mCurrentSensitivityLevel);
-    }
+    NotifyAttributeChangedAndCallDelegate(CurrentSensitivityLevel::Id,
+                                          [this](auto * delegate) { delegate->OnCurrentSensitivityLevelChanged(mCurrentSensitivityLevel); });
 
     // TODO: we should migrate this to not use `Safe` attribute persistence and use
     //       a common persistence layer.
@@ -346,11 +331,8 @@ Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms
     VerifyOrReturnError(mAlarmsActive != alarms, Status::Success);
 
     mAlarmsActive = alarms;
-    NotifyAttributeChanged(AlarmsActive::Id);
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnAlarmsActiveChanged(mAlarmsActive);
-    }
+    NotifyAttributeChangedAndCallDelegate(AlarmsActive::Id,
+                                          [this](auto * delegate) { delegate->OnAlarmsActiveChanged(mAlarmsActive); });
     GenerateAlarmsStateChangedEvent();
 
     return Status::Success;
@@ -364,11 +346,8 @@ Status BooleanStateConfigurationCluster::SetAllEnabledAlarmsActive()
     VerifyOrReturnError(mAlarmsActive != mAlarmsEnabled, Status::Success);
 
     mAlarmsActive = mAlarmsEnabled;
-    NotifyAttributeChanged(AlarmsActive::Id);
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnAlarmsActiveChanged(mAlarmsActive);
-    }
+    NotifyAttributeChangedAndCallDelegate(AlarmsActive::Id,
+                                          [this](auto * delegate) { delegate->OnAlarmsActiveChanged(mAlarmsActive); });
     GenerateAlarmsStateChangedEvent();
     return Status::Success;
 }
@@ -380,20 +359,14 @@ void BooleanStateConfigurationCluster::ClearAllAlarms()
     if (mAlarmsActive.HasAny())
     {
         mAlarmsActive.ClearAll();
-        NotifyAttributeChanged(AlarmsActive::Id);
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnAlarmsActiveChanged(mAlarmsActive);
-        }
+        NotifyAttributeChangedAndCallDelegate(AlarmsActive::Id,
+                                              [this](auto * delegate) { delegate->OnAlarmsActiveChanged(mAlarmsActive); });
     }
     if (mAlarmsSuppressed.HasAny())
     {
         mAlarmsSuppressed.ClearAll();
-        NotifyAttributeChanged(AlarmsSuppressed::Id);
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed);
-        }
+        NotifyAttributeChangedAndCallDelegate(AlarmsSuppressed::Id,
+                                              [this](auto * delegate) { delegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed); });
     }
 
     GenerateAlarmsStateChangedEvent();
@@ -420,11 +393,8 @@ Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
     }
 
     mAlarmsSuppressed.Set(alarms);
-    NotifyAttributeChanged(AlarmsSuppressed::Id);
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed);
-    }
+    NotifyAttributeChangedAndCallDelegate(AlarmsSuppressed::Id,
+                                          [this](auto * delegate) { delegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed); });
     GenerateAlarmsStateChangedEvent();
     return Status::Success;
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,14 @@
 
 #pragma once
 
-#include "clusters/BooleanStateConfiguration/Events.h"
-#include <app-common/zap-generated/cluster-enums.h>
+#include <clusters/BooleanStateConfiguration/Events.h>
+#include <clusters/BooleanStateConfiguration/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitMask.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-
-class BooleanStateConfigurationCluster;
 
 namespace BooleanStateConfiguration {
 
@@ -46,21 +44,10 @@ public:
     // These methods are called when specific attributes are updated via WriteAttribute or InvokeCommand.
     // Default implementations are empty - override only the callbacks you need.
 
-    // TODO: If application want to return error on attribute change, should we have mechanism to fallback?
-
-    // Called when CurrentSensitivityLevel attribute changes
     virtual void OnCurrentSensitivityLevelChanged(uint8_t newValue) {}
-
-    // Called when AlarmsActive attribute changes
     virtual void OnAlarmsActiveChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
-
-    // Called when AlarmsSuppressed attribute changes
     virtual void OnAlarmsSuppressedChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
-
-    // Called when AlarmsEnabled attribute changes
     virtual void OnAlarmsEnabledChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
-
-    // Called when SensorFault attribute changes
     virtual void OnSensorFaultChanged(chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> newValue) {}
 };
 
