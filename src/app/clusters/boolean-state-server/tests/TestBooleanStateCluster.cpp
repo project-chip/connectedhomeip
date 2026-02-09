@@ -71,6 +71,8 @@ TEST_F(TestBooleanStateCluster, ReadAttributeTest)
 
     uint32_t features{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
+    constexpr uint32_t kFeatureChangeEvent = 1 << 0;
+    EXPECT_EQ(features, kFeatureChangeEvent);
 
     bool stateValue{};
     ASSERT_EQ(tester.ReadAttribute(StateValue::Id, stateValue), CHIP_NO_ERROR);

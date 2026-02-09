@@ -23,6 +23,10 @@ namespace chip::app::Clusters {
 
 using namespace BooleanState::Attributes;
 
+namespace {
+constexpr uint32_t kFeatureChangeEvent = 1 << 0;
+}
+
 BooleanStateCluster::BooleanStateCluster(EndpointId endpointId) :
     DefaultServerCluster({ endpointId, BooleanState::Id }), mStateValue(false)
 {}
@@ -37,7 +41,7 @@ DataModel::ActionReturnStatus BooleanStateCluster::ReadAttribute(const DataModel
     case ClusterRevision::Id:
         return encoder.Encode(BooleanState::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode<uint32_t>(0);
+        return encoder.Encode(kFeatureChangeEvent);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
