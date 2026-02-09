@@ -147,11 +147,8 @@ class MatterCMAFUploadValidator:
             errors.append("Multi-variant playlist must contain at least one EXT-X-MEDIA or EXT-X-STREAM-INF tag")
 
         # Store track count in session for later validation
-        if not hasattr(session, 'hls_expected_track_count'):
+        if not session.hls_completed_tracks:
             session.hls_expected_track_count = track_count
-        elif session.hls_expected_track_count != track_count:
-            errors.append(
-                f"Multi-variant playlist track count mismatch: expected {session.hls_expected_track_count}, got {track_count}")
 
         return errors, session
 
@@ -188,7 +185,7 @@ class MatterCMAFUploadValidator:
         has_segment_lines = any(not line.startswith('#') and line.strip() != '' for line in lines)
 
         # Check if multi-variant playlist was uploaded first
-        if not hasattr(session, 'hls_expected_track_count'):
+        if not session.hls_expected_track_count:
             errors.append("Multi-variant playlist must be uploaded before media playlists")
 
         # Get or create track
@@ -197,7 +194,7 @@ class MatterCMAFUploadValidator:
 
         track = session.tracks[track_name_in_path]
 
-        if has_ext_x_endlist:
+        if not track.state == TrackState.NOT_STARTED:
             # Final media playlist
             if not has_ext_x_playlist_type:
                 errors.append("Final media playlist must contain #EXT-X-PLAYLIST-TYPE:VOD")
@@ -236,11 +233,6 @@ class MatterCMAFUploadValidator:
                 errors.append("Initial media playlist must NOT contain #EXTINF tags")
             if has_segment_lines:
                 errors.append("Initial media playlist must NOT contain segment lines")
-
-            # Validate track state: initial playlist must be first upload for this track
-            if track.state != TrackState.NOT_STARTED:
-                errors.append(
-                    f"Initial media playlist already uploaded for track '{track_name_in_path}', duplicate upload not allowed")
 
             # Mark track as having uploaded initial playlist
             track.state = TrackState.INITIAL_PLAYLIST_UPLOADED
