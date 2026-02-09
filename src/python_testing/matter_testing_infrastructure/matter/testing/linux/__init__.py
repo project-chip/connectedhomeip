@@ -17,9 +17,9 @@
 
 from .bluetooth import BluetoothMock
 from .dbus import DBusTestSystemBus
+from .namespace import IsolatedNetworkNamespace
 from .thread import ThreadBorderRouter
 from .wifi import WpaSupplicantMock
-from .namespace import IsolatedNetworkNamespace
 
 __all__: list[str] = []
 

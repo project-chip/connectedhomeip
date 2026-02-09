@@ -26,6 +26,7 @@ import threading
 from typing import Union
 
 import sdbus
+
 from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
