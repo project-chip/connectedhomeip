@@ -1480,7 +1480,7 @@ Status EnergyEvseDelegate::SendFaultEvent(FaultStateEnum newFaultState)
 
     VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
     event.sessionID               = mInstance->GetSessionID(); // Note here the event sessionID can be Null!
-    event.state                   = GetState();          // This is the state prior to the fault being raised
+    event.state                   = GetState();                // This is the state prior to the fault being raised
     event.faultStatePreviousState = GetFaultState();
     event.faultStateCurrentState  = newFaultState;
 
@@ -1841,7 +1841,8 @@ void EvseSession::UpdateEnergyCharged(Instance * instance, int64_t chargingMeter
 void EvseSession::UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue)
 {
     VerifyOrReturn(instance != nullptr);
-    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyDischarged(MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart));
+    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyDischarged(
+        MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart));
 }
 
 // ------------------------------------------------------------------
