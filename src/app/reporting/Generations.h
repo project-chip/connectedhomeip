@@ -47,8 +47,9 @@ static_assert(AreGenerationsInOrder(1000, 0x800000AB));
 static_assert(AreGenerationsInOrder(0x80000000 + 1000, 900));
 static_assert(AreGenerationsInOrder(0x80000000 + 0x12345, 0x12344));
 
-/// Represents a generation of an attribute. A wrapper of a u32 that does NOT auto-cast back to U32, so that we can
-/// force comparisons to use the wrap-around aware compares
+/// Represents a generation of an attribute. A thin wrapper around `uint32_t` that intentionally does not
+/// provide an implicit conversion operator back to `uint32_t`, so that callers use the wrap-around-aware
+/// comparison helpers (e.g. `Before`/`After`) instead of comparing raw integer values directly.
 ///
 /// Note: usage of uint32_t is intentional to minimize size overhead. See
 ///       `struct AttributePathParamsWithGeneration` as an example - since that inherits
