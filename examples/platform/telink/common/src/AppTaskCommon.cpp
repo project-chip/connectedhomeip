@@ -132,11 +132,7 @@ public:
 AppCallbacks sCallbacks;
 } // namespace
 
-class AppFabricTableDelegate : public FabricTable::Delegate
-{
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-    {
-        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+static void DoDelayedFactoryReset(struct k_work * work)
         {
             ChipLogProgress(DeviceLayer, "Erasing settings partition");
 
@@ -167,6 +163,17 @@ class AppFabricTableDelegate : public FabricTable::Delegate
                 ChipLogProgress(DeviceLayer, "Rebooting board");
                 sys_reboot(SYS_REBOOT_WARM);
             }
+}
+
+static k_work_delayable sDelayedFactoryResetWork = Z_WORK_DELAYABLE_INITIALIZER(DoDelayedFactoryReset);
+
+class AppFabricTableDelegate : public FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+    {
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            k_work_schedule(&sDelayedFactoryResetWork, K_SECONDS(2));
         }
     }
 };
