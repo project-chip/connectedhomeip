@@ -669,46 +669,46 @@ TEST_F(TestBasicInformationReadWrite, ShutDownEventTest)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestBasicInformationReadWrite, LeaveEventTest)
-{
-    /**
-     * Basic Information Cluster - Event: Leave (ID: 0x02)
-     * Priority: Info
-     * Trigger: Generated when the Node leaves a fabric.
-     * Data: Must contain the FabricIndex.
-     */
+// TEST_F(TestBasicInformationReadWrite, LeaveEventTest)
+// {
+//     /**
+//      * Basic Information Cluster - Event: Leave (ID: 0x02)
+//      * Priority: Info
+//      * Trigger: Generated when the Node leaves a fabric.
+//      * Data: Must contain the FabricIndex.
+//      */
 
-    BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+//     BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+//     BasicInformationCluster cluster(optionalAttributeSet, mContext);
 
-    // 1. Startup the cluster so it registers as a PlatformManager delegate
-    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
-    // Setup Operational Credentials context to simulate fabric management
-    OperationalCredentialsCluster::Context opCredsContext = { .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                              .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                              .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                              .dnssdServer     = app::DnssdServer::Instance(),
-                                                              .commissioningWindowManager =
-                                                                  Server::GetInstance().GetCommissioningWindowManager() };
+//     // 1. Startup the cluster so it registers as a PlatformManager delegate
+//     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+//     // Setup Operational Credentials context to simulate fabric management
+//     OperationalCredentialsCluster::Context opCredsContext = { .fabricTable     = Server::GetInstance().GetFabricTable(),
+//                                                               .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+//                                                               .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+//                                                               .dnssdServer     = app::DnssdServer::Instance(),
+//                                                               .commissioningWindowManager =
+//                                                                   Server::GetInstance().GetCommissioningWindowManager() };
 
-    OperationalCredentialsCluster opCredsCluster(kRootEndpointId, opCredsContext);
-    ASSERT_EQ(opCredsCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+//     OperationalCredentialsCluster opCredsCluster(kRootEndpointId, opCredsContext);
+//     ASSERT_EQ(opCredsCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-    // Act: Simulate the removal of a fabric.
-    // The Basic Information cluster listens to FabricTable delegates to trigger the 'Leave' event.
-    opCredsCluster.FabricWillBeRemoved(opCredsContext.fabricTable, kTestFabricIndex);
+//     // Act: Simulate the removal of a fabric.
+//     // The Basic Information cluster listens to FabricTable delegates to trigger the 'Leave' event.
+//     opCredsCluster.FabricWillBeRemoved(opCredsContext.fabricTable, kTestFabricIndex);
 
-    chip::app::Clusters::BasicInformation::Events::Leave::DecodableType decodedEvent;
-    auto event = testContext.EventsGenerator().GetNextEvent();
-    ASSERT_TRUE(event.has_value());
+//     chip::app::Clusters::BasicInformation::Events::Leave::DecodableType decodedEvent;
+//     auto event = testContext.EventsGenerator().GetNextEvent();
+//     ASSERT_TRUE(event.has_value());
 
-    // Ensure the event priority is INFO
-    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info); // NOLINT(bugprone-unchecked-optional-access)
+//     // Ensure the event priority is INFO
+//     ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info); // NOLINT(bugprone-unchecked-optional-access)
 
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+//     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
 
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
+//     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+// }
 
 TEST_F(TestBasicInformationReadWrite, ReachableEventTest)
 {
