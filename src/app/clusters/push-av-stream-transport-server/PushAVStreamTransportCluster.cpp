@@ -38,15 +38,6 @@
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::PushAvStreamTransport;
-using namespace chip::app::Clusters::PushAvStreamTransport::Structs;
-using namespace chip::app::Clusters::PushAvStreamTransport::Attributes;
-using namespace Protocols::InteractionModel;
-using chip::Protocols::InteractionModel::Status;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -66,8 +57,13 @@ constexpr CommandId kGeneratedCommands[] = {
 
 } // namespace
 
-using Protocols::InteractionModel::Status;
+using namespace PushAvStreamTransport;
+using namespace PushAvStreamTransport::Attributes;
 using namespace PushAvStreamTransport::Commands;
+using namespace PushAvStreamTransport::Structs;
+using namespace Protocols::InteractionModel;
+
+using Protocols::InteractionModel::Status;
 
 CHIP_ERROR PushAvStreamTransportServer::Attributes(const ConcreteClusterPath & path,
                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
