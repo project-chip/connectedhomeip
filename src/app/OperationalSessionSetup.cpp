@@ -1003,7 +1003,6 @@ void OperationalSessionSetup::OnFallbackTimeout(System::Layer * systemLayer, voi
     VerifyOrDie(self->mFallbackResolveResult.HasValue());
     self->UpdateDeviceData(self->mFallbackResolveResult.Value());
     // Do not touch `self` instance anymore; it might have been destroyed in UpdateDeviceData.
-    // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
