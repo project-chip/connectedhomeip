@@ -15,9 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "CommissioningProxyCommandDelegate.h"
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
@@ -28,16 +25,43 @@
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h>
 #include "commissioning-proxy-delegate-impl.h"
 
-using namespace chip::app::Clusters;
+using namespace chip;
+using namespace chip::app;
+using namespace Clusters::CommissioningProxy;
 
-chip::Protocols::InteractionModel::Status chip::app::Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(
-    chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport, 
-    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
-    chip::app::CommandHandler * commandObj,
+Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyConnectRequest(
+                        DataModel::Nullable<chip::ByteSpan> address,
+                        CapabilitiesBitmap transport,
+                        uint16_t discriminator,
+                        chip::VendorId vendorid,
+                        uint16_t productid,
+                        WiFiBandBitmap wiFiBand,
+                        app::CommandHandler * commandObj,
+                        const DataModel::InvokeRequest & request)
+{
+    ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBand:%d", __func__, (int)transport, (int)wiFiBand);
+    // Cluster state is owned by the cluster; access it via the bound server pointer.
+    ChipLogProgress(NotSpecified, "=== %s() State:%u", __func__, (uint8_t)Server().GetCPState());
+
+    // Successfully Connected, change CP state
+    CHIP_ERROR err = Server().SetCPState(CommissioningProxyCluster::kState_CPConnected);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Commissioning Proxy SetCPState() Failed");
+        return chip::Protocols::InteractionModel::Status::Failure;
+    }
+    ChipLogProgress(NotSpecified, "=== %s() State:%u", __func__, (uint8_t)Server().GetCPState());
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(
+    CapabilitiesBitmap transport,
+    WiFiBandBitmap wiFiBands,
+    app::CommandHandler * commandObj,
     const DataModel::InvokeRequest & request)
 {
     ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBands:%d", __func__, (int)transport, (int)wiFiBands);
-    using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
+    using ScanResultT = Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
     std::vector<ScanResultT> results;
 
     // Start PAF
@@ -72,52 +96,12 @@ chip::Protocols::InteractionModel::Status chip::app::Clusters::CommissioningProx
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-#if 0 /* ORIGINAL CODE BELOW */
-
-
-#if 0
-    Protocols::InteractionModel::Status PowerAdjustRequest(int64_t power, uint32_t duration,
-                                                           AdjustmentCauseEnum cause) override
-    {
-        // lock the app task
-
-        // Implement power adjustment logic
-
-        // unlock the app task
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    Protocols::InteractionModel::Status CancelPowerAdjustRequest() override
-    {
-        // lock the app task
-
-        // Cancel ongoing power adjustment
-
-        // unlock the app task
-        return Protocols::InteractionModel::Status::Success;
-    }
-
-    // ... implement other required methods
-
-    ESATypeEnum GetESAType() override { return ESATypeEnum::kEvse; }
-    bool GetESACanGenerate() override { return false; }
-    ESAStateEnum GetESAState() override { return mESAState; }
-    // ... implement other getters
-#endif
-
-private:
-    //ESAStateEnum mESAState = ESAStateEnum::kOnline;
-};
-#endif
-
-#if 0
-#define SWITCH_RELEASED_POSITION 0
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
+#if 0
 CommissioningProxyCommandHandler * CommissioningProxyCommandHandler::FromJSON(const char * json)
 {
     Json::Reader reader;

@@ -28,12 +28,11 @@ namespace CommissioningProxy {
 
 namespace {
 
-    constexpr uint8_t kDefaultScanMaxTimeSeconds = 5;
+constexpr uint8_t kDefaultScanMaxTimeSeconds = 5;
 
 // Store per-instance state without requiring member fields in the header.
 struct DelegateState
 {
-    CommissioningProxyCluster * server = nullptr;
     uint8_t scanMaxTime         = kDefaultScanMaxTimeSeconds;
 };
 

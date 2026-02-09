@@ -28,8 +28,7 @@ source_set("commissioning-proxy-manager") {
   deps = [ "${chip_root}/src/lib" ]
   public_configs = [ ":config" ]
   sources = [
-    "include/CommissioningProxyManager.h",
-    "src/CommissioningProxyManager.cpp",
+    "include/commissioning-proxy-delegate-impl.h",
     "src/commissioning-proxy-delegate-impl.cpp",
   ]
 }

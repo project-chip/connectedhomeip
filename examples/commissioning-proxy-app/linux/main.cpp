@@ -23,6 +23,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include "NamedPipeCommands.h"
 
 #include <string>
 
@@ -34,17 +35,11 @@
 #include <imgui_ui/windows/qrcode.h>
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-#include "CommissioningProxyCommandDelegate.h"
-#include "CommissioningProxyManager.h"
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-
 NamedPipeCommands sChipNamedPipeCommands;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
@@ -254,6 +249,9 @@ chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::Comm
 
 void ApplicationInit()
 {
+    // No need to manually bind gMyCPDelegate -> cluster here anymore:
+    // the cluster constructor calls mDelegate.SetServer(this).
+
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
     // Register the Commissioning Proxy Code Driven mechanism

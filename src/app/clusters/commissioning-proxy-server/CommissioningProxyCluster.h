@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,13 +33,6 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
-#if 0
-// Helper functions to convert AdjustmentCauseEnum to ForecastUpdateReasonEnum and PowerAdjustReasonEnum
-ForecastUpdateReasonEnum AdjustmentCauseToForecastUpdateReason(AdjustmentCauseEnum cause);
-PowerAdjustReasonEnum AdjustmentCauseToPowerAdjustReason(AdjustmentCauseEnum cause);
-} // namespace CommissioningProxy
-#endif
-
 class CommissioningProxyCluster : public DefaultServerCluster
 {
 private:
@@ -52,6 +45,12 @@ private:
         >;
 
 public:
+    enum State_t
+    {
+        kState_CPDisconnected = 0,
+        kState_CPConnected
+    };
+
     struct Config
     {
         EndpointId endpointId;
@@ -64,6 +63,7 @@ public:
             featureFlags(aFeatures), delegate(aDelegate)
         {}
     };
+
     // Don't allow the default constructor as this cluster requires a delegate to be set
     CommissioningProxyCluster() = delete;
 
@@ -85,6 +85,12 @@ public:
         }())
     {
         mDelegate.SetEndpointId(config.endpointId);
+
+        // Initialize local state
+        mMainCommissioningProxyState = kState_CPDisconnected;
+
+        // Bind delegate back to this cluster (no RTTI needed)
+        mDelegate.SetServer(this);
     }
 
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
@@ -102,32 +108,28 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR SetCPState(State_t state);
+    CommissioningProxyCluster::State_t GetCPState(void);
 
 private:
-    DataModel::ActionReturnStatus HandleProxyScanRequest(const DataModel::InvokeRequest & request,
-                                                           TLV::TLVReader & input_arguments, CommandHandler * handler);
-#if 0
-    // DataModel::ActionReturnStatus CheckOptOutAllowsRequest(CommissioningProxy::AdjustmentCauseEnum adjustmentCause);
-    DataModel::ActionReturnStatus HandlePowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                           TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleCancelPowerAdjustRequest(const DataModel::InvokeRequest & request,
-                                                                 TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleStartTimeAdjustRequest(const DataModel::InvokeRequest & request,
+    DataModel::ActionReturnStatus HandleProxyConnectRequest(const DataModel::InvokeRequest & request,
+                                                            TLV::TLVReader & input_arguments, CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandlePauseRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                     CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleResumeRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                      CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleModifyForecastRequest(const DataModel::InvokeRequest & request,
-                                                              TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleRequestConstraintBasedForecast(const DataModel::InvokeRequest & request,
+    DataModel::ActionReturnStatus HandleProxyScanRequest(const DataModel::InvokeRequest & request,
+                                                         TLV::TLVReader & input_arguments, CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleProxyBackGroundScanStartRequest(const DataModel::InvokeRequest & request,
+                                                                        TLV::TLVReader & input_arguments, CommandHandler * handler);
+    DataModel::ActionReturnStatus HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
                                                                        TLV::TLVReader & input_arguments, CommandHandler * handler);
-    DataModel::ActionReturnStatus HandleCancelRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                      CommandHandler * handler);
-#endif
+    DataModel::ActionReturnStatus HandleProxyMessageRequest(const DataModel::InvokeRequest & request,
+                                                            TLV::TLVReader & input_arguments, CommandHandler * handler);
+
     CommissioningProxy::Delegate & mDelegate;
     const BitFlags<CommissioningProxy::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
+    State_t mMainCommissioningProxyState;
+
 };
 
 } // namespace CommissioningProxy
