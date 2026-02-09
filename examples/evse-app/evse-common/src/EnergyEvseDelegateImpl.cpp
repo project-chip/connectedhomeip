@@ -897,7 +897,7 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
 
         /* EV was not plugged in - start a new session */
         // TODO get energy meter readings - #35370
-        mSession.StartSession(mEndpointId, 0, 0);
+        mSession.StartSession(mInstance, 0, 0);
         SendEVConnectedEvent();
 
         /* Set the state to either PluggedInNoDemand or PluggedInDemand as indicated by mHwState */
@@ -922,7 +922,7 @@ Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
     }
 
     // TODO get energy meter readings - #35370
-    mSession.StopSession(mEndpointId, 0, 0);
+    mSession.StopSession(mInstance, 0, 0);
     SendEVNotDetectedEvent();
     TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kNotPluggedIn);
     return Status::Success;
@@ -938,7 +938,7 @@ Status EnergyEvseDelegate::HandleEVNoDemandEvent()
         /*
          * EV was transferring current - EV decided to stop
          */
-        mSession.RecalculateSessionDuration(mEndpointId);
+        mSession.RecalculateSessionDuration(mInstance);
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped);
     }
     /* We must still be plugged in to get here - so no need to check if we are plugged in! */
@@ -1358,13 +1358,11 @@ Status EnergyEvseDelegate::SendEVConnectedEvent()
     Events::EVConnected::Type event;
     EventNumber eventNumber;
 
-    if (mSession.mSessionID.IsNull())
-    {
-        ChipLogError(AppServer, "SessionID is Null");
-        return Status::Failure;
-    }
+    VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    DataModel::Nullable<uint32_t> sessionID = mInstance->GetSessionID();
+    VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
-    event.sessionID = mSession.mSessionID.Value();
+    event.sessionID = sessionID.Value();
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1380,17 +1378,15 @@ Status EnergyEvseDelegate::SendEVNotDetectedEvent()
     Events::EVNotDetected::Type event;
     EventNumber eventNumber;
 
-    if (mSession.mSessionID.IsNull())
-    {
-        ChipLogError(AppServer, "SessionID is Null");
-        return Status::Failure;
-    }
+    VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    DataModel::Nullable<uint32_t> sessionID = mInstance->GetSessionID();
+    VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
-    event.sessionID               = mSession.mSessionID.Value();
+    event.sessionID               = sessionID.Value();
     event.state                   = GetState();
-    event.sessionDuration         = mSession.mSessionDuration.Value();
-    event.sessionEnergyCharged    = mSession.mSessionEnergyCharged.Value();
-    event.sessionEnergyDischarged = MakeOptional(mSession.mSessionEnergyDischarged.Value());
+    event.sessionDuration         = mInstance->GetSessionDuration().Value();
+    event.sessionEnergyCharged    = mInstance->GetSessionEnergyCharged().Value();
+    event.sessionEnergyDischarged = MakeOptional(mInstance->GetSessionEnergyDischarged().Value());
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
@@ -1406,20 +1402,17 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
     Events::EnergyTransferStarted::Type event;
     EventNumber eventNumber;
 
-    if (mSession.mSessionID.IsNull())
-    {
-        ChipLogError(AppServer, "SessionID is Null");
-        return Status::Failure;
-    }
+    VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    DataModel::Nullable<uint32_t> sessionID = mInstance->GetSessionID();
+    VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
-    event.sessionID = mSession.mSessionID.Value();
+    event.sessionID = sessionID.Value();
     event.state     = GetState();
 
     /* Sample the energy meter for charging */
     GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, mImportedMeterValueAtEnergyTransferStart);
     event.maximumCurrent = GetMaximumChargeCurrent();
 
-    VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
     /* For V2X we may switch between charging and discharging, but we don't
      * keep sending EnergyTransferStarted events */
     if (mInstance->HasFeature(Feature::kV2x))
@@ -1449,21 +1442,17 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
     Events::EnergyTransferStopped::Type event;
     EventNumber eventNumber;
 
-    if (mSession.mSessionID.IsNull())
-    {
-        ChipLogError(AppServer, "SessionID is Null");
-        return Status::Failure;
-    }
+    VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    DataModel::Nullable<uint32_t> sessionID = mInstance->GetSessionID();
+    VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
-    event.sessionID       = mSession.mSessionID.Value();
+    event.sessionID       = sessionID.Value();
     event.state           = GetState();
     event.reason          = reason;
     int64_t meterValueNow = 0;
 
     GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, meterValueNow);
     event.energyTransferred = meterValueNow - mImportedMeterValueAtEnergyTransferStart;
-
-    VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
 
     if (mInstance->HasFeature(Feature::kV2x))
     {
@@ -1489,7 +1478,8 @@ Status EnergyEvseDelegate::SendFaultEvent(FaultStateEnum newFaultState)
     Events::Fault::Type event;
     EventNumber eventNumber;
 
-    event.sessionID               = mSession.mSessionID; // Note here the event sessionID can be Null!
+    VerifyOrReturnError(mInstance != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
+    event.sessionID               = mInstance->GetSessionID(); // Note here the event sessionID can be Null!
     event.state                   = GetState();          // This is the state prior to the fault being raised
     event.faultStatePreviousState = GetFaultState();
     event.faultStateCurrentState  = newFaultState;
@@ -1687,58 +1677,52 @@ void EnergyEvseDelegate::OnVehicleIDChanged(DataModel::Nullable<CharSpan> newVal
 
 void EnergyEvseDelegate::OnSessionIDChanged(DataModel::Nullable<uint32_t> newValue)
 {
-    mSession.mSessionID = newValue;
     if (newValue.IsNull())
     {
         ChipLogDetail(AppServer, "SessionID updated to Null");
     }
     else
     {
-        ChipLogDetail(AppServer, "SessionID updated to %lu", static_cast<unsigned long int>(mSession.mSessionID.Value()));
+        ChipLogDetail(AppServer, "SessionID updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
     // Write value to persistent storage.
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, SessionID::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSession.mSessionID);
+    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
 }
 
 void EnergyEvseDelegate::OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue)
 {
-    mSession.mSessionDuration = newValue;
     if (newValue.IsNull())
     {
         ChipLogDetail(AppServer, "SessionDuration updated to Null");
     }
     else
     {
-        ChipLogDetail(AppServer, "SessionDuration updated to %lu",
-                      static_cast<unsigned long int>(mSession.mSessionDuration.Value()));
+        ChipLogDetail(AppServer, "SessionDuration updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
 }
 
 void EnergyEvseDelegate::OnSessionEnergyChargedChanged(DataModel::Nullable<int64_t> newValue)
 {
-    mSession.mSessionEnergyCharged = newValue;
     if (newValue.IsNull())
     {
         ChipLogDetail(AppServer, "SessionEnergyCharged updated to Null");
     }
     else
     {
-        ChipLogDetail(AppServer, "SessionEnergyCharged updated to %ld", static_cast<long>(mSession.mSessionEnergyCharged.Value()));
+        ChipLogDetail(AppServer, "SessionEnergyCharged updated to %ld", static_cast<long>(newValue.Value()));
     }
 }
 
 void EnergyEvseDelegate::OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue)
 {
-    mSession.mSessionEnergyDischarged = newValue;
     if (newValue.IsNull())
     {
         ChipLogDetail(AppServer, "SessionEnergyDischarged updated to Null");
     }
     else
     {
-        ChipLogDetail(AppServer, "SessionEnergyDischarged updated to %ld",
-                      static_cast<long>(mSession.mSessionEnergyDischarged.Value()));
+        ChipLogDetail(AppServer, "SessionEnergyDischarged updated to %ld", static_cast<long>(newValue.Value()));
     }
 }
 
@@ -1760,15 +1744,15 @@ bool EnergyEvseDelegate::IsEvsePluggedIn()
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
  * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
  */
-void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
+void EvseSession::StartSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
+    VerifyOrReturn(instance != nullptr);
+
     /* Get Timestamp */
     uint32_t matterEpochSeconds = 0;
     CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err != CHIP_NO_ERROR)
     {
-        /* Note that the error will be also be logged inside GetErrorTS() -
-         * adding context here to help debugging */
         ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
@@ -1777,29 +1761,21 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
     mSessionEnergyChargedAtStart    = chargingMeterValue;
     mSessionEnergyDischargedAtStart = dischargingMeterValue;
 
-    if (mSessionID.IsNull())
+    // Compute next session ID
+    DataModel::Nullable<uint32_t> currentSessionID = instance->GetSessionID();
+    if (currentSessionID.IsNull())
     {
-        mSessionID = MakeNullable(static_cast<uint32_t>(0));
+        TEMPORARY_RETURN_IGNORED instance->SetSessionID(MakeNullable(static_cast<uint32_t>(0)));
     }
     else
     {
-        uint32_t sessionID = mSessionID.Value() + 1;
-        mSessionID         = MakeNullable(sessionID);
+        TEMPORARY_RETURN_IGNORED instance->SetSessionID(MakeNullable(currentSessionID.Value() + 1));
     }
 
-    /* Reset other session values */
-    mSessionDuration         = MakeNullable(static_cast<uint32_t>(0));
-    mSessionEnergyCharged    = MakeNullable(static_cast<int64_t>(0));
-    mSessionEnergyDischarged = MakeNullable(static_cast<int64_t>(0));
-
-    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionID::Id);
-    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
-    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
-    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
-
-    // Write values to persistent storage.
-    ConcreteAttributePath path = ConcreteAttributePath(endpointId, EnergyEvse::Id, SessionID::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
+    // Reset session counters
+    TEMPORARY_RETURN_IGNORED instance->SetSessionDuration(MakeNullable(static_cast<uint32_t>(0)));
+    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0)));
+    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0)));
 
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart
@@ -1813,11 +1789,11 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
  * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
  */
-void EvseSession::StopSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
+void EvseSession::StopSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
-    RecalculateSessionDuration(endpointId);
-    UpdateEnergyCharged(endpointId, chargingMeterValue);
-    UpdateEnergyDischarged(endpointId, dischargingMeterValue);
+    RecalculateSessionDuration(instance);
+    UpdateEnergyCharged(instance, chargingMeterValue);
+    UpdateEnergyDischarged(instance, dischargingMeterValue);
 }
 
 /*---------------------- EvseSession functions --------------------------*/
@@ -1827,23 +1803,21 @@ void EvseSession::StopSession(EndpointId endpointId, int64_t chargingMeterValue,
  *
  * @param endpointId            - The endpoint to report the update on
  */
-void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
+void EvseSession::RecalculateSessionDuration(Instance * instance)
 {
-    /* Get Timestamp */
+    VerifyOrReturn(instance != nullptr);
+
     uint32_t matterEpochSeconds = 0;
     CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err != CHIP_NO_ERROR)
     {
-        /* Note that the error will be also be logged inside GetErrorTS() -
-         * adding context here to help debugging */
         ChipLogError(AppServer, "EVSE: Unable to get current time when updating session duration - err:%" CHIP_ERROR_FORMAT,
                      err.Format());
         return;
     }
 
     uint32_t duration = matterEpochSeconds - mStartTime;
-    mSessionDuration  = MakeNullable(duration);
-    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
+    TEMPORARY_RETURN_IGNORED instance->SetSessionDuration(MakeNullable(duration));
 }
 
 /**
@@ -1852,10 +1826,10 @@ void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
  * @param endpointId            - The endpoint to report the update on
  * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
  */
-void EvseSession::UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMeterValue)
+void EvseSession::UpdateEnergyCharged(Instance * instance, int64_t chargingMeterValue)
 {
-    mSessionEnergyCharged = MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart);
-    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+    VerifyOrReturn(instance != nullptr);
+    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyCharged(MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart));
 }
 
 /**
@@ -1864,10 +1838,10 @@ void EvseSession::UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMet
  * @param endpointId            - The endpoint to report the update on
  * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
  */
-void EvseSession::UpdateEnergyDischarged(EndpointId endpointId, int64_t dischargingMeterValue)
+void EvseSession::UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue)
 {
-    mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
-    MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+    VerifyOrReturn(instance != nullptr);
+    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyDischarged(MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart));
 }
 
 // ------------------------------------------------------------------

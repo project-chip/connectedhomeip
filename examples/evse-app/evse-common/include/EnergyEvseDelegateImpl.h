@@ -49,58 +49,56 @@ enum EVSEStateMachineEvent
 };
 
 /**
- * Helper class to handle all of the session related info
+ * Helper class to handle session timing and energy meter deltas.
+ * Session attribute values are stored in the cluster (EnergyEvseCluster) and
+ * updated through Instance setters. This class only tracks the internal
+ * computation state (start time, energy meter baselines).
  */
 class EvseSession
 {
 public:
     EvseSession() {}
+
     /**
-     * @brief This function records the start time and provided energy meter values as part of the new session.
+     * @brief Start a new session: assigns a session ID, resets duration/energy counters.
      *
-     * @param endpointId            - The endpoint to report the update on
+     * @param instance              - The cluster Instance to update attributes on
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StartSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
-     * @brief This function updates the session information at the unplugged event
+     * @brief Stop the current session: recalculates duration and energy values.
      *
-     * @param endpointId            - The endpoint to report the update on
+     * @param instance              - The cluster Instance to update attributes on
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StopSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StopSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
-     * @brief This function updates the session Duration to allow read attributes to return latest values
+     * @brief Recalculate session duration from start time to now.
      *
-     * @param endpointId            - The endpoint to report the update on
+     * @param instance - The cluster Instance to update attributes on
      */
-    void RecalculateSessionDuration(EndpointId endpointId);
+    void RecalculateSessionDuration(Instance * instance);
 
     /**
-     * @brief This function updates the EnergyCharged meter value
+     * @brief Update the session's charged energy delta.
      *
-     * @param endpointId            - The endpoint to report the update on
-     * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
+     * @param instance           - The cluster Instance to update attributes on
+     * @param chargingMeterValue - The current value of the energy meter (charging) in mWh
      */
-    void UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMeterValue);
+    void UpdateEnergyCharged(Instance * instance, int64_t chargingMeterValue);
 
     /**
-     * @brief This function updates the EnergyDischarged meter value
+     * @brief Update the session's discharged energy delta.
      *
-     * @param endpointId            - The endpoint to report the update on
-     * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
+     * @param instance              - The cluster Instance to update attributes on
+     * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void UpdateEnergyDischarged(EndpointId endpointId, int64_t dischargingMeterValue);
-
-    /* Public members - represent attributes in the cluster */
-    DataModel::Nullable<uint32_t> mSessionID;
-    DataModel::Nullable<uint32_t> mSessionDuration;
-    DataModel::Nullable<int64_t> mSessionEnergyCharged;
-    DataModel::Nullable<int64_t> mSessionEnergyDischarged;
+    void UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue);
 
 private:
     uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet

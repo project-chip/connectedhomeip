@@ -260,7 +260,8 @@ CHIP_ERROR EnergyEvseCluster::SetSessionID(DataModel::Nullable<uint32_t> newValu
 
 CHIP_ERROR EnergyEvseCluster::SetSessionDuration(DataModel::Nullable<uint32_t> newValue)
 {
-    VerifyOrReturnError(mSessionDuration != newValue, CHIP_NO_ERROR);
+    // We do not check for equality here because the tests expect reports at session boundaries (start/stop) even when the value has
+    // not changed (e.g. energy stayed at 0 because no charging occurred).
     mSessionDuration = newValue;
     mDelegate.OnSessionDurationChanged(newValue);
     NotifyAttributeChanged(SessionDuration::Id);
@@ -269,7 +270,8 @@ CHIP_ERROR EnergyEvseCluster::SetSessionDuration(DataModel::Nullable<uint32_t> n
 
 CHIP_ERROR EnergyEvseCluster::SetSessionEnergyCharged(DataModel::Nullable<int64_t> newValue)
 {
-    VerifyOrReturnError(mSessionEnergyCharged != newValue, CHIP_NO_ERROR);
+    // We do not check for equality here because the tests expect reports at session boundaries (start/stop) even when the value has
+    // not changed (e.g. energy stayed at 0 because no charging occurred).
     mSessionEnergyCharged = newValue;
     mDelegate.OnSessionEnergyChargedChanged(newValue);
     NotifyAttributeChanged(SessionEnergyCharged::Id);
@@ -278,7 +280,8 @@ CHIP_ERROR EnergyEvseCluster::SetSessionEnergyCharged(DataModel::Nullable<int64_
 
 CHIP_ERROR EnergyEvseCluster::SetSessionEnergyDischarged(DataModel::Nullable<int64_t> newValue)
 {
-    VerifyOrReturnError(mSessionEnergyDischarged != newValue, CHIP_NO_ERROR);
+    // We do not check for equality here because the tests expect reports at session boundaries (start/stop) even when the value has
+    // not changed (e.g. energy stayed at 0 because no charging occurred).
     mSessionEnergyDischarged = newValue;
     mDelegate.OnSessionEnergyDischargedChanged(newValue);
     NotifyAttributeChanged(SessionEnergyDischarged::Id);

@@ -39,10 +39,6 @@ struct TestEvseClusterBackwardsCompatibility : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
-    void SetUp() override {}
-
-    TestServerClusterContext mContext;
 };
 
 TEST_F(TestEvseClusterBackwardsCompatibility, TestInstanceLifecycle)
