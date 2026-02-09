@@ -29,11 +29,11 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -72,23 +72,10 @@ class TestFactoryResetRequests(MatterBaseTest):
 
     @async_test_body
     async def test_TestFactoryResetRequests(self):
-        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         pase_node_id = self.dut_node_id + 1
-        discriminator = 1324
-        passcode = 20202021
-
-        # Get setup parameters for the test
-        if not is_ci:
-            logger.info("Running in non-CI mode, getting parameters from the test config")
-            setupPayloadInfo = self.get_setup_payload_info()
-            discriminator = setupPayloadInfo[0].filter_value
-            passcode = setupPayloadInfo[0].passcode
-        else:
-            logger.info("Running in CI mode, using hardcoded parameters")
-
         setup_params = SetupParameters(
-            discriminator=discriminator,
-            passcode=passcode
+            discriminator=1324,
+            passcode=20202021
         )
 
         logger.info("\n\n\t** Testing 'Factory Reset App Only' Back to Back **\n")
