@@ -146,5 +146,6 @@ types or functionality) as well as individual examples.
 | `examples/tv-app`                              | Chris DeCenzo, Lazar Kovacic |              |
 | `examples/tv-casting-app`                      | Chris DeCenzo, Lazar Kovacic |              |
 | `examples/virtual-device-app`                  |                              | UNMAINTAINED |
+| `examples/water-heater-app`                    | James Harrow                 |              |
 | `examples/water-leak-detector-app`             |                              | UNMAINTAINED |
 | `examples/window-app`                          |                              | UNMAINTAINED |

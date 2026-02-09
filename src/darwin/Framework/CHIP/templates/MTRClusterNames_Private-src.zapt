@@ -12,7 +12,7 @@ NSString * MTRPrivateClusterNameForID(MTRClusterIDType clusterID)
 {
     NSString * result = nil;
 
-    switch ((MTRClusterIDType)clusterID) {
+    switch ((MTRPrivateClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -40,7 +40,7 @@ NSString * MTRPrivateAttributeNameForID(MTRClusterIDType clusterID, MTRAttribute
 {
     NSString * result = nil;
 
-    switch ((MTRClusterIDType)clusterID) {
+    switch ((MTRPrivateClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -140,7 +140,7 @@ NSString * MTRPrivateAttributeNameForID(MTRClusterIDType clusterID, MTRAttribute
 {{~#*inline "commandIDOutput"}}
     NSString * result = nil;
 
-    switch ((MTRClusterIDType)clusterID) {
+    switch ((MTRPrivateClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
@@ -233,7 +233,7 @@ NSString * MTRPrivateEventNameForID(MTRClusterIDType clusterID, MTREventIDType e
 {
     NSString * result = nil;
 
-    switch ((MTRClusterIDType)clusterID) {
+    switch ((MTRPrivateClusterIDType)clusterID) {
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}

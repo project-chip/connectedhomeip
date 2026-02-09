@@ -1909,7 +1909,7 @@ cluster UserLabel = 65 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster LaundryWasherMode = 81 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1956,8 +1956,7 @@ cluster LaundryWasherMode = 81 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
