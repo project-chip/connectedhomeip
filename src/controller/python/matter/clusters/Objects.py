@@ -14288,6 +14288,10 @@ class BooleanState(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kChangeEvent = 0x1
+
     class Attributes:
         @dataclass
         class StateValue(ClusterAttributeDescriptor):
@@ -21900,6 +21904,7 @@ class BooleanStateConfiguration(Cluster):
             kAudible = 0x2
             kAlarmSuppress = 0x4
             kSensitivityLevel = 0x8
+            kFaultEvents = 0x10
 
         class SensorFaultBitmap(IntFlag):
             kGeneralFault = 0x1
@@ -37963,6 +37968,7 @@ class OccupancySensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="occupancySensorTypeBitmap", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="holdTime", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="holdTimeLimits", Tag=0x00000004, Type=typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct]),
+                ClusterObjectFieldDescriptor(Label="predictedOccupancy", Tag=0x00000005, Type=typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]]),
                 ClusterObjectFieldDescriptor(Label="PIROccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedThreshold", Tag=0x00000012, Type=typing.Optional[uint]),
@@ -37984,6 +37990,7 @@ class OccupancySensing(Cluster):
     occupancySensorTypeBitmap: uint = 0
     holdTime: typing.Optional[uint] = None
     holdTimeLimits: typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct] = None
+    predictedOccupancy: typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]] = None
     PIROccupiedToUnoccupiedDelay: typing.Optional[uint] = None
     PIRUnoccupiedToOccupiedDelay: typing.Optional[uint] = None
     PIRUnoccupiedToOccupiedThreshold: typing.Optional[uint] = None
@@ -38021,6 +38028,8 @@ class OccupancySensing(Cluster):
             kRadar = 0x20
             kRFSensing = 0x40
             kVision = 0x80
+            kPrediction = 0x100
+            kOccupancyEvent = 0x200
 
         class OccupancyBitmap(IntFlag):
             kOccupied = 0x1
@@ -38045,6 +38054,23 @@ class OccupancySensing(Cluster):
             holdTimeMin: 'uint' = 0
             holdTimeMax: 'uint' = 0
             holdTimeDefault: 'uint' = 0
+
+        @dataclass
+        class PredictedOccupancyStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="startTimestamp", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endTimestamp", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="confidence", Tag=3, Type=uint),
+                    ])
+
+            startTimestamp: 'uint' = 0
+            endTimestamp: 'uint' = 0
+            occupancy: 'uint' = 0
+            confidence: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -38126,6 +38152,22 @@ class OccupancySensing(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct])
 
             value: typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct] = None
+
+        @dataclass
+        class PredictedOccupancy(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000406
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]])
+
+            value: typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]] = None
 
         @dataclass
         class PIROccupiedToUnoccupiedDelay(ClusterAttributeDescriptor):

@@ -3511,6 +3511,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "HoldTime";
         case chip::app::Clusters::OccupancySensing::Attributes::HoldTimeLimits::Id:
             return "HoldTimeLimits";
+        case chip::app::Clusters::OccupancySensing::Attributes::PredictedOccupancy::Id:
+            return "PredictedOccupancy";
         case chip::app::Clusters::OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id:
             return "PIROccupiedToUnoccupiedDelay";
         case chip::app::Clusters::OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id:
