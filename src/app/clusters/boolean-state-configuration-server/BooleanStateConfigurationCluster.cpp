@@ -45,7 +45,7 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
                                                                    OptionalAttributesSet optionalAttributes,
                                                                    const StartupConfiguration & config) :
     DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
-    mFeatures(features), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
+    mFeatures(features.Set(Feature::kFaultEvents)), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
         // constructs the attribute set, that once constructed stays const
         AttributeSet enabledOptionalAttributes;
 
@@ -217,7 +217,7 @@ ActionReturnStatus BooleanStateConfigurationCluster::ReadAttribute(const ReadAtt
     case ClusterRevision::Id:
         return encoder.Encode(BooleanStateConfiguration::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(mFeatures.Raw() | to_underlying(Feature::kFaultEvents));
+        return encoder.Encode(mFeatures);
     case CurrentSensitivityLevel::Id:
         return encoder.Encode(mCurrentSensitivityLevel);
     case SupportedSensitivityLevels::Id:
