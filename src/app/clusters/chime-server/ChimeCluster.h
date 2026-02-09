@@ -40,7 +40,8 @@ public:
      * @param aSafeAttributePersistenceProvider A reference to the SafeAttributePersistenceProvider to be used for persistence.
      * Note: the caller must ensure that the delegate and SafeAttributePersistenceProvider live throughout the instance's lifetime.
      */
-    ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate, SafeAttributePersistenceProvider & aSafeAttributePersistenceProvider);
+    ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate,
+                 SafeAttributePersistenceProvider & aSafeAttributePersistenceProvider);
     ~ChimeCluster();
 
     // Attribute Setters

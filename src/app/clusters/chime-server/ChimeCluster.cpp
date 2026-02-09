@@ -46,8 +46,8 @@ namespace Clusters {
 
 ChimeCluster::ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate,
                            SafeAttributePersistenceProvider & safeAttributePersistenceProvider) :
-    DefaultServerCluster({ endpointId, Chime::Id }), mDelegate(delegate),
-    mSafeAttributePersistenceProvider(safeAttributePersistenceProvider)
+    DefaultServerCluster({ endpointId, Chime::Id }),
+    mDelegate(delegate), mSafeAttributePersistenceProvider(safeAttributePersistenceProvider)
 {
     mDelegate.SetChimeCluster(this);
 }
