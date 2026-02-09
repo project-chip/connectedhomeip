@@ -14,10 +14,7 @@ from typing import Literal, Optional
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.asymmetric.types import (
-    CertificateIssuerPrivateKeyTypes,
-    CertificatePublicKeyTypes,
-)
+from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
 from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 
 log = logging.getLogger(__name__)
@@ -57,7 +54,7 @@ class CAHierarchy:
         self.directory = base
         self.root_cert_path = self.directory / "root.pem"
         self.root_key_path = self.directory / "root.key"
-        
+
         if self.root_key_path.exists() and self.root_cert_path.exists():
             # Root certificate already exists, re-using them
             self.root_cert = x509.load_pem_x509_certificate(
@@ -145,7 +142,7 @@ class CAHierarchy:
         """
         cert_path = self.directory / f"{name}.pem"
         key_path = self.directory / f"{name}.key" if key else None
-        
+
         if key and key_path:
             with open(key_path, "wb") as f:
                 f.write(
@@ -155,13 +152,13 @@ class CAHierarchy:
                         encryption_algorithm=serialization.NoEncryption(),
                     )
                 )
-        
+
         with open(cert_path, "wb") as f:
             f.write(cert.public_bytes(serialization.Encoding.PEM))
             if bundle_root:
                 f.write(b"\n")
                 f.write(self.root_cert.public_bytes(serialization.Encoding.PEM))
-        
+
         return (key_path, cert_path)
 
     def _sign_cert(
@@ -176,7 +173,7 @@ class CAHierarchy:
         """
         # Use ip_address for Common Name if provided, otherwise use dns
         common_name = ip_address if ip_address else dns
-        
+
         # Sign certificate
         subject = x509.Name(
             [
@@ -185,10 +182,10 @@ class CAHierarchy:
                 x509.NameAttribute(NameOID.COMMON_NAME, common_name),
             ]
         )
-        
+
         extended_key_usage = [ExtendedKeyUsageOID.CLIENT_AUTH] if self.kind == "client" else [
             ExtendedKeyUsageOID.SERVER_AUTH]
-        
+
         builder = (x509.CertificateBuilder()
                    .subject_name(subject)
                    .issuer_name(self.root_cert.subject)
@@ -229,7 +226,7 @@ class CAHierarchy:
                 crl_issuer=None
             )]), critical=False)
         )
-        
+
         if self.kind == 'server':
             san_names: list[x509.DNSName | x509.IPAddress] = [x509.DNSName(dns)]
             if ip_address:
@@ -238,7 +235,7 @@ class CAHierarchy:
                 x509.SubjectAlternativeName(san_names),
                 critical=False,
             )
-        
+
         return builder.sign(self.root_key, hashes.SHA256())
 
     def gen_cert(self, dns: str, csr: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1)) -> tuple[Path, Path, bool]:
@@ -248,17 +245,17 @@ class CAHierarchy:
         """
         signing_request = x509.load_pem_x509_csr(csr.encode('utf-8'))
         signing_request.public_key()
-        
+
         # If we don't always override, first check if an existing keypair already exists
         if not override:
             cert_path = self.directory / f"{dns}.pem"
             key_path = self.directory / f"{dns}.key"
             if cert_path.exists() and key_path.exists():
                 return (key_path, cert_path, True)
-        
+
         # Sign certificate
         cert = self._sign_cert(dns, signing_request.public_key(), duration)
-        
+
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(
             dns, cert, None, bundle_root=True
@@ -283,13 +280,13 @@ class CAHierarchy:
                 if datetime.datetime.now() > cert.not_valid_after:
                     # We only reuse the certificate/key if the cert is still valid
                     return (key_path, cert_path, True)
-        
+
         # Generate private key
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        
+
         # Sign certificate
         cert = self._sign_cert(dns, key.public_key(), duration, ip_address=ip_address)
-        
+
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(dns, cert, key, bundle_root=True)
         if key_path is None:

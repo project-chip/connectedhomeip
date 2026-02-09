@@ -2,7 +2,6 @@
 Utility functions and constants for the Push AV Server.
 """
 
-import json
 import logging
 import os.path
 import pathlib

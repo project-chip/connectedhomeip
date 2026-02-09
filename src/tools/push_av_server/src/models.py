@@ -3,7 +3,7 @@ Data models for the Push AV Server.
 """
 
 from enum import Enum
-from typing import Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple
 
 from pydantic import BaseModel
 
