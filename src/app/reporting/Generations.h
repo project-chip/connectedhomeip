@@ -49,6 +49,14 @@ static_assert(AreGenerationsInOrder(0x80000000 + 0x12345, 0x12344));
 
 /// Represents a generation of an attribute. A wrapper of a u32 that does NOT auto-cast back to U32, so that we can
 /// force comparisons to use the wrap-around aware compares
+///
+/// Note: usage of uint32_t is intentional to minimize size overhead. See
+///       `struct AttributePathParamsWithGeneration` as an example - since that inherits
+///       from AttributePathParams, it is already 32-bit aligned, however if this were 64-bit
+///       (and then not need to worry about wrap-around) then that structure size would increase
+///       including an extra 4 bytes for 64-bit alignment padding.
+///       It also turns out that for most devices, 32-bit code results in smaller flash compared
+///       to 64-bit handling.
 class AttributeGeneration
 {
 public:
