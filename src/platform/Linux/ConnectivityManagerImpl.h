@@ -303,7 +303,7 @@ private:
      *
      *  A non-null value implies that a Wi-Fi scan is in progress.
      */
-    NetworkCommissioning::WiFiDriver::ScanCallback * mpOneShotScanCallback;
+    OneShotScanCallback * mpOneShotScanCallback;
 
     /**
      *  A callback through which, when non-null, the wireless driver
@@ -314,7 +314,8 @@ private:
      *  A non-null value implies that a Wi-Fi association is in
      *  progress.
      */
-    NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+    OneShotConnectCallback * mpOneShotConnectCallback;
+    NetworkStatusChangeCallback * mpStatusChangeCallback;
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
