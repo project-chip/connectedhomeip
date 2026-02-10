@@ -91,9 +91,6 @@ public:
     }
 
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) { return CHIP_NO_ERROR; }
-    CHIP_ERROR LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams) { return CHIP_NO_ERROR; }
 };
 
 struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
@@ -725,4 +722,163 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZRelativeMoveCo
     }
 }
 
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZPositionPersistenceTest)
+{
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    // Set new values of pan, tilt, zoom to be the mid-point of their allowed ranges
+    int16_t testPan  = (kPanMaxMaxValue - kPanMinMinValue) / 2;
+    int16_t testTilt = (kTiltMaxMaxValue - kTiltMinMinValue) / 2;
+    uint8_t testZoom = (kZoomMaxMaxValue - kZoomMinValue) / 2;
+
+    mServer.GetLogic().SetPan(Optional<int16_t>(testPan));
+    mServer.GetLogic().SetTilt(Optional<int16_t>(testTilt));
+    mServer.GetLogic().SetZoom(Optional<uint8_t>(testZoom));
+
+    // Verify that the values in the attribute are the values set
+    Structs::MPTZStruct::DecodableType mptzPosition;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mptzPosition.pan.Value(), testPan);
+    ASSERT_EQ(mptzPosition.tilt.Value(), testTilt);
+    ASSERT_EQ(mptzPosition.zoom.Value(), testZoom);
+
+    // Shutdown the Server
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // Start the Server back up
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Make sure the attribute value has persisted
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, mptzPosition), CHIP_NO_ERROR);
+    ASSERT_EQ(mptzPosition.pan.Value(), testPan);
+    ASSERT_EQ(mptzPosition.tilt.Value(), testTilt);
+    ASSERT_EQ(mptzPosition.zoom.Value(), testZoom);
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZPresetsPersistenceTest)
+{
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+    ConcreteCommandPath kCommandPath{ 1, Clusters::CameraAvSettingsUserLevelManagement::Id, Commands::MPTZSavePreset::Id };
+    Commands::MPTZSavePreset::DecodableType commandData;
+
+    // Presets attribute should be empty
+    Attributes::MPTZPresets::TypeInfo::DecodableType mptzPresets;
+    size_t presetsSize;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
+    ASSERT_EQ(presetsSize, static_cast<size_t>(0));
+
+    // Get the current values of MPTZ, these should be the server defaults (0,0,1)
+    Structs::MPTZStruct::DecodableType currentMptzPosition;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPosition::Id, currentMptzPosition), CHIP_NO_ERROR);
+
+    // Save the current values as a preset
+    chip::CharSpan presetName("DefaultPreset"_span);
+    uint8_t presetIDAsInt = 2;
+
+    commandData.name = presetName;
+    commandData.presetID.Emplace(presetIDAsInt);
+    auto response = mServer.GetLogic().HandleMPTZSavePreset(commandHandler, kCommandPath, commandData);
+
+    // The response should contain an ActionReturnStatus
+    if (response.has_value())
+    {
+        ASSERT_TRUE(response.value().IsSuccess());
+    }
+    else
+    {
+        FAIL();
+    }
+
+    // Verify that there is a single saved preset. The values match those of the current MPTZ Position
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
+    ASSERT_EQ(presetsSize, static_cast<size_t>(1));
+
+    auto it = mptzPresets.begin();
+    while (it.Next())
+    {
+        ASSERT_EQ(*it.GetValue().name.data(), *presetName.data());
+        ASSERT_EQ(it.GetValue().presetID, presetIDAsInt);
+    }
+
+    // Shutdown the Server
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // Start the Server back up
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Read the save presets, should be a single persisted value
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
+    ASSERT_EQ(presetsSize, static_cast<size_t>(1));
+
+    it = mptzPresets.begin();
+    while (it.Next())
+    {
+        ASSERT_EQ(*it.GetValue().name.data(), *presetName.data());
+        ASSERT_EQ(it.GetValue().presetID, presetIDAsInt);
+        ASSERT_EQ(it.GetValue().settings.pan.Value(), kDefaultPan);
+        ASSERT_EQ(it.GetValue().settings.tilt.Value(), kDefaultTilt);
+        ASSERT_EQ(it.GetValue().settings.zoom.Value(), kDefaultZoom);
+    }
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZStreamsPersistenceTest)
+{
+    Testing::MockCommandHandler commandHandler;
+    commandHandler.SetFabricIndex(1);
+
+    // DPTZStreams attribute starts empty
+    Attributes::DPTZStreams::TypeInfo::DecodableType dptzStreams;
+    size_t streamsSize;
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED dptzStreams.ComputeSize(&streamsSize);
+    ASSERT_EQ(streamsSize, static_cast<size_t>(0));
+
+    // Try to set the viewport when no streams exist, this should fail with NOT FOUND
+    uint8_t videoStreamID                           = 1;
+    Globals::Structs::ViewportStruct::Type viewPort = { 0, 0, 1920, 1080 };
+
+    // Allocate a video stream
+    mServer.GetLogic().AddMoveCapableVideoStream(videoStreamID, viewPort);
+
+    // Verify that DPTZStreams is now populated correctly
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED dptzStreams.ComputeSize(&streamsSize);
+    ASSERT_EQ(streamsSize, static_cast<size_t>(1));
+
+    auto it = dptzStreams.begin();
+    while (it.Next())
+    {
+        ASSERT_EQ(it.GetValue().videoStreamID, videoStreamID);
+        ASSERT_EQ(it.GetValue().viewport.x1, viewPort.x1);
+        ASSERT_EQ(it.GetValue().viewport.x2, viewPort.x2);
+        ASSERT_EQ(it.GetValue().viewport.y1, viewPort.y1);
+        ASSERT_EQ(it.GetValue().viewport.y2, viewPort.y2);
+    }
+
+    // Shutdown the Server
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // Start the Server back up
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Verify that DPTZStreams has the persisted entry
+    ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::DPTZStreams::Id, dptzStreams), CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED dptzStreams.ComputeSize(&streamsSize);
+    ASSERT_EQ(streamsSize, static_cast<size_t>(1));
+
+    it = dptzStreams.begin();
+    while (it.Next())
+    {
+        ASSERT_EQ(it.GetValue().videoStreamID, videoStreamID);
+        ASSERT_EQ(it.GetValue().viewport.x1, viewPort.x1);
+        ASSERT_EQ(it.GetValue().viewport.x2, viewPort.x2);
+        ASSERT_EQ(it.GetValue().viewport.y1, viewPort.y1);
+        ASSERT_EQ(it.GetValue().viewport.y2, viewPort.y2);
+    }
+}
 } // namespace
