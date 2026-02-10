@@ -242,6 +242,7 @@ if CHIP_PERSISTENT_SUBSCRIPTIONS
 
 config CHIP_MAX_FABRICS
 	int "Maximum number of Matter fabrics"
+	default 3 if BOARD_TL3218X_RETENTION
 	default 5
 	help
 	  The maximum number of Matter fabrics that device can be joined to.
