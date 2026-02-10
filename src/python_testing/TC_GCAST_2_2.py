@@ -17,7 +17,6 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
-# # TODO: Enable CI Test arguments once cluster works
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -105,8 +104,6 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("1a")
         ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        endpoint1 = endpoints_list[0] if endpoints_list else None
-        endpoint2 = endpoints_list[1] if len(endpoints_list) > 1 else endpoint1
 
         # TH removes any existing group and KeySetID on the DUT.
         self.step("1b")
@@ -114,11 +111,13 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # Th subscribes to Membership attribute with min interval 0s and max interval 30s
         self.step("1c")
-        sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
-        await sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
+        membership_sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
+        await membership_sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
 
         # If GCAST.S.F00(LN) feature is not supported on the cluster, skip to step 12
         self.step(2)
+        if endpoints_list[0] is None:
+            self.mark_step_range_skipped("3a", 8)
         if not ln_enabled:
             self.mark_step_range_skipped("3a", 11)
 
@@ -127,6 +126,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         groupID1 = 1
         keySetID1 = 1
         inputKey1 = secrets.token_bytes(16)
+        endpoint1 = endpoints_list[0]
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
@@ -140,11 +140,11 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("3b")
         membership_matcher = generate_membership_entry_matcher(
             group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+        membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a
         self.step("4a")
-        if len(endpoints_list) < 2:
+        if len(endpoints_list) == 1:
             self.mark_step_range_skipped("4b", "4c")
 
         # Attempt to add EP2 to Group G1
@@ -160,8 +160,8 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("4c")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID1, endpoints=[endpoint1, endpoint2], key_set_id=keySetID1, has_auxiliary_acl=False)
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+            group_id=groupID1, endpoints=endpoints_list[0:2], key_set_id=keySetID1, has_auxiliary_acl=False)
+        membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 with existing Key1 and using Auxiliary ACL
         self.step("5a")
@@ -178,7 +178,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("5b")
         membership_matcher = generate_membership_entry_matcher(
             group_id=groupID2, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=True)
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+        membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 with new Key
         self.step("6a")
@@ -197,7 +197,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("6b")
         membership_matcher = generate_membership_entry_matcher(
             group_id=groupID2, key_set_id=keySetID2, endpoints=[endpoint1], has_auxiliary_acl=True)
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+        membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G3 using a new Key but providing existing KeySetID (result: already exists)
         self.step(7)
@@ -299,8 +299,8 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("13b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID4, key_set_id=keySetID4, endpoints=[])
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+            group_id=groupID4, key_set_id=keySetID4, endpoints=endpoints_list_empty)
+        membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G5 as Sender using existing KeySetID
         self.step("14a")
@@ -314,8 +314,8 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("14b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID5, key_set_id=keySetID4, endpoints=[])
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+            group_id=groupID5, key_set_id=keySetID4, endpoints=endpoints_list_empty)
+        membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G5 with new Key but providing existing KeySetID (result: already exists)
         self.step("15a")
@@ -353,7 +353,7 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID5,
-            endpoints=[],
+            endpoints=endpoints_list_empty,
             keySetID=keySetID5,
             key=inputKey5)
         )
@@ -361,8 +361,8 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("16b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID5, key_set_id=keySetID5, endpoints=[])
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+            group_id=groupID5, key_set_id=keySetID5, endpoints=endpoints_list_empty)
+        membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Confirm If Listener featIsSupported, skip this step. Else attempt to add endpoints to Group G5 (result: constraint error)
         self.step(17)
@@ -438,11 +438,14 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # TH awaits subscription report for Group G6 with EP1
         self.step("21b")
-        sub.await_all_expected_report_matches([generate_membership_entry_matcher(
+        membership_sub.await_all_expected_report_matches([generate_membership_entry_matcher(
             group_id=groupID6, key_set_id=keySetID6, endpoints=[endpoint1])], timeout_sec=60)
 
         # Test JoinGroup with ReplaceEndpoints=True: Replace EP1 with EP2 in Group G6
         self.step("21c")
+        endpoint2 = endpoints_list[1]
+        if endpoint2 is None:
+            self.mark_step_range_skipped("21c", "21d")
         if not (endpoint2 and endpoint1 != endpoint2):
             self.mark_step_range_skipped("21c", "21d")
 
@@ -455,7 +458,7 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # TH awaits subscription report for Group G6 with only EP2
         self.step("21d")
-        sub.await_all_expected_report_matches([generate_membership_entry_matcher(
+        membership_sub.await_all_expected_report_matches([generate_membership_entry_matcher(
             group_id=groupID6, key_set_id=keySetID6, endpoints=[endpoint2])], timeout_sec=60)
 
         # JoinGroup with Endpoint 0 (result: constraint error)
