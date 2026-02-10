@@ -116,9 +116,9 @@ class AutoRelease
 public:
     AutoRelease(const AutoRelease &)             = delete;
     AutoRelease & operator=(const AutoRelease &) = delete;
+    AutoRelease & operator=(AutoRelease &&)      = delete;
 
-    AutoRelease(AutoRelease &&)             = default;
-    AutoRelease & operator=(AutoRelease &&) = default;
+    AutoRelease(AutoRelease && other) : mValue(other.mValue) { other.mValue = nullptr; }
     AutoRelease(T * iterator) : mValue(iterator) {}
     ~AutoRelease()
     {
@@ -1188,7 +1188,8 @@ CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPa
     }
     else
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-    {}
+    {
+    }
 
     if (Features().Has(Feature::kPerDeviceCredentials))
     {
@@ -1266,7 +1267,8 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
     }
     else
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-    {}
+    {
+    }
 
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optionalAttributes);
 }
