@@ -182,11 +182,13 @@ public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
     void UpdateEthernetNetworkingStatus();
 
-    void
-    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
-    {
-        mpStatusChangeCallback = statusChangeCallback;
-    }
+    using NetworkStatusChangeCallback = NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback;
+    using OneShotScanCallback         = NetworkCommissioning::WiFiDriver::ScanCallback;
+    using OneShotConnectCallback      = NetworkCommissioning::Internal::WirelessDriver::ConnectCallback;
+
+    void SetOneShotConnectCallback(OneShotConnectCallback * inOneShotConnectCallback) noexcept;
+    void SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept;
+    void SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
@@ -262,7 +264,6 @@ private:
     void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
     void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
                         Optional<int32_t> inConnectStatus) noexcept;
-    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     // ==================== ConnectivityManager Private Methods ====================
 
@@ -313,7 +314,7 @@ private:
      *  A non-null value implies that a Wi-Fi association is in
      *  progress.
      */
-    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpOneShotConnectCallback;
+    NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

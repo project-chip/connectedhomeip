@@ -63,6 +63,25 @@ ConnectivityManagerImpl & ConnectivityManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
+// Linux Implementation-specific Methods
+
+// Mutation
+
+void ConnectivityManagerImpl::SetOneShotConnectCallback(OneShotConnectCallback * inOneShotConnectCallback) noexcept
+{
+    mpOneShotConnectCallback = inOneShotConnectCallback;
+}
+
+void ConnectivityManagerImpl::SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept
+{
+    mpOneShotScanCallback = inOneShotScanCallback;
+}
+
+void ConnectivityManagerImpl::SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept
+{
+    mpStatusChangeCallback = inStatusChangeCallback;
+}
+
 void ConnectivityManagerImpl::UpdateEthernetNetworkingStatus()
 {
     if (mpStatusChangeCallback != nullptr)
