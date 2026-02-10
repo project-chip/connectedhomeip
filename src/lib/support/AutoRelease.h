@@ -45,8 +45,13 @@ public:
     AutoRelease(AutoRelease && other) : mReleasable(other.mReleasable) { other.mReleasable = nullptr; }
     AutoRelease & operator=(AutoRelease && other)
     {
-        Set(other.mReleasable);
-        other.mReleasable = nullptr;
+        if (this != &other)
+        {
+            Release();
+            mReleasable       = other.mReleasable;
+            other.mReleasable = nullptr;
+        }
+        return *this;
     }
 
     inline Releasable * operator->() { return mReleasable; }
