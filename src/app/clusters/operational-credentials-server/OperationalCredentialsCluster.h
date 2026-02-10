@@ -48,8 +48,8 @@ public:
         app::EventManagement & eventManagement;
     };
 
-    OperationalCredentialsCluster(EndpointId endpoint, const Context & context) :
-        DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context){};
+    OperationalCredentialsCluster(EndpointId endpoint, const Context && context) :
+        DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(std::move(context)){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
