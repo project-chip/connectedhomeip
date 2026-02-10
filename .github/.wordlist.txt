@@ -1247,6 +1247,7 @@ recommand
 recommanded
 Reconnection
 reconnection
+reconnections
 recurse
 refrigeratoralarm
 regen
