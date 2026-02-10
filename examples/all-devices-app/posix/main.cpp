@@ -193,7 +193,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
-    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    auto * exampleDAC = Credentials::Examples::GetExampleDACProvider();
+    ChipLogProgress(AppServer, "ExampleDAC ptr: %p", exampleDAC);
+    ChipLogProgress(AppServer, "Type: %s", typeid(*exampleDAC).name());
+
+    Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)
@@ -201,7 +205,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         ChipLogError(AppServer, "Failed to get the DeviceInstanceInfoProvifer.");
         chipDie();
     }
-
+   
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                   //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
