@@ -27,6 +27,7 @@ class PushAvContext:
     Hold the context for a full Push AV Server including temporary disk,
     CA hierarchies and web server.
     """
+
     def __init__(
         self,
         host: Optional[str],
