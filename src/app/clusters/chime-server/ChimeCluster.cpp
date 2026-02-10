@@ -85,11 +85,11 @@ void ChimeCluster::LoadPersistentAttributes(ServerClusterContext & context)
     AttributePersistence persistence(context.attributeStorage);
 
     // Load Active Chime ID
-    (void) persistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
-                                                      mSelectedChime, 0);
+    persistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
+                                               mSelectedChime, 0);
 
     // Load Enabled
-    (void) persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, false);
+    (void) persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, true);
 }
 
 DataModel::ActionReturnStatus ChimeCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
