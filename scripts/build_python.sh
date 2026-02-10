@@ -381,7 +381,7 @@ if [ -n "$install_virtual_env" ]; then
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
 
         # Install Push AV Server dependencies
-        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tools/push_av_server/requirements.txt"
+        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/tools/push_av_server/requirements.txt"
         patch -d "$("$ENVIRONMENT_ROOT"/bin/pip show hypercorn | grep 'Location: ' | sed 's/Location: //')" -p0 <src/tools/push_av_server/hypercorn.patch
 
         if [ "$enable_nfc" = "true" ]; then
