@@ -137,7 +137,6 @@ void ApplicationShutdown()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     EvseApplicationShutdown();
-
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 

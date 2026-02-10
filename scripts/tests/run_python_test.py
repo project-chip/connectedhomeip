@@ -400,9 +400,9 @@ def monitor_app_restart_requests(
         log.info("Restarting app '%s'...", app)
         if is_restart_only:
             new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
-            new_app_manager.start()
+            app_manager_ref[0].stop()
             with app_manager_lock:
-                app_manager_ref[0].stop()
+                new_app_manager.start()
                 app_manager_ref[0] = new_app_manager
 
         elif is_factory_reset or is_factory_reset_app_only:
