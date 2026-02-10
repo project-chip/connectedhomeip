@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/Switch/Attributes.h>
@@ -42,59 +41,32 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    CHIP_ERROR SetNumberOfPositions(uint8_t numberOfPositions);
-    uint8_t GetNumberOfPositions() const { return mNumberOfPositions; }
-
-    CHIP_ERROR SetMultiPressMax(uint8_t multiPressMax);
-    uint8_t GetMultiPressMax() const { return mMultiPressMax; }
-
     CHIP_ERROR SetCurrentPosition(uint8_t currentPosition);
     uint8_t GetCurrentPosition() const { return mCurrentPosition; }
 
-    /**
-     * @brief
-     *   Called when the latching switch is moved to a new position.
-     */
-    void OnSwitchLatch(uint8_t newPosition);
+    // Should be called when the latching switch is moved to a new position.
+    std::optional<EventNumber> OnSwitchLatch(uint8_t newPosition);
 
-    /**
-     * @brief
-     *   Called when the momentary switch starts to be pressed.
-     */
-    void OnInitialPress(uint8_t newPosition);
+    // Should be called when the momentary switch starts to be pressed.
+    std::optional<EventNumber> OnInitialPress(uint8_t newPosition);
 
-    /**
-     * @brief
-     *   Called when the momentary switch has been pressed for a "long" time.
-     */
-    void OnLongPress(uint8_t newPosition);
+    // Should be called when the momentary switch has been pressed for a "long" time.
+    std::optional<EventNumber> OnLongPress(uint8_t newPosition);
 
-    /**
-     * @brief
-     *   Called when the momentary switch has been released.
-     */
-    void OnShortRelease(uint8_t previousPosition);
+    // Should be called when the momentary switch has been released.
+    std::optional<EventNumber> OnShortRelease(uint8_t previousPosition);
 
-    /**
-     * @brief
-     *   Called when the momentary switch has been released (after debouncing)
-     *   after having been pressed for a long time.
-     */
-    void OnLongRelease(uint8_t previousPosition);
+    // Should be called when the momentary switch has been released (after debouncing)
+    // after having been pressed for a long time.
+    std::optional<EventNumber> OnLongRelease(uint8_t previousPosition);
 
-    /**
-     * @brief
-     *   Called to indicate how many times the momentary switch has been pressed
-     *   in a multi-press sequence, during that sequence.
-     */
-    void OnMultiPressOngoing(uint8_t newPosition, uint8_t count);
+    // Should be called to indicate how many times the momentary switch has been pressed
+    // in a multi-press sequence, during that sequence.
+    std::optional<EventNumber> OnMultiPressOngoing(uint8_t newPosition, uint8_t count);
 
-    /**
-     * @brief
-     *   Called to indicate how many times the momentary switch has been pressed
-     *   in a multi-press sequence, after it has been detected that the sequence has ended.
-     */
-    void OnMultiPressComplete(uint8_t newPosition, uint8_t count);
+    // Should be called to indicate how many times the momentary switch has been pressed
+    // in a multi-press sequence, after it has been detected that the sequence has ended.
+    std::optional<EventNumber> OnMultiPressComplete(uint8_t newPosition, uint8_t count);
 
 protected:
     const BitFlags<Switch::Feature> mFeatures;

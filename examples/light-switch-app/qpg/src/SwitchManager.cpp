@@ -36,10 +36,9 @@ void SwitchManager::Init(void)
 {
     uint8_t multiPressMax = 2;
 
-    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
-    VerifyOrReturn(switchCluster != nullptr);
-
-    RETURN_SAFELY_IGNORED switchCluster->SetMultiPressMax(multiPressMax);
+    // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
+    // This is why the actual cluster does not provide a setter for this attribute.
+    RETURN_SAFELY_IGNORED Switch::Attributes::MultiPressMax::Set(GENERICSWITCH_ENDPOINT_ID, multiPressMax);
 }
 
 void SwitchManager::ToggleHandler(AppEvent * aEvent)
@@ -136,7 +135,7 @@ void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
 
         RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
-        switchCluster->OnInitialPress(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
     });
 }
 
@@ -156,7 +155,7 @@ void SwitchManager::GenericSwitchLongPressHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        switchCluster->OnLongPress(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
     });
 }
 
@@ -179,7 +178,7 @@ void SwitchManager::GenericSwitchShortReleaseHandler(AppEvent * aEvent)
 
         RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
-        switchCluster->OnShortRelease(previousPosition);
+        RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
     });
 }
 
@@ -202,7 +201,7 @@ void SwitchManager::GenericSwitchLongReleaseHandler(AppEvent * aEvent)
 
         RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
-        switchCluster->OnLongRelease(previousPosition);
+        RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
     });
 }
 
@@ -218,7 +217,7 @@ void SwitchManager::GenericSwitchMultipressOngoingHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        switchCluster->OnMultiPressOngoing(newPosition, multiPressCount);
+        RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, multiPressCount);
     });
 }
 
@@ -232,7 +231,7 @@ void SwitchManager::GenericSwitchMultipressCompleteHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        switchCluster->OnMultiPressComplete(previousPosition, multiPressCount);
+        RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, multiPressCount);
     });
 
     multiPressCount = 1;

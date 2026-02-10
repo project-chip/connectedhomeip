@@ -175,7 +175,7 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
             RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(currentPosition);
 
             // Trigger event
-            switchCluster->OnInitialPress(currentPosition);
+            RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(currentPosition);
         }
         break;
     }
@@ -190,7 +190,7 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
             RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(currentPosition);
 
             // Trigger event
-            switchCluster->OnShortRelease(previousPosition);
+            RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
         }
         break;
     }

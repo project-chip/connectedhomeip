@@ -100,7 +100,7 @@ void LightSwitch::GenericSwitchInitialPress()
 
         RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
-        switchCluster->OnInitialPress(newPosition);
+        RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
     });
 }
 
@@ -116,6 +116,6 @@ void LightSwitch::GenericSwitchReleasePress()
 
         RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
 
-        switchCluster->OnShortRelease(previousPosition);
+        RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
     });
 }

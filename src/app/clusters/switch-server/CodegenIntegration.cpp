@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/switch-server/CodegenIntegration.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
 #include <app/static-cluster-config/Switch.h>
@@ -28,6 +29,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Switch;
 using namespace chip::app::Clusters::Switch::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
@@ -43,7 +45,6 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         SwitchCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        using namespace chip::Protocols::InteractionModel;
 
         uint8_t numberOfPositions{};
         VerifyOrDie(NumberOfPositions::Get(endpointId, &numberOfPositions) == Status::Success);

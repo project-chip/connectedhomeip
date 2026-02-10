@@ -269,7 +269,7 @@ void LightingAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
     VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
 
-    switchCluster->OnSwitchLatch(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(newPosition);
 }
 
 void LightingAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPosition)
@@ -283,7 +283,7 @@ void LightingAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPositio
     VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
 
-    switchCluster->OnInitialPress(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
 }
 
 void LightingAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
@@ -297,7 +297,7 @@ void LightingAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
     VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
-    switchCluster->OnLongPress(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
 }
 
 void LightingAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPosition)
@@ -312,7 +312,7 @@ void LightingAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPos
     ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
                   previousPosition);
 
-    switchCluster->OnShortRelease(previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
 }
 
 void LightingAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosition)
@@ -329,7 +329,7 @@ void LightingAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosi
                   "pressed for a long time:%d",
                   previousPosition);
 
-    switchCluster->OnLongRelease(previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
 }
 
 void LightingAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count)
@@ -345,7 +345,7 @@ void LightingAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosi
                   newPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    switchCluster->OnMultiPressOngoing(newPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, count);
 }
 
 void LightingAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count)
@@ -361,7 +361,7 @@ void LightingAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previo
                   previousPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    switchCluster->OnMultiPressComplete(previousPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, count);
 }
 
 void LightingAppCommandDelegate::OnEventCommandReceived(const char * json)

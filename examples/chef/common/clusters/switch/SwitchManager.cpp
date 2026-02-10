@@ -43,11 +43,11 @@ class SwitchActionsDelegate : public chip::app::ActionsDelegate
 {
 public:
     SwitchActionsDelegate(ClusterId clusterId, SwitchEventHandler * eventHandler) :
-        ActionsDelegate(clusterId), mEventHandler(eventHandler){};
-    ~SwitchActionsDelegate() override{};
+        ActionsDelegate(clusterId), mEventHandler(eventHandler) {};
+    ~SwitchActionsDelegate() override {};
 
     void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override;
-    void CommandHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override{};
+    void CommandHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args) override {};
     void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t> args) override;
 
 private:
@@ -68,10 +68,9 @@ void SwitchActionsDelegate::AttributeWriteHandler(chip::EndpointId endpointId, c
     case Switch::Attributes::NumberOfPositions::Id: {
         uint8_t data = static_cast<uint8_t>(args[0]);
 
-        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-        VerifyOrReturn(switchCluster != nullptr);
-
-        RETURN_SAFELY_IGNORED switchCluster->SetNumberOfPositions(data);
+        // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
+        // This is why the actual cluster does not provide a setter for this attribute.
+        RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Set(endpointId, data);
     }
     break;
     case Switch::Attributes::CurrentPosition::Id: {
@@ -86,10 +85,9 @@ void SwitchActionsDelegate::AttributeWriteHandler(chip::EndpointId endpointId, c
     case Switch::Attributes::MultiPressMax::Id: {
         uint8_t data = static_cast<uint8_t>(args[0]);
 
-        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-        VerifyOrReturn(switchCluster != nullptr);
-
-        RETURN_SAFELY_IGNORED switchCluster->SetMultiPressMax(data);
+        // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
+        // This is why the actual cluster does not provide a setter for this attribute.
+        RETURN_SAFELY_IGNORED Switch::Attributes::MultiPressMax::Set(endpointId, data);
     }
     break;
     default:

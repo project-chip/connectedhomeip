@@ -27,9 +27,8 @@ using namespace Switch::Attributes;
 
 SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features,
                              const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Switch::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mNumberOfPositions(config.numberOfPositions),
-    mMultiPressMax(config.multiPressMax)
+    DefaultServerCluster({ endpointId, Switch::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mNumberOfPositions(config.numberOfPositions), mMultiPressMax(config.multiPressMax)
 {}
 
 DataModel::ActionReturnStatus SwitchCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -64,24 +63,6 @@ CHIP_ERROR SwitchCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyB
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
-CHIP_ERROR SwitchCluster::SetNumberOfPositions(uint8_t numberOfPositions)
-{
-    // According to the spec, the minimum value is 2.
-    VerifyOrReturnError(numberOfPositions >= 2, CHIP_ERROR_INVALID_ARGUMENT);
-
-    SetAttributeValue(mNumberOfPositions, numberOfPositions, NumberOfPositions::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SwitchCluster::SetMultiPressMax(uint8_t multiPressMax)
-{
-    // According to the spec, the minimum value is 2.
-    VerifyOrReturnError(multiPressMax >= 2, CHIP_ERROR_INVALID_ARGUMENT);
-
-    SetAttributeValue(mMultiPressMax, multiPressMax, MultiPressMax::Id);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR SwitchCluster::SetCurrentPosition(uint8_t currentPosition)
 {
     // According to the spec, the valid range is zero to NumberOfPositions - 1.
@@ -91,67 +72,55 @@ CHIP_ERROR SwitchCluster::SetCurrentPosition(uint8_t currentPosition)
     return CHIP_NO_ERROR;
 }
 
-void SwitchCluster::OnSwitchLatch(uint8_t newPosition)
+std::optional<EventNumber> SwitchCluster::OnSwitchLatch(uint8_t newPosition)
 {
-    ChipLogProgress(Zcl, "SwitchCluster: OnSwitchLatch");
-
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kLatchingSwitch), std::nullopt);
     Events::SwitchLatched::Type event{ newPosition };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void SwitchCluster::OnInitialPress(uint8_t newPosition)
+std::optional<EventNumber> SwitchCluster::OnInitialPress(uint8_t newPosition)
 {
-    ChipLogProgress(Zcl, "SwitchCluster: OnInitialPress");
-
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitch), std::nullopt);
     Events::InitialPress::Type event{ newPosition };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void SwitchCluster::OnLongPress(uint8_t newPosition)
+std::optional<EventNumber> SwitchCluster::OnLongPress(uint8_t newPosition)
 {
-    ChipLogProgress(Zcl, "SwitchCluster: OnLongPress");
-
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchLongPress), std::nullopt);
     Events::LongPress::Type event{ newPosition };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void SwitchCluster::OnShortRelease(uint8_t previousPosition)
+std::optional<EventNumber> SwitchCluster::OnShortRelease(uint8_t previousPosition)
 {
-    ChipLogProgress(Zcl, "SwitchCluster: OnShortRelease");
-
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchRelease), std::nullopt);
     Events::ShortRelease::Type event{ previousPosition };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void SwitchCluster::OnLongRelease(uint8_t previousPosition)
+std::optional<EventNumber> SwitchCluster::OnLongRelease(uint8_t previousPosition)
 {
-    ChipLogProgress(Zcl, "SwitchCluster: OnLongRelease");
-
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchLongPress), std::nullopt);
     Events::LongRelease::Type event{ previousPosition };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void SwitchCluster::OnMultiPressOngoing(uint8_t newPosition, uint8_t count)
+std::optional<EventNumber> SwitchCluster::OnMultiPressOngoing(uint8_t newPosition, uint8_t count)
 {
-    ChipLogProgress(Zcl, "SwitchCluster: OnMultiPressOngoing");
-
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchMultiPress) &&
+                            !mFeatures.Has(Feature::kActionSwitch),
+                        std::nullopt);
     Events::MultiPressOngoing::Type event{ newPosition, count };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void SwitchCluster::OnMultiPressComplete(uint8_t previousPosition, uint8_t count)
+std::optional<EventNumber> SwitchCluster::OnMultiPressComplete(uint8_t previousPosition, uint8_t count)
 {
-    ChipLogProgress(Zcl, "SwitchCluster: OnMultiPressComplete");
-
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchMultiPress), std::nullopt);
     Events::MultiPressComplete::Type event{ previousPosition, count };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 } // namespace chip::app::Clusters

@@ -64,11 +64,9 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     uint8_t numPositions = 0;
 
     // On failure, the numPositions won't be changed, so 0 returned.
-    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
-    if (switchCluster != nullptr)
-    {
-        numPositions = switchCluster->GetNumberOfPositions();
-    }
+    // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
+    // This is why the actual cluster does not provide a getter for this attribute.
+    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
 
     return numPositions;
 }
@@ -279,7 +277,7 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
         VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         ChipLogDetail(NotSpecified, "The latching switch is moved to a new position: %u", static_cast<unsigned>(positionId));
 
-        switchCluster->OnSwitchLatch(positionId);
+        RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(positionId);
     }
     else
     {
@@ -708,7 +706,7 @@ void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
     VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
 
-    switchCluster->OnSwitchLatch(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(newPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPosition)
@@ -722,7 +720,7 @@ void AllClustersAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPosi
     VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
 
-    switchCluster->OnInitialPress(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
@@ -736,7 +734,7 @@ void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPositio
     VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
-    switchCluster->OnLongPress(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
 
     // Long press to trigger smokeco self-test
     SmokeCoAlarmServer::Instance().RequestSelfTest(endpoint);
@@ -754,7 +752,7 @@ void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previous
     ChipLogDetail(NotSpecified, "The previous value of the CurrentPosition when the momentary switch has been released:%d",
                   previousPosition);
 
-    switchCluster->OnShortRelease(previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosition)
@@ -771,7 +769,7 @@ void AllClustersAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousP
                   "pressed for a long time:%d",
                   previousPosition);
 
-    switchCluster->OnLongRelease(previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count)
@@ -787,7 +785,7 @@ void AllClustersAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newP
                   newPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    switchCluster->OnMultiPressOngoing(newPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, count);
 }
 
 void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count)
@@ -803,7 +801,7 @@ void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t pre
                   previousPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    switchCluster->OnMultiPressComplete(previousPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, count);
 }
 
 void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::string type, DataModel::Nullable<uint8_t> mode)

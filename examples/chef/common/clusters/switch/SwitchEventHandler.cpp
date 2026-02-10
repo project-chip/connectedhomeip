@@ -39,7 +39,7 @@ void SwitchEventHandler::OnSwitchLatched(EndpointId endpointId, uint8_t newPosit
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    switchCluster->OnSwitchLatch(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(newPosition);
 }
 
 void SwitchEventHandler::OnInitialPress(EndpointId endpointId, uint8_t newPosition)
@@ -49,7 +49,7 @@ void SwitchEventHandler::OnInitialPress(EndpointId endpointId, uint8_t newPositi
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    switchCluster->OnInitialPress(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
 }
 
 void SwitchEventHandler::OnLongPress(EndpointId endpointId, uint8_t newPosition)
@@ -59,7 +59,7 @@ void SwitchEventHandler::OnLongPress(EndpointId endpointId, uint8_t newPosition)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    switchCluster->OnLongPress(newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
 }
 
 void SwitchEventHandler::OnShortRelease(EndpointId endpointId, uint8_t previousPosition)
@@ -69,7 +69,7 @@ void SwitchEventHandler::OnShortRelease(EndpointId endpointId, uint8_t previousP
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    switchCluster->OnShortRelease(previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
 }
 
 void SwitchEventHandler::OnLongRelease(EndpointId endpointId, uint8_t previousPosition)
@@ -79,7 +79,7 @@ void SwitchEventHandler::OnLongRelease(EndpointId endpointId, uint8_t previousPo
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    switchCluster->OnLongRelease(previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
 }
 
 void SwitchEventHandler::OnMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count)
@@ -89,7 +89,7 @@ void SwitchEventHandler::OnMultiPressOngoing(EndpointId endpointId, uint8_t newP
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    switchCluster->OnMultiPressOngoing(newPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, count);
 }
 
 void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
@@ -99,6 +99,6 @@ void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t pre
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    switchCluster->OnMultiPressComplete(previousPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, count);
 }
 #endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
