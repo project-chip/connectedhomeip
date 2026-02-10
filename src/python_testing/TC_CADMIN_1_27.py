@@ -422,7 +422,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
         log.info("Setup event on fabric_a_admin for JCM completion message")
         self.fabric_a_admin.set_output_match("[JF] Joint Commissioning Method (nodeId=15) success")
         self.fabric_a_admin.event.clear()
-        
+
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork-long 15 {response.setupPinCode} {discriminator} --jcm true",
             expected_output="[CTL] Commissioning complete for node ID 0x000000000000000F: success",
