@@ -4687,6 +4687,9 @@ static BOOL AttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttribute
     case Attributes::HoldTimeLimits::Id: {
         return YES;
     }
+    case Attributes::PredictedOccupancy::Id: {
+        return YES;
+    }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
         return YES;
     }

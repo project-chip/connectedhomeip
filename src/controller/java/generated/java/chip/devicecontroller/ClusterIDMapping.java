@@ -13900,6 +13900,7 @@ public class ClusterIDMapping {
             OccupancySensorTypeBitmap(2L),
             HoldTime(3L),
             HoldTimeLimits(4L),
+            PredictedOccupancy(5L),
             PIROccupiedToUnoccupiedDelay(16L),
             PIRUnoccupiedToOccupiedDelay(17L),
             PIRUnoccupiedToOccupiedThreshold(18L),

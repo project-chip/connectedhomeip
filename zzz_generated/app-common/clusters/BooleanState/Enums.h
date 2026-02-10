@@ -26,7 +26,14 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace BooleanState {} // namespace BooleanState
+namespace BooleanState {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kChangeEvent = 0x1,
+};
+} // namespace BooleanState
 } // namespace Clusters
 } // namespace app
 } // namespace chip

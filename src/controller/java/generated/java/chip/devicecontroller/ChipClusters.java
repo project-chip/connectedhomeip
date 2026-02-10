@@ -46322,6 +46322,7 @@ public class ChipClusters {
     private static final long OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID = 2L;
     private static final long HOLD_TIME_ATTRIBUTE_ID = 3L;
     private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 4L;
+    private static final long PREDICTED_OCCUPANCY_ATTRIBUTE_ID = 5L;
     private static final long PIR_OCCUPIED_TO_UNOCCUPIED_DELAY_ATTRIBUTE_ID = 16L;
     private static final long PIR_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID = 17L;
     private static final long PIR_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID = 18L;
@@ -46349,6 +46350,10 @@ public class ChipClusters {
 
     public interface HoldTimeLimitsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(ChipStructs.OccupancySensingClusterHoldTimeLimitsStruct value);
+    }
+
+    public interface PredictedOccupancyAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.OccupancySensingClusterPredictedOccupancyStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -46500,6 +46505,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, HOLD_TIME_LIMITS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readPredictedOccupancyAttribute(
+        PredictedOccupancyAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PREDICTED_OCCUPANCY_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.OccupancySensingClusterPredictedOccupancyStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PREDICTED_OCCUPANCY_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribePredictedOccupancyAttribute(
+        PredictedOccupancyAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PREDICTED_OCCUPANCY_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.OccupancySensingClusterPredictedOccupancyStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, PREDICTED_OCCUPANCY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPIROccupiedToUnoccupiedDelayAttribute(

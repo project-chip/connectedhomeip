@@ -1677,7 +1677,11 @@ cluster GroupKeyManagement = 63 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
-  revision 1;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kChangeEvent = 0x1;
+  }
 
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -1693,7 +1697,7 @@ cluster BooleanState = 69 {
 
 /** This cluster is used to configure a boolean sensor. */
 cluster BooleanStateConfiguration = 128 {
-  revision 1;
+  revision 2;
 
   bitmap AlarmModeBitmap : bitmap8 {
     kVisual = 0x1;
@@ -1705,6 +1709,7 @@ cluster BooleanStateConfiguration = 128 {
     kAudible = 0x2;
     kAlarmSuppress = 0x4;
     kSensitivityLevel = 0x8;
+    kFaultEvents = 0x10;
   }
 
   bitmap SensorFaultBitmap : bitmap16 {
@@ -1742,9 +1747,9 @@ cluster BooleanStateConfiguration = 128 {
     AlarmModeBitmap alarmsToEnableDisable = 0;
   }
 
-  /** This command is used to suppress the specified alarm mode. */
+  /** This command will suppress the alarm modes specified. */
   command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
-  /** This command is used to enable or disable the specified alarm mode. */
+  /** This command allows setting the enable or disable value for the specified alarm modes. */
   command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 

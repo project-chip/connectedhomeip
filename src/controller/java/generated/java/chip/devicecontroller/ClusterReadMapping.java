@@ -13987,6 +13987,17 @@ public class ClusterReadMapping {
           readOccupancySensingHoldTimeCommandParams
         );
         result.put("readHoldTimeAttribute", readOccupancySensingHoldTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOccupancySensingPredictedOccupancyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOccupancySensingPredictedOccupancyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OccupancySensingCluster) cluster).readPredictedOccupancyAttribute(
+              (ChipClusters.OccupancySensingCluster.PredictedOccupancyAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOccupancySensingClusterPredictedOccupancyAttributeCallback(),
+          readOccupancySensingPredictedOccupancyCommandParams
+        );
+        result.put("readPredictedOccupancyAttribute", readOccupancySensingPredictedOccupancyAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOccupancySensingPIROccupiedToUnoccupiedDelayAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
