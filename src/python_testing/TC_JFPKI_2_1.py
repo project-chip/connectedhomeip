@@ -123,6 +123,7 @@ class TC_JFPKI_2_1(MatterBaseTest):
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             self.jfc_server_app,
+            "JFC-A",
             rpc_server_port=33033,
             storage_dir=self.storage_fabric_a,
             vendor_id=self.jfctrl_fabric_a_vid)
