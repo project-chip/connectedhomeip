@@ -41,7 +41,7 @@
 import logging
 
 from mobly import asserts
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
@@ -172,7 +172,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         host_ip = self.user_params.get("host_ip", None)
         tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(
             endpoint=endpoint, server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream()
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
 
         # Step 1: Reads CurrentConnections attribute
         self.step(1)
@@ -322,7 +322,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         # Step 13: Try to allocate transport with invalid URL
         self.step(13)
-        stream_id = self.server.create_stream()
+        stream_id = self.server.create_stream(SupportedIngestInterface.cmaf.value)
         status = await self.allocate_one_pushav_transport(
             endpoint,
             url=f"http://{host_ip}:1234/streams/{stream_id}/",

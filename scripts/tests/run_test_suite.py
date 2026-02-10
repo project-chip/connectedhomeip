@@ -17,12 +17,13 @@
 import enum
 import logging
 import os
+import random
 import sys
 import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import chiptest
 import click
@@ -84,6 +85,20 @@ class DeprecatedOption(click.Option):
         super().__init__(*args, **kwargs, callback=deprecation_warning)
 
 
+def validate_test_order(ctx: click.Context, param: click.Parameter, value: Any) -> str | None:
+    if not isinstance(value, str):
+        raise click.BadParameter("Test order needs to be a string.")
+    if value == "alphabetic":
+        return None
+    if (value_split := value.split(":", maxsplit=1))[0] == "random":
+        if len(value_split) == 1:
+            return str(time.time_ns())
+        if not value_split[1]:
+            raise click.BadParameter("Random seed not specified. Should be: 'random[:seed]'.")
+        return value_split[1]
+    raise click.BadParameter("Wrong format of test order. Should be: 'alphabetic' or 'random[:seed]'.")
+
+
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 
 
@@ -139,6 +154,14 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--test-order', 'test_order_seed',
+    type=click.UNPROCESSED,
+    callback=validate_test_order,
+    default="alphabetic",
+    show_default=True,
+    help="Order in which tests should be executed. Possible values: 'alphabetic', 'random[:seed]'."
+)
+@click.option(
     '--find-path',
     default=[DEFAULT_CHIP_ROOT],
     multiple=True,
@@ -156,7 +179,8 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.pass_context
 def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], find_path: list[str], runner: str, chip_tool: Path | None) -> None:
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
+         chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
@@ -239,7 +263,13 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
 
         tests_filtered.append(test)
 
-    tests_filtered.sort(key=lambda x: x.name)
+    if test_order_seed is None:
+        log.info('Executing the tests in alphabetic order')
+        tests_filtered.sort(key=lambda x: x.name)
+    else:
+        log.info('Using the following seed for test order randomization: %s', test_order_seed)
+        random.seed(test_order_seed)
+        random.shuffle(tests_filtered)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
                              runtime=runtime, find_path=find_path)

@@ -287,7 +287,6 @@ public:
 
 private:
     CameraAvSettingsUserLevelMgmtServerLogic mLogic;
-    BitFlags<CameraAvSettingsUserLevelManagement::Feature> mFeatures;
 
     std::vector<CameraAvSettingsUserLevelManagement::MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> mDptzStreams;

@@ -6558,6 +6558,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"HoldTimeLimits";
             break;
 
+        case MTRAttributeIDTypeClusterOccupancySensingAttributePredictedOccupancyID:
+            result = @"PredictedOccupancy";
+            break;
+
         case MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID:
             result = @"PIROccupiedToUnoccupiedDelay";
             break;
