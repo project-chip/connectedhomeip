@@ -73,7 +73,7 @@ struct ManagerInitParams
  * or watched cluster is changed).
  *
  */
-class Manager : chip::FabricTable::Delegate
+class Manager : public chip::FabricTable::Delegate
 {
 public:
     Manager() {}

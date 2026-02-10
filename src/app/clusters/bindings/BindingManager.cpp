@@ -46,7 +46,7 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mInitParams = params;
     mBindingTable.SetPersistentStorage(params.mStorage);
-    TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(&mFabricTableDelegate);
+    TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(this);
 
     CHIP_ERROR error = mBindingTable.LoadFromStorage();
     if (error != CHIP_NO_ERROR)

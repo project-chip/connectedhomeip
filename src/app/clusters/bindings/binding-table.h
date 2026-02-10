@@ -56,8 +56,8 @@ struct TableEntry
 {
     TableEntry(FabricIndex fabric, NodeId node, EndpointId localEndpoint, EndpointId remoteEndpoint,
                std::optional<ClusterId> cluster) :
-        type(MATTER_UNICAST_BINDING), fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(remoteEndpoint),
-        nodeId(node)
+        type(MATTER_UNICAST_BINDING),
+        fabricIndex(fabric), local(localEndpoint), clusterId(cluster), remote(remoteEndpoint), nodeId(node)
     {}
 
     TableEntry(FabricIndex fabric, GroupId group, EndpointId localEndpoint, std::optional<ClusterId> cluster) :
