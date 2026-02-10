@@ -26,7 +26,7 @@ import("//build_overrides/build.gni")
 #       user_id (User id Authentication),
 #       aes_key (AES Authentication with IoT applet),
 #       ec_key (EC key Authentication),
-#       scp03_user_id_key (SCP03 + User ID Authentication),
+#       scp03_user_id (SCP03 + User ID Authentication),
 #       scp03_aes_key (SCP03 + AES Key Authentication),
 #       scp03_ec_key (SCP03 + EC Key Authentication),
 

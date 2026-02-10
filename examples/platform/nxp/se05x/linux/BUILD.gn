@@ -117,6 +117,15 @@ source_set("linux-commissionable-data-provider") {
     "${chip_root}/src/platform",
   ]
 
+  defines = []
+
+  if (chip_se05x_spake_verifier_use_tp_values) {
+    defines += [ "ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=1" ]
+  }
+
+  defines +=
+      [ "SE05X_SPAKE_VERIFIER_TP_SET_NO=$chip_se05x_spake_verifier_tp_set_no" ]
+
   deps = [ "${chip_root}/third_party/simw-top-mini:se05x" ]
 
   public_configs = [ ":app-main-config" ]
@@ -127,7 +136,7 @@ source_set("commodity-tariff-test-event-trigger") {
 }
 
 source_set("app-main-loop") {
-  sources = [ "AppMainLoop.h" ]
+  sources = [ "../../../linux/AppMainLoop.h" ]
 
   public_configs = [ ":app-main-config" ]
 }
@@ -198,8 +207,11 @@ source_set("app-main") {
     "../../../linux/CommissionableInit.h",
     "../../../linux/NamedPipeCommands.cpp",
     "../../../linux/NamedPipeCommands.h",
+    "../DeviceAttestationSe05xCredsExample.cpp",
     "AppMain.cpp",
   ]
+
+
 
   public_deps = [
     ":app-main-loop",
@@ -230,6 +242,8 @@ source_set("app-main") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
+
+  deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
