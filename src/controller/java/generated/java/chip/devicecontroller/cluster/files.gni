@@ -152,6 +152,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterThreadInterfaceScanResultStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterWiFiInterfaceScanResultStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OccupancySensingClusterHoldTimeLimitsStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OccupancySensingClusterPredictedOccupancyStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OperationalCredentialsClusterFabricDescriptorStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OperationalCredentialsClusterNOCStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OperationalStateClusterErrorStateStruct.kt",

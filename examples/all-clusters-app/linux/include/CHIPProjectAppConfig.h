@@ -27,6 +27,11 @@
 
 #pragma once
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP && !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 0
+#define CONFIG_RENDEZVOUS_MODE (1 << 5) // Thread MeshCoP
+#endif
+
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
 

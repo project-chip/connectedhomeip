@@ -587,6 +587,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OccupancySensin
 static void Finalize(chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type & request,
                         Json::Value & value);
 

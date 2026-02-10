@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,198 +13,106 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/CommandHandler.h>
-#include <app/clusters/identify-server/CodegenIntegration.h>
-#include <app/reporting/reporting.h>
-#include <app/util/config.h>
-#include <credentials/GroupDataProvider.h>
-#include <inttypes.h>
-#include <lib/support/CodeUtils.h>
+#include <app/clusters/groups-server/GroupsCluster.h>
+
+#include <app/clusters/scenes-server/Constants.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/GroupKeyManagement/Ids.h>
+#include <clusters/Groups/Attributes.h>
+#include <clusters/Groups/Commands.h>
+#include <clusters/Groups/Metadata.h>
+#include <clusters/Groups/Structs.h>
 #include <tracing/macros.h>
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/scenes-server.h> // nogncheck
-#endif                                                // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+using namespace chip::app::Clusters::Groups;
 
-using namespace chip;
-using namespace chip::app::Clusters;
-using namespace app::Clusters;
-using namespace app::Clusters::Groups;
-using namespace chip::Credentials;
-using Protocols::InteractionModel::Status;
+using chip::Credentials::GroupDataProvider;
+using chip::Protocols::InteractionModel::Status;
 
-// Is the device identifying?
-static bool emberAfIsDeviceIdentifying(EndpointId endpoint)
+// The macro LogErrorOnFailure generally logs file:line which makes the macro larger. We use here a smaller
+// macro (i.e. no line & file info) since the underlying error would have the original cause and logs would contain
+// what call is being processed. This is to save about 100 bytes or so of flash.
+#define LogIfFailure(expr)                                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            ChipLogError(Zcl, "Error: %" CHIP_ERROR_FORMAT, __err.Format());                                                       \
+        }                                                                                                                          \
+    } while (false)
+
+namespace chip::app::Clusters {
+namespace {
+
+constexpr AttributePathParams kGroupKeyGroupTableAttributePath{ kRootEndpointId, GroupKeyManagement::Id,
+                                                                GroupKeyManagement::Attributes::GroupTable::Id };
+
+void NotifyGroupTableChanged(ServerClusterContext * context)
 {
-#ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
-    auto cluster = FindIdentifyClusterOnEndpoint(endpoint);
-    return cluster != nullptr && cluster->GetIdentifyTime() > 0;
-#else
-    return false;
-#endif
+    // TODO: This seems a bit coupled: we are notifying in this cluster that ANOTHER cluster
+    //       has changed. We should support only one cluster or another really...
+    VerifyOrReturn(context != nullptr);
+    context->interactionContext.dataModelChangeListener.MarkDirty(kGroupKeyGroupTableAttributePath);
 }
 
-/**
- * @brief Checks if group-endpoint association exist for the given fabric
- */
-static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
+class AutoReleaseIterator
 {
-    GroupDataProvider * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, false);
+public:
+    AutoReleaseIterator(GroupDataProvider & provider, FabricIndex fabricIndex) : mIterator(provider.IterateGroupKeys(fabricIndex))
+    {}
+    ~AutoReleaseIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+    bool Valid() const { return mIterator != nullptr; }
+    GroupDataProvider::GroupKeyIterator * operator->() { return mIterator; }
 
-    return provider->HasEndpoint(fabricIndex, groupId, endpointId);
-}
+private:
+    GroupDataProvider::GroupKeyIterator * mIterator;
+};
 
 /**
  * @brief Checks if there are key set associated with the given GroupId
  */
-static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
+bool KeyExists(GroupDataProvider & provider, FabricIndex fabricIndex, GroupId groupId)
 {
-    GroupDataProvider * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, false);
-    GroupDataProvider::GroupKey entry;
+    AutoReleaseIterator it(provider, fabricIndex);
+    VerifyOrReturnValue(it.Valid(), false);
 
-    auto it    = provider->IterateGroupKeys(fabricIndex);
-    bool found = false;
-    while (!found && it->Next(entry))
+    GroupDataProvider::GroupKey key;
+    while (it->Next(key))
     {
-        if (entry.group_id == groupId)
+        Credentials::GroupDataProvider::KeySet keys;
+        if ((key.group_id == groupId) && (provider.GetKeySet(fabricIndex, key.keyset_id, keys) == CHIP_NO_ERROR))
         {
-            GroupDataProvider::KeySet keys;
-            found = (CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys));
+            return true;
         }
     }
-    it->Release();
 
-    return found;
-}
-
-static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
-{
-    VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
-    VerifyOrReturnError(groupName.size() <= GroupDataProvider::GroupInfo::kGroupNameMax, Status::ConstraintError);
-
-    GroupDataProvider * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, Status::NotFound);
-    VerifyOrReturnError(KeyExists(fabricIndex, groupId), Status::UnsupportedAccess);
-
-    // Add a new entry to the GroupTable
-    CHIP_ERROR err = provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
-    if (CHIP_NO_ERROR == err)
-    {
-        err = provider->AddEndpoint(fabricIndex, groupId, endpointId);
-    }
-    if (CHIP_NO_ERROR == err)
-    {
-        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
-                                               GroupKeyManagement::Attributes::GroupTable::Id);
-        return Status::Success;
-    }
-
-    ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
-                  err.Format());
-    return Status::ResourceExhausted;
-}
-
-static Status GroupRemove(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
-{
-    VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
-    VerifyOrReturnError(GroupExists(fabricIndex, endpointId, groupId), Status::NotFound);
-
-    GroupDataProvider * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, Status::NotFound);
-
-    CHIP_ERROR err = provider->RemoveEndpoint(fabricIndex, groupId, endpointId);
-    if (CHIP_NO_ERROR == err)
-    {
-        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
-                                               GroupKeyManagement::Attributes::GroupTable::Id);
-        return Status::Success;
-    }
-
-    ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
-                  err.Format());
-    return Status::NotFound;
-}
-
-void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
-{
-    // According to spec, highest bit (Group Names) MUST match feature bit 0 (Group Names)
-    Status status = Attributes::NameSupport::Set(endpointId, NameSupportBitmap::kGroupNames);
-    if (status != Status::Success)
-    {
-        ChipLogDetail(Zcl, "ERR: writing NameSupport %x", to_underlying(status));
-    }
-
-    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(Feature::kGroupNames));
-    if (status != Status::Success)
-    {
-        ChipLogDetail(Zcl, "ERR: writing group feature map %x", to_underlying(status));
-    }
-}
-
-bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          const Commands::AddGroup::DecodableType & commandData)
-{
-    MATTER_TRACE_SCOPE("AddGroup", "Groups");
-    auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    Groups::Commands::AddGroupResponse::Type response;
-
-    response.groupID = commandData.groupID;
-    response.status  = to_underlying(GroupAdd(fabricIndex, commandPath.mEndpointId, commandData.groupID, commandData.groupName));
-    commandObj->AddResponse(commandPath, response);
-    return true;
-}
-
-bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           const Commands::ViewGroup::DecodableType & commandData)
-{
-    MATTER_TRACE_SCOPE("ViewGroup", "Groups");
-    auto fabricIndex             = commandObj->GetAccessingFabricIndex();
-    auto groupId                 = commandData.groupID;
-    GroupDataProvider * provider = GetGroupDataProvider();
-    GroupDataProvider::GroupInfo info;
-    Groups::Commands::ViewGroupResponse::Type response;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    Status status  = Status::NotFound;
-
-    VerifyOrExit(IsValidGroupId(groupId), status = Status::ConstraintError);
-    VerifyOrExit(nullptr != provider, status = Status::Failure);
-    VerifyOrExit(provider->HasEndpoint(fabricIndex, groupId, commandPath.mEndpointId), status = Status::NotFound);
-
-    err = provider->GetGroupInfo(fabricIndex, groupId, info);
-    VerifyOrExit(CHIP_NO_ERROR == err, status = Status::NotFound);
-
-    response.groupName = CharSpan(info.name, strnlen(info.name, GroupDataProvider::GroupInfo::kGroupNameMax));
-    status             = Status::Success;
-exit:
-    response.groupID = groupId;
-    response.status  = to_underlying(status);
-    commandObj->AddResponse(commandPath, response);
-    return true;
+    return false;
 }
 
 struct GroupMembershipResponse
 {
     // A null capacity means that it is unknown if any further groups MAY be added.
-    const chip::app::DataModel::Nullable<uint8_t> kCapacityUnknown;
+    const DataModel::Nullable<uint8_t> kCapacityUnknown;
 
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
-    GroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data, chip::EndpointId endpoint,
+    GroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data, EndpointId endpoint,
                             GroupDataProvider::EndpointIterator * iter) :
         mCommandData(data),
         mEndpoint(endpoint), mIterator(iter)
     {}
 
     const Commands::GetGroupMembership::DecodableType & mCommandData;
-    chip::EndpointId mEndpoint                      = kInvalidEndpointId;
+    EndpointId mEndpoint                            = kInvalidEndpointId;
     GroupDataProvider::EndpointIterator * mIterator = nullptr;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
@@ -214,8 +121,8 @@ struct GroupMembershipResponse
 
         ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
 
-        ReturnErrorOnFailure(app::DataModel::Encode(
-            writer, TLV::ContextTag(Commands::GetGroupMembershipResponse::Fields::kCapacity), kCapacityUnknown));
+        ReturnErrorOnFailure(
+            DataModel::Encode(writer, TLV::ContextTag(Commands::GetGroupMembershipResponse::Fields::kCapacity), kCapacityUnknown));
         {
             TLV::TLVType type;
             ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(Commands::GetGroupMembershipResponse::Fields::kGroupList),
@@ -225,35 +132,30 @@ struct GroupMembershipResponse
                 size_t requestedCount = 0;
                 ReturnErrorOnFailure(mCommandData.groupList.ComputeSize(&requestedCount));
 
-                if (0 == requestedCount)
-                {
+                auto accept_group = [&](GroupId groupId) {
                     // 1.3.6.3.1. If the GroupList field is empty, the entity SHALL respond with all group identifiers of which the
                     // entity is a member.
-                    while (mIterator && mIterator->Next(mapping))
+                    VerifyOrReturnValue(0 != requestedCount, true);
+                    auto iter = mCommandData.groupList.begin();
+                    while (iter.Next())
                     {
-                        if (mapping.endpoint_id == mEndpoint)
-                        {
-                            ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
-                            ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
-                        }
+                        VerifyOrReturnValue(groupId != iter.GetValue(), true);
                     }
-                }
-                else
+                    return false;
+                };
+
+                while (mIterator && mIterator->Next(mapping))
                 {
-                    while (mIterator && mIterator->Next(mapping))
+                    if (mapping.endpoint_id != mEndpoint)
                     {
-                        auto iter = mCommandData.groupList.begin();
-                        while (iter.Next())
-                        {
-                            if (mapping.endpoint_id == mEndpoint && mapping.group_id == iter.GetValue())
-                            {
-                                ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
-                                ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
-                                break;
-                            }
-                        }
-                        ReturnErrorOnFailure(iter.GetStatus());
+                        continue;
                     }
+                    if (!accept_group(mapping.group_id))
+                    {
+                        continue;
+                    }
+                    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
+                    ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
                 }
                 ChipLogDetail(Zcl, "]");
             }
@@ -264,126 +166,232 @@ struct GroupMembershipResponse
     }
 };
 
-bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::GetGroupMembership::DecodableType & commandData)
+} // namespace
+
+CHIP_ERROR GroupsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    MATTER_TRACE_SCOPE("GetGroupMembership", "Groups");
-    auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto * provider  = GetGroupDataProvider();
-    Status status    = Status::Failure;
-
-    VerifyOrExit(nullptr != provider, status = Status::Failure);
-
-    {
-        GroupDataProvider::EndpointIterator * iter = nullptr;
-
-        iter = provider->IterateEndpoints(fabricIndex);
-        VerifyOrExit(nullptr != iter, status = Status::Failure);
-
-        commandObj->AddResponse(commandPath, GroupMembershipResponse(commandData, commandPath.mEndpointId, iter));
-        iter->Release();
-        status = Status::Success;
-    }
-
-exit:
-    if (Status::Success != status)
-    {
-        ChipLogDetail(Zcl, "GroupsCluster: GetGroupMembership failed: failed: 0x%x", to_underlying(status));
-        commandObj->AddStatus(commandPath, status);
-    }
-    return true;
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Attributes::kMandatoryMetadata, {});
 }
 
-bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             const Commands::RemoveGroup::DecodableType & commandData)
+CHIP_ERROR GroupsCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    MATTER_TRACE_SCOPE("RemoveGroup", "Groups");
-    auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    Groups::Commands::RemoveGroupResponse::Type response;
+    using namespace Commands;
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    // If a group is removed the scenes associated with that group SHOULD be removed.
-    ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
-#endif
-    response.groupID = commandData.groupID;
-    response.status  = to_underlying(GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID));
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+        AddGroup::kMetadataEntry,              //
+        ViewGroup::kMetadataEntry,             //
+        GetGroupMembership::kMetadataEntry,    //
+        RemoveGroup::kMetadataEntry,           //
+        RemoveAllGroups::kMetadataEntry,       //
+        AddGroupIfIdentifying::kMetadataEntry, //
+    };
 
-    commandObj->AddResponse(commandPath, response);
-    return true;
+    return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 const Commands::RemoveAllGroups::DecodableType & commandData)
+CHIP_ERROR GroupsCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    MATTER_TRACE_SCOPE("RemoveAllGroups", "Groups");
-    auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto * provider  = GetGroupDataProvider();
-    Status status    = Status::Failure;
+    using namespace Commands;
 
-    VerifyOrExit(nullptr != provider, status = Status::Failure);
+    static constexpr CommandId kGeneratedCommands[] = {
+        AddGroupResponse::Id,           //
+        ViewGroupResponse::Id,          //
+        GetGroupMembershipResponse::Id, //
+        RemoveGroupResponse::Id,        //
+    };
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+    return builder.ReferenceExisting(kGeneratedCommands);
+}
+
+DataModel::ActionReturnStatus GroupsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                           AttributeValueEncoder & encoder)
+{
+    using namespace Attributes;
+
+    switch (request.path.mAttributeId)
     {
-        GroupDataProvider::EndpointIterator * iter = provider->IterateEndpoints(fabricIndex);
-        GroupDataProvider::GroupEndpoint mapping;
+    case ClusterRevision::Id:
+        return encoder.Encode(kRevision);
+    case FeatureMap::Id:
+        // Group names is hardcoded (feature is M conformance in the spec)
+        return encoder.Encode(Feature::kGroupNames);
+    case NameSupport::Id:
+        // According to the spec, kGroupNames must be set (M conformance in the spec)
+        return encoder.Encode(NameSupportBitmap::kGroupNames);
+    default:
+        return Status::UnsupportedAttribute;
+    }
+}
 
-        VerifyOrExit(nullptr != iter, status = Status::Failure);
-        while (iter->Next(mapping))
-        {
-            if (commandPath.mEndpointId == mapping.endpoint_id)
+std::optional<DataModel::ActionReturnStatus>
+GroupsCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler)
+{
+    using namespace Commands;
+
+    const FabricIndex fabricIndex = request.GetAccessingFabricIndex();
+
+    switch (request.path.mCommandId)
+    {
+    case AddGroup::Id: {
+        MATTER_TRACE_SCOPE("AddGroup", "Groups");
+        AddGroup::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabricIndex));
+
+        Groups::Commands::AddGroupResponse::Type response;
+        response.groupID = request_data.groupID;
+        response.status  = to_underlying(AddGroup(request_data.groupID, request_data.groupName, fabricIndex));
+        handler->AddResponse(request.path, response);
+
+        return std::nullopt;
+    }
+    case ViewGroup::Id: {
+        MATTER_TRACE_SCOPE("ViewGroup", "Groups");
+        ViewGroup::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabricIndex));
+
+        const GroupId groupId = request_data.groupID;
+
+        Credentials::GroupDataProvider::GroupInfo info;
+        const Status status = [&]() {
+            VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
+            VerifyOrReturnError(mGroupDataProvider.HasEndpoint(fabricIndex, groupId, mPath.mEndpointId), Status::NotFound);
+
+            if (mGroupDataProvider.GetGroupInfo(fabricIndex, groupId, info) != CHIP_NO_ERROR)
             {
-                ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, mapping.endpoint_id, mapping.group_id);
+                return Status::NotFound;
             }
+
+            return Status::Success;
+        }();
+
+        if (status != Status::Success)
+        {
+            info.name[0] = 0;
         }
+
+        handler->AddResponse(request.path,
+                             ViewGroupResponse::Type{
+                                 .status    = to_underlying(status),
+                                 .groupID   = request_data.groupID,
+                                 .groupName = CharSpan(info.name, strnlen(info.name, GroupDataProvider::GroupInfo::kGroupNameMax)),
+                             });
+        return std::nullopt;
+    }
+    case GetGroupMembership::Id: {
+        MATTER_TRACE_SCOPE("GetGroupMembership", "Groups");
+        GetGroupMembership::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabricIndex));
+
+        GroupDataProvider::EndpointIterator * iter = mGroupDataProvider.IterateEndpoints(fabricIndex);
+        VerifyOrReturnError(nullptr != iter, Status::Failure);
+
+        handler->AddResponse(request.path, GroupMembershipResponse(request_data, mPath.mEndpointId, iter));
         iter->Release();
-        ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId,
-                                                                      ScenesManagement::ScenesServer::kGlobalSceneGroupId);
+        return std::nullopt;
     }
-#endif
+    case RemoveGroup::Id: {
+        MATTER_TRACE_SCOPE("RemoveGroup", "Groups");
+        RemoveGroup::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabricIndex));
 
-    LogErrorOnFailure(provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId));
-    status = Status::Success;
-    MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id);
-exit:
-    commandObj->AddStatus(commandPath, status);
-    if (Status::Success != status)
-    {
-        ChipLogDetail(Zcl, "GroupsCluster: RemoveAllGroups failed: 0x%x", to_underlying(status));
+        const GroupId groupId = request_data.groupID;
+
+        handler->AddResponse(
+            request.path,
+            Groups::Commands::RemoveGroupResponse::Type{
+                .status  = to_underlying([&]() {
+                    VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
+                    VerifyOrReturnError(mGroupDataProvider.HasEndpoint(fabricIndex, groupId, mPath.mEndpointId), Status::NotFound);
+
+                    if (CHIP_ERROR err = mGroupDataProvider.RemoveEndpoint(fabricIndex, groupId, mPath.mEndpointId);
+                        err != CHIP_NO_ERROR)
+                    {
+                        ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT,
+                                       mPath.mEndpointId, groupId, err.Format());
+                        return Status::NotFound;
+                    }
+
+                    if (mScenesIntegration != nullptr)
+                    {
+                        // If a group is removed the scenes associated with that group SHOULD be removed.
+                        LogIfFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, groupId));
+                    }
+
+                    NotifyGroupTableChanged(mContext);
+                    return Status::Success;
+                }()),
+                .groupID = request_data.groupID,
+            });
+        return std::nullopt;
     }
-    return true;
+    case RemoveAllGroups::Id: {
+        MATTER_TRACE_SCOPE("RemoveAllGroups", "Groups");
+
+        if (mScenesIntegration != nullptr)
+        {
+            GroupDataProvider::EndpointIterator * iter = mGroupDataProvider.IterateEndpoints(fabricIndex);
+            GroupDataProvider::GroupEndpoint mapping;
+
+            VerifyOrReturnError(nullptr != iter, Status::Failure);
+            while (iter->Next(mapping))
+            {
+                if (mPath.mEndpointId == mapping.endpoint_id)
+                {
+                    LogIfFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, mapping.group_id));
+                }
+            }
+            iter->Release();
+            LogIfFailure(mScenesIntegration->GroupWillBeRemoved(fabricIndex, scenes::kGlobalSceneGroupId));
+        }
+
+        LogIfFailure(mGroupDataProvider.RemoveEndpoint(fabricIndex, mPath.mEndpointId));
+        NotifyGroupTableChanged(mContext);
+        return Status::Success;
+    }
+    case AddGroupIfIdentifying::Id: {
+        MATTER_TRACE_SCOPE("AddGroupIfIdentifying", "Groups");
+        AddGroupIfIdentifying::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments, fabricIndex));
+
+        // skip with success if we are not identifying
+        VerifyOrReturnValue((mIdentifyIntegration != nullptr) && mIdentifyIntegration->IsIdentifying(), Status::Success);
+
+        // AddGroupIfIdentifying is response `Y` in the spec: we return the status (not a structure, as opposed to AddGroup)
+        return AddGroup(request_data.groupID, request_data.groupName, fabricIndex);
+    }
+    default:
+        return Status::UnsupportedCommand;
+    }
 }
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::AddGroupIfIdentifying::DecodableType & commandData)
+Status GroupsCluster::AddGroup(GroupId groupID, CharSpan groupName, FabricIndex fabricIndex)
 {
-    MATTER_TRACE_SCOPE("AddGroupIfIdentifying", "Groups");
-    auto fabricIndex = commandObj->GetAccessingFabricIndex();
-    auto groupId     = commandData.groupID;
-    auto groupName   = commandData.groupName;
-    auto endpointId  = commandPath.mEndpointId;
+    VerifyOrReturnError(IsValidGroupId(groupID), Status::ConstraintError);
+    VerifyOrReturnError(groupName.size() <= GroupDataProvider::GroupInfo::kGroupNameMax, Status::ConstraintError);
 
-    Status status;
-    if (!emberAfIsDeviceIdentifying(endpointId))
+    VerifyOrReturnError(KeyExists(mGroupDataProvider, fabricIndex, groupID), Status::UnsupportedAccess);
+
+    // Add a new entry to the GroupTable
+    if (CHIP_ERROR err = mGroupDataProvider.SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupID, groupName));
+        err != CHIP_NO_ERROR)
     {
-        // If not identifying, ignore add group -> success; not a failure.
-        status = Status::Success;
-    }
-    else
-    {
-        status = GroupAdd(fabricIndex, endpointId, groupId, groupName);
+        ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, mPath.mEndpointId, groupID,
+                      err.Format());
+        return Status::ResourceExhausted;
     }
 
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    if (CHIP_ERROR err = mGroupDataProvider.AddEndpoint(fabricIndex, groupID, mPath.mEndpointId); err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, mPath.mEndpointId, groupID,
+                      err.Format());
+        // best-effort undo the mapping we added above, to try to be a bit more atomic.
+        LogIfFailure(mGroupDataProvider.RemoveGroupInfo(fabricIndex, groupID));
+        return Status::ResourceExhausted;
+    }
+    NotifyGroupTableChanged(mContext);
+    return Status::Success;
 }
 
-bool emberAfGroupsClusterEndpointInGroupCallback(chip::FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
-{
-    return GroupExists(fabricIndex, endpointId, groupId);
-}
-
-void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}
-
-void MatterGroupsPluginServerInitCallback() {}
-void MatterGroupsPluginServerShutdownCallback() {}
+} // namespace chip::app::Clusters

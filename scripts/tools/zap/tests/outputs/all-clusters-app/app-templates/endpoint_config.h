@@ -2921,9 +2921,6 @@
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
-        (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
-    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
         (EmberAfGenericClusterFunction) MatterOnOffClusterServerShutdownCallback,                                                  \
@@ -3500,8 +3497,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 3, \
       .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 7 ), \
       .eventList = nullptr, \
@@ -3877,8 +3874,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(254), \
       .attributeCount = 3, \
       .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 92 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 99 ), \
       .eventList = nullptr, \
@@ -4826,8 +4823,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(978), \
       .attributeCount = 3, \
       .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupsServer, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 327 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 334 ), \
       .eventList = nullptr, \

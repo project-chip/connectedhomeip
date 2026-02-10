@@ -14,6 +14,10 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+source_set("delegates") {
+  sources = [ "IdentifyIntegrationDelegate.h" ]
+}
+
 source_set("identify-server") {
   sources = [
     "IdentifyCluster.cpp",
@@ -21,6 +25,7 @@ source_set("identify-server") {
   ]
 
   public_deps = [
+    ":delegates",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
