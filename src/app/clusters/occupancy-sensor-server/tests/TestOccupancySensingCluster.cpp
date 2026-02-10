@@ -82,7 +82,7 @@ TEST_F(TestOccupancySensingCluster, TestFeatureMapHasOccupancyEvent)
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
     chip::Testing::ClusterTester tester(cluster);
 
-    BitMask<OccupancySensing::Feature> featureMap;
+    BitFlags<OccupancySensing::Feature> featureMap;
     EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
     EXPECT_TRUE(featureMap.Has(Feature::kOccupancyEvent));
@@ -113,7 +113,7 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-        BitMask<OccupancySensing::Feature> expectedFeatures(featureMapPir);
+        BitFlags<OccupancySensing::Feature> expectedFeatures(featureMapPir);
         expectedFeatures.Set(Feature::kOccupancyEvent);
 
         EXPECT_EQ(featureMap, expectedFeatures.Raw());
@@ -128,7 +128,7 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
         chip::Testing::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
 
-        BitMask<OccupancySensing::Feature> expectedFeatures(featureMapUltrasonic);
+        BitFlags<OccupancySensing::Feature> expectedFeatures(featureMapUltrasonic);
         expectedFeatures.Set(Feature::kOccupancyEvent);
 
         EXPECT_EQ(featureMap, expectedFeatures.Raw());
@@ -690,7 +690,7 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEventAlwaysGenerated)
     // Event SHOULD be generated even if we try to disable kOccupancyEvent.
     // We explicitly set features to empty, but the cluster should force it on.
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
-        BitMask<OccupancySensing::Feature>()) };
+        BitFlags<OccupancySensing::Feature>()) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     OccupancySensing::Events::OccupancyChanged::DecodableType decodedEvent;
