@@ -25,6 +25,10 @@ not_automated:
       reason:
           AVSM flaky test in CI.
           https://github.com/project-chip/connectedhomeip/issues/42871
+    - name: TC_AVSM_2_21.py
+      reason:
+          AVSM flaky test in CI.
+          https://github.com/project-chip/connectedhomeip/issues/42871
     - name: TC_BRBINFO_3_1.py
       reason:
           Attribute is not implemented in the bridge app. Same code as
