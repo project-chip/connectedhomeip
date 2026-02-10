@@ -79,7 +79,11 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
-                                      InteractionModelEngine::GetInstance());
+                                      GeneralDiagnosticsCluster::Context{
+                                          .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,
+                                          .diagnosticDataProvider   = mContext.diagnosticDataProvider,
+                                          .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
+                                      });
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
     mGroupKeyManagementCluster.Create(GroupKeyManagementCluster::Context{
@@ -88,7 +92,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     });
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
-    mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet{});
+    mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsServerCluster::OptionalAttributeSet{},
+                                             mContext.diagnosticDataProvider);
     ReturnErrorOnFailure(provider.AddCluster(mSoftwareDiagnosticsServerCluster.Registration()));
 
     mAccessControlCluster.Create(AccessControlCluster::Context{

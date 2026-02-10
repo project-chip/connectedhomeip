@@ -99,17 +99,16 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
                 rawPts = 0;
             }
         }
-        auto firstPtsIt = self->mVideoStreamFirstPts.find(videoStreamID);
-        auto now        = std::chrono::steady_clock::now().time_since_epoch();
-        if (firstPtsIt == self->mVideoStreamFirstPts.end())
+        auto firstPtsIt = self->mVideoStreamPtsOffsetMs.find(videoStreamID);
+        if (firstPtsIt == self->mVideoStreamPtsOffsetMs.end())
         {
-
-            int64_t nowMs                             = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-            int64_t rawMs                             = static_cast<int64_t>(rawPts / 1000000);
-            self->mVideoStreamFirstPts[videoStreamID] = nowMs - rawMs;
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mVideoStreamPtsOffsetMs[videoStreamID] = nowMs - rawMs;
         }
-        int64_t ts = self->mVideoStreamFirstPts[videoStreamID] + (rawPts / 1000000);
-        if (ts >= self->mVideoStreamFirstPts[videoStreamID])
+        int64_t ts = self->mVideoStreamPtsOffsetMs[videoStreamID] + (rawPts / 1000000);
+        if (ts >= self->mVideoStreamPtsOffsetMs[videoStreamID])
         {
 
             // Forward raw H.264 encoded frames to media controller with timestamp
@@ -121,7 +120,7 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
         {
             ChipLogError(Camera,
                          "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                         rawPts, self->mVideoStreamFirstPts[videoStreamID], videoStreamID);
+                         rawPts, self->mVideoStreamPtsOffsetMs[videoStreamID], videoStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
@@ -172,16 +171,16 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
                 rawPts = 0;
             }
         }
-        auto firstPtsIt = self->mAudioStreamFirstPts.find(audioStreamID);
-        if (firstPtsIt == self->mAudioStreamFirstPts.end())
+        auto firstPtsIt = self->mAudioStreamPtsOffsetMs.find(audioStreamID);
+        if (firstPtsIt == self->mAudioStreamPtsOffsetMs.end())
         {
-            auto now                                  = std::chrono::steady_clock::now().time_since_epoch();
-            int64_t nowMs                             = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-            int64_t rawMs                             = static_cast<int64_t>(rawPts / 1000000);
-            self->mAudioStreamFirstPts[audioStreamID] = nowMs - rawMs;
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mAudioStreamPtsOffsetMs[audioStreamID] = nowMs - rawMs;
         }
-        int64_t ts = self->mAudioStreamFirstPts[audioStreamID] + (rawPts / 1000000);
-        if (ts >= self->mAudioStreamFirstPts[audioStreamID])
+        int64_t ts = self->mAudioStreamPtsOffsetMs[audioStreamID] + (rawPts / 1000000);
+        if (ts >= self->mAudioStreamPtsOffsetMs[audioStreamID])
         {
             // Forward raw Opus encoded frames to media controller with timestamp
             // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
@@ -192,7 +191,7 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         {
             ChipLogError(Camera,
                          "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                         rawPts, self->mAudioStreamFirstPts[audioStreamID], audioStreamID);
+                         rawPts, self->mAudioStreamPtsOffsetMs[audioStreamID], audioStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
@@ -997,7 +996,7 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
             return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
         }
     }
-    mVideoStreamFirstPts.erase(streamID);
+    mVideoStreamPtsOffsetMs.erase(streamID);
 
     return CameraError::SUCCESS;
 }
@@ -1115,7 +1114,7 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
         }
     }
 
-    mAudioStreamFirstPts.erase(streamID);
+    mAudioStreamPtsOffsetMs.erase(streamID);
 
     return CameraError::SUCCESS;
 }

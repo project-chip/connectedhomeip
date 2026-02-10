@@ -14,14 +14,13 @@
     <div class="left-bar">
         <h2>Streams</h2>
 
-
         <ul>
             {% for stream in streams %}
-            <li> Stream {{stream['id']}}
+            <li> Stream {{stream.id}}
                 <ul>
-                    {% for file in stream['files'] %}
-                    <li><a href="/ui/streams/{{stream['id']}}/{{file}}">{{file}}</a></li>
-                    {% endfor %}
+                    <li>Error{% if stream.error_uploads|length > 1 %}s{% endif %}: {{stream.error_uploads|length}}</li>
+                    <li>Session{% if stream.sessions|length > 1 %}s{% endif %}: {{stream.sessions|length}}</li>
+                    <li><a href="/ui/streams/{{stream.id}}">Open details</a></li>
                 </ul>
             </li>
             {% endfor %}

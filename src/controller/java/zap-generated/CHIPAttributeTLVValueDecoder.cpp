@@ -33999,6 +33999,81 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::PredictedOccupancy::Id: {
+            using TypeInfo = Attributes::PredictedOccupancy::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_startTimestamp;
+                std::string newElement_0_startTimestampClassName     = "java/lang/Long";
+                std::string newElement_0_startTimestampCtorSignature = "(J)V";
+                jlong jninewElement_0_startTimestamp                 = static_cast<jlong>(entry_0.startTimestamp);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0_startTimestampClassName.c_str(), newElement_0_startTimestampCtorSignature.c_str(),
+                    jninewElement_0_startTimestamp, newElement_0_startTimestamp);
+                jobject newElement_0_endTimestamp;
+                std::string newElement_0_endTimestampClassName     = "java/lang/Long";
+                std::string newElement_0_endTimestampCtorSignature = "(J)V";
+                jlong jninewElement_0_endTimestamp                 = static_cast<jlong>(entry_0.endTimestamp);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0_endTimestampClassName.c_str(), newElement_0_endTimestampCtorSignature.c_str(),
+                    jninewElement_0_endTimestamp, newElement_0_endTimestamp);
+                jobject newElement_0_occupancy;
+                std::string newElement_0_occupancyClassName     = "java/lang/Integer";
+                std::string newElement_0_occupancyCtorSignature = "(I)V";
+                jint jninewElement_0_occupancy                  = static_cast<jint>(entry_0.occupancy.Raw());
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_occupancyClassName.c_str(), newElement_0_occupancyCtorSignature.c_str(), jninewElement_0_occupancy,
+                    newElement_0_occupancy);
+                jobject newElement_0_confidence;
+                std::string newElement_0_confidenceClassName     = "java/lang/Integer";
+                std::string newElement_0_confidenceCtorSignature = "(I)V";
+                jint jninewElement_0_confidence                  = static_cast<jint>(entry_0.confidence);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_confidenceClassName.c_str(), newElement_0_confidenceCtorSignature.c_str(),
+                    jninewElement_0_confidence, newElement_0_confidence);
+
+                {
+                    jclass predictedOccupancyStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$OccupancySensingClusterPredictedOccupancyStruct",
+                        predictedOccupancyStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$OccupancySensingClusterPredictedOccupancyStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID predictedOccupancyStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, predictedOccupancyStructStructClass_1, "<init>",
+                        "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                        &predictedOccupancyStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || predictedOccupancyStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$OccupancySensingClusterPredictedOccupancyStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 = env->NewObject(predictedOccupancyStructStructClass_1, predictedOccupancyStructStructCtor_1,
+                                                  newElement_0_startTimestamp, newElement_0_endTimestamp, newElement_0_occupancy,
+                                                  newElement_0_confidence);
+                }
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
         case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
             using TypeInfo = Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo;
             TypeInfo::DecodableType cppValue;
