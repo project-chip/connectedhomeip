@@ -258,6 +258,8 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
+        _certAuthorityManagerA.Shutdown()
+        _fabric_a_persistent_storage.Shutdown()
 
 
 if __name__ == "__main__":
