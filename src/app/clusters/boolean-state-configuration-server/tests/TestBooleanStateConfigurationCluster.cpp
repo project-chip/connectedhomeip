@@ -241,7 +241,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestFeatureMap)
         BooleanStateConfigurationCluster cluster(kTestEndpointId, {}, {}, DefaultConfig());
         ClusterTester tester(cluster);
 
-        uint32_t features;
+        uint32_t features = 0;
         EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, features),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(features, to_underlying(Feature::kFaultEvents));
@@ -251,7 +251,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestFeatureMap)
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {}, DefaultConfig());
         ClusterTester tester(cluster);
-        uint32_t features;
+        uint32_t features = 0;
         EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, features),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(features, to_underlying(Feature::kVisual) | to_underlying(Feature::kFaultEvents));
