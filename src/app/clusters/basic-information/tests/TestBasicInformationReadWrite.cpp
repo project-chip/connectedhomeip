@@ -59,7 +59,7 @@ static constexpr uint8_t kManufacturingDay           = 15;
 static constexpr ProductFinishEnum kProductFinish    = ProductFinishEnum::kMatte;
 static constexpr ColorEnum kProductPrimaryColor      = ColorEnum::kBlack;
 
-static constexpr chip::FabricIndex kTestFabricIndex = static_cast<chip::FabricIndex>(123);
+// static constexpr chip::FabricIndex kTestFabricIndex = static_cast<chip::FabricIndex>(123);
 
 // Helper function to safely copy strings and check for buffer size
 CHIP_ERROR SafeCopyString(char * buf, size_t bufSize, const char * source)
@@ -619,7 +619,8 @@ TEST_F(TestBasicInformationReadWrite, TestStartUpEvent)
 
     // ACT: Simulate a server start via PlatformManager.
     // This triggers the OnStartUp() method in the cluster.
-    chip::DeviceLayer::PlatformMgr().HandleServerStarted();
+    // chip::DeviceLayer::PlatformMgr().HandleServerStarted();
+    cluster.OnStartUp(kTestSoftwareVersion);
     // ASSERT: Verify the event was generated
     auto event = testContext.EventsGenerator().GetNextEvent();
     ASSERT_TRUE(event.has_value());
@@ -652,7 +653,8 @@ TEST_F(TestBasicInformationReadWrite, ShutDownEventTest)
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 2. ACT: Trigger the server shutdown sequence via PlatformManager
-    chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
+    // chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
+    cluster.OnShutDown();
 
     // 3. ASSERT: Verify the event was generated
     auto event = testContext.EventsGenerator().GetNextEvent();
