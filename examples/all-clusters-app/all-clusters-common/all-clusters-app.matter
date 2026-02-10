@@ -3415,11 +3415,10 @@ cluster RvcRunMode = 84 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
