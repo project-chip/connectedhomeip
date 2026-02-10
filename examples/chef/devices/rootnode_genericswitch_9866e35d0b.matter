@@ -1948,13 +1948,13 @@ endpoint 1 {
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition default = 0;
+    callback attribute currentPosition;
     ram      attribute multiPressMax default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 30;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 }
 endpoint 2 {
@@ -1990,12 +1990,12 @@ endpoint 2 {
   server cluster Switch {
     emits event InitialPress;
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition default = 0;
+    callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 }
 
