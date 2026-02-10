@@ -21,15 +21,12 @@ Handles linux-specific functionality for running test cases
 from __future__ import annotations
 
 import asyncio
-import logging
 import threading
 from typing import Union
 
 import sdbus
 
 from .namespace import IsolatedNetworkNamespace
-
-log = logging.getLogger(__name__)
 
 DbusAnyT = Union[bool, int, float, str, bytes, list["DbusAnyT"], tuple["DbusAnyT", ...], dict[str, "DbusAnyT"], "DictVariantT"]
 DictVariantT = dict[str, tuple[str, DbusAnyT]]
