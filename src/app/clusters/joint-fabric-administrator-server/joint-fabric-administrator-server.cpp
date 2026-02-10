@@ -22,6 +22,7 @@
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -274,12 +275,14 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an ICACCSRRequest command");
 
     auto nonDefaultStatus           = Status::Success;
+    Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
     auto & failSafeContext          = Server::GetInstance().GetFailSafeContext();
     auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
 
     uint8_t buf[Credentials::kMaxDERCertLength];
     MutableByteSpan icacCsr(buf, Credentials::kMaxDERCertLength);
     Commands::ICACCSRResponse::Type response;
+    DataModel::Nullable<FabricIndex> administratorFabricIndex;
 
     // command must be invoked over CASE
     VerifyOrExit(ctx.mCommandHandler.GetSubjectDescriptor().authMode == Access::AuthMode::kCase,
@@ -291,6 +294,12 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     /* TODO spec.: If the <<ref_FabricTableVendorIdVerificationProcedure, FabricFabric Table Vendor ID Verification Procedure>>
      * has not been executed against the initiator of this command, the command SHALL fail
      * with a <<ref_JFVidNotVerified, JfVidNotVerified>> status code SHALL be sent back to the initiator.*/
+    VerifyOrExit(jointFabricAdministrator.WasVidVerificationExecutedForFabric(ctx.mCommandHandler.GetAccessingFabricIndex()),
+                 status.Emplace(StatusCodeEnum::kVIDNotVerified));
+    VerifyOrExit(Attributes::AdministratorFabricIndex::Get(ctx.mRequestPath.mEndpointId, administratorFabricIndex) ==
+                     Status::Success,
+                 nonDefaultStatus = Status::Failure);
+    VerifyOrExit(!administratorFabricIndex.IsNull(), status.Emplace(StatusCodeEnum::kInvalidAdministratorFabricIndex));
 
     VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
@@ -301,7 +310,12 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 
 exit:
-    if (nonDefaultStatus != Status::Success)
+    if (status.HasValue())
+    {
+        TEMPORARY_RETURN_IGNORED ctx.mCommandHandler.AddClusterSpecificFailure(ctx.mRequestPath,
+                                                                               to_underlying(status.Value()));
+    }
+    else if (nonDefaultStatus != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
     }
