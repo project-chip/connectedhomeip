@@ -51,8 +51,8 @@ from TC_SUTestBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # Create a logger

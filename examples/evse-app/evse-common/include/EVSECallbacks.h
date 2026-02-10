@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <clusters/EnergyEvse/Enums.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {

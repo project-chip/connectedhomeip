@@ -343,6 +343,9 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     EnergyEvseDelegate * dg = mn->GetEvseDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
+    Instance * instance = dg->GetInstance();
+    VerifyOrReturnError(instance != nullptr, CHIP_ERROR_UNINITIALIZED);
+
     BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap = 0;
     ReturnErrorOnFailure(GetLocalDayOfWeekNow(dayOfWeekMap));
 
@@ -413,10 +416,10 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
     }
 
     // Update the attributes to allow a UI to inform the user
-    TEMPORARY_RETURN_IGNORED dg->SetNextChargeStartTime(startTime_epoch_s);
-    TEMPORARY_RETURN_IGNORED dg->SetNextChargeTargetTime(targetTime_epoch_s);
-    TEMPORARY_RETURN_IGNORED dg->SetNextChargeRequiredEnergy(targetAddedEnergy_mWh);
-    TEMPORARY_RETURN_IGNORED dg->SetNextChargeTargetSoC(targetSoC);
+    TEMPORARY_RETURN_IGNORED instance->SetNextChargeStartTime(startTime_epoch_s);
+    TEMPORARY_RETURN_IGNORED instance->SetNextChargeTargetTime(targetTime_epoch_s);
+    TEMPORARY_RETURN_IGNORED instance->SetNextChargeRequiredEnergy(targetAddedEnergy_mWh);
+    TEMPORARY_RETURN_IGNORED instance->SetNextChargeTargetSoC(targetSoC);
 
     return err;
 }

@@ -38,7 +38,8 @@ import logging
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
+from TC_GCAST_common import (generate_membership_empty_matcher, generate_membership_entry_matcher, get_feature_map,
+                             valid_endpoints_list)
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
@@ -52,20 +53,29 @@ logger = logging.getLogger(__name__)
 
 class TC_GCAST_2_4(MatterBaseTest):
     def desc_TC_GCAST_2_4(self):
-        return "[TC-GCAST-2.4] ExpireGracePeriod command effect with DUT as Server - PROVISIONAL"
+        return "[TC-GCAST-2.4] LeaveGroup partial & full removal with DUT as Server - PROVISIONAL"
 
     def steps_TC_GCAST_2_4(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
-            TestStep("1b", "TH removes any existing group and KeyID on the DUT"),
+            TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
-            TestStep("1d", "Join Group G1 generating a new Key with KeyID K1 using JoinGroup"),
-            TestStep("1e", "Use JoinGroup to Update Group G1 Key while providing a grace period to K1."),
-            TestStep(2, "TH awaits subscription report of new Membership within max interval."),
-            TestStep(3, "Expire K1 on Group G1 immediately: TH sends command ExpireGracePeriod (GroupID=G1)"),
-            TestStep(4, "TH awaits subscription report of new Membership within max interval."),
-            TestStep(5, "Attempt to expire a KeyId on Group G1 where there is no ExpiringKey: TH sends command ExpireGracePeriod (GroupID=G1)"),
-            TestStep(6, "Attempt to expire a KeyId for non-existent GroupID: TH sends command ExpireGracePeriod (GroupID=G_Unknown)")
+            TestStep("1d", "Join Group G1 generating new KeySetID K1 with Key InputKey1 using JoinGroup"),
+            TestStep("1e", "Join Group G2 with existing KeySetID K1 using JoinGroup"),
+            TestStep("2a", "Completely Leave Group G2 by omitting the endpoint list parameters. LeaveGroup (GroupID=G2, Endpoints omitted)"),
+            TestStep("2b", "TH awaits subscription report of new Membership within max interval. (G2 entry removed)"),
+            TestStep(3, "If LN feature is not supported skip to step 5"),
+            TestStep("4a", "Join Group G3 with existing KeySetID K1 using JoinGroup"),
+            TestStep("4b", "If DUT only support one non-root and non-aggregator endpoint, skip to step 4e"),
+            TestStep("4c", "Remove EP2 from Group G3. LeaveGroup (GroupID=G3, Endpoints=[EP2])"),
+            TestStep(
+                "4d", "TH awaits subscription report of new Membership within max interval. (G3 entry with endpoints list [EP1])"),
+            TestStep("4e", "Remove EP1 from Group G3. LeaveGroup (GroupID=G3, Endpoints=[EP1])"),
+            TestStep("4f", "TH awaits subscription report of new Membership within max interval. (If SD supported: G3 entry with empty endpoints list, else G3 entry removed)"),
+            TestStep(5, "Attempt to Leave a non-existing group. LeaveGroup (GroupID=NonExisting)"),
+            TestStep(6, "Leave all groups. LeaveGroup with GroupID=0"),
+            TestStep(7, "TH awaits subscription report of new Membership within max interval. (Empty list)"),
+            TestStep(8, "Leave all groups without being part of any group on this fabric. LeaveGroup with GroupID=0"),
         ]
 
     def pics_TC_GCAST_2_4(self) -> list[str]:
@@ -75,12 +85,12 @@ class TC_GCAST_2_4(MatterBaseTest):
     async def test_TC_GCAST_2_4(self):
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
-        # membership_attribute = Clusters.Objects.Groupcast.Attributes.Membership ?
 
         self.step("1a")
-        ln_enabled, sd_enabled = await get_feature_map(self)
+        ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        endpoints_list = [endpoints_list[0]]
+        if len(endpoints_list) > 1:
+            endpoints_list = endpoints_list[:2]
 
         self.step("1b")
         await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
@@ -91,56 +101,110 @@ class TC_GCAST_2_4(MatterBaseTest):
 
         self.step("1d")
         groupID1 = 1
-        keyID1 = 1
+        keySetID1 = 1
         inputKey1 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
             endpoints=endpoints_list,
-            keyID=keyID1,
+            keySetID=keySetID1,
             key=inputKey1)
         )
 
         self.step("1e")
-        keyID2 = 2
-        gracePeriodSeconds = 5
-        inputKey2 = secrets.token_bytes(16)
+        groupID2 = 2
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID1,
+            groupID=groupID2,
             endpoints=endpoints_list,
-            keyID=keyID2,
-            gracePeriod=gracePeriodSeconds,
-            key=inputKey2)
+            keySetID=keySetID1)
         )
 
-        self.step(2)
-        membership_matcher = generate_membership_entry_matcher(groupID1, expiring_key_id=keyID1)
+        self.step("2a")
+        resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=groupID2))
+        asserts.assert_is_not_none(resp.endpoints, "LeaveGroupResponse endpoints should not be None")
+        asserts.assert_equal(resp.endpoints, endpoints_list,
+                             f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to the endpoints list provided in step 1e {endpoints_list}")
+
+        self.step("2b")
+        membership_matcher = generate_membership_entry_matcher(groupID2, test_for_exists=False)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(3)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.ExpireGracePeriod(groupID=groupID1))
+        if not ln_enabled:
+            self.mark_step_range_skipped("4a", "4f")
 
-        self.step(4)
+        self.step("4a")
+        groupID3 = 3
+        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+            groupID=groupID3,
+            endpoints=endpoints_list,
+            keySetID=keySetID1)
+        )
+
+        self.step("4b")
+        if len(endpoints_list) == 1:
+            self.mark_step_range_skipped("4c", "4d")
+
+        self.step("4c")
+        endpoint_2 = [endpoints_list[1]]
+        resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(
+            groupID=groupID3,
+            endpoints=endpoint_2)
+        )
+        asserts.assert_is_not_none(resp.endpoints, "LeaveGroupResponse endpoints should not be None")
+        asserts.assert_equal(resp.endpoints, endpoint_2,
+                             f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to {endpoint_2}")
+
+        self.step("4d")
         sub.reset()
-        membership_matcher = generate_membership_entry_matcher(groupID1, expiring_key_id_must_not_exist=True)
+        membership_matcher = generate_membership_entry_matcher(groupID3, endpoints=[endpoints_list[0]])
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
+        self.step("4e")
+        endpoint_1 = [endpoints_list[0]]
+        resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(
+            groupID=groupID3,
+            endpoints=endpoint_1)
+        )
+        asserts.assert_is_not_none(resp.endpoints, "LeaveGroupResponse endpoints should not be None")
+        asserts.assert_equal(resp.endpoints, endpoint_1,
+                             f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to {endpoint_1}")
+
+        self.step("4f")
+        if sd_enabled:
+            membership_matcher = generate_membership_entry_matcher(groupID3, endpoints=[])
+            sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+        else:
+            membership_matcher = generate_membership_entry_matcher(groupID3, test_for_exists=False)
+            sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+
         self.step(5)
+        groupIDUnknown = 100
         try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.ExpireGracePeriod(groupID=groupID1))
-            asserts.fail("ExpireGracePeriod command should have failed when there is no ExpiringKey, but it succeeded")
+            await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=groupIDUnknown))
+            asserts.fail("LeaveGroup command should have failed the groupID does not exist, but it succeeded")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure,
-                                 f"Send ExpireGracePeriod command error should be {Status.Failure} instead of {e.status}")
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
 
         self.step(6)
-        groupIDUnknown = 2
+        resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        asserts.assert_is_not_none(resp.endpoints, "LeaveGroupResponse endpoints should not be None")
+        asserts.assert_equal(resp.endpoints, [],
+                             f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to an empty list")
+
+        self.step(7)
+        sub.reset()
+        membership_matcher = generate_membership_empty_matcher()
+        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+
+        self.step(8)
         try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.ExpireGracePeriod(groupID=groupIDUnknown))
-            asserts.fail("ExpireGracePeriod command should have failed for a non-existent groupID, but it succeeded")
+            await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+            asserts.fail("LeaveGroup command should have failed, but it succeeded")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidCommand,
-                                 f"Send ExpireGracePeriod command error should be {Status.InvalidCommand} instead of {e.status}")
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
 
 
 if __name__ == "__main__":
