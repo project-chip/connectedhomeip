@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/switch-server/CodegenIntegration.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
 #include <app/static-cluster-config/Switch.h>
