@@ -26,6 +26,7 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <credentials/FabricTable.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 using namespace chip;
@@ -304,8 +305,9 @@ struct TestTLSClientManagementCluster : public ::testing::Test
 
     MockTLSClientManagementDelegate mMockDelegate;
     MockCertificateTable mMockCertTable;
+    FabricTable mFabricTable;
 
-    TLSClientManagementCluster mCluster{ kTestEndpointId, mMockDelegate, mMockCertTable, kMaxProvisioned };
+    TLSClientManagementCluster mCluster{ { mFabricTable }, kTestEndpointId, mMockDelegate, mMockCertTable, kMaxProvisioned };
 
     ClusterTester mClusterTester{ mCluster };
 

@@ -53,7 +53,10 @@ class TC_GCAST_2_1(MatterBaseTest):
     def steps_TC_GCAST_2_1(self):
         return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                 TestStep(2, "TH reads from the DUT the Membership attribute"),
-                TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute")]
+                TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute"),
+                TestStep(4, "TH reads from the DUT the MaxMcastAddrCount attribute"),
+                TestStep(5, "TH reads from the DUT the UsedMcastAddrCount attribute"),
+                TestStep(6, "TH reads from the DUT the FabricUnderTest attribute")]
 
     def pics_TC_GCAST_2_1(self) -> list[str]:
         return ["GCAST.S"]
@@ -65,6 +68,9 @@ class TC_GCAST_2_1(MatterBaseTest):
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
         max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
+        max_mcast_addr_count_attribute = Clusters.Groupcast.Attributes.MaxMcastAddrCount
+        used_mcast_addr_count_attribute = Clusters.Groupcast.Attributes.UsedMcastAddrCount
+        fabric_under_test_attribute = Clusters.Groupcast.Attributes.FabricUnderTest
 
         self.step(1)
 
@@ -76,6 +82,19 @@ class TC_GCAST_2_1(MatterBaseTest):
         self.step(3)
         M_max = await self.read_single_attribute_check_success(groupcast_cluster, max_membership_count_attribute)
         asserts.assert_true(M_max >= 10, "MaxMembershipCount attribute should be >= 10")
+
+        self.step(4)
+        A_max = await self.read_single_attribute_check_success(groupcast_cluster, max_mcast_addr_count_attribute)
+        asserts.assert_true(A_max >= 1, "MaxMcastAddrCount attribute should be >= 1")
+
+        self.step(5)
+        usedMcastAddrCount = await self.read_single_attribute_check_success(groupcast_cluster, used_mcast_addr_count_attribute)
+        asserts.assert_true(usedMcastAddrCount <= A_max,
+                            f"UsedMcastAddrCount ({usedMcastAddrCount}) should be <= MaxMcastAddrCount ({A_max})")
+
+        self.step(6)
+        fabricUnderTest = await self.read_single_attribute_check_success(groupcast_cluster, fabric_under_test_attribute)
+        asserts.assert_equal(fabricUnderTest, 0, "FabricUnderTest attribute should be 0 (testing disabled by default)")
 
 
 if __name__ == "__main__":
