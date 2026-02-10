@@ -109,7 +109,7 @@ TEST_F(TestAutoRelease, TestMove)
 
         r3 = std::move(r2);
 
-        // relesable2 was released, since r3 took over releasable
+        // r3 now owns releasable, and releasable2 should have been released by the move-assignment.
         EXPECT_EQ(releasable.Counter(), 1);
         EXPECT_EQ(releasable2.Counter(), 0);
     }
