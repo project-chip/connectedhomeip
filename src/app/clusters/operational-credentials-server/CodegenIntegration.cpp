@@ -72,7 +72,7 @@ public:
 
 void MatterOperationalCredentialsClusterInitCallback(EndpointId endpointId)
 {
-    IntegrationDelegate integrationDelegate;
+    static IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
         {
