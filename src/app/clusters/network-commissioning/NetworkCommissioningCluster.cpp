@@ -127,6 +127,12 @@ private:
     T * mValue;
 };
 
+// avoid `-Wctad-maybe-unsupported` error
+struct AllowCTAD;
+
+// A dummy deduction guide, which is never slected because the struct is incomplete
+[[maybe_unused]] AutoRelease(AllowCTAD) -> AutoRelease<void>;
+
 /// Convenience macro to auto-create a variable for you to release the given name at
 /// the exit of the current scope.
 #define DEFER_AUTO_RELEASE(name) AutoRelease autoRelease##__COUNTER__(name)
