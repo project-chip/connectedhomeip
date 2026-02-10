@@ -73,10 +73,10 @@ struct ManagerInitParams
  * or watched cluster is changed).
  *
  */
-class Manager
+class Manager : chip::FabricTable::Delegate
 {
 public:
-    Manager() : mFabricTableDelegate(*this) {}
+    Manager() {}
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
@@ -179,30 +179,23 @@ private:
         Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     };
 
-    struct BindingFabricTableDelegate : public chip::FabricTable::Delegate
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
-        Manager & bindingManager;
-
-        BindingFabricTableDelegate(Manager & manager) : bindingManager(manager) {}
-
-        void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+        auto & bindingTable = GetBindingTable();
+        auto iter           = bindingTable.begin();
+        while (iter != bindingTable.end())
         {
-            auto & bindingTable = bindingManager.GetBindingTable();
-            auto iter           = bindingTable.begin();
-            while (iter != bindingTable.end())
+            if (iter->fabricIndex == fabricIndex)
             {
-                if (iter->fabricIndex == fabricIndex)
-                {
-                    TEMPORARY_RETURN_IGNORED bindingTable.RemoveAt(iter);
-                }
-                else
-                {
-                    ++iter;
-                }
+                TEMPORARY_RETURN_IGNORED bindingTable.RemoveAt(iter);
             }
-            bindingManager.FabricRemoved(fabricIndex);
+            else
+            {
+                ++iter;
+            }
         }
-    };
+        FabricRemoved(fabricIndex);
+    }
 
     static Manager sBindingManager;
 
@@ -212,7 +205,6 @@ private:
     PendingNotificationMap mPendingNotificationMap{ mBindingTable };
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     ManagerInitParams mInitParams;
-    BindingFabricTableDelegate mFabricTableDelegate;
 
     void HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ERROR error);
