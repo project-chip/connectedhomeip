@@ -200,7 +200,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         ChipLogError(AppServer, "Failed to get the DeviceInstanceInfoProvifer.");
         chipDie();
     }
-   
+
     static CodeDrivenDataModelDevices devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                   //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
