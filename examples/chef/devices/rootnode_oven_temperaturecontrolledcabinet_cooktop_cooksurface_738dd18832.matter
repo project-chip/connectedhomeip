@@ -1623,7 +1623,7 @@ cluster OvenCavityOperationalState = 72 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster OvenMode = 73 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1645,10 +1645,10 @@ cluster OvenMode = 73 {
     kConvectionRoast = 16390;
     kWarming = 16391;
     kProofing = 16392;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kSteam = 16393;
+    kAirFry = 16394;
+    kAirSousVide = 16395;
+    kFrozenFood = 16396;
   }
 
   shared struct ModeTagStruct {

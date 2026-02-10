@@ -33,6 +33,11 @@ chip_enable_software_diagnostics_trigger = true
 chip_enable_wifi_diagnostics_trigger = true
 chip_minmdns_high_verbosity = true
 
+_openthread_config_file =
+    rebase_path(
+        get_path_info("${chip_root}/third_party/openthread/openthread-config.h",
+                      "abspath"))
+openthread_config_file = "\"$_openthread_config_file\""
 openthread_config_ecdsa_enable = true
 openthread_config_ip6_slaac_enable = true
 openthread_config_full_logs = true

@@ -14288,6 +14288,10 @@ class BooleanState(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kChangeEvent = 0x1
+
     class Attributes:
         @dataclass
         class StateValue(ClusterAttributeDescriptor):
@@ -15473,15 +15477,15 @@ class OvenMode(Cluster):
             kConvectionRoast = 0x4006
             kWarming = 0x4007
             kProofing = 0x4008
+            kSteam = 0x4009
+            kAirFry = 0x400A
+            kAirSousVide = 0x400B
+            kFrozenFood = 0x400C
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 10
-
-    class Bitmaps:
-        class Feature(IntFlag):
-            kOnOff = 0x1
 
     class Structs:
         @dataclass
@@ -20621,6 +20625,9 @@ class Groupcast(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="membership", Tag=0x00000000, Type=typing.List[Groupcast.Structs.MembershipStruct]),
                 ClusterObjectFieldDescriptor(Label="maxMembershipCount", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="maxMcastAddrCount", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="usedMcastAddrCount", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="fabricUnderTest", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -20630,16 +20637,53 @@ class Groupcast(Cluster):
 
     membership: typing.List[Groupcast.Structs.MembershipStruct] = field(default_factory=lambda: [])
     maxMembershipCount: uint = 0
+    maxMcastAddrCount: uint = 0
+    usedMcastAddrCount: uint = 0
+    fabricUnderTest: uint = 0
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Enums:
+        class GroupcastTestResultEnum(MatterIntEnum):
+            kSuccess = 0x00
+            kGeneralError = 0x01
+            kMessageReplay = 0x02
+            kFailedAuth = 0x03
+            kNoAvailableKey = 0x04
+            kSendFailure = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 6
+
+        class GroupcastTestingEnum(MatterIntEnum):
+            kDisableTesting = 0x00
+            kEnableListenerTesting = 0x01
+            kEnableSenderTesting = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class MulticastAddrPolicyEnum(MatterIntEnum):
+            kIanaAddr = 0x00
+            kPerGroup = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
     class Bitmaps:
         class Feature(IntFlag):
             kListener = 0x1
             kSender = 0x2
+            kPerGroup = 0x4
 
     class Structs:
         @dataclass
@@ -20649,16 +20693,18 @@ class Groupcast(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(Label="endpoints", Tag=1, Type=typing.Optional[typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="keySetID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="hasAuxiliaryACL", Tag=3, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="hasAuxiliaryACL", Tag=3, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="mcastAddrPolicy", Tag=4, Type=Groupcast.Enums.MulticastAddrPolicyEnum),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             groupID: 'uint' = 0
-            endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
+            endpoints: 'typing.Optional[typing.List[uint]]' = None
             keySetID: 'uint' = 0
-            hasAuxiliaryACL: 'bool' = False
+            hasAuxiliaryACL: 'typing.Optional[bool]' = None
+            mcastAddrPolicy: 'Groupcast.Enums.MulticastAddrPolicyEnum' = 0
             fabricIndex: 'uint' = 0
 
     class Commands:
@@ -20679,6 +20725,7 @@ class Groupcast(Cluster):
                         ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="useAuxiliaryACL", Tag=4, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="replaceEndpoints", Tag=5, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="mcastAddrPolicy", Tag=6, Type=typing.Optional[Groupcast.Enums.MulticastAddrPolicyEnum]),
                     ])
 
             groupID: uint = 0
@@ -20687,6 +20734,7 @@ class Groupcast(Cluster):
             key: typing.Optional[bytes] = None
             useAuxiliaryACL: typing.Optional[bool] = None
             replaceEndpoints: typing.Optional[bool] = None
+            mcastAddrPolicy: typing.Optional[Groupcast.Enums.MulticastAddrPolicyEnum] = None
 
         @dataclass
         class LeaveGroup(ClusterCommand):
@@ -20762,6 +20810,24 @@ class Groupcast(Cluster):
             groupID: uint = 0
             useAuxiliaryACL: bool = False
 
+        @dataclass
+        class GroupcastTesting(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000065
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="testOperation", Tag=0, Type=Groupcast.Enums.GroupcastTestingEnum),
+                        ClusterObjectFieldDescriptor(Label="durationSeconds", Tag=1, Type=typing.Optional[uint]),
+                    ])
+
+            testOperation: Groupcast.Enums.GroupcastTestingEnum = 0
+            durationSeconds: typing.Optional[uint] = None
+
     class Attributes:
         @dataclass
         class Membership(ClusterAttributeDescriptor):
@@ -20788,6 +20854,54 @@ class Groupcast(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class MaxMcastAddrCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000065
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class UsedMcastAddrCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000065
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
+
+        @dataclass
+        class FabricUnderTest(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000065
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -20874,6 +20988,42 @@ class Groupcast(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class GroupcastTesting(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000065
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sourceIpAddress", Tag=0, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="destinationIpAddress", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="endpointID", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="clusterID", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="elementID", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="accessAllowed", Tag=6, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="groupcastTestResult", Tag=7, Type=Groupcast.Enums.GroupcastTestResultEnum),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            sourceIpAddress: typing.Optional[bytes] = None
+            destinationIpAddress: typing.Optional[bytes] = None
+            groupID: typing.Optional[uint] = None
+            endpointID: typing.Optional[uint] = None
+            clusterID: typing.Optional[uint] = None
+            elementID: typing.Optional[uint] = None
+            accessAllowed: typing.Optional[bool] = None
+            groupcastTestResult: Groupcast.Enums.GroupcastTestResultEnum = 0
+            fabricIndex: uint = 0
 
 
 @dataclass
@@ -21754,6 +21904,7 @@ class BooleanStateConfiguration(Cluster):
             kAudible = 0x2
             kAlarmSuppress = 0x4
             kSensitivityLevel = 0x8
+            kFaultEvents = 0x10
 
         class SensorFaultBitmap(IntFlag):
             kGeneralFault = 0x1
@@ -37817,6 +37968,7 @@ class OccupancySensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="occupancySensorTypeBitmap", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="holdTime", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="holdTimeLimits", Tag=0x00000004, Type=typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct]),
+                ClusterObjectFieldDescriptor(Label="predictedOccupancy", Tag=0x00000005, Type=typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]]),
                 ClusterObjectFieldDescriptor(Label="PIROccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedThreshold", Tag=0x00000012, Type=typing.Optional[uint]),
@@ -37838,6 +37990,7 @@ class OccupancySensing(Cluster):
     occupancySensorTypeBitmap: uint = 0
     holdTime: typing.Optional[uint] = None
     holdTimeLimits: typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct] = None
+    predictedOccupancy: typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]] = None
     PIROccupiedToUnoccupiedDelay: typing.Optional[uint] = None
     PIRUnoccupiedToOccupiedDelay: typing.Optional[uint] = None
     PIRUnoccupiedToOccupiedThreshold: typing.Optional[uint] = None
@@ -37875,6 +38028,8 @@ class OccupancySensing(Cluster):
             kRadar = 0x20
             kRFSensing = 0x40
             kVision = 0x80
+            kPrediction = 0x100
+            kOccupancyEvent = 0x200
 
         class OccupancyBitmap(IntFlag):
             kOccupied = 0x1
@@ -37899,6 +38054,23 @@ class OccupancySensing(Cluster):
             holdTimeMin: 'uint' = 0
             holdTimeMax: 'uint' = 0
             holdTimeDefault: 'uint' = 0
+
+        @dataclass
+        class PredictedOccupancyStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="startTimestamp", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endTimestamp", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="confidence", Tag=3, Type=uint),
+                    ])
+
+            startTimestamp: 'uint' = 0
+            endTimestamp: 'uint' = 0
+            occupancy: 'uint' = 0
+            confidence: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -37980,6 +38152,22 @@ class OccupancySensing(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct])
 
             value: typing.Optional[OccupancySensing.Structs.HoldTimeLimitsStruct] = None
+
+        @dataclass
+        class PredictedOccupancy(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000406
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]])
+
+            value: typing.Optional[typing.List[OccupancySensing.Structs.PredictedOccupancyStruct]] = None
 
         @dataclass
         class PIROccupiedToUnoccupiedDelay(ClusterAttributeDescriptor):
