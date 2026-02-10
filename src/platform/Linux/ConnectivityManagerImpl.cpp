@@ -148,6 +148,18 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+bool ConnectivityManagerImpl::IsWiFiStationConnecting() const noexcept
+{
+    return mpOneShotConnectCallback != nullptr;
+}
+
+bool ConnectivityManagerImpl::IsWiFiStationScanning() const noexcept
+{
+    return mpOneShotScanCallback != nullptr;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     // Forward the event to the generic base classes as needed.
