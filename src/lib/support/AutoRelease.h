@@ -77,4 +77,8 @@ protected:
     Releasable * mReleasable = nullptr;
 };
 
+// Template deduction guides to allow auto-release creation from pointers
+template <class T>
+AutoRelease(T * releasable) -> AutoRelease<T>;
+
 } // namespace chip

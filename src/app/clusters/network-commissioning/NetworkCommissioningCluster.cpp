@@ -109,16 +109,9 @@ BitFlags<Feature> WiFiFeatures(WiFiDriver * driver)
     return features;
 }
 
-// avoid `-Wctad-maybe-unsupported` error
-template <typename T>
-AutoRelease<T> MakeAutoRelease(T * iterator)
-{
-    return AutoRelease<T>(iterator);
-}
-
 /// Convenience macro to auto-create a variable for you to release the given name at
 /// the exit of the current scope.
-#define DEFER_AUTO_RELEASE(name) auto autoRelease##__COUNTER__ = MakeAutoRelease(name)
+#define DEFER_AUTO_RELEASE(name) AutoRelease autoRelease##__COUNTER__(name)
 
 } // namespace
 
