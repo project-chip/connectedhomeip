@@ -1165,8 +1165,7 @@ CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPa
     }
     else
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-    {
-    }
+    {}
 
     if (Features().Has(Feature::kPerDeviceCredentials))
     {
@@ -1244,8 +1243,7 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
     }
     else
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-    {
-    }
+    {}
 
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optionalAttributes);
 }
