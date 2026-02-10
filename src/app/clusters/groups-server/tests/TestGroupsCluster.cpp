@@ -62,6 +62,37 @@ private:
     bool mIsIdentifying = false;
 };
 
+class MockScenesIntegrationDelegate : public scenes::ScenesIntegrationDelegate
+{
+public:
+    CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) override
+    {
+        mGroupWillBeRemovedCallCount++;
+        mLastFabricIndex = fabricIndex;
+        mLastGroupId     = groupId;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR MakeSceneInvalidForAllFabrics() override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    uint32_t mGroupWillBeRemovedCallCount = 0;
+    FabricIndex mLastFabricIndex          = kUndefinedFabricIndex;
+    GroupId mLastGroupId                  = kUndefinedGroupId;
+};
+
 class TestGroupsCluster : public ::testing::Test
 {
 public:
@@ -73,6 +104,7 @@ public:
         mCluster       = std::make_unique<GroupsCluster>(kTestEndpointId,
                                                    GroupsCluster::Context{
                                                              .groupDataProvider   = mGroupDataProvider,
+                                                             .scenesIntegration   = &mScenesDelegate,
                                                              .identifyIntegration = &mIdentifyDelegate,
                                                    });
         mClusterTester = std::make_unique<ClusterTester>(*mCluster);
@@ -141,6 +173,7 @@ protected:
     GroupDataProviderImpl mGroupDataProvider;
     Crypto::DefaultSessionKeystore mSessionKeystore;
     MockIdentifyIntegrationDelegate mIdentifyDelegate;
+    MockScenesIntegrationDelegate mScenesDelegate;
     std::unique_ptr<GroupsCluster> mCluster;
     std::unique_ptr<ClusterTester> mClusterTester;
 };
@@ -765,6 +798,153 @@ TEST_F(TestGroupsCluster, TestFabricScoping)
     EXPECT_TRUE(iter.Next());
     EXPECT_EQ(iter.GetValue(), kGroupId2);
     EXPECT_FALSE(iter.Next());
+}
+
+// Tests that group name changes are node-wide.
+// Spec: The server stores a name string, which is set by the client for each assigned group.
+// The GroupName associated with the GroupID in the Group Table SHALL be updated to reflect the new GroupName provided for the Group,
+// such that subsequent ViewGroup commands yield the same name for all endpoints which have a group association to the given GroupID.
+TEST_F(TestGroupsCluster, TestGroupNameNodeWide)
+{
+    constexpr GroupId kGroupId = 1;
+    constexpr EndpointId kEndpoint1 = 1;
+    constexpr EndpointId kEndpoint2 = 2;
+
+    SetupKeySet(kTestFabricIndex, kKeysetId);
+    MapGroupToKeyset(kTestFabricIndex, kGroupId, kKeysetId);
+
+    // Endpoint 1
+    GroupsCluster cluster1(kEndpoint1, {mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate});
+    ClusterTester tester1(cluster1);
+    tester1.SetFabricIndex(kTestFabricIndex);
+
+    // Endpoint 2
+    GroupsCluster cluster2(kEndpoint2, {mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate});
+    ClusterTester tester2(cluster2);
+    tester2.SetFabricIndex(kTestFabricIndex);
+
+    // Add group to Endpoint 1
+    {
+        Groups::Commands::AddGroup::Type request = {kGroupId, "Group Name 1"_span};
+        auto result = tester1.Invoke<Groups::Commands::AddGroup::Type>(request);
+        EXPECT_TRUE(result.IsSuccess());
+        EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
+    }
+
+    // Add group to Endpoint 2
+    {
+        Groups::Commands::AddGroup::Type request = {kGroupId, "Group Name 1"_span};
+        auto result = tester2.Invoke<Groups::Commands::AddGroup::Type>(request);
+        EXPECT_TRUE(result.IsSuccess());
+        EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
+    }
+
+    // Update group name from Endpoint 1
+    {
+        Groups::Commands::AddGroup::Type request = {kGroupId, "Updated Name"_span};
+        auto result = tester1.Invoke<Groups::Commands::AddGroup::Type>(request);
+        EXPECT_TRUE(result.IsSuccess());
+        EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
+    }
+
+    // Verify name change on Endpoint 1
+    {
+        Groups::Commands::ViewGroup::Type request = {kGroupId};
+        auto viewResult = tester1.Invoke<Groups::Commands::ViewGroup::Type>(request);
+        EXPECT_TRUE(viewResult.IsSuccess());
+        EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
+        EXPECT_TRUE(viewResult.response->groupName.data_equal("Updated Name"_span));
+    }
+
+    // Verify name change on Endpoint 2
+    {
+        Groups::Commands::ViewGroup::Type request = {kGroupId};
+        auto viewResult = tester2.Invoke<Groups::Commands::ViewGroup::Type>(request);
+        EXPECT_TRUE(viewResult.IsSuccess());
+        EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
+        EXPECT_TRUE(viewResult.response->groupName.data_equal("Updated Name"_span));
+    }
+}
+
+// Tests AddGroup command when group info table is full but key mapping exists.
+// Spec: If there are no available resources to add the membership for the server endpoint, the status SHALL be RESOURCE_EXHAUSTED.
+TEST_F(TestGroupsCluster, TestAddGroupResourceExhaustedKeyExists)
+{
+    mClusterTester->SetFabricIndex(kFabricIndex1);
+    const uint16_t max_groups = mGroupDataProvider.GetMaxGroupsPerFabric();
+
+    SetupKeySet(kFabricIndex1, kKeysetId);
+
+    // Fill up the group info table to max_groups - 1
+    for (uint16_t i = 0; i < max_groups - 1; ++i)
+    {
+        auto kGroupId = static_cast<GroupId>(i + 1);
+        MapGroupToKeyset(kFabricIndex1, kGroupId, kKeysetId, i);
+        ASSERT_EQ(mGroupDataProvider.SetGroupInfo(kFabricIndex1, GroupDataProvider::GroupInfo(kGroupId, "Test")), CHIP_NO_ERROR);
+    }
+
+    // Add the last group to make the table full
+    const GroupId kLastGroupId = max_groups;
+    MapGroupToKeyset(kFabricIndex1, kLastGroupId, kKeysetId, max_groups - 1);
+    ASSERT_EQ(mGroupDataProvider.SetGroupInfo(kFabricIndex1, GroupDataProvider::GroupInfo(kLastGroupId, "Test")), CHIP_NO_ERROR);
+
+    // There will be no space for this one
+    const GroupId kExistingKeyGroupId = max_groups + 1;
+    // Ensure the key mapping still exists for GroupId 1
+    MapGroupToKeyset(kFabricIndex1, kExistingKeyGroupId, kKeysetId, 0);
+
+    auto result = InvokeAddGroup(kExistingKeyGroupId, "FinalOverflow");
+    EXPECT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::ResourceExhausted);
+}
+
+// Tests that ScenesIntegrationDelegate is called when a group is removed.
+TEST_F(TestGroupsCluster, TestRemoveGroupScenesCleanup)
+{
+    mClusterTester->SetFabricIndex(kFabricIndex3);
+    constexpr GroupId kGroupId = 10;
+
+    SetupKeySet(kFabricIndex3, kKeysetId);
+    MapGroupToKeyset(kFabricIndex3, kGroupId, kKeysetId);
+    ASSERT_EQ(CodeFor(InvokeAddGroup(kGroupId, "SceneTest").response->status), Protocols::InteractionModel::Status::Success);
+
+    EXPECT_EQ(mScenesDelegate.mGroupWillBeRemovedCallCount, 0u);
+
+    Groups::Commands::RemoveGroup::Type removeRequest;
+    removeRequest.groupID = kGroupId;
+    auto result           = mClusterTester->Invoke<Groups::Commands::RemoveGroup::Type>(removeRequest);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
+
+    EXPECT_EQ(mScenesDelegate.mGroupWillBeRemovedCallCount, 1u);
+    EXPECT_EQ(mScenesDelegate.mLastFabricIndex, kFabricIndex3);
+    EXPECT_EQ(mScenesDelegate.mLastGroupId, kGroupId);
+}
+
+// Tests that ScenesIntegrationDelegate is called for each group during RemoveAllGroups.
+TEST_F(TestGroupsCluster, TestRemoveAllGroupsScenesCleanup)
+{
+    mClusterTester->SetFabricIndex(kFabricIndex5);
+
+    SetupKeySet(kFabricIndex5, kKeysetId);
+
+    constexpr GroupId kGroupId1 = 1;
+    constexpr GroupId kGroupId2 = 5;
+    MapGroupToKeyset(kFabricIndex5, kGroupId1, kKeysetId, 0);
+    MapGroupToKeyset(kFabricIndex5, kGroupId2, kKeysetId, 1);
+
+    ASSERT_EQ(CodeFor(InvokeAddGroup(kGroupId1, "G1").response->status), Protocols::InteractionModel::Status::Success);
+    ASSERT_EQ(CodeFor(InvokeAddGroup(kGroupId2, "G2").response->status), Protocols::InteractionModel::Status::Success);
+
+    EXPECT_EQ(mScenesDelegate.mGroupWillBeRemovedCallCount, 0u);
+
+    Groups::Commands::RemoveAllGroups::Type removeAllRequest;
+    auto result = mClusterTester->Invoke<Groups::Commands::RemoveAllGroups::Type>(removeAllRequest);
+    EXPECT_TRUE(result.IsSuccess());
+
+    EXPECT_EQ(mScenesDelegate.mGroupWillBeRemovedCallCount, 3u); // 2 groups + global scene group
 }
 
 } // namespace
