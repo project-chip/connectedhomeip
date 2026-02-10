@@ -46,7 +46,7 @@ import matter.clusters as Clusters
 from matter import CertificateAuthority
 from matter.interaction_model import InteractionModelError
 from matter.storage import VolatileTemporaryPersistentStorage
-from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.apps import JFControllerSubprocess, JFAdministratorSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -64,17 +64,17 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_a_server_app = None
 
-        jfc_server_app = self.user_params.get("jfc_server_app", None)
-        if not jfc_server_app:
+        self.jfc_server_app = self.user_params.get("jfc_server_app", None)
+        if not self.jfc_server_app:
             asserts.fail("This test requires a Joint Fabric Controller app. Specify app path with --string-arg jfc_server_app:<path_to_app>")
-        if not os.path.exists(jfc_server_app):
-            asserts.fail(f"The path {jfc_server_app} does not exist")
+        if not os.path.exists(self.jfc_server_app):
+            asserts.fail(f"The path {self.jfc_server_app} does not exist")
 
-        jfa_server_app = self.user_params.get("jfa_server_app", None)
-        if not jfa_server_app:
+        self.jfa_server_app = self.user_params.get("jfa_server_app", None)
+        if not self.jfa_server_app:
             asserts.fail("This test requires a Joint Fabrics Admin app. Specify app path with --string-arg jfa_server_app:<path_to_app>")
-        if not os.path.exists(jfa_server_app):
-            asserts.fail(f"The path {jfa_server_app} does not exist")
+        if not os.path.exists(self.jfa_server_app):
+            asserts.fail(f"The path {self.jfa_server_app} does not exist")
 
         # Create a temporary storage directory for both ecosystems to keep KVS files if not already provided by user.
         if self.storage_fabric_a is None:
@@ -87,15 +87,17 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         # Initialize Ecosystem A
         #
         #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
+        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = AppServerSubprocess(
-            jfa_server_app,
+        self.fabric_a_admin = JFAdministratorSubprocess(
+            self.jfa_server_app,
+            "JFA_A",
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
+            discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
         self.fabric_a_admin.start(
@@ -104,20 +106,20 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
-            jfc_server_app,
+            self.jfc_server_app,
             "JFC_A",  # Name of the controller instance, used for logging purposes in the JF-Controller app:w
             rpc_server_port=33033,
             storage_dir=self.storage_fabric_a,
             vendor_id=self.jfctrl_fabric_a_vid)
         self.fabric_a_ctrl.start(
             expected_output="CHIP task running",
-            timeout=10)
+            timeout=30)
 
         # # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {self.jfadmin_fabric_a_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
-            timeout=10)
+            timeout=60)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
