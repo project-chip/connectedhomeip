@@ -40,8 +40,10 @@ public:
 
     // Not copyable or movable
     AutoRelease(const AutoRelease &)             = delete;
-    AutoRelease(const AutoRelease &&)            = delete;
     AutoRelease & operator=(const AutoRelease &) = delete;
+    AutoRelease & operator=(AutoRelease &&)      = delete;
+
+    AutoRelease(AutoRelease && other) : mReleasable(other.mReleasable) { other.mReleasable = nullptr; }
 
     inline Releasable * operator->() { return mReleasable; }
     inline const Releasable * operator->() const { return mReleasable; }
