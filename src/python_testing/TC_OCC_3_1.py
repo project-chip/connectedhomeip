@@ -141,7 +141,7 @@ class TC_OCC_3_1(MatterBaseTest):
         except AttributeError:
             has_occevent_feature = False
 
-        occupancy_event_supported = has_occevent_feature or self.check_pics("OCC.S.E00") or self.is_ci
+        occupancy_event_supported = has_occevent_feature or self.check_pics("OCC.S.E00")
 
         log.info(f"Feature map: 0x{feature_map:x}, OCCEVENT feature: {has_occevent_feature}")
         log.info(f"HoldTime supported: {has_hold_time}, OccupancyChanged event supported: {occupancy_event_supported}")
