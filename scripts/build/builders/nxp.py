@@ -335,7 +335,7 @@ class NxpBuilder(GnBuilder):
 
         if self.enable_ethernet and self.os_env == NxpOsUsed.ZEPHYR:
             flags.append('-DEXTRA_CONF_FILE="prj_ethernet.conf"')
-        
+
         if self.enable_thread and self.os_env == NxpOsUsed.ZEPHYR:
             flags.append('-DEXTRA_CONF_FILE="prj_thread_ftd.conf"')
 
