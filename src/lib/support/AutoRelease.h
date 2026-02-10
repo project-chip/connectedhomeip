@@ -38,12 +38,16 @@ public:
     AutoRelease(Releasable * releasable) : mReleasable(releasable) {}
     ~AutoRelease() { Release(); }
 
-    // Not copyable or movable
+    // Not copyable
     AutoRelease(const AutoRelease &)             = delete;
     AutoRelease & operator=(const AutoRelease &) = delete;
-    AutoRelease & operator=(AutoRelease &&)      = delete;
 
     AutoRelease(AutoRelease && other) : mReleasable(other.mReleasable) { other.mReleasable = nullptr; }
+    AutoRelease & operator=(AutoRelease && other)
+    {
+        Set(other.mReleasable);
+        other.mReleasable = nullptr;
+    }
 
     inline Releasable * operator->() { return mReleasable; }
     inline const Releasable * operator->() const { return mReleasable; }
