@@ -12,7 +12,7 @@ from typing import Awaitable, Callable, Optional
 
 from api import PushAvServer
 from certificates import CAHierarchy
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from streams import StreamService
@@ -83,6 +83,9 @@ class PushAvContext:
         # Setup exception handler
         @self.app.exception_handler(Exception)
         async def http_exception_handler(request, exc):
+            if isinstance(exc, HTTPException):
+                # Re-raise HTTPException for FastAPI's default handler to process
+                raise exc
             logger.error(f"Exception: {exc}")
             return JSONResponse(
                 status_code=500,

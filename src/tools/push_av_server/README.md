@@ -214,8 +214,7 @@ activated):
 $ pip install -r requirements-test.txt
 ```
 
-This will install pytest and pytest-asyncio, which are required for running the
-test suite.
+This will install dependencies required for running the test suite.
 
 ### Run pytest
 
