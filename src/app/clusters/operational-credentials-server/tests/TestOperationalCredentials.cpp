@@ -58,7 +58,7 @@ TEST_F(TestOperationalCredentials, TestAttributes)
         .platformManager            = DeviceLayer::PlatformMgr(),
         .eventManagement            = EventManagement::GetInstance(),
     };
-    OperationalCredentialsCluster cluster(kRootEndpointId, context);
+    OperationalCredentialsCluster cluster(kRootEndpointId, std::move(context));
 
     ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -85,7 +85,7 @@ TEST_F(TestOperationalCredentials, TestCommands)
         .platformManager            = DeviceLayer::PlatformMgr(),
         .eventManagement            = EventManagement::GetInstance(),
     };
-    OperationalCredentialsCluster cluster(kRootEndpointId, context);
+    OperationalCredentialsCluster cluster(kRootEndpointId, std::move(context));
 
     EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                               {
