@@ -348,15 +348,15 @@ PICS:
     - label:
           "Does the device implement Joint Fabric Administrator cluster as
           server?"
-      id: JFADMIN.S
+      id: JFPKI.S
 
     - label:
           "Does the device implement Joint Fabric Administrator cluster as
           client?"
-      id: JFADMIN.C
+      id: JFPKI.C
 
     - label: "Does the device implement AdministratorFabricIndex attribute?"
-      id: JFADMIN.S.A0000
+      id: JFPKI.S.A0000
 
     #
     #IDM
