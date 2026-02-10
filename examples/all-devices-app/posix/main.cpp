@@ -222,7 +222,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
-
     SuccessOrDie(devices.Startup());
 
     initParams.dataModelProvider             = &devices.DataModelProvider();
