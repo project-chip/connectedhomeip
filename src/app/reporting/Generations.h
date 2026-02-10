@@ -62,7 +62,7 @@ static_assert(AreGenerationsInOrder(0x80000000 + 0x12345, 0x12344));
 /// - Current: Adding a 4-byte `AttributeGeneration` results in a total of 16 bytes.
 /// - Hypothetical: If this were 64-bit, the compiler would insert 4 bytes of alignment
 ///   padding after the 12-byte base to satisfy the 8-byte alignment requirement for
-///   the uint64_t, resulting in 24 bytes ($12 + 4 + 8$)—a 50% increase in size.
+///   the uint64_t, resulting in 24 bytes (12 + 4 + 8) — a 50% increase in size.
 ///
 /// On typical 32-bit MCU targets used by this stack, using 32-bit arithmetic instead of
 /// 64-bit handling often results in smaller generated code, helping reduce flash usage.
