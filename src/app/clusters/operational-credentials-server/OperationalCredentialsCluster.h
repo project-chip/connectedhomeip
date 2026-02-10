@@ -74,7 +74,7 @@ public:
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
-    const OperationalCredentialsCluster::Context & mOpCredsContext;
+    const OperationalCredentialsCluster::Context mOpCredsContext;
 
     FabricTable & GetFabricTable();
     FailSafeContext & GetFailSafeContext();
