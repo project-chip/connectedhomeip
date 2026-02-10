@@ -164,8 +164,8 @@ class TC_JFADMIN_2_2(MatterBaseTest):
                      "DUT response contains status code FAILSAFE_REQUIRED."),
             TestStep("7", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
                      "DUT respond with ArmFailSafeResponse Command."),
-            # TestStep("8", "[SKIP Missing SDK Implementation] TH sends AddICAC command to DUT using icac1 as parameter.",
-            #          "DUT ICACResponse contains status 2 (InvalidICAC).")
+            TestStep("8", "TH sends AddICAC command to DUT using icac1 as parameter.",
+                     "DUT ICACResponse contains status 2 (InvalidICAC).")
         ]
 
     @async_test_body
@@ -236,22 +236,27 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
 
         # TODO SDK Functionality is not finished. Uncomment when implementation is ready
-        # self.step("8")
-        # cmd = Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
-        # csr_update = await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd)
-        # new_noc_chain = await devCtrlEcoA.IssueNOCChain(csr_update, 1)
-        # cmd = Clusters.JointFabricAdministrator.Commands.AnnounceJointFabricAdministrator(1)
-        # await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
-        # cmd = Clusters.JointFabricAdministrator.Commands.ICACCSRRequest()
-        # await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
-        # cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(new_noc_chain.icacBytes)
+        self.step("8")
+        cmd = Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
+        csr_update = await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd)
+        new_noc_chain = await devCtrlEcoA.IssueNOCChain(csr_update, 1)
+        cmd = Clusters.JointFabricAdministrator.Commands.AnnounceJointFabricAdministrator(1)
         # try:
-        #     await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        #    await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
         # except InteractionModelError as e:
-        #     asserts.assert_in('InvalidICAC (0x02)',
-        #                       str(e), f'Expected InvalidICAC error, but got {str(e)}')
-        # else:
-        #     asserts.assert_true(False, 'Expected InteractionModelError with InvalidICAC, but no exception occurred.')
+        #    log.info("AnnounceJointFabricAdministrator failed: %s", str(e))
+        #    devCtrlEcoA.Shutdown()
+        #    return
+        cmd = Clusters.JointFabricAdministrator.Commands.ICACCSRRequest()
+        await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(new_noc_chain.icacBytes)
+        try:
+            await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        except InteractionModelError as e:
+            asserts.assert_in('InvalidICAC (0x02)',
+                              str(e), f'Expected InvalidICAC error, but got {str(e)}')
+        else:
+            asserts.assert_true(False, 'Expected InteractionModelError with InvalidICAC, but no exception occurred.')
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
