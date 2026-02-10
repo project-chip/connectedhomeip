@@ -170,7 +170,6 @@ public:
 
     std::vector<PushAvStreamTransport::TransportConfigurationStorage> mCurrentConnections;
 
-    // Methods coming from previous LOGIC implementation
     bool HasFeature(PushAvStreamTransport::Feature feature) const;
 
     Protocols::InteractionModel::Status ValidateIncomingTransportOptions(
@@ -214,7 +213,6 @@ public:
     Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
-    // Previous LOGIC state move to CLUSTER implementation
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;

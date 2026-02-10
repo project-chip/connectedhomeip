@@ -165,7 +165,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         {
             MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
             // ValidateIncomingTransportOptions() function already checked the CENCKey length
-            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
+            LogErrorOnFailure(CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer));
             CENCKey.SetValue(CENCKeyBuffer);
         }
         else
@@ -179,7 +179,7 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
         {
             MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
             // ValidateIncomingTransportOptions() function already checked the CENCKeyID length
-            TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
+            LogErrorOnFailure(CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer));
             CENCKeyID.SetValue(CENCKeyIDBuffer);
         }
         else

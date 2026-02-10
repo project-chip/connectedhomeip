@@ -272,7 +272,7 @@ void PushAvStreamTransportServer::LoadPersistentAttributes()
                        "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
 
         // Signal delegate that all persistent configuration attributes have been loaded.
-        TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
+        LogErrorOnFailure(mDelegate->PersistentAttributesLoadedCallback());
     }
     else
     {
@@ -777,7 +777,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Valida
                 auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
                 ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate videoStreamName or videoStreamID found",
                              mPath.mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
                 return std::nullopt;
             }
 
@@ -815,7 +815,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Valida
                 auto status = to_underlying(StatusCodeEnum::kDuplicateStreamValues);
                 ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Duplicate audioStreamName or audioStreamID found",
                              mPath.mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
                 return std::nullopt;
             }
 
@@ -829,7 +829,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Valida
                     auto status = to_underlying(StatusCodeEnum::kInvalidStream);
                     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: AudioStreamName conflicts with video stream",
                                  mPath.mEndpointId);
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                    LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
                     return std::nullopt;
                 }
 
@@ -846,7 +846,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Valida
         {
             auto status = to_underlying(StatusCodeEnum::kInvalidStream);
             ChipLogError(Zcl, "Transport Options[ep=%d]: Both VideoStreams and AudioStreams empty", mPath.mEndpointId);
-            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+            LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
             return std::nullopt;
         }
     }
@@ -882,7 +882,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Valida
                 {
                     auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
                     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Video Stream ", mPath.mEndpointId);
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
+                    LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, cluster_status));
                     return std::nullopt;
                 }
 
@@ -925,7 +925,7 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Valida
                 {
                     auto cluster_status = to_underlying(StatusCodeEnum::kInvalidStream);
                     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Audio Stream ", mPath.mEndpointId);
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, cluster_status);
+                    LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, cluster_status));
                     return std::nullopt;
                 }
 
@@ -1001,7 +1001,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
                          mPath.mEndpointId);
             auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+            LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
             return std::nullopt;
         });
     }
@@ -1009,7 +1009,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
     {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLS Client Management Delegate is not set", mPath.mEndpointId);
         auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
-        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+        LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
         return std::nullopt;
     }
 
@@ -1037,7 +1037,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
                      "%02X and Container Format: %02X)",
                      mPath.mEndpointId, to_underlying(ingestMethod),
                      to_underlying(commandData.transportOptions.containerOptions.containerType));
-        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+        LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
         return std::nullopt;
     }
 
@@ -1050,7 +1050,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
         {
             auto status = to_underlying(StatusCodeEnum::kInvalidURL);
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid Url", mPath.mEndpointId);
-            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+            LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
             return std::nullopt;
         }
     }
@@ -1061,7 +1061,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
         auto status = to_underlying(StatusCodeEnum::kInvalidStreamUsage);
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: StreamUsage not present in the StreamUsagePriorities list",
                      mPath.mEndpointId);
-        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+        LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
         return std::nullopt;
     }
 
@@ -1073,7 +1073,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
         auto iterDupCheck      = motionZonesList.Value().Value().begin();
         size_t zoneListSize    = 0;
-        TEMPORARY_RETURN_IGNORED motionZonesList.Value().Value().ComputeSize(&zoneListSize);
+        LogErrorOnFailure(motionZonesList.Value().Value().ComputeSize(&zoneListSize));
 
         // If there are duplicate entries, reject the command
         std::set<uint16_t> zoneIDsFound;
@@ -1132,7 +1132,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
                 {
                     auto status = to_underlying(StatusCodeEnum::kInvalidZone);
                     ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Invalid ZoneId", mPath.mEndpointId);
-                    TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, status);
+                    LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, status));
                     return std::nullopt;
                 }
             }
@@ -1170,7 +1170,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
                 auto segmentDurationStatus = to_underlying(StatusCodeEnum::kInvalidOptions);
                 ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Segment Duration not within allowed range",
                              mPath.mEndpointId);
-                TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus);
+                LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, segmentDurationStatus));
                 return std::nullopt;
             }
         }
@@ -1218,7 +1218,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
             auto maxPreRollLengthStatus = to_underlying(StatusCodeEnum::kInvalidPreRollLength);
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: MaxPreRollLength (%u) validation failed", mPath.mEndpointId,
                          maxPreRollLength);
-            TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, maxPreRollLengthStatus);
+            LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, maxPreRollLengthStatus));
             return std::nullopt;
         }
     }
@@ -1252,7 +1252,7 @@ PushAvStreamTransportServer::HandleAllocatePushTransport(CommandHandler & handle
         // ExpiryTime Handling
         if (transportOptions.expiryTime.HasValue())
         {
-            TEMPORARY_RETURN_IGNORED ScheduleTransportDeallocate(connectionID, transportOptions.expiryTime.Value());
+            LogErrorOnFailure(ScheduleTransportDeallocate(connectionID, transportOptions.expiryTime.Value()));
         }
 
         handler.AddResponse(commandPath, response);
@@ -1516,7 +1516,7 @@ PushAvStreamTransportServer::HandleManuallyTriggerTransport(CommandHandler & han
     {
         auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTransportStatus);
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Transport status", mPath.mEndpointId);
-        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, clusterStatus);
+        LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, clusterStatus));
         return std::nullopt;
     }
 
@@ -1524,7 +1524,7 @@ PushAvStreamTransportServer::HandleManuallyTriggerTransport(CommandHandler & han
     {
         auto clusterStatus = to_underlying(StatusCodeEnum::kInvalidTriggerType);
         ChipLogError(Zcl, "HandleManuallyTriggerTransport[ep=%d]: Invalid Trigger type", mPath.mEndpointId);
-        TEMPORARY_RETURN_IGNORED handler.AddClusterSpecificFailure(commandPath, clusterStatus);
+        LogErrorOnFailure(handler.AddClusterSpecificFailure(commandPath, clusterStatus));
         return std::nullopt;
     }
 

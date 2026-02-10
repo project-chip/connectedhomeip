@@ -117,7 +117,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
     {
         cluster->SetDelegate(delegate);
-        TEMPORARY_RETURN_IGNORED cluster->Init();
+        LogErrorOnFailure(cluster->Init());
     }
 }
 
