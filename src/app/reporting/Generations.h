@@ -47,8 +47,26 @@ static_assert(AreGenerationsInOrder(1000, 0x800000AB));
 static_assert(AreGenerationsInOrder(0x80000000 + 1000, 900));
 static_assert(AreGenerationsInOrder(0x80000000 + 0x12345, 0x12344));
 
-/// Represents a generation of an attribute. A wrapper of a u32 that does NOT auto-cast back to U32, so that we can
-/// force comparisons to use the wrap-around aware compares
+/// Represents a generation of an attribute. A thin wrapper around `uint32_t` that intentionally does not
+/// provide an implicit conversion operator back to `uint32_t`, ensuring that callers use
+/// wrap-around-aware comparison logic (e.g. `Before`/`After`) instead of
+/// raw integer comparisons which would break at the 2^32-1 boundary.
+///
+/// Note: usage of uint32_t is intentional to minimize size overhead. For example, in
+/// `struct AttributePathParamsWithGeneration` (defined in Engine.h), using 32-bit generations
+/// keeps the structure size at 16 bytes.
+///
+/// The size breakdown is as follows:
+/// - Base `AttributePathParams`: 12 bytes (4-byte ClusterId, 4-byte AttributeId,
+///   2-byte EndpointId, 2-byte ListIndex).
+/// - Current: Adding a 4-byte `AttributeGeneration` results in a total of 16 bytes.
+/// - Hypothetical: If this were 64-bit, the compiler would insert 4 bytes of alignment
+///   padding after the 12-byte base to satisfy the 8-byte alignment requirement for
+///   the uint64_t, resulting in 24 bytes (12 + 4 + 8) — a 50% increase in size.
+///
+/// On typical 32-bit MCU targets used by this stack, using 32-bit arithmetic instead of
+/// 64-bit handling often results in smaller generated code, helping reduce flash usage.
+/// The value 0 is reserved as a "not defined" marker and is skipped during increment.
 class AttributeGeneration
 {
 public:
