@@ -32,6 +32,7 @@ __all__ = [
     "TestTarget",
     "TestDefinition",
     "runner",
+    "linux.py"
 ]
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(

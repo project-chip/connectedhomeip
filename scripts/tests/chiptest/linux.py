@@ -19,27 +19,35 @@ Handles linux-specific functionality for running test cases
 """
 
 import os
-import sys
 from typing import IO, Any
 
 from chiptest.runner import Executor, LogPipe, SubprocessInfo
 
-if sys.platform == 'linux':
-    from python_path import PythonPath
+from python_path import PythonPath
 
-    root_dir = os.path.dirname(
-        os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+root_dir = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-    with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
-        from testing import linux
+with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
+    from testing.linux import IsolatedNetworkNamespace, DBusTestSystemBus, BluetoothMock, ThreadBorderRouter, WpaSupplicantMock, ensure_network_namespace_availability, ensure_private_state
 
-    class LinuxNamespacedExecutor(Executor):
-        def __init__(self, ns: linux.IsolatedNetworkNamespace):
-            super().__init__()
-            self.ns = ns
+__all__ = [
+    "IsolatedNetworkNamespace",
+    "DBusTestSystemBus",
+    "BluetoothMock",
+    "ThreadBorderRouter",
+    "WpaSupplicantMock",
+    "ensure_network_namespace_availability",
+    "ensure_private_state",
+]
 
-        def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
-                stderr: IO[Any] | LogPipe | None = None):
-            wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind.name.lower()))
-            return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
+class LinuxNamespacedExecutor(Executor):
+    def __init__(self, ns: IsolatedNetworkNamespace):
+        super().__init__()
+        self.ns = ns
+
+    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
+            stderr: IO[Any] | LogPipe | None = None):
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind.name.lower()))
+        return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)

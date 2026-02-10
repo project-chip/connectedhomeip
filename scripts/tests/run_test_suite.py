@@ -38,14 +38,7 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
 if sys.platform == 'linux':
-    from python_path import PythonPath
-
-    root_dir = os.path.dirname(
-        os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-    with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
-        from testing import linux
+    import chiptest.linux
 
 if sys.platform == 'darwin':
     import chiptest.darwin
@@ -174,9 +167,9 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     if sys.platform == "linux":
         if not internal_inside_unshare:
             # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
-            linux.namespace.ensure_network_namespace_availability()
+            linux.ensure_network_namespace_availability()
         else:
-            linux.namespace.ensure_private_state()
+            linux.ensure_private_state()
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
@@ -487,7 +480,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            to_terminate.append(ns := linux.namespace.IsolatedNetworkNamespace(
+            to_terminate.append(ns := linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                 setup_app_link_up=not wifi_required,
@@ -509,7 +502,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 
-            to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
+            to_terminate.append(executor := linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
             to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
         else:
