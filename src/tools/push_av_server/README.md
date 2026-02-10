@@ -207,13 +207,15 @@ To run the tests, follow these steps:
 
 ### Install Test Dependencies
 
-First, install the test dependencies (assuming you have a virtual environment activated):
+First, install the test dependencies (assuming you have a virtual environment
+activated):
 
 ```sh
 $ pip install -r requirements-test.txt
 ```
 
-This will install pytest and pytest-asyncio, which are required for running the test suite.
+This will install pytest and pytest-asyncio, which are required for running the
+test suite.
 
 ### Run pytest
 
@@ -252,5 +254,3 @@ To see detailed print statements in test output:
 ```sh
 $ pytest -s
 ```
-
-
