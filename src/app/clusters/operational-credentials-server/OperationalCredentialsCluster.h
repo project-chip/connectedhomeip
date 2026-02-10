@@ -48,7 +48,7 @@ public:
         app::EventManagement & eventManagement;
     };
 
-    OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
+    OperationalCredentialsCluster(EndpointId endpoint, const Context & context) :
         DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(context){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -74,7 +74,7 @@ public:
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
-    const OperationalCredentialsCluster::Context mOpCredsContext;
+    const OperationalCredentialsCluster::Context & mOpCredsContext;
 
     FabricTable & GetFabricTable();
     FailSafeContext & GetFailSafeContext();
