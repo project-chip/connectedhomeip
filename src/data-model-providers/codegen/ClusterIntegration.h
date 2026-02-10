@@ -147,4 +147,96 @@ public:
     static ServerClusterInterface * FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options, Delegate & delegate);
 };
 
+/// Default integration helper for a cluster that can be constructed with just an endpoint id.
+///
+/// Manages cluster servers using an array of LazyRegisteredServerCluster, exposed via the Storage
+/// type alias. The storage object is expected to be declared as a global variable in the integration
+/// code, and passed to the static methods of this class.
+///
+/// Example:
+/// ```
+/// using Integration = DefaultClusterIntegration<MyExampleCluster, kMyExampleFixedClusterCount>;
+/// Integration::Storage gStorage;
+///
+/// void MatterNetworkIdentityManagementClusterInitCallback(EndpointId endpointId)
+/// {
+///     Integration::RegisterServer(gStorage, endpointId);
+/// }
+/// ```
+template <class ClusterImpl, unsigned FixedClusterCount, bool SupportDynamicEndpoints = true>
+class DefaultClusterIntegration : protected CodegenClusterIntegration::Delegate
+{
+protected:
+    constexpr static ClusterId kClusterId        = ClusterImpl::Id;
+    constexpr static unsigned kFixedClusterCount = FixedClusterCount;
+    constexpr static unsigned kMaxClusterCount =
+        kFixedClusterCount + (SupportDynamicEndpoints ? CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT : 0);
+
+public:
+    using Storage = std::array<LazyRegisteredServerCluster<ClusterImpl>, kMaxClusterCount>;
+
+    static void RegisterServer(Storage & storage, EndpointId endpointId)
+    {
+        DefaultClusterIntegration instance(storage);
+        CodegenClusterIntegration::RegisterServer(
+            {
+                .endpointId                = endpointId,
+                .clusterId                 = kClusterId,
+                .fixedClusterInstanceCount = kFixedClusterCount,
+                .maxClusterInstanceCount   = kMaxClusterCount,
+                .fetchFeatureMap           = false,
+                .fetchOptionalAttributes   = false,
+            },
+            instance);
+    }
+
+    static void UnregisterServer(Storage & storage, EndpointId endpointId,
+                                 MatterClusterShutdownType clusterShutdownType = MatterClusterShutdownType::kClusterShutdown)
+    {
+        DefaultClusterIntegration instance(storage);
+        CodegenClusterIntegration::UnregisterServer(
+            {
+                .endpointId                = endpointId,
+                .clusterId                 = kClusterId,
+                .fixedClusterInstanceCount = kFixedClusterCount,
+                .maxClusterInstanceCount   = kMaxClusterCount,
+            },
+            instance, clusterShutdownType);
+    }
+
+    static ClusterImpl * FindClusterOnEndpoint(Storage & storage, EndpointId endpointId)
+    {
+        DefaultClusterIntegration instance(storage);
+        return static_cast<ClusterImpl *>(CodegenClusterIntegration::FindClusterOnEndpoint(
+            {
+                .endpointId                = endpointId,
+                .clusterId                 = kClusterId,
+                .fixedClusterInstanceCount = kFixedClusterCount,
+                .maxClusterInstanceCount   = kMaxClusterCount,
+            },
+            instance));
+    }
+
+protected:
+    DefaultClusterIntegration(Storage & storage) : mStorage(storage) {}
+
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        mStorage[clusterInstanceIndex].Create(endpointId);
+        return mStorage[clusterInstanceIndex].Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(mStorage[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &mStorage[clusterInstanceIndex].Cluster();
+    }
+
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { mStorage[clusterInstanceIndex].Destroy(); }
+
+private:
+    Storage & mStorage;
+};
+
 } // namespace chip::app
