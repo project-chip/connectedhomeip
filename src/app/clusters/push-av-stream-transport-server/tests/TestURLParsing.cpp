@@ -138,20 +138,20 @@ public:
 class TestValidateUrl : public ::testing::Test
 {
 public:
+    TestValidateUrl() : mClusterTester(mServer) {}
+
     void SetUp() override
     {
         CHIP_ERROR err = chip::Platform::MemoryInit();
         assert(err == CHIP_NO_ERROR);
 
-        chip::Testing::ClusterTester clusterTester(mServer);
-        ASSERT_EQ(mPersistenceProvider.Init(&clusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
-        mPreviousPersistenceProvider = app::GetSafeAttributePersistenceProvider();
+        ASSERT_EQ(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
         app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
     }
 
     void TearDown() override
     {
-        app::SetSafeAttributePersistenceProvider(mPreviousPersistenceProvider);
+        app::SetSafeAttributePersistenceProvider(nullptr);
         chip::Platform::MemoryShutdown();
     }
 
@@ -184,8 +184,6 @@ public:
 
     bool TestUrlValidation(const std::string & urlInput, bool shouldSucceed)
     {
-        chip::Testing::ClusterTester clusterTester(mServer);
-        EXPECT_EQ(mServer.Startup(clusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         TestValidateUrlDelegate mockDelegate;
         TestValidateUrlTLSDelegate tlsClientManagementDelegate;
 
@@ -214,13 +212,31 @@ public:
 
         if (shouldSucceed)
         {
-            return commandHandler.HasResponse();
+            EXPECT_TRUE(commandHandler.HasResponse());
+            // Call deallocate to remove the allocated transport for cleanup
+            ConcreteCommandPath kDeallocateCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+            Commands::DeallocatePushTransport::DecodableType deallocateCommandData;
+
+            // Decode response using MockCommandHandler helper
+            Commands::AllocatePushTransportResponse::DecodableType decodedResponse;
+            CHIP_ERROR err = commandHandler.DecodeResponse(decodedResponse);
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+            deallocateCommandData.connectionID = decodedResponse.transportConfiguration.connectionID;
+
+            EXPECT_EQ(
+                mServer.GetLogic().HandleDeallocatePushTransport(commandHandler, kDeallocateCommandPath, deallocateCommandData),
+                std::nullopt);
+
+            EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+
+            return true;
         }
 
         return commandHandler.HasStatus();
     }
 
 protected:
+    chip::Testing::ClusterTester mClusterTester;
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
     app::SafeAttributePersistenceProvider * mPreviousPersistenceProvider = nullptr;
     PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
