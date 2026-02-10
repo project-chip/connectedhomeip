@@ -75,11 +75,12 @@ class MatterCMAFUploadValidator:
         if mpd_type == "static":
             if len(session.uploaded_segments) == 0:
                 errors.append("Static MPD cannot be uploaded before segments have been uploaded")
-                # Mark all tracks as completed when static MPD is uploaded
-                if not session.complete:
-                    for _, track in session.tracks.items():
-                        track.state = TrackState.COMPLETED
-                    session.complete = True
+
+            # Mark all tracks as completed when static MPD is uploaded
+            if not session.complete:
+                for _, track in session.tracks.items():
+                    track.state = TrackState.COMPLETED
+                session.complete = True
 
         if not self.dash_manifest_path_regex.match(file_path):
             errors.append("DASH manifest must be uploaded as session_X/index.mpd")
@@ -198,8 +199,9 @@ class MatterCMAFUploadValidator:
             # Final media playlist
             if not has_ext_x_playlist_type:
                 errors.append("Final media playlist must contain #EXT-X-PLAYLIST-TYPE:VOD")
-            if 'VOD' not in body_str:
-                errors.append("Final media playlist must have #EXT-X-PLAYLIST-TYPE:VOD")
+            is_vod = any(line.strip() == '#EXT-X-PLAYLIST-TYPE:VOD' for line in lines)
+            if not is_vod:
+                errors.append("Final media playlist must contain '#EXT-X-PLAYLIST-TYPE:VOD'")
             if not has_extinf:
                 errors.append("Final media playlist must contain #EXTINF tags")
             if not has_segment_lines:
@@ -216,8 +218,6 @@ class MatterCMAFUploadValidator:
             track.state = TrackState.COMPLETED
 
             # Track completion
-            if not hasattr(session, 'hls_completed_tracks'):
-                session.hls_completed_tracks = 0
             session.hls_completed_tracks += 1
 
             # Check if all tracks are completed
