@@ -1924,6 +1924,10 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
         mUdcServer->OnCommissionableNodeFound(nodeData);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    if (nodeData.Get<Dnssd::CommissionNodeData>().threadMeshcop)
+    {
+        mAutoCommissioner.SetNetworkSetupNeeded(true);
+    }
     AbstractDnssdDiscoveryController::OnNodeDiscovered(nodeData);
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }

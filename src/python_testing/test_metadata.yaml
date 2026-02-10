@@ -194,6 +194,10 @@ not_automated:
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.
+    - name: TC_ACL_2_10.py
+      reason:
+          Flaky, see
+          https://github.com/project-chip/connectedhomeip/issues/43056
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
