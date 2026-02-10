@@ -100,12 +100,10 @@ endif()
 
 if(CONFIG_CHIP_WIFI)
     chip_configure_data_model(app
-        INCLUDE_SERVER
         ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_wifi.zap
     )
 elseif(CONFIG_NET_L2_OPENTHREAD)
     chip_configure_data_model(app
-        INCLUDE_SERVER
         ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_thread.zap
     )
 endif()
