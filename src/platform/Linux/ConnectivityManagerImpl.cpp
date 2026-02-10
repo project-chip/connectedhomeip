@@ -101,8 +101,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 #endif
-    mpOneShotConnectCallback = nullptr;
-    mpOneShotScanCallback    = nullptr;
+    SetNetworkStatusChangeCallback(nullptr);
+    SetOneShotConnectCallback(nullptr);
+    SetOneShotScanCallback(nullptr);
 
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
