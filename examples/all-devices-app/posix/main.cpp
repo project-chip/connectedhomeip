@@ -189,7 +189,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
 
     auto * exampleDAC = chip::Credentials::Examples::GetExampleDACProvider();
-    chip::Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)
@@ -223,6 +222,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     });
 
+    
     SuccessOrDie(devices.Startup());
 
     initParams.dataModelProvider             = &devices.DataModelProvider();
@@ -264,6 +264,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(payload.vendorID));
     SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(payload.productID));
     PrintOnboardingCodes(payload);
+
+    chip::Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
 
     chip::app::SetTerminateHandler(StopSignalHandler);
 
