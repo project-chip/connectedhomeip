@@ -91,6 +91,10 @@ private:
 
     static void OnTrustVerificationCompletion(CHIP_ERROR err);
 
+    CHIP_ERROR VerifyAddICACStep1(const FabricIndex accessFabric, const Commands::AddICAC::DecodableType & commandData);
+    CHIP_ERROR VerifyAddICACPublicKey(const Commands::AddICAC::DecodableType & commandData);
+    CHIP_ERROR VerifyAddICACDNEncodingRules(const Commands::AddICAC::DecodableType & commandData);
+
     // Cleans up asynchronous resources used in HandleAnnounceJointFabricAdministrator
     void CleanupAnnounceJFA();
 
@@ -291,9 +295,6 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     VerifyOrExit(failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
 
-    /* TODO spec.: If the <<ref_FabricTableVendorIdVerificationProcedure, FabricFabric Table Vendor ID Verification Procedure>>
-     * has not been executed against the initiator of this command, the command SHALL fail
-     * with a <<ref_JFVidNotVerified, JfVidNotVerified>> status code SHALL be sent back to the initiator.*/
     VerifyOrExit(jointFabricAdministrator.WasVidVerificationExecutedForFabric(ctx.mCommandHandler.GetAccessingFabricIndex()),
                  status.Emplace(StatusCodeEnum::kVIDNotVerified));
     VerifyOrExit(Attributes::AdministratorFabricIndex::Get(ctx.mRequestPath.mEndpointId, administratorFabricIndex) ==
@@ -329,7 +330,7 @@ void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
 
     auto nonDefaultStatus  = Status::Success;
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-
+    Optional<ICACResponseStatusEnum> status = Optional<ICACResponseStatusEnum>::Missing();
     // command must be invoked over CASE
     VerifyOrExit(ctx.mCommandHandler.GetSubjectDescriptor().authMode == Access::AuthMode::kCase,
                  nonDefaultStatus = Status::InvalidCommand);
@@ -342,8 +343,67 @@ void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
 
     /* TODO: implement rest of the AddICAC checks */
 
+    VerifyOrExit(VerifyAddICACStep1(ctx.mCommandHandler.GetAccessingFabricIndex(), commandData) == CHIP_NO_ERROR,
+                 status.Emplace(ICACResponseStatusEnum::kInvalidICAC));
+
+    VerifyOrExit(VerifyAddICACPublicKey(commandData) == CHIP_NO_ERROR, status.Emplace(ICACResponseStatusEnum::kInvalidPublicKey));
+
+    VerifyOrExit(VerifyAddICACDNEncodingRules(commandData) == CHIP_NO_ERROR, status.Emplace(ICACResponseStatusEnum::kInvalidICAC));
+
 exit:
+    if (status.HasValue())
+    {
+        Commands::ICACResponse::Type response;
+        response.statusCode = status.Value();
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+}
+
+CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACStep1(const FabricIndex accessFabric,
+                                                                      const Commands::AddICAC::DecodableType & commandData)
+{
+    constexpr uint8_t kMaxCertsInChain = 2;
+    uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
+    MutableByteSpan rcacSpan{ rcacBuf };
+    ChipCertificateSet certificates;
+    ValidationContext validContext;
+
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().FetchRootCert(accessFabric, rcacSpan));
+    ReturnErrorOnFailure(certificates.Init(kMaxCertsInChain));
+    ReturnErrorOnFailure(certificates.LoadCert(rcacSpan, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+    ReturnErrorOnFailure(
+        certificates.LoadCert(commandData.ICACValue, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+    validContext.Reset();
+    validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kKeyCertSign);
+    validContext.mRequiredCertType = CertType::kICA;
+    return certificates.ValidateCert(certificates.GetLastCert(), validContext);
+}
+
+CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACPublicKey(const Commands::AddICAC::DecodableType & commandData)
+{
+    uint8_t csrBuf[Credentials::kMaxDERCertLength];
+    MutableByteSpan icacCsr{ csrBuf };
+    Crypto::P256PublicKey csrPubKey;
+    Credentials::P256PublicKeySpan icacPubKeySpan;
+
+    auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
+    VerifyOrReturnError(jointFabricAdministrator.GetDelegate() != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr));
+    ReturnErrorOnFailure(Crypto::VerifyCertificateSigningRequest(icacCsr.data(), icacCsr.size(), csrPubKey));
+    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(commandData.ICACValue, icacPubKeySpan));
+
+    Credentials::P256PublicKeySpan csrPubKeySpan(csrPubKey.ConstBytes());
+    VerifyOrReturnError(memcmp(icacPubKeySpan.data(), csrPubKeySpan.data(), icacPubKeySpan.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JointFabricAdministratorGlobalInstance::VerifyAddICACDNEncodingRules(
+    const Commands::AddICAC::DecodableType & commandData)
+{
+    Credentials::ChipCertificateData certData;
+    return Credentials::DecodeChipCert(commandData.ICACValue, certData);
 }
 
 void JointFabricAdministratorGlobalInstance::HandleTransferAnchorRequest(
