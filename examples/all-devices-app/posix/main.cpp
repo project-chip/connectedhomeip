@@ -202,24 +202,24 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
 
     static CodeDrivenDataModelDevices devices({
-        .storageDelegate                = *initParams.persistentStorageDelegate,                   //
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
-            .configurationManager       = DeviceLayer::ConfigurationMgr(),                         //
-            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
-            .fabricTable                = Server::GetInstance().GetFabricTable(),                  //
-            .accessControl              = Server::GetInstance().GetAccessControl(),                //
-            .persistentStorage          = Server::GetInstance().GetPersistentStorage(),            //
-            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),              //
-            .deviceInstanceInfoProvider = *provider,                                               //
-            .platformManager            = DeviceLayer::PlatformMgr(),                              //
-            .groupDataProvider          = gGroupDataProvider,                                      //
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),         //
-            .dnssdServer                = DnssdServer::Instance(),                                 //
-            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                  //
-            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),                //
-            .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                     //
-            .dacProvider                = *exampleDAC, //
-            .eventManagement            = EventManagement::GetInstance(),                          //
+        .storageDelegate                = *initParams.persistentStorageDelegate,                 //
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .accessControl              = Server::GetInstance().GetAccessControl(),              //
+            .persistentStorage          = Server::GetInstance().GetPersistentStorage(),          //
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .deviceInstanceInfoProvider = *provider,                                             //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
+            .groupDataProvider          = gGroupDataProvider,                                    //
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
+            .dnssdServer                = DnssdServer::Instance(),                               //
+            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
+            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
+            .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
+            .dacProvider                = *exampleDAC,                                           //
+            .eventManagement            = EventManagement::GetInstance(),                        //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
