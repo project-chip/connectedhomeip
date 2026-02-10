@@ -245,7 +245,7 @@ void ConnectivityManagerImpl::UpdateNetworkStatus()
 {
     Network configuredNetwork;
 
-    VerifyOrReturn(IsWiFiStationEnabled() && mpStatusChangeCallback != nullptr);
+    VerifyOrReturn(IsWiFiStationEnabled());
 
     CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
     if (err != CHIP_NO_ERROR)
@@ -257,14 +257,13 @@ void ConnectivityManagerImpl::UpdateNetworkStatus()
     // If we have already connected to the WiFi AP, then return null to indicate a success state.
     if (IsWiFiStationConnected())
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(
-            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+        OnStatusChange(Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+                       NullOptional);
         return;
     }
 
-    mpStatusChangeCallback->OnNetworkingStatusChange(
-        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
-        MakeOptional(GetDisconnectReason()));
+    OnStatusChange(Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+                   MakeOptional(GetDisconnectReason()));
 }
 
 void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * changedProperties)
@@ -350,13 +349,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 break;
             }
 
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, reason]() {
-                if (mpOneShotConnectCallback != nullptr)
-                {
-                    mpOneShotConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
-                    mpOneShotConnectCallback = nullptr;
-                }
-            });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+                [this, reason]() { OnConnectResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason); });
             if (delegate != nullptr)
             {
                 TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate, associationFailureCause, status]() {
@@ -384,11 +378,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         if (mAssociationStarted)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                if (mpOneShotConnectCallback != nullptr)
-                {
-                    mpOneShotConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-                    mpOneShotConnectCallback = nullptr;
-                }
+                OnConnectResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
                 ConnectivityMgrImpl().PostNetworkConnect();
             });
         }
@@ -875,7 +865,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     // Network was provisioned successfully - emit a connectivity change event so the application can update its state.
     NotifyWiFiConnectivityChange(kConnectivity_NoChange);
 
-    mpOneShotConnectCallback = apCallback;
+    SetOneShotConnectCallback(apCallback);
     return CHIP_NO_ERROR;
 }
 
@@ -893,7 +883,7 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
     // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpOneShotConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!IsWiFiStationConnecting(), CHIP_ERROR_INCORRECT_STATE);
 
     GVariantBuilder builder;
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
@@ -948,7 +938,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
     // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpOneShotConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!IsWiFiStationConnecting(), CHIP_ERROR_INCORRECT_STATE);
 
     // Convert identities and our key pair to DER and add them to wpa_supplicant as blobs
     {
@@ -1269,7 +1259,7 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
     // There is another ongoing scan request, reject the new one.
-    VerifyOrReturnError(mpOneShotScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!IsWiFiStationScanning(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(ssid.size() <= sizeof(sInterestedSSID), CHIP_ERROR_INVALID_ARGUMENT);
 
     GAutoPtr<GError> err;
@@ -1283,11 +1273,11 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     g_variant_builder_add(&builder, "{sv}", "Type", g_variant_new_string("active"));
     args = g_variant_builder_end(&builder);
 
-    mpOneShotScanCallback = callback;
+    SetOneShotScanCallback(callback);
     if (!wpa_supplicant_1_interface_call_scan_sync(mWpaSupplicant.iface.get(), args, nullptr, &err.GetReceiver()))
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to start network scan: %s", err ? err->message : "unknown error");
-        mpOneShotScanCallback = nullptr;
+        SetOneShotScanCallback(nullptr);
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -1571,13 +1561,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     if (bsss == nullptr)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: no network found");
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-            if (mpOneShotScanCallback != nullptr)
-            {
-                mpOneShotScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
-                mpOneShotScanCallback = nullptr;
-            }
-        });
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+            [this]() { OnScanFinished(Status::kSuccess, CharSpan(), nullptr); });
         return;
     }
 
@@ -1597,12 +1582,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, networkScanned]() {
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
-        if (mpOneShotScanCallback != nullptr)
-        {
-            LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
-            mpOneShotScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-            mpOneShotScanCallback = nullptr;
-        }
+        LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
+
+        OnScanFinished(Status::kSuccess, CharSpan(), &iter);
 
         delete networkScanned;
     });
