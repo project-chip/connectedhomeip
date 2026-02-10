@@ -109,9 +109,9 @@ TEST_F(TestAutoRelease, TestMove)
 
         r3 = std::move(r2);
 
-        // all still in scope and we only moved (so only one reference)
+        // relesable2 was released, since r3 took over releasable
         EXPECT_EQ(releasable.Counter(), 1);
-        EXPECT_EQ(releasable2.Counter(), 1);
+        EXPECT_EQ(releasable2.Counter(), 0);
     }
 
     // cleanup done
