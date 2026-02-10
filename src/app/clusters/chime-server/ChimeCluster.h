@@ -95,9 +95,6 @@ private:
     uint8_t mSelectedChime = 0;
     bool mEnabled          = true;
     // Helpers
-    // Loads all the persistent attributes from the KVS.
-    void LoadPersistentAttributes(ServerClusterContext & context);
-
     // Checks if the chimeID is supported by the delegate
     bool IsSupportedChimeID(uint8_t chimeID);
 

@@ -59,7 +59,13 @@ CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    LoadPersistentAttributes(context);
+    AttributePersistence persistence(context.attributeStorage);
+    // Load Active Chime ID
+    persistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
+                                               mSelectedChime, 0);
+    // Load Enabled
+    (void) persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, true);
+
     return CHIP_NO_ERROR;
 }
 
@@ -78,18 +84,6 @@ CHIP_ERROR ChimeCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBu
     // Chime does not have optional attributes implemented yet (or exposed via options),
     // so we just return mandatory ones.
     return listBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {});
-}
-
-void ChimeCluster::LoadPersistentAttributes(ServerClusterContext & context)
-{
-    AttributePersistence persistence(context.attributeStorage);
-
-    // Load Active Chime ID
-    persistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
-                                               mSelectedChime, 0);
-
-    // Load Enabled
-    (void) persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, true);
 }
 
 DataModel::ActionReturnStatus ChimeCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
