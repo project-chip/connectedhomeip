@@ -18,6 +18,11 @@
 
 namespace chip::app::Clusters {
 
+/// Provides information for code that requires information about weather a device
+/// is currently actively identifying or not.
+///
+/// This is separated out from the cluster itself, so that unit testing is
+/// easier (easier mocking) and integration points are clearer.
 class IdentifyIntegrationDelegate
 {
 public:
