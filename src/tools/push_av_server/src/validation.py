@@ -194,7 +194,7 @@ class MatterCMAFUploadValidator:
 
         track = session.tracks[track_name_in_path]
 
-        if not track.state == TrackState.NOT_STARTED:
+        if track.state != TrackState.NOT_STARTED:
             # Final media playlist
             if not has_ext_x_playlist_type:
                 errors.append("Final media playlist must contain #EXT-X-PLAYLIST-TYPE:VOD")
