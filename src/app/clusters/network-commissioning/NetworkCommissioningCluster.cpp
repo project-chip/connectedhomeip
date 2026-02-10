@@ -114,6 +114,11 @@ template <typename T>
 class AutoRelease
 {
 public:
+    AutoRelease(const AutoRelease &) = delete;
+    AutoRelease& operator=(const AutoRelease &) = delete;
+
+    AutoRelease(AutoRelease &&) = default;
+    AutoRelease& operator=(AutoRelease &&) = default;
     AutoRelease(T * iterator) : mValue(iterator) {}
     ~AutoRelease()
     {
@@ -128,14 +133,14 @@ private:
 };
 
 // avoid `-Wctad-maybe-unsupported` error
-struct AllowCTAD;
-
-// A dummy deduction guide, which is never selected because the struct is incomplete
-[[maybe_unused]] AutoRelease(AllowCTAD) -> AutoRelease<void>;
+template<typename T>
+AutoRelease<T> MakeAutoRelease(T *iterator) {
+    return AutoRelease<T>(iterator);
+}
 
 /// Convenience macro to auto-create a variable for you to release the given name at
 /// the exit of the current scope.
-#define DEFER_AUTO_RELEASE(name) AutoRelease autoRelease##__COUNTER__(name)
+#define DEFER_AUTO_RELEASE(name) auto autoRelease##__COUNTER__ = MakeAutoRelease(name)
 
 } // namespace
 
