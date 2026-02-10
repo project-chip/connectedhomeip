@@ -200,6 +200,11 @@ private:
     CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    bool IsWiFiStationConnecting() const noexcept;
+    bool IsWiFiStationScanning() const noexcept;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     WiFiStationMode _GetWiFiStationMode();
     CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
