@@ -123,6 +123,9 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         return err;
     }
 
+    // Link the delegate to the instance for attribute access
+    gEvseDelegate->SetInstance(gEvseInstance.get());
+
     err = gEvseTargetsDelegate->LoadTargets();
     if (err != CHIP_NO_ERROR)
     {
@@ -305,7 +308,7 @@ void EvseApplicationInit()
 
 void EvseApplicationShutdown()
 {
-    ChipLogDetail(AppServer, "Energy Management App (EVSE): EvseApplicationShutdown()");
+    ChipLogDetail(AppServer, "Evse App: EvseApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
     TEMPORARY_RETURN_IGNORED EVSEManufacturerShutdown();
