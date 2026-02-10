@@ -114,11 +114,11 @@ template <typename T>
 class AutoRelease
 {
 public:
-    AutoRelease(const AutoRelease &) = delete;
-    AutoRelease& operator=(const AutoRelease &) = delete;
+    AutoRelease(const AutoRelease &)             = delete;
+    AutoRelease & operator=(const AutoRelease &) = delete;
 
-    AutoRelease(AutoRelease &&) = default;
-    AutoRelease& operator=(AutoRelease &&) = default;
+    AutoRelease(AutoRelease &&)             = default;
+    AutoRelease & operator=(AutoRelease &&) = default;
     AutoRelease(T * iterator) : mValue(iterator) {}
     ~AutoRelease()
     {
@@ -133,8 +133,9 @@ private:
 };
 
 // avoid `-Wctad-maybe-unsupported` error
-template<typename T>
-AutoRelease<T> MakeAutoRelease(T *iterator) {
+template <typename T>
+AutoRelease<T> MakeAutoRelease(T * iterator)
+{
     return AutoRelease<T>(iterator);
 }
 
