@@ -57,12 +57,12 @@ class TestFactoryResetRequests(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
         return new_fabric_admin.NewController(paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
-    async def factory_reset_and_pase(self, setup_params: SetupParameters, pase_node_id: int, app_only: bool):
+    async def factory_reset_and_pase(self, setup_params: SetupParameters, pase_node_id: int, reset_ctrl: bool):
         # Get a new controller
         th2 = self.get_new_controller()
 
         # Request factory reset
-        await self.request_factory_reset(app_only=app_only)
+        await self.request_app_factory_reset(reset_ctrl=reset_ctrl)
 
         # Open a PASE session
         await th2.FindOrEstablishPASESession(
@@ -79,15 +79,15 @@ class TestFactoryResetRequests(MatterBaseTest):
         )
 
         logger.info("\n\n\t** Testing 'Factory Reset App Only' Back to Back **\n")
-        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, app_only=True)
-        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, app_only=True)
+        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, reset_ctrl=False)
+        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, reset_ctrl=False)
 
         logger.info("\n\n\t** Testing previous 'Factory Reset App Only' followed by a Back to Back 'Factory Reset' **\n")
-        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, app_only=False)
-        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, app_only=False)
+        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, reset_ctrl=True)
+        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, reset_ctrl=True)
 
         logger.info("\n\n\t** Testing previous 'Factory Reset' followed by a 'Factory Reset App Only' **\n")
-        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, app_only=True)
+        await self.factory_reset_and_pase(setup_params=setup_params, pase_node_id=pase_node_id, reset_ctrl=False)
 
 
 if __name__ == "__main__":

@@ -1523,7 +1523,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error(f"Failed to reboot app: {e}")
                 asserts.fail(f"App reboot failed: {e}")
 
-    async def request_factory_reset(self, app_only: bool = True) -> None:
+    async def request_app_factory_reset(self, reset_ctrl: bool = False) -> None:
         """Request a factory reset of the Device Under Test (DUT).
 
         This method handles factory resets in both CI and development environments and also manual
@@ -1531,9 +1531,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         to reconnect to the DUT after the factory reset.
 
         Args:
-            app_only (bool): If True, removes app and REPL configs but keeps controller config.
-                             If False, also removes controller config.
-                             Defaults to True.
+            reset_ctrl (bool): If True, removes app, REPL configs, and controller config.
+                               If False, removes app and REPL configs but keeps controller config.
+                               Defaults to False.
 
         Returns:
             None
@@ -1550,7 +1550,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("Manual device factory reset completed")
 
         else:
-            restart_flag_text = "factory reset app only" if app_only else "factory reset"
+            restart_flag_text = "factory reset" if reset_ctrl else "factory reset app only"
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:

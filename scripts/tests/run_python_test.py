@@ -391,36 +391,20 @@ def monitor_app_restart_requests(
 
         # Successfully read the flag file, remove to prevent multiple restarts
         os.unlink(restart_flag_file)
-        is_restart_only = (flag_file_content == "restart")
         is_factory_reset = (flag_file_content == "factory reset")
         is_factory_reset_app_only = (flag_file_content == "factory reset app only")
         log.info("%s requested by test script", flag_file_content.capitalize())
 
+        # If factory reset is requested, remove app/ctrl config and storage
+        factory_reset_config_removal(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
+
         # Restart the app
         log.info("Restarting app '%s'...", app)
-        if is_restart_only:
-            new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
-            app_manager_ref[0].stop()
-            with app_manager_lock:
-                new_app_manager.start()
-                app_manager_ref[0] = new_app_manager
-
-        elif is_factory_reset or is_factory_reset_app_only:
-            # Remove app config and storage if factory reset is requested
-            factory_reset_config_removal(is_factory_reset, is_factory_reset_app_only, app_args, script_args)
-
-            with app_manager_lock:
-                # Stop the app
-                log.info("Stopping app...")
-                app_manager_ref[0].stop()
-
-                # Start the app
-                new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
-                new_app_manager.start()
-                app_manager_ref[0] = new_app_manager
-
-        else:
-            log.info("Unknown restart flag file content: '%s', no action taken", flag_file_content)
+        new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        app_manager_ref[0].stop()
+        with app_manager_lock:
+            new_app_manager.start()
+            app_manager_ref[0] = new_app_manager
 
         # Action complete, continue monitoring for additional restart requests
         log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
