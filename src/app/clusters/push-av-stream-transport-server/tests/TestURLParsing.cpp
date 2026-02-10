@@ -214,7 +214,8 @@ public:
         {
             EXPECT_TRUE(commandHandler.HasResponse());
             // Call deallocate to remove the allocated transport for cleanup
-            ConcreteCommandPath kDeallocateCommandPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+            ConcreteCommandPath kDeallocateCommandPath{ 1, Clusters::PushAvStreamTransport::Id,
+                                                        Commands::DeallocatePushTransport::Id };
             Commands::DeallocatePushTransport::DecodableType deallocateCommandData;
 
             // Decode response using MockCommandHandler helper
