@@ -117,6 +117,7 @@ RUN set -x \
     shellcheck \
     strace \
     systemd \
+    tcpdump \
     udev \
     unzip \
     wget \
