@@ -187,11 +187,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
-
-    auto * exampleDAC = Credentials::Examples::GetExampleDACProvider();
-    ChipLogProgress(AppServer, "ExampleDAC ptr: %p", exampleDAC);
-
-    Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
+    
+    auto * exampleDAC = chip::Credentials::Examples::GetExampleDACProvider();
 
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)
