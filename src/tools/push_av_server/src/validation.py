@@ -170,7 +170,7 @@ class MatterCMAFUploadValidator:
 
         # Validate track name
         track_name_in_path = is_media_playlist.group("trackName")
-        
+
         # Check if track name is in expected_track_names list
         if stream.expected_track_names and track_name_in_path not in stream.expected_track_names:
             errors.append(
@@ -266,7 +266,7 @@ class MatterCMAFUploadValidator:
         else:
             # Validate track name
             track_name_in_path = match.group("trackName")
-            
+
             # Check if track name is in expected_track_names list
             if stream.expected_track_names and track_name_in_path not in stream.expected_track_names:
                 errors.append(
@@ -284,17 +284,16 @@ class MatterCMAFUploadValidator:
                 # For init files, ensure init file name matches track name
                 if ext == "init":
                     init_name = match.group("initName")
-                    expected_init_name = f"{track_name_in_path}.init"
-                    if init_name != expected_init_name:
+                    if init_name != track_name_in_path:
                         errors.append(
-                            f"Init file name must match track name: expected '{expected_init_name}', got '{init_name}'"
+                            f"Init file name must match track name: expected '{track_name_in_path}', received '{init_name}'"
                         )
 
                 # Session number must start from 1 and increment
                 session_number = int(match.group("sessionNumber"))
                 if session_number != session.id:
                     errors.append(
-                        f"Session number must be sequential and start from 1: expected session {session.id}, got session {session_number}"
+                        f"Session number must be sequential and start from 1: expected session {session.id}, received session {session_number}"
                     )
 
                 # Segment number validation (only for m4s files)
@@ -302,11 +301,11 @@ class MatterCMAFUploadValidator:
                     segment_number = int(match.group("segmentNumber"))
                     if segment_number < 1001:
                         errors.append(
-                            f"Segment number must start from 1001: got segment number {segment_number}"
+                            f"Segment number must start from 1001: received segment number {segment_number}"
                         )
                     elif segment_number > 9999:
                         errors.append(
-                            f"Segment number cannot exceed 9999: got segment number {segment_number}"
+                            f"Segment number cannot exceed 9999: received segment number {segment_number}"
                         )
                     else:
                         # Check if segment number is properly incremented
@@ -315,7 +314,7 @@ class MatterCMAFUploadValidator:
                         if segment_number != expected_segment_number:
                             errors.append(
                                 f"Segment number must increment by 1 starting from 1001: "
-                                f"expected segment {expected_segment_number}, got segment {segment_number}"
+                                f"expected segment {expected_segment_number}, received segment {segment_number}"
                             )
 
                 # Validate upload order based on interface type
@@ -377,6 +376,6 @@ class MatterCMAFUploadValidator:
                         float(extinf_duration)
                     except ValueError:
                         errors.append(
-                            f"X-EXTINF-duration header must be a valid decimal floating-point value, got: {extinf_duration}")
+                            f"X-EXTINF-duration header must be a valid decimal floating-point value, received: {extinf_duration}")
 
         return errors, session

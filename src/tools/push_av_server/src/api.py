@@ -14,11 +14,7 @@ from cryptography.hazmat.primitives import serialization
 from fastapi import APIRouter, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from models import (
-    ExpectedTrackNamesRequest,
-    SignClientCertificate,
-    SupportedIngestInterface,
-)
+from models import ExpectedTrackNamesRequest, SignClientCertificate, SupportedIngestInterface
 from streams import StreamService
 from utils import templates_path
 from validation import MatterCMAFUploadValidator
