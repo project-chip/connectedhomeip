@@ -190,7 +190,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     auto * exampleDAC = Credentials::Examples::GetExampleDACProvider();
     ChipLogProgress(AppServer, "ExampleDAC ptr: %p", exampleDAC);
-    ChipLogProgress(AppServer, "Type: %s", typeid(*exampleDAC).name());
 
     Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
 
