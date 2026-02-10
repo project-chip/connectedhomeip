@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,53 +17,48 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/WiFiNetworkManagement/ClusterId.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/FixedBuffer.h>
 #include <lib/support/Span.h>
 
-void emberAfWiFiNetworkManagementClusterServerInitCallback(chip::EndpointId);
+namespace chip::app::Clusters {
 
-namespace chip {
-namespace app {
-namespace Clusters {
-
-class WiFiNetworkManagementServer : private AttributeAccessInterface, private CommandHandlerInterface
+class WiFiNetworkManagementCluster : public DefaultServerCluster
 {
 public:
-    WiFiNetworkManagementServer(EndpointId endpoint);
-    ~WiFiNetworkManagementServer();
+    static constexpr auto Id = WiFiNetworkManagement::Id;
 
-    CHIP_ERROR Init();
+    WiFiNetworkManagementCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, Id }) {}
 
     CHIP_ERROR ClearNetworkCredentials();
     CHIP_ERROR SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase);
 
-    WiFiNetworkManagementServer(WiFiNetworkManagementServer const &)             = delete;
-    WiFiNetworkManagementServer & operator=(WiFiNetworkManagementServer const &) = delete;
+    WiFiNetworkManagementCluster(WiFiNetworkManagementCluster const &)             = delete;
+    WiFiNetworkManagementCluster & operator=(WiFiNetworkManagementCluster const &) = delete;
 
-private:
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+    // ServerClusterInterface overrides
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    void InvokeCommand(HandlerContext & handlerContext) override;
-
-    void HandleNetworkPassphraseRequest(HandlerContext & ctx,
-                                        const WiFiNetworkManagement::Commands::NetworkPassphraseRequest::DecodableType & req);
-
-    uint8_t mSsid[32];
-    uint8_t mSsidLen = 0;
-    static_assert(std::numeric_limits<decltype(mSsidLen)>::max() >= sizeof(mSsid));
-    ByteSpan SsidSpan() const { return ByteSpan(mSsid, mSsidLen); }
+protected:
+    FixedByteBuffer<32, uint8_t> mSsid;
+    ByteSpan SsidSpan() const { return mSsid.span(); }
 
     uint64_t mPassphraseSurrogate = 0;
     Crypto::SensitiveDataBuffer<64> mPassphrase;
     ByteSpan PassphraseSpan() const { return mPassphrase.Span(); }
 
-    bool HaveNetworkCredentials() { return mSsidLen > 0; }
+    bool HaveNetworkCredentials() const { return !mSsid.empty(); }
 };
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters

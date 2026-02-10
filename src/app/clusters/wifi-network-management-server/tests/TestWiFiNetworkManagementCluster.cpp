@@ -1,0 +1,174 @@
+/*
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
+#include <pw_unit_test/framework.h>
+
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <clusters/WiFiNetworkManagement/Attributes.h>
+#include <clusters/WiFiNetworkManagement/Commands.h>
+#include <clusters/WiFiNetworkManagement/Metadata.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WiFiNetworkManagement;
+using namespace chip::app::Clusters::WiFiNetworkManagement::Attributes;
+using namespace chip::Testing;
+
+namespace {
+
+struct TestWiFiNetworkManagementCluster : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    void SetUp() override { ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR); }
+
+    void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
+
+    TestWiFiNetworkManagementCluster() : cluster(kTestEndpointId) {}
+
+    static constexpr EndpointId kTestEndpointId = 1;
+
+    TestServerClusterContext testContext;
+    WiFiNetworkManagementCluster cluster;
+};
+
+} // namespace
+
+TEST_F(TestWiFiNetworkManagementCluster, AttributeListTest)
+{
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Ssid::kMetadataEntry,
+                                            PassphraseSurrogate::kMetadataEntry,
+                                        }));
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, ReadGlobalAttributesTest)
+{
+    ClusterTester tester(cluster);
+
+    uint16_t revision{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    EXPECT_EQ(revision, WiFiNetworkManagement::kRevision);
+
+    uint32_t features{};
+    ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
+    EXPECT_EQ(features, 0u);
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, InitialStateHasNoCredentials)
+{
+    ClusterTester tester(cluster);
+
+    DataModel::Nullable<ByteSpan> ssid;
+    ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);
+    EXPECT_TRUE(ssid.IsNull());
+
+    DataModel::Nullable<uint64_t> passphraseSurrogate;
+    ASSERT_EQ(tester.ReadAttribute(PassphraseSurrogate::Id, passphraseSurrogate), CHIP_NO_ERROR);
+    EXPECT_TRUE(passphraseSurrogate.IsNull());
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentials)
+{
+    ClusterTester tester(cluster);
+
+    const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
+    const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
+
+    ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
+
+    DataModel::Nullable<ByteSpan> ssid;
+    ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);
+    ASSERT_FALSE(ssid.IsNull());
+    EXPECT_TRUE(ssid.Value().data_equal(ByteSpan(ssidData)));
+
+    DataModel::Nullable<uint64_t> passphraseSurrogate;
+    ASSERT_EQ(tester.ReadAttribute(PassphraseSurrogate::Id, passphraseSurrogate), CHIP_NO_ERROR);
+    EXPECT_FALSE(passphraseSurrogate.IsNull());
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, ClearNetworkCredentials)
+{
+    ClusterTester tester(cluster);
+
+    const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
+    const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
+
+    ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
+
+    // Verify credentials are set
+    DataModel::Nullable<ByteSpan> ssid;
+    ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);
+    ASSERT_FALSE(ssid.IsNull());
+
+    // Clear credentials
+    ASSERT_EQ(cluster.ClearNetworkCredentials(), CHIP_NO_ERROR);
+
+    // Verify credentials are cleared
+    ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);
+    EXPECT_TRUE(ssid.IsNull());
+
+    DataModel::Nullable<uint64_t> passphraseSurrogate;
+    ASSERT_EQ(tester.ReadAttribute(PassphraseSurrogate::Id, passphraseSurrogate), CHIP_NO_ERROR);
+    EXPECT_TRUE(passphraseSurrogate.IsNull());
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentialsValidation)
+{
+    // SSID too short (empty)
+    const uint8_t validPassphrase[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
+    EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(), ByteSpan(validPassphrase)), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Passphrase too short (less than 8 characters)
+    const uint8_t ssidData[]      = { 'T', 'e', 's', 't' };
+    const uint8_t shortPassword[] = { 's', 'h', 'o', 'r', 't' };
+    EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(shortPassword)), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Valid credentials should succeed
+    const uint8_t validPassword[] = { 'v', 'a', 'l', 'i', 'd', 'p', 'a', 's', 's' };
+    EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(validPassword)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, PassphraseSurrogateChangesOnPassphraseChange)
+{
+    ClusterTester tester(cluster);
+
+    const uint8_t ssidData[]        = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
+    const uint8_t passphraseData1[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1' };
+    const uint8_t passphraseData2[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '2' };
+
+    ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData1)), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint64_t> surrogate1;
+    ASSERT_EQ(tester.ReadAttribute(PassphraseSurrogate::Id, surrogate1), CHIP_NO_ERROR);
+    ASSERT_FALSE(surrogate1.IsNull());
+
+    // Change passphrase, surrogate should change
+    ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData2)), CHIP_NO_ERROR);
+
+    DataModel::Nullable<uint64_t> surrogate2;
+    ASSERT_EQ(tester.ReadAttribute(PassphraseSurrogate::Id, surrogate2), CHIP_NO_ERROR);
+    ASSERT_FALSE(surrogate2.IsNull());
+
+    EXPECT_NE(surrogate1.Value(), surrogate2.Value());
+}
