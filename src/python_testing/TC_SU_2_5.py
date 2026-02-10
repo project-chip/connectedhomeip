@@ -106,13 +106,13 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
 
         if not self.expected_software_version:
-            asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
+            asserts.fail("Missing OTA image software version. Specify using --int-arg ota_image_expected_version:<ota_image_expected_version>")
 
         if not self.provider_app_path:
-            asserts.fail("Missing provider app path. Speficy using --string-arg provider_app_path:<provider_app_path>")
+            asserts.fail("Missing provider app path. Specify using --string-arg provider_app_path:<provider_app_path>")
 
         if not self.ota_image:
-            asserts.fail("Missing ota image path. Speficy using --string-arg ota_image:<ota_image>")
+            asserts.fail("Missing ota image path. Specify using --string-arg ota_image:<ota_image>")
 
         if self.matter_test_config.timeout is None or self.matter_test_config.timeout <= 0:
             asserts.fail(
@@ -174,7 +174,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         ]
 
     async def _wait_for_idle_after_softwareaupdate(self, update_state_handler):
-        # On Physical Devices we dont know how much time it can take to apply the update so let the user help us.
+        # On Physical Devices we don't know how much time it can take to apply the update so let the user help us.
         # This should be updated to work automatically by detecting if the session is up and then read the UpdateState attribute
         # This will allow us to remove the AttributeEventListener for kIdle and just read the attribute
         if self.is_pics_sdk_ci_only:
