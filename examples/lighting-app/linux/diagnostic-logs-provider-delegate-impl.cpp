@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "include/diagnostic-logs-provider-delegate-impl.h"
+#include "diagnostic-logs-provider-delegate-impl.h"
 
 #include <lib/support/SafeInt.h>
 
