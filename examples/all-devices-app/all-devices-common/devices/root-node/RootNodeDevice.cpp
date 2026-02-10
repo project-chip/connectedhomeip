@@ -104,7 +104,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
     mOperationalCredentialsCluster.Create(endpointId,
-                                          std::move(OperationalCredentialsCluster::Context{
+                                          OperationalCredentialsCluster::Context{
                                               .fabricTable                = mContext.fabricTable,
                                               .failSafeContext            = mContext.failSafeContext,
                                               .sessionManager             = mContext.sessionManager,
@@ -116,7 +116,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                               .platformManager            = mContext.platformManager,
                                               .eventManagement            = mContext.eventManagement,
 
-                                          }));
+                                          });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 
     return provider.AddEndpoint(mEndpointRegistration);
