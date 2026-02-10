@@ -47,7 +47,7 @@ public:
         app::EventManagement & eventManagement;
     };
 
-    OperationalCredentialsCluster(EndpointId endpoint, Context context) :
+    OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
         DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(std::move(context)){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
