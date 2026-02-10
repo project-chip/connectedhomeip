@@ -22,6 +22,7 @@
 #include <app/server/Dnssd.h>
 #include <clusters/OperationalCredentials/ClusterId.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <include/platform/PlatformManager.h>
 
 namespace chip {
 namespace app {
@@ -37,6 +38,12 @@ public:
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
         CommissioningWindowManager & commissioningWindowManager;
+        DeviceAttestationCredentialsProvider & dacProvider;
+        Credentials::GroupDataProvider & groupDataProvider;
+        Access::AccessControl & accessControl;
+        DeviceLayer::PlatformManager & platformManager;
+        EventManagement & eventManagement;
+        GroupDataProvider & groupDataProvider;
     };
 
     OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
@@ -69,7 +76,7 @@ private:
 
     FabricTable & GetFabricTable();
     FailSafeContext & GetFailSafeContext();
-    Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
+    Credentials::DeviceAttestationCredentialsProvider & GetDACProvider();
     SessionManager & GetSessionManager();
     DnssdServer & GetDNSSDServer();
     CommissioningWindowManager & GetCommissioningWindowManager();
