@@ -187,7 +187,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);
-    
+
     auto * exampleDAC = chip::Credentials::Examples::GetExampleDACProvider();
     chip::Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
 
