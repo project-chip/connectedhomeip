@@ -213,6 +213,8 @@ public:
 
     CameraAvSettingsUserLevelMgmtServerLogic & GetLogic() { return mLogic; }
 
+    void MarkAttributeDirty(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
+
     void SetDelegate(CameraAvSettingsUserLevelManagementDelegate * delegate)
     {
         mLogic.SetDelegate(delegate);
@@ -285,7 +287,6 @@ public:
 
 private:
     CameraAvSettingsUserLevelMgmtServerLogic mLogic;
-    BitFlags<CameraAvSettingsUserLevelManagement::Feature> mFeatures;
 
     std::vector<CameraAvSettingsUserLevelManagement::MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> mDptzStreams;

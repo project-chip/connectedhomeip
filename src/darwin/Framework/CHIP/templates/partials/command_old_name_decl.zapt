@@ -1,0 +1,11 @@
+{{#if (or (not (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name)))
+          (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
+
+{{> completeDecl cluster=(compatClusterNameRemapping parent.name)
+                 command=(compatCommandNameRemapping parent.name name)
+                 includeRenamedProperties=true
+                 deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")
+                 base=(concat "MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")
+                 includeInitWithResponseValue=false}}
+
+{{/if}}

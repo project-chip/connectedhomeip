@@ -67,6 +67,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
       "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests",
       "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/energy-evse-server/tests",
       "${chip_root}/src/app/clusters/fixed-label-server/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
@@ -74,7 +75,9 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
       "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/identify-server/tests",
+      "${chip_root}/src/app/clusters/illuminance-measurement-server/tests",
       "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      "${chip_root}/src/app/clusters/level-control/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/occupancy-sensor-server/tests",
@@ -87,12 +90,14 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/scenes-server/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
+      "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/clusters/time-synchronization-server/tests",
       "${chip_root}/src/app/clusters/tls-certificate-management-server/tests",
       "${chip_root}/src/app/clusters/tls-client-management-server/tests",
       "${chip_root}/src/app/clusters/unit-localization-server/tests",
       "${chip_root}/src/app/clusters/user-label-server/tests",
+      "${chip_root}/src/app/clusters/valve-configuration-and-control-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
@@ -108,6 +113,8 @@ if (chip_build_tests) {
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
+      "${chip_root}/src/app/server-cluster/tests",
+      "${chip_root}/src/app/server/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
@@ -223,9 +230,10 @@ if (chip_build_tests) {
   chip_test_group("example_tests") {
     deps = []
     tests = []
+
     if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
         current_os != "android") {
-      tests += [ "${chip_root}/examples/energy-management-app/energy-management-common/tests" ]
+      tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
   }
 

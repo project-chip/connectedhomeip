@@ -23,8 +23,9 @@ from mdns_discovery.utils.asserts import (assert_is_border_router_type, assert_i
                                           assert_valid_devtype_subtype, assert_valid_dn_key, assert_valid_dt_key,
                                           assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
                                           assert_valid_jf_key, assert_valid_long_discriminator_subtype,
-                                          assert_valid_operational_instance_name, assert_valid_ph_key, assert_valid_pi_key,
-                                          assert_valid_product_id, assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
+                                          assert_valid_operational_instance_name, assert_valid_ph_key,
+                                          assert_valid_ph_pi_relationship, assert_valid_pi_key, assert_valid_product_id,
+                                          assert_valid_ri_key, assert_valid_sai_key, assert_valid_sat_key,
                                           assert_valid_short_discriminator_subtype, assert_valid_sii_key, assert_valid_t_key,
                                           assert_valid_vendor_id, assert_valid_vendor_subtype, assert_valid_vp_key)
 from mobly import signals
@@ -1019,14 +1020,14 @@ class TestAssertValidOperationalInstanceName(unittest.TestCase):
 class TestAssertValidPhKey(unittest.TestCase):
     INT_MSG = "Must be a decimal integer without leading zeroes"
     GT0_MSG = "Value must be greater than 0"
-    BIT_MSG = "Only bits 0-19 may be set (value must fit in 20 bits)"
+    BIT_MSG = "Only bits 0-22 may be set"
 
     # Valid values
     VALID_VALUES = [
         "1",          # minimum allowed
         "33",         # typical example
-        "1048575",    # max 20-bit value (2^20 - 1)
-        "524288",     # power of two within 20 bits
+        "8388607",    # all 22-bits enabled (1<<23 - 1)
+        "524288",     # power of two within 23 bits
         "999999",     # large but still valid under mask
     ]
 
@@ -1052,8 +1053,8 @@ class TestAssertValidPhKey(unittest.TestCase):
         self.assertIn(self.GT0_MSG, msg)
 
     def test_invalid_due_to_out_of_range(self):
-        # Exceeds 20-bit mask
-        msg = fail_msg(assert_valid_ph_key, str((1 << 20)))
+        # Only bits 1 through 22 are defined.
+        msg = fail_msg(assert_valid_ph_key, str((1 << 23)))
         self.assertIn(self.BIT_MSG, msg)
 
     def test_invalid_due_to_empty_string(self):
@@ -1069,8 +1070,8 @@ class TestAssertValidPhKey(unittest.TestCase):
         self.assertNotIn(self.BIT_MSG, msg)
 
     def test_invalid_due_to_leading_zero_and_out_of_range(self):
-        # Leading zero present and numeric value beyond 20-bit mask → INT + BIT
-        msg = fail_msg(assert_valid_ph_key, "01048576")  # 1_048_576 == 1 << 20
+        # Leading zero present and numeric value beyond range
+        msg = fail_msg(assert_valid_ph_key, "08388608")  # 8,388,608 == 1 << 23
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.BIT_MSG, msg)
         self.assertNotIn(self.GT0_MSG, msg)
@@ -1091,8 +1092,8 @@ class TestAssertValidPhKey(unittest.TestCase):
         self.assertNotIn(self.BIT_MSG, msg)
 
     def test_invalid_due_to_leading_zero_and_out_of_range_variant(self):
-        # Leading zero plus value beyond 20-bit mask -> INT + BIT, no GT0
-        msg = fail_msg(assert_valid_ph_key, "0001048577")  # 1_048_577 > (1<<20) - 1
+        # Leading zero plus value beyond 22-bit mask -> INT + BIT, no GT0
+        msg = fail_msg(assert_valid_ph_key, "0008388608")  # 1_048_577 > (1<<20) - 1
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.BIT_MSG, msg)
         self.assertNotIn(self.GT0_MSG, msg)
@@ -1173,6 +1174,38 @@ class TestAssertValidPiKey(unittest.TestCase):
         msg = fail_msg(assert_valid_pi_key, bad)
         self.assertIn(self.UTF8_MSG, msg)
         self.assertNotIn(self.LEN_MSG, msg)
+
+
+class TestAssertValidPhPiRelationship(unittest.TestCase):
+    def test_valid_ph_no_pi_needed(self):
+        # PH has no mandatory PI bits set (e.g., bit 0, 1, 2, 3)
+        # 7 = 0b0111
+        assert_valid_ph_pi_relationship({'PH': '7'})
+
+    def test_valid_ph_with_mandatory_pi_bits(self):
+        # PH bit 4 is set, PI is present
+        # 16 = 0b10000
+        assert_valid_ph_pi_relationship({'PH': '16', 'PI': 'some instruction'})
+
+    def test_invalid_ph_mandatory_pi_bit_set_no_pi(self):
+        # PH bit 4 is set, but PI is missing
+        msg = fail_msg(assert_valid_ph_pi_relationship, {'PH': '16'})
+        self.assertIn("'PI' key must be present", msg)
+
+    def test_invalid_pi_no_ph(self):
+        # PI is present, but PH is missing
+        msg = fail_msg(assert_valid_ph_pi_relationship, {'PI': 'some instruction'})
+        self.assertIn("'PH' key must be present", msg)
+
+    def test_invalid_pi_with_ph_missing_related_bits(self):
+        # PI is present, PH is present but has none of bits 4, 8-12, 15-22 set
+        # 7 = 0b0111
+        msg = fail_msg(assert_valid_ph_pi_relationship, {'PH': '7', 'PI': 'some instruction'})
+        self.assertIn("'PH' key must have at least one of bits", msg)
+
+    def test_empty_txt(self):
+        # No PH or PI, should pass
+        assert_valid_ph_pi_relationship({})
 
 
 class TestAssertValidProductId(unittest.TestCase):

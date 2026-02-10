@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -2222,7 +2222,7 @@ cluster IcdManagement = 70 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
-  revision 7;
+  revision 10;
 
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;

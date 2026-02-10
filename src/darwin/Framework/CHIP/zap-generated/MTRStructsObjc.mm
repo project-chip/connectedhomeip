@@ -4841,11 +4841,13 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupID = @(0);
 
-        _endpoints = [NSArray array];
+        _endpoints = nil;
 
         _keySetID = @(0);
 
-        _hasAuxiliaryACL = @(0);
+        _hasAuxiliaryACL = nil;
+
+        _mcastAddrPolicy = @(0);
 
         _fabricIndex = @(0);
     }
@@ -4860,6 +4862,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.endpoints = self.endpoints;
     other.keySetID = self.keySetID;
     other.hasAuxiliaryACL = self.hasAuxiliaryACL;
+    other.mcastAddrPolicy = self.mcastAddrPolicy;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -4867,7 +4870,58 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; hasAuxiliaryACL:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, _hasAuxiliaryACL, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; endpoints:%@; keySetID:%@; hasAuxiliaryACL:%@; mcastAddrPolicy:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupID, _endpoints, _keySetID, _hasAuxiliaryACL, _mcastAddrPolicy, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRGroupcastClusterGroupcastTestingEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sourceIpAddress = nil;
+
+        _destinationIpAddress = nil;
+
+        _groupID = nil;
+
+        _endpointID = nil;
+
+        _clusterID = nil;
+
+        _elementID = nil;
+
+        _accessAllowed = nil;
+
+        _groupcastTestResult = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRGroupcastClusterGroupcastTestingEvent alloc] init];
+
+    other.sourceIpAddress = self.sourceIpAddress;
+    other.destinationIpAddress = self.destinationIpAddress;
+    other.groupID = self.groupID;
+    other.endpointID = self.endpointID;
+    other.clusterID = self.clusterID;
+    other.elementID = self.elementID;
+    other.accessAllowed = self.accessAllowed;
+    other.groupcastTestResult = self.groupcastTestResult;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sourceIpAddress:%@; destinationIpAddress:%@; groupID:%@; endpointID:%@; clusterID:%@; elementID:%@; accessAllowed:%@; groupcastTestResult:%@; fabricIndex:%@; >", NSStringFromClass([self class]), [_sourceIpAddress base64EncodedStringWithOptions:0], [_destinationIpAddress base64EncodedStringWithOptions:0], _groupID, _endpointID, _clusterID, _elementID, _accessAllowed, _groupcastTestResult, _fabricIndex];
     return descriptionString;
 }
 
@@ -8448,6 +8502,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTROccupancySensingClusterPredictedOccupancyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startTimestamp = @(0);
+
+        _endTimestamp = @(0);
+
+        _occupancy = @(0);
+
+        _confidence = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterPredictedOccupancyStruct alloc] init];
+
+    other.startTimestamp = self.startTimestamp;
+    other.endTimestamp = self.endTimestamp;
+    other.occupancy = self.occupancy;
+    other.confidence = self.confidence;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTimestamp:%@; endTimestamp:%@; occupancy:%@; confidence:%@; >", NSStringFromClass([self class]), _startTimestamp, _endTimestamp, _occupancy, _confidence];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROccupancySensingClusterOccupancyChangedEvent
 - (instancetype)init
 {
@@ -8483,6 +8573,10 @@ NS_ASSUME_NONNULL_BEGIN
         _ambientContextSensed = [NSArray array];
 
         _detectionStartTime = nil;
+
+        _objectCountThreshold = nil;
+
+        _objectCount = nil;
     }
     return self;
 }
@@ -8493,13 +8587,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.ambientContextSensed = self.ambientContextSensed;
     other.detectionStartTime = self.detectionStartTime;
+    other.objectCountThreshold = self.objectCountThreshold;
+    other.objectCount = self.objectCount;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; objectCountThreshold:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime, _objectCountThreshold, _objectCount];
     return descriptionString;
 }
 
@@ -8575,6 +8671,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTimestamp:%@; endTimestamp:%@; ambientContextType:%@; crowdDetected:%@; crowdCount:%@; confidence:%@; >", NSStringFromClass([self class]), _startTimestamp, _endTimestamp, _ambientContextType, _crowdDetected, _crowdCount, _confidence];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterAmbientContextDetectedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ambientContextType = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectedEvent alloc] init];
+
+    other.ambientContextType = self.ambientContextType;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; >", NSStringFromClass([self class]), _ambientContextType];
     return descriptionString;
 }
 

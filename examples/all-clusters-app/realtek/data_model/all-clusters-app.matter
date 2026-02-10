@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -3020,7 +3020,11 @@ cluster UserLabel = 65 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
-  revision 1;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kChangeEvent = 0x1;
+  }
 
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -3194,7 +3198,7 @@ cluster OvenCavityOperationalState = 72 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster OvenMode = 73 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3216,10 +3220,10 @@ cluster OvenMode = 73 {
     kConvectionRoast = 16390;
     kWarming = 16391;
     kProofing = 16392;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kSteam = 16393;
+    kAirFry = 16394;
+    kAirSousVide = 16395;
+    kFrozenFood = 16396;
   }
 
   shared struct ModeTagStruct {
@@ -3319,7 +3323,7 @@ cluster ModeSelect = 80 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster LaundryWasherMode = 81 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3366,14 +3370,13 @@ cluster LaundryWasherMode = 81 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3418,8 +3421,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3510,11 +3512,10 @@ cluster RvcRunMode = 84 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3638,7 +3639,7 @@ cluster RefrigeratorAlarm = 87 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster DishwasherMode = 89 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3684,8 +3685,7 @@ cluster DishwasherMode = 89 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3879,7 +3879,7 @@ cluster DishwasherAlarm = 93 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster MicrowaveOvenMode = 94 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -4322,7 +4322,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
 /** This cluster is used to configure a boolean sensor. */
 cluster BooleanStateConfiguration = 128 {
-  revision 1;
+  revision 2;
 
   bitmap AlarmModeBitmap : bitmap8 {
     kVisual = 0x1;
@@ -4334,6 +4334,7 @@ cluster BooleanStateConfiguration = 128 {
     kAudible = 0x2;
     kAlarmSuppress = 0x4;
     kSensitivityLevel = 0x8;
+    kFaultEvents = 0x10;
   }
 
   bitmap SensorFaultBitmap : bitmap16 {
@@ -4371,9 +4372,9 @@ cluster BooleanStateConfiguration = 128 {
     AlarmModeBitmap alarmsToEnableDisable = 0;
   }
 
-  /** This command is used to suppress the specified alarm mode. */
+  /** This command will suppress the alarm modes specified. */
   command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
-  /** This command is used to enable or disable the specified alarm mode. */
+  /** This command allows setting the enable or disable value for the specified alarm modes. */
   command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 
@@ -5334,7 +5335,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
-  revision 5;
+  revision 8;
 
   enum EndProductType : enum8 {
     kRollerShade = 0;
@@ -6158,7 +6159,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 7;
+  revision 9;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
@@ -6609,7 +6610,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 5;
+  revision 7;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0 [spec_name = "PIR"];
@@ -6627,6 +6628,8 @@ cluster OccupancySensing = 1030 {
     kRadar = 0x20;
     kRFSensing = 0x40;
     kVision = 0x80;
+    kPrediction = 0x100;
+    kOccupancyEvent = 0x200;
   }
 
   bitmap OccupancyBitmap : bitmap8 {
@@ -6645,6 +6648,13 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeDefault = 2;
   }
 
+  struct PredictedOccupancyStruct {
+    epoch_s startTimestamp = 0;
+    epoch_s endTimestamp = 1;
+    OccupancyBitmap occupancy = 2;
+    percent confidence = 3;
+  }
+
   info event OccupancyChanged = 0 {
     OccupancyBitmap occupancy = 0;
   }
@@ -6654,6 +6664,7 @@ cluster OccupancySensing = 1030 {
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) optional int16u holdTime = 3;
   readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
+  provisional readonly attribute optional PredictedOccupancyStruct predictedOccupancy[] = 5;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
@@ -8784,22 +8795,22 @@ endpoint 1 {
   server cluster ValveConfigurationAndControl {
     emits event ValveStateChanged;
     emits event ValveFault;
-    ram      attribute openDuration;
+    callback attribute openDuration;
     persist  attribute defaultOpenDuration;
-    ram      attribute autoCloseTime;
+    callback attribute autoCloseTime;
     callback attribute remainingDuration;
-    ram      attribute currentState;
-    ram      attribute targetState;
-    ram      attribute currentLevel;
-    ram      attribute targetLevel;
+    callback attribute currentState;
+    callback attribute targetState;
+    callback attribute currentLevel;
+    callback attribute targetLevel;
     persist  attribute defaultOpenLevel default = 100;
-    ram      attribute valveFault default = 0;
+    callback attribute valveFault;
     ram      attribute levelStep default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Open;
     handle command Close;
@@ -9224,13 +9235,13 @@ endpoint 1 {
   }
 
   server cluster IlluminanceMeasurement {
-    ram      attribute measuredValue default = 0x0000;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x01;
     ram      attribute maxMeasuredValue default = 0xFFFE;
     ram      attribute tolerance;
     ram      attribute lightSensorType default = 0xFF;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster TemperatureMeasurement {

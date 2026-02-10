@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
+import("${chip_root}/src/system/system.gni")
 
 declare_args() {
   # Device platform layer: cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, nxp, qpg, tizen, cyw30739, bl602, zephyr, beken, none.
@@ -66,12 +67,13 @@ declare_args() {
 
   # Enable wifi support.
   chip_enable_wifi =
-      chip_device_platform == "linux" || chip_device_platform == "esp32" ||
-      chip_device_platform == "tizen" || chip_device_platform == "android" ||
-      chip_device_platform == "ameba" || chip_device_platform == "webos" ||
-      chip_device_platform == "cc32xx" || chip_device_platform == "bl602" ||
-      chip_device_platform == "beken" || chip_device_platform == "mt793x" ||
-      chip_device_platform == "asr" ||
+      (chip_device_platform == "linux" &&
+       !chip_system_config_use_openthread_inet_endpoints) ||
+      chip_device_platform == "esp32" || chip_device_platform == "tizen" ||
+      chip_device_platform == "android" || chip_device_platform == "ameba" ||
+      chip_device_platform == "webos" || chip_device_platform == "cc32xx" ||
+      chip_device_platform == "bl602" || chip_device_platform == "beken" ||
+      chip_device_platform == "mt793x" || chip_device_platform == "asr" ||
       (chip_device_platform == "darwin" && current_os == "mac")
 
   # Enable ethernet support
@@ -94,16 +96,20 @@ declare_args() {
   chip_enable_ota_requestor = false
 
   # Select DNS-SD implementation
-  if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
-      chip_device_platform == "psoc6" || chip_device_platform == "ameba" ||
-      chip_device_platform == "webos" || chip_device_platform == "cc32xx" ||
-      chip_device_platform == "beken" || chip_device_platform == "mt793x" ||
-      chip_device_platform == "asr" || chip_device_platform == "nuttx") {
+  if ((chip_device_platform == "linux" &&
+       !chip_system_config_use_openthread_inet_endpoints) ||
+      chip_device_platform == "esp32" || chip_device_platform == "psoc6" ||
+      chip_device_platform == "ameba" || chip_device_platform == "webos" ||
+      chip_device_platform == "cc32xx" || chip_device_platform == "beken" ||
+      chip_device_platform == "mt793x" || chip_device_platform == "asr" ||
+      chip_device_platform == "nuttx") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin" ||
              chip_device_platform == "cc13x4_26x4" || current_os == "android" ||
              chip_device_platform == "fake" ||
              chip_device_platform == "realtek_bee" ||
+             (chip_device_platform == "linux" &&
+              chip_system_config_use_openthread_inet_endpoints) ||
              chip_device_platform == "tizen") {
     chip_mdns = "platform"
   } else {

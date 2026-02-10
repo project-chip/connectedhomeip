@@ -33,7 +33,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Device Energy Management Mode
     - Dishwasher Mode
     - Electrical Energy Measurement
-    - Energy EVSE
     - Energy EVSE Mode
     - Joint Fabric Administrator
     - Laundry Washer Mode
@@ -128,6 +127,7 @@ CodeDrivenClusters:
     - Device Energy Management
     - Diagnostic Logs
     - Electrical Power Measurement
+    - Energy EVSE
     - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
@@ -137,6 +137,7 @@ CodeDrivenClusters:
     - HEPA Filter Monitoring
     - ICD Management
     - Identify
+    - Illuminance Measurement
     - Localization Configuration
     - OTA Software Update Provider
     - Occupancy Sensing
@@ -147,9 +148,11 @@ CodeDrivenClusters:
     - Software Diagnostics
     - TLS Certificate Management
     - TLS Client Management
+    - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization
     - Unit Localization
     - User Label
+    - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
     # keep-sorted end

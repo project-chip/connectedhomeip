@@ -211,10 +211,11 @@ config CHIP_APP_CLI
         Enable application implementation of the Matter CLI.
 
 config CHIP_APP_OPERATIONAL_KEYSTORE
-    bool "App Operational Keystore"
-    default y if OPERATIONAL_KEYSTORE
-    help
-        Enable application operational keystore.
+	bool "Use custom implementation of operational keystore"
+	default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
+	default y if CHIP_SE05X
+	help
+		Use custom implementation of operational keystore.
 
 if CHIP_APP_OPERATIONAL_KEYSTORE
     choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
@@ -383,7 +384,7 @@ config CHIP_APP_QUEUE_TICKS_TO_WAIT
     help
         Define app queue ticks to wait.
 
-config APP_TASK_STACK_SIZE
+config CHIP_APP_TASK_STACK_SIZE
     int "App Task Stack Size"
     default 9000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
     default 6144

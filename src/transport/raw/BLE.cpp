@@ -59,6 +59,11 @@ void BLEBase::ClearState()
     mState = State::kNotReady;
 }
 
+void BLEBase::Close()
+{
+    ClearState();
+}
+
 CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 {
     BleLayer * bleLayer = param.GetBleLayer();

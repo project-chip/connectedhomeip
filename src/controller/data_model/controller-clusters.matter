@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -3093,7 +3093,11 @@ cluster ProxyValid = 68 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
-  revision 1;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kChangeEvent = 0x1;
+  }
 
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -3313,7 +3317,7 @@ cluster OvenCavityOperationalState = 72 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster OvenMode = 73 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3335,10 +3339,10 @@ cluster OvenMode = 73 {
     kConvectionRoast = 16390;
     kWarming = 16391;
     kProofing = 16392;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kSteam = 16393;
+    kAirFry = 16394;
+    kAirSousVide = 16395;
+    kFrozenFood = 16396;
   }
 
   shared struct ModeTagStruct {
@@ -3435,7 +3439,7 @@ cluster ModeSelect = 80 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster LaundryWasherMode = 81 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3482,14 +3486,13 @@ cluster LaundryWasherMode = 81 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3534,8 +3537,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3626,11 +3628,10 @@ cluster RvcRunMode = 84 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3754,7 +3755,7 @@ cluster RefrigeratorAlarm = 87 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster DishwasherMode = 89 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3800,8 +3801,7 @@ cluster DishwasherMode = 89 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3995,7 +3995,7 @@ cluster DishwasherAlarm = 93 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster MicrowaveOvenMode = 94 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -4383,21 +4383,58 @@ provisional cluster ScenesManagement = 98 {
 cluster Groupcast = 101 {
   revision 1;
 
+  enum GroupcastTestResultEnum : enum8 {
+    kSuccess = 0;
+    kGeneralError = 1;
+    kMessageReplay = 2;
+    kFailedAuth = 3;
+    kNoAvailableKey = 4;
+    kSendFailure = 5;
+  }
+
+  enum GroupcastTestingEnum : enum8 {
+    kDisableTesting = 0;
+    kEnableListenerTesting = 1;
+    kEnableSenderTesting = 2;
+  }
+
+  enum MulticastAddrPolicyEnum : enum8 {
+    kIanaAddr = 0;
+    kPerGroup = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kListener = 0x1;
     kSender = 0x2;
+    kPerGroup = 0x4;
   }
 
   fabric_scoped struct MembershipStruct {
     group_id groupID = 0;
-    endpoint_no endpoints[] = 1;
+    optional endpoint_no endpoints[] = 1;
     fabric_sensitive int16u keySetID = 2;
-    boolean hasAuxiliaryACL = 3;
+    optional boolean hasAuxiliaryACL = 3;
+    MulticastAddrPolicyEnum mcastAddrPolicy = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_sensitive info event access(read: administer) GroupcastTesting = 0 {
+    optional octet_string sourceIpAddress = 0;
+    optional octet_string destinationIpAddress = 1;
+    optional group_id groupID = 2;
+    optional endpoint_no endpointID = 3;
+    optional cluster_id clusterID = 4;
+    optional int32u elementID = 5;
+    optional boolean accessAllowed = 6;
+    GroupcastTestResultEnum groupcastTestResult = 7;
     fabric_idx fabricIndex = 254;
   }
 
   readonly attribute MembershipStruct membership[] = 0;
   readonly attribute int16u maxMembershipCount = 1;
+  readonly attribute int16u maxMcastAddrCount = 2;
+  readonly attribute int16u usedMcastAddrCount = 3;
+  readonly attribute fabric_idx fabricUnderTest = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4411,6 +4448,7 @@ cluster Groupcast = 101 {
     optional octet_string<16> key = 3;
     optional boolean useAuxiliaryACL = 4;
     optional boolean replaceEndpoints = 5;
+    optional MulticastAddrPolicyEnum mcastAddrPolicy = 6;
   }
 
   request struct LeaveGroupRequest {
@@ -4434,6 +4472,11 @@ cluster Groupcast = 101 {
     boolean useAuxiliaryACL = 1;
   }
 
+  request struct GroupcastTestingRequest {
+    GroupcastTestingEnum testOperation = 0;
+    optional int16u durationSeconds = 1;
+  }
+
   /** This command SHALL be used to instruct the server to join a multicast group. */
   fabric command access(invoke: manage) JoinGroup(JoinGroupRequest): DefaultSuccess = 0;
   /** This command SHALL allow a maintainer to request that the server withdraws itself or specific endpoints from a specific group or from all groups of this client's fabric. */
@@ -4442,6 +4485,8 @@ cluster Groupcast = 101 {
   fabric command access(invoke: manage) UpdateGroupKey(UpdateGroupKeyRequest): DefaultSuccess = 3;
   /** This command SHALL allow an Administrator to enable or disable the generation of AuxiliaryACL entries in the Access Control Cluster based on the groups joined (see Groupcast Auxiliary ACL Handling). */
   fabric command access(invoke: administer) ConfigureAuxiliaryACL(ConfigureAuxiliaryACLRequest): DefaultSuccess = 4;
+  /** This command SHALL allow an Administrator to configure test modes that allow validation of Groupcast communication. */
+  fabric command access(invoke: administer) GroupcastTesting(GroupcastTestingRequest): DefaultSuccess = 5;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -4596,7 +4641,7 @@ cluster WaterTankLevelMonitoring = 121 {
 
 /** This cluster is used to configure a boolean sensor. */
 cluster BooleanStateConfiguration = 128 {
-  revision 1;
+  revision 2;
 
   bitmap AlarmModeBitmap : bitmap8 {
     kVisual = 0x1;
@@ -4608,6 +4653,7 @@ cluster BooleanStateConfiguration = 128 {
     kAudible = 0x2;
     kAlarmSuppress = 0x4;
     kSensitivityLevel = 0x8;
+    kFaultEvents = 0x10;
   }
 
   bitmap SensorFaultBitmap : bitmap16 {
@@ -4645,9 +4691,9 @@ cluster BooleanStateConfiguration = 128 {
     AlarmModeBitmap alarmsToEnableDisable = 0;
   }
 
-  /** This command is used to suppress the specified alarm mode. */
+  /** This command will suppress the alarm modes specified. */
   command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
-  /** This command is used to enable or disable the specified alarm mode. */
+  /** This command allows setting the enable or disable value for the specified alarm modes. */
   command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 
@@ -5802,7 +5848,7 @@ provisional cluster ElectricalGridConditions = 160 {
 
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
-  revision 7;
+  revision 10;
 
   enum AlarmCodeEnum : enum8 {
     kLockJammed = 0;
@@ -6453,7 +6499,7 @@ cluster DoorLock = 257 {
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
-  revision 5;
+  revision 8;
 
   enum EndProductType : enum8 {
     kRollerShade = 0;
@@ -7616,7 +7662,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 7;
+  revision 9;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
@@ -8067,7 +8113,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 5;
+  revision 7;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0 [spec_name = "PIR"];
@@ -8085,6 +8131,8 @@ cluster OccupancySensing = 1030 {
     kRadar = 0x20;
     kRFSensing = 0x40;
     kVision = 0x80;
+    kPrediction = 0x100;
+    kOccupancyEvent = 0x200;
   }
 
   bitmap OccupancyBitmap : bitmap8 {
@@ -8103,6 +8151,13 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeDefault = 2;
   }
 
+  struct PredictedOccupancyStruct {
+    epoch_s startTimestamp = 0;
+    epoch_s endTimestamp = 1;
+    OccupancyBitmap occupancy = 2;
+    percent confidence = 3;
+  }
+
   info event OccupancyChanged = 0 {
     OccupancyBitmap occupancy = 0;
   }
@@ -8112,6 +8167,7 @@ cluster OccupancySensing = 1030 {
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) optional int16u holdTime = 3;
   readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
+  provisional readonly attribute optional PredictedOccupancyStruct predictedOccupancy[] = 5;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
@@ -8709,13 +8765,15 @@ provisional cluster AmbientContextSensing = 1073 {
     kHumanActivity = 0x1;
     kObjectCounting = 0x2;
     kObjectIdentification = 0x4;
-    kSoundClassification = 0x8;
+    kSoundIdentification = 0x8;
     kPredictedActivity = 0x10;
   }
 
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
     optional epoch_s detectionStartTime = 1;
+    optional int16u objectCountThreshold = 2;
+    optional int16u objectCount = 3;
   }
 
   struct HoldTimeLimitsStruct {
@@ -8733,19 +8791,20 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
+  info event AmbientContextDetected = 0 {
+    AmbientContextTypeStruct ambientContextType[] = 0;
+  }
+
   readonly attribute optional boolean humanActivityDetected = 0;
   readonly attribute optional boolean objectIdentified = 1;
   readonly attribute optional boolean audioContextDetected = 2;
   readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
   attribute int8u simultaneousDetectionLimit = 5;
-  readonly attribute optional boolean countThresholdReached = 6;
-  attribute optional int16u countThreshold = 7;
-  readonly attribute optional int16u objectCount = 8;
-  attribute access(write: manage) optional int16u holdTime = 9;
-  readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 10;
-  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
-  readonly attribute optional boolean privacyModeEnabled = 12;
+  readonly attribute optional boolean objectCountReached = 6;
+  attribute access(write: manage) int16u holdTime = 7;
+  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 8;
+  readonly attribute access(write: manage) optional PredictedActivityStruct predictedActivity[] = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

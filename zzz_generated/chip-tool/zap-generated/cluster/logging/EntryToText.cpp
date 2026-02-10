@@ -2086,6 +2086,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Membership";
         case chip::app::Clusters::Groupcast::Attributes::MaxMembershipCount::Id:
             return "MaxMembershipCount";
+        case chip::app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id:
+            return "MaxMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id:
+            return "UsedMcastAddrCount";
+        case chip::app::Clusters::Groupcast::Attributes::FabricUnderTest::Id:
+            return "FabricUnderTest";
         case chip::app::Clusters::Groupcast::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Groupcast::Attributes::AcceptedCommandList::Id:
@@ -3505,6 +3511,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "HoldTime";
         case chip::app::Clusters::OccupancySensing::Attributes::HoldTimeLimits::Id:
             return "HoldTimeLimits";
+        case chip::app::Clusters::OccupancySensing::Attributes::PredictedOccupancy::Id:
+            return "PredictedOccupancy";
         case chip::app::Clusters::OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id:
             return "PIROccupiedToUnoccupiedDelay";
         case chip::app::Clusters::OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id:
@@ -3963,20 +3971,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AmbientContextTypeSupported";
         case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
             return "SimultaneousDetectionLimit";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThresholdReached::Id:
-            return "CountThresholdReached";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThreshold::Id:
-            return "CountThreshold";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
-            return "ObjectCount";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountReached::Id:
+            return "ObjectCountReached";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTime::Id:
             return "HoldTime";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTimeLimits::Id:
             return "HoldTimeLimits";
         case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
             return "PredictedActivity";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::PrivacyModeEnabled::Id:
-            return "PrivacyModeEnabled";
         case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:
@@ -5664,6 +5666,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "UpdateGroupKey";
         case chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::Id:
             return "ConfigureAuxiliaryACL";
+        case chip::app::Clusters::Groupcast::Commands::GroupcastTesting::Id:
+            return "GroupcastTesting";
         default:
             return "Unknown";
         }

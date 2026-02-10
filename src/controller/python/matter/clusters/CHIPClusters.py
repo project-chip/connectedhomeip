@@ -5520,6 +5520,7 @@ class ChipClusters:
                     "key": "bytes",
                     "useAuxiliaryACL": "bool",
                     "replaceEndpoints": "bool",
+                    "mcastAddrPolicy": "int",
                 },
             },
             0x00000001: {
@@ -5547,6 +5548,14 @@ class ChipClusters:
                     "useAuxiliaryACL": "bool",
                 },
             },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "GroupcastTesting",
+                "args": {
+                    "testOperation": "int",
+                    "durationSeconds": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -5558,6 +5567,24 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "MaxMembershipCount",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxMcastAddrCount",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "UsedMcastAddrCount",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "FabricUnderTest",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -10233,6 +10260,12 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000005: {
+                "attributeName": "PredictedOccupancy",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x00000010: {
                 "attributeName": "PIROccupiedToUnoccupiedDelay",
                 "attributeId": 0x00000010,
@@ -11462,47 +11495,28 @@ class ChipClusters:
                 "writable": True,
             },
             0x00000006: {
-                "attributeName": "CountThresholdReached",
+                "attributeName": "ObjectCountReached",
                 "attributeId": 0x00000006,
                 "type": "bool",
                 "reportable": True,
             },
             0x00000007: {
-                "attributeName": "CountThreshold",
+                "attributeName": "HoldTime",
                 "attributeId": 0x00000007,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
             0x00000008: {
-                "attributeName": "ObjectCount",
+                "attributeName": "HoldTimeLimits",
                 "attributeId": 0x00000008,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000009: {
-                "attributeName": "HoldTime",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x0000000A: {
-                "attributeName": "HoldTimeLimits",
-                "attributeId": 0x0000000A,
-                "type": "",
-                "reportable": True,
-            },
-            0x0000000B: {
                 "attributeName": "PredictedActivity",
-                "attributeId": 0x0000000B,
+                "attributeId": 0x00000009,
                 "type": "",
-                "reportable": True,
-            },
-            0x0000000C: {
-                "attributeName": "PrivacyModeEnabled",
-                "attributeId": 0x0000000C,
-                "type": "bool",
                 "reportable": True,
             },
             0x0000FFF8: {

@@ -8224,6 +8224,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)groupcastTestingWithParams:(MTRGroupcastClusterGroupcastTestingParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRGroupcastClusterGroupcastTestingParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Groupcast::Commands::GroupcastTesting::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMembershipWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeMembershipID) params:params];
@@ -8232,6 +8259,21 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxMembershipCountWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeMaxMembershipCountID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxMcastAddrCountWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeMaxMcastAddrCountID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUsedMcastAddrCountWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeUsedMcastAddrCountID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFabricUnderTestWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGroupcastID) attributeID:@(MTRAttributeIDTypeClusterGroupcastAttributeFabricUnderTestID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -15411,6 +15453,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOccupancySensingID) attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributeHoldTimeLimitsID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePredictedOccupancyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOccupancySensingID) attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePredictedOccupancyID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePIROccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeOccupancySensingID) attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID) params:params];
@@ -16549,30 +16596,9 @@ using chip::System::Clock::Timeout;
     [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCountThresholdReachedWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectCountReachedWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdReachedID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCountThresholdWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdID) params:params];
-}
-
-- (void)writeAttributeCountThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeCountThresholdWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeCountThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectCountWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeHoldTimeWithParams:(MTRReadParams * _Nullable)params
@@ -16599,11 +16625,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePredictedActivityWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributePredictedActivityID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePrivacyModeEnabledWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributePrivacyModeEnabledID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
