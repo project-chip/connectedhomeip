@@ -35,17 +35,18 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import secrets
-import time
-from mobly import asserts
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, has_cluster, run_if_endpoint_matches
-from matter.interaction_model import InteractionModelError, Status
 
-from src.python_testing.TC_GCAST_common import get_feature_map, valid_endpoints_list, generate_membership_entry_matcher
+from mobly import asserts
+from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -91,15 +92,12 @@ class TC_GCAST_2_2(MatterBaseTest):
                 TestStep("21c", "Test JoinGroup with ReplaceEndpoints=True: Replace EP1 with EP2 in Group G6"),
                 TestStep("21d", "TH awaits subscription report for Group G6 with only EP2"),
                 TestStep(22, "JoinGroup with Endpoint 0 (result: constraint error)")]
-        # Add McastAddrPolicy tests after this
 
     def pics_TC_GCAST_2_2(self) -> list[str]:
         return ["GCAST.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_2(self):
-        if self.matter_test_config.endpoint is None:
-            self.matter_test_config.endpoint = 0
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
 
@@ -114,7 +112,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("1b")
         await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
 
-        # TH subscribes to Membership attribute with min interval 0s and max interval 30s.
+        # Th subscribes to Membership attribute with min interval 0s and max interval 30s
         self.step("1c")
         sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
         await sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
@@ -124,9 +122,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         if not ln_enabled:
             self.mark_step_range_skipped("3a", 11)
 
-        # Attempt to join a Group G1 with a new key using the following configuration:
-        # {THcommand} JoinGroup (GroupID=G1, Endpoints=[EP1], KeySetID=K1, Key=InputKey1)
-        # success
+        # Attempt to join Group G1 with a new Key with KeySetID K1 on Endpoint EP1
         self.step("3a")
         groupID1 = 1
         keySetID1 = 1
@@ -143,17 +139,16 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("3b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID1, ln_enabled, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
+            group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
-        # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a.
+        # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a
         self.step("4a")
         if len(endpoints_list) < 2:
             self.mark_step_range_skipped("4b", "4c")
 
-        # Attempt to add EP2 to Group G1. {THcommand} JoinGroup (G1,[EP2],K1,Key omitted)
+        # Attempt to add EP2 to Group G1
         self.step("4b")
-
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
             endpoints=endpoints_list[0:2],
@@ -165,7 +160,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("4c")
         membership_matcher = generate_membership_entry_matcher(
-            groupID1, ln_enabled, endpoints=[endpoint1, endpoint2], key_set_id=keySetID1, has_auxiliary_acl=False)
+            group_id=groupID1, endpoints=[endpoint1, endpoint2], key_set_id=keySetID1, has_auxiliary_acl=False)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 with existing Key1 and using Auxiliary ACL
@@ -182,11 +177,10 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("5b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID2, ln_enabled, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=True)
+            group_id=groupID2, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=True)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
-        # Attempt to join Group G2 using a new Key:
-        # {THcommand} JoinGroup (GroupID=G2, Endpoints=[EP1], KeySetID=K2, Key=InputKey2)
+        # Attempt to join Group G2 with new Key
         self.step("6a")
         keySetID2 = 2
         inputKey2 = secrets.token_bytes(16)
@@ -202,7 +196,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("6b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID2, ln_enabled, key_set_id=keySetID2, endpoints=[endpoint1], has_auxiliary_acl=True)
+            group_id=groupID2, key_set_id=keySetID2, endpoints=[endpoint1], has_auxiliary_acl=True)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G3 using a new Key but providing existing KeySetID (result: already exists)
@@ -246,7 +240,7 @@ class TC_GCAST_2_2(MatterBaseTest):
                 endpoints=[endpoint_invalid],
                 keySetID=keySetID1)
             )
-            asserts.fail("JoinGroup command should have failed because endpoint is invalid (not in uint16 format), but it still succeeded")
+            asserts.fail("JoinGroup command should have failed because endpoint is invalid, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedEndpoint,
                                  f"Send JoinGroup command error should be {Status.UnsupportedEndpoint} instead of {e.status}")
@@ -254,7 +248,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # If Sender is supported in DUT, skip this step. Else, attempt to join Group G3 with an empty endpoints list (result: constraint error)
         self.step(10)
         if sd_enabled:
-            self.skip_step("10")
+            self.skip_step(10)
 
         endpoints_list_empty = []
         try:
@@ -305,7 +299,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("13b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID4, ln_enabled, key_set_id=keySetID4, endpoints=[])
+            group_id=groupID4, key_set_id=keySetID4, endpoints=[])
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G5 as Sender using existing KeySetID
@@ -320,7 +314,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("14b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID5, ln_enabled, key_set_id=keySetID4, endpoints=[])
+            group_id=groupID5, key_set_id=keySetID4, endpoints=[])
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G5 with new Key but providing existing KeySetID (result: already exists)
@@ -367,13 +361,14 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("16b")
         membership_matcher = generate_membership_entry_matcher(
-            groupID5, ln_enabled, key_set_id=keySetID5, endpoints=[])
+            group_id=groupID5, key_set_id=keySetID5, endpoints=[])
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Confirm If Listener featIsSupported, skip this step. Else attempt to add endpoints to Group G5 (result: constraint error)
         self.step(17)
         if ln_enabled:
-            self.skip_step("18")
+            self.skip_step(17)
+
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID5,
@@ -393,14 +388,14 @@ class TC_GCAST_2_2(MatterBaseTest):
                 groupID=groupID5,
                 endpoints=endpoints_list_empty,
                 keySetID=keySetID5,
-                useAuxiliaryACL="true")
+                useAuxiliaryACL=True)
             )
             asserts.fail("JoinGroup command should have failed because listener cannot do JoinGroup commands, but it still succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
-        # Negative Test, JoinGroup with invalid GroupID (result: constraint error)
+        # JoinGroup with invalid GroupID (result: constraint error)
         self.step(19)
         groupID0 = 0
         try:
@@ -425,39 +420,60 @@ class TC_GCAST_2_2(MatterBaseTest):
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
-        # Step 21: Test ReplaceEndpoints=True
-        if ln_enabled:
-            groupID6 = 6
-            keySetID6 = 6
-            key6 = secrets.token_bytes(16)
-
-            self.step("21a")
-            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(groupID=groupID6, endpoints=[endpoint1], keySetID=keySetID6, key=key6))
-
-            self.step("21b")
-            sub.await_all_expected_report_matches([generate_membership_entry_matcher(
-                groupID6, ln_enabled, key_set_id=keySetID6, endpoints=[endpoint1])], timeout_sec=35)
-
-            if endpoint2 and endpoint1 != endpoint2:
-
-                self.step("21c")
-                await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(groupID=groupID6, endpoints=[endpoint2], keySetID=keySetID6, replaceEndpoints=True))
-
-                self.step("21d")
-                sub.await_all_expected_report_matches([generate_membership_entry_matcher(
-                    groupID6, ln_enabled, key_set_id=keySetID6, endpoints=[endpoint2])], timeout_sec=35)
-            else:
-                self.mark_step_range_skipped("21c", "21d")
-        else:
+        # Test JoinGroup with ReplaceEndpoints=True: Add EP1 to Group G6
+        self.step("21a")
+        if not ln_enabled:
             self.mark_step_range_skipped("21a", "21d")
 
-        # Step 22: JoinGroup with Endpoint 0
+        groupID6 = 6
+        keySetID6 = 6
+        key6 = secrets.token_bytes(16)
+
+        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+            groupID=groupID6,
+            endpoints=[endpoint1],
+            keySetID=keySetID6,
+            key=key6)
+        )
+
+        # TH awaits subscription report for Group G6 with EP1
+        self.step("21b")
+        sub.await_all_expected_report_matches([generate_membership_entry_matcher(
+            group_id=groupID6, key_set_id=keySetID6, endpoints=[endpoint1])], timeout_sec=60)
+
+        # Test JoinGroup with ReplaceEndpoints=True: Replace EP1 with EP2 in Group G6
+        self.step("21c")
+        if not (endpoint2 and endpoint1 != endpoint2):
+            self.mark_step_range_skipped("21c", "21d")
+
+        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+            groupID=groupID6,
+            endpoints=[endpoint2],
+            keySetID=keySetID6,
+            replaceEndpoints=True)
+        )
+
+        # TH awaits subscription report for Group G6 with only EP2
+        self.step("21d")
+        sub.await_all_expected_report_matches([generate_membership_entry_matcher(
+            group_id=groupID6, key_set_id=keySetID6, endpoints=[endpoint2])], timeout_sec=60)
+
+        # JoinGroup with Endpoint 0 (result: constraint error)
         self.step(22)
-        if ln_enabled:
-            with self.assertRaises(InteractionModelError) as e:
-                await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(groupID=1, endpoints=[0], keySetID=1))
-            asserts.assert_equal(e.exception.status, Status.ConstraintError, "Expected ConstraintError for Endpoint 0")
-        else:
+        if not ln_enabled:
             self.skip_step(22)
 
-        await sub.stop()
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=1,
+                endpoints=[0],
+                keySetID=1)
+            )
+            asserts.fail("JoinGroup command should have failed for Endpoint 0, but it succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
