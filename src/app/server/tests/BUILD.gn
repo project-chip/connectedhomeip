@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestJointFabricDatastore.cpp",
     "TestServerPortRetry.cpp",
+    "TestThreadRendezvousAnnouncement.cpp",
   ]
 
   public_deps = [
