@@ -18,7 +18,7 @@
 
 namespace chip::app::Clusters {
 
-/// Provides information for code that requires information about weather a device
+/// Provides information for code that requires information about whether a device
 /// is currently actively identifying or not.
 ///
 /// This is separated out from the cluster itself, so that unit testing is

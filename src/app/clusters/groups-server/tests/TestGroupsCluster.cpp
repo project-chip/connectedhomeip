@@ -73,20 +73,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR MakeSceneInvalidForAllFabrics() override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR MakeSceneInvalidForAllFabrics() override { return CHIP_NO_ERROR; }
 
     uint32_t mGroupWillBeRemovedCallCount = 0;
     FabricIndex mLastFabricIndex          = kUndefinedFabricIndex;
@@ -802,11 +793,12 @@ TEST_F(TestGroupsCluster, TestFabricScoping)
 
 // Tests that group name changes are node-wide.
 // Spec: The server stores a name string, which is set by the client for each assigned group.
-// The GroupName associated with the GroupID in the Group Table SHALL be updated to reflect the new GroupName provided for the Group,
-// such that subsequent ViewGroup commands yield the same name for all endpoints which have a group association to the given GroupID.
+// The GroupName associated with the GroupID in the Group Table SHALL be updated to reflect the new GroupName provided for the
+// Group, such that subsequent ViewGroup commands yield the same name for all endpoints which have a group association to the given
+// GroupID.
 TEST_F(TestGroupsCluster, TestGroupNameNodeWide)
 {
-    constexpr GroupId kGroupId = 1;
+    constexpr GroupId kGroupId      = 1;
     constexpr EndpointId kEndpoint1 = 1;
     constexpr EndpointId kEndpoint2 = 2;
 
@@ -814,43 +806,43 @@ TEST_F(TestGroupsCluster, TestGroupNameNodeWide)
     MapGroupToKeyset(kTestFabricIndex, kGroupId, kKeysetId);
 
     // Endpoint 1
-    GroupsCluster cluster1(kEndpoint1, {mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate});
+    GroupsCluster cluster1(kEndpoint1, { mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate });
     ClusterTester tester1(cluster1);
     tester1.SetFabricIndex(kTestFabricIndex);
 
     // Endpoint 2
-    GroupsCluster cluster2(kEndpoint2, {mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate});
+    GroupsCluster cluster2(kEndpoint2, { mGroupDataProvider, &mScenesDelegate, &mIdentifyDelegate });
     ClusterTester tester2(cluster2);
     tester2.SetFabricIndex(kTestFabricIndex);
 
     // Add group to Endpoint 1
     {
-        Groups::Commands::AddGroup::Type request = {kGroupId, "Group Name 1"_span};
-        auto result = tester1.Invoke<Groups::Commands::AddGroup::Type>(request);
+        Groups::Commands::AddGroup::Type request = { kGroupId, "Group Name 1"_span };
+        auto result                              = tester1.Invoke<Groups::Commands::AddGroup::Type>(request);
         EXPECT_TRUE(result.IsSuccess());
         EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
     }
 
     // Add group to Endpoint 2
     {
-        Groups::Commands::AddGroup::Type request = {kGroupId, "Group Name 1"_span};
-        auto result = tester2.Invoke<Groups::Commands::AddGroup::Type>(request);
+        Groups::Commands::AddGroup::Type request = { kGroupId, "Group Name 1"_span };
+        auto result                              = tester2.Invoke<Groups::Commands::AddGroup::Type>(request);
         EXPECT_TRUE(result.IsSuccess());
         EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
     }
 
     // Update group name from Endpoint 1
     {
-        Groups::Commands::AddGroup::Type request = {kGroupId, "Updated Name"_span};
-        auto result = tester1.Invoke<Groups::Commands::AddGroup::Type>(request);
+        Groups::Commands::AddGroup::Type request = { kGroupId, "Updated Name"_span };
+        auto result                              = tester1.Invoke<Groups::Commands::AddGroup::Type>(request);
         EXPECT_TRUE(result.IsSuccess());
         EXPECT_EQ(CodeFor(result.response->status), Protocols::InteractionModel::Status::Success);
     }
 
     // Verify name change on Endpoint 1
     {
-        Groups::Commands::ViewGroup::Type request = {kGroupId};
-        auto viewResult = tester1.Invoke<Groups::Commands::ViewGroup::Type>(request);
+        Groups::Commands::ViewGroup::Type request = { kGroupId };
+        auto viewResult                           = tester1.Invoke<Groups::Commands::ViewGroup::Type>(request);
         EXPECT_TRUE(viewResult.IsSuccess());
         EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
         EXPECT_TRUE(viewResult.response->groupName.data_equal("Updated Name"_span));
@@ -858,8 +850,8 @@ TEST_F(TestGroupsCluster, TestGroupNameNodeWide)
 
     // Verify name change on Endpoint 2
     {
-        Groups::Commands::ViewGroup::Type request = {kGroupId};
-        auto viewResult = tester2.Invoke<Groups::Commands::ViewGroup::Type>(request);
+        Groups::Commands::ViewGroup::Type request = { kGroupId };
+        auto viewResult                           = tester2.Invoke<Groups::Commands::ViewGroup::Type>(request);
         EXPECT_TRUE(viewResult.IsSuccess());
         EXPECT_EQ(CodeFor(viewResult.response->status), Protocols::InteractionModel::Status::Success);
         EXPECT_TRUE(viewResult.response->groupName.data_equal("Updated Name"_span));
