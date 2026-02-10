@@ -130,7 +130,7 @@ private:
 // avoid `-Wctad-maybe-unsupported` error
 struct AllowCTAD;
 
-// A dummy deduction guide, which is never slected because the struct is incomplete
+// A dummy deduction guide, which is never selected because the struct is incomplete
 [[maybe_unused]] AutoRelease(AllowCTAD) -> AutoRelease<void>;
 
 /// Convenience macro to auto-create a variable for you to release the given name at
