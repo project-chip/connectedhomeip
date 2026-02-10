@@ -1523,7 +1523,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error(f"Failed to reboot app: {e}")
                 asserts.fail(f"App reboot failed: {e}")
 
-    async def request_factory_reset(self, app_only: bool = False) -> None:
+    async def request_factory_reset(self, app_only: bool = True) -> None:
         """Request a factory reset of the Device Under Test (DUT).
 
         This method handles factory resets in both CI and development environments and also manual
@@ -1533,7 +1533,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Args:
             app_only (bool): If True, removes app and REPL configs but keeps controller config.
                              If False, also removes controller config.
-                             Defaults to False.
+                             Defaults to True.
 
         Returns:
             None

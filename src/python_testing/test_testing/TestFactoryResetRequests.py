@@ -57,7 +57,7 @@ class TestFactoryResetRequests(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
         return new_fabric_admin.NewController(paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
-    async def factory_reset_and_pase(self, setup_params: SetupParameters, pase_node_id: int, app_only: bool = False):
+    async def factory_reset_and_pase(self, setup_params: SetupParameters, pase_node_id: int, app_only: bool):
         # Get a new controller
         th2 = self.get_new_controller()
 
@@ -74,7 +74,7 @@ class TestFactoryResetRequests(MatterBaseTest):
     async def test_TestFactoryResetRequests(self):
         pase_node_id = self.dut_node_id + 1
         setup_params = SetupParameters(
-            discriminator=1324,
+            discriminator=1234,
             passcode=20202021
         )
 
