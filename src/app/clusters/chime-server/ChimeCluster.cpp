@@ -23,7 +23,7 @@
 #include "ChimeCluster.h"
 
 #include <app/EventLogging.h>
-#include <app/SafeAttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Chime/Attributes.h>
 #include <clusters/Chime/Commands.h>
@@ -59,7 +59,7 @@ CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    LoadPersistentAttributes();
+    LoadPersistentAttributes(context);
     return CHIP_NO_ERROR;
 }
 
@@ -80,36 +80,16 @@ CHIP_ERROR ChimeCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBu
     return listBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {});
 }
 
-// TODO: Migrate to use context.attributeStorage instead of SafeAttributePersistenceProvider
-void ChimeCluster::LoadPersistentAttributes()
+void ChimeCluster::LoadPersistentAttributes(ServerClusterContext & context)
 {
+    AttributePersistence persistence(context.attributeStorage);
+
     // Load Active Chime ID
-    uint8_t storedSelectedChime = 0;
-    CHIP_ERROR err              = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id), storedSelectedChime);
-    if (err == CHIP_NO_ERROR)
-    {
-        mSelectedChime = storedSelectedChime;
-    }
-    else
-    {
-        // otherwise defaults
-        ChipLogDetail(Zcl, "Chime: Unable to load the SelectedChime attribute from the KVS. Defaulting to %u", mSelectedChime);
-    }
+    (void) persistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
+                                                      mSelectedChime, 0);
 
     // Load Enabled
-    bool storedEnabled = false;
-    err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id),
-                                                                 storedEnabled);
-    if (err == CHIP_NO_ERROR)
-    {
-        mEnabled = storedEnabled;
-    }
-    else
-    {
-        // otherwise take the default
-        ChipLogDetail(Zcl, "Chime: Unable to load the Enabled attribute from the KVS. Defaulting to %u", mEnabled);
-    }
+    (void) persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, false);
 }
 
 DataModel::ActionReturnStatus ChimeCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -229,9 +209,10 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
     }
     if (SetAttributeValue(mSelectedChime, chimeID, Attributes::SelectedChime::Id))
     {
-        // TODO: Migrate to use context.attributeStorage
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            { mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id }, mSelectedChime);
+        VerifyOrReturnValue(mContext != nullptr, Protocols::InteractionModel::Status::Success);
+        TEMPORARY_RETURN_IGNORED mContext->attributeStorage.WriteValue(
+            { mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id },
+            { reinterpret_cast<const uint8_t *>(&mSelectedChime), sizeof(mSelectedChime) });
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -240,9 +221,10 @@ Status ChimeCluster::SetEnabled(bool enabled)
 {
     if (SetAttributeValue(mEnabled, enabled, Attributes::Enabled::Id))
     {
-        // TODO: Migrate to use context.attributeStorage
-        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            { mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id }, mEnabled);
+        VerifyOrReturnValue(mContext != nullptr, Protocols::InteractionModel::Status::Success);
+        TEMPORARY_RETURN_IGNORED mContext->attributeStorage.WriteValue(
+            { mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id },
+            { reinterpret_cast<const uint8_t *>(&mEnabled), sizeof(mEnabled) });
     }
     return Protocols::InteractionModel::Status::Success;
 }
