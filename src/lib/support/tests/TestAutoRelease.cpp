@@ -100,7 +100,7 @@ TEST_F(TestAutoRelease, TestMove)
         EXPECT_EQ(releasable.Counter(), 1);
 
         // move
-        AutoRelease<TestCounterRelease> r2{std::move(r1)};
+        AutoRelease<TestCounterRelease> r2{ std::move(r1) };
         EXPECT_EQ(releasable.Counter(), 1);
 
         AutoRelease<TestCounterRelease> r3(&releasable2);
