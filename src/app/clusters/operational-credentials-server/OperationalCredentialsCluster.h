@@ -25,7 +25,6 @@
 #include <clusters/OperationalCredentials/ClusterId.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProvider.h>
-#include <include/platform/PlatformManager.h>
 
 namespace chip {
 namespace app {
@@ -48,7 +47,7 @@ public:
         app::EventManagement & eventManagement;
     };
 
-    OperationalCredentialsCluster(EndpointId endpoint, Context && context) :
+    OperationalCredentialsCluster(EndpointId endpoint, Context context) :
         DefaultServerCluster({ endpoint, OperationalCredentials::Id }), mOpCredsContext(std::move(context)){};
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -74,7 +73,7 @@ public:
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 private:
-    const OperationalCredentialsCluster::Context mOpCredsContext;
+    OperationalCredentialsCluster::Context mOpCredsContext;
 
     FabricTable & GetFabricTable();
     FailSafeContext & GetFailSafeContext();
