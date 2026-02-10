@@ -38,6 +38,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
@@ -107,30 +108,6 @@ BitFlags<Feature> WiFiFeatures(WiFiDriver * driver)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     return features;
 }
-
-/// Performs an auto-release of the given item, generally an `Iterator` type
-/// like Wifi or Thread scan results.
-template <typename T>
-class AutoRelease
-{
-public:
-    AutoRelease(const AutoRelease &)             = delete;
-    AutoRelease & operator=(const AutoRelease &) = delete;
-    AutoRelease & operator=(AutoRelease &&)      = delete;
-
-    AutoRelease(AutoRelease && other) : mValue(other.mValue) { other.mValue = nullptr; }
-    AutoRelease(T * iterator) : mValue(iterator) {}
-    ~AutoRelease()
-    {
-        if (mValue != nullptr)
-        {
-            mValue->Release();
-        }
-    }
-
-private:
-    T * mValue;
-};
 
 // avoid `-Wctad-maybe-unsupported` error
 template <typename T>
