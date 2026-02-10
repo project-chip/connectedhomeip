@@ -277,7 +277,7 @@ class CAHierarchy:
             key_path = self.directory / f"{dns}.key"
             if cert_path.exists() and key_path.exists():
                 cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
-                if datetime.datetime.now() > cert.not_valid_after:
+                if datetime.datetime.now(datetime.timezone.utc) < cert.not_valid_after:
                     # We only reuse the certificate/key if the cert is still valid
                     return (key_path, cert_path, True)
 
