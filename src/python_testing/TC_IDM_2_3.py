@@ -34,7 +34,7 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
+#
 import logging
 
 from mobly import asserts
