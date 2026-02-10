@@ -1523,7 +1523,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error(f"Failed to reboot app: {e}")
                 asserts.fail(f"App reboot failed: {e}")
 
-    async def request_app_factory_reset(self, reset_ctrl: bool = False) -> None:
+    async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:
         """Request a factory reset of the Device Under Test (DUT).
 
         This method handles factory resets in both CI and development environments and also manual

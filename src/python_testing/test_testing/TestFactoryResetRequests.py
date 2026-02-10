@@ -62,7 +62,7 @@ class TestFactoryResetRequests(MatterBaseTest):
         th2 = self.get_new_controller()
 
         # Request factory reset
-        await self.request_app_factory_reset(reset_ctrl=reset_ctrl)
+        await self.request_device_factory_reset(reset_ctrl=reset_ctrl)
 
         # Open a PASE session
         await th2.FindOrEstablishPASESession(
