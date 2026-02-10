@@ -223,7 +223,9 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
                 .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
                 .testEventTriggerDelegate   = testEventTriggerDelegate,                              //
-
+                .dacProvider            = Credentials::GetDeviceAttestationCredentialsProvider(), //
+                .accessControl          = Access::GetAccessControl(),              //
+                .eventManagement        = EventManagement::GetInstance(), //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

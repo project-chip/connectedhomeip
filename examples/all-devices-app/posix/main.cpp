@@ -93,6 +93,10 @@ public:
         DeviceLoadStatusProvider & deviceLoadStatusProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         TestEventTriggerDelegate * testEventTriggerDelegate;
+        Credentials::DeviceAttestationCredentialsProvider & dacProvider;
+        Access::AccessControl & accessControl;
+        EventManagement & eventManagement;
+
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -209,6 +213,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
             .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
+            .dacProvider                = Credentials::GetDeviceAttestationCredentialsProvider(), //
+            .accessControl              = Access::GetAccessControl(),              //
+            .eventManagement            = EventManagement::GetInstance(),                       //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

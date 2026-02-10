@@ -31,8 +31,12 @@
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
+<<<<<<< HEAD
 #include <platform/DiagnosticDataProvider.h>
 
+=======
+#include <credentials/DeviceAttestationCredsProvider.h>
+>>>>>>> 488d0336bb (Decouple OpCredCluster)
 namespace chip {
 namespace app {
 
@@ -56,7 +60,9 @@ public:
         DeviceLoadStatusProvider & deviceLoadStatusProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         TestEventTriggerDelegate * testEventTriggerDelegate;
-
+        Credentials::DeviceAttestationCredentialsProvider & dacProvider;
+        Access::AccessControl & accessControl;
+        EventManagement & eventManagement;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
