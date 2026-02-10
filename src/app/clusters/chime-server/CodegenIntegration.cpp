@@ -16,7 +16,6 @@
  */
 
 #include "CodegenIntegration.h"
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
@@ -25,9 +24,7 @@ using namespace chip;
 using namespace chip::app;
 using chip::app::Clusters::ChimeServer;
 
-ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) :
-    mCluster(endpointId, delegate, *GetSafeAttributePersistenceProvider())
-{}
+ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate) {}
 
 ChimeServer::~ChimeServer()
 {
