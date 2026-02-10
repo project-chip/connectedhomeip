@@ -451,6 +451,7 @@ full list):
 -   `closure`
 -   `energy-gateway`
 -   `evse`
+-   `water-heater`
 -   `fabric-sync`
 -   `lit-icd`
 -   `lock`

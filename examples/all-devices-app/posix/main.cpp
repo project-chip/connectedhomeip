@@ -21,13 +21,18 @@
 #include <AppRootNode.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
+#include <app/DeviceLoadStatusProvider.h>
+#include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <app_options/AppOptions.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <devices/device-factory/DeviceFactory.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
@@ -85,6 +90,9 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
+        DeviceLoadStatusProvider & deviceLoadStatusProvider;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        TestEventTriggerDelegate * testEventTriggerDelegate;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
@@ -107,6 +115,9 @@ public:
                     .groupDataProvider          = mContext.groupDataProvider,          //
                     .sessionManager             = mContext.sessionManager,             //
                     .dnssdServer                = mContext.dnssdServer,                //
+                    .deviceLoadStatusProvider   = mContext.deviceLoadStatusProvider,   //
+                    .diagnosticDataProvider     = mContext.diagnosticDataProvider,     //
+                    .testEventTriggerDelegate   = mContext.testEventTriggerDelegate,   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
@@ -195,6 +206,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .groupDataProvider          = gGroupDataProvider,                                    //
             .sessionManager             = Server::GetInstance().GetSecureSessionManager(),       //
             .dnssdServer                = DnssdServer::Instance(),                               //
+            .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
+            .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
+            .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),

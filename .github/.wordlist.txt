@@ -711,6 +711,7 @@ ICD
 ICDs
 iCloud
 ICMP
+idempotency
 IDF
 IDL
 IDLs
@@ -956,6 +957,7 @@ MLD
 mmevk
 moal
 Mobly
+Mockito
 ModeSelect
 modprobe
 Modustoolbox
@@ -1037,6 +1039,7 @@ nwk
 NXP
 objcopy
 OccupancySensing
+OCMock
 OctetString
 OECORE
 OID
@@ -1242,6 +1245,8 @@ Realtek
 rebase
 recommand
 recommanded
+Reconnection
+reconnection
 recurse
 refrigeratoralarm
 regen

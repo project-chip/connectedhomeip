@@ -1688,3 +1688,33 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 0
 #endif // CHIP_DEVICE_ENABLE_PORT_PARAMS
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+ *
+ * Enable automatic port retry to handle port conflicts.
+ * When enabled, if binding to the operational service port (or user directed commissioning port)
+ * fails with "address in use", the system will automatically try additional sequential ports
+ * up to CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT.
+ *
+ * For example: if operationalServicePort=5540 and CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT=9,
+ * it will try ports 5540, 5541, 5542, ... up to 5549 until one succeeds.
+ *
+ * When set to 0 (default), no retry is attempted - implements single port behavior.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+#define CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
+/**
+ * CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT
+ *
+ * Number of sequential port retries if binding fails with "address in use".
+ * Only used when CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY is enabled.
+ *
+ * Default value is 9, which means up to 10 ports will be tried (original + 9 retries).
+ * 9 was chosen since CHIP_UDC_PORT defaults to CHIP_PORT + 10 so trying to avoid UDC port.
+ */
+#ifndef CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT
+#define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
+#endif // CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT

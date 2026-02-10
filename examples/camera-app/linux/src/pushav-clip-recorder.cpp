@@ -125,8 +125,8 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         {
             if (!std::filesystem::create_directories(p, ec))
             {
-                ChipLogError(Camera, "Failed to create directory: %s, error code: %d (%s)", p.c_str(), ec.value(),
-                             ec.message().c_str());
+                ChipLogError(Camera, "Failed to create directory: %s, error code: %d (%s), category: %s", p.c_str(), ec.value(),
+                             ec.message().c_str(), ec.category().name());
                 return false;
             }
             // Set permissions to file: (owner rwx, group rx)
@@ -137,7 +137,8 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         }
         else if (!std::filesystem::is_directory(p, ec))
         {
-            ChipLogError(Camera, "Path is not a directory: %s, error code: %d (%s)", p.c_str(), ec.value(), ec.message().c_str());
+            ChipLogError(Camera, "Path is not a directory: %s, error code: %d (%s), category: %s", p.c_str(), ec.value(),
+                         ec.message().c_str(), ec.category().name());
             return false;
         }
 
@@ -520,11 +521,16 @@ RecorderStatus PushAVClipRecorder::StartClipRecording()
                             mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
             break; // Exit loop
         }
-        if (ProcessBuffersAndWrite() == RecorderStatus::kFail)
+        RecorderStatus status = ProcessBuffersAndWrite();
+        if (status == RecorderStatus::kFail)
         {
             ChipLogError(Camera, "Error processing buffers and writing");
             result = RecorderStatus::kFail;
             Stop();
+        }
+        else if (status == RecorderStatus::kWarning)
+        {
+            ChipLogProgress(Camera, "Warning occurred while processing buffers and writing");
         }
     }
     CleanupOutput();
@@ -870,8 +876,10 @@ void PushAVClipRecorder::FinalizeCurrentClip(ClipFinalizationReason reason)
         const auto & timeBase = mClipInfo.mHasVideo ? mVideoInfo.mVideoTimeBase : mAudioInfo.mAudioTimeBase;
         if (timeBase.num == 0)
         {
-            ChipLogError(Camera, "Invalid timebase (num=0) for %s stream in sessionID: %" PRIu64 " Track name: %s",
+            ChipLogError(Camera,
+                         "Invalid timebase (num=0) for %s stream in sessionID: %" PRIu64 " Track name: %s - stopping recording",
                          mClipInfo.mHasVideo ? "video" : "audio", mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
+            reason = ClipFinalizationReason::kErrorOccurred;
         }
         else
         {
