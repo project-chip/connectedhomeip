@@ -34,6 +34,8 @@ from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
+log = logging.getLogger(__name__)
+
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -42,9 +44,6 @@ if sys.platform == 'linux':
 
 if sys.platform == 'darwin':
     import chiptest.darwin
-
-log = logging.getLogger(__name__)
-
 
 class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
