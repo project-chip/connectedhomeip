@@ -40,6 +40,7 @@ __all__ = [
     "WpaSupplicantMock",
     "ensure_network_namespace_availability",
     "ensure_private_state",
+    "LinuxNamespacedExecutor"
 ]
 
 
