@@ -214,7 +214,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
             .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
-            .dacProvider = Credentials::GetDeviceAttestationCredentialsProvider(), //                                           //
+            .dacProvider = *Credentials::GetDeviceAttestationCredentialsProvider(), //                                           //
             .eventManagement = EventManagement::GetInstance(),                     //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -265,6 +265,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     PrintOnboardingCodes(payload);
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    
     chip::app::SetTerminateHandler(StopSignalHandler);
 
     // This message is used as a marker for when the application process has started.
