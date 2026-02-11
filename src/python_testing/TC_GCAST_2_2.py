@@ -104,6 +104,8 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("1a")
         ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
+        if not endpoints_list:
+            self.mark_step_range_skipped("1b", 8)
 
         # TH removes any existing group and KeySetID on the DUT.
         self.step("1b")
@@ -144,7 +146,7 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a
         self.step("4a")
-        if len(endpoints_list) == 1:
+        if len(endpoints_list) < 2:
             self.mark_step_range_skipped("4b", "4c")
 
         # Attempt to add EP2 to Group G1
@@ -272,7 +274,7 @@ class TC_GCAST_2_2(MatterBaseTest):
             try:
                 await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                     groupID=groupID3,
-                    endpoints=[endpoints_list_exceeds_DUT_endpoints],
+                    endpoints=endpoints_list_exceeds_DUT_endpoints,
                     keySetID=keySetID2)
                 )
                 asserts.fail(
@@ -290,10 +292,12 @@ class TC_GCAST_2_2(MatterBaseTest):
         self.step("13a")
         groupID4 = 4
         keySetID4 = 4
+        inputKey4 = secrets.token_bytes(16)
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID4,
             endpoints=endpoints_list_empty,
-            keySetID=keySetID4)
+            keySetID=keySetID4,
+            key=inputKey4)
         )
 
         # TH awaits subscription report of new membership within max interval
@@ -367,7 +371,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # Confirm If Listener featIsSupported, skip this step. Else attempt to add endpoints to Group G5 (result: constraint error)
         self.step(17)
         if ln_enabled:
-            self.skip_step(17)
+            self.skip_step(17)  # go to step 18
 
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
