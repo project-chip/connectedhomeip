@@ -66,7 +66,6 @@ CommandHandlerInterfaceOnlyClusters:
 ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
-    - Groups
     - Level Control
     - Mode Select
     - On/Off
@@ -134,6 +133,7 @@ CodeDrivenClusters:
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - Groups
     - HEPA Filter Monitoring
     - ICD Management
     - Identify
