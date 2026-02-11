@@ -313,12 +313,11 @@ class IsolatedNetworkNamespace:
 
             # Bring up selected links.
             if mgmt_link_up:
-                self.mgmt_link.activate(wait_for_dad=False)
+                self.mgmt_link.activate()
             if ctrl_link_up:
-                self.ctrl_link.activate(wait_for_dad=False)
+                self.ctrl_link.activate()
             if app_link_up:
-                self.app_link.activate(wait_for_dad=False)
-            NetworkLink.wait_for_duplicate_address_detection()
+                self.app_link.activate()
         except BaseException as e:
             log.error("Encountered error while setting up network namespaces: %r", e)
             # Ensure that we leave a clean state on any exception.
