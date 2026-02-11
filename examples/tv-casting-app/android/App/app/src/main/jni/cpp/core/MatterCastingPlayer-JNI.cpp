@@ -167,13 +167,13 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     matter::casting::core::IdentificationDeclarationOptions idOptions;
     if (jIdentificationDeclarationOptions != nullptr)
     {
-        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::sendUDC() jIdentificationDeclarationOptions was provided by client");
+        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jIdentificationDeclarationOptions was provided by client");
         std::unique_ptr<matter::casting::core::IdentificationDeclarationOptions> idOptionsCpp(
             support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions));
         if (idOptionsCpp == nullptr)
         {
             ChipLogError(AppServer,
-                         "MatterCastingPlayer-JNI::sendUDC() "
+                         "MatterCastingPlayer-JNI::verifyOrEstablishConnection() "
                          "convertIdentificationDeclarationOptionsFromJavaToCpp() error");
             return support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT);
         }
@@ -183,7 +183,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     else
     {
         ChipLogProgress(AppServer,
-                        "MatterCastingPlayer-JNI::sendUDC() Optional jIdentificationDeclarationOptions not "
+                        "MatterCastingPlayer-JNI::verifyOrEstablishConnection() Optional jIdentificationDeclarationOptions not "
                         "provided by the client");
     }
 
