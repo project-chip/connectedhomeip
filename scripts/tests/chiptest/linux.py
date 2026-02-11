@@ -42,6 +42,7 @@ __all__ = [
     "ensure_private_state",
 ]
 
+
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: IsolatedNetworkNamespace):
         super().__init__()
