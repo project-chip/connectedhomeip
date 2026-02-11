@@ -351,8 +351,6 @@ void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
     VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
     failSafeContext.SetAddICACHasBeenInvoked();
 
-    /* TODO: implement rest of the AddICAC checks */
-
     VerifyOrExit(VerifyAddICACStep1(ctx.mCommandHandler.GetAccessingFabricIndex(), commandData) == CHIP_NO_ERROR,
                  status.Emplace(ICACResponseStatusEnum::kInvalidICAC));
 
