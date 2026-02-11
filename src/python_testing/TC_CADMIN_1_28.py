@@ -131,6 +131,9 @@ class TC_CADMIN_1_28(CADMINBaseTest):
                      "DUT_AJF NOC from JointFabric should contain Administrator CAT")
         ]
 
+    def pics_TC_CADMIN_1_28(self):
+        return ['CADMIN.S']
+
     @async_test_body
     async def test_TC_CADMIN_1_28(self):
         _devCtrlEcoA = None
