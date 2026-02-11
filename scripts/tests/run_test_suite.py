@@ -190,9 +190,9 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     if sys.platform == "linux":
         if not internal_inside_unshare:
             # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
-            linux.ensure_network_namespace_availability()
+            chiptest.linux.ensure_network_namespace_availability()
         else:
-            linux.ensure_private_state()
+            chiptest.linux.ensure_private_state()
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
@@ -515,7 +515,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
-            to_terminate.append(ns := linux.IsolatedNetworkNamespace(
+            to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
                 setup_app_link_up=not wifi_required,
@@ -525,15 +525,15 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 app_link_name='wlx-app' if wifi_required else 'eth-app'))
 
             if commissioning_method == 'ble-wifi':
-                to_terminate.append(linux.DBusTestSystemBus())
-                to_terminate.append(linux.BluetoothMock())
-                to_terminate.append(linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
             elif commissioning_method == 'ble-thread':
-                to_terminate.append(linux.DBusTestSystemBus())
-                to_terminate.append(linux.BluetoothMock())
-                to_terminate.append(linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
             elif commissioning_method == 'thread-meshcop':
@@ -541,7 +541,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 thread_ba_host = tbr.get_border_agent_host()
                 thread_ba_port = tbr.get_border_agent_port()
 
-            to_terminate.append(executor := linux.LinuxNamespacedExecutor(ns))
+            to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
             to_terminate.append(executor := chiptest.darwin.DarwinExecutor())
         else:
@@ -613,7 +613,7 @@ if sys.platform == 'linux':
         help='Index of Linux network namespace'
     )
     def cmd_shell(ns_index: int) -> None:
-        linux.IsolatedNetworkNamespace(ns_index)
+        chiptest.linux.IsolatedNetworkNamespace(ns_index)
 
         shell = os.environ.get("SHELL", "bash")
         os.execvpe(shell, [shell], os.environ.copy())
