@@ -45,6 +45,7 @@ if sys.platform == 'darwin':
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
+
 class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
     SKIP = enum.auto()
