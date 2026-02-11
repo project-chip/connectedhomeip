@@ -404,9 +404,10 @@ class ThreadBorderRouter:
         self._event = threading.Event()
         self._pattern: Pattern[str] | None = None
         self._event.set()
+        self._ns_cmd_wrapper = ns.app_ns.netns_cmd_wrapper
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
-        args = shlex.split(ns.app_ns.netns_cmd_wrapper) + ['otbr-agent', '-d7', '-v', f'-B{ns.app_link.link_name}', radio_url]
+        args = shlex.split(self._ns_cmd_wrapper) + ['otbr-agent', '-d7', '-v', f'-B{ns.app_link.link_name}', radio_url]
 
         self._otbr = subprocess.Popen(args,
                                       stdout=subprocess.PIPE,
@@ -414,7 +415,7 @@ class ThreadBorderRouter:
                                       text=True,
                                       encoding='UTF-8')
 
-        sniffer_cmd = f'{ns.app_ns.netns_cmd_wrapper} tcpdump -ilo -U -Zroot -wthread.pcap udp port 9000'
+        sniffer_cmd = f'{self._ns_cmd_wrapper} tcpdump -ilo -U -Zroot -wthread.pcap udp port 9000'
 
         self._sniffer = subprocess.Popen(sniffer_cmd,
                                          stdout=sys.stdout,
@@ -463,7 +464,7 @@ class ThreadBorderRouter:
                 self._event.set()
 
     def get_border_agent_port(self) -> int:
-        cmd = f'ip netns exec {self._netns_app} ot-ctl ba port'
+        cmd = f'{self._ns_cmd_wrapper} ot-ctl ba port'
         output = subprocess.check_output(shlex.split(cmd), text=True)
         # ot-ctl output includes the port number followed by "Done"
         # Using regex to find the first number in the output
