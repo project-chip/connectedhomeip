@@ -107,9 +107,21 @@ class TC_GCAST_2_2(MatterBaseTest):
         if not endpoints_list:
             self.mark_step_range_skipped("1b", 8)
 
-        # TH removes any existing group and KeySetID on the DUT.
+        # LeaveGroup all groups. If There were no groups, it should fail with Status.NotFound.
         self.step("1b")
-        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
+
+        # remove any existing KeySetID on the DUT, except KeySetId 0 (IPK).
+        resp: Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse = await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
+
+        read_group_key_ids: list[int] = resp.groupKeySetIDs
+        for key_set_id in read_group_key_ids:
+            if key_set_id != 0:
+                await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRemove(key_set_id))
 
         # Th subscribes to Membership attribute with min interval 0s and max interval 30s
         self.step("1c")
@@ -141,7 +153,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("3b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
+            group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl="false")
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a
@@ -162,7 +174,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("4c")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID1, endpoints=endpoints_list[0:2], key_set_id=keySetID1, has_auxiliary_acl=False)
+            group_id=groupID1, endpoints=endpoints_list[0:2], key_set_id=keySetID1, has_auxiliary_acl="false")
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 with existing Key1 and using Auxiliary ACL
@@ -179,7 +191,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("5b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID2, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=True)
+            group_id=groupID2, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl="true")
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 with new Key
@@ -198,7 +210,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("6b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID2, key_set_id=keySetID2, endpoints=[endpoint1], has_auxiliary_acl=True)
+            group_id=groupID2, key_set_id=keySetID2, endpoints=[endpoint1], has_auxiliary_acl="true")
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G3 using a new Key but providing existing KeySetID (result: already exists)
