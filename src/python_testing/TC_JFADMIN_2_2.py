@@ -230,12 +230,17 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         # TODO: "TH sends ICACCSRRequest command to DUT.", "DUT response contains status code VIDNotVerified."
         self.step("4")
-        response = await self.send_single_cmd(
-            dev_ctrl=devCtrlEcoA,
-            node_id=1,
-            endpoint=1,
-            cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
-        asserts.assert_not_equal(response.icaccsr, b'', "No ICACSR was returned!")
+        try:
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
+        except InteractionModelError as e:
+            asserts.assert_in('Failure (0x1, clusterStatus: 5)', str(e),
+                              f'Expected VIDNotVerified error, but got {str(e)}')
+        else:
+            asserts.assert_true(False, 'Expected InteractionModelError with VIDNotVerified, but no exception occurred.')
 
         # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT responds with SUCCESS status."
         self.step("5")
