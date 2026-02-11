@@ -106,19 +106,26 @@ class TC_IDM_2_3(BasicCompositionTests):
             attribute=Clusters.BasicInformation.Attributes.ClusterRevision
         )
         
-        # Default values, used for older cluster revisions where these values aren't specified
+        # Default values for number of read paths and subscribe paths
         num_read_paths_supported = 9
         num_subscribe_paths_supported = 3
 
-        if cluster_revision >= 6:
-            capability_minima = await self.read_single_attribute_check_success(
-                cluster=Clusters.BasicInformation,
-                attribute=Clusters.BasicInformation.Attributes.CapabilityMinima
-            )
+        capability_minima = await self.read_single_attribute_check_success(
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.CapabilityMinima
+        )
 
+        if cluster_revision >= 6:
+            asserts.assert_is_not_none(capability_minima.readPathsSupported,
+                                        "ReadPathsSupported should be present when ClusterRevision >= 6")
+            asserts.assert_is_not_none(capability_minima.subscribePathsSupported,
+                                        "SubscribePathsSupported should be present when ClusterRevision >= 6")
+            
             # Extract values, providing defaults if optional fields are missing
             num_read_paths_supported = capability_minima.readPathsSupported
             num_subscribe_paths_supported = capability_minima.subscribePathsSupported
+        else:
+            log.info("Basic Information Cluster revision is less than 6, read paths and subscribe paths are not part of CapabilityMinima struct.")
 
         log.info(f"CapabilityMinima: readPathsSupported={num_read_paths_supported}, "
                  f"subscribePathsSupported={num_subscribe_paths_supported}")
