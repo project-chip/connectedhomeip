@@ -646,10 +646,12 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
             const auto transportOptionsPtr = transportConfig.GetTransportOptionsPtr();
             if (transportOptionsPtr)
             {
-                Protocols::InteractionModel::Status status = this->AllocatePushTransport(*transportOptionsPtr, connectionID, transportConfig.GetFabricIndex());
+                Protocols::InteractionModel::Status status =
+                    this->AllocatePushTransport(*transportOptionsPtr, connectionID, transportConfig.GetFabricIndex());
                 if (status != Protocols::InteractionModel::Status::Success)
                 {
-                    ChipLogError(Zcl, "Failed to re-allocate transport for connection ID: %u, status: %u", connectionID, to_underlying(status));
+                    ChipLogError(Zcl, "Failed to re-allocate transport for connection ID: %u, status: %u", connectionID,
+                                 to_underlying(status));
                 }
             }
             else
