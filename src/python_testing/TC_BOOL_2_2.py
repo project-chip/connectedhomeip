@@ -124,22 +124,19 @@ class TC_BOOL_2_2(MatterBaseTest):
             "BOOL.S.M.ManuallyControlled",
         ]
 
-    def _has_state_change_event(self) -> bool:
+    def _feature_map_has_chgevent(self, feature_map: int) -> bool:
+        CHGEVENT_MASK = 0x01
+        return (int(feature_map) & CHGEVENT_MASK) != 0
+
+    def _has_state_change_event(self, feature_map: int) -> bool:
         """
         Determines whether StateChange event should be tested.
 
-        Current behavior:
-          - Gated solely by PICS BOOL.S.E00(StateChange)
-
-        Future behavior:
+        Behavior:
           - PICS BOOL.S.E00(StateChange) OR
           - FeatureMap CHGEVENT bit (when defined for BooleanState)
         """
-        return self.check_pics("BOOL.S.E00")
-
-        # Future extension point:
-        # if self._feature_map_has_chgevent():
-        #     return True
+        return self.check_pics("BOOL.S.E00") or self._feature_map_has_chgevent(feature_map)
 
     async def _set_dut_state_value(self, endpoint: int, state: bool) -> None:
         """
@@ -187,7 +184,16 @@ class TC_BOOL_2_2(MatterBaseTest):
         logger.info(f"FeatureMap attribute: {feature_map}")
 
         # Check if StateChange event is supported
-        has_state_change_event = self._has_state_change_event()
+        feature_map = await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl,
+            node_id=node_id,
+            endpoint=endpoint,
+            cluster=cbool,
+            attribute=cbool.Attributes.FeatureMap,
+        )
+        logger.info(f"FeatureMap attribute: {feature_map}")
+
+        has_state_change_event = self._has_state_change_event(feature_map)
         logger.info(f"StateChange event test enabled: {has_state_change_event}")
 
         # Step 3: Put DUT in FALSE
@@ -241,6 +247,8 @@ class TC_BOOL_2_2(MatterBaseTest):
 
         item = attr_cb.wait_for_attribute_report(timeout_sec=30)
 
+        logger.info(f"Attribute from event callback: {item}")
+
         asserts.assert_equal(item.endpoint_id, endpoint, "Attribute report received for unexpected endpoint")
         asserts.assert_equal(item.attribute, cbool.Attributes.StateValue, "Received unexpected attribute report")
         asserts.assert_true(item.value, "Report value for StateValue should be TRUE")
@@ -258,6 +266,8 @@ class TC_BOOL_2_2(MatterBaseTest):
                 data.stateValue,
                 "StateChange event should have StateValue == TRUE"
             )
+        else:
+            logger.info("Skipping test step 10")
 
         # Step 11: Clear accumulated reports
         self.step("11")
