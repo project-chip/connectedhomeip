@@ -303,11 +303,9 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     VerifyOrExit(failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
 
-    if (jointFabricAdministrator.GetPeerJFAdminClusterEndpointId() != kInvalidEndpointId)
-    {
-        VerifyOrExit(jointFabricAdministrator.WasVidVerificationExecutedForFabric(ctx.mCommandHandler.GetAccessingFabricIndex()),
-                     status.Emplace(StatusCodeEnum::kVIDNotVerified));
-    }
+    VerifyOrExit(jointFabricAdministrator.WasVidVerificationExecutedForFabric(ctx.mCommandHandler.GetAccessingFabricIndex()),
+                 status.Emplace(StatusCodeEnum::kVIDNotVerified));
+
     VerifyOrExit(Attributes::AdministratorFabricIndex::Get(ctx.mRequestPath.mEndpointId, administratorFabricIndex) ==
                      Status::Success,
                  nonDefaultStatus = Status::Failure);
