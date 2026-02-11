@@ -54,7 +54,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_JFADMIN_2_2(MatterBaseTest):
+class TC_JFPKI_2_2(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
@@ -124,7 +124,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         super().teardown_class()
 
-    def steps_TC_JFADMIN_2_2(self) -> list[TestStep]:
+    def steps_TC_JFPKI_2_2(self) -> list[TestStep]:
         return [
             TestStep("1", "Commission DUT to TH."),
             TestStep("2", "TH sends ICACCSRRequest command to DUT.",
@@ -160,7 +160,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         ]
 
     @async_test_body
-    async def test_TC_JFADMIN_2_2(self):
+    async def test_TC_JFPKI_2_2(self):
 
         self.step("1")
 
