@@ -14631,6 +14631,36 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
         value.holdTimeDefault = [NSNumber numberWithUnsignedShort:cppValue.holdTimeDefault];
         return value;
     }
+    case Attributes::PredictedOccupancy::Id: {
+        using TypeInfo = Attributes::PredictedOccupancy::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTROccupancySensingClusterPredictedOccupancyStruct * newElement_0;
+                newElement_0 = [MTROccupancySensingClusterPredictedOccupancyStruct new];
+                newElement_0.startTimestamp = [NSNumber numberWithUnsignedInt:entry_0.startTimestamp];
+                newElement_0.endTimestamp = [NSNumber numberWithUnsignedInt:entry_0.endTimestamp];
+                newElement_0.occupancy = [NSNumber numberWithUnsignedChar:entry_0.occupancy.Raw()];
+                newElement_0.confidence = [NSNumber numberWithUnsignedChar:entry_0.confidence];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
         using TypeInfo = Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;

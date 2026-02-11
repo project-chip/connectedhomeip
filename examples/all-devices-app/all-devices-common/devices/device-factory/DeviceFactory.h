@@ -22,6 +22,7 @@
 #include <devices/chime/impl/LoggingChimeDevice.h>
 #include <devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.h>
 #include <devices/on-off-light/LoggingOnOffLightDevice.h>
+#include <devices/speaker/impl/LoggingSpeakerDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
@@ -110,6 +111,11 @@ private:
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
             });
+        };
+        mRegistry["speaker"] = [this]() {
+            VerifyOrDie(mContext.has_value());
+            return std::make_unique<LoggingSpeakerDevice>(
+                LoggingSpeakerDevice::Context{ .timerDelegate = mContext->timerDelegate });
         };
     }
 };

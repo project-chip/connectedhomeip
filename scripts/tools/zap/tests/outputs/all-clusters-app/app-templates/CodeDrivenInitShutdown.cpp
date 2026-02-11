@@ -31,6 +31,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Identify::Id:
         MatterIdentifyClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Groups::Id:
+        MatterGroupsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterInitCallback(endpoint);
         break;
@@ -115,6 +118,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::DeviceEnergyManagement::Id:
         MatterDeviceEnergyManagementClusterInitCallback(endpoint);
         break;
+    case app::Clusters::EnergyEvse::Id:
+        MatterEnergyEvseClusterInitCallback(endpoint);
+        break;
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterInitCallback(endpoint);
         break;
@@ -142,6 +148,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     {
     case app::Clusters::Identify::Id:
         MatterIdentifyClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::Groups::Id:
+        MatterGroupsClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::Descriptor::Id:
         MatterDescriptorClusterShutdownCallback(endpoint, shutdownType);
@@ -226,6 +235,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::DeviceEnergyManagement::Id:
         MatterDeviceEnergyManagementClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::EnergyEvse::Id:
+        MatterEnergyEvseClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::PowerTopology::Id:
         MatterPowerTopologyClusterShutdownCallback(endpoint, shutdownType);

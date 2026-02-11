@@ -25,6 +25,7 @@
 // It would be best if we could use generic cluster API instead
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -260,9 +261,17 @@ public:
             {
                 value               = (value == "Yes") ? "No" : "Yes";
                 bool attributeValue = (value == "Yes");
-                ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
                 // update the current occupancy here for hardcoded endpoint 1
-                app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
+                auto occupancy = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
+                if (occupancy != nullptr)
+                {
+                    ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
+                    occupancy->SetOccupancy(attributeValue);
+                }
+                else
+                {
+                    ESP_LOGE(TAG, "Unable to change occupancy: no cluster");
+                }
             }
         }
         else
@@ -549,7 +558,12 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Occupancy Sensor");
     AddAttribute("Occupancy", "Yes");
-    app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
+
+    auto occupancy = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
+    if (occupancy != nullptr)
+    {
+        occupancy->SetOccupancy(true);
+    }
 
     AddDevice("Contact Sensor");
     AddEndpoint("External");
