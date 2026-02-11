@@ -435,14 +435,9 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             result = await self.write_single_attribute(
                 avsmAttr.SoftRecordingPrivacyModeEnabled(False), endpoint_id=endpoint
             )
-        else:
-            self.skip_step(11)
-            self.skip_step(12)
-            self.skip_step(13)
 
-        # Modify transport to set streamUsage to Livestream and validate privacy mode
-        if self.pics_guard(self.check_pics(PICS_PRIVACY)):
             self.step(14)
+            # Modify transport to set streamUsage to Livestream and validate privacy mode
             transportOptions['streamUsage'] = Globals.Enums.StreamUsageEnum.kLiveView
             await self.send_single_cmd(
                 cmd=pushavCluster.Commands.ModifyPushTransport(
@@ -489,10 +484,21 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                 avsmAttr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint
             )
         else:
+            self.skip_step(11)
+            self.skip_step(12)
+            self.skip_step(13)
             self.skip_step(14)
             self.skip_step(15)
             self.skip_step(16)
             self.skip_step(17)
+            transportOptions['streamUsage'] = Globals.Enums.StreamUsageEnum.kLiveView
+            await self.send_single_cmd(
+                cmd=pushavCluster.Commands.ModifyPushTransport(
+                    connectionID=aConnectionID,
+                    transportOptions=transportOptions
+                ),
+                endpoint=endpoint,
+            )
 
         self.step(18)
         await self.send_single_cmd(
