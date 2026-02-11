@@ -57,6 +57,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
     switch (aAttributeId) {
         {{#zcl_attributes_server removeKeys='isOptional'}}
         {{#if clusterRef}}
+        {{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         case Attributes::{{asUpperCamelCase name}}::Id: {
             using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
@@ -71,6 +72,7 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
             return value;
         }
         {{/if}}
+        {{/unless}}
         {{/if}}
         {{/zcl_attributes_server}}
         default: {

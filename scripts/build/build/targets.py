@@ -145,6 +145,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-gateway', app=HostApp.ENERGY_GATEWAY),
+        TargetPart('water-heater', app=HostApp.WATER_HEATER),
         TargetPart('evse', app=HostApp.EVSE),
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
@@ -234,6 +235,7 @@ def BuildEsp32Target():
         TargetPart('m5stack', board=Esp32Board.M5Stack),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
+        TargetPart('p4functionev', board=Esp32Board.P4FunctionEV),
         TargetPart('qemu', board=Esp32Board.QEMU).OnlyIfRe('-tests'),
     ])
 
@@ -244,6 +246,7 @@ def BuildEsp32Target():
         TargetPart('all-devices', app=Esp32App.ALL_DEVICES),
         TargetPart('energy-gateway', app=Esp32App.ENERGY_GATEWAY),
         TargetPart('evse', app=Esp32App.EVSE),
+        TargetPart('water-heater', app=Esp32App.WATER_HEATER),
         TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
         TargetPart('shell', app=Esp32App.SHELL),
@@ -292,6 +295,7 @@ def BuildEfr32Target():
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
+        TargetPart('water-heater', app=Efr32App.WATER_HEATER),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('pump', app=Efr32App.PUMP),

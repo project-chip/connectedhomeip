@@ -146,6 +146,10 @@ jobs:
                 scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
 
+            - name: Build example All Clusters App (Target:ESP32P4, Ethernet)
+              run: |
+                scripts/examples/esp_example.sh all-clusters-app sdkconfig.eth.esp32p4 esp32p4
+                rm -rf examples/all-clusters-app/esp32/{build,managed_components}
 
             - name: Build example Lighting App (external platform)
               run: |
@@ -158,11 +162,17 @@ jobs:
                 scripts/examples/esp_example.sh energy-gateway-app sdkconfig.defaults
                 rm -rf examples/energy-gateway-app/esp32/{build,managed_components}
 
-            - name: Build example Energy Management App
-              if: steps.changed_paths.outputs.energy_management == 'true'
+            - name: Build example EVSE App
+              if: steps.changed_paths.outputs.evse == 'true'
               run: |
                 scripts/examples/esp_example.sh evse-app sdkconfig.defaults
                 rm -rf examples/evse-app/esp32/{build,managed_components}
+
+            - name: Build example Water Heater App
+              if: steps.changed_paths.outputs.water_heater == 'true'
+              run: |
+                scripts/examples/esp_example.sh water-heater-app sdkconfig.defaults
+                rm -rf examples/water-heater-app/esp32/{build,managed_components}
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

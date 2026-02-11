@@ -41,11 +41,6 @@ project(chip-nxp-all-clusters-app-example)
 include(${CHIP_ROOT}/config/nxp/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
-# This is required to include Mbedtls user config file for NXP platform.
-# We use zephyr_include_directories to ensure the include is propagated to
-# the Zephyr Mbedtls module.
-zephyr_include_directories(${CHIP_ROOT}/src)
-
 target_include_directories(app
     PRIVATE
     ${LAUNDRY_WASHER_NXP_COMMON_DIR}/main/include

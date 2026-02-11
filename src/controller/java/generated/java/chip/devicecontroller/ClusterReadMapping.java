@@ -7566,6 +7566,39 @@ public class ClusterReadMapping {
           readGroupcastMaxMembershipCountCommandParams
         );
         result.put("readMaxMembershipCountAttribute", readGroupcastMaxMembershipCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGroupcastMaxMcastAddrCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGroupcastMaxMcastAddrCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GroupcastCluster) cluster).readMaxMcastAddrCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGroupcastMaxMcastAddrCountCommandParams
+        );
+        result.put("readMaxMcastAddrCountAttribute", readGroupcastMaxMcastAddrCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGroupcastUsedMcastAddrCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGroupcastUsedMcastAddrCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GroupcastCluster) cluster).readUsedMcastAddrCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGroupcastUsedMcastAddrCountCommandParams
+        );
+        result.put("readUsedMcastAddrCountAttribute", readGroupcastUsedMcastAddrCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGroupcastFabricUnderTestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGroupcastFabricUnderTestAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GroupcastCluster) cluster).readFabricUnderTestAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readGroupcastFabricUnderTestCommandParams
+        );
+        result.put("readFabricUnderTestAttribute", readGroupcastFabricUnderTestAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGroupcastGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGroupcastGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -13954,6 +13987,17 @@ public class ClusterReadMapping {
           readOccupancySensingHoldTimeCommandParams
         );
         result.put("readHoldTimeAttribute", readOccupancySensingHoldTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readOccupancySensingPredictedOccupancyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readOccupancySensingPredictedOccupancyAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.OccupancySensingCluster) cluster).readPredictedOccupancyAttribute(
+              (ChipClusters.OccupancySensingCluster.PredictedOccupancyAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedOccupancySensingClusterPredictedOccupancyAttributeCallback(),
+          readOccupancySensingPredictedOccupancyCommandParams
+        );
+        result.put("readPredictedOccupancyAttribute", readOccupancySensingPredictedOccupancyAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOccupancySensingPIROccupiedToUnoccupiedDelayAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

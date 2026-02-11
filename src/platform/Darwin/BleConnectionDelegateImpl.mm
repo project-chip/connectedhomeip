@@ -494,7 +494,7 @@ namespace DeviceLayer {
         ChipLogError(Ble, "Failed to discover services: %@", error);
     }
 
-    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<int32_t>(error.code)));
 
     for (CBService * service in peripheral.services) {
         if ([service.UUID isEqual:_chipServiceUUID] && !self.found) {
@@ -515,7 +515,7 @@ namespace DeviceLayer {
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
     assertChipStackLockedByCurrentThread();
-    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<int32_t>(error.code)));
 
     if (error != nil) {
         ChipLogError(Ble, "Failed to discover characteristics: %@", error);
