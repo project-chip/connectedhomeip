@@ -110,7 +110,7 @@ types or functionality) as well as individual examples.
 | `examples/contact-sensor-app`                  |                              | UNMAINTAINED |
 | `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
 | `examples/dishwasher-app`                      |                              | UNMAINTAINED |
-| `examples/energy-management-app`               | James Harrow                 |              |
+| `examples/evse-app`                            | James Harrow                 |              |
 | `examples/fabric-admin`                        | Yufeng Wang, Terence Hampson |              |
 | `examples/fabric-bridge-app`                   | Yufeng Wang, Terence Hampson |              |
 | `examples/java-matter-controller`              | Yunhan Wang, Yufeng Wang     |              |
@@ -146,5 +146,6 @@ types or functionality) as well as individual examples.
 | `examples/tv-app`                              | Chris DeCenzo, Lazar Kovacic |              |
 | `examples/tv-casting-app`                      | Chris DeCenzo, Lazar Kovacic |              |
 | `examples/virtual-device-app`                  |                              | UNMAINTAINED |
+| `examples/water-heater-app`                    | James Harrow                 |              |
 | `examples/water-leak-detector-app`             |                              | UNMAINTAINED |
 | `examples/window-app`                          |                              | UNMAINTAINED |

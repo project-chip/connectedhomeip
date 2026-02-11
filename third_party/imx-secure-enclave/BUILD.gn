@@ -63,7 +63,6 @@ config("libele_config") {
     "MT_SAB_STORAGE_CHUNK_EXPORT_REQ=${ELE_FMW}",
     "MT_SAB_STORAGE_OPEN=${ELE_FMW}",
     "MT_SAB_STORAGE_CLOSE=${ELE_FMW}",
-    "MT_SAB_STORAGE_KEY_DB_REQ=${ELE_FMW}",
     "MT_SAB_ENC_DATA_STORAGE=${ELE_FMW}",
 
     "HSM_SIGN_GEN=1",
@@ -162,7 +161,6 @@ source_set("libelematter") {
     "repo/${ELE_PLAT_COMMON_PATH}/sab_msg/sab_storage_export_finish.c",
     "repo/${ELE_PLAT_COMMON_PATH}/sab_msg/sab_storage_get_chunk.c",
     "repo/${ELE_PLAT_COMMON_PATH}/sab_msg/sab_storage_get_chunk_done.c",
-    "repo/${ELE_PLAT_COMMON_PATH}/sab_msg/sab_storage_key_db.c",
     "repo/${ELE_PLAT_COMMON_PATH}/sab_msg/sab_storage_master_export.c",
     "repo/${ELE_PLAT_COMMON_PATH}/sab_msg/sab_storage_master_import.c",
     "repo/${ELE_PLAT_COMMON_PATH}/sab_msg/sab_storage_open.c",

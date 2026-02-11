@@ -107,10 +107,10 @@ Instance::~Instance()
 } // namespace app
 } // namespace chip
 
-void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId endpointId) {}
+void MatterActivatedCarbonFilterMonitoringClusterInitCallback(EndpointId) {}
 
-void MatterHepaFilterMonitoringClusterInitCallback(EndpointId endpointId) {}
+void MatterHepaFilterMonitoringClusterInitCallback(EndpointId) {}
 
-void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(EndpointId endpointId) {}
+void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 
-void MatterHepaFilterMonitoringClusterShutdownCallback(EndpointId endpointId) {}
+void MatterHepaFilterMonitoringClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}

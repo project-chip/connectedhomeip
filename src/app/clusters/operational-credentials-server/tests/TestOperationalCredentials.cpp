@@ -16,19 +16,21 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <app/server/Server.h>
 #include <clusters/OperationalCredentials/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 
 namespace {
 
 using namespace chip;
 using namespace chip::app;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
 
@@ -52,22 +54,15 @@ TEST_F(TestOperationalCredentials, TestAttributes)
                                                            Server::GetInstance().GetCommissioningWindowManager() };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
-    ReadOnlyBufferBuilder<AttributeEntry> builder;
-    ASSERT_EQ(cluster.Attributes({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.AppendElements({
-                  OperationalCredentials::Attributes::NOCs::kMetadataEntry,
-                  OperationalCredentials::Attributes::Fabrics::kMetadataEntry,
-                  OperationalCredentials::Attributes::SupportedFabrics::kMetadataEntry,
-                  OperationalCredentials::Attributes::CommissionedFabrics::kMetadataEntry,
-                  OperationalCredentials::Attributes::TrustedRootCertificates::kMetadataEntry,
-                  OperationalCredentials::Attributes::CurrentFabricIndex::kMetadataEntry,
-              }),
-              CHIP_NO_ERROR);
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-    ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            OperationalCredentials::Attributes::NOCs::kMetadataEntry,
+                                            OperationalCredentials::Attributes::Fabrics::kMetadataEntry,
+                                            OperationalCredentials::Attributes::SupportedFabrics::kMetadataEntry,
+                                            OperationalCredentials::Attributes::CommissionedFabrics::kMetadataEntry,
+                                            OperationalCredentials::Attributes::TrustedRootCertificates::kMetadataEntry,
+                                            OperationalCredentials::Attributes::CurrentFabricIndex::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestOperationalCredentials, TestCommands)
@@ -80,25 +75,19 @@ TEST_F(TestOperationalCredentials, TestCommands)
                                                            Server::GetInstance().GetCommissioningWindowManager() };
     OperationalCredentialsCluster cluster(kRootEndpointId, context);
 
-    ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-    ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, OperationalCredentials::Id }, builder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.AppendElements({
-                  OperationalCredentials::Commands::AttestationRequest::kMetadataEntry,
-                  OperationalCredentials::Commands::CertificateChainRequest::kMetadataEntry,
-                  OperationalCredentials::Commands::CSRRequest::kMetadataEntry,
-                  OperationalCredentials::Commands::AddNOC::kMetadataEntry,
-                  OperationalCredentials::Commands::UpdateNOC::kMetadataEntry,
-                  OperationalCredentials::Commands::UpdateFabricLabel::kMetadataEntry,
-                  OperationalCredentials::Commands::RemoveFabric::kMetadataEntry,
-                  OperationalCredentials::Commands::AddTrustedRootCertificate::kMetadataEntry,
-                  OperationalCredentials::Commands::SetVIDVerificationStatement::kMetadataEntry,
-                  OperationalCredentials::Commands::SignVIDVerificationRequest::kMetadataEntry,
-              }),
-              CHIP_NO_ERROR);
-
-    EXPECT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  OperationalCredentials::Commands::AttestationRequest::kMetadataEntry,
+                                                  OperationalCredentials::Commands::CertificateChainRequest::kMetadataEntry,
+                                                  OperationalCredentials::Commands::CSRRequest::kMetadataEntry,
+                                                  OperationalCredentials::Commands::AddNOC::kMetadataEntry,
+                                                  OperationalCredentials::Commands::UpdateNOC::kMetadataEntry,
+                                                  OperationalCredentials::Commands::UpdateFabricLabel::kMetadataEntry,
+                                                  OperationalCredentials::Commands::RemoveFabric::kMetadataEntry,
+                                                  OperationalCredentials::Commands::AddTrustedRootCertificate::kMetadataEntry,
+                                                  OperationalCredentials::Commands::SetVIDVerificationStatement::kMetadataEntry,
+                                                  OperationalCredentials::Commands::SignVIDVerificationRequest::kMetadataEntry,
+                                              }));
 }
 
 } // namespace

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/data-model-provider/ProviderMetadataTree.h>
 #include <app/storage/TableEntry.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
@@ -142,7 +143,7 @@ public:
     CHIP_ERROR RemoveTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, EntryIndex entry_idx);
 
     // Fabrics
-    CHIP_ERROR RemoveFabric(FabricIndex fabric_index);
+    CHIP_ERROR RemoveFabric(DataModel::ProviderMetadataTree & provider, FabricIndex fabric_index);
     CHIP_ERROR RemoveEndpoint();
 
     /**

@@ -1115,11 +1115,11 @@ CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context
     return DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
 }
 
-void OperationalCredentialsCluster::Shutdown()
+void OperationalCredentialsCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
     mOpCredsContext.fabricTable.RemoveFabricDelegate(this);
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 CHIP_ERROR OperationalCredentialsCluster::Attributes(const ConcreteClusterPath & path,

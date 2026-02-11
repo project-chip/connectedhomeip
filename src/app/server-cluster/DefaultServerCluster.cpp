@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "ServerClusterInterface.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 
 #include <access/Privilege.h>
@@ -91,7 +92,7 @@ CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void DefaultServerCluster::Shutdown()
+void DefaultServerCluster::Shutdown(ClusterShutdownType)
 {
     mContext = nullptr;
 }

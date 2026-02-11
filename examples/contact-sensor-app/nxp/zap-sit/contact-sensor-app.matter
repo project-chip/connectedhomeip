@@ -359,6 +359,8 @@ fabric_scoped struct WebRTCSessionStruct {
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
   fabric_idx fabricIndex = 254;
 }
 
@@ -1772,7 +1774,11 @@ cluster GroupKeyManagement = 63 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
-  revision 1;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kChangeEvent = 0x1;
+  }
 
   info event StateChange = 0 {
     boolean stateValue = 0;

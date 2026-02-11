@@ -41,10 +41,27 @@ TEST_F(TestQNameString, Construction)
         const testing::TestQName<2> kShort({ "some", "test" });
         QNameString heapQName(kShort.Serialized());
         EXPECT_STREQ(heapQName.c_str(), "some.test");
+        EXPECT_TRUE(heapQName.EndsWith("test"));
+        EXPECT_TRUE(heapQName.EndsWith(".test"));
+        EXPECT_FALSE(heapQName.EndsWith("some"));
 
         mdns::Minimal::SerializedQNameIterator SInvalid;
         QNameString heapQNameI(SInvalid);
         EXPECT_STREQ(heapQNameI.c_str(), "(!INVALID!)");
     }
+}
+
+TEST_F(TestQNameString, EndsWith)
+{
+    const testing::TestQName<3> kLong({ "abc", "test", "abc" });
+    QNameString qName(kLong.Serialized());
+    EXPECT_STREQ(qName.c_str(), "abc.test.abc");
+
+    // Verify that EndsWith matches only the suffix, not the first occurrence of "abc"
+    EXPECT_TRUE(qName.EndsWith("abc"));
+    EXPECT_TRUE(qName.EndsWith(".abc"));
+    EXPECT_TRUE(qName.EndsWith("test.abc"));
+    EXPECT_FALSE(qName.EndsWith("test"));
+    EXPECT_FALSE(qName.EndsWith("abc.test"));
 }
 } // namespace

@@ -20,7 +20,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #ifndef CONFIG_APP_FREERTOS_OS
-#include <platform/nxp/zephyr/ota/OTAImageProcessorImpl.h>
+#include <platform/Zephyr/OTAImageProcessorImpl.h>
 #else
 #include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #endif /* CONFIG_APP_FREERTOS_OS */

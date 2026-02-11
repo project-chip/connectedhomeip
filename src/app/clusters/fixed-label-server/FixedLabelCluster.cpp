@@ -27,8 +27,8 @@ namespace {
 class AutoReleaseIterator
 {
 public:
-    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider * provider, EndpointId endpointId) :
-        mIterator(provider != nullptr ? provider->IterateFixedLabel(endpointId) : nullptr)
+    AutoReleaseIterator(DeviceLayer::DeviceInfoProvider & provider, EndpointId endpointId) :
+        mIterator(provider.IterateFixedLabel(endpointId))
     {}
     ~AutoReleaseIterator()
     {
@@ -46,9 +46,9 @@ private:
     DeviceLayer::DeviceInfoProvider::FixedLabelIterator * mIterator;
 };
 
-CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder, DeviceLayer::DeviceInfoProvider & provider)
 {
-    AutoReleaseIterator it(DeviceLayer::GetDeviceInfoProvider(), endpoint);
+    AutoReleaseIterator it(provider, endpoint);
     VerifyOrReturnValue(it.IsValid(), encoder.EncodeEmptyList());
 
     return encoder.EncodeList([&it](const auto & encod) -> CHIP_ERROR {
@@ -63,7 +63,9 @@ CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
 
 } // namespace
 
-FixedLabelCluster::FixedLabelCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, FixedLabel::Id }) {}
+FixedLabelCluster::FixedLabelCluster(EndpointId endpoint, DeviceLayer::DeviceInfoProvider & deviceInfoProvider) :
+    DefaultServerCluster({ endpoint, FixedLabel::Id }), mDeviceInfoProvider(deviceInfoProvider)
+{}
 
 DataModel::ActionReturnStatus FixedLabelCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
@@ -71,7 +73,7 @@ DataModel::ActionReturnStatus FixedLabelCluster::ReadAttribute(const DataModel::
     switch (request.path.mAttributeId)
     {
     case LabelList::Id:
-        return ReadLabelList(mPath.mEndpointId, encoder);
+        return ReadLabelList(mPath.mEndpointId, encoder, mDeviceInfoProvider);
     case ClusterRevision::Id:
         return encoder.Encode(FixedLabel::kRevision);
     case FeatureMap::Id:

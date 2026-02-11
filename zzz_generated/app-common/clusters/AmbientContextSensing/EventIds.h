@@ -10,7 +10,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace AmbientContextSensing {
-namespace Events {} // namespace Events
+namespace Events {
+namespace AmbientContextDetected {
+inline constexpr EventId Id = 0x00000000;
+} // namespace AmbientContextDetected
+
+} // namespace Events
 } // namespace AmbientContextSensing
 } // namespace Clusters
 } // namespace app

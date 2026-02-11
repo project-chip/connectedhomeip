@@ -95,7 +95,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestAttrAcc
     EXPECT_FALSE(minimalAttrAccess.HasFeature(Feature::kExportedEnergy));
     EXPECT_FALSE(minimalAttrAccess.HasFeature(Feature::kCumulativeEnergy));
     EXPECT_FALSE(minimalAttrAccess.HasFeature(Feature::kPeriodicEnergy));
-    minimalAttrAccess.Shutdown();
+    minimalAttrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     // Test optional attribute checking methods
     EXPECT_TRUE(attrAccess.SupportsOptAttr(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
@@ -104,10 +104,10 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestAttrAcc
     ElectricalEnergyMeasurementAttrAccess noOptAttrAccess(features, noOptionalAttrs, kTestEndpointId + 2);
     EXPECT_EQ(noOptAttrAccess.Init(), CHIP_NO_ERROR);
     EXPECT_FALSE(noOptAttrAccess.SupportsOptAttr(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
-    noOptAttrAccess.Shutdown();
+    noOptAttrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     // Test shutdown
-    attrAccess.Shutdown();
+    attrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     // Verify cluster is unregistered from the registry
     EXPECT_EQ(FindElectricalEnergyMeasurementClusterOnEndpoint(kTestEndpointId), nullptr);
@@ -272,7 +272,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
     }
 
     // Cleanup
-    attrAccess.Shutdown();
+    attrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

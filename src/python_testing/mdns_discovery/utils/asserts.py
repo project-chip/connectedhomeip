@@ -746,7 +746,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
     - Encoded as a variable-length decimal number in ASCII text
     - Omitting any leading zeroes
     - Must be greater than 0
-    - Only bits 0-19 are valid
+    - Only bits 0-22 are valid
 
     Example:
         "33"
@@ -760,7 +760,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
     constraints = [
         "Must be a decimal integer without leading zeroes",
         "Value must be greater than 0",
-        "Only bits 0-19 may be set (value must fit in 20 bits)",
+        "Only bits 0-22 may be set (value must fit in 23 bits)",
     ]
 
     failed: list[str] = []
@@ -777,7 +777,7 @@ def assert_valid_ph_key(ph_key: str) -> None:
             if v <= 0:
                 failed.append(constraints[1])
             # Bit-mask validity only meaningful for positive integers
-            allowed_mask = (1 << 20) - 1
+            allowed_mask = (1 << 23) - 1
             if v > 0 and (v & ~allowed_mask):
                 failed.append(constraints[2])
         except ValueError:
@@ -827,6 +827,41 @@ def assert_valid_pi_key(pi_key: str) -> None:
         not failed,
         f"Invalid PI key: '{pi_key}', failed constraint(s): {failed}"
     )
+
+
+@not_none_args
+def assert_valid_ph_pi_relationship(txt: dict[str, str]) -> None:
+    """
+    Verify the relationship between Pairing Hint (PH) and Pairing Instruction (PI) keys.
+
+    Constraints:
+    - If any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set in PH, then PI MUST be present.
+    - If PI is present, PH MUST be present and have at least one of the bits 4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, or 22 set.
+
+    Raises:
+        TestFailure: If the relationship constraints are violated.
+    """
+    ph_key = txt.get('PH')
+    pi_key = txt.get('PI')
+
+    if ph_key:
+        try:
+            ph_val = int(ph_key)
+            mandatory_pi_bits = [4, 8, 10, 12, 15, 17, 19, 20, 21, 22]
+            if any((ph_val & (1 << bit)) for bit in mandatory_pi_bits):
+                asserts.assert_in('PI', txt, f"'PI' key must be present if any of bits {mandatory_pi_bits} are set in 'PH' key.")
+        except (ValueError, TypeError):
+            pass
+
+    if pi_key is not None:
+        asserts.assert_in('PH', txt, "'PH' key must be present if 'PI' key is present.")
+        try:
+            ph_val = int(ph_key)
+            pi_related_bits = [4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22]
+            asserts.assert_true(any((ph_val & (1 << bit)) for bit in pi_related_bits),
+                                f"'PH' key must have at least one of bits {pi_related_bits} set if 'PI' key is present.")
+        except (ValueError, TypeError):
+            pass
 
 
 @not_none_args

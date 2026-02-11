@@ -26,7 +26,7 @@ get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/pla
 # This must be called before find_package(Zephyr)
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nxp/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
@@ -88,6 +88,13 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     )
 endif()
 
+if (CONFIG_CHIP_FACTORY_DATA)
+    target_sources(app PRIVATE
+        ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
+        ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
+    )
+endif()
+
 chip_configure_data_model(app
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
@@ -120,3 +127,6 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
+
+# Post-build steps
+include(${CHIP_ROOT}/config/nxp/app/zephyr-post-build.cmake)

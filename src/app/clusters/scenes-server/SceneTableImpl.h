@@ -27,18 +27,6 @@
 namespace chip {
 namespace scenes {
 
-#if defined(SCENES_MANAGEMENT_TABLE_SIZE) && SCENES_MANAGEMENT_TABLE_SIZE
-static constexpr uint16_t kMaxScenesPerEndpoint = SCENES_MANAGEMENT_TABLE_SIZE;
-#else
-static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
-#endif
-
-static_assert(kMaxScenesPerEndpoint <= CHIP_CONFIG_MAX_SCENES_TABLE_SIZE,
-              "CHIP_CONFIG_MAX_SCENES_TABLE_SIZE is smaller than the zap configuration, please increase "
-              "CHIP_CONFIG_MAX_SCENES_TABLE_SIZE in CHIPConfig.h if you really need more scenes");
-static_assert(kMaxScenesPerEndpoint >= 16, "Per spec, kMaxScenesPerEndpoint must be at least 16");
-static constexpr uint16_t kMaxScenesPerFabric = (kMaxScenesPerEndpoint - 1) / 2;
-
 /**
  * @brief Implementation of a storage in nonvolatile storage of the scene table.
  *
@@ -88,6 +76,8 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
     CHIP_ERROR RemoveEndpoint() override;
 
+    uint16_t GetTableSize() const override { return mCurrentTableSize; }
+
     void SetTableSize(uint16_t endpointSceneTableSize);
 
 protected:
@@ -107,6 +97,7 @@ protected:
 
 private:
     app::DataModel::Provider * mDataModel = nullptr;
+    uint16_t mCurrentTableSize            = kMaxScenesPerEndpoint;
 }; // class DefaultSceneTableImpl
 
 /// @brief Gets a pointer to the instance of Scene Table Impl, providing EndpointId and Table Size for said endpoint

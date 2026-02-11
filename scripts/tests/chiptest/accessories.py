@@ -47,6 +47,7 @@ if sys.platform == 'linux':
 else:
     IP = '127.0.0.1'
 
+
 S = TypeVar("S", bound="AppsRegister")
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -232,7 +233,11 @@ class AppsRegister:
         s = subprocess.Popen(cmd)
         # We need to have some timeout so that in case the process hangs we don't wait infinitely in CI. 60 seconds is large enough
         # for the OTA tool.
-        s.wait(60)
+        try:
+            s.communicate(timeout=60)
+        except subprocess.TimeoutExpired:
+            s.kill()
+            raise RuntimeError('OTA image tool timed out')
         if s.returncode != 0:
             raise RuntimeError('Cannot create OTA image file')
         return True

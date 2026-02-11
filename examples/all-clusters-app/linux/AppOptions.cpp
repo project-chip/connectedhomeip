@@ -19,6 +19,7 @@
 #include "AppOptions.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <system/SystemClock.h>
@@ -114,6 +115,7 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
     {
     case kOptionMinCommissioningTimeout: {
         auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+        // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion)
         commissionMgr.OverrideMinCommissioningTimeout(chip::System::Clock::Seconds16(static_cast<uint16_t>(atoi(value))));
         break;
     }
@@ -142,10 +144,12 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
         if (!sMockClock.HasValue())
         {
             sMockClock.Emplace();
+
             // This ensures that the UTCTime attribute will be reported to have a value.
-            TimeSource::Set(chip::kRootEndpointId, chip::app::Clusters::TimeSynchronization::TimeSourceEnum::kUnknown);
+            using namespace chip::app::Clusters::TimeSynchronization;
+            ForceTimeSource(TimeSourceEnum::kUnknown);
         }
-        long longValue = atoi(value);
+        long longValue = atol(value); // NOLINT(bugprone-unchecked-string-to-number-conversion)
         if (longValue >= 0)
         {
             uint64_t override = uint64_t(longValue) * chip::kMicrosecondsPerSecond;

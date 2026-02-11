@@ -57,6 +57,6 @@ void Instance::Shutdown()
 } // namespace app
 } // namespace chip
 
-void MatterElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpoint) {}
+void MatterElectricalPowerMeasurementClusterInitCallback(chip::EndpointId) {}
 
-void MatterElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId endpoint) {}
+void MatterElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}

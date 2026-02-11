@@ -416,6 +416,10 @@ CHIP_ERROR FabricTable::VerifyCredentials(ByteSpan noc, ByteSpan icac, ByteSpan 
     if (!icac.empty())
     {
         ReturnErrorOnFailure(certificates.LoadCert(icac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+        const ChipDN & icacSubjectDN = certificates.GetLastCert()[0].mSubjectDN;
+        CertType certType;
+        ReturnErrorOnFailure(icacSubjectDN.GetCertType(certType));
+        VerifyOrReturnError(certType == CertType::kICA, CHIP_ERROR_WRONG_CERT_DN);
     }
 
     ReturnErrorOnFailure(certificates.LoadCert(noc, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));

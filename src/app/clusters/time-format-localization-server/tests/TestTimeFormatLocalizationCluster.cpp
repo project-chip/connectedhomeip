@@ -19,8 +19,9 @@
 #include <app/clusters/time-format-localization-server/TimeFormatLocalizationCluster.h>
 
 #include <app/ConcreteClusterPath.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/TimeFormatLocalization/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -35,6 +36,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -46,46 +48,36 @@ struct TestTimeFormatLocalizationCluster : public ::testing::Test
 
 TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
 {
+    chip::DeviceLayer::SampleDeviceProvider sampleProvider;
+
+    TimeFormatLocalizationCluster::Context clusterContext{ sampleProvider };
+
     {
         BitFlags<TimeFormatLocalization::Feature> features{ 0 };
 
         TimeFormatLocalizationCluster onlyMandatory(kRootEndpointId, features, TimeFormatLocalization::HourFormatEnum::k12hr,
-                                                    TimeFormatLocalization::CalendarTypeEnum::kBuddhist);
+                                                    TimeFormatLocalization::CalendarTypeEnum::kBuddhist, clusterContext);
 
         // Test attributes listing with no features enabled
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ConcreteClusterPath clusterPath(kRootEndpointId, TimeFormatLocalization::Id);
-        ASSERT_EQ(onlyMandatory.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
-        ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(onlyMandatory,
+                                            {
+                                                TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry,
+                                            }));
     }
 
     {
         BitFlags<TimeFormatLocalization::Feature> features{ TimeFormatLocalization::Feature::kCalendarFormat };
 
         TimeFormatLocalizationCluster withCalendarFeature(kRootEndpointId, features, TimeFormatLocalization::HourFormatEnum::k12hr,
-                                                          TimeFormatLocalization::CalendarTypeEnum::kBuddhist);
+                                                          TimeFormatLocalization::CalendarTypeEnum::kBuddhist, clusterContext);
 
         // Test attributes listing with CalendarFormat feature enabled
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ConcreteClusterPath clusterPath(kRootEndpointId, TimeFormatLocalization::Id);
-        ASSERT_EQ(withCalendarFeature.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
-        ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedAttributes.AppendElements({ TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(withCalendarFeature,
+                                            {
+                                                TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry,
+                                                TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry,
+                                                TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry,
+                                            }));
     }
 }
 

@@ -15,8 +15,6 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-#import("//build_overrides/pigweed.gni")
-
 import("${chip_root}/build/chip/tools.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
@@ -26,27 +24,12 @@ import("${chip_root}/src/platform/device.gni")
 chip_test_suite("jcm") {
   output_name = "libControllerJCMTests"
 
-  sources = [
-    "../data_model/DataModelFixtures.cpp",
-    "../data_model/DataModelFixtures.h",
-  ]
-
   test_sources = [ "TestJCMCommissioner.cpp" ]
 
-  defines = [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=1" ]
-
   public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server:joint_fabric",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
-    "${chip_root}/src/app/util/mock:mock_ember",
-    "${chip_root}/src/controller",
     "${chip_root}/src/controller/jcm:jcm",
-    "${chip_root}/src/lib/core:string-builder-adapters",
-    "${chip_root}/src/messaging/tests:helpers",
-    "${chip_root}/src/transport/raw/tests:helpers",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
   ]
 }

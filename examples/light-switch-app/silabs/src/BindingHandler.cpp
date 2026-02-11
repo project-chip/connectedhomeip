@@ -408,10 +408,15 @@ void SwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
-                                                                                       static_cast<void *>(data));
+    CHIP_ERROR err            = Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
+                                                                                          static_cast<void *>(data));
 
-    Platform::Delete(data);
+    if (err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_HANDLER_NOT_SET || err == CHIP_ERROR_NO_MEMORY)
+    {
+        // NotifyBoundClusterChanged failed early and won't call LightSwitchContextReleaseHandler on exit
+        // Clear the context here to avoid memory leak.
+        Platform::Delete(data);
+    }
 }
 
 void BindingWorkerFunction(intptr_t context)

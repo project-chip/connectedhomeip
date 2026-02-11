@@ -17,11 +17,15 @@
 
 #pragma once
 
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/storage/FabricTableImpl.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TypeTraits.h>
-#include <stdlib.h>
+
+#include <cstdlib>
 
 namespace chip {
 namespace app {
@@ -705,20 +709,20 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData>::RemoveTableEntryAtPosition(E
 }
 
 template <class StorageId, class StorageData>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData>::RemoveFabric(FabricIndex fabric_index)
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::RemoveFabric(DataModel::ProviderMetadataTree & provider,
+                                                                 FabricIndex fabric_index)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
 
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsBuilder;
+    ReturnErrorOnFailure(provider.Endpoints(endpointsBuilder));
+
+    for (const auto & ep : endpointsBuilder.TakeBuffer())
     {
-        if (!emberAfEndpointIndexIsEnabled(index))
-        {
-            continue;
-        }
-        EndpointId endpoint = emberAfEndpointFromIndex(index);
+        EndpointId endpoint = ep.id;
         TypedFabricEntryData fabric(endpoint, fabric_index);
         EntryIndex idx = 0;
         CHIP_ERROR err = fabric.Load(mStorage);

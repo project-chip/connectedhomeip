@@ -19,6 +19,8 @@
 #include <lib/dnssd/minimal_mdns/core/QName.h>
 #include <lib/support/StringBuilder.h>
 
+#include <cstring>
+
 namespace mdns {
 namespace Minimal {
 
@@ -34,7 +36,24 @@ public:
 
     inline bool Fit() const { return mBuffer.Fit(); }
 
+    template <size_t N>
+    bool EndsWith(const char (&aSuffix)[N]) const
+    {
+        return EndsWith(&aSuffix[0], N - 1);
+    }
+
 private:
+    bool EndsWith(const char * aSuffix, size_t aLength) const
+    {
+        const char * buffer = mBuffer.c_str();
+        size_t bufferLength = strlen(buffer);
+        if (bufferLength < aLength)
+        {
+            return false;
+        }
+        return memcmp(buffer + bufferLength - aLength, aSuffix, aLength) == 0;
+    }
+
     static constexpr size_t kMaxQNameLength = 128;
     chip::StringBuilder<kMaxQNameLength> mBuffer;
 };

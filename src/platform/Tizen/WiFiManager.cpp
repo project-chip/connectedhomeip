@@ -417,7 +417,8 @@ bool WiFiManager::_FoundAPOnScanCb(wifi_manager_ap_h ap, void * userData)
     wifiErr = wifi_manager_ap_get_rssi(ap, &rssi);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Fail: get rssi value [%s]", get_error_message(wifiErr)));
-    scannedAP.rssi = static_cast<int8_t>(rssi);
+    scannedAP.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+    scannedAP.signal.strength = static_cast<int8_t>(rssi);
 
     wifiErr = wifi_manager_ap_get_security_type(ap, &type);
     VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,

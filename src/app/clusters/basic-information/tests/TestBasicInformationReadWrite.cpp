@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/Enums.h>
@@ -103,6 +103,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer) override
+    {
+        if (mManufacturingDateSuffix == nullptr)
+        {
+            suffixBuffer.reduce_size(0);
+            return CHIP_NO_ERROR;
+        }
+        return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(mManufacturingDateSuffix), suffixBuffer);
+    }
+
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return SafeCopyString(buf, bufSize, kPartNumber); }
 
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return SafeCopyString(buf, bufSize, kProductURL); }
@@ -124,15 +134,25 @@ public:
     }
 
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_NO_ERROR; }
+
+    // NOTE: suffix lifetime MUST be longer than this object lifetime as just a pointer is kept.
+    void SetManufacturingDateSuffix(const char * suffix) { mManufacturingDateSuffix = suffix; }
+
+private:
+    const char * mManufacturingDateSuffix = nullptr;
 };
 
 static constexpr size_t kCountryCodeLength = 2;
 static constexpr const char * kUniqueId    = "TEST_UNIQUE_ID_12345";
 // Mock ConfigurationManager for testing
-class MockConfigurationManager : public chip::DeviceLayer::ConfigurationManagerImpl
+class MockConfigurationManager : public chip::DeviceLayer::ConfigurationManager
 {
 public:
+    // ========================================================================
+    // Methods used by the Test Logic
+    // ========================================================================
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override { return SafeCopyString(buf, bufSize, kUniqueId); }
+
     CHIP_ERROR StoreCountryCode(const char * countryCode, size_t countryCodeLen) override
     {
         VerifyOrReturnError(countryCodeLen == kCountryCodeLength, CHIP_ERROR_INVALID_ARGUMENT);
@@ -148,49 +168,154 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    // The following methods does not have implementation on Linux, so we provide
-    // a stub that returns success.
+    // ========================================================================
+    // Stubs required to satisfy the ConfigurationManager Interface
+    // ========================================================================
+
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    void RunUnitTests() override {}
+    bool IsFullyProvisioned() override { return false; }
+    void LogDeviceConfig() override {}
+
+    bool IsCommissionableDeviceTypeEnabled() override { return false; }
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    bool IsCommissionableDeviceNameEnabled() override { return false; }
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+
+    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR IncrementLifetimeCounter() override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+#endif
+
+    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetRebootCount(uint32_t & v) override
+    {
+        v = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreRebootCount(uint32_t) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & v) override
+    {
+        v = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetBootReason(uint32_t & v) override
+    {
+        v = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreBootReason(uint32_t) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetRegulatoryLocation(uint8_t & loc) override
+    {
+        loc = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetLocationCapability(uint8_t & cap) override
+    {
+        cap = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetConfigurationVersion(uint32_t & v) override
+    {
+        v = 1;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreConfigurationVersion(uint32_t) override { return CHIP_NO_ERROR; }
+    bool CanFactoryReset() override { return false; }
+    void InitiateFactoryReset() override {}
 
 private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
 };
-
-MockConfigurationManager gMockConfigurationManager;
-MockDeviceInstanceInfoProvider gMockDeviceInstanceInfoProvider;
 struct TestBasicInformationReadWrite : public ::testing::Test
 {
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        DeviceLayer::SetDeviceInstanceInfoProvider(&gMockDeviceInstanceInfoProvider);
-        DeviceLayer::SetConfigurationMgr(&gMockConfigurationManager);
+
+        // Back up any existing DeviceInstanceInfoProvider and install the mock provider. This is required on platforms that build
+        // all unit tests into a single binary(e.g. Nordic), where global DeviceLayer state persists across test suites.
+        // DeviceInstanceInfoProvider has no universal default and cannot be reliably reset via Init/Shutdown, so without this
+        // backup/restore the mock would leak into subsequent tests.
+        sDeviceInstanceInfoProviderBackup = DeviceLayer::TestOnlyTryGetDeviceInstanceInfoProvider();
     }
 
     static void TearDownTestSuite()
     {
-        // For the DeviceInstanceInfoProvider there is no default instance.
-        // No need setting it to nullptr, as it won't do anything. It returns immediately if the input is nullptr.
+        // For the DeviceInstanceInfoProvider there is no default instance. Restore the provider that was installed prior to this
+        // test suite, if any.
+        if (sDeviceInstanceInfoProviderBackup != nullptr)
+        {
+            DeviceLayer::SetDeviceInstanceInfoProvider(sDeviceInstanceInfoProviderBackup);
+        }
         DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         chip::Platform::MemoryShutdown();
     }
 
     TestBasicInformationReadWrite() {}
-
-    void SetUp() override { ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR); }
-
-    void TearDown() override { basicInformationClusterInstance.Shutdown(); }
-
     chip::Testing::TestServerClusterContext testContext;
-    static BasicInformationCluster & basicInformationClusterInstance;
-    static chip::Testing::ClusterTester tester;
+    static DeviceLayer::DeviceInstanceInfoProvider * sDeviceInstanceInfoProviderBackup;
+    // Context
+    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
+    MockConfigurationManager mMockConfigurationManager;
+    BasicInformationCluster::Context mContext = {
+        .deviceInstanceInfoProvider = mDeviceInfoProvider,
+        .configurationManager       = mMockConfigurationManager,
+        .platformManager            = chip::DeviceLayer::PlatformMgr(),
+    };
 };
 
-BasicInformationCluster & TestBasicInformationReadWrite::basicInformationClusterInstance = BasicInformationCluster::Instance();
-chip::Testing::ClusterTester TestBasicInformationReadWrite::tester{ basicInformationClusterInstance };
+DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDeviceInstanceInfoProviderBackup = nullptr;
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // 1. GIVEN: A mock storage with a pre-existing "Old Label".
     CharSpan oldLabelSpan = "Old Label"_span;
 
@@ -204,8 +329,8 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 
     // 2. WHEN: The BasicInformationCluster starts up.
     // We must shut down the one from SetUp and re-start it to force a load.
-    basicInformationClusterInstance.Shutdown();
-    ASSERT_EQ(basicInformationClusterInstance.Startup(testContext.Get()), CHIP_NO_ERROR);
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // 3. THEN: The cluster should have loaded "Old Label" into its memory.
     char readBuffer[32];
@@ -232,11 +357,18 @@ TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
     Storage::String<32> persistedLabel;
     persistence.LoadString({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, persistedLabel);
     EXPECT_TRUE(persistedLabel.Content().data_equal(newLabelSpan));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;
+
+    BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.Set<Attributes::ManufacturingDate::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    chip::Testing::ClusterTester tester(cluster);
 
     // VendorName
     {
@@ -305,6 +437,16 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         EXPECT_TRUE(val.data_equal("20230615"_span));
     }
 
+    // ManufacturingDate with suffix
+    {
+        char buf[32];
+        CharSpan val(buf);
+        mDeviceInfoProvider.SetManufacturingDateSuffix("ABCDEFGH");
+        ASSERT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, val), CHIP_NO_ERROR);
+        EXPECT_TRUE(val.data_equal("20230615ABCDEFGH"_span));
+        mDeviceInfoProvider.SetManufacturingDateSuffix(nullptr);
+    }
+
     // UniqueID (Mandatory in Rev 4+, so if it fails, cluster rev must be < 4)
     {
         // Read ClusterRevision first
@@ -333,11 +475,28 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
         ASSERT_EQ(tester.ReadAttribute(Attributes::CapabilityMinima::Id, val), CHIP_NO_ERROR);
         EXPECT_GE(val.caseSessionsPerFabric, 3);
         EXPECT_GE(val.subscriptionsPerFabric, 3);
+
+        ASSERT_TRUE(val.simultaneousInvocationsSupported.HasValue());
+        EXPECT_GE(val.simultaneousInvocationsSupported.Value(), CHIP_IM_MAX_NUM_COMMAND_HANDLER);
+
+        ASSERT_TRUE(val.simultaneousWritesSupported.HasValue());
+        EXPECT_GE(val.simultaneousWritesSupported.Value(), CHIP_IM_MAX_NUM_WRITE_HANDLER);
+
+        ASSERT_TRUE(val.readPathsSupported.HasValue());
+        EXPECT_GE(val.readPathsSupported.Value(), CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS);
+
+        ASSERT_TRUE(val.subscribePathsSupported.HasValue());
+        EXPECT_GE(val.subscribePathsSupported.Value(), CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS);
     }
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // 1. ARRANGE: Define a new valid label
     CharSpan newLabel = "My Awesome Hub"_span;
     char readBuffer[32];
@@ -349,10 +508,17 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
     // 3. ASSERT: Read the attribute back and verify it matches the new label
     ASSERT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, readSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpan.data_equal(newLabel));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
+    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+
     // --- Test Case 1: Write a valid 2-character location ---
     {
         CharSpan validLocation = "US"_span;
@@ -373,11 +539,19 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
         DataModel::ActionReturnStatus writeErr = tester.WriteAttribute(Attributes::Location::Id, invalidLocation);
         EXPECT_NE(writeErr, CHIP_NO_ERROR); // Expect a failure (ConstraintError)
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 {
     bool readValue{};
+
+    BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.Set<Attributes::LocalConfigDisabled::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
 
     // --- Test Case 1: Write 'true' ---
     {
@@ -400,6 +574,8 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
         ASSERT_EQ(tester.ReadAttribute(Attributes::LocalConfigDisabled::Id, readValue), CHIP_NO_ERROR);
         EXPECT_EQ(readValue, finalValue);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

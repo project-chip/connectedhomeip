@@ -120,7 +120,7 @@ CHIP_ERROR ICDManagementCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
-void ICDManagementCluster::Shutdown()
+void ICDManagementCluster::Shutdown(ClusterShutdownType shutdownType)
 {
 // TODO(#32321): Remove #if after issue is resolved
 // Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
@@ -129,6 +129,7 @@ void ICDManagementCluster::Shutdown()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     Server::GetInstance().GetICDManager().ReleaseObserver(this);
 #endif
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -272,11 +273,11 @@ CHIP_ERROR ICDManagementClusterWithCIP::Startup(ServerClusterContext & context)
     return mFabricTable.AddFabricDelegate(&mFabricDelegate);
 }
 
-void ICDManagementClusterWithCIP::Shutdown()
+void ICDManagementClusterWithCIP::Shutdown(ClusterShutdownType shutdownType)
 {
     mFabricTable.RemoveFabricDelegate(&mFabricDelegate);
 
-    ICDManagementCluster::Shutdown();
+    ICDManagementCluster::Shutdown(shutdownType);
 }
 
 DataModel::ActionReturnStatus ICDManagementClusterWithCIP::ReadAttribute(const DataModel::ReadAttributeRequest & request,

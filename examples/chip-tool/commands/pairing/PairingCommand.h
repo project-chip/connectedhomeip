@@ -19,6 +19,9 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#if CHIP_ENABLE_OT_COMMISSIONER
+#include "CommissionProxy.h"
+#endif
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 
@@ -116,6 +119,10 @@ public:
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
+#if CHIP_ENABLE_OT_COMMISSIONER
+            AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
+            AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
+#endif
             AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery,
                         "Whether to only use DNS-SD for discovery. The default is true if no network credentials are provided, "
                         "false otherwise.");
@@ -263,6 +270,9 @@ private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
+#if CHIP_ENABLE_OT_COMMISSIONER
+    CHIP_ERROR PairWithMeshCoP();
+#endif
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
     CHIP_ERROR PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index);
@@ -330,6 +340,12 @@ private:
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
+
+#if CHIP_ENABLE_OT_COMMISSIONER
+    chip::Optional<char *> mThreadBaHost;
+    chip::Optional<uint16_t> mThreadBaPort;
+    CommissionProxy mCommissionProxy;
+#endif
 
     std::optional<std::thread> mPrompterThread;
 

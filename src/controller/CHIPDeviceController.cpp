@@ -40,13 +40,13 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/Base64.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
@@ -101,6 +101,9 @@ using namespace chip::Encoding;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+using chip::AddressResolve::Resolver;
+using chip::AddressResolve::ResolveResult;
 
 DeviceController::DeviceController()
 {
@@ -839,7 +842,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
         {
-            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
+            ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %" PRIu64,
                             params.GetPeerAddress().GetRemoteId());
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
             auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
@@ -934,7 +937,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeComplete(void * appState)
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
-        ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %lu", device->GetDeviceId());
+        ChipLogProgress(Controller, "WiFi-PAF: Subscription Completed, dev_id = %" PRIu64, device->GetDeviceId());
         auto remoteId = device->GetDeviceId();
         auto params   = self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF;
 
@@ -951,7 +954,7 @@ void DeviceCommissioner::OnWiFiPAFSubscribeError(void * appState, CHIP_ERROR err
 
     if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kWiFiPAF)
     {
-        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %lu, err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
+        ChipLogError(Controller, "WiFi-PAF: Subscription Error, id = %" PRIu64 ", err = %" CHIP_ERROR_FORMAT, device->GetDeviceId(),
                      err.Format());
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = RendezvousParameters();
@@ -974,6 +977,11 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 {
     MATTER_TRACE_SCOPE("Commission", "DeviceCommissioner");
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // Reset fallback from any previous commissioning session
+    mFallbackOperationalResolveResult.ClearValue();
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     if (device == nullptr || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
@@ -1925,6 +1933,10 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
         mUdcServer->OnCommissionableNodeFound(nodeData);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    if (nodeData.Get<Dnssd::CommissionNodeData>().threadMeshcop)
+    {
+        mAutoCommissioner.SetNetworkSetupNeeded(true);
+    }
     AbstractDnssdDiscoveryController::OnNodeDiscovered(nodeData);
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }
@@ -2212,6 +2224,16 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     VerifyOrDie(self->GetCommissioningStage() == CommissioningStage::kFindOperationalForStayActive ||
                 self->GetCommissioningStage() == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
+
+    bool supportsConcurrent =
+        self->mCommissioningDelegate->GetCommissioningParameters().GetSupportsConcurrentConnection().ValueOr(true);
+    if (!supportsConcurrent)
+    {
+        // Concurrent mode not supported.
+        // We are in operational phase so the commissioning channel is not
+        // available anymore and it is not possible to re-arm the fail-safe timer.
+        return;
+    }
 
     // We need to do the fail-safe arming over the PASE session.
     auto * commissioneeDevice = self->FindCommissioneeDevice(peerId.GetNodeId());
@@ -3743,6 +3765,21 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+        Transport::Type type = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+        // cache address if we are connected over TCP or UDP
+        if (type == Transport::Type::kTcp || type == Transport::Type::kUdp)
+        {
+            // Store the address we are using for PASE as a fallback for operational discovery
+            ResolveResult result;
+            result.address         = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
+            result.mrpRemoteConfig = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
+            // Note: supportsTcpClient and supportsTcpServer are device capabilities from DNS-SD TXT records,
+            // not derivable from the transport type. They remain false (default) here.
+            // TODO: Consider passing these through RendezvousParameters if available from SetUpCodePairer.
+            mFallbackOperationalResolveResult.SetValue(result);
+        }
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
         CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
@@ -3751,13 +3788,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
         MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
-                                                               &mOnDeviceConnectionFailureCallback
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(
+            scopedPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                                               ,
-                                                               /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback
+            /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-        );
+            TransportPayloadCapability::kMRPPayload, mFallbackOperationalResolveResult);
     }
     break;
     case CommissioningStage::kPrimaryOperationalNetworkFailed: {

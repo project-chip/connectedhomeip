@@ -24,9 +24,9 @@ import re
 import shlex
 import subprocess
 import threading
-import typing
 from contextlib import suppress
 from dataclasses import dataclass, replace
+from enum import StrEnum
 from typing import IO, TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ class LogPipe(threading.Thread):
         """
         Setup the object with a logger and a loglevel and start the thread.
         """
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, name=name)
 
         self.daemon = False
         self.level = level
@@ -57,8 +57,6 @@ class LogPipe(threading.Thread):
         self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')  # noqa: SIM115
         self.captured_logs: list[str] = []
         self.capture_delegate = capture_delegate
-        if name is not None:
-            self.name = name
 
         self.start()
 
@@ -139,10 +137,10 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class SubprocessKind(enum.Enum):
-    APP = enum.auto()
-    TOOL = enum.auto()
-    RPC = enum.auto()
+class SubprocessKind(StrEnum):
+    APP = 'app'
+    CTRL = 'ctrl'
+    MGMT = 'mgmt'
 
 
 @dataclass
@@ -161,19 +159,17 @@ class SubprocessInfo:
     def wrap_with(self, *args: str):
         return replace(self, wrapper=tuple(args) + self.wrapper)
 
-    def to_cmd(self) -> typing.List[str]:
+    def to_cmd(self) -> list[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
 
 
 class Executor:
-    CLEANUP_TIMEOUT = 1
+    CLEANUP_TIMEOUT_S = 5
 
     def __init__(self) -> None:
         self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
 
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None,
-            stdout: IO[Any] | LogPipe | None = None,
-            stderr: IO[Any] | LogPipe | None = None):
+    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None, stderr: IO[Any] | LogPipe | None = None):
         # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr,
         # but mypy doesn't think the same.
         self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin,
@@ -195,16 +191,23 @@ class Executor:
 
             # SIGTERM
             log.debug('Terminating leftover process "%s"', cmd)
-            process.terminate()
+            try:
+                process.terminate()
+            except OSError:
+                # Can occur in case of race condition when process exits between poll and terminate.
+                continue
             with suppress(subprocess.TimeoutExpired):
-                process.wait(self.CLEANUP_TIMEOUT)
+                process.wait(self.CLEANUP_TIMEOUT_S)
                 continue
 
             # SIGKILL
             log.warning('Failed to terminate the process "%s". Killing instead', cmd)
-            process.kill()
+            try:
+                process.kill()
+            except OSError:
+                continue
             with suppress(subprocess.TimeoutExpired):
-                process.wait(self.CLEANUP_TIMEOUT)
+                process.wait(self.CLEANUP_TIMEOUT_S)
                 continue
 
             log.error('Failed to kill process "%s". It may become a zombie', cmd)

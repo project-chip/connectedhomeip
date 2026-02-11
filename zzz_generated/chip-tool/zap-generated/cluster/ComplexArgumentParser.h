@@ -587,6 +587,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OccupancySensin
 static void Finalize(chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type & request,
                         Json::Value & value);
 
@@ -870,6 +876,16 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::TransportZoneOptionsStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::AudioStreamStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PushAvStreamTransport::Structs::VideoStreamStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::Type & request,

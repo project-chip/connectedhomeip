@@ -18,7 +18,6 @@
 #include <app/server/Dnssd.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <inttypes.h>
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
@@ -40,6 +39,15 @@
 #include <system/TimeSource.h>
 
 #include <algorithm>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+#include <app/server/ThreadRendezvousAnnouncement.h>
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+#include <app/server/Server.h>
+#endif
 
 using namespace chip;
 using namespace chip::DeviceLayer;
@@ -137,6 +145,16 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
     return mdnsAdvertiser.GetCommissionableInstanceName(buffer, bufferLen);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+CHIP_ERROR DnssdServer::SendThreadRendezvousAnnouncement(void * context, const Transport::PeerAddress & peerAddr)
+{
+    auto * self = static_cast<DnssdServer *>(context);
+    VerifyOrReturnError(!self->mThreadRendezvousAnnouncement.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+
+    return chip::Server::GetInstance().GetTransportManager().SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
 CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminator)
 {
@@ -391,6 +409,19 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     );
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    if (commissionableNode && !DeviceLayer::ThreadStackMgr().IsThreadProvisioned())
+    {
+        ReturnErrorOnFailure(BuildThreadRendezvousAnnouncement(advertiseParameters, mThreadRendezvousAnnouncement));
+        return DeviceLayer::ThreadStackMgr().RendezvousStart(SendThreadRendezvousAnnouncement, this);
+    }
+    else
+    {
+        DeviceLayer::ThreadStackMgr().RendezvousStop();
+        mThreadRendezvousAnnouncement = nullptr;
+    }
+#endif
+
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
@@ -449,6 +480,11 @@ void DnssdServer::StopServer()
 
         Dnssd::ServiceAdvertiser::Instance().Shutdown();
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    DeviceLayer::ThreadStackMgr().RendezvousStop();
+    mThreadRendezvousAnnouncement = nullptr;
+#endif
 }
 
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)

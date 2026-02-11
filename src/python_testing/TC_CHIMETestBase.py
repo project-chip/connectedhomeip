@@ -35,10 +35,11 @@ class CHIMETestBase:
 
         asserts.assert_equal(response, status, "Unexpected error returned")
 
-    async def send_play_chime_sound_command(self, endpoint, expected_status: Status = Status.Success):
+    async def send_play_chime_sound_command(self, endpoint, chimeID: int = None, expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.Chime.Commands.PlayChimeSound(),
-                                       endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.Chime.Commands.PlayChimeSound(
+                chimeID=chimeID),
+                endpoint=endpoint)
 
             asserts.assert_equal(expected_status, Status.Success)
 

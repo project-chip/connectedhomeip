@@ -58,7 +58,7 @@ TEST_F(TestPowerTopologyClusterBackwardsCompatibility, TestInstanceLifecycle)
     EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
     // Test shutdown
-    instance.Shutdown();
+    instance.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

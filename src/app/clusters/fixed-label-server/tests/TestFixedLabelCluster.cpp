@@ -17,13 +17,17 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/fixed-label-server/FixedLabelCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/FixedLabel/Attributes.h>
 #include <clusters/FixedLabel/Metadata.h>
+
+#include <clusters/FixedLabel/Structs.h>
+#include <platform/DeviceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -31,8 +35,57 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FixedLabel;
 using namespace chip::app::Clusters::FixedLabel::Attributes;
 using namespace chip::Testing;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
+
+// Mock DeviceInfoProvider for testing
+class MockFixedLabelIterator : public DeviceLayer::DeviceInfoProvider::FixedLabelIterator
+{
+public:
+    MockFixedLabelIterator()
+    {
+        mLabels[0].label = chip::CharSpan::fromCharString("test_label1");
+        mLabels[0].value = chip::CharSpan::fromCharString("test_value1");
+    }
+
+    size_t Count() override { return 1; }
+
+    bool Next(DeviceLayer::DeviceInfoProvider::FixedLabelType & output) override
+    {
+        if (mIndex < Count())
+        {
+            output = mLabels[mIndex++];
+            return true;
+        }
+        return false;
+    }
+
+    void Release() override { delete this; }
+
+private:
+    size_t mIndex = 0;
+    DeviceLayer::DeviceInfoProvider::FixedLabelType mLabels[1];
+};
+
+// In MockDeviceInfoProvider:
+class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
+{
+public:
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return new MockFixedLabelIterator(); }
+    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
+    SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; }
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
+
+protected:
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+};
 
 struct TestFixedLabelCluster : public ::testing::Test
 {
@@ -42,11 +95,12 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(fixedLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { fixedLabel.Shutdown(); }
+    void TearDown() override { fixedLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestFixedLabelCluster() : fixedLabel(kRootEndpointId) {}
+    TestFixedLabelCluster() : fixedLabel(kRootEndpointId, mDeviceInfoProvider) {}
 
     TestServerClusterContext testContext;
+    MockDeviceInfoProvider mDeviceInfoProvider;
     FixedLabelCluster fixedLabel;
 };
 
@@ -54,13 +108,10 @@ struct TestFixedLabelCluster : public ::testing::Test
 
 TEST_F(TestFixedLabelCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(fixedLabel.Attributes(ConcreteClusterPath(kRootEndpointId, FixedLabel::Id), attributes), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(FixedLabel::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(fixedLabel,
+                                        {
+                                            FixedLabel::Attributes::LabelList::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestFixedLabelCluster, ReadAttributeTest)
@@ -76,8 +127,9 @@ TEST_F(TestFixedLabelCluster, ReadAttributeTest)
     DataModel::DecodableList<Structs::LabelStruct::DecodableType> labelList;
     ASSERT_EQ(tester.ReadAttribute(LabelList::Id, labelList), CHIP_NO_ERROR);
     auto it = labelList.begin();
-    while (it.Next())
-    {
-        ASSERT_GT(it.GetValue().label.size(), 0u);
-    }
+    ASSERT_TRUE(it.Next());
+    auto label = it.GetValue();
+    ASSERT_TRUE(label.label.data_equal(chip::CharSpan::fromCharString("test_label1")));
+    ASSERT_TRUE(label.value.data_equal(chip::CharSpan::fromCharString("test_value1")));
+    ASSERT_FALSE(it.Next());
 }

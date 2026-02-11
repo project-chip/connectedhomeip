@@ -22,6 +22,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -270,7 +271,7 @@ void init()
             continue;
         }
 
-        if (!chef::DeviceTypes::EndpointHasDeviceType(endpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (!chef::DeviceTypes::EndpointHasDeviceType(endpointId, Device::kPumpDeviceTypeId))
         {
             continue;
         }

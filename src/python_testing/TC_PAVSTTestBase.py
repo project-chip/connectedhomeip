@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 
 class PAVSTTestBase:
-    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 30  # 30 seconds
+    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 100  # 100 seconds
 
     async def read_pavst_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.PushAvStreamTransport

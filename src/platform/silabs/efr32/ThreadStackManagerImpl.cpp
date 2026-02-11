@@ -36,6 +36,8 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
+#include <openthread-core-config.h>
+
 #include <lib/support/CodeUtils.h>
 #include <mbedtls/platform.h>
 
@@ -114,6 +116,12 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::ConfigureThreadStack(otInst);
+    if (err == CHIP_NO_ERROR)
+    {
+        // To make sure that timeout is set with OT libraries
+        otThreadSetChildTimeout(otInst, OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT);
+    }
+
     return err;
 }
 
@@ -175,7 +183,14 @@ extern "C" void sl_ot_create_instance(void)
 {
     SuccessOrDie(chip::Platform::MemoryInit());
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+#if SL_OPENTHREAD_MULTI_PAN_ENABLE
+    // Initialize multiple OT instances for Multi-PAN support
+    // Instance 0: Matter protocol stack
+    sOTInstance = otInstanceInitMultiple(0);
+#else
+    // Standard single instance initialization
     sOTInstance = otInstanceInitSingle();
+#endif // SL_OPENTHREAD_MULTI_PAN_ENABLE
 }
 
 extern "C" void sl_ot_cli_init(void)

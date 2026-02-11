@@ -45,7 +45,9 @@ import matter.clusters as Clusters
 from matter import CertificateAuthority
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
@@ -101,6 +103,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         # Start Fabric A JF-Controller App
         self.fabric_a_ctrl = JFControllerSubprocess(
             jfc_server_app,
+            "JFC_A",  # Name of the controller instance, used for logging purposes in the JF-Controller app:w
             rpc_server_port=33033,
             storage_dir=self.storage_fabric_a,
             vendor_id=self.jfctrl_fabric_a_vid)

@@ -114,6 +114,7 @@ matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_EN
 matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_W91)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
+matter_add_gn_arg_bool  ("chip_persist_subscriptions"             CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)

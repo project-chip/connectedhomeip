@@ -32,8 +32,6 @@ declare_args() {
   ota_periodic_query_timeout_sec = 86400
 }
 
-chip_detail_logging = sl_verbose_mode
-
 import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check

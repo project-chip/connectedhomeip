@@ -396,7 +396,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
     return CHIP_NO_ERROR;
 }
 
-EndpointId emberAfClearDynamicEndpoint(uint16_t index)
+EndpointId emberAfClearDynamicEndpoint(uint16_t index, MatterClusterShutdownType shutdownType)
 {
     EndpointId ep = 0;
 
@@ -406,7 +406,7 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         (emberAfEndpointIndexIsEnabled(index)))
     {
         ep = emAfEndpoints[index].endpoint;
-        emberAfEndpointEnableDisable(ep, false);
+        emberAfEndpointEnableDisable(ep, false, shutdownType);
         emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }
 
@@ -492,7 +492,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     }
 }
 
-static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint, MatterClusterShutdownType shutdownType)
 {
     // Call shutdown callbacks from clusters, mainly for canceling pending timers
     uint8_t clusterIndex;
@@ -502,7 +502,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         if (cluster->IsServer())
         {
-            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId);
+            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId, shutdownType);
         }
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
         if (f != nullptr)
@@ -978,7 +978,7 @@ bool emberAfEndpointIsEnabled(EndpointId endpoint)
     return emberAfEndpointIndexIsEnabled(index);
 }
 
-bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
+bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterClusterShutdownType shutdownType)
 {
     uint16_t index = findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
     bool currentlyEnabled;
@@ -1004,7 +1004,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         }
         else
         {
-            shutdownEndpoint(&(emAfEndpoints[index]));
+            shutdownEndpoint(&(emAfEndpoints[index]), shutdownType);
             emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
         }
 

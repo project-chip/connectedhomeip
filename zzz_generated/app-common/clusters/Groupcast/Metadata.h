@@ -30,9 +30,21 @@ namespace MaxMembershipCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMembershipCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxMembershipCount
-constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
-    Membership::kMetadataEntry,
-    MaxMembershipCount::kMetadataEntry,
+namespace MaxMcastAddrCount {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace MaxMcastAddrCount
+namespace UsedMcastAddrCount {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(UsedMcastAddrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace UsedMcastAddrCount
+namespace FabricUnderTest {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(FabricUnderTest::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace FabricUnderTest
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    Membership::kMetadataEntry,         MaxMembershipCount::kMetadataEntry, MaxMcastAddrCount::kMetadataEntry,
+    UsedMcastAddrCount::kMetadataEntry, FabricUnderTest::kMetadataEntry,
 
 };
 
@@ -55,21 +67,26 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(UpdateGroupKey::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kManage);
 } // namespace UpdateGroupKey
-namespace ExpireGracePeriod {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ExpireGracePeriod::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
-                   Access::Privilege::kManage);
-} // namespace ExpireGracePeriod
 namespace ConfigureAuxiliaryACL {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ConfigureAuxiliaryACL::Id,
                    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kAdminister);
 } // namespace ConfigureAuxiliaryACL
+namespace GroupcastTesting {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(GroupcastTesting::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+                   Access::Privilege::kAdminister);
+} // namespace GroupcastTesting
 
 } // namespace Commands
 
-namespace Events {} // namespace Events
+namespace Events {
+namespace GroupcastTesting {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace GroupcastTesting
+
+} // namespace Events
 } // namespace Groupcast
 } // namespace Clusters
 } // namespace app

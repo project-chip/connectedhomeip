@@ -29,14 +29,56 @@ namespace core {
 
 memory::Weak<CastingPlayer> CastingPlayer::mTargetCastingPlayer;
 
+void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions)
+{
+    ChipLogProgress(AppServer, "CastingPlayer::SendUDC() called");
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(
+        connectionCallbacks.mOnConnectionComplete != nullptr,
+        ChipLogError(AppServer,
+                     "CastingPlayer::VerifyOrEstablishConnection() ConnectionCallbacks.mOnConnectionComplete was not provided"));
+
+    mOnCompleted         = connectionCallbacks.mOnConnectionComplete;
+    mTargetCastingPlayer = weak_from_this();
+    mIdOptions           = idOptions;
+
+    mIdOptions.LogDetail();
+
+    if (connectionCallbacks.mCommissionerDeclarationCallback != nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::SendUDC() Setting CommissionerDeclarationCallback in "
+                        "CommissionerDeclarationHandler");
+        // Set the callback for handling CommissionerDeclaration messages.
+        matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
+            connectionCallbacks.mCommissionerDeclarationCallback);
+        mClientProvidedCommissionerDeclarationCallback = true;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    SuccessOrExit(err = SendUserDirectedCommissioningRequest());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // clear the UdcStatus to allow other UDC messages to be sent
+    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::SendUDC() failed with %" CHIP_ERROR_FORMAT, err.Format());
+        resetState(err);
+    }
+}
+
 void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks, uint16_t commissioningWindowTimeoutSec,
                                                 IdentificationDeclarationOptions idOptions)
 {
     ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() called");
 
     CastingPlayerDiscovery * castingPlayerDiscovery = CastingPlayerDiscovery::GetInstance();
-    std::vector<core::CastingPlayer>::iterator it;
-    std::vector<core::CastingPlayer> cachedCastingPlayers = support::CastingStore::GetInstance()->ReadAll();
+    std::list<core::CastingPlayer>::iterator it;
+    std::list<core::CastingPlayer> cachedCastingPlayers = support::CastingStore::GetInstance()->ReadAll();
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -116,12 +158,22 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
             ChipLogProgress(
                 AppServer,
                 "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer found in cache; checking for TargetApp(s)");
-            unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
-            if (ContainsDesiredTargetApp(&cachedCastingPlayers[index], idOptions.getTargetAppInfoList()))
+            if (!ContainsDesiredTargetApp(&*it, idOptions.getTargetAppInfoList()))
+            {
+                ChipLogProgress(
+                    AppServer,
+                    "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer not found in cache; TargetApp(s) not found");
+            }
             {
                 ChipLogProgress(
                     AppServer,
                     "CastingPlayer::VerifyOrEstablishConnection() Attempting to Re-establish CASE with cached CastingPlayer");
+
+                ChipLogProgress(AppServer,
+                                "Assigning from cache. Current: nodeId=0x" ChipLogFormatX64
+                                " fabricIndex=%d, Cached: nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                                ChipLogValueX64(mAttributes.nodeId), mAttributes.fabricIndex, ChipLogValueX64(it->GetNodeId()),
+                                it->GetFabricIndex());
 
                 // Preserve the IP addresses from the discovered CastingPlayer before overwriting with cached data
                 unsigned int discoveredNumIPs = mAttributes.numIPs;
@@ -131,11 +183,10 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                     discoveredIpAddresses[i] = mAttributes.ipAddresses[i];
                 }
                 chip::Inet::InterfaceId discoveredInterfaceId = mAttributes.interfaceId;
-
-                *this                          = cachedCastingPlayers[index];
-                mConnectionState               = CASTING_PLAYER_CONNECTING;
-                mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
-                mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
+                *this                                         = *it;
+                mConnectionState                              = CASTING_PLAYER_CONNECTING;
+                mOnCompleted                                  = connectionCallbacks.mOnConnectionComplete;
+                mCommissioningWindowTimeoutSec                = commissioningWindowTimeoutSec;
 
                 // Restore the IP addresses from the discovered CastingPlayer
                 mAttributes.numIPs = discoveredNumIPs;
@@ -175,6 +226,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                                          "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                          "CastingPlayer failed");
                             CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+                            CastingPlayer::GetTargetCastingPlayer()->RemoveFabric();
                             CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
                             if (e != CHIP_NO_ERROR)
                             {
@@ -545,11 +597,28 @@ CastingPlayer & CastingPlayer::operator=(const CastingPlayer & other)
     if (this != &other)
     {
         mAttributes                    = other.mAttributes;
-        mEndpoints                     = other.mEndpoints;
         mConnectionState               = other.mConnectionState;
         mIdOptions                     = other.mIdOptions;
         mCommissioningWindowTimeoutSec = other.mCommissioningWindowTimeoutSec;
         mOnCompleted                   = other.mOnCompleted;
+
+        // Create new Endpoint objects instead of sharing them
+        mEndpoints.clear();
+        for (const auto & endpoint : other.mEndpoints)
+        {
+            // Create EndpointAttributes from the existing endpoint
+            EndpointAttributes attrs;
+            attrs.mId             = endpoint->GetId();
+            attrs.mVendorId       = endpoint->GetVendorId();
+            attrs.mProductId      = endpoint->GetProductId();
+            attrs.mDeviceTypeList = endpoint->GetDeviceTypeList();
+
+            // Create a new Endpoint with the same attributes but pointing to this CastingPlayer
+            auto newEndpoint = std::make_shared<Endpoint>(this, attrs);
+            // Register the same clusters
+            newEndpoint->RegisterClusters(endpoint->GetServerList());
+            mEndpoints.push_back(newEndpoint);
+        }
     }
     return *this;
 }

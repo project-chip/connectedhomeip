@@ -34,7 +34,7 @@ ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
         ServerClusterRegistration * next = mRegistrations->next;
         if (mContext.has_value())
         {
-            mRegistrations->serverClusterInterface->Shutdown();
+            mRegistrations->serverClusterInterface->Shutdown(ClusterShutdownType::kClusterShutdown);
         }
         mRegistrations->next = nullptr;
         mRegistrations       = next;
@@ -73,7 +73,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * what)
+CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * what, ClusterShutdownType clusterShutdownType)
 {
     ServerClusterRegistration * prev    = nullptr;
     ServerClusterRegistration * current = mRegistrations;
@@ -102,7 +102,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * w
             current->next = nullptr; // Make sure current does not look like part of a list.
             if (mContext.has_value())
             {
-                current->serverClusterInterface->Shutdown();
+                current->serverClusterInterface->Shutdown(clusterShutdownType);
             }
 
             return CHIP_NO_ERROR;
@@ -188,7 +188,7 @@ void ServerClusterInterfaceRegistry::ClearContext()
     }
     for (ServerClusterRegistration * registration = mRegistrations; registration != nullptr; registration = registration->next)
     {
-        registration->serverClusterInterface->Shutdown();
+        registration->serverClusterInterface->Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
     mContext.reset();

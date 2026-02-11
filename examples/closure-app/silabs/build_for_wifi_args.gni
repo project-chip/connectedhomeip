@@ -18,6 +18,6 @@ chip_enable_openthread = false
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
 sl_enable_test_event_trigger = true
-chip_enable_ota_requestor = false
+chip_enable_ota_requestor = true
 app_data_model =
     "${chip_root}/examples/closure-app/silabs/data_model:silabs-closure"

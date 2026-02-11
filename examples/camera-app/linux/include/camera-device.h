@@ -91,8 +91,7 @@ public:
     SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
-    GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
     chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
@@ -320,6 +319,10 @@ public:
     // Audio playback pipeline methods
     CameraError StartAudioPlaybackStream();
     CameraError StopAudioPlaybackStream();
+
+    // Timestamp handling for video and audio streams
+    std::map<uint16_t, int64_t> mVideoStreamPtsOffsetMs;
+    std::map<uint16_t, int64_t> mAudioStreamPtsOffsetMs;
 
 private:
     int videoDeviceFd            = -1;

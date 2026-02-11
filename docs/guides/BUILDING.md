@@ -10,7 +10,8 @@ The build system has been tested on the following Operating Systems:
 
 -   macOS 10.15
 -   Debian 11 (64 bit required)
--   Ubuntu 22.04 LTS
+-   Ubuntu 22.04 LTS (requires Python 3.11+)
+-   Ubuntu 24.04 LTS
 
 ## Build system features
 
@@ -34,39 +35,34 @@ for specific platforms, which can obviously reduce the project size.
 To check out the Matter repository with all platforms, run the following
 command:
 
-```
+```shell
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
-
 ```
 
 ### Specific platforms Checking out
 
 -   first step, checking out matter top level repo with command below:
 
-```
-  git clone --depth=1 git@github.com:project-chip/connectedhomeip.git
-
+```shell
+git clone --depth=1 git@github.com:project-chip/connectedhomeip.git
 ```
 
 -   Second step, check out third-party platform support repos as follows:
 
-```
-  python3 scripts/checkout_submodules.py --shallow --platform platform1,platform2...
-
+```shell
+python3 scripts/checkout_submodules.py --shallow --platform platform1,platform2...
 ```
 
 For Linux host example:
 
-```
- ./scripts/checkout_submodules.py --shallow --platform  linux
-
+```shell
+./scripts/checkout_submodules.py --shallow --platform  linux
 ```
 
 For Darwin host example:
 
-```
- ./scripts/checkout_submodules.py --shallow --platform  darwin
-
+```shell
+./scripts/checkout_submodules.py --shallow --platform  darwin
 ```
 
 Please note that in the above commands, you should replace platform1,platform2
@@ -77,7 +73,7 @@ with the specific platform names you wish to check out.
 If you already have the Matter code checked out, run the following commands to
 update the repository and synchronize submodules:
 
-```
+```shell
 git pull
 git submodule update --init
 ```
@@ -91,11 +87,26 @@ Before building, you must install a few OS specific dependencies.
 On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following command:
 
-```
-sudo apt-get install git gcc g++ pkg-config cmake libssl-dev libdbus-1-dev \
+```shell
+sudo apt-get install git gcc g++ pkg-config cmake curl libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
      default-jre
+```
+
+#### Upgrading Python on Ubuntu 22.04
+
+Ubuntu 22.04 ships with Python 3.10 by default, but Matter SDK requires Python
+3.11 or newer. To upgrade Python, run the following commands:
+
+```shell
+sudo apt-get install python3.11 python3.11-dev python3.11-venv
+# Register python3.10 so that it can be switched back if needed
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+# Register python3.11 with higher priority (will be automatically selected)
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2
+# Verify that python3 points to python3.11
+python3 --version
 ```
 
 #### NFC builds
@@ -104,7 +115,7 @@ If you plan to build with NFC support for Python tests (by passing
 `--enable_nfc true` to `build_python.sh`), you must install `libpcsclite-dev`
 before running the build script:
 
-```sh
+```shell
 sudo apt-get install libpcsclite-dev
 ```
 
@@ -112,7 +123,7 @@ sudo apt-get install libpcsclite-dev
 
 If building via `build_examples.py` and `-with-ui` variant, also install SDL2:
 
-```
+```shell
 sudo apt-get install libsdl2-dev
 ```
 
@@ -124,7 +135,7 @@ On macOS, install Xcode from the Mac App Store.
 
 If building `-with-ui` variant, also install SDL2:
 
-```
+```shell
 brew install sdl2
 ```
 
@@ -140,7 +151,7 @@ Complete the following steps:
    [Installing prerequisites on Linux](#installing-prerequisites-on-linux).
 1. Install some Raspberry Pi specific dependencies:
 
-    ```
+    ```shell
     sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
@@ -162,7 +173,7 @@ during the Matter commissioning process.
 
 1. Edit the `bluetooth.service` unit by running the following command:
 
-    ```sh
+    ```shell
     sudo systemctl edit bluetooth.service
     ```
 
@@ -176,7 +187,7 @@ during the Matter commissioning process.
 
 1. Restart the Bluetooth service by running the following command:
 
-    ```sh
+    ```shell
     sudo systemctl restart bluetooth.service
     ```
 
@@ -189,26 +200,26 @@ permanently, you need to make the following changes:
 1. Edit the `dbus-fi.w1.wpa_supplicant1.service` file to use configuration file
    instead by running the following command:
 
-    ```
+    ```shell
     sudo nano /etc/systemd/system/dbus-fi.w1.wpa_supplicant1.service
     ```
 
 1. Run the following command to change the wpa_supplicant start parameters to
    the provided values:
 
-    ```
+    ```shell
     ExecStart=/sbin/wpa_supplicant -u -s -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
     ```
 
 1. Add the `wpa-supplicant` configuration file by running the following command:
 
-    ```
+    ```shell
     sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
     ```
 
 1. Add the following content to the `wpa-supplicant` file:
 
-    ```
+    ```ini
     ctrl_interface=DIR=/run/wpa_supplicant
     update_config=1
     ```
@@ -241,7 +252,7 @@ To check out as source code, the corresponding tag should exist in the
 
 Example commands:
 
-```sh
+```dockerfile
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
     && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
@@ -278,7 +289,7 @@ to build and test.
 
 Run the following command:
 
-```
+```shell
 source scripts/activate.sh
 ```
 
@@ -287,7 +298,7 @@ source scripts/activate.sh
 If the script says the environment is out of date, you can update it by running
 the following command:
 
-```
+```shell
 source scripts/bootstrap.sh
 ```
 
@@ -299,7 +310,7 @@ is expensive, so avoid running it unless the environment is out of date.
 Run the following commands to build all sources, libraries, and tests for the
 host platform:
 
-```
+```shell
 source scripts/activate.sh
 
 gn gen out/host
@@ -310,7 +321,7 @@ ninja -C out/host
 These commands generate a configuration suitable for debugging. To configure an
 optimized build, specify `is_debug=false`:
 
-```
+```shell
 gn gen out/host --args='is_debug=false'
 
 ninja -C out/host
@@ -324,13 +335,13 @@ ninja -C out/host
 
 To run all tests, run the following command:
 
-```
+```shell
 ninja -C out/host check
 ```
 
 To run only the tests in `src/inet/tests`, you can run the following command:
 
-```
+```shell
 ninja -C out/host src/inet/tests:tests_run
 ```
 
@@ -360,7 +371,7 @@ To run a unit test, pass the target path to ninja in the form:
 
 For example:
 
-```
+```shell
 # Assuming `gn gen out/debug` has been run
 ninja -C out/debug mac_arm64_gcc/tests/TestSessionManagerDispatch
 
@@ -380,7 +391,7 @@ targets.
 
 Example build commands:
 
-```
+```shell
 # Compiles and runs all tests on the host:
 ./scripts/build/build_examples.py --target linux-x64-tests build
 
@@ -402,7 +413,7 @@ manually execute them). For best error detection, some form of sanitizer like
 
 To compile, use:
 
-```
+```shell
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-asan-libfuzzer build
 ```
 
@@ -425,11 +436,12 @@ An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
 framework, integrated through `pw_fuzzer`. The Tests will have to be built and
 executed manually.
 
-```
+```shell
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
 ```
 
-> [!NOTE]  
+> [!NOTE]
+>
 > `asan` is enabled by default in FuzzTest, so please do not add it in
 > `build_examples.py` invocation.
 
@@ -464,7 +476,7 @@ the following manners:
 To configure a new build or edit the arguments to existing build, run the
 following command:
 
-```
+```shell
 source scripts/activate.sh
 
 gn args out/custom
@@ -477,7 +489,7 @@ the OS and CPU of the build, respectively.
 
 To see help for all available build arguments, run the following command:
 
-```
+```shell
 gn gen out/custom
 gn args --list out/custom
 ```
@@ -492,7 +504,7 @@ To build examples as separate projects that add Matter in the
 `third_party directory`, run the following command with the correct path to the
 example (here, `chip-shell`):
 
-```
+```shell
 cd examples/shell
 gn gen out/debug
 ninja -C out/debug
@@ -508,7 +520,7 @@ You can build examples at the top level of the Matter project. See the following
 To build a unified configuration that approximates the set of continuous builds,
 run the following commands:
 
-```
+```shell
 source scripts/activate.sh
 
 gn gen out/unified --args='is_debug=true target_os="all"'
@@ -525,7 +537,7 @@ This unified build can be used for day-to-day development, although it's more
 expensive to build everything for every edit. To save time, you can name the
 configuration to build:
 
-```
+```shell
 ninja -C out/unified host_gcc
 ninja -C out/unified check_host_gcc
 ```
@@ -535,7 +547,7 @@ root `BUILD.gn`.
 
 You can also fine tune the configurations generated with arguments. For example:
 
-```
+```shell
 gn gen out/unified --args='is_debug=true target_os="all" enable_host_clang_build=false'
 ```
 
@@ -545,7 +557,7 @@ In the unified build, targets have multiple instances and need to be
 disambiguated by adding a `(toolchain)` suffix. Use `gn ls out/debug` to list
 all of the target instances. For example:
 
-```
+```shell
 gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
@@ -556,7 +568,7 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 > [SysConfig](https://www.ti.com/tool/SYSCONFIG) and add the following build
 > arguments:
 >
-> ```
+> ```shell
 > gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true > ti_sysconfig_root=\"/path/to/sysconfig\""
 > ```
 
@@ -566,7 +578,7 @@ GN has integrated help that you can access with the `gn help` command.
 
 Make sure to check the following recommended topics:
 
-```
+```shell
 gn help execution
 gn help grammar
 gn help toolchain
@@ -582,43 +594,43 @@ The following examples use the `out/host` output directory as example:
 
 -   Show all of the targets in an output directory:
 
-    ```
+    ```shell
     gn ls out/host
     ```
 
 -   Show all of the files that will be built:
 
-    ```
+    ```shell
     gn outputs out/host '*'
     ```
 
 -   Show the GN representation of a configured target:
 
-    ```
+    ```shell
     gn desc out/host //src/inet --all
     ```
 
 -   Dump the GN representation of the entire build as JSON:
 
-    ```
+    ```shell
     gn desc out/host/ '*' --all --format=json
     ```
 
 -   Show the dependency tree:
 
-    ```
+    ```shell
     gn desc out/host //:all deps --tree --all
     ```
 
 -   Find dependency paths:
 
-    ```
+    ```shell
     gn path out/host //src/transport/tests:tests //src/system
     ```
 
 -   List useful information for linking against `libCHIP`:
 
-    ```
+    ```shell
     gn desc out/host //src/lib include_dirs
     gn desc out/host //src/lib defines
     gn desc out/host //src/lib outputs
@@ -636,7 +648,7 @@ annotated with execution frequencies.
 
 ### How to Run
 
-```
+```shell
 ./scripts/build_coverage.sh [OPTIONS]
 ```
 
@@ -646,7 +658,7 @@ Builds the Matter SDK with coverage instrumentation (unless you specify a custom
 --output_root). Runs the unit tests to generate coverage data. Produces an HTML
 coverage report located at:
 
-```
+```shell
 out/coverage/coverage/html/index.html
 ```
 
@@ -673,31 +685,31 @@ to run (e.g., TestEmberAttributeBuffer.run).
 
 Run coverage with the default scope (core) and only unit tests:
 
-```
+```shell
 ./scripts/build_coverage.sh
 ```
 
 Run coverage including YAML tests (plus the always-enabled unit tests):
 
-```
+```shell
 ./scripts/build_coverage.sh --yaml
 ```
 
 Run coverage including Python tests (plus the always-enabled unit tests):
 
-```
+```shell
 ./scripts/build_coverage.sh --python
 ```
 
 Run coverage including both YAML and Python tests:
 
-```
+```shell
 ./scripts/build_coverage.sh --yaml --python
 ```
 
 Change coverage scope to all (core + clusters) and run YAML tests:
 
-```
+```shell
 ./scripts/build_coverage.sh --code=all --yaml
 ```
 

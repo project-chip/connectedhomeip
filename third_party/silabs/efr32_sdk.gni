@@ -93,6 +93,12 @@ declare_args() {
   sl_verbose_mode = false
 
   sl_em4_sleep = false
+
+  # Enable Multi-PAN support for Matter over Thread devices
+  sl_openthread_multi_pan_enable = false
+
+  # Enable a Watchdog with debug features to catch software hangs
+  sl_matter_debug_watchdog_enable = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -492,6 +498,18 @@ template("efr32_sdk") {
       "SL_MATTER_EM4_SLEEP=${sl_em4_sleep}",
     ]
 
+    # Enable OpenThread multiple instance support when multi-PAN is enabled
+    if (sl_openthread_multi_pan_enable) {
+      defines += [
+        "SL_OPENTHREAD_MULTI_PAN_ENABLE=1",
+        "OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE=1",
+        "OPENTHREAD_CONFIG_MULTIPLE_STATIC_INSTANCE_ENABLE=1",
+        "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
+      ]
+    } else {
+      defines += [ "SL_OPENTHREAD_MULTI_PAN_ENABLE=0" ]
+    }
+
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {
@@ -606,6 +624,12 @@ template("efr32_sdk") {
           ]
         }
       }
+    }
+
+    if (sl_matter_debug_watchdog_enable) {
+      defines += [ "SL_MATTER_DEBUG_WATCHDOG_ENABLE=1" ]
+    } else {
+      defines += [ "SL_MATTER_DEBUG_WATCHDOG_ENABLE=0" ]
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -937,6 +961,10 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c",
       ]
+    }
+
+    if (sl_matter_debug_watchdog_enable) {
+      sources += [ "${efr32_sdk_root}/platform/peripheral/src/sl_hal_wdog.c" ]
     }
 
     # COS and SWO sources files for when we use generate with slc

@@ -215,8 +215,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ west build -d <build_directory> -b <b
 
 It is also supported to provide Kconfig symbols in the build command line with
 `-DCONFIG_<symbol>=<value>`. For example, adding to the build command line
-`-DCONFIG_CHIP_DEVICE_DISCRIMINATOR=3841` will set the discriminator Kconfig
-`CONFIG_CHIP_DEVICE_DISCRIMINATOR` to `3841`.
+`-DCONFIG_CHIP_DEVICE_DISCRIMINATOR=0xF01` will set the discriminator Kconfig
+`CONFIG_CHIP_DEVICE_DISCRIMINATOR` to `0xF01` (3841 in decimal).
 
 ###### CMake Build with Secure Element
 

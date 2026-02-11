@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/CriticalFailure.h>
 #include <system/SystemClock.h>
 
 namespace chip {

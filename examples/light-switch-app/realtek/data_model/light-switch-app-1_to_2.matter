@@ -359,6 +359,8 @@ fabric_scoped struct WebRTCSessionStruct {
   nullable int16u videoStreamID = 4;
   nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
+  optional int16u videoStreams[] = 7;
+  optional int16u audioStreams[] = 8;
   fabric_idx fabricIndex = 254;
 }
 
@@ -2345,7 +2347,7 @@ cluster IcdManagement = 70 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 7;
+  revision 9;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
