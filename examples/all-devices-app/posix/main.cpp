@@ -271,6 +271,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     PrintOnboardingCodes(payload);
 
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    
     chip::app::SetTerminateHandler(StopSignalHandler);
 
     // This message is used as a marker for when the application process has started.
