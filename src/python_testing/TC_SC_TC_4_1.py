@@ -35,7 +35,6 @@ class TC_SC_TC_4_1(MatterBaseTest):
             TestStep(2, 'Validate the discriminator and perform the commissioning')
         ]
 
-
     @async_test_body
     async def test_TC_SC_TC_4_1(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
