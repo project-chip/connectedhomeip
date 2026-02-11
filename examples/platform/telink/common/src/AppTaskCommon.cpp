@@ -21,6 +21,7 @@
 
 #include "BLEManagerImpl.h"
 #include "ButtonManager.h"
+#include "FabricTableDelegate.h"
 #include "LEDManager.h"
 #include "PWMManager.h"
 
@@ -52,9 +53,7 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
 
-#include <zephyr/fs/nvs.h>
-#include <zephyr/settings/settings.h>
-#include <zephyr/sys/reboot.h>
+bool AppTaskCommon::sIsCommissioningFailed = false;
 
 using namespace chip::app;
 
@@ -82,11 +81,10 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 k_timer sFactoryResetTimer;
 uint8_t sFactoryResetCntr = 0;
 
-bool sIsCommissioningFailed = false;
-bool sIsNetworkProvisioned  = false;
-bool sIsNetworkEnabled      = false;
-bool sIsNetworkAttached     = false;
-bool sHaveBLEConnections    = false;
+bool sIsNetworkProvisioned = false;
+bool sIsNetworkEnabled     = false;
+bool sIsNetworkAttached    = false;
+bool sHaveBLEConnections   = false;
 
 #if APP_SET_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -116,10 +114,10 @@ class AppCallbacks : public AppDelegate
     bool isComissioningStarted;
 
 public:
-    void OnCommissioningSessionEstablishmentStarted() override { sIsCommissioningFailed = false; }
+    void OnCommissioningSessionEstablishmentStarted() override { AppTaskCommon::sIsCommissioningFailed = false; }
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
-    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { sIsCommissioningFailed = true; }
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { AppTaskCommon::sIsCommissioningFailed = true; }
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override
     {
@@ -131,45 +129,6 @@ public:
 
 AppCallbacks sCallbacks;
 } // namespace
-
-class AppFabricTableDelegate : public FabricTable::Delegate
-{
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-    {
-        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
-        {
-            ChipLogProgress(DeviceLayer, "Erasing settings partition");
-
-            // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
-            void * storage = nullptr;
-            int status     = settings_storage_get(&storage);
-
-            if (!status)
-            {
-                status = nvs_clear(static_cast<nvs_fs *>(storage));
-            }
-
-            if (!status)
-            {
-                status = nvs_mount(static_cast<nvs_fs *>(storage));
-            }
-
-            if (status)
-            {
-                ChipLogError(DeviceLayer, "Storage clear failed: %d", status);
-            }
-#ifdef CONFIG_TFLM_FEATURE
-            AppTask::MicroSpeechProcessStop();
-#endif
-            // Reboot in case of failed commissioning to allow new pairing via BLE
-            if (sIsCommissioningFailed)
-            {
-                ChipLogProgress(DeviceLayer, "Rebooting board");
-                sys_reboot(SYS_REBOOT_WARM);
-            }
-        }
-    }
-};
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
@@ -273,8 +232,6 @@ void AppTaskCommon::PrintFirmwareInfo(void)
 }
 CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 {
-    CHIP_ERROR err;
-
     PrintFirmwareInfo();
 
     InitLeds();
@@ -300,8 +257,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     SetCommissionableDataProvider(&mFactoryDataProvider);
     // Read EnableKey from the factory data.
     MutableByteSpan enableKey(sTestEventTriggerEnableKey);
-    err = mFactoryDataProvider.GetEnableKey(enableKey);
-    if (err != CHIP_NO_ERROR)
+    if (mFactoryDataProvider.GetEnableKey(enableKey) != CHIP_NO_ERROR)
     {
         LOG_ERR("GetEnableKey failed. Could not delegate test event trigger");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
@@ -356,12 +312,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // between the main and the CHIP threads.
     TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("AppFabricTableDelegate fail");
-        return err;
-    }
+    AppFabricTableDelegate::Init();
 
     return CHIP_NO_ERROR;
 }
