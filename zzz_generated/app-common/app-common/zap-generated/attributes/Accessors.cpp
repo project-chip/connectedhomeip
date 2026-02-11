@@ -62,34 +62,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip:
     return status;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Groups::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value)
-{
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
-}
-
 } // namespace NameSupport
 
 namespace FeatureMap {
@@ -109,33 +81,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
     return status;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Groups::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_BITMAP32_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
-}
-
 } // namespace FeatureMap
 
 namespace ClusterRevision {
@@ -153,33 +98,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::Groups::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -10594,33 +10512,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value)
     }
     *value = Traits::StorageToWorking(temp);
     return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::EnergyEvse::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT16U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
-{
-    using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvse::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision

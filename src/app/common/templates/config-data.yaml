@@ -33,7 +33,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Device Energy Management Mode
     - Dishwasher Mode
     - Electrical Energy Measurement
-    - Energy EVSE
     - Energy EVSE Mode
     - Joint Fabric Administrator
     - Laundry Washer Mode
@@ -67,7 +66,6 @@ CommandHandlerInterfaceOnlyClusters:
 ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
-    - Groups
     - Level Control
     - Mode Select
     - On/Off
@@ -128,12 +126,14 @@ CodeDrivenClusters:
     - Device Energy Management
     - Diagnostic Logs
     - Electrical Power Measurement
+    - Energy EVSE
     - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - Groups
     - HEPA Filter Monitoring
     - ICD Management
     - Identify

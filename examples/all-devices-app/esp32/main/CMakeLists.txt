@@ -28,18 +28,24 @@ set(PRIV_INCLUDE_DIRS_LIST
 set(APP_SRCS
     "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/DeviceShellCommands.cpp"
+
     # All-devices common sources
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
+    # keep-sorted: start
     "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/ChimeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/chime/impl/LoggingChimeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl/TogglingOccupancySensorDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/OccupancySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/WifiRootNodeDevice.cpp"
+    # keep-sorted: end
+
     # Providers
     "${CHIP_ROOT}/examples/providers/DeviceInfoProviderImpl.cpp"
+
     # Shell extension
     "${CHIP_ROOT}/examples/platform/esp32/shell_extension/launch.cpp"
 )
@@ -99,11 +105,18 @@ set(CLUSTER_SRCS
     "${CHIP_ROOT}/src/app/clusters/general-commissioning-server/GeneralCommissioningCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/groups-server/GroupsCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/identify-server/IdentifyCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/network-commissioning/NetworkCommissioningCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/network-commissioning/WifiScanResponse.cpp"
     "${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/OccupancySensingCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/on-off-server/OnOffCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/on-off-server/OnOffLightingCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/operational-credentials-server/OperationalCredentialsCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp"
+    "${CHIP_ROOT}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp"
+    "${CHIP_ROOT}/src/app/clusters/scenes-server/ScenesManagementCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/scenes-server/SceneTableImpl.cpp"
     "${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.cpp"
     "${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-fault-listener.cpp"
     "${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.cpp"

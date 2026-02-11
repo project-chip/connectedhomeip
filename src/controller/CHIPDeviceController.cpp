@@ -40,6 +40,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -100,6 +101,9 @@ using namespace chip::Encoding;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+using chip::AddressResolve::Resolver;
+using chip::AddressResolve::ResolveResult;
 
 DeviceController::DeviceController()
 {
@@ -973,6 +977,11 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 {
     MATTER_TRACE_SCOPE("Commission", "DeviceCommissioner");
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // Reset fallback from any previous commissioning session
+    mFallbackOperationalResolveResult.ClearValue();
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     if (device == nullptr || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
@@ -1924,6 +1933,10 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
         mUdcServer->OnCommissionableNodeFound(nodeData);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    if (nodeData.Get<Dnssd::CommissionNodeData>().threadMeshcop)
+    {
+        mAutoCommissioner.SetNetworkSetupNeeded(true);
+    }
     AbstractDnssdDiscoveryController::OnNodeDiscovered(nodeData);
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }
@@ -3752,6 +3765,21 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+        Transport::Type type = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+        // cache address if we are connected over TCP or UDP
+        if (type == Transport::Type::kTcp || type == Transport::Type::kUdp)
+        {
+            // Store the address we are using for PASE as a fallback for operational discovery
+            ResolveResult result;
+            result.address         = proxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress();
+            result.mrpRemoteConfig = proxy->GetSecureSession().Value()->GetRemoteMRPConfig();
+            // Note: supportsTcpClient and supportsTcpServer are device capabilities from DNS-SD TXT records,
+            // not derivable from the transport type. They remain false (default) here.
+            // TODO: Consider passing these through RendezvousParameters if available from SetUpCodePairer.
+            mFallbackOperationalResolveResult.SetValue(result);
+        }
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
         CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
@@ -3760,13 +3788,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
         MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioningOperationalSetup);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
-                                                               &mOnDeviceConnectionFailureCallback
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(
+            scopedPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                                               ,
-                                                               /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback
+            /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-        );
+            TransportPayloadCapability::kMRPPayload, mFallbackOperationalResolveResult);
     }
     break;
     case CommissioningStage::kPrimaryOperationalNetworkFailed: {

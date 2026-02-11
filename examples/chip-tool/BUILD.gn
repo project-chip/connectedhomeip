@@ -28,6 +28,10 @@ import("${chip_root}/src/crypto/crypto.gni")
 
 assert(chip_build_tools)
 
+# Thread Commissioner is using newer version of mbedtls
+_enable_thread_meshcop = chip_device_platform == "linux" &&
+                         chip_enable_ot_commissioner && chip_crypto != "mbedtls"
+
 config("config") {
   include_dirs = [
     ".",
@@ -49,6 +53,12 @@ config("config") {
 
   if (config_enable_https_requests) {
     defines += [ "CONFIG_ENABLE_HTTPS_REQUESTS" ]
+  }
+
+  if (_enable_thread_meshcop) {
+    defines += [ "CHIP_ENABLE_OT_COMMISSIONER=1" ]
+  } else {
+    defines += [ "CHIP_ENABLE_OT_COMMISSIONER=0" ]
   }
 
   cflags = [ "-Wconversion" ]
@@ -145,8 +155,9 @@ static_library("chip-tool-utils") {
         [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
   }
 
-  if (chip_device_platform == "linux" && chip_enable_ot_commissioner) {
-    deps += [ "${chip_root}/third_party/ot-commissioner" ]
+  if (_enable_thread_meshcop) {
+    sources += [ "commands/pairing/CommissionProxy.cpp" ]
+    public_deps += [ "${chip_root}/third_party/ot-commissioner" ]
   }
 
   output_dir = root_out_dir

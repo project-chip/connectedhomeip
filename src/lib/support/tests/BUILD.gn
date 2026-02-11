@@ -67,6 +67,7 @@ chip_test_suite("tests") {
     "TestStringBuilder.cpp",
     "TestStringSplitter.cpp",
     "TestTestPersistentStorageDelegate.cpp",
+    "TestThreadDiscoveryCode.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
     "TestTlvJson.cpp",

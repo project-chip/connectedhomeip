@@ -28,6 +28,10 @@ void MatterIdentifyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIdentifyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterGroupsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterGroupsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterDescriptorClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -140,6 +144,10 @@ void MatterElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId en
 void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterEnergyEvseClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
