@@ -281,7 +281,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         # await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
         # cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(new_noc_chain.icacBytes)
         # try:
-        #     await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        #    await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
         # except InteractionModelError as e:
         #     asserts.assert_in('InvalidICAC (0x02)',
         #                       str(e), f'Expected InvalidICAC error, but got {str(e)}')
