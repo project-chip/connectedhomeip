@@ -214,7 +214,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .deviceLoadStatusProvider   = *InteractionModelEngine::GetInstance(),                //
             .diagnosticDataProvider     = DeviceLayer::GetDiagnosticDataProvider(),              //
             .testEventTriggerDelegate   = initParams.testEventTriggerDelegate,                   //
-            .dacProvider                = *exampleDAC,                                           //
+            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //                                           //
             .eventManagement            = EventManagement::GetInstance(),                        //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
