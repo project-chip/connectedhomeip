@@ -57,10 +57,6 @@ public:
             VerifyOrDie(optionalAttributeSet.IsSet(MultiPressMax::Id));
             VerifyOrDie(MultiPressMax::Get(endpointId, &multiPressMax) == Status::Success);
         }
-        else
-        {
-            VerifyOrDie(!optionalAttributeSet.IsSet(MultiPressMax::Id));
-        }
 
         gServers[clusterInstanceIndex].Create(endpointId, features,
                                               SwitchCluster::StartupConfiguration{
