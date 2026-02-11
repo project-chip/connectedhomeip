@@ -143,11 +143,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
 #endif
     case PairingMode::ThreadMeshcop:
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
-        err = PairWithMeshCoP(remoteId, PeerAddress::Uninitialized());
-#else
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
+        err = Pair(remoteId, PeerAddress::Uninitialized());
         break;
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
@@ -301,15 +297,15 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
     return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
-CHIP_ERROR PairingCommand::PairWithMeshCoP(NodeId remoteId, PeerAddress address)
+CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    SetupPayload setupPayload;
-    ReturnErrorOnFailure(ParseSetupPayload(setupPayload, mOnboardingPayload));
-    auto params = RendezvousParameters()
-                      .SetSetupPINCode(setupPayload.setUpPINCode)
-                      .SetPeerAddress(address)
-                      .SetSetupDiscriminator(setupPayload.discriminator);
+    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode.value()).SetPeerAddress(address);
+    if (mDiscriminator.has_value())
+    {
+        params.SetDiscriminator(mDiscriminator.value());
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
     if (!address.IsInitialized() && mThreadBaHost.HasValue() && mThreadBaPort.HasValue())
     {
         CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
@@ -321,19 +317,9 @@ CHIP_ERROR PairingCommand::PairWithMeshCoP(NodeId remoteId, PeerAddress address)
         commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
         ReturnErrorOnFailure(CurrentCommissioner().PairDevice(remoteId, params, commissioningParams));
         CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
-}
-#endif
-
-CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
-{
-    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
-    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode.value()).SetPeerAddress(address);
-    if (mDiscriminator.has_value())
-    {
-        params.SetDiscriminator(mDiscriminator.value());
-    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))

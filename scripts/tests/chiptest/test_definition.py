@@ -576,7 +576,7 @@ class TestDefinition:
                         pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 elif op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
                     pairing_cmd = pairing_cmd.with_args(
-                        "pairing", "thread-meshcop", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
+                        "pairing", "thread-meshcop", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", TEST_PASSCODE, TEST_DISCRIMINATOR,
                         "--thread-ba-host", thread_ba_host, "--thread-ba-port", str(thread_ba_port))
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
