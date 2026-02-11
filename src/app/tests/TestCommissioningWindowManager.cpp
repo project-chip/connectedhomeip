@@ -73,6 +73,8 @@ Spake2pVerifier sTestSpake2p01_PASEVerifier = { .mW0 = {
     0xCF
 } };
 
+bool sSimulateFailedSessionEstablishmentTaskCalled = false;
+
 bool sAdminFabricIndexDirty = false;
 bool sAdminVendorIdDirty    = false;
 bool sWindowStatusDirty     = false;
@@ -152,6 +154,25 @@ public:
     uint32_t mNumPairingComplete = 0;
 };
 
+class MockAppDelegate : public AppDelegate
+{
+public:
+    void OnCommissioningWindowOpened() override { mOnCommissioningWindowOpenedCount++; }
+    void OnCommissioningWindowClosed() override { mOnCommissioningWindowClosedCount++; }
+
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR error) override
+    {
+        mOnCommissioningSessionEstablishmentErrorCount++;
+        mError = error;
+    }
+
+    uint8_t mOnCommissioningWindowOpenedCount              = 0;
+    uint8_t mOnCommissioningWindowClosedCount              = 0;
+    uint8_t mOnCommissioningSessionEstablishmentErrorCount = 0;
+
+    CHIP_ERROR mError = CHIP_NO_ERROR;
+};
+
 class TestCommissioningWindowManager : public chip::Testing::LoopbackMessagingContext
 {
 public:
@@ -213,6 +234,8 @@ public:
     {
         ConfigInitializeNodes(false);
         chip::Testing::LoopbackMessagingContext::SetUp();
+
+        sSimulateFailedSessionEstablishmentTaskCalled = false;
     }
 
     void EstablishPASEHandshake(SessionManager & sessionManager, PASESession & pairingCommissioner,
@@ -225,9 +248,8 @@ void TestCommissioningWindowManager::ServiceEvents()
 {
     DrainAndServiceIO();
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
-        [](intptr_t) -> void { TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
-        (intptr_t) nullptr);
+    ASSERT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        [](intptr_t) -> void { EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().StopEventLoopTask()); }, (intptr_t) nullptr));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
@@ -297,7 +319,7 @@ private:
     SessionManager mSessionManager;
 };
 
-void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
+TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenClose)
 {
     EXPECT_FALSE(sWindowStatusDirty);
     EXPECT_FALSE(sAdminFabricIndexDirty);
@@ -325,15 +347,7 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
     EXPECT_FALSE(sAdminVendorIdDirty);
 }
 
-TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenClose)
-{
-
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseTask));
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-}
-
-void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t context)
+TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenCloseFromCluster)
 {
     EXPECT_FALSE(sWindowStatusDirty);
     EXPECT_FALSE(sAdminFabricIndexDirty);
@@ -373,15 +387,7 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t
     ResetDirtyFlags();
 }
 
-TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenCloseFromCluster)
-{
-    EXPECT_SUCCESS(
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask));
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-}
-
-void CheckCommissioningWindowManagerWindowClosedTask(chip::System::Layer *, void *)
+void VerifyCommissioningWindowManagerWindowClosed()
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
@@ -392,41 +398,48 @@ void CheckCommissioningWindowManagerWindowClosedTask(chip::System::Layer *, void
     EXPECT_FALSE(sAdminVendorIdDirty);
 }
 
-void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
+TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerWindowTimeout)
 {
+    System::Clock::Internal::RAIIMockClock clock;
 
     EXPECT_FALSE(sWindowStatusDirty);
     EXPECT_FALSE(sAdminFabricIndexDirty);
     EXPECT_FALSE(sAdminVendorIdDirty);
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds32(1);
-    constexpr uint16_t kTimeoutMs              = 1000;
-    constexpr unsigned kSleepPadding           = 100;
+    MockAppDelegate delegateApp;
+    commissionMgr.SetAppDelegate(&delegateApp);
+
+    constexpr auto kTimeoutSeconds   = chip::System::Clock::Seconds32(1);
+    constexpr uint16_t kTimeoutMs    = 1000;
+    constexpr unsigned kSleepPadding = 100;
     commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);
-    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly),
-              CHIP_NO_ERROR);
+    EXPECT_SUCCESS(commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly));
+
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_EQ(commissionMgr.CommissioningWindowStatusForCluster(),
               chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+    EXPECT_EQ(delegateApp.mOnCommissioningWindowOpenedCount, 1u);
+    EXPECT_EQ(delegateApp.mOnCommissioningWindowClosedCount, 0u);
+
     EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     EXPECT_FALSE(sWindowStatusDirty);
     EXPECT_FALSE(sAdminFabricIndexDirty);
     EXPECT_FALSE(sAdminVendorIdDirty);
 
-    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
-                                                               CheckCommissioningWindowManagerWindowClosedTask, nullptr));
-}
+    // Advance time so that the commissioning window times out
+    clock.AdvanceMonotonic(chip::System::Clock::Milliseconds64(kTimeoutMs + kSleepPadding));
+    ServiceEvents();
 
-TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerWindowTimeout)
-{
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerWindowTimeoutTask));
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    VerifyCommissioningWindowManagerWindowClosed();
+    EXPECT_EQ(delegateApp.mOnCommissioningWindowClosedCount, 1u);
+
+    commissionMgr.SetAppDelegate(nullptr);
 }
 
 void SimulateFailedSessionEstablishmentTask(chip::System::Layer *, void *)
 {
+
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
     EXPECT_EQ(commissionMgr.CommissioningWindowStatusForCluster(),
@@ -443,19 +456,29 @@ void SimulateFailedSessionEstablishmentTask(chip::System::Layer *, void *)
     EXPECT_FALSE(sWindowStatusDirty);
     EXPECT_FALSE(sAdminFabricIndexDirty);
     EXPECT_FALSE(sAdminVendorIdDirty);
+
+    sSimulateFailedSessionEstablishmentTaskCalled = true;
 }
 
-void CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsTask(intptr_t context)
+TEST_F(TestCommissioningWindowManager, CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrors)
 {
+    System::Clock::Internal::RAIIMockClock clock;
+
     EXPECT_FALSE(sWindowStatusDirty);
     EXPECT_FALSE(sAdminFabricIndexDirty);
     EXPECT_FALSE(sAdminVendorIdDirty);
+    EXPECT_FALSE(sSimulateFailedSessionEstablishmentTaskCalled);
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds16(1);
-    constexpr uint16_t kTimeoutMs              = 1000;
-    constexpr unsigned kSleepPadding           = 100;
+    MockAppDelegate delegateApp;
+    commissionMgr.SetAppDelegate(&delegateApp);
 
+    constexpr auto kTimeoutSeconds                          = chip::System::Clock::Seconds16(1);
+    constexpr uint16_t kTimeoutMs                           = 1000;
+    constexpr unsigned kSleepPadding                        = 100;
+    constexpr uint16_t kFailedSessionEstablishmentTimeoutMs = kTimeoutMs / 4 * 3;
+
+    commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);
     EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly),
               CHIP_NO_ERROR);
 
@@ -468,23 +491,33 @@ void CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsT
     EXPECT_FALSE(sAdminFabricIndexDirty);
     EXPECT_FALSE(sAdminVendorIdDirty);
 
-    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
-                                                               CheckCommissioningWindowManagerWindowClosedTask, nullptr));
+    EXPECT_EQ(delegateApp.mOnCommissioningWindowOpenedCount, 1u);
+    EXPECT_EQ(delegateApp.mOnCommissioningWindowClosedCount, 0u);
+    EXPECT_EQ(delegateApp.mOnCommissioningSessionEstablishmentErrorCount, 0u);
+
     // Simulate a session establishment error during that window, such that the
-    // delay for the error plus the window size exceeds our "timeout + padding" above.
-    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs / 4 * 3),
-                                                               SimulateFailedSessionEstablishmentTask, nullptr));
+    // delay for the error plus the window size exceeds the "timeout + padding" needed to result in Commissioning Window Closing.
+    EXPECT_SUCCESS(DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kFailedSessionEstablishmentTimeoutMs),
+                                                         SimulateFailedSessionEstablishmentTask, nullptr));
+
+    // Advance time so that SimulateFailedSessionEstablishmentTask is fired
+    clock.AdvanceMonotonic(chip::System::Clock::Milliseconds64(kFailedSessionEstablishmentTimeoutMs));
+    ServiceEvents();
+
+    EXPECT_TRUE(sSimulateFailedSessionEstablishmentTaskCalled);
+    EXPECT_EQ(delegateApp.mOnCommissioningSessionEstablishmentErrorCount, 1u);
+
+    // Advance time so that the Commissioning Window times out and closes
+    clock.AdvanceMonotonic(chip::System::Clock::Milliseconds64(kTimeoutMs + kSleepPadding - kFailedSessionEstablishmentTimeoutMs));
+    ServiceEvents();
+
+    VerifyCommissioningWindowManagerWindowClosed();
+    EXPECT_EQ(delegateApp.mOnCommissioningWindowClosedCount, 1u);
+
+    commissionMgr.SetAppDelegate(nullptr);
 }
 
-TEST_F(TestCommissioningWindowManager, CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrors)
-{
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(
-        CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsTask));
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-}
-
-void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
+TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhancedWindow)
 {
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     uint16_t originDiscriminator;
@@ -532,13 +565,6 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     EXPECT_TRUE(sAdminVendorIdDirty);
 
     ResetDirtyFlags();
-}
-
-TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhancedWindow)
-{
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerEnhancedWindowTask));
-    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
 TEST_F(TestCommissioningWindowManager, RevokeCommissioningClearsPASESession)

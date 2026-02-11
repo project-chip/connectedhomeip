@@ -243,6 +243,7 @@ struct CommissionNodeData : public CommonResolutionData
     char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    bool threadMeshcop                                        = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     BitFlags<JointFabricMode> jointFabricMode;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
