@@ -54,7 +54,8 @@ void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
+    auto event = switchCluster->OnInitialPress(newPosition);
+    VerifyOrReturn(event.has_value());
 
     ChipLogProgress(NotSpecified, "Logged InitialPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
                     static_cast<unsigned>(endpointId));
@@ -65,7 +66,8 @@ void EmitLongPress(EndpointId endpointId, uint8_t newPosition)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
+    auto event = switchCluster->OnLongPress(newPosition);
+    VerifyOrReturn(event.has_value());
 
     ChipLogProgress(NotSpecified, "Logged LongPress(%u) on Endpoint %u", static_cast<unsigned>(newPosition),
                     static_cast<unsigned>(endpointId));
@@ -76,7 +78,8 @@ void EmitLongRelease(EndpointId endpointId, uint8_t previousPosition)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
+    auto event = switchCluster->OnLongRelease(previousPosition);
+    VerifyOrReturn(event.has_value());
 
     ChipLogProgress(NotSpecified, "Logged LongRelease on Endpoint %u", static_cast<unsigned>(endpointId));
 }
@@ -86,7 +89,8 @@ void EmitMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uin
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, count);
+    auto event = switchCluster->OnMultiPressComplete(previousPosition, count);
+    VerifyOrReturn(event.has_value());
 
     ChipLogProgress(NotSpecified, "Logged MultiPressComplete(count=%u) on Endpoint %u", static_cast<unsigned>(count),
                     static_cast<unsigned>(endpointId));
@@ -97,7 +101,8 @@ void EmitShortRelease(EndpointId endpointId, uint8_t previousPosition)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
+    auto event = switchCluster->OnShortRelease(previousPosition);
+    VerifyOrReturn(event.has_value());
 
     ChipLogProgress(NotSpecified, "Logged ShortRelease on Endpoint %u", static_cast<unsigned>(endpointId));
 }
@@ -107,10 +112,11 @@ void EmitMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t c
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, count);
+    auto event = switchCluster->OnMultiPressOngoing(newPosition, count);
+    VerifyOrReturn(event.has_value());
 
     ChipLogProgress(NotSpecified, "Logged MultiPressOngoing on Endpoint %u position %u, count %u",
-                    static_cast<unsigned>(endpointId), newPosition, count);
+                    static_cast<unsigned>(endpointId), static_cast<unsigned>(newPosition), static_cast<unsigned>(count));
 }
 
 } // namespace

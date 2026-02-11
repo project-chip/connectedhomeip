@@ -65,7 +65,7 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
 
     // On failure, the numPositions won't be changed, so 0 returned.
     // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
-    // This is why the actual cluster does not provide a getter for this attribute.
+    // This is why the cluster does not provide a getter for this attribute.
     RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
 
     return numPositions;

@@ -34,11 +34,8 @@ static uint8_t multiPressCount = 1;
 
 void SwitchManager::Init(void)
 {
-    uint8_t multiPressMax = 2;
-
-    // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
-    // This is why the actual cluster does not provide a setter for this attribute.
-    RETURN_SAFELY_IGNORED Switch::Attributes::MultiPressMax::Set(GENERICSWITCH_ENDPOINT_ID, multiPressMax);
+    // MultiPressMax is an optional attribute, it has to be enabled in ember with an appropriate default value (minimum value is 2).
+    // If this attribute is enabled, the cluster will take the value as a configuration value that can not be changed.
 }
 
 void SwitchManager::ToggleHandler(AppEvent * aEvent)
