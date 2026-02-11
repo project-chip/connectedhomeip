@@ -17,9 +17,7 @@
 
 from .bluetooth import BluetoothMock
 from .dbus import DBusTestSystemBus
-from .namespace import IsolatedNetworkNamespace
-from .namespace import ensure_network_namespace_availability
-from .namespace import ensure_private_state
+from .namespace import IsolatedNetworkNamespace, ensure_network_namespace_availability, ensure_private_state
 from .thread import ThreadBorderRouter
 from .wifi import WpaSupplicantMock
 
