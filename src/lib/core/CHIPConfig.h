@@ -2057,7 +2057,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum number of PushAV transports per device per fabric
  */
 #ifndef CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
-#define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 2
+#define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 4
 #endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
 
 /**

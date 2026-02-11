@@ -183,11 +183,9 @@ CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(con
             mCurrentConnections.push_back(removedValue); // Revert
             return err;
         }
-        else
-        {
-            // Notify the stack that the CurrentConnections attribute has changed.
-            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
-        }
+
+        // Notify the stack that the CurrentConnections attribute has changed.
+        mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -1856,12 +1854,14 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     }
     bufferSpan = MutableByteSpan{ currentConns.Get(), maxBufferSize };
 
+    // Clear the list before attempting to load
+    mCurrentConnections.clear();
+
     auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
 
     CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        mCurrentConnections.clear();
         ChipLogProgress(Zcl, "No persisted CurrentConnections found.");
         return CHIP_NO_ERROR;
     }
@@ -1874,7 +1874,6 @@ CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
-    mCurrentConnections.clear();
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         // Decode into a temporary DecodableType first.
