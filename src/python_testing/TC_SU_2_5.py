@@ -463,14 +463,17 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
 
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
-        # State is Downloading, let it run a few secnods to have some data to check.
-        await asyncio.sleep(3)
-        # Verify the default download path and the file size
-        # Read file for /tmp/test.bin should exists and greater than 0
-        ota_file_data = self.get_downloaded_ota_image_info()
-        logger.info(f"Downloaded ota image data {str(ota_file_data)}")
-        asserts.assert_equal(True, ota_file_data['exists'], f"File is was not downloaded  at {ota_file_data['path']}")
-        asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
+
+        # This can be only be tested on CI or Locally, real devices might not have this path available.
+        if self.is_pics_sdk_ci_only:
+            # State is Downloading, let it run a few seconds to have some data to check.
+            await asyncio.sleep(3)
+            # Verify the default download path and the file size
+            # Read file for /tmp/test.bin should exists and greater than 0
+            ota_file_data = self.get_downloaded_ota_image_info()
+            logger.info(f"Downloaded ota image data {str(ota_file_data)}")
+            asserts.assert_equal(True, ota_file_data['exists'], f"File is was not downloaded  at {ota_file_data['path']}")
+            asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
 
         # Applying
         update_state_match = AttributeMatcher.from_callable(
