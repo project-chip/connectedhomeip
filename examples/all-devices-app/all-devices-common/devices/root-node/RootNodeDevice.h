@@ -28,14 +28,11 @@
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
 
 #include <platform/DiagnosticDataProvider.h>
-
-#include <credentials/DeviceAttestationCredsProvider.h>
 
 namespace chip {
 namespace app {
