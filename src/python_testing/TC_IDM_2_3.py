@@ -51,6 +51,7 @@ log = logging.getLogger(__name__)
 
 MAX_NUM_PATHS_IN_MTU = 50
 
+
 class TC_IDM_2_3(BasicCompositionTests):
 
     def __init__(self, *args, **kwargs):
@@ -115,9 +116,9 @@ class TC_IDM_2_3(BasicCompositionTests):
 
         if cluster_revision >= 6:
             asserts.assert_is_not_none(capability_minima.readPathsSupported,
-                                        "ReadPathsSupported should be present when ClusterRevision >= 6")
+                                       "ReadPathsSupported should be present when ClusterRevision >= 6")
             asserts.assert_is_not_none(capability_minima.subscribePathsSupported,
-                                        "SubscribePathsSupported should be present when ClusterRevision >= 6")
+                                       "SubscribePathsSupported should be present when ClusterRevision >= 6")
 
             # Extract values, providing defaults if optional fields are missing
             num_read_paths_supported = capability_minima.readPathsSupported
@@ -160,7 +161,7 @@ class TC_IDM_2_3(BasicCompositionTests):
         async def conduct_request_with_potential_path_size_reduction(paths, num_paths, request_function):
             # TODO: The maximum here should be adjusted and be based upon the max size
             # of an AttributePath, as well as the size of the payload for the MTU. See Issue #43083
-            if num_paths>MAX_NUM_PATHS_IN_MTU:
+            if num_paths > MAX_NUM_PATHS_IN_MTU:
                 paths[:] = paths[:MAX_NUM_PATHS_IN_MTU]
             return await request_function(paths)
 
