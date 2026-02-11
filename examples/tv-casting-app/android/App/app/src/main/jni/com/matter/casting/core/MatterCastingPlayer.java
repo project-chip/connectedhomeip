@@ -189,7 +189,18 @@ public class MatterCastingPlayer implements CastingPlayer {
    *     MatterError object corresponding to the error.
    */
   @Override
-  public native MatterError sendUDC(
+  public MatterError sendUDC(
+      ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions) {
+    if (!CastingApp.getInstance().isRunning()) {
+      Log.e(
+          TAG,
+          "sendUDC() called before CastingApp is running. Please call CastingApp.initialize() and CastingApp.start() first.");
+      return MatterError.CHIP_ERROR_INCORRECT_STATE;
+    }
+    return sendUDCNative(connectionCallbacks, idOptions);
+  }
+
+  private native MatterError sendUDCNative(
       ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions);
 
   /**
@@ -224,7 +235,21 @@ public class MatterCastingPlayer implements CastingPlayer {
    *     MatterError object corresponding to the error.
    */
   @Override
-  public native MatterError verifyOrEstablishConnection(
+  public MatterError verifyOrEstablishConnection(
+      ConnectionCallbacks connectionCallbacks,
+      short commissioningWindowTimeoutSec,
+      IdentificationDeclarationOptions idOptions) {
+    if (!CastingApp.getInstance().isRunning()) {
+      Log.e(
+          TAG,
+          "verifyOrEstablishConnection() called before CastingApp is running. Please call CastingApp.initialize() and CastingApp.start() first.");
+      return MatterError.CHIP_ERROR_INCORRECT_STATE;
+    }
+    return verifyOrEstablishConnectionNative(
+        connectionCallbacks, commissioningWindowTimeoutSec, idOptions);
+  }
+
+  private native MatterError verifyOrEstablishConnectionNative(
       ConnectionCallbacks connectionCallbacks,
       short commissioningWindowTimeoutSec,
       IdentificationDeclarationOptions idOptions);

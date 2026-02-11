@@ -46,6 +46,9 @@
 // Client defiend data source used to initialize the MCCommissionableDataProvider and, if needed, update the MCCommissionableDataProvider post initialization. This is necessary for the Commissioner-Generated passcode commissioning feature.
 @property (nonatomic, strong) id<MCDataSource> dataSource;
 
+// Tracks whether the app has been initialized
+@property (atomic) BOOL initialized;
+
 @end
 
 @implementation MCCastingApp
@@ -73,6 +76,13 @@
 - (NSError *)initializeWithDataSource:(id)dataSource
 {
     ChipLogProgress(AppServer, "MCCastingApp.initializeWithDataSource() called");
+
+    // Check if already initialized
+    if (_initialized) {
+        ChipLogError(AppServer, "MCCastingApp.initializeWithDataSource() already initialized");
+        return [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE];
+    }
+
     // store the data source provided by the client
     _dataSource = dataSource;
 
@@ -107,6 +117,9 @@
 
     // Get and store the CHIP Work queue
     _workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
+    // Mark as initialized
+    _initialized = YES;
 
     return [MCErrorUtils NSErrorFromChipError:CHIP_NO_ERROR];
 }
@@ -171,6 +184,11 @@
         running = matter::casting::core::CastingApp::GetInstance()->isRunning();
     });
     return running;
+}
+
+- (bool)isInitialized
+{
+    return _initialized;
 }
 
 - (NSError *)ShutdownAllSubscriptions

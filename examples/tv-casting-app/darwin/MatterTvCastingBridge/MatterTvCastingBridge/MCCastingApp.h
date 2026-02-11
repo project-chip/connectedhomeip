@@ -58,6 +58,11 @@
 - (bool)isRunning;
 
 /**
+ * @brief true, if MCCastingApp has been initialized. false otherwise
+ */
+- (bool)isInitialized;
+
+/**
  * @brief Tears down all active subscriptions.
  */
 - (NSError * _Nullable)ShutdownAllSubscriptions;
