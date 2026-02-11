@@ -232,6 +232,8 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
         // TODO: Migrate to use context.attributeStorage
         TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
             { mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id }, mSelectedChime);
+        NotifyAttributeChangedAndCallDelegate(Attributes::SelectedChime::Id,
+                                              [this](auto & delegate) { delegate.OnSelectedChimeChanged(mSelectedChime); });
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -243,6 +245,8 @@ Status ChimeCluster::SetEnabled(bool enabled)
         // TODO: Migrate to use context.attributeStorage
         TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(
             { mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id }, mEnabled);
+        NotifyAttributeChangedAndCallDelegate(Attributes::Enabled::Id,
+                                              [this](auto & delegate) { delegate.OnEnabledChanged(mEnabled); });
     }
     return Protocols::InteractionModel::Status::Success;
 }
