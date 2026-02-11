@@ -64,6 +64,9 @@ CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
     persistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
                                                mSelectedChime, 0);
     // Load Enabled
+    // Specialization because some platforms `#define` true/false as 1/0 and we get;
+    // error: no matching function for call to
+    //   'chip::app::AttributePersistence::LoadNativeEndianValue(<brace-enclosed initializer list>, bool&, int)'
     (void) persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, true);
 
     return CHIP_NO_ERROR;
