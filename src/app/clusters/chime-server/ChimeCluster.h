@@ -116,9 +116,8 @@ private:
     /// @param attributeId The attribute ID that changed
     /// @param callback A callable that takes the delegate reference and calls the appropriate callback method
     template <typename CallbackType>
-    void NotifyAttributeChangedAndCallDelegate(AttributeId attributeId, CallbackType && callback)
+    void CallDelegatesForAttributeChange(CallbackType && callback)
     {
-        NotifyAttributeChanged(attributeId);
         std::forward<CallbackType>(callback)(mDelegate);
     }
 };
