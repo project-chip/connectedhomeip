@@ -298,7 +298,7 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struc
     // Note that at this point the LwIP core lock is also held.
     ThreadStackMgrImpl().LockThreadStack();
 
-    msgSettings.mLinkSecurityEnabled = otThreadGetDeviceRole(mOTInstance) != OT_DEVICE_ROLE_DISABLED;
+    msgSettings.mLinkSecurityEnabled = otThreadGetDeviceRole(ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_DISABLED;
     msgSettings.mPriority            = OT_MESSAGE_PRIORITY_NORMAL;
 
     // Allocate an OpenThread message
