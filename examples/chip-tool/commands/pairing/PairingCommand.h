@@ -172,8 +172,7 @@ public:
             break;
         case PairingMode::ThreadMeshcop:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
-            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            AddArgument("payload", &mOnboardingPayload);
             AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
             AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
             break;
@@ -272,7 +271,7 @@ private:
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
 #if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
-    CHIP_ERROR PairWithMeshCoP();
+    CHIP_ERROR PairWithMeshCoP(NodeId remoteId, PeerAddress address);
 #endif
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
