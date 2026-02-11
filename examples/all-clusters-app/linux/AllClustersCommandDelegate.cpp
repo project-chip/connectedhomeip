@@ -996,6 +996,8 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
     cluster->SetOccupancy(newOccupancyValue == 1);
 }
 
+// TODO: Do not rely on global getters. Use a direct reference to a directly registered boolean state cluster.
+// See https://github.com/project-chip/connectedhomeip/issues/43081
 void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState)
 {
     auto booleanState = BooleanState::FindClusterOnEndpoint(endpointId);
