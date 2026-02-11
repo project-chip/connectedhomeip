@@ -31,8 +31,7 @@ log = logging.getLogger(__name__)
 __all__ = [
     "TestTarget",
     "TestDefinition",
-    "runner",
-    "linux.py"
+    "runner"
 ]
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
