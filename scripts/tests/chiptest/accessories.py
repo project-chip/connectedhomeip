@@ -83,20 +83,18 @@ class AppsRegister:
             self.net_ns_wrapper = net_ns_wrapper
             self.log_config = log_config
             self.mp_manager = manager = multiprocessing.Manager()
-            self.work_cancel_error = manager.Condition()
+            self.state_changed = self.mp_manager.Condition()
             self.cancel_event = manager.Event()
             self.init_done = manager.Event()
 
         def run(self) -> None:
             log.debug("Starting server process")
-            state_changed = self.mp_manager.Condition()
             with (mp_wrapped_spawn_context(self.net_ns_wrapper) as ctx,
-                  AppsXmlRpcServer(ctx, self.mp_manager, self.log_config, state_changed, self.work_cancel_error,
-                                   self.cancel_event) as server):
+                  AppsXmlRpcServer(ctx, self.mp_manager, self.log_config, self.state_changed, self.cancel_event) as server):
                 log.debug("XMLRPC Server process started")
-                with state_changed:
+                with self.state_changed:
                     self.init_done.set()
-                    self.cancel_init_condition.notify_all()
+                    self.state_changed.notify_all()
 
                 while not self.cancel_event.is_set():
                     try:
@@ -128,18 +126,19 @@ class AppsRegister:
 
         log.debug("Starting XMLRPC Manager")
         self._server.start()
-        self._server.cancel_init_condition.wait_for(lambda: self._server.init_done.is_set(), AppsXmlRpcServer.DEFAULT_START_TIMEOUT)
-        self._server_thread_init_done.wait(AppsXmlRpcServer.DEFAULT_START_TIMEOUT)
+        self._server.state_changed.wait_for(lambda: self._server.init_done.is_set(), AppsXmlRpcServer.DEFAULT_START_TIMEOUT)
         log.debug("XMLRPC Manager started")
 
     def uninit(self) -> None:
-        if not self._server_thread.is_alive():
+        if not self._server.is_alive():
             log.debug("XMLRPC server is already down")
             return
 
         log.debug("Stopping XMLRPC Manager")
-        self._server_thread_cancel.set()
-        self._server_thread.join(AppsXmlRpcServer.DEFAULT_STOP_TIMEOUT)
+        with self._server.state_changed:
+            self._server.cancel_event.set()
+            self._server.state_changed.notify_all()
+        self._server.join(AppsXmlRpcServer.DEFAULT_STOP_TIMEOUT)
         log.debug("XMLRPC Manager stopped")
 
     def terminate(self):
@@ -274,10 +273,10 @@ class AppsXmlRpcServer(WrappedProcessContext):
     ResponseQueue = queue.Queue[bool | Exception]
 
     def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, log_config: LogConfig, state_changed: threading.Condition,
-                 work_cancel_errror: threading.Condition, cancel_event: threading.Event) -> None:
+                 cancel_event: threading.Event) -> None:
         proc_name_short = f"{log_config.process_name}/XMLRPC" if log_config.process_name is not None else "XMLRPC"
         super().__init__(mp_context, mp_manager, "XML RPC Server", proc_name_short, log_config,
-                         state_changed=state_changed, work_cancel_error=work_cancel_errror, cancel_event=cancel_event)
+                         state_changed=state_changed, cancel_event=cancel_event)
 
         self.cmd_queue: AppsXmlRpcServer.CommandQueue = mp_manager.Queue()
         self.rsp_queue: AppsXmlRpcServer.ResponseQueue = mp_manager.Queue()

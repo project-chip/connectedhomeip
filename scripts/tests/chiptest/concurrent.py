@@ -99,10 +99,10 @@ class WorkerProcess(WrappedProcess, ABC):
     ResultQueueT: TypeAlias = queue.Queue[WorkerResult]
 
     def __init__(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager,
-                 config: WorkerConfig, state_changed: threading.Condition, work_cancel_error: threading.Condition,
-                 cancel_event: threading.Event, worker_ready_queue: queue.Queue[int], resp_queue: ResultQueueT) -> None:
+                 config: WorkerConfig, state_changed: threading.Condition, cancel_event: threading.Event,
+                 worker_ready_queue: queue.Queue[int], resp_queue: ResultQueueT) -> None:
         super().__init__(mp_context, mp_manager, f"Worker {id}", f"W{id:0{len(str(config.concurrency))}}", config.logconfig,
-                         state_changed, work_cancel_error, cancel_event)
+                         state_changed, cancel_event)
         self.id = id
         self.config = config
 
@@ -126,9 +126,9 @@ class WorkerProcess(WrappedProcess, ABC):
         self.runner = chiptest.runner.Runner(executor)
         self.apps_register = self._add_to_clean(apps := AppsRegister(self.mgmt_ns_wrapper, self.log_config))
         apps.init()
-        with self.work_cancel_error:
+        with self.state_changed:
             self.worker_ready_queue.put(self.id)
-            self.work_cancel_error.notify_all()
+            self.state_changed.notify_all()
 
     @abstractmethod
     def _platform_init(self) -> Executor:
@@ -140,7 +140,7 @@ class WorkerProcess(WrappedProcess, ABC):
         self._to_clean.put(component)
         return component
 
-    def _proc_work(self, work_cancel_error: threading.Condition, cancel_event: threading.Event):
+    def _proc_work(self, state_changed: threading.Condition, cancel_event: threading.Event):
         while not cancel_event.is_set():
             try:
                 work = self.work_queue.get_nowait()
@@ -155,13 +155,13 @@ class WorkerProcess(WrappedProcess, ABC):
             # Perform the test.
             self.active.set()
             self.resp_queue.put(self._run_test(work))
-            with self.work_cancel_error:
+            with self.state_changed:
                 self.worker_ready_queue.put(self.id)
-                self.work_cancel_error.notify_all()
+                self.state_changed.notify_all()
             self.active.clear()
 
-            with work_cancel_error:
-                work_cancel_error.wait()
+            with state_changed:
+                state_changed.wait()
 
     def _proc_cleanup(self):
         log.debug("Cleaning up state of the worker")
@@ -293,17 +293,15 @@ WorkerPoolProcessT = TypeVar("WorkerPoolProcessT", bound=WorkerProcess)
 class WorkerPool(WrappedProcessPoolContext[WorkerPoolProcessT]):
     def __init__(self, process_cls: type[WorkerPoolProcessT], mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfig) -> None:
         self.config = config
-        self.work_cancel_error = mp_manager.Condition()
         self.result_queue: WorkerProcess.ResultQueueT = mp_manager.Queue()
         self.worker_ready_queue: queue.Queue[int] = mp_manager.Queue()
 
         super().__init__(process_cls, mp_context, mp_manager, config.concurrency, "Test Pool", WORKER_START_TIMEOUT, WORKER_STOP_TIMEOUT)
 
     def _init_process(self, process_cls: type[WorkerPoolProcessT], id: int, mp_context: SpawnContext, mp_manager: SyncManager,
-                      state_changed: threading.Condition, work_cancel_error: threading.Condition,
-                      cancel_event: threading.Event) -> WorkerPoolProcessT:
-        return process_cls(id, mp_context, mp_manager, self.config, state_changed, work_cancel_error, cancel_event,
-                           self.worker_ready_queue, self.result_queue)
+                      state_changed: threading.Condition, cancel_event: threading.Event) -> WorkerPoolProcessT:
+        return process_cls(id, mp_context, mp_manager, self.config, state_changed, cancel_event, self.worker_ready_queue,
+                           self.result_queue)
 
     @property
     def worker_utilization(self) -> int:
@@ -320,9 +318,9 @@ class WorkerPool(WrappedProcessPoolContext[WorkerPoolProcessT]):
 
         if id > self.config.concurrency:
             raise ValueError(f"No worker with ID {id}")
-        with self.work_cancel_error:
+        with self.state_changed:
             self._pool[id].work_queue.put(item, block, timeout)
-            self.work_cancel_error.notify_all()
+            self.state_changed.notify_all()
 
     def finalize(self):
         return self.put(None, None)
@@ -400,8 +398,8 @@ class TestPoolManager:
                 log.info("All jobs scheduled")
 
                 while not all(state in PROCESS_EXIT_STATES for state in pool.state):
-                    with pool.work_cancel_error:
-                        pool.work_cancel_error.wait()
+                    with pool.state_changed:
+                        pool.state_changed.wait()
                     check_if_error()
             except BaseException as e:
                 if isinstance(e, KeyboardInterrupt):
@@ -418,9 +416,9 @@ class TestPoolManager:
                 pool.stop()
 
                 log.debug("Stopping result processing thread")
-                with pool.work_cancel_error:
+                with pool.state_changed:
                     result_thread_cancel.set()
-                    pool.work_cancel_error.notify_all()
+                    pool.state_changed.notify_all()
                 result_thread.join()
 
                 log.debug("Finalized worker pool")
@@ -429,8 +427,8 @@ class TestPoolManager:
     def _scheduler_fast(self, pool: WorkerPool, tests: list[TestDefinition], check_if_error: Callable[[], None]):
         for test in tests:
             while True:
-                with pool.work_cancel_error:
-                    pool.work_cancel_error.wait()
+                with pool.state_changed:
+                    pool.state_changed.wait()
                 check_if_error()
                 with suppress(queue.Empty):
                     worker_id = pool.worker_ready_queue.get_nowait()
@@ -445,8 +443,8 @@ class TestPoolManager:
 
     def _process_result_queue(self, pool: WorkerPool, cancel_event: threading.Event,exception_queue: queue.Queue[Exception]) -> None:
         while not cancel_event.is_set():
-            with pool.work_cancel_error:
-                pool.work_cancel_error.wait()
+            with pool.state_changed:
+                pool.state_changed.wait()
 
             try:
                 result = pool.result_queue.get_nowait()
