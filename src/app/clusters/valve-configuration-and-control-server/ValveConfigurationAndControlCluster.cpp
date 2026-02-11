@@ -154,7 +154,12 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id)
     {
         AttributePersistence persistence{ mContext->attributeStorage };
-        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mDefaultOpenDuration);
+        auto status = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mDefaultOpenDuration);
+        if (status.IsSuccess())
+        {
+            CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnDefaultOpenDurationChanged(mDefaultOpenDuration); });
+        }
+        return status;
     }
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id)
@@ -170,8 +175,13 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         VerifyOrReturnError(ValueCompliesWithLevelStep(defaultOpenLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         mDefaultOpenLevel = defaultOpenLevel;
-        return mContext->attributeStorage.WriteValue(
+        auto status       = mContext->attributeStorage.WriteValue(
             request.path, { reinterpret_cast<const uint8_t *>(&mDefaultOpenLevel), sizeof(mDefaultOpenLevel) });
+        if (status == CHIP_NO_ERROR)
+        {
+            CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnDefaultOpenLevelChanged(mDefaultOpenLevel); });
+        }
+        return DataModel::ActionReturnStatus(status);
     }
 
     return Status::UnsupportedWrite;

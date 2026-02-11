@@ -41,6 +41,9 @@ public:
     virtual CHIP_ERROR HandleCloseValve()                                                    = 0;
     virtual void HandleRemainingDurationTick(uint32_t duration)                              = 0;
 
+    virtual void OnDefaultOpenDurationChanged(DataModel::Nullable<uint32_t> defaultOpenDuration) {}
+    virtual void OnDefaultOpenLevelChanged(Percent defaultOpenLevel) {}
+
     virtual ~Delegate() = default;
 };
 
