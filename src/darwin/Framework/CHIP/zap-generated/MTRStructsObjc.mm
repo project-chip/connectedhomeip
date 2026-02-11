@@ -8573,10 +8573,6 @@ NS_ASSUME_NONNULL_BEGIN
         _ambientContextSensed = [NSArray array];
 
         _detectionStartTime = nil;
-
-        _objectCountThreshold = nil;
-
-        _objectCount = nil;
     }
     return self;
 }
@@ -8587,15 +8583,13 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.ambientContextSensed = self.ambientContextSensed;
     other.detectionStartTime = self.detectionStartTime;
-    other.objectCountThreshold = self.objectCountThreshold;
-    other.objectCount = self.objectCount;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; objectCountThreshold:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime, _objectCountThreshold, _objectCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime];
     return descriptionString;
 }
 
@@ -8629,6 +8623,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterObjectCountConfigStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _countingObject = [MTRDataTypeSemanticTagStruct new];
+
+        _objectCountThreshold = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterObjectCountConfigStruct alloc] init];
+
+    other.countingObject = self.countingObject;
+    other.objectCountThreshold = self.objectCountThreshold;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: countingObject:%@; objectCountThreshold:%@; >", NSStringFromClass([self class]), _countingObject, _objectCountThreshold];
     return descriptionString;
 }
 
@@ -8676,28 +8700,58 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAmbientContextSensingClusterAmbientContextDetectedEvent
+@implementation MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _ambientContextType = [NSArray array];
+        _ambientContextType = nil;
+
+        _objectCount = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectedEvent alloc] init];
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent alloc] init];
 
     other.ambientContextType = self.ambientContextType;
+    other.objectCount = self.objectCount;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; >", NSStringFromClass([self class]), _ambientContextType];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextType, _objectCount];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startEventNumber = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent alloc] init];
+
+    other.startEventNumber = self.startEventNumber;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startEventNumber:%@; >", NSStringFromClass([self class]), _startEventNumber];
     return descriptionString;
 }
 

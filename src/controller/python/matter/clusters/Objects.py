@@ -42046,11 +42046,13 @@ class AmbientContextSensing(Cluster):
                 ClusterObjectFieldDescriptor(Label="audioContextDetected", Tag=0x00000002, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="ambientContextType", Tag=0x00000003, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]]),
                 ClusterObjectFieldDescriptor(Label="ambientContextTypeSupported", Tag=0x00000004, Type=typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]]),
-                ClusterObjectFieldDescriptor(Label="simultaneousDetectionLimit", Tag=0x00000005, Type=uint),
-                ClusterObjectFieldDescriptor(Label="objectCountReached", Tag=0x00000006, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="holdTime", Tag=0x00000007, Type=uint),
-                ClusterObjectFieldDescriptor(Label="holdTimeLimits", Tag=0x00000008, Type=AmbientContextSensing.Structs.HoldTimeLimitsStruct),
-                ClusterObjectFieldDescriptor(Label="predictedActivity", Tag=0x00000009, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]]),
+                ClusterObjectFieldDescriptor(Label="objectCountReached", Tag=0x00000005, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="objectCountConfig", Tag=0x00000006, Type=typing.Optional[AmbientContextSensing.Structs.ObjectCountConfigStruct]),
+                ClusterObjectFieldDescriptor(Label="objectCount", Tag=0x00000007, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="simultaneousDetectionLimit", Tag=0x00000008, Type=uint),
+                ClusterObjectFieldDescriptor(Label="holdTime", Tag=0x00000009, Type=uint),
+                ClusterObjectFieldDescriptor(Label="holdTimeLimits", Tag=0x0000000A, Type=AmbientContextSensing.Structs.HoldTimeLimitsStruct),
+                ClusterObjectFieldDescriptor(Label="predictedActivity", Tag=0x0000000B, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -42063,8 +42065,10 @@ class AmbientContextSensing(Cluster):
     audioContextDetected: typing.Optional[bool] = None
     ambientContextType: typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]] = None
     ambientContextTypeSupported: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
-    simultaneousDetectionLimit: uint = 0
     objectCountReached: typing.Optional[bool] = None
+    objectCountConfig: typing.Optional[AmbientContextSensing.Structs.ObjectCountConfigStruct] = None
+    objectCount: typing.Optional[uint] = None
+    simultaneousDetectionLimit: uint = 0
     holdTime: uint = 0
     holdTimeLimits: AmbientContextSensing.Structs.HoldTimeLimitsStruct = field(default_factory=lambda: AmbientContextSensing.Structs.HoldTimeLimitsStruct())
     predictedActivity: typing.Optional[typing.List[AmbientContextSensing.Structs.PredictedActivityStruct]] = None
@@ -42091,14 +42095,10 @@ class AmbientContextSensing(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ambientContextSensed", Tag=0, Type=typing.List[Globals.Structs.SemanticTagStruct]),
                         ClusterObjectFieldDescriptor(Label="detectionStartTime", Tag=1, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="objectCountThreshold", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="objectCount", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             ambientContextSensed: 'typing.List[Globals.Structs.SemanticTagStruct]' = field(default_factory=lambda: [])
             detectionStartTime: 'typing.Optional[uint]' = None
-            objectCountThreshold: 'typing.Optional[uint]' = None
-            objectCount: 'typing.Optional[uint]' = None
 
         @dataclass
         class HoldTimeLimitsStruct(ClusterObject):
@@ -42114,6 +42114,19 @@ class AmbientContextSensing(Cluster):
             holdTimeMin: 'uint' = 0
             holdTimeMax: 'uint' = 0
             holdTimeDefault: 'uint' = 0
+
+        @dataclass
+        class ObjectCountConfigStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="countingObject", Tag=0, Type=Globals.Structs.SemanticTagStruct),
+                        ClusterObjectFieldDescriptor(Label="objectCountThreshold", Tag=1, Type=uint),
+                    ])
+
+            countingObject: 'Globals.Structs.SemanticTagStruct' = field(default_factory=lambda: Globals.Structs.SemanticTagStruct())
+            objectCountThreshold: 'uint' = 0
 
         @dataclass
         class PredictedActivityStruct(ClusterObject):
@@ -42218,7 +42231,7 @@ class AmbientContextSensing(Cluster):
             value: typing.Optional[typing.List[Globals.Structs.SemanticTagStruct]] = None
 
         @dataclass
-        class SimultaneousDetectionLimit(ClusterAttributeDescriptor):
+        class ObjectCountReached(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000431
@@ -42229,12 +42242,12 @@ class AmbientContextSensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
 
-            value: uint = 0
+            value: typing.Optional[bool] = None
 
         @dataclass
-        class ObjectCountReached(ClusterAttributeDescriptor):
+        class ObjectCountConfig(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000431
@@ -42245,9 +42258,41 @@ class AmbientContextSensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[AmbientContextSensing.Structs.ObjectCountConfigStruct])
 
-            value: typing.Optional[bool] = None
+            value: typing.Optional[AmbientContextSensing.Structs.ObjectCountConfigStruct] = None
+
+        @dataclass
+        class ObjectCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class SimultaneousDetectionLimit(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: uint = 0
 
         @dataclass
         class HoldTime(ClusterAttributeDescriptor):
@@ -42257,7 +42302,7 @@ class AmbientContextSensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000007
+                return 0x00000009
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -42273,7 +42318,7 @@ class AmbientContextSensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000008
+                return 0x0000000A
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -42289,7 +42334,7 @@ class AmbientContextSensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000009
+                return 0x0000000B
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -42379,7 +42424,7 @@ class AmbientContextSensing(Cluster):
 
     class Events:
         @dataclass
-        class AmbientContextDetected(ClusterEvent):
+        class AmbientContextDetectStarted(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000431
@@ -42392,10 +42437,31 @@ class AmbientContextSensing(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="ambientContextType", Tag=0, Type=typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]),
+                        ClusterObjectFieldDescriptor(Label="ambientContextType", Tag=0, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]]),
+                        ClusterObjectFieldDescriptor(Label="objectCount", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            ambientContextType: typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct] = field(default_factory=lambda: [])
+            ambientContextType: typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]] = None
+            objectCount: typing.Optional[uint] = None
+
+        @dataclass
+        class AmbientContextDetectEnded(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000431
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="startEventNumber", Tag=0, Type=uint),
+                    ])
+
+            startEventNumber: uint = 0
 
 
 @dataclass

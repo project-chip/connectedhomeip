@@ -4786,22 +4786,6 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
-    {
-        CHIP_ERROR err = LogValue("ObjectCountThreshold", indent + 1, value.objectCountThreshold);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ObjectCountThreshold'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ObjectCount", indent + 1, value.objectCount);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ObjectCount'");
-            return err;
-        }
-    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -4833,6 +4817,32 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HoldTimeDefault'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CountingObject", indent + 1, value.countingObject);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CountingObject'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ObjectCountThreshold", indent + 1, value.objectCountThreshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ObjectCountThreshold'");
             return err;
         }
     }
@@ -11517,7 +11527,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const AmbientContextSensing::Events::AmbientContextDetected::DecodableType & value)
+                                     const AmbientContextSensing::Events::AmbientContextDetectStarted::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -11525,6 +11535,30 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AmbientContextType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ObjectCount", indent + 1, value.objectCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ObjectCount'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AmbientContextSensing::Events::AmbientContextDetectEnded::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("StartEventNumber", indent + 1, value.startEventNumber);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StartEventNumber'");
             return err;
         }
     }
@@ -21090,15 +21124,25 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AmbientContextTypeSupported", 1, value);
         }
-        case AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SimultaneousDetectionLimit", 1, value);
-        }
         case AmbientContextSensing::Attributes::ObjectCountReached::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ObjectCountReached", 1, value);
+        }
+        case AmbientContextSensing::Attributes::ObjectCountConfig::Id: {
+            chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ObjectCountConfig", 1, value);
+        }
+        case AmbientContextSensing::Attributes::ObjectCount::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ObjectCount", 1, value);
+        }
+        case AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SimultaneousDetectionLimit", 1, value);
         }
         case AmbientContextSensing::Attributes::HoldTime::Id: {
             uint16_t value;
@@ -25435,10 +25479,15 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
     case AmbientContextSensing::Id: {
         switch (header.mPath.mEventId)
         {
-        case AmbientContextSensing::Events::AmbientContextDetected::Id: {
-            chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetected::DecodableType value;
+        case AmbientContextSensing::Events::AmbientContextDetectStarted::Id: {
+            chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetectStarted::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AmbientContextDetected", 1, value);
+            return DataModelLogger::LogValue("AmbientContextDetectStarted", 1, value);
+        }
+        case AmbientContextSensing::Events::AmbientContextDetectEnded::Id: {
+            chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetectEnded::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AmbientContextDetectEnded", 1, value);
         }
         }
         break;
