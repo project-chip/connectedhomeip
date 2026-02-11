@@ -17,11 +17,10 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/Identify/Attributes.h>
 #include <clusters/Identify/Commands.h>
 #include <clusters/Identify/Metadata.h>
@@ -32,6 +31,9 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Identify;
 using namespace chip::app::Clusters::Identify::Attributes;
+
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -80,18 +82,11 @@ TEST_F(TestIdentifyCluster, AttributeListTest)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, Identify::Id), attributes), CHIP_NO_ERROR);
-
-    const DataModel::AttributeEntry expectedAttributes[] = {
-        Attributes::IdentifyTime::kMetadataEntry,
-        Attributes::IdentifyType::kMetadataEntry,
-    };
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    EXPECT_EQ(listBuilder.Append(Span(expectedAttributes), {}), CHIP_NO_ERROR);
-    EXPECT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                        {
+                                            Attributes::IdentifyTime::kMetadataEntry,
+                                            Attributes::IdentifyType::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestIdentifyCluster, AcceptedCommandsMandatoryOnlyTest)
@@ -100,16 +95,10 @@ TEST_F(TestIdentifyCluster, AcceptedCommandsMandatoryOnlyTest)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
-    EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, Identify::Id), acceptedCommands), CHIP_NO_ERROR);
-
-    const DataModel::AcceptedCommandEntry expectedCommands[] = {
-        Commands::Identify::kMetadataEntry,
-    };
-
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expected;
-    EXPECT_EQ(expected.ReferenceExisting(expectedCommands), CHIP_NO_ERROR);
-    EXPECT_TRUE(chip::Testing::EqualAcceptedCommandSets(acceptedCommands.TakeBuffer(), expected.TakeBuffer()));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  Commands::Identify::kMetadataEntry,
+                                              }));
 }
 
 TEST_F(TestIdentifyCluster, AcceptedCommandsWithOptionalTriggerEffectTest)
@@ -119,17 +108,12 @@ TEST_F(TestIdentifyCluster, AcceptedCommandsWithOptionalTriggerEffectTest)
     chip::Testing::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
-    EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, Identify::Id), acceptedCommands), CHIP_NO_ERROR);
-
-    const DataModel::AcceptedCommandEntry expectedCommands[] = {
-        Commands::Identify::kMetadataEntry,
-        Commands::TriggerEffect::kMetadataEntry, // Expects the optional command because we passed in onEffectIdentifier.
-    };
-
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expected;
-    EXPECT_EQ(expected.ReferenceExisting(expectedCommands), CHIP_NO_ERROR);
-    EXPECT_TRUE(chip::Testing::EqualAcceptedCommandSets(acceptedCommands.TakeBuffer(), expected.TakeBuffer()));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(
+        cluster,
+        {
+            Commands::Identify::kMetadataEntry,
+            Commands::TriggerEffect::kMetadataEntry, // Expects the optional command because we passed in onEffectIdentifier.
+        }));
 }
 
 TEST_F(TestIdentifyCluster, ReadAttributesTest)

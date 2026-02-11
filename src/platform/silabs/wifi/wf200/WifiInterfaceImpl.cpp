@@ -30,6 +30,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformError.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
 #include <platform/silabs/wifi/lwip-support/lwip_netif.h>
@@ -393,9 +394,7 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         sl_wfx_exception_ind_t * firmware_exception = (sl_wfx_exception_ind_t *) event_payload;
         ChipLogError(DeviceLayer, "event: SL_WFX_EXCEPTION_IND_ID");
         ChipLogError(DeviceLayer, "firmware_exception->header.length: %d", firmware_exception->header.length);
-        // create a bytespan header.length with exception payload
-        ByteSpan exception_byte_span = ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length);
-        ChipLogByteSpan(DeviceLayer, exception_byte_span);
+        ChipLogByteSpan(DeviceLayer, ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length));
         break;
     }
     case SL_WFX_ERROR_IND_ID: {
@@ -403,9 +402,7 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         ChipLogError(DeviceLayer, "event: SL_WFX_ERROR_IND_ID");
         ChipLogError(DeviceLayer, "firmware_error->type: %lu", firmware_error->body.type);
         ChipLogError(DeviceLayer, "firmware_error->header.length: %d", firmware_error->header.length);
-        // create a bytespan header.length with error payload
-        ByteSpan error_byte_span = ByteSpan((uint8_t *) firmware_error, firmware_error->header.length);
-        ChipLogByteSpan(DeviceLayer, error_byte_span);
+        ChipLogByteSpan(DeviceLayer, ByteSpan((uint8_t *) firmware_error, firmware_error->header.length));
         break;
     }
     }
@@ -499,7 +496,8 @@ static void sl_wfx_scan_complete_callback(uint32_t status)
  *****************************************************************************/
 static void sl_wfx_start_ap_callback(uint32_t status)
 {
-    VerifyOrReturnLogError(status == AP_START_SUCCESS, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnLogError(status == AP_START_SUCCESS, MATTER_PLATFORM_ERROR(status),
+                           ChipLogError(DeviceLayer, "Failed to start AP: %lx", status));
     wifi_extra.Set(WifiInterface::WifiState::kAPReady);
 
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_START_AP);
@@ -653,10 +651,12 @@ CHIP_ERROR WifiInterfaceImpl::StartWifiTask()
     }
     wifi_extra.Set(WifiInterface::WifiState::kStationInit);
 
-    VerifyOrReturnError(wfx_soft_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Failed to execute the WFX software init."));
-    VerifyOrReturnError(InitWf200Platform() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Failed to execute the WFX HW start."));
+    sl_status_t status = wfx_soft_init();
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX software init : %ld", status));
+    status = InitWf200Platform();
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX HW start : %ld", status));
 
     return CHIP_NO_ERROR;
 }
@@ -686,7 +686,7 @@ CHIP_ERROR WifiInterfaceImpl::TriggerDisconnection(void)
     ChipLogProgress(DeviceLayer, "STA-Disconnecting");
 
     sl_status_t status = sl_wfx_send_disconnect_command();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status));
 
     wifi_extra.Clear(WifiInterface::WifiState::kStationConnected);
 
@@ -711,7 +711,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     info.chan     = ap_info.chan;
 
     sl_status_t status = sl_wfx_get_signal_strength(&signal_strength);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status));
 
     info.rssi = ConvertRcpiToRssi(signal_strength);
 
@@ -728,7 +728,8 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
 {
     sl_status_t status = get_all_counters();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Failed to get the couters"));
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
+                        ChipLogError(DeviceLayer, "Failed to get the counters : %ld", status));
 
     info.beacon_lost_count = counters->body.count_miss_beacon;
     info.beacon_rx_count   = counters->body.count_rx_beacon;
@@ -817,10 +818,10 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    VerifyOrReturnError(sl_wfx_send_join_command(wifi_provision.ssid, wifi_provision.ssidLength, NULL, CHANNEL_0,
-                                                 connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
-                                                 wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH) == SL_STATUS_OK,
-                        CHIP_ERROR_INTERNAL);
+    sl_status_t status = sl_wfx_send_join_command(wifi_provision.ssid, wifi_provision.ssidLength, NULL, CHANNEL_0,
+                                                  connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
+                                                  wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH);
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status));
 
     return CHIP_NO_ERROR;
 }

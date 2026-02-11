@@ -43,7 +43,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import has_attribute, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 from matter.testing.timeoperations import utc_time_in_matter_epoch
@@ -54,7 +54,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=attribute)
 
-    @run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization) and has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
+    @run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization))
     async def test_TC_TIMESYNC_2_1(self):
         attributes = Clusters.TimeSynchronization.Attributes
         features = await self.read_ts_attribute_expect_success(attribute=attributes.FeatureMap)

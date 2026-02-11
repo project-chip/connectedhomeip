@@ -28,6 +28,10 @@ void MatterIdentifyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIdentifyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterGroupsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterGroupsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterDescriptorClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -64,6 +68,10 @@ void MatterSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterThreadNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -91,6 +99,10 @@ void MatterFixedLabelClusterShutdownCallback(chip::EndpointId endpointId, Matter
 void MatterUserLabelClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterScenesManagementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterScenesManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 

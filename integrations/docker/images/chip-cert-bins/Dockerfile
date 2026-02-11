@@ -297,6 +297,24 @@ RUN case ${TARGETPLATFORM} in \
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true --enable_nfc true -i out/python_env
 
+# Generate OTA image from the built OTA requestor app
+# This creates ota-requestor-app.ota for OTA testing
+RUN case ${TARGETPLATFORM} in \
+    "linux/amd64" | "linux/arm64") \
+    set -x \
+    && cd out \
+    && ../src/app/ota_image_tool.py create \
+       -v 0xDEAD \
+       -p 0xBEEF \
+       -vn 2 \
+       -vs "2.0" \
+       -da sha256 \
+       chip-ota-requestor-app \
+       ota-requestor-app.ota \
+    ;; \
+    *) ;; \
+    esac
+
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:24.04
 ENV TZ=Etc/UTC
@@ -342,6 +360,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-bridge-app apps/
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/thermostat-app apps/thermostat-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app apps/chip-ota-provider-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app apps/chip-ota-requestor-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/ota-requestor-app.ota apps/ota-requestor-app.ota
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app apps/chip-lock-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 apps/chip-app1
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app apps/lit-icd-app
@@ -361,6 +380,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-controlle
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/closure-app apps/closure-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfc-app apps/jfc-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfa-app apps/jfa-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
 
 # Create symbolic links for now since this allows users to use existing configurations
 # for running just `app-name` instead of `apps/app-name`
@@ -375,11 +395,6 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
-
-# Copy PushAV Server to apps and install dependencies
-COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
-RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt \
-    && patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < apps/push_av_server/hypercorn.patch
 
 # Stage 3.2: Setup the Mock Server
 COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server mock_server

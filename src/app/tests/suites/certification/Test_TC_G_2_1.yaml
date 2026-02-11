@@ -13,6 +13,17 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/on-off-light"
+      app: all-devices
+      args:
+          - --device
+          - on-off-light
+
 name: 120.2.1. [TC-G-2.1] Attributes [DUT-Server]
 
 PICS:

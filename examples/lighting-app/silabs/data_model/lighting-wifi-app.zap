@@ -61,7 +61,7 @@
         }
       ],
       "deviceVersions": [
-        3,
+        4,
         1
       ],
       "deviceIdentifiers": [
@@ -2963,18 +2963,18 @@
       "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "code": 257,
+        "code": 269,
         "profileId": 259,
-        "label": "MA-dimmablelight",
-        "name": "MA-dimmablelight",
+        "label": "MA-extendedcolorlight",
+        "name": "MA-extendedcolorlight",
         "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
-          "code": 257,
+          "code": 269,
           "profileId": 259,
-          "label": "MA-dimmablelight",
-          "name": "MA-dimmablelight",
+          "label": "MA-extendedcolorlight",
+          "name": "MA-extendedcolorlight",
           "deviceTypeOrder": 0
         },
         {
@@ -2986,15 +2986,15 @@
         }
       ],
       "deviceVersions": [
-        1,
+        4,
         1
       ],
       "deviceIdentifiers": [
-        257,
+        269,
         17
       ],
-      "deviceTypeName": "MA-dimmablelight",
-      "deviceTypeCode": 257,
+      "deviceTypeName": "MA-extendedcolorlight",
+      "deviceTypeCode": 269,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -3678,54 +3678,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0xFE",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "CurrentFrequency",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "MinFrequency",
-              "code": 5,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "MaxFrequency",
-              "code": 6,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4579,10 +4531,10 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

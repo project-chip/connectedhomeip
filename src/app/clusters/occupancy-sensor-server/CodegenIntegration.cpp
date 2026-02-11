@@ -50,7 +50,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         OccupancySensingCluster::Config config(endpointId);
-        config.WithFeatures(static_cast<Feature>(featureMap));
+        config.WithFeatures(BitFlags<Feature>(featureMap));
 
         // If the optional HoldTime attribute is enabled, enable the HoldTime logic.
         // The delay attributes are required if the corresponding sensor feature is present.

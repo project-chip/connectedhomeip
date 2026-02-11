@@ -148,6 +148,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
       "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${chip_device_config_enable_joint_fabric}",
+      "CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP=${chip_device_config_enable_thread_meshcop}",
     ]
 
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
@@ -217,6 +218,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       device_layer_target_define = "LINUX"
       defines += [
         "CHIP_DEVICE_LAYER_TARGET=Linux",
+        "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
     } else if (chip_device_platform == "tizen") {
@@ -417,7 +419,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
 
-    if (chip_enable_openthread && chip_device_platform != "linux" &&
+    if (chip_enable_openthread &&
+        (chip_device_platform != "linux" ||
+         chip_system_config_use_openthread_inet_endpoints) &&
         chip_device_platform != "tizen" && chip_device_platform != "webos") {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID=${chip_device_config_thread_network_endpoint_id}" ]
     }
@@ -459,6 +463,13 @@ source_set("platform_config_header") {
 }
 
 if (chip_device_platform != "none") {
+  # Minimal target for PlatformError.h to avoid circular dependencies
+  # PlatformError.h only needs CHIPError.h, which is available via lib/core
+  source_set("platform_error") {
+    sources = [ "PlatformError.h" ]
+
+    public_deps = [ "${chip_root}/src/lib/core" ]
+  }
   source_set("platform_base") {
     public_deps = [
       ":platform_config_header",
@@ -541,7 +552,6 @@ if (chip_device_platform != "none") {
       "Globals.cpp",
       "LockTracker.cpp",
       "PersistedStorage.cpp",
-      "PlatformError.cpp",
       "PlatformError.h",
       "PlatformEventSupport.cpp",
       "RuntimeOptionsProvider.cpp",
@@ -577,6 +587,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/app/util:types",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:fixedbuffer",
       "${chip_root}/src/lib/support:timer-delegate",
     ]
 
