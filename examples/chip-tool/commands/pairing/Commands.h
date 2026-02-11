@@ -53,7 +53,7 @@ public:
     {}
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+#if CHIP_SUPPORT_THREAD_MESHCOP
 class PairThreadMeshcop : public PairingCommand
 {
 public:
@@ -288,7 +288,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         make_unique<PairWiFiPAF>(credsIssuerConfig),
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+#if CHIP_SUPPORT_THREAD_MESHCOP
         make_unique<PairThreadMeshcop>(credsIssuerConfig),
 #endif
         make_unique<PairAlreadyDiscovered>(credsIssuerConfig),

@@ -15,6 +15,25 @@
 #    limitations under the License.
 
 
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method thread-meshcop
+#       --discriminator 1234
+#       --passcode 20202021
+#       --border-agent-ip-addr 127.0.0.1
+#       --border-agent-port 49152
+#       --thread-dataset-hex 0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import logging
 
 from matter import ChipDeviceCtrl
@@ -31,7 +50,7 @@ class TC_SC_TC_4_1(MatterBaseTest):
 
     def steps_TC_SC_TC_4_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "DUT petitions the Thread network to become the Thread Commissioner with a 12-bit discriminator"),
+            TestStep(1, "Commissioner petitions the Thread Border Agent to become the Thread Commissioner with a 12-bit discriminator"),
             TestStep(2, 'Validate the discriminator and perform the commissioning')
         ]
 

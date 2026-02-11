@@ -142,9 +142,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
 #endif
-    case PairingMode::ThreadMeshcop:
-        err = Pair(remoteId, PeerAddress::Uninitialized());
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    case PairingMode::ThreadMeshcop: {
+        Inet::IPAddress ipAddr;
+
+        VerifyOrReturnError(mThreadBaHost.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mThreadBaPort.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
+        err = Pair(remoteId, PeerAddress::ThreadMeshcop(ipAddr, mThreadBaPort.Value()));
         break;
+    }
+#endif
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
         break;
@@ -299,27 +307,37 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
-    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode.value()).SetPeerAddress(address);
-    if (mDiscriminator.has_value())
+    auto params = RendezvousParameters().SetPeerAddress(address);
+    if (mOnboardingPayload != nullptr)
     {
-        params.SetDiscriminator(mDiscriminator.value());
+        SetupPayload payload;
+
+        ReturnErrorOnFailure(ParseSetupPayload(payload, mOnboardingPayload));
+        params.SetSetupPINCode(payload.setUpPINCode);
+        params.SetSetupDiscriminator(payload.discriminator);
     }
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
-    if (!address.IsInitialized() && mThreadBaHost.HasValue() && mThreadBaPort.HasValue())
+    else
+    {
+        VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+        params.SetSetupPINCode(mSetupPINCode.value());
+        if (mDiscriminator.has_value())
+        {
+            params.SetDiscriminator(mDiscriminator.value());
+        }
+    }
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (address.GetTransportType() == Transport::Type::kThreadMeshcop)
     {
         CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
-        CommissioningParameters commissioningParams;
-        Inet::IPAddress ipAddr;
-        VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
-        commissioningParams.SetBorderAgentAddress(ipAddr);
-        commissioningParams.SetBorderAgentPort(mThreadBaPort.Value());
+        CommissioningParameters commissioningParams = GetCommissioningParameters();
+
         commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
-        ReturnErrorOnFailure(CurrentCommissioner().PairDevice(remoteId, params, commissioningParams));
+        auto error = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
         CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
-        return CHIP_NO_ERROR;
+        return error;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))

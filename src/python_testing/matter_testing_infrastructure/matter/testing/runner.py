@@ -724,14 +724,13 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
-                  "--in-test-commissioning-method ble-thread or nfc-thread!")
+                  "--in-test-commissioning-method ble-thread, nfc-thread or thread-meshcop!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
         if commissioning_method == 'thread-meshcop':
             if args.border_agent_ip_addr is None or args.border_agent_port is None:
                 print("error: missing --border-agent-ip-addr or --border-agent-port for --commissioning-method thread-meshcop!")
                 return False
-            print("set border agent")
             config.border_agent_ip_addr = args.border_agent_ip_addr
             config.border_agent_port = args.border_agent_port
     elif config.commissioning_method == "on-network-ip":

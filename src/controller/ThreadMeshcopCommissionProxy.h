@@ -34,6 +34,7 @@
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/ThreadDiscoveryCode.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <transport/raw/PeerAddress.h>
 
 #include <commissioner/commissioner.hpp>
 
@@ -64,7 +65,7 @@ public:
     /**
      * Entry point to start the Thread commissioning and discover the device.
      */
-    CHIP_ERROR Discover(ByteSpan & pskc, const char * host, uint16_t port, const Thread::DiscoveryCode code,
+    CHIP_ERROR Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr, const Thread::DiscoveryCode code,
                         chip::SetupDiscriminator expectedDiscriminator, Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout);
 
     // ot::commissioner::CommissionerHandler

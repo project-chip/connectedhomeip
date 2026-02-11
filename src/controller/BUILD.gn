@@ -125,12 +125,13 @@ static_library("controller") {
   }
 
   if (chip_device_platform == "linux" && chip_crypto != "mbedtls" &&
-      chip_device_config_enable_ot_commissioner && current_cpu == host_cpu &&
+      chip_support_thread_meshcop && current_cpu == host_cpu &&
       current_os == host_os) {
     sources += [
       "ThreadMeshcopCommissionProxy.cpp",
       "ThreadMeshcopCommissionProxy.h",
     ]
+    deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns:minimal_mdns" ]
     public_deps += [ "${chip_root}/third_party/ot-commissioner" ]
   }
 

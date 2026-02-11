@@ -44,7 +44,9 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+#if CHIP_SUPPORT_THREAD_MESHCOP
     ThreadMeshcop,
+#endif
 };
 
 enum class PairingNetworkType
@@ -107,6 +109,12 @@ public:
         {
         case PairingMode::None:
             break;
+#if CHIP_SUPPORT_THREAD_MESHCOP
+        case PairingMode::ThreadMeshcop:
+            AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
+            AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
+            FALLTHROUGH;
+#endif
         case PairingMode::Code:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("dcl-hostname", &mDCLHostName,
@@ -169,13 +177,6 @@ public:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
-            break;
-        case PairingMode::ThreadMeshcop:
-            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
-            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
-            AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
-            AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
             break;
         }
 
@@ -271,9 +272,6 @@ private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
-    CHIP_ERROR PairWithMeshCoP();
-#endif
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
     CHIP_ERROR PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index);
@@ -342,8 +340,10 @@ private:
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
     chip::Optional<char *> mThreadBaHost;
     chip::Optional<uint16_t> mThreadBaPort;
+#endif
 
     std::optional<std::thread> mPrompterThread;
 

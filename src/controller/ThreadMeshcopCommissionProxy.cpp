@@ -26,7 +26,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
-#include <error.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -387,10 +387,14 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::InitializeCommissioner(ByteSpan & pskc)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const char * host, uint16_t port,
+CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr,
                                                   const Thread::DiscoveryCode code, SetupDiscriminator expectedDiscriminator,
                                                   Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout)
 {
+    using ot::commissioner::Error;
+
+    Error error;
+
     // Reset the promise and state for a new discovery session
     std::future<Dnssd::DiscoveredNodeData> future;
     {
@@ -405,17 +409,22 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const char * 
 
     ReturnErrorOnFailure(InitializeCommissioner(pskc));
 
-    ChipLogProgress(Controller, "Petitioning Thread Border Agent at %s:%u", host, port);
-    std::string id;
-    auto error = mCommissioner->Petition(id, std::string(host), port);
-    if (error != ot::commissioner::ErrorCode::kNone)
     {
-        ChipLogError(Controller, "Petition failed: %s", error.GetMessage().c_str());
-        SetState(State::kAborted);
-        return CHIP_ERROR_INTERNAL;
-    }
+        std::string id;
+        char host[Inet::IPAddress::kMaxStringLength];
+        peerAddr.GetIPAddress().ToString(host);
 
-    ChipLogProgress(Controller, "Thread Commissioner active with ID: %s", id.c_str());
+        ChipLogProgress(Controller, "Petitioning Thread Border Agent at %s:%u", host, peerAddr.GetPort());
+        error = mCommissioner->Petition(id, std::string(host), peerAddr.GetPort());
+        if (error != ot::commissioner::ErrorCode::kNone)
+        {
+            ChipLogError(Controller, "Petition failed: %s", error.GetMessage().c_str());
+            SetState(State::kAborted);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        ChipLogProgress(Controller, "Thread Commissioner active with ID: %s", id.c_str());
+    }
 
     error = mCommissioner->SetCommissionerDataset(MakeCommissionerDataset(code));
     if (error != ot::commissioner::ErrorCode::kNone)

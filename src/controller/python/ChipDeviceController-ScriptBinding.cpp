@@ -585,22 +585,22 @@ PyChipError pychip_DeviceController_ThreadMeshcopCommission(chip::Controller::De
                                                             uint64_t nodeId, uint32_t setupPasscode, uint16_t discriminator,
                                                             const char * borderAgentIPAddrStr, uint16_t borderAgentPort)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+#if CHIP_SUPPORT_THREAD_MESHCOP
     const uint32_t kDefaultDiscoveryTimeoutMsec = 1000000;
     CHIP_ERROR err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, pairingDelegate, devCtrl,
                                                           kDefaultDiscoveryTimeoutMsec);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    chip::Transport::PeerAddress address(Transport::Type::kThreadMeshcop);
     chip::Inet::IPAddress borderAgentIPAddr;
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(borderAgentIPAddrStr, borderAgentIPAddr),
                         ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
-    sCommissioningParameters.SetBorderAgentAddress(borderAgentIPAddr);
-    sCommissioningParameters.SetBorderAgentPort(borderAgentPort);
+    address.SetIPAddress(borderAgentIPAddr).SetPort(borderAgentPort);
 
-    auto params = RendezvousParameters().SetSetupPINCode(setupPasscode).SetDiscriminator(discriminator);
+    auto params = RendezvousParameters().SetSetupPINCode(setupPasscode).SetDiscriminator(discriminator).SetPeerAddress(address);
     return ToPyChipError(devCtrl->PairDevice(nodeId, params, sCommissioningParameters));
 #else
     return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
-#endif //
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 }
 
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size)

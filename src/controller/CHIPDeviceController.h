@@ -76,7 +76,7 @@
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+#if CHIP_SUPPORT_THREAD_MESHCOP
 #include <controller/ThreadMeshcopCommissionProxy.h>
 #endif
 
@@ -1141,7 +1141,7 @@ private:
 
     bool IsAttestationInformationMissing(const CommissioningParameters & params);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+#if CHIP_SUPPORT_THREAD_MESHCOP
     CHIP_ERROR PairThreadMeshcop(RendezvousParameters & rendezvousParams, CommissioningParameters & commissioningParams);
 #endif
 
@@ -1171,7 +1171,7 @@ private:
     EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OT_COMMISSIONER
+#if CHIP_SUPPORT_THREAD_MESHCOP
     ThreadMeshcopCommissionProxy mThreadMeshcopCommissionProxy;
 #endif
 };

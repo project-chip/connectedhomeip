@@ -2543,9 +2543,14 @@ class ChipDeviceControllerBase():
                 c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.argtypes = [
-                c_void_p, c_void_p, c_uint64, c_uint32, c_uint16, c_char_p, c_uint16]
-            self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.restype = PyChipError
+            if hasattr(self._dmLib, "pychip_DeviceController_ThreadMeshcopCommission"):
+                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.argtypes = [
+                    c_void_p, c_void_p, c_uint64, c_uint32, c_uint16, c_char_p, c_uint16]
+                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.restype = PyChipError
+            else:
+                logging.getLogger(__name__).warning(
+                    "pychip_DeviceController_ThreadMeshcopCommission is not available in the loaded CHIP library; "
+                    "Thread Meshcop commissioning is disabled.")
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
@@ -3194,11 +3199,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         over Thread MeshCoP transport
 
         Args:
-            setupPinCode: The setup Pin Code
-            discriminator: The discriminator
-            borderAgentIPAddr: IP address of Border Agent in Thread network
-            borderAgentPort: The port of Border Agent in Thread network
-            threadOperationalDataset: The operational dataset of Thread network
+            nodeId (int): The node ID of the device.
+            setupPinCode (int): The setup pin code of the device.
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            borderAgentIPAddr (str): IP address of Border Agent in Thread network
+            borderAgentPort (int): The port of Border Agent in Thread network
+            threadOperationalDataset (bytes): The operational dataset of Thread network
         '''
         self.CheckIsActive()
 
