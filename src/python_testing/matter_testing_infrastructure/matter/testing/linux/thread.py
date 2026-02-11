@@ -17,6 +17,7 @@
 import logging
 import os
 import re
+import shlex
 import subprocess
 import threading
 from typing import Optional, Pattern
