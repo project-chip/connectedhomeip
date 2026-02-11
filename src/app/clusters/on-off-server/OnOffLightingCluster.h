@@ -22,6 +22,8 @@
 #include <cstdint>
 #include <lib/support/TimerDelegate.h>
 
+#include <utility>
+
 namespace chip::app::Clusters {
 
 class OnOffLightingClusterTestAccess;
@@ -134,6 +136,18 @@ private:
 
     // Timer logic
     void UpdateTimer();
+
+    /// Helper method to call delegate callbacks after attribute updates.
+    /// @tparam CallbackType The type of the callback function/lambda
+    /// @param callback A callable that takes the delegate reference and calls the appropriate callback method
+    template <typename CallbackType>
+    void CallDelegatesForAttributeChange(CallbackType && callback)
+    {
+        for (auto & delegate : mDelegates)
+        {
+            std::forward<CallbackType>(callback)(delegate);
+        }
+    }
 
     // Command Handlers
     DataModel::ActionReturnStatus HandleOffWithEffect(const DataModel::InvokeRequest & request,

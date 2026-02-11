@@ -176,6 +176,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteImpl(const DataModel::W
         VerifyOrReturnValue(mOnTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         mOnTime = value;
         UpdateTimer();
+        CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnOnTimeChanged(mOnTime); });
         return Status::Success;
     }
     case Attributes::OffWaitTime::Id: {
@@ -184,11 +185,17 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteImpl(const DataModel::W
         VerifyOrReturnValue(mOffWaitTime != value, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         mOffWaitTime = value;
         UpdateTimer();
+        CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnOffWaitTimeChanged(mOffWaitTime); });
         return Status::Success;
     }
     case Attributes::StartUpOnOff::Id: {
         AttributePersistence persistence(mContext->attributeStorage);
-        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mStartUpOnOff);
+        auto status = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mStartUpOnOff);
+        if (status.IsSuccess())
+        {
+            CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnStartUpOnOffChanged(mStartUpOnOff); });
+        }
+        return status;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
@@ -222,12 +229,14 @@ void OnOffLightingCluster::SetOnTime(uint16_t value)
 {
     VerifyOrReturn(SetAttributeValue(mOnTime, value, Attributes::OnTime::Id));
     UpdateTimer();
+    CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnOnTimeChanged(mOnTime); });
 }
 
 void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
 {
     VerifyOrReturn(SetAttributeValue(mOffWaitTime, value, Attributes::OffWaitTime::Id));
     UpdateTimer();
+    CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnOffWaitTimeChanged(mOffWaitTime); });
 }
 
 CHIP_ERROR OnOffLightingCluster::SetStartupOnOff(DataModel::Nullable<OnOff::StartUpOnOffEnum> value)
@@ -244,6 +253,7 @@ CHIP_ERROR OnOffLightingCluster::SetStartupOnOff(DataModel::Nullable<OnOff::Star
                                                   { reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue) }));
     }
 
+    CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnStartUpOnOffChanged(mStartUpOnOff); });
     return CHIP_NO_ERROR;
 }
 

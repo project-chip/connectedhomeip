@@ -15,6 +15,8 @@
  */
 #pragma once
 
+#include <app/data-model/Nullable.h>
+#include <clusters/OnOff/Enums.h>
 #include <lib/support/IntrusiveList.h>
 
 namespace chip::app::Clusters {
@@ -36,6 +38,10 @@ public:
     ///
     /// This is NOT called as part of startup.
     virtual void OnOnOffChanged(bool on) = 0;
+
+    virtual void OnOnTimeChanged(uint16_t onTime) {}
+    virtual void OnOffWaitTimeChanged(uint16_t offWaitTime) {}
+    virtual void OnStartUpOnOffChanged(DataModel::Nullable<OnOff::StartUpOnOffEnum> startUpOnOff) {}
 };
 
 } // namespace chip::app::Clusters
