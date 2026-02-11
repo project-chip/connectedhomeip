@@ -32,7 +32,7 @@ class ThreadBorderRouter:
     # The Thread radio simulation node id, choose other if there is a conflict.
     NODE_ID = 9
 
-    def __init__(self, test_thread_dataset: str, ns: IsolatedNetworkNamespace):
+    def __init__(self, dataset: str, ns: IsolatedNetworkNamespace):
         self._event = threading.Event()
         self._pattern: Optional[Pattern[str]] = None
         self._event.set()
@@ -55,7 +55,7 @@ class ThreadBorderRouter:
         threading.Thread(target=self._otbr_read_stdout, daemon=True).start()
 
         self.expect(r'Co-processor version:', timeout=20)
-        self.join_network(test_thread_dataset)
+        self.join_network(dataset)
 
     def join_network(self, dataset):
         status = os.system(
