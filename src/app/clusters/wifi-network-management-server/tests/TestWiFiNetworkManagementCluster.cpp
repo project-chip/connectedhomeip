@@ -17,6 +17,7 @@
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
 #include <pw_unit_test/framework.h>
 
+#include <access/SubjectDescriptor.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -94,7 +95,6 @@ TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentials)
 
     const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
-
     ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
 
     DataModel::Nullable<ByteSpan> ssid;
@@ -113,7 +113,6 @@ TEST_F(TestWiFiNetworkManagementCluster, ClearNetworkCredentials)
 
     const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
-
     ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
 
     // Verify credentials are set
@@ -171,4 +170,66 @@ TEST_F(TestWiFiNetworkManagementCluster, PassphraseSurrogateChangesOnPassphraseC
     ASSERT_FALSE(surrogate2.IsNull());
 
     EXPECT_NE(surrogate1.Value(), surrogate2.Value());
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCaseSession)
+{
+    ClusterTester tester(cluster);
+
+    const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
+    const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
+    ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
+
+    // Test with non-CASE auth mode (e.g., PASE) - should be rejected
+    Access::SubjectDescriptor paseDescriptor;
+    paseDescriptor.authMode    = Access::AuthMode::kPase;
+    paseDescriptor.fabricIndex = 1;
+    tester.SetSubjectDescriptor(paseDescriptor);
+
+    Commands::NetworkPassphraseRequest::Type request;
+    auto result = tester.Invoke(request);
+
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status->GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCredentials)
+{
+    ClusterTester tester(cluster);
+
+    // Set up CASE session but don't set credentials
+    Access::SubjectDescriptor caseDescriptor;
+    caseDescriptor.authMode    = Access::AuthMode::kCase;
+    caseDescriptor.fabricIndex = 1;
+    tester.SetSubjectDescriptor(caseDescriptor);
+
+    Commands::NetworkPassphraseRequest::Type request;
+    auto result = tester.Invoke(request);
+
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status->GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
+}
+
+TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestSuccess)
+{
+    ClusterTester tester(cluster);
+
+    const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
+    const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
+    ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
+
+    // Set up CASE session
+    Access::SubjectDescriptor caseDescriptor;
+    caseDescriptor.authMode    = Access::AuthMode::kCase;
+    caseDescriptor.fabricIndex = 1;
+    tester.SetSubjectDescriptor(caseDescriptor);
+
+    Commands::NetworkPassphraseRequest::Type request;
+    auto result = tester.Invoke(request);
+
+    ASSERT_TRUE(result.IsSuccess());
+    ASSERT_TRUE(result.response.has_value());
+    EXPECT_TRUE(result.response->passphrase.data_equal(ByteSpan(passphraseData)));
 }

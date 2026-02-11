@@ -19,7 +19,10 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 #include <app/util/generic-callbacks.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceConfig.h>
 
+#include <array>
 #include <cstdint>
 
 namespace chip::app {
