@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device contact-sensor --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -163,6 +163,7 @@ class TC_IDM_2_3(BasicCompositionTests):
             # of an AttributePath, as well as the size of the payload for the MTU. See Issue #43083
             if num_paths > MAX_NUM_PATHS_IN_MTU:
                 paths[:] = paths[:MAX_NUM_PATHS_IN_MTU]
+                log.info(f"Reduced number of paths used from {num_paths} to {MAX_NUM_PATHS_IN_MTU}")
             return await request_function(paths)
 
         read_response = await conduct_request_with_potential_path_size_reduction(read_paths, num_read_paths_supported, read_request)
