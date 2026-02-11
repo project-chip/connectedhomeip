@@ -64,7 +64,7 @@ TEST_F(TestSwitchCluster, AttributeTest)
 {
     {
         const BitFlags<Feature> features{};
-        SwitchCluster cluster(kRootEndpointId, features, SwitchCluster::OptionalAttributeSet(),
+        SwitchCluster cluster(kRootEndpointId, features,
                               SwitchCluster::StartupConfiguration{
                                   .numberOfPositions = 2,
                               });
@@ -83,10 +83,7 @@ TEST_F(TestSwitchCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kMomentarySwitchMultiPress };
-        const DataModel::AttributeEntry optionalAttributes[] = { MultiPressMax::kMetadataEntry };
-        SwitchCluster::OptionalAttributeSet optionalAttributeSet;
-        optionalAttributeSet.Set<MultiPressMax::Id>();
-        SwitchCluster cluster(kRootEndpointId, features, optionalAttributeSet,
+        SwitchCluster cluster(kRootEndpointId, features,
                               SwitchCluster::StartupConfiguration{
                                   .numberOfPositions = 2,
                                   .multiPressMax     = 2,
@@ -95,6 +92,10 @@ TEST_F(TestSwitchCluster, AttributeTest)
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
         ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, Switch::Id), attributes), CHIP_NO_ERROR);
+
+        const DataModel::AttributeEntry optionalAttributes[] = { MultiPressMax::kMetadataEntry };
+        app::OptionalAttributeSet<MultiPressMax::Id> optionalAttributeSet;
+        optionalAttributeSet.Set<MultiPressMax::Id>();
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
         AttributeListBuilder listBuilder(expected);
@@ -109,7 +110,7 @@ TEST_F(TestSwitchCluster, ReadAttributeTest)
 {
     {
         const BitFlags<Feature> features{};
-        SwitchCluster cluster(kRootEndpointId, features, SwitchCluster::OptionalAttributeSet(),
+        SwitchCluster cluster(kRootEndpointId, features,
                               SwitchCluster::StartupConfiguration{
                                   .numberOfPositions = 2,
                               });
@@ -124,9 +125,7 @@ TEST_F(TestSwitchCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kMomentarySwitchMultiPress };
-        SwitchCluster::OptionalAttributeSet optionalAttributeSet;
-        optionalAttributeSet.Set<MultiPressMax::Id>();
-        SwitchCluster cluster(kRootEndpointId, features, optionalAttributeSet,
+        SwitchCluster cluster(kRootEndpointId, features,
                               SwitchCluster::StartupConfiguration{
                                   .numberOfPositions = 2,
                                   .multiPressMax     = 2,
@@ -148,7 +147,7 @@ TEST_F(TestSwitchCluster, CurrentPosition)
 {
     {
         const BitFlags<Feature> features{};
-        SwitchCluster cluster(kRootEndpointId, features, SwitchCluster::OptionalAttributeSet(),
+        SwitchCluster cluster(kRootEndpointId, features,
                               SwitchCluster::StartupConfiguration{
                                   .numberOfPositions = 4,
                               });
@@ -185,7 +184,7 @@ TEST_F(TestSwitchCluster, Events)
 {
     {
         const BitFlags<Feature> features{ Feature::kLatchingSwitch };
-        SwitchCluster cluster(kRootEndpointId, features, SwitchCluster::OptionalAttributeSet(),
+        SwitchCluster cluster(kRootEndpointId, features,
                               SwitchCluster::StartupConfiguration{
                                   .numberOfPositions = 2,
                               });
@@ -200,11 +199,26 @@ TEST_F(TestSwitchCluster, Events)
     {
         const BitFlags<Feature> features{ Feature::kMomentarySwitch, Feature::kMomentarySwitchRelease,
                                           Feature::kMomentarySwitchLongPress, Feature::kMomentarySwitchMultiPress };
-        SwitchCluster::OptionalAttributeSet optionalAttributeSet;
-        optionalAttributeSet.Set<MultiPressMax::Id>();
-        SwitchCluster cluster(kRootEndpointId, features, optionalAttributeSet,
+        SwitchCluster cluster(kRootEndpointId, features,
+                              SwitchCluster::StartupConfiguration{
+                                  .numberOfPositions = 2,
+                                  .multiPressMax     = 2,
+                              });
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        uint8_t currentPosition = 0;
+        EXPECT_EQ(cluster.OnSwitchLatch(currentPosition), std::nullopt);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        const BitFlags<Feature> features{ Feature::kMomentarySwitch, Feature::kMomentarySwitchRelease,
+                                          Feature::kMomentarySwitchLongPress, Feature::kMomentarySwitchMultiPress };
+        SwitchCluster cluster(kRootEndpointId, features,
                               SwitchCluster::StartupConfiguration{
                                   .numberOfPositions = 4,
+                                  .multiPressMax     = 2,
                               });
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -223,6 +237,77 @@ TEST_F(TestSwitchCluster, Events)
 
         currentPosition = 3;
         EXPECT_NE(cluster.OnMultiPressComplete(currentPosition, 1), std::nullopt);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        const BitFlags<Feature> features{ Feature::kLatchingSwitch };
+        SwitchCluster cluster(kRootEndpointId, features,
+                              SwitchCluster::StartupConfiguration{
+                                  .numberOfPositions = 4,
+                                  .multiPressMax     = 2,
+                              });
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        uint8_t currentPosition = 0;
+        EXPECT_EQ(cluster.OnInitialPress(currentPosition), std::nullopt);
+
+        currentPosition = 1;
+        EXPECT_EQ(cluster.OnLongPress(currentPosition), std::nullopt);
+
+        EXPECT_EQ(cluster.OnShortRelease(currentPosition), std::nullopt);
+
+        EXPECT_EQ(cluster.OnLongRelease(currentPosition), std::nullopt);
+
+        currentPosition = 2;
+        EXPECT_EQ(cluster.OnMultiPressOngoing(currentPosition, 1), std::nullopt);
+
+        currentPosition = 3;
+        EXPECT_EQ(cluster.OnMultiPressComplete(currentPosition, 1), std::nullopt);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        const BitFlags<Feature> features{ Feature::kLatchingSwitch };
+        SwitchCluster cluster(kRootEndpointId, features,
+                              SwitchCluster::StartupConfiguration{
+                                  .numberOfPositions = 2,
+                              });
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        uint8_t currentPosition = 2;
+        EXPECT_EQ(cluster.OnSwitchLatch(currentPosition), std::nullopt);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        const BitFlags<Feature> features{ Feature::kMomentarySwitch, Feature::kMomentarySwitchRelease,
+                                          Feature::kMomentarySwitchLongPress, Feature::kMomentarySwitchMultiPress };
+        SwitchCluster cluster(kRootEndpointId, features,
+                              SwitchCluster::StartupConfiguration{
+                                  .numberOfPositions = 4,
+                                  .multiPressMax     = 2,
+                              });
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        uint8_t currentPosition = 4;
+        EXPECT_EQ(cluster.OnInitialPress(currentPosition), std::nullopt);
+
+        currentPosition = 5;
+        EXPECT_EQ(cluster.OnLongPress(currentPosition), std::nullopt);
+
+        EXPECT_EQ(cluster.OnShortRelease(currentPosition), std::nullopt);
+
+        EXPECT_EQ(cluster.OnLongRelease(currentPosition), std::nullopt);
+
+        currentPosition = 6;
+        EXPECT_EQ(cluster.OnMultiPressOngoing(currentPosition, 1), std::nullopt);
+
+        currentPosition = 7;
+        EXPECT_EQ(cluster.OnMultiPressComplete(currentPosition, 1), std::nullopt);
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }

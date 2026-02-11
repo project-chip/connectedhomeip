@@ -160,7 +160,6 @@ void LightSwitchMgr::TriggerLevelControlAction(LevelControl::StepModeEnum stepMo
 
 void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
 {
-
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
 
     switch (data->event)
@@ -172,10 +171,11 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
         if (switchCluster != nullptr)
         {
             // Set new attribute value
-            RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(currentPosition);
-
-            // Trigger event
-            RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(currentPosition);
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                // Trigger event
+                RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(currentPosition);
+            }
         }
         break;
     }
@@ -187,10 +187,11 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
         if (switchCluster != nullptr)
         {
             // Set new attribute value
-            RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(currentPosition);
-
-            // Trigger event
-            RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                // Trigger event
+                RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
+            }
         }
         break;
     }

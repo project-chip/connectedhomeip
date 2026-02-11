@@ -18,6 +18,7 @@
 
 #include <app/clusters/switch-server/CodegenIntegration.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/Switch.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -43,18 +44,25 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        SwitchCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        app::OptionalAttributeSet<MultiPressMax::Id> optionalAttributeSet(optionalAttributeBits);
+        BitFlags<Feature> features(featureMap);
 
         uint8_t numberOfPositions{};
         VerifyOrDie(NumberOfPositions::Get(endpointId, &numberOfPositions) == Status::Success);
 
         uint8_t multiPressMax{};
-        if (optionalAttributeSet.IsSet(MultiPressMax::Id))
+        // Enforce a valid configuration from ember
+        if (features.Has(Feature::kMomentarySwitchMultiPress))
         {
+            VerifyOrDie(optionalAttributeSet.IsSet(MultiPressMax::Id));
             VerifyOrDie(MultiPressMax::Get(endpointId, &multiPressMax) == Status::Success);
         }
+        else
+        {
+            VerifyOrDie(!optionalAttributeSet.IsSet(MultiPressMax::Id));
+        }
 
-        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<Feature>(featureMap), optionalAttributeSet,
+        gServers[clusterInstanceIndex].Create(endpointId, features,
                                               SwitchCluster::StartupConfiguration{
                                                   .numberOfPositions = numberOfPositions,
                                                   .multiPressMax     = multiPressMax,

@@ -66,6 +66,7 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     // On failure, the numPositions won't be changed, so 0 returned.
     // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
     // This is why the cluster does not provide a getter for this attribute.
+    // We read this via ember (i.e. defaults that were set during codegen startup)
     RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
 
     return numPositions;
@@ -356,7 +357,7 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(0);
+    LogErrorOnFailure(switchCluster->SetCurrentPosition(0));
 }
 
 } // namespace

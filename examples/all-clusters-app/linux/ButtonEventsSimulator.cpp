@@ -46,7 +46,7 @@ void SetButtonPosition(EndpointId endpointId, uint8_t position)
     auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
     VerifyOrReturn(switchCluster != nullptr);
 
-    RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(position);
+    LogErrorOnFailure(switchCluster->SetCurrentPosition(position));
 }
 
 void EmitInitialPress(EndpointId endpointId, uint8_t newPosition)

@@ -18,7 +18,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/Switch/Attributes.h>
 
 namespace chip::app::Clusters {
@@ -26,16 +25,13 @@ namespace chip::app::Clusters {
 class SwitchCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet = app::OptionalAttributeSet<Switch::Attributes::MultiPressMax::Id>;
-
     struct StartupConfiguration
     {
         uint8_t numberOfPositions{};
         uint8_t multiPressMax{};
     };
 
-    SwitchCluster(EndpointId endpointId, const BitFlags<Switch::Feature> features,
-                  const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config);
+    SwitchCluster(EndpointId endpointId, const BitFlags<Switch::Feature> features, const StartupConfiguration & config);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -71,7 +67,6 @@ public:
 
 protected:
     const BitFlags<Switch::Feature> mFeatures;
-    const OptionalAttributeSet mOptionalAttributeSet;
     uint8_t mNumberOfPositions{};
     uint8_t mMultiPressMax{};
     uint8_t mCurrentPosition{};

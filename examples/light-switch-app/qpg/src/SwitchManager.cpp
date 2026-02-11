@@ -36,6 +36,7 @@ void SwitchManager::Init(void)
 {
     // MultiPressMax is an optional attribute, it has to be enabled in ember with an appropriate default value (minimum value is 2).
     // If this attribute is enabled, the cluster will take the value as a configuration value that can not be changed.
+    // Cluster default is used currently (so MultiPressMax will be 2)
 }
 
 void SwitchManager::ToggleHandler(AppEvent * aEvent)
@@ -130,7 +131,8 @@ void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
 
         RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
     });
@@ -173,7 +175,8 @@ void SwitchManager::GenericSwitchShortReleaseHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
 
         RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
     });
@@ -196,7 +199,8 @@ void SwitchManager::GenericSwitchLongReleaseHandler(AppEvent * aEvent)
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(GENERICSWITCH_ENDPOINT_ID);
         VerifyOrReturn(switchCluster != nullptr);
 
-        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
 
         RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
     });

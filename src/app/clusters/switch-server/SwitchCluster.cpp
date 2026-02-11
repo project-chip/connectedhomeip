@@ -25,12 +25,13 @@ namespace chip::app::Clusters {
 using namespace Switch;
 using namespace Switch::Attributes;
 
-SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features,
-                             const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Switch::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mNumberOfPositions(config.numberOfPositions),
+SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features, const StartupConfiguration & config) :
+    DefaultServerCluster({ endpointId, Switch::Id }), mFeatures(features), mNumberOfPositions(config.numberOfPositions),
     mMultiPressMax(config.multiPressMax)
-{}
+{
+    VerifyOrDie(mNumberOfPositions >= 2);
+    VerifyOrDie(!mFeatures.Has(Feature::kMomentarySwitchMultiPress) || mMultiPressMax >= 2);
+}
 
 DataModel::ActionReturnStatus SwitchCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                            AttributeValueEncoder & encoder)
@@ -57,8 +58,7 @@ CHIP_ERROR SwitchCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyB
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { mOptionalAttributeSet.IsSet(MultiPressMax::Id) && mFeatures.Has(Feature::kMomentarySwitchMultiPress),
-          MultiPressMax::kMetadataEntry }
+        { mFeatures.Has(Feature::kMomentarySwitchMultiPress), MultiPressMax::kMetadataEntry }
     };
 
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));

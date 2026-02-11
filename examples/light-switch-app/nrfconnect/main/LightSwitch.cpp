@@ -98,7 +98,8 @@ void LightSwitch::GenericSwitchInitialPress()
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
         VerifyOrReturn(switchCluster != nullptr);
 
-        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
 
         RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
     });
@@ -114,7 +115,8 @@ void LightSwitch::GenericSwitchReleasePress()
         auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
         VerifyOrReturn(switchCluster != nullptr);
 
-        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(newPosition);
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
 
         RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
     });
