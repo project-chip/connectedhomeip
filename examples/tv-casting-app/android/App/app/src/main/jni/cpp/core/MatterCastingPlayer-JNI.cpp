@@ -167,7 +167,9 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     matter::casting::core::IdentificationDeclarationOptions idOptions;
     if (jIdentificationDeclarationOptions != nullptr)
     {
-        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jIdentificationDeclarationOptions was provided by client");
+        ChipLogProgress(
+            AppServer,
+            "MatterCastingPlayer-JNI::verifyOrEstablishConnection() jIdentificationDeclarationOptions was provided by client");
         std::unique_ptr<matter::casting::core::IdentificationDeclarationOptions> idOptionsCpp(
             support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions));
         if (idOptionsCpp == nullptr)
