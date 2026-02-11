@@ -40,7 +40,7 @@ public:
     // ChimeDelegate
     CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name) override;
     CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
-    Protocols::InteractionModel::Status PlayChimeSound() override;
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
 
 private:
     DefaultTimerDelegate mTimerDelegate;

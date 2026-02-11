@@ -19,7 +19,6 @@
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server/Server.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
 
@@ -134,18 +133,15 @@ struct KeySetReadAllIndicesResponse
         return CHIP_NO_ERROR;
     }
 };
-CHIP_ERROR ReadGroupKeyMap(FabricTable * fabricTable, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupKeyMap(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
-    auto provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
-
-    return aEncoder.EncodeList([&fabricTable, provider](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : *fabricTable)
+        for (auto & fabric : fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
-            auto iter         = provider->IterateGroupKeys(fabric_index);
+            auto iter         = provider.IterateGroupKeys(fabric_index);
             VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
 
             GroupDataProvider::GroupKey mapping;
@@ -172,22 +168,20 @@ CHIP_ERROR ReadGroupKeyMap(FabricTable * fabricTable, AttributeValueEncoder & aE
     });
 }
 
-CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     auto fabric_index = aDecoder.AccessingFabricIndex();
-    auto provider     = GetGroupDataProvider();
 
     if (!aPath.IsListItemOperation())
     {
         Attributes::GroupKeyMap::TypeInfo::DecodableType list;
         size_t new_count;
 
-        VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
         ReturnErrorOnFailure(aDecoder.Decode(list));
         ReturnErrorOnFailure(list.ComputeSize(&new_count));
 
         // Remove existing keys, ignore errors
-        TEMPORARY_RETURN_IGNORED provider->RemoveGroupKeys(fabric_index);
+        TEMPORARY_RETURN_IGNORED provider.RemoveGroupKeys(fabric_index);
 
         // Add the new keys
         auto iter = list.begin();
@@ -200,7 +194,7 @@ CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeVa
             VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
             ReturnErrorOnFailure(
-                provider->SetGroupKeyAt(value.fabricIndex, i++, GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
+                provider.SetGroupKeyAt(value.fabricIndex, i++, GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
         }
         ReturnErrorOnFailure(iter.GetStatus());
     }
@@ -208,20 +202,19 @@ CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeVa
     {
         Structs::GroupKeyMapStruct::DecodableType value;
         size_t current_count = 0;
-        VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
         ReturnErrorOnFailure(aDecoder.Decode(value));
         VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
         // Cannot map to IPK, see `GroupKeyMapStruct` in Group Key Management cluster spec
         VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         {
-            auto iter     = provider->IterateGroupKeys(fabric_index);
+            auto iter     = provider.IterateGroupKeys(fabric_index);
             current_count = iter->Count();
             iter->Release();
         }
 
-        ReturnErrorOnFailure(provider->SetGroupKeyAt(value.fabricIndex, current_count,
-                                                     GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
+        ReturnErrorOnFailure(provider.SetGroupKeyAt(value.fabricIndex, current_count,
+                                                    GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
     }
     else
     {
@@ -231,24 +224,21 @@ CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeVa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadGroupTable(FabricTable * fabricTable, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadGroupTable(FabricTable & fabricTable, GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
-    auto provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
-
-    return aEncoder.EncodeList([&fabricTable, provider](const auto & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([&fabricTable, &provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : *fabricTable)
+        for (auto & fabric : fabricTable)
         {
             auto fabric_index = fabric.GetFabricIndex();
-            auto iter         = provider->IterateGroupInfo(fabric_index);
+            auto iter         = provider.IterateGroupInfo(fabric_index);
             VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
 
             GroupDataProvider::GroupInfo info;
             while (iter->Next(info))
             {
-                encodeStatus = encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                encodeStatus = encoder.Encode(GroupTableCodec(&provider, fabric_index, info));
                 if (encodeStatus != CHIP_NO_ERROR)
                 {
                     break;
@@ -265,47 +255,19 @@ CHIP_ERROR ReadGroupTable(FabricTable * fabricTable, AttributeValueEncoder & aEn
     });
 }
 
-CHIP_ERROR ReadMaxGroupsPerFabric(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadMaxGroupsPerFabric(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
-    auto * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
-    return aEncoder.Encode(provider->GetMaxGroupsPerFabric());
+    return aEncoder.Encode(provider.GetMaxGroupsPerFabric());
 }
 
-CHIP_ERROR ReadMaxGroupKeysPerFabric(AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadMaxGroupKeysPerFabric(GroupDataProvider & provider, AttributeValueEncoder & aEncoder)
 {
-    auto * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
-    return aEncoder.Encode(provider->GetMaxGroupKeysPerFabric());
+    return aEncoder.Encode(provider.GetMaxGroupKeysPerFabric());
 }
 
-bool GetProviderAndFabric(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                          Credentials::GroupDataProvider ** outGroupDataProvider, const FabricInfo ** outFabricInfo,
-                          FabricTable * fabricTable)
+const FabricInfo * GetFabricInfoOrNull(CommandHandler * handler, FabricTable & fabricTable)
 {
-    VerifyOrDie(commandObj != nullptr);
-    VerifyOrDie(outGroupDataProvider != nullptr);
-    VerifyOrDie(outFabricInfo != nullptr);
-
-    auto provider = GetGroupDataProvider();
-    auto fabric   = fabricTable->FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
-
-    if (nullptr == provider)
-    {
-        commandObj->AddStatus(commandPath, Status::Failure, "Internal consistency error on provider!");
-        return false;
-    }
-
-    if (nullptr == fabric)
-    {
-        commandObj->AddStatus(commandPath, Status::Failure, "Internal consistency error on access fabric!");
-        return false;
-    }
-
-    *outGroupDataProvider = provider;
-    *outFabricInfo        = fabric;
-
-    return true;
+    return fabricTable.FindFabricWithIndex(handler->GetAccessingFabricIndex());
 }
 
 Status ValidateKeySetWriteArguments(const Commands::KeySetWrite::DecodableType & commandData)
@@ -627,19 +589,17 @@ std::optional<DataModel::ActionReturnStatus> GroupKeyManagementCluster::InvokeCo
                                                                                       chip::TLV::TLVReader & input_arguments,
                                                                                       CommandHandler * handler)
 {
-    Credentials::GroupDataProvider * provider = nullptr;
-    const FabricInfo * fabric                 = nullptr;
+    const FabricInfo * fabric = GetFabricInfoOrNull(handler, mContext.fabricTable);
 
-    /*
-     * Fetch provider and fabric before command handling. Provider needed for many of the key set
-     * functions and the fabric index is needed for the GroupKeyManagement Decode function.
-     */
-    if (!GetProviderAndFabric(handler, request.path, &provider, &fabric, mFabricTable))
+    if (fabric == nullptr)
     {
-        // Command will already have status populated from validation.
-        return std::nullopt;
+        ChipLogError(Zcl, "GroupKeyManagement: Failed to find fabric for index %u", handler->GetAccessingFabricIndex());
+        return CHIP_ERROR_INTERNAL;
     }
+
     const FabricIndex fabric_index = fabric->GetFabricIndex();
+
+    GroupDataProvider * provider = &mContext.groupDataProvider;
 
     switch (request.path.mCommandId)
     {
@@ -684,13 +644,13 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
         return encoder.Encode(features);
     }
     case GroupKeyManagement::Attributes::GroupKeyMap::Id:
-        return ReadGroupKeyMap(mFabricTable, encoder);
+        return ReadGroupKeyMap(mContext.fabricTable, mContext.groupDataProvider, encoder);
     case GroupKeyManagement::Attributes::GroupTable::Id:
-        return ReadGroupTable(mFabricTable, encoder);
+        return ReadGroupTable(mContext.fabricTable, mContext.groupDataProvider, encoder);
     case GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id:
-        return ReadMaxGroupsPerFabric(encoder);
+        return ReadMaxGroupsPerFabric(mContext.groupDataProvider, encoder);
     case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
-        return ReadMaxGroupKeysPerFabric(encoder);
+        return ReadMaxGroupKeysPerFabric(mContext.groupDataProvider, encoder);
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -702,7 +662,8 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::WriteAttribute(const Da
     switch (request.path.mAttributeId)
     {
     case GroupKeyMap::Id: {
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteGroupKeyMap(request.path, decoder));
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
+                                               WriteGroupKeyMap(mContext.groupDataProvider, request.path, decoder));
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;

@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -3020,7 +3020,11 @@ cluster UserLabel = 65 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
-  revision 1;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kChangeEvent = 0x1;
+  }
 
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -3036,7 +3040,7 @@ cluster BooleanState = 69 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
 cluster OvenCavityOperationalState = 72 {
-  revision 1;
+  revision 2;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -3089,15 +3093,15 @@ cluster OvenCavityOperationalState = 72 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** This command SHALL be supported if the device supports remotely stopping the operation. */
   command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  /** This command SHALL be supported if the device supports remotely starting the operation. */
   command Start(): OperationalCommandResponse = 2;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster OvenMode = 73 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3119,10 +3123,10 @@ cluster OvenMode = 73 {
     kConvectionRoast = 16390;
     kWarming = 16391;
     kProofing = 16392;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kSteam = 16393;
+    kAirFry = 16394;
+    kAirSousVide = 16395;
+    kFrozenFood = 16396;
   }
 
   shared struct ModeTagStruct {
@@ -3222,7 +3226,7 @@ cluster ModeSelect = 80 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster LaundryWasherMode = 81 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3269,14 +3273,13 @@ cluster LaundryWasherMode = 81 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3321,8 +3324,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3413,11 +3415,10 @@ cluster RvcRunMode = 84 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3475,11 +3476,10 @@ cluster RvcCleanMode = 85 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3541,7 +3541,7 @@ cluster RefrigeratorAlarm = 87 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster DishwasherMode = 89 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3587,8 +3587,7 @@ cluster DishwasherMode = 89 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3782,7 +3781,7 @@ cluster DishwasherAlarm = 93 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster MicrowaveOvenMode = 94 {
-  revision 1;
+  revision 2;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3821,7 +3820,7 @@ cluster MicrowaveOvenMode = 94 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
-  revision 1;
+  revision 3;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -3874,13 +3873,13 @@ cluster OperationalState = 96 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  /** This command SHALL be supported if the device supports remotely pausing the operation. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** This command SHALL be supported if the device supports remotely stopping the operation. */
   command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  /** This command SHALL be supported if the device supports remotely starting the operation. */
   command Start(): OperationalCommandResponse = 2;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  /** This command SHALL be supported if the device supports remotely resuming the operation. */
   command Resume(): OperationalCommandResponse = 3;
 }
 
@@ -4225,7 +4224,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
 /** This cluster is used to configure a boolean sensor. */
 cluster BooleanStateConfiguration = 128 {
-  revision 1;
+  revision 2;
 
   bitmap AlarmModeBitmap : bitmap8 {
     kVisual = 0x1;
@@ -4237,6 +4236,7 @@ cluster BooleanStateConfiguration = 128 {
     kAudible = 0x2;
     kAlarmSuppress = 0x4;
     kSensitivityLevel = 0x8;
+    kFaultEvents = 0x10;
   }
 
   bitmap SensorFaultBitmap : bitmap16 {
@@ -4274,9 +4274,9 @@ cluster BooleanStateConfiguration = 128 {
     AlarmModeBitmap alarmsToEnableDisable = 0;
   }
 
-  /** This command is used to suppress the specified alarm mode. */
+  /** This command will suppress the alarm modes specified. */
   command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
-  /** This command is used to enable or disable the specified alarm mode. */
+  /** This command allows setting the enable or disable value for the specified alarm modes. */
   command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 
@@ -4380,7 +4380,7 @@ provisional cluster EnergyPreference = 155 {
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
-  revision 5;
+  revision 8;
 
   enum EndProductType : enum8 {
     kRollerShade = 0;
@@ -5204,7 +5204,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 7;
+  revision 9;
 
   enum ColorLoopActionEnum : enum8 {
     kDeactivate = 0;
@@ -5655,7 +5655,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 5;
+  revision 7;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0 [spec_name = "PIR"];
@@ -5673,6 +5673,8 @@ cluster OccupancySensing = 1030 {
     kRadar = 0x20;
     kRFSensing = 0x40;
     kVision = 0x80;
+    kPrediction = 0x100;
+    kOccupancyEvent = 0x200;
   }
 
   bitmap OccupancyBitmap : bitmap8 {
@@ -5691,6 +5693,13 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeDefault = 2;
   }
 
+  struct PredictedOccupancyStruct {
+    epoch_s startTimestamp = 0;
+    epoch_s endTimestamp = 1;
+    OccupancyBitmap occupancy = 2;
+    percent confidence = 3;
+  }
+
   info event OccupancyChanged = 0 {
     OccupancyBitmap occupancy = 0;
   }
@@ -5700,6 +5709,7 @@ cluster OccupancySensing = 1030 {
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) optional int16u holdTime = 3;
   readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
+  provisional readonly attribute optional PredictedOccupancyStruct predictedOccupancy[] = 5;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;
@@ -6316,116 +6326,17 @@ cluster LowPower = 1288 {
   command Sleep(): DefaultSuccess = 0;
 }
 
-/** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-cluster CameraAvSettingsUserLevelManagement = 1362 {
-  revision 1;
-
-  enum PhysicalMovementEnum : enum8 {
-    kIdle = 0;
-    kMoving = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kDigitalPTZ = 0x1;
-    kMechanicalPan = 0x2;
-    kMechanicalTilt = 0x4;
-    kMechanicalZoom = 0x8;
-    kMechanicalPresets = 0x10;
-  }
-
-  struct MPTZStruct {
-    optional int16s pan = 0;
-    optional int16s tilt = 1;
-    optional int8u zoom = 2;
-  }
-
-  struct MPTZPresetStruct {
-    int8u presetID = 0;
-    char_string<32> name = 1;
-    MPTZStruct settings = 2;
-  }
-
-  struct DPTZStruct {
-    int16u videoStreamID = 0;
-    ViewportStruct viewport = 1;
-  }
-
-  readonly attribute optional MPTZStruct MPTZPosition = 0;
-  readonly attribute optional int8u maxPresets = 1;
-  readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
-  readonly attribute optional DPTZStruct DPTZStreams[] = 3;
-  readonly attribute optional int8u zoomMax = 4;
-  readonly attribute optional int16s tiltMin = 5;
-  readonly attribute optional int16s tiltMax = 6;
-  readonly attribute optional int16s panMin = 7;
-  readonly attribute optional int16s panMax = 8;
-  readonly attribute optional PhysicalMovementEnum movementState = 9;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct MPTZSetPositionRequest {
-    optional int16s pan = 0;
-    optional int16s tilt = 1;
-    optional int8u zoom = 2;
-  }
-
-  request struct MPTZRelativeMoveRequest {
-    optional int16s panDelta = 0;
-    optional int16s tiltDelta = 1;
-    optional int8s zoomDelta = 2;
-  }
-
-  request struct MPTZMoveToPresetRequest {
-    int8u presetID = 0;
-  }
-
-  request struct MPTZSavePresetRequest {
-    optional int8u presetID = 0;
-    char_string<32> name = 1;
-  }
-
-  request struct MPTZRemovePresetRequest {
-    int8u presetID = 0;
-  }
-
-  request struct DPTZSetViewportRequest {
-    int16u videoStreamID = 0;
-    ViewportStruct viewport = 1;
-  }
-
-  request struct DPTZRelativeMoveRequest {
-    int16u videoStreamID = 0;
-    optional int16s deltaX = 1;
-    optional int16s deltaY = 2;
-    optional int8s zoomDelta = 3;
-  }
-
-  /** This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ. */
-  command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
-  /** This command SHALL move the camera by the delta values relative to the currently defined position. */
-  command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
-  /** This command SHALL move the camera to the positions specified by the Preset passed. */
-  command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
-  /** This command allows creating a new preset or updating the values of an existing one. */
-  command MPTZSavePreset(MPTZSavePresetRequest): DefaultSuccess = 3;
-  /** This command SHALL remove a preset entry from the PresetMptzTable. */
-  command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
-  /** This command allows for setting the digital viewport for a specific Video Stream. */
-  command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
-  /** This command SHALL change the per stream viewport by the amount specified in a relative fashion. */
-  command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
-}
-
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 cluster Chime = 1366 {
-  revision 1;
+  revision 2;
 
   struct ChimeSoundStruct {
     int8u chimeID = 0;
     char_string<48> name = 1;
+  }
+
+  info event ChimeStartedPlaying = 0 {
+    int8u chimeID = 0;
   }
 
   readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
@@ -6437,8 +6348,12 @@ cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** This command will play the currently selected chime. */
-  command PlayChimeSound(): DefaultSuccess = 0;
+  request struct PlayChimeSoundRequest {
+    optional int8u chimeID = 0;
+  }
+
+  /** This command will play the currently selected chime or the chime passed in. */
+  command PlayChimeSound(PlayChimeSoundRequest): DefaultSuccess = 0;
 }
 
 /** This Cluster is used to manage TLS Client Certificates and to provision
@@ -8148,22 +8063,22 @@ endpoint 1 {
   server cluster ValveConfigurationAndControl {
     emits event ValveStateChanged;
     emits event ValveFault;
-    ram      attribute openDuration;
-    persist  attribute defaultOpenDuration;
-    ram      attribute autoCloseTime;
+    callback attribute openDuration;
+    callback attribute defaultOpenDuration;
+    callback attribute autoCloseTime;
     callback attribute remainingDuration;
-    ram      attribute currentState;
-    ram      attribute targetState;
-    ram      attribute currentLevel;
-    ram      attribute targetLevel;
-    persist  attribute defaultOpenLevel default = 100;
-    ram      attribute valveFault default = 0;
-    ram      attribute levelStep default = 1;
+    callback attribute currentState;
+    callback attribute targetState;
+    callback attribute currentLevel;
+    callback attribute targetLevel;
+    callback attribute defaultOpenLevel;
+    callback attribute valveFault;
+    ram      attribute levelStep default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Open;
     handle command Close;
@@ -8413,13 +8328,13 @@ endpoint 1 {
   }
 
   server cluster IlluminanceMeasurement {
-    ram      attribute measuredValue default = 0x0000;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x01;
     ram      attribute maxMeasuredValue default = 0xFFFE;
     ram      attribute tolerance;
     ram      attribute lightSensorType default = 0xFF;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster TemperatureMeasurement {
@@ -8679,32 +8594,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Sleep;
-  }
-
-  server cluster CameraAvSettingsUserLevelManagement {
-    callback attribute MPTZPosition;
-    ram      attribute maxPresets default = 5;
-    callback attribute MPTZPresets;
-    callback attribute DPTZStreams;
-    ram      attribute zoomMax default = 100;
-    ram      attribute tiltMin default = -90;
-    ram      attribute tiltMax default = 90;
-    ram      attribute panMin default = -180;
-    ram      attribute panMax default = 180;
-    ram      attribute movementState;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command MPTZSetPosition;
-    handle command MPTZRelativeMove;
-    handle command MPTZMoveToPreset;
-    handle command MPTZSavePreset;
-    handle command MPTZRemovePreset;
-    handle command DPTZSetViewport;
-    handle command DPTZRelativeMove;
   }
 
   server cluster Chime {

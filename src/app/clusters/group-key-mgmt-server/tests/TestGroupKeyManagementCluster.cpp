@@ -38,7 +38,7 @@ using namespace chip::Testing;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsGeneratedCommandsListEqualTo;
 
-chip::FabricIndex kTestFabricIndex = Testing::kTestFabrixIndex;
+chip::FabricIndex kTestFabricIndex = Testing::kTestFabricIndex;
 const chip::GroupId kTestGroupId   = 0x1234;
 constexpr uint16_t kTestKeySetId   = 1;
 
@@ -79,7 +79,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
     Crypto::DefaultSessionKeystore mMockKeystore;
     FabricTestFixture fabricHelper{ &mTestContext.StorageDelegate() };
 
-    GroupKeyManagementCluster mCluster{ fabricHelper.GetFabricTable() };
+    GroupKeyManagementCluster mCluster{ { fabricHelper.GetFabricTable(), mRealProvider } };
 
     ClusterTester tester{ mCluster };
 

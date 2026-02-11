@@ -15,14 +15,9 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Groupcast::Commands::JoinGroup::kMetadataEntry,
     Groupcast::Commands::LeaveGroup::kMetadataEntry,
     Groupcast::Commands::UpdateGroupKey::kMetadataEntry,
-    Groupcast::Commands::ExpireGracePeriod::kMetadataEntry,
     Groupcast::Commands::ConfigureAuxiliaryACL::kMetadataEntry,
 };
 } // namespace
-
-GroupcastCluster::GroupcastCluster(BitFlags<Groupcast::Feature> features) :
-    DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mLogic(features)
-{}
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)
@@ -34,7 +29,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::ClusterRevision::Id:
         return encoder.Encode(Groupcast::kRevision);
     case Groupcast::Attributes::Membership::Id:
-        return mLogic.ReadMembership(request.path.mEndpointId, encoder);
+        return mLogic.ReadMembership(request.subjectDescriptor, request.path.mEndpointId, encoder);
     case Groupcast::Attributes::MaxMembershipCount::Id:
         return mLogic.ReadMaxMembershipCount(request.path.mEndpointId, encoder);
     }
@@ -64,20 +59,21 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::LeaveGroup::Id: {
         Groupcast::Commands::LeaveGroup::DecodableType data;
         Groupcast::Commands::LeaveGroupResponse::Type response;
+        GroupcastLogic::EndpointList endpoints;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        TEMPORARY_RETURN_IGNORED mLogic.LeaveGroup(fabric_index, data, response);
-        handler->AddResponse(request.path, response);
-        return std::nullopt;
+        Protocols::InteractionModel::Status status = mLogic.LeaveGroup(fabric_index, data, endpoints);
+        if (Protocols::InteractionModel::Status::Success == status)
+        {
+            response.groupID   = data.groupID;
+            response.endpoints = DataModel::List<const chip::EndpointId>(endpoints.entries, endpoints.count);
+            handler->AddResponse(request.path, response);
+        }
+        return status;
     }
     case Groupcast::Commands::UpdateGroupKey::Id: {
         Groupcast::Commands::UpdateGroupKey::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
         return mLogic.UpdateGroupKey(fabric_index, data);
-    }
-    case Groupcast::Commands::ExpireGracePeriod::Id: {
-        Groupcast::Commands::ExpireGracePeriod::DecodableType data;
-        ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        return mLogic.ExpireGracePeriod(fabric_index, data);
     }
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;

@@ -66,8 +66,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        log.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
-
+        log.info(f"Launching provider app with with ota image {ota_image_path}")
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
@@ -112,7 +111,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             self.current_provider_app_proc.terminate()
             self.current_provider_app_proc = None
         else:
-            log.info("Provider process not found. Unable to terminate.")
+            log.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -336,9 +335,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 with open(restart_flag_file, "w") as f:
                     f.write("restart")
                 log.info("Created restart flag file to signal app restart")
-                # Expire sessions and re-establish connections
-                # This sleep allows the app to reconnect before atempt to perform actions.
+                # This sleep allows the app start while waiting for app ready pattern. If not in some cases connections will Drop.
                 sleep(1)
+                # Expire sessions and re-establish connections
                 log.info("Expiring sessions after manual device reboot")
                 self.controller.ExpireSessions(self.requestor_node_id)
                 log.info("App restart completed successfully")
@@ -352,6 +351,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         Args:
             controller (ChipDeviceCtrl): The controller to use for writing attributes.
             requestor_node_id (int): Node ID of the Requestor device.
+
         Returns:
             None
         """

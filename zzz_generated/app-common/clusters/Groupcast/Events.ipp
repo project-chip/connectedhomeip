@@ -29,7 +29,79 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Groupcast {
-namespace Events {} // namespace Events
+namespace Events {
+namespace GroupcastTesting {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSourceIpAddress), sourceIpAddress));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kDestinationIpAddress), destinationIpAddress));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kGroupID), groupID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kEndpointID), endpointID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kClusterID), clusterID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kElementID), elementID));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kAccessAllowed), accessAllowed));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kGroupcastTestResult), groupcastTestResult));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFabricIndex), fabricIndex));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kSourceIpAddress))
+        {
+            err = DataModel::Decode(reader, sourceIpAddress);
+        }
+        else if (__context_tag == to_underlying(Fields::kDestinationIpAddress))
+        {
+            err = DataModel::Decode(reader, destinationIpAddress);
+        }
+        else if (__context_tag == to_underlying(Fields::kGroupID))
+        {
+            err = DataModel::Decode(reader, groupID);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        {
+            err = DataModel::Decode(reader, endpointID);
+        }
+        else if (__context_tag == to_underlying(Fields::kClusterID))
+        {
+            err = DataModel::Decode(reader, clusterID);
+        }
+        else if (__context_tag == to_underlying(Fields::kElementID))
+        {
+            err = DataModel::Decode(reader, elementID);
+        }
+        else if (__context_tag == to_underlying(Fields::kAccessAllowed))
+        {
+            err = DataModel::Decode(reader, accessAllowed);
+        }
+        else if (__context_tag == to_underlying(Fields::kGroupcastTestResult))
+        {
+            err = DataModel::Decode(reader, groupcastTestResult);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GroupcastTesting.
+} // namespace Events
 } // namespace Groupcast
 } // namespace Clusters
 } // namespace app

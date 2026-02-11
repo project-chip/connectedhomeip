@@ -20,7 +20,7 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
+#   run1: # Runs through all tests
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -31,19 +31,19 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run2:
+#   run2: # tests PASE connection using manual code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json --manual-code 10054912339
 #     factory-reset: true
 #     quiet: true
-#   run3:
+#   run3: # tests PASE connection using QR code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
 #     factory-reset: true
 #     quiet: true
-#   run4:
+#   run4: # tests PASE connection using discriminator and passcode (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
@@ -52,7 +52,7 @@
 #       --passcode 20202021
 #     factory-reset: true
 #     quiet: true
-#   run5:
+#   run5: # Tests CASE connection using manual code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
@@ -61,7 +61,7 @@
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
-#   run6:
+#   run6: # Tests CASE connection using QR code (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
@@ -70,7 +70,7 @@
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
-#   run7:
+#   run7: # Tests CASE connection using manual discriminator and passcode (12.1 only)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
@@ -80,20 +80,20 @@
 #       --commissioning-method on-network
 #     factory-reset: true
 #     quiet: true
-#   run8:
+#   run8: # Tests reusing storage from run7 (i.e. factory-reset=false)
 #     app: ${CHIP_LOCK_APP}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json
 #     factory-reset: false
 #     quiet: true
-#   run9:
+#   run9: # Test using the generated attribute wildcard file from previous run
 #     script-args:
 #       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: false
 #     quiet: true
-#   run10:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#   run10: # Tests against energy-management-app
+#     app: ${EVSE_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -103,7 +103,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run11:
+#   run11: # Tests against lit-icd app
 #     app: ${LIT_ICD_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -114,7 +114,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run12:
+#   run12: # Tests against microwave-oven app
 #     app: ${CHIP_MICROWAVE_OVEN_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -125,7 +125,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run13:
+#   run13: # Tests against chip-rvc app
 #     app: ${CHIP_RVC_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -136,7 +136,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run14:
+#   run14: # Tests against network-management-app
 #     app: ${NETWORK_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -147,7 +147,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run15:
+#   run15: # Tests against lighting-app-data-mode-no-unique-id
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -158,9 +158,11 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run16:
+#   run16: # Tests against all-devices-app - default (contactsensor)
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -169,7 +171,21 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run17:
+#   run17: # Tests against all-devices-app - on/off light
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --device on-off-light
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run18: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -182,24 +198,6 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-# Run 1: runs through all tests
-# Run 2: tests PASE connection using manual code (12.1 only)
-# Run 3: tests PASE connection using QR code (12.1 only)
-# Run 4: tests PASE connection using discriminator and passcode (12.1 only)
-# Run 5: Tests CASE connection using manual code (12.1 only)
-# Run 6: Tests CASE connection using QR code (12.1 only)
-# Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
-# Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
-# Run 9: Test using the generated attribute wildcard file from previous run
-# Run 10: Tests against energy-management-app
-# Run 11: Tests against lit-icd app
-# Run 12: Tests against microwave-oven app
-# Run 13: Tests against chip-rvc app
-# Run 14: Tests against network-management-app
-# Run 15: Tests against lighting-app-data-mode-no-unique-id
-# Run 16: Tests against all-devices-app
-# Run 17: runs through all tests with debug mode enabled (dumps attribute data on failure)
 
 import logging
 import os

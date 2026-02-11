@@ -8484,6 +8484,9 @@ public class ClusterIDMapping {
         public enum Attribute {
             Membership(0L),
             MaxMembershipCount(1L),
+            MaxMcastAddrCount(2L),
+            UsedMcastAddrCount(3L),
+            FabricUnderTest(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -8508,7 +8511,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            GroupcastTesting(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -8532,8 +8536,8 @@ public class ClusterIDMapping {
             JoinGroup(0L),
             LeaveGroup(1L),
             UpdateGroupKey(3L),
-            ExpireGracePeriod(4L),
-            ConfigureAuxiliaryACL(5L),;
+            ConfigureAuxiliaryACL(4L),
+            GroupcastTesting(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8551,7 +8555,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeyID(2),Key(3),GracePeriod(4),UseAuxiliaryACL(5),;
+        }public enum JoinGroupCommandField {GroupID(0),Endpoints(1),KeySetID(2),Key(3),UseAuxiliaryACL(4),ReplaceEndpoints(5),McastAddrPolicy(6),;
                     private final int id;
                     JoinGroupCommandField(int id) {
                         this.id = id;
@@ -8585,7 +8589,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum UpdateGroupKeyCommandField {GroupID(0),KeyID(1),Key(2),GracePeriod(3),;
+                }public enum UpdateGroupKeyCommandField {GroupID(0),KeySetID(1),Key(2),;
                     private final int id;
                     UpdateGroupKeyCommandField(int id) {
                         this.id = id;
@@ -8596,23 +8600,6 @@ public class ClusterIDMapping {
                     }
                     public static UpdateGroupKeyCommandField value(int id) throws NoSuchFieldError {
                         for (UpdateGroupKeyCommandField field : UpdateGroupKeyCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ExpireGracePeriodCommandField {GroupID(0),;
-                    private final int id;
-                    ExpireGracePeriodCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ExpireGracePeriodCommandField value(int id) throws NoSuchFieldError {
-                        for (ExpireGracePeriodCommandField field : ExpireGracePeriodCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -8630,6 +8617,23 @@ public class ClusterIDMapping {
                     }
                     public static ConfigureAuxiliaryACLCommandField value(int id) throws NoSuchFieldError {
                         for (ConfigureAuxiliaryACLCommandField field : ConfigureAuxiliaryACLCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GroupcastTestingCommandField {TestOperation(0),DurationSeconds(1),;
+                    private final int id;
+                    GroupcastTestingCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GroupcastTestingCommandField value(int id) throws NoSuchFieldError {
+                        for (GroupcastTestingCommandField field : GroupcastTestingCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -13896,6 +13900,7 @@ public class ClusterIDMapping {
             OccupancySensorTypeBitmap(2L),
             HoldTime(3L),
             HoldTimeLimits(4L),
+            PredictedOccupancy(5L),
             PIROccupiedToUnoccupiedDelay(16L),
             PIRUnoccupiedToOccupiedDelay(17L),
             PIRUnoccupiedToOccupiedThreshold(18L),
@@ -15212,13 +15217,10 @@ public class ClusterIDMapping {
             AmbientContextType(3L),
             AmbientContextTypeSupported(4L),
             SimultaneousDetectionLimit(5L),
-            CountThresholdReached(6L),
-            CountThreshold(7L),
-            ObjectCount(8L),
-            HoldTime(9L),
-            HoldTimeLimits(10L),
-            PredictedActivity(11L),
-            PrivacyModeEnabled(12L),
+            ObjectCountReached(6L),
+            HoldTime(7L),
+            HoldTimeLimits(8L),
+            PredictedActivity(9L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -15243,7 +15245,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            AmbientContextDetected(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -19225,7 +19228,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            ChimeStartedPlaying(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -19264,7 +19268,24 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }@Override
+        }public enum PlayChimeSoundCommandField {ChimeID(0),;
+                    private final int id;
+                    PlayChimeSoundCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PlayChimeSoundCommandField value(int id) throws NoSuchFieldError {
+                        for (PlayChimeSoundCommandField field : PlayChimeSoundCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

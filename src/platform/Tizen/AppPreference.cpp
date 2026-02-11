@@ -32,10 +32,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "ErrorUtils.h"
-
-using chip::DeviceLayer::Internal::TizenToChipError;
+#include <platform/PlatformError.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -62,9 +59,10 @@ CHIP_ERROR GetData(const char * key, void * data, size_t dataSize, size_t * getD
     int err = preference_get_string(key, &encodedData);
     if (err != PREFERENCE_ERROR_NONE)
     {
-        if (err != PREFERENCE_ERROR_NO_KEY)
-            ChipLogError(DeviceLayer, "Failed to get preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
-        return TizenToChipError(err);
+        if (err == PREFERENCE_ERROR_NO_KEY)
+            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        ChipLogError(DeviceLayer, "Failed to get preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
+        return MATTER_PLATFORM_ERROR(err);
     }
 
     size_t encodedDataSize = strlen(encodedData);
@@ -102,7 +100,7 @@ CHIP_ERROR SaveData(const char * key, const void * data, size_t dataSize)
 
     int err = preference_set_string(key, encodedData.Get());
     VerifyOrReturnError(
-        err == PREFERENCE_ERROR_NONE, TizenToChipError(err),
+        err == PREFERENCE_ERROR_NONE, MATTER_PLATFORM_ERROR(err),
         ChipLogError(DeviceLayer, "Failed to set preference [%s]: %s", StringOrNullMarker(key), get_error_message(err)));
 
     ChipLogDetail(DeviceLayer, "Save preference data: key=%s len=%u", key, static_cast<unsigned int>(dataSize));
@@ -116,9 +114,10 @@ CHIP_ERROR RemoveData(const char * key)
     int err = preference_remove(key);
     if (err != PREFERENCE_ERROR_NONE)
     {
-        if (err != PREFERENCE_ERROR_NO_KEY)
-            ChipLogError(DeviceLayer, "Failed to remove preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
-        return TizenToChipError(err);
+        if (err == PREFERENCE_ERROR_NO_KEY)
+            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        ChipLogError(DeviceLayer, "Failed to remove preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
+        return MATTER_PLATFORM_ERROR(err);
     }
 
     ChipLogProgress(DeviceLayer, "Remove preference data: key=%s", key);

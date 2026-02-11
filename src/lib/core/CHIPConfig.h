@@ -2050,6 +2050,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 #define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
 #endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+ *
+ * @brief The maximum number of PushAV transports per device per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+#define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 4
+#endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_ZONES
+ *
+ * @brief The maximum number of zones
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_ZONES
+#define CHIP_CONFIG_MAX_NUM_ZONES 4
+#endif // CHIP_CONFIG_MAX_NUM_ZONES
 /**
  * @}
  */

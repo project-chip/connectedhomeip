@@ -46,22 +46,7 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
-    "access-closure",
-    "cameras",
-    "closures",
-    "electrical-grid-conditions",
-    "energy-mtrid",
-    "energy-price",
-    "energy-tariff",
-    "irrigation-system",
-    "metering",
-    "nfcCommissioning",
-    "q-phase-2",
-    "rvc-direct-mode",
-    "rvc-go-home",
-    "soil-sensor",
-    "temperature-sensor-with-screen",
-    "tls"
+    "cameras"
 ]
 
 

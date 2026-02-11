@@ -90,8 +90,8 @@
 
 #define ESP_OPENTHREAD_RCP_UPDATE_CONFIG()                                                                                         \
     {                                                                                                                              \
-        .rcp_type = RCP_TYPE_ESP32H2_UART, .uart_rx_pin = 17, .uart_tx_pin = 18, .uart_port = 1, .uart_baudrate = 115200,          \
-        .reset_pin = 7, .boot_pin = 8, .update_baudrate = 460800, .firmware_dir = "/rcp_fw/ot_rcp", .target_chip = ESP32H2_CHIP,   \
+        .rcp_type = RCP_TYPE_UART, .uart_rx_pin = 17, .uart_tx_pin = 18, .uart_port = 1, .uart_baudrate = 115200, .reset_pin = 7,  \
+        .boot_pin = 8, .update_baudrate = 460800, .firmware_dir = "/rcp_fw/ot_rcp", .target_chip = ESP32H2_CHIP,                   \
     }
 #endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
 
