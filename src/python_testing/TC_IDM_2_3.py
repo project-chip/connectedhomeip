@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -51,6 +51,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+MAX_NUM_PATHS_IN_MTU = 50
 
 class TC_IDM_2_3(BasicCompositionTests):
 
@@ -60,7 +61,7 @@ class TC_IDM_2_3(BasicCompositionTests):
 
     @property
     def default_timeout(self) -> int:
-        return 600
+        return 5 * 60
 
     def steps_TC_IDM_2_3(self) -> list[TestStep]:
         return [
@@ -100,14 +101,24 @@ class TC_IDM_2_3(BasicCompositionTests):
 
         # Step 1: CapabilityMinima
         self.step(1)
-        capability_minima = await self.read_single_attribute_check_success(
-            cluster=Clusters.BasicInformation,
-            attribute=Clusters.BasicInformation.Attributes.CapabilityMinima
+        cluster_revision = await self.read_single_attribute_check_success(
+            cluster=Clusters.BasicInformation, 
+            attribute=Clusters.BasicInformation.Attributes.ClusterRevision
         )
+        
+        # Default values, used for older cluster revisions where these values aren't specified
+        num_read_paths_supported = 9
+        num_subscribe_paths_supported = 3
 
-        # Extract values, providing defaults if optional fields are missing
-        num_read_paths_supported = capability_minima.readPathsSupported if capability_minima.readPathsSupported is not None else 1
-        num_subscribe_paths_supported = capability_minima.subscribePathsSupported if capability_minima.subscribePathsSupported is not None else 1
+        if cluster_revision >= 6:
+            capability_minima = await self.read_single_attribute_check_success(
+                cluster=Clusters.BasicInformation,
+                attribute=Clusters.BasicInformation.Attributes.CapabilityMinima
+            )
+
+            # Extract values, providing defaults if optional fields are missing
+            num_read_paths_supported = capability_minima.readPathsSupported
+            num_subscribe_paths_supported = capability_minima.subscribePathsSupported
 
         log.info(f"CapabilityMinima: readPathsSupported={num_read_paths_supported}, "
                  f"subscribePathsSupported={num_subscribe_paths_supported}")
@@ -138,31 +149,15 @@ class TC_IDM_2_3(BasicCompositionTests):
             log.info("Conducting read request")
             return await self.default_controller.Read(self.dut_node_id, paths)
 
-        # Read requests must fit into 1 MTU, as reads cannot be chained acrross multiple packets. If a device reports
+        # Read requests must fit into 1 MTU, as reads cannot be chained across multiple packets. If a device reports
         # a number of read paths (or subscription paths) larger than what is possible on the controller side, we need to
-        # reduce the number of paths here to be as much as can fit in the request. This requires some trial and error to
-        # see what size works. AttributePath objects can vary slightly in size, so this isn't a fixed number of paths.
+        # reduce the number of paths here to be as much as can fit in the request. 
         async def conduct_request_with_potential_path_size_reduction(paths, num_paths, request_function):
-            num_paths_reduced = num_paths
-            response = None
-            while num_paths_reduced > 0:
-                try:
-                    paths[:] = paths[:num_paths_reduced]
-                    response = await request_function(paths)
-                except ChipStackError as e:  # chipstack-ok: This check is needed to try and build a request until it's a valid size
-                    # Check for CHIP Error 0x0000000B No memory - Thrown when request is too large for 1 MTU
-                    if e.err == 0x0000000B:
-                        num_paths_reduced -= 1
-                    else:
-                        raise e
-                except Exception as e:
-                    raise e
-                else:
-                    break
-            if num_paths_reduced < num_paths:
-                log.info(
-                    f"Reduced number of paths from maximum reported of {num_paths} to {num_paths_reduced} to fit the request in one MTU")
-            return response
+            # TODO: The maximum here should be adjusted and be based upon the max size
+            # of an AttributePath, as well as the size of the payload for the MTU. See Issue #43083
+            if num_paths>MAX_NUM_PATHS_IN_MTU:
+                paths[:] = paths[:MAX_NUM_PATHS_IN_MTU]
+            return await request_function(paths)
 
         read_response = await conduct_request_with_potential_path_size_reduction(read_paths, num_read_paths_supported, read_request)
         asserts.assert_is_not_none(
@@ -178,6 +173,7 @@ class TC_IDM_2_3(BasicCompositionTests):
             attribute=Clusters.BasicInformation.Attributes.NodeLabel
         )
 
+        # TODO: Should have resilience to a missing node label
         sub_paths = self.get_paths(num_subscribe_paths_supported, all_paths)
         sub_paths[0] = AttributePath(EndpointId=0, ClusterId=Clusters.BasicInformation.id,
                                      AttributeId=Clusters.BasicInformation.Attributes.NodeLabel.attribute_id)
@@ -202,14 +198,6 @@ class TC_IDM_2_3(BasicCompositionTests):
         log.info("Successfully completed subscribe request")
         sub_transaction.SetAttributeUpdateCallback(handler)
 
-        # Manually add the priming report value to the handler's queue.
-        # The priming report was received during the Read call, before the callback was set.
-        handler.attribute_queue.put(AttributeValue(
-            endpoint_id=0,
-            attribute=Clusters.BasicInformation.Attributes.NodeLabel,
-            value=initial_node_label
-        ))
-
         # Write new NodeLabel to trigger a subscription report
         new_label = initial_node_label + "_Updated"
         await self.write_single_attribute(
@@ -220,7 +208,7 @@ class TC_IDM_2_3(BasicCompositionTests):
         # Verify the sequence: [Priming Report (initial), Subscription Update (new)]
         handler.await_sequence_of_reports(
             attribute=Clusters.BasicInformation.Attributes.NodeLabel,
-            sequence=[initial_node_label, new_label],
+            sequence=[new_label],
             timeout_sec=10
         )
 
