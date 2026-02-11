@@ -23,12 +23,13 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Access;
 
-using Entry            = AccessControl::Entry;
-using EntryListener    = AccessControl::EntryListener;
-using StagingAuthMode  = Clusters::AccessControl::AccessControlEntryAuthModeEnum;
-using StagingPrivilege = Clusters::AccessControl::AccessControlEntryPrivilegeEnum;
-using StagingTarget    = Clusters::AccessControl::Structs::AccessControlTargetStruct::Type;
-using Target           = AccessControl::Entry::Target;
+using Entry                  = AccessControl::Entry;
+using EntryListener          = AccessControl::EntryListener;
+using StagingAuthMode        = Clusters::AccessControl::AccessControlEntryAuthModeEnum;
+using StagingPrivilege       = Clusters::AccessControl::AccessControlEntryPrivilegeEnum;
+using StagingAuxiliaryType   = Clusters::AccessControl::AccessControlAuxiliaryTypeEnum;
+using StagingTarget          = Clusters::AccessControl::Structs::AccessControlTargetStruct::Type;
+using Target                 = AccessControl::Entry::Target;
 
 namespace {
 
@@ -119,6 +120,38 @@ CHIP_ERROR Convert(StagingPrivilege from, Privilege & to)
         break;
     case StagingPrivilege::kAdminister:
         to = Privilege::kAdminister;
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Convert(AuxiliaryType from, StagingAuxiliaryType & to)
+{
+    switch (from)
+    {
+    case AuxiliaryType::kSystem:
+        to = StagingAuxiliaryType::kSystem;
+        break;
+    case AuxiliaryType::kGroupcast:
+        to = StagingAuxiliaryType::kGroupcast;
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Convert(StagingAuxiliaryType from, AuxiliaryType & to)
+{
+    switch (from)
+    {
+    case StagingAuxiliaryType::kSystem:
+        to = AuxiliaryType::kSystem;
+        break;
+    case StagingAuxiliaryType::kGroupcast:
+        to = AuxiliaryType::kGroupcast;
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -248,6 +281,13 @@ CHIP_ERROR AclStorage::DecodableEntry::Unstage()
         ReturnErrorOnFailure(mEntry.SetAuthMode(authMode));
     }
 
+    if (mStagingEntry.auxiliaryType.HasValue())
+    {
+        AuxiliaryType auxiliaryType;
+        ReturnErrorOnFailure(Convert(mStagingEntry.auxiliaryType.Value(), auxiliaryType));
+        ReturnErrorOnFailure(mEntry.SetAuxiliaryType(auxiliaryType));
+    }
+
     if (!mStagingEntry.subjects.IsNull())
     {
         auto iterator = mStagingEntry.subjects.Value().begin();
@@ -304,6 +344,14 @@ CHIP_ERROR AclStorage::EncodableEntry::Stage() const
         AuthMode authMode;
         ReturnErrorOnFailure(mEntry.GetAuthMode(authMode));
         ReturnErrorOnFailure(Convert(authMode, mStagingEntry.authMode));
+    }
+
+    {
+        AuxiliaryType auxiliaryType;
+        ReturnErrorOnFailure(mEntry.GetAuxiliaryType(auxiliaryType));
+        StagingAuxiliaryType stagingAuxiliaryType;
+        ReturnErrorOnFailure(Convert(auxiliaryType, stagingAuxiliaryType));
+        mStagingEntry.auxiliaryType.SetValue(stagingAuxiliaryType);
     }
 
     {

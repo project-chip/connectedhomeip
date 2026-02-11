@@ -23,7 +23,9 @@
 
 #include "AccessControl.h"
 
+#include <credentials/GroupDataProvider.h>
 #include <lib/core/Global.h>
+#include <lib/support/TypeTraits.h>
 
 #include <credentials/GroupDataProvider.h>
 
@@ -171,6 +173,18 @@ char GetPrivilegeStringForLogging(Privilege privilege)
         return 'm';
     case Privilege::kAdminister:
         return 'a';
+    }
+    return 'u';
+}
+
+char GetAuxiliaryTypeStringForLogging(AuxiliaryType auxiliaryType)
+{
+    switch (auxiliaryType)
+    {
+    case AuxiliaryType::kSystem:
+        return 's';
+    case AuxiliaryType::kGroupcast:
+        return 'g';
     }
     return 'u';
 }
@@ -325,6 +339,102 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
             return;
         }
     }
+}
+
+class AuxiliaryEntryIteratorDelegate : public AccessControl::EntryIterator::Delegate
+{
+public:
+    AuxiliaryEntryIteratorDelegate(Credentials::GroupDataProvider & groupDataProvider, FabricIndex fabric) :
+        mGroupDataProvider(groupDataProvider), mFabric(fabric)
+    {
+        mGroupInfoIterator = mGroupDataProvider.IterateGroupInfo(mFabric);
+    }
+
+    ~AuxiliaryEntryIteratorDelegate() override
+    {
+        if (mGroupInfoIterator)
+        {
+            mGroupInfoIterator->Release();
+        }
+        if (mEndpointIterator)
+        {
+            mEndpointIterator->Release();
+        }
+    }
+
+    CHIP_ERROR Next(AccessControl::Entry & entry) override
+    {
+        while (mGroupInfoIterator != nullptr || mEndpointIterator != nullptr)
+        {
+            if (mEndpointIterator != nullptr)
+            {
+                Credentials::GroupDataProvider::GroupEndpoint endpoint;
+                if (mEndpointIterator->Next(endpoint))
+                {
+                    ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
+                    ReturnErrorOnFailure(entry.SetFabricIndex(mFabric));
+                    ReturnErrorOnFailure(entry.SetPrivilege(Privilege::kOperate));
+                    ReturnErrorOnFailure(entry.SetAuthMode(AuthMode::kGroup));
+                    ReturnErrorOnFailure(entry.SetAuxiliaryType(AuxiliaryType::kGroupcast));
+                    ReturnErrorOnFailure(entry.AddSubject(nullptr, NodeIdFromGroupId(mGroupId)));
+                    AccessControl::Entry::Target target;
+                    target.flags    = AccessControl::Entry::Target::kEndpoint;
+                    target.endpoint = endpoint.endpoint_id;
+                    ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+                    return CHIP_NO_ERROR;
+                }
+                mEndpointIterator->Release();
+                mEndpointIterator = nullptr;
+            }
+
+            if (mGroupInfoIterator != nullptr)
+            {
+                Credentials::GroupDataProvider::GroupInfo info;
+                if (mGroupInfoIterator->Next(info))
+                {
+                    if (info.flags & to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL))
+                    {
+                        mGroupId          = info.group_id;
+                        mEndpointIterator = mGroupDataProvider.IterateEndpoints(mFabric, mGroupId);
+                    }
+                }
+                else
+                {
+                    mGroupInfoIterator->Release();
+                    mGroupInfoIterator = nullptr;
+                }
+            }
+        }
+
+        return CHIP_ERROR_SENTINEL;
+    }
+
+private:
+    Credentials::GroupDataProvider & mGroupDataProvider;
+    FabricIndex mFabric;
+    Credentials::GroupDataProvider::GroupInfoIterator * mGroupInfoIterator = nullptr;
+    Credentials::GroupDataProvider::EndpointIterator * mEndpointIterator   = nullptr;
+    GroupId mGroupId                                                       = kUndefinedGroupId;
+};
+
+CHIP_ERROR AccessControl::AuxiliaryEntries(FabricIndex fabric, EntryIterator & iterator) const
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+    if (mGroupDataProvider)
+    {
+        auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>(*mGroupDataProvider, fabric);
+        if (delegate)
+        {
+            iterator.SetDelegate(*delegate);
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_NO_MEMORY;
+    } else {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 bool AccessControl::IsAccessRestrictionListSupported() const
@@ -591,6 +701,12 @@ CHIP_ERROR AccessControl::Dump(const Entry & entry)
     }
 
     {
+        AuxiliaryType auxiliaryType;
+        SuccessOrExit(err = entry.GetAuxiliaryType(auxiliaryType));
+        ChipLogDetail(DataManagement, "auxiliaryType: %d", to_underlying(auxiliaryType));
+    }
+
+    {
         size_t count;
         SuccessOrExit(err = entry.GetSubjectCount(count));
         if (count)
@@ -651,6 +767,7 @@ bool AccessControl::Entry::IsValid() const
     AuthMode authMode       = AuthMode::kNone;
     FabricIndex fabricIndex = kUndefinedFabricIndex;
     Privilege privilege     = static_cast<Privilege>(0);
+    AuxiliaryType auxiliaryType;
     size_t subjectCount     = 0;
     size_t targetCount      = 0;
 
@@ -658,13 +775,14 @@ bool AccessControl::Entry::IsValid() const
     SuccessOrExit(err = GetAuthMode(authMode));
     SuccessOrExit(err = GetFabricIndex(fabricIndex));
     SuccessOrExit(err = GetPrivilege(privilege));
+    SuccessOrExit(err = GetAuxiliaryType(auxiliaryType));
     SuccessOrExit(err = GetSubjectCount(subjectCount));
     SuccessOrExit(err = GetTargetCount(targetCount));
 
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
-    ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c s=%d t=%d", fabricIndex,
-                    GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode), static_cast<int>(subjectCount),
-                    static_cast<int>(targetCount));
+    ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c x=%d s=%d t=%d", fabricIndex,
+                    GetPrivilegeStringForLogging(privilege), GetAuthModeStringForLogging(authMode),
+                    GetAuxiliaryTypeStringForLogging(auxiliaryType), static_cast<int>(subjectCount), static_cast<int>(targetCount));
 #endif // CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
 
     // Fabric index must be defined.

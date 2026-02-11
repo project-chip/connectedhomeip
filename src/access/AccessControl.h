@@ -27,6 +27,7 @@
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
+#include "AuxiliaryType.h"
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Global.h>
@@ -36,6 +37,10 @@
 #define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
 
 namespace chip {
+namespace Credentials {
+class GroupDataProvider;
+}
+
 namespace Access {
 
 class AccessControl
@@ -88,11 +93,13 @@ public:
             virtual CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR GetPrivilege(Privilege & privilege) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Simple setters
             virtual CHIP_ERROR SetAuthMode(AuthMode authMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR SetPrivilege(Privilege privilege) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Subjects
             virtual CHIP_ERROR GetSubjectCount(size_t & count) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -133,11 +140,13 @@ public:
         CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return mDelegate->GetAuthMode(authMode); }
         CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return mDelegate->GetFabricIndex(fabricIndex); }
         CHIP_ERROR GetPrivilege(Privilege & privilege) const { return mDelegate->GetPrivilege(privilege); }
+        CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const { return mDelegate->GetAuxiliaryType(auxiliaryType); }
 
         // Simple setters
         CHIP_ERROR SetAuthMode(AuthMode authMode) { return mDelegate->SetAuthMode(authMode); }
         CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return mDelegate->SetFabricIndex(fabricIndex); }
         CHIP_ERROR SetPrivilege(Privilege privilege) { return mDelegate->SetPrivilege(privilege); }
+        CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) { return mDelegate->SetAuxiliaryType(auxiliaryType); }
 
         /**
          * Gets the number of subjects.
@@ -634,6 +643,14 @@ public:
         return mDelegate->Entries(iterator, fabricIndex);
     }
 
+    /**
+     * Iterates over auxiliary entries for the given fabric.
+     *
+     * @param [in]  fabric   Fabric for which to iterate auxiliary entries.
+     * @param [out] iterator Iterator controlling the iteration.
+     */
+    CHIP_ERROR AuxiliaryEntries(FabricIndex fabric, EntryIterator & iterator) const;
+
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
 
@@ -649,6 +666,13 @@ public:
 
     AccessRestrictionProvider * GetAccessRestrictionProvider() { return mAccessRestrictionProvider; }
 #endif
+
+    void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider)
+    {
+        mGroupDataProvider = groupDataProvider;
+    }
+
+    Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
 
     /**
      * Check whether or not Access Restriction List is supported.
@@ -698,6 +722,8 @@ private:
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 
     EntryListener * mEntryListener = nullptr;
+
+    Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     AccessRestrictionProvider * mAccessRestrictionProvider;

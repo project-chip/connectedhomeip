@@ -325,6 +325,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
+    mAccessControl.SetGroupDataProvider(mGroupsProvider);
 
     mReportScheduler = initParams.reportScheduler;
 

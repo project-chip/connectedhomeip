@@ -46,8 +46,8 @@ public:
         Access::AccessControl & accessControl;
     };
 
-    constexpr AccessControlCluster(const Context & context) :
-        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)), mClusterContext(context)
+    constexpr AccessControlCluster(BitFlags<AccessControl::Feature> featureFlags, const Context & context) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)), mFeatureFlags(featureFlags), mClusterContext(context)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -94,6 +94,7 @@ private:
 #endif
 
     Context mClusterContext;
+    BitFlags<AccessControl::Feature> mFeatureFlags;
 };
 
 } // namespace Clusters

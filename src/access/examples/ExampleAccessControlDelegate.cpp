@@ -37,6 +37,7 @@ using chip::kUndefinedNodeId;
 
 using chip::Access::AccessControl;
 using chip::Access::AuthMode;
+using chip::Access::AuxiliaryType;
 using chip::Access::Privilege;
 using chip::Access::RequestPath;
 using chip::Access::SubjectDescriptor;
@@ -410,10 +411,11 @@ public:
 
     void Clear()
     {
-        mInUse       = false;
-        mFabricIndex = chip::kUndefinedFabricIndex;
-        mAuthMode    = AuthMode::kPase;
-        mPrivilege   = Privilege::kView;
+        mInUse         = false;
+        mFabricIndex   = chip::kUndefinedFabricIndex;
+        mAuthMode      = AuthMode::kPase;
+        mPrivilege     = Privilege::kView;
+        mAuxiliaryType = AuxiliaryType::kSystem;
         for (auto & subject : mSubjects)
         {
             subject.Clear();
@@ -485,6 +487,7 @@ public:
     FabricIndex mFabricIndex;
     AuthMode mAuthMode;
     Privilege mPrivilege;
+    AuxiliaryType mAuxiliaryType;
     SubjectStorage mSubjects[kMaxSubjects];
     TargetStorage mTargets[kMaxTargets];
 };
@@ -544,6 +547,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const override
+    {
+        auxiliaryType = mStorage->mAuxiliaryType;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR SetAuthMode(AuthMode authMode) override
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
@@ -562,6 +571,13 @@ public:
     {
         ReturnErrorOnFailure(EnsureStorageInPool());
         mStorage->mPrivilege = privilege;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) override
+    {
+        ReturnErrorOnFailure(EnsureStorageInPool());
+        mStorage->mAuxiliaryType = auxiliaryType;
         return CHIP_NO_ERROR;
     }
 

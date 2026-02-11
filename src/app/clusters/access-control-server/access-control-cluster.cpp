@@ -84,6 +84,27 @@ CHIP_ERROR ReadAcl(FabricTable & fabricTable, Access::AccessControl & accessCont
     });
 }
 
+CHIP_ERROR ReadAuxiliaryAcl(FabricTable & fabricTable, Access::AccessControl & accessControl, AttributeValueEncoder & aEncoder)
+{
+    AccessControl::EntryIterator iterator;
+    AccessControl::Entry entry;
+    AclStorage::EncodableEntry encodableEntry(entry);
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        for (auto & info : fabricTable)
+        {
+            auto fabric = info.GetFabricIndex();
+            ReturnErrorOnFailure(accessControl.AuxiliaryEntries(fabric, iterator));
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            while ((err = iterator.Next(entry)) == CHIP_NO_ERROR)
+            {
+                ReturnErrorOnFailure(encoder.Encode(encodableEntry));
+            }
+            VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_SENTINEL, err);
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 CHIP_ERROR IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list)
 {
     auto validationIterator = list.begin();
@@ -469,6 +490,8 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     {
     case AccessControl::Attributes::Acl::Id:
         return ReadAcl(mClusterContext.fabricTable, mClusterContext.accessControl, encoder);
+    case AccessControl::Attributes::AuxiliaryACL::Id:
+        return ReadAuxiliaryAcl(mClusterContext.fabricTable, mClusterContext.accessControl, encoder);
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case AccessControl::Attributes::Extension::Id:
         return ReadExtension(mClusterContext.persistentStorage, mClusterContext.fabricTable, encoder);
@@ -527,8 +550,8 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
 
-#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS || CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
+        { .enabled = mFeatureFlags.Has(Feature::kAuxiliary), .metadata = Attributes::AuxiliaryACL::kMetadataEntry},
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
         { .enabled = true, .metadata = Attributes::Extension::kMetadataEntry },
 #endif
@@ -539,9 +562,6 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
     };
 
     return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), Span(kOptionalAttributes));
-#else
-    return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), {});
-#endif
 }
 
 CHIP_ERROR AccessControlCluster::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
