@@ -324,14 +324,14 @@ class IsolatedNetworkNamespace:
             self.terminate()
             raise
 
-    def netns_for_subprocess_kind(self, kind: SubprocessKind) -> str:
+    def netns_for_subprocess_kind(self, kind: SubprocessKind) -> NetworkNamespace:
         match kind:
             case SubprocessKind.APP:
-                return self.app_ns.name
+                return self.app_ns
             case SubprocessKind.CTRL:
-                return self.ctrl_ns.name
+                return self.ctrl_ns
             case _:
-                raise ValueError("Unknown subprocess kind.")
+                raise ValueError(f"Subprocess kind {kind} doesn't map to a network namespace.")
 
     def terminate(self):
         """Execute all down commands in reverse order, gracefully omitting errors."""
@@ -349,7 +349,12 @@ class LinuxNamespacedExecutor(Executor):
 
     def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
             stderr: IO[Any] | LogPipe | None = None):
-        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
+        try:
+            subprocess_ns = self.ns.netns_for_subprocess_kind(subproc.kind)
+            wrapped = subproc.wrap_with(*shlex.split(subprocess_ns.netns_cmd_wrapper))
+        except ValueError as e:
+            log.warning("%s", e)
+            wrapped = subproc
         return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
 
 
