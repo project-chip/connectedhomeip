@@ -303,6 +303,8 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     VerifyOrExit(failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
 
+    VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+
     VerifyOrExit(jointFabricAdministrator.WasVidVerificationExecutedForFabric(ctx.mCommandHandler.GetAccessingFabricIndex()),
                  status.Emplace(StatusCodeEnum::kVIDNotVerified));
 
@@ -310,8 +312,6 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
                      Status::Success,
                  nonDefaultStatus = Status::Failure);
     VerifyOrExit(!administratorFabricIndex.IsNull(), status.Emplace(StatusCodeEnum::kInvalidAdministratorFabricIndex));
-
-    VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
 
     VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
     VerifyOrExit(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr) == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
