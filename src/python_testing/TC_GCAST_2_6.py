@@ -35,15 +35,17 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import math
+import random
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
+from TC_GCAST_common import get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -52,22 +54,21 @@ logger = logging.getLogger(__name__)
 
 class TC_GCAST_2_6(MatterBaseTest):
     def desc_TC_GCAST_2_6(self):
-        return "[TC-GCAST-2.6] ConfigureAuxiliaryACL (Listener feature) with DUT as Server - PROVISIONAL"
+        return "[TC-GCAST-2.6] Capacity & MaxMembershipCount enforcement with DUT as Server - PROVISIONAL"
 
     def steps_TC_GCAST_2_6(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
-            TestStep("1b", "TH removes any existing group and KeyID on the DUT."),
-            TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s."),
-            TestStep(
-                "1d", "Join group G1 generating a new KeyID K1 with Key InputKey1: TH sends command JoinGroup (GroupID=G1, Endpoints=[EP1], KeyID=K1, Key=InputKey1)."),
-            TestStep(2, "Enable Auxiliary ACL on group G1: TH sends command ConfigureAuxiliaryACL (GroupID=G1, Enable=true)."),
-            TestStep(3, "TH awaits subscription report of new Membership within max interval."),
-            TestStep(4, "Disable Auxiliary ACL on group G1: TH sends command ConfigureAuxiliaryACL (GroupID=G1, Enable=false)."),
-            TestStep(5, "TH awaits subscription report of new Membership within max interval."),
-            TestStep(6, "Attempt to enable Auxiliary ACL on a unknown GroupId: TH sends command ConfigureAuxiliaryACL (GroupID=G_UNKNOWN, Enable=true)."),
-            TestStep(7, "If GCAST.S.F01(SD) feature is supported on the cluster, join group G2 as Sender: TH sends command JoinGroup (GroupID=G2, Endpoints=[],KeyId=K1) to join group as sender only."),
-            TestStep(8, "If GCAST.S.F01(SD) feature is supported on the cluster, attempt to enable Auxiliary ACL on group G2: TH sends command ConfigureAuxiliaryACL (GroupID=G2, Enable=true) on Sender-only membership"),
+            TestStep("1b", "Commission DUT to TH2 (can be skipped if done in a preceding test)"),
+            TestStep("1c", "TH removes any existing group and KeySetID on the DUT"),
+            TestStep(2, "Join group G1 generating a new key. JoinGroup (GroupID=G1, Endpoints='see notes', KeySetID=K1, Key=InputKey1)"),
+            TestStep(3, "Iteratively Join groups, using a new GroupId and assigning KeySetID K1 every time until group count on fabric F1 = floor(M_max/2). JoinGroup (GroupID=Gn, Endpoints='see notes', KeySetID=K1)"),
+            TestStep(4, "Attempt to join 1 additional group. JoinGroup (GroupID=Gn+1, Endpoints='see notes', KeySetID=K1)"),
+            TestStep(5, "Leave one group. LeaveGroup (GroupID=Gn)"),
+            TestStep(6, "Repeat Step 4. JoinGroup (GroupID=Gn+1, Endpoints='see notes', KeySetID=K1)"),
+            TestStep(7, "On F2, join group G1 generating a new key. TH2 sends command JoinGroup (GroupID=G1, Endpoints='see notes', KeySetID=K1, Key=InputKey1)"),
+            TestStep(8, "On F2, iteratively Join groups using a new GroupId and assigning KeySetID K1 every time until the total group count combining all DUT groups on both fabrics = M_max. TH2 sends command JoinGroup (GroupID=Gi, Endpoints='see notes', KeySetID=K1)"),
+            TestStep(9, "On F2, attempt to join 1 additional group. TH2 sends command JoinGroup (GroupID=Gi+1, Endpoints='see notes', KeySetID=K1)"),
         ]
 
     def pics_TC_GCAST_2_6(self) -> list[str]:
@@ -76,90 +77,122 @@ class TC_GCAST_2_6(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_6(self):
         groupcast_cluster = Clusters.Objects.Groupcast
-        membership_attribute = Clusters.Groupcast.Attributes.Membership
+        max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
 
         self.step("1a")
-        ln_enabled, sd_enabled = await get_feature_map(self)
-        if not ln_enabled:
-            logger.info("Listener feature is not enabled, skip remaining steps.")
-            self.mark_all_remaining_steps_skipped("1b")
+        ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        endpoints_list = [endpoints_list[0]]
+        if len(endpoints_list) > 1:
+            endpoints_list = endpoints_list[:2]
+
+        M_max = await self.read_single_attribute_check_success(groupcast_cluster, max_membership_count_attribute)
+        asserts.assert_true(M_max >= 10, "MaxMembershipCount attribute should be >= 10")
 
         self.step("1b")
-        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        self.th1 = self.default_controller
+        self.discriminatorTH2 = random.randint(0, 4095)
+        # Create TH2 controller
+        th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+
+        # Open commissioning window on TH1
+        params = await self.th1.OpenCommissioningWindow(
+            nodeId=self.dut_node_id,
+            timeout=900,
+            iteration=1000,
+            discriminator=self.discriminatorTH2,
+            option=1
+        )
+
+        # Commission TH2
+        await self.th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.discriminatorTH2
+        )
 
         self.step("1c")
-        sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
-        await sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
+        groupID0 = 0
+        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=groupID0))
 
-        self.step("1d")
+        self.step(2)
         groupID1 = 1
-        keyID1 = 1
+        keySetID1 = 1
         inputKey1 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
             endpoints=endpoints_list,
-            keyID=keyID1,
+            keySetID=keySetID1,
             key=inputKey1)
         )
 
-        self.step(2)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(
-            groupID=groupID1,
-            ConfigureAuxiliaryACL=True)
-        )
-
         self.step(3)
-        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl="true")
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+        f1MaxMembershipCount = math.floor(M_max / 2)
+        for membership in range(1, f1MaxMembershipCount):
+            groupID = membership + 1
+
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID,
+                endpoints=endpoints_list,
+                keySetID=keySetID1)
+            )
 
         self.step(4)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(
-            groupID=groupID1,
-            ConfigureAuxiliaryACL=False)
-        )
+        groupIDExhausted = f1MaxMembershipCount + 1
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupIDExhausted,
+                endpoints=endpoints_list,
+                keySetID=keySetID1)
+            )
+            asserts.fail("JoinGroup command should have failed with ResourceExhausted, but it succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ResourceExhausted,
+                                 f"Send JoinGroup command error should be {Status.ResourceExhausted} instead of {e.status}")
 
         self.step(5)
-        sub.reset()
-        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl="false")
-        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=f1MaxMembershipCount))
 
         self.step(6)
-        try:
-            groupIDUnknown = 2
-            await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(
-                groupID=groupIDUnknown,
-                ConfigureAuxiliaryACL=True)
-            )
-            asserts.fail("ConfigureAuxiliaryACL command should have failed with an unknown GroupID, but it succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Send ConfigureAuxiliaryACL command error should be {Status.NotFound} instead of {e.status}")
-
-        if not sd_enabled:
-            self.mark_all_remaining_steps_skipped("7")
+        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+            groupID=f1MaxMembershipCount,
+            endpoints=endpoints_list,
+            keySetID=keySetID1)
+        )
 
         self.step(7)
-        groupID2 = 2
-        endpoints = []
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID2,
-            endpoints=endpoints,
-            keyID=keyID1)
+        await self.send_single_cmd(dev_ctrl=self.th2, cmd=Clusters.Groupcast.Commands.JoinGroup(
+            groupID=groupID1,
+            endpoints=endpoints_list,
+            keySetID=keySetID1,
+            key=inputKey1)
         )
 
         self.step(8)
-        try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(
-                groupID=groupID2,
-                useAuxiliaryACL=True)
+        for membership in range(f1MaxMembershipCount + 1, M_max):
+            groupID = membership + 1
+
+            await self.send_single_cmd(dev_ctrl=self.th2, cmd=Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID,
+                endpoints=endpoints_list,
+                keySetID=keySetID1)
             )
-            asserts.fail("ConfigureAuxiliaryACL command should have failed with on Sender only, but it succeeded.")
+
+        self.step(9)
+        groupIDExhausted = M_max + 1
+        try:
+            await self.send_single_cmd(dev_ctrl=self.th2, cmd=Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupIDExhausted,
+                endpoints=endpoints_list,
+                keySetID=keySetID1)
+            )
+            asserts.fail("JoinGroup command should have failed with ResourceExhausted, but it succeeded")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure,
-                                 f"Send ConfigureAuxiliaryACL command error should be {Status.Failure} instead of {e.status}")
+            asserts.assert_equal(e.status, Status.ResourceExhausted,
+                                 f"Send JoinGroup command error should be {Status.ResourceExhausted} instead of {e.status}")
 
 
 if __name__ == "__main__":

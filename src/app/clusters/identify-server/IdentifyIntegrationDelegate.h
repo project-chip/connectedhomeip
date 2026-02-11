@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2024-2025 NXP
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,24 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#if CONFIG_CHIP_CRYPTO_PSA
-#define MBEDTLS_PSA_CRYPTO_DRIVERS
-#endif /* CONFIG_CHIP_CRYPTO_PSA */
+namespace chip::app::Clusters {
 
-#if CONFIG_MCUX_ELS_PKC
+/// Provides information for code that requires information about whether a device
+/// is currently actively identifying or not.
+///
+/// This is separated out from the cluster itself, so that unit testing is
+/// easier (easier mocking) and integration points are clearer.
+class IdentifyIntegrationDelegate
+{
+public:
+    virtual ~IdentifyIntegrationDelegate() = default;
+    virtual bool IsIdentifying()           = 0;
+};
 
-#define MBEDTLS_CIPHER_PADDING_PKCS7
-
-#if CONFIG_WIFI_NXP
-#include "wpa_supp_els_pkc_mbedtls_config.h"
-#endif /* CONFIG_WIFI_NXP && CONFIG_WPA_SUPP */
-
-#if CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC
-#define PSA_CRYPTO_DRIVER_ELS_PKC
-#endif /* CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC */
-
-#endif /* CONFIG_MCUX_ELS_PKC */
-
-#undef MBEDTLS_MD4_C
-#undef MBEDTLS_ARC4_C
+} // namespace chip::app::Clusters

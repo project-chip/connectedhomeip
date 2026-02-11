@@ -26,6 +26,7 @@
 #include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 
 #include <algorithm>
 
@@ -44,7 +45,8 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
                                                                    OptionalAttributesSet optionalAttributes,
                                                                    const StartupConfiguration & config) :
     DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
-    mFeatures(features), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
+    mFeatures(features.Set(Feature::kFaultEvents)),
+    mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
         // constructs the attribute set, that once constructed stays const
         AttributeSet enabledOptionalAttributes;
 

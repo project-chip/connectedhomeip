@@ -136,6 +136,12 @@ declare_args() {
   # and the supplicant can support.
   chip_device_config_enable_wifipaf =
       chip_enable_wifi && chip_device_platform == "linux"
+
+  # Disable Thread MeshCoP if cross-compiling by default.
+  chip_device_config_enable_thread_meshcop =
+      chip_device_platform == "linux" &&
+      chip_system_config_use_openthread_inet_endpoints &&
+      current_cpu == host_cpu && current_os == host_os
 }
 
 declare_args() {

@@ -1941,13 +1941,60 @@ endpoint 1 {
   }
 
   server cluster Switch {
-    emits event SwitchLatched;
-    persist  attribute numberOfPositions default = 5;
-    persist  attribute currentPosition default = 0;
+    emits event InitialPress;
+    emits event LongPress;
+    emits event ShortRelease;
+    emits event LongRelease;
+    emits event MultiPressOngoing;
+    emits event MultiPressComplete;
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition default = 0;
+    ram      attribute multiPressMax default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 30;
+    ram      attribute clusterRevision default = 2;
+  }
+}
+endpoint 2 {
+  device type ma_genericswitch = 15, version 1;
+
+
+  server cluster Identify {
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Identify;
+    handle command TriggerEffect;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute tagList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Switch {
+    emits event InitialPress;
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 2;
   }
 }

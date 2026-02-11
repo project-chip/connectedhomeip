@@ -646,7 +646,7 @@ void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
     for (auto & pavst : mTransportMap)
     {
         int connectionId = pavst.first;
-        ChipLogError(Camera, "PushAV sending trigger to connection ID %d", connectionId);
+        ChipLogProgress(Camera, "PushAV sending trigger to connection ID %d", connectionId);
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {

@@ -17,6 +17,7 @@
 #include <app/EventLogging.h>
 #include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/BooleanState/Enums.h>
 #include <clusters/BooleanState/Metadata.h>
 
 namespace chip::app::Clusters {
@@ -37,7 +38,7 @@ DataModel::ActionReturnStatus BooleanStateCluster::ReadAttribute(const DataModel
     case ClusterRevision::Id:
         return encoder.Encode(BooleanState::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode<uint32_t>(0);
+        return encoder.Encode(BooleanState::Feature::kChangeEvent);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

@@ -466,6 +466,8 @@ class TestDefinition:
             ble_controller_app: int | None = None,
             ble_controller_tool: int | None = None,
             op_network: str = 'WiFi',
+            thread_ba_host: str | None = None,
+            thread_ba_port: int | None = None,
             ):
         """
         Executes the given test case using the provided runner for execution.
@@ -474,14 +476,16 @@ class TestDefinition:
         for target in self.targets:
             log.info('Executing %s::%s', self.name, target.name)
             self._RunImpl(target, runner, apps_register, subproc_info_repo, pics_file, timeout_seconds, dry_run,
-                          test_runtime, ble_controller_app, ble_controller_tool, op_network)
+                          test_runtime, ble_controller_app, ble_controller_tool, op_network, thread_ba_host, thread_ba_port)
 
     def _RunImpl(self, target: TestTarget, runner: Runner, apps_register: AppsRegister, subproc_info_repo: SubprocessInfoRepo,
                  pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
                  test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
                  ble_controller_app: int | None = None,
                  ble_controller_tool: int | None = None,
-                 op_network: str = 'WiFi'):
+                 op_network: str = 'WiFi',
+                 thread_ba_host: str | None = None,
+                 thread_ba_port: int | None = None):
         runner.capture_delegate = ExecutionCapture()
 
         tool_storage_dir = None
@@ -503,13 +507,13 @@ class TestDefinition:
                         for arg in target.arguments:
                             subproc = subproc.with_args(arg)
 
-                    if ble_controller_app is not None:
+                    if op_network == 'Thread':
+                        # The node id must not conflict with ThreadBorderRouter.NODE_ID
+                        subproc = subproc.with_args("--thread-node-id=2")
+                    elif ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(ble_controller_app))
                         if op_network == 'WiFi':
                             subproc = subproc.with_args("--wifi")
-                        elif op_network == 'Thread':
-                            # The node id must not conflict with ThreadBorderRouter.NODE_ID
-                            subproc = subproc.with_args("--thread-node-id=2")
 
                     app = App(runner, subproc)
                     # Add the App to the register immediately, so if it fails during
@@ -570,6 +574,10 @@ class TestDefinition:
                         pairing_cmd = pairing_cmd.with_args(
                             "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", TEST_SETUP_QR_CODE)
                         pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                elif op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
+                    pairing_cmd = pairing_cmd.with_args(
+                        "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
+                        "--thread-ba-host", thread_ba_host, "--thread-ba-port", str(thread_ba_port))
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 

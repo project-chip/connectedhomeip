@@ -34,7 +34,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import secrets
 
@@ -53,26 +52,25 @@ logger = logging.getLogger(__name__)
 
 class TC_GCAST_2_3(MatterBaseTest):
     def desc_TC_GCAST_2_3(self):
-        return "[TC-GCAST-2.3] Key rotation using UpdateGroupKey with GracePeriod with DUT as Server - PROVISIONAL"
+        return "[TC-GCAST-2.3] UpdateGroupKey KeySetID assignment and key creation with DUT as Server - PROVISIONAL"
 
     def steps_TC_GCAST_2_3(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
-            TestStep("1b", "TH removes any existing group and KeyID on the DUT"),
+            TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
-            TestStep("1d", "Join Group G1 generating a new Key with KeyID K1 using JoinGroup"),
-            TestStep("1e", "Join Group G2 generating a new Key with KeyID K2 using JoinGroup"),
-            TestStep(2, "Update Group G1 with a new KeyID K3 with a grace period for K1 using UpdateGroupKey"),
-            TestStep(3, "TH awaits subscription report showing KeyID=K3, ExpiringKeyID=K1 for G1"),
-            TestStep(4, "Update Group G2 generating a new Key with KeyId=ExpiringKeyID K1 (should fail)"),
-            TestStep(5, "TH Wait GracePeriod(GP) + tolerance (+10%)"),
-            TestStep(6, "TH awaits subscription report showing no ExpiringKeyID; only KeyID=K3 remains for G1"),
-            TestStep(7, "Repeat Step 4, It SHALL now succeed: Update Group G2 with KeyID=K1"),
-            TestStep(8, "Update Group G1 generating a new Key for an existing KeyID K2 (should fail)"),
-            TestStep(9, "Update Group G1 with a new KeyID K4 without providing an InputKey (should fail)"),
-            TestStep(10, "Update Group G1 generating a new KeyID K4 with invalid Key length (should fail)"),
-            TestStep(11, "Update Group G1 generating a new KeyID K4 with GracePeriod exceeding limit (should fail)"),
-            TestStep(12, "Update Group G1 with KeyID already used by another group. "),
+            TestStep("1d", "Join Group G1 generating a new Key with KeySetID K1 using JoinGroup"),
+            TestStep("1e", "Join Group G2 generating a new Key with KeySetID K2 using JoinGroup"),
+            TestStep(2, "Update Group G1 to use a new KeySetID K3 and create it by providing a Key: TH sends command UpdateGroupKey (GroupID=G1, KeySetID=K3, Key=InputKey3)"),
+            TestStep(3, "TH awaits subscription report showing KeySetID=K3 for G1"),
+            TestStep(4, "Update Group G2 generating a new key with an existing KeySetID K1. UpdateGroupKey (GroupID=G2, KeySetID=K1, Key=InputKey4)"),
+            TestStep(5, "Update Group G2 to use an existing KeySetID K1 without providing a Key. UpdateGroupKey (GroupID=G2, KeySetID=K1, Key omitted)"),
+            TestStep(6, "TH awaits subscription report showing new Membership within max interval. (G2 shows KeySetID=K1)"),
+            TestStep(7, "Update Group G1 to use a non-existent KeySetID K4 without providing a Key. UpdateGroupKey (GroupID=G1, KeySetID=K4, Key omitted)"),
+            TestStep(8, "Update Group G_UNKNOWN. (UpdateGroupKey GroupID=G_UNKNOWN, KeySetID=K4, Key=InputKey4)"),
+            TestStep(9, "Update Group G1 with invalid Key length. (UpdateGroupKey GroupID=G1, KeySetID=K4, Key= Input with length !=16)"),
+            TestStep(10, "Update Group G1 to use KeySetID already used by another group. (UpdateGroupKey (GroupID=G1, KeySetID=K1, Key omitted)"),
+            TestStep(11, "TH awaits subscription report showing new Membership within max interval. (G1 shows KeySetID=K1)"),
         ]
 
     def pics_TC_GCAST_2_3(self) -> list[str]:
@@ -84,7 +82,7 @@ class TC_GCAST_2_3(MatterBaseTest):
         membership_attribute = Clusters.Groupcast.Attributes.Membership
 
         self.step("1a")
-        ln_enabled, sd_enabled = await get_feature_map(self)
+        ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
         endpoints_list = [endpoints_list[0]]
 
@@ -97,42 +95,40 @@ class TC_GCAST_2_3(MatterBaseTest):
 
         self.step("1d")
         groupID1 = 1
-        keyID1 = 1
+        keySetID1 = 1
         inputKey1 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
             endpoints=endpoints_list,
-            keyID=keyID1,
+            keySetID=keySetID1,
             key=inputKey1)
         )
 
         self.step("1e")
         groupID2 = 2
-        keyID2 = 2
+        keySetID2 = 2
         inputKey2 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID2,
             endpoints=endpoints_list,
-            keyID=keyID2,
+            keySetID=keySetID2,
             key=inputKey2)
         )
 
         self.step(2)
-        keyID3 = 3
-        gracePeriodSeconds = 5
+        keySetID3 = 3
         inputKey3 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID1,
-            keyID=keyID3,
-            gracePeriod=gracePeriodSeconds,
+            keySetID=keySetID3,
             key=inputKey3)
         )
 
         self.step(3)
-        membership_matcher = generate_membership_entry_matcher(groupID1, key_id=keyID3, expiring_key_id=keyID1)
+        membership_matcher = generate_membership_entry_matcher(groupID1, key_set_id=keySetID3)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(4)
@@ -140,87 +136,73 @@ class TC_GCAST_2_3(MatterBaseTest):
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
                 groupID=groupID2,
-                keyID=keyID1,
+                keySetID=keySetID1,
                 key=inputKey4)
             )
-            asserts.fail("UpdateGroupKey command should have failed with as keyID1 still exists, but it succeeded.")
+            asserts.fail(f"UpdateGroupKey command should have failed with {Status.AlreadyExists}, but it succeeded.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.AlreadyExists,
                                  f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step(5)
-        gracePeriodWaitingTime = max(gracePeriodSeconds * 1.1, 30)
-        logger.info(f"Waiting for {gracePeriodWaitingTime:.1f} seconds for grace period to make sure it expired.")
-        await asyncio.sleep(gracePeriodWaitingTime)
+        await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
+            groupID=groupID2,
+            keySetID=keySetID1)
+        )
 
         self.step(6)
         sub.reset()
-        membership_matcher = generate_membership_entry_matcher(groupID1, key_id=keyID3, expiring_key_id_must_not_exist=True)
+        membership_matcher = generate_membership_entry_matcher(groupID2, key_set_id=keySetID1)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(7)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
-            groupID=groupID2,
-            keyID=keyID1,
-            key=inputKey4)
-        )
+        keySetID4 = 4
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
+                groupID=groupID1,
+                keySetID=keySetID4)
+            )
+            asserts.fail(f"UpdateGroupKey command should have failed {Status.NotFound}, but it succeeded.")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Send UpdateGroupKey command error should be {Status.NotFound} instead of {e.status}")
 
         self.step(8)
+        groupIDUnknown = 100
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
-                groupID=groupID1,
-                keyID=keyID2,
-                key=inputKey3)
-            )
-            asserts.fail("UpdateGroupKey command should have failed with already existing keyID K2, but it succeeded.")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.AlreadyExists,
-                                 f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
-
-        self.step(9)
-        keyID4 = 4
-        try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
-                groupID=groupID1,
-                keyID=keyID4)
-            )
-            asserts.fail("UpdateGroupKey command should have failed, but it succeeded.")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure,
-                                 f"Send UpdateGroupKey command error should be {Status.Failure} instead of {e.status}")
-
-        self.step(10)
-        inputKey4InvalidLength = secrets.token_bytes(15)
-        try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
-                groupID=groupID1,
-                keyID=keyID4,
-                key=inputKey4InvalidLength)
-            )
-            asserts.fail("UpdateGroupKey command should have failed because of Key with invalid length, but it succeeded.")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError,
-                                 f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")
-
-        self.step(11)
-        gracePeriodSecondsInvalidLimit = 86400 + 1
-        try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
-                groupID=groupID1,
-                keyID=keyID4,
-                gracePeriod=gracePeriodSecondsInvalidLimit,
+                groupID=groupIDUnknown,
+                keySetID=keySetID4,
                 key=inputKey4)
             )
-            asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
+            asserts.fail(f"UpdateGroupKey command should have failed with {Status.NotFound}, but it succeeded.")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Send UpdateGroupKey command error should be {Status.NotFound} instead of {e.status}")
+
+        self.step(9)
+        inputKeyInvalidLength = secrets.token_bytes(15)
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
+                groupID=groupID1,
+                keySetID=keySetID4,
+                key=inputKeyInvalidLength)
+            )
+            asserts.fail(f"UpdateGroupKey command should have failed with {Status.ConstraintError}, but it succeeded.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")
 
-        self.step(12)
+        self.step(10)
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID1,
-            keyID=keyID2)
+            keySetID=keySetID1)
         )
+
+        self.step(11)
+        sub.reset()
+        membership_matcher = generate_membership_entry_matcher(groupID1, key_set_id=keySetID1)
+        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
 
 if __name__ == "__main__":
