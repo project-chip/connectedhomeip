@@ -264,7 +264,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(payload.productID));
     PrintOnboardingCodes(payload);
 
-    chip::Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
 
     chip::app::SetTerminateHandler(StopSignalHandler);
 
@@ -336,6 +335,10 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     ReturnErrorOnFailure(ParseArguments(argc, argv, AppOptions::GetOptions()));
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
+
+    auto * exampleDAC = chip::Credentials::Examples::GetExampleDACProvider();
+    chip::Credentials::SetDeviceAttestationCredentialsProvider(exampleDAC);
+    ChipLogProgress(AppServer, "DAC Provider set to Example implementation");
 
     ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
