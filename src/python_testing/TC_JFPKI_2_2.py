@@ -261,13 +261,34 @@ class TC_JFPKI_2_2(MatterBaseTest):
             else:
                 asserts.assert_true(False, 'Expected InteractionModelError with VIDNotVerified, but no exception occurred.')
 
-            # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT responds with SUCCESS status."
             self.step("5")
-            # # Wait for ArmFailSafe timer to expire
-            # await asyncio.sleep(11)
+            response = await devCtrlEcoA.ReadAttribute(
+                nodeId=1,
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+                returnClusterObject=True)
+            icac1 = response[0][Clusters.OperationalCredentials].NOCs[0].icac
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
 
-            # TODO: "TH sends ICACCSRRequest command to DUT.", "DUT responds with status code CONSTRAINTERROR."
             self.step("6")
+            try:
+                await self.send_single_cmd(
+                    dev_ctrl=devCtrlEcoA,
+                    node_id=1,
+                    endpoint=1,
+                    cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.ConstraintError,
+                    f'Expected ConstraintError status, but got {str(e)}',
+                )
+            else:
+                asserts.assert_true(False, 'Expected InteractionModelError with ConstraintError, but no exception occurred.')
+
             # # Get the ICAC from JF-Admin
             # response = await devCtrlEcoA.ReadAttribute(
             #     nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
@@ -287,6 +308,8 @@ class TC_JFPKI_2_2(MatterBaseTest):
 
             # TODO: "Wait for ArmFailSafe to expire."
             self.step("7")
+            # Wait for ArmFailSafe timer to expire
+            await asyncio.sleep(11)
             # await self.send_single_cmd(
             #     dev_ctrl=devCtrlEcoA,
             #     node_id=1,
