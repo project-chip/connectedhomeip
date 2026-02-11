@@ -265,6 +265,7 @@ class NetworkLink(NetworkCmdHandler):
         self._ipv4 = ipv4
         self._ipv6 = ipv6
         self._ipv6_ula = ipv6_ula
+        self._ns_wrapper: str | None = None
 
         self._setup_cmds.append(
             NetworkCmd(f"ip link add {link_name} type veth peer name {switch_name}", f"ip link delete {switch_name}")
@@ -311,16 +312,20 @@ class NetworkLink(NetworkCmdHandler):
         if wait_for_dad:
             self.wait_for_duplicate_address_detection()
 
-    @staticmethod
-    def wait_for_duplicate_address_detection() -> bool:
+    def wait_for_duplicate_address_detection(self) -> bool:
         # IPv6 does Duplicate Address Detection even though we know ULAs provided are isolated.
         # Wait for 'tentative' address to be gone.
         log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
 
+        cmd = "ip addr"
+        if self._ns_wrapper:
+            cmd = f"{self._ns_wrapper} {cmd}"
+        cmd_list = shlex.split(cmd)
+
         # Wait at most 10 seconds.
         start_time = time.time()
         while time.time() - start_time < 10:
-            if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
+            if 'tentative' not in subprocess.check_output(cmd_list, text=True):
                 log.info("No more tentative addresses")
                 return True
             time.sleep(0.1)
@@ -337,6 +342,7 @@ class NetworkLink(NetworkCmdHandler):
                 case NetworkNamespace():
                     self._setup_cmds.append(NetworkCmd(f"ip link set {self._link_name} netns {dep.name}"))
                     self._activate_cmds.append(NetworkCmd("ip link set dev lo up", ns_wrapper=True))
+                    self._ns_wrapper = dep.netns_cmd_wrapper
                     for cmd in itertools.chain(self._setup_cmds, self._activate_cmds):
                         if cmd.ns_wrapper:
                             cmd.ns_wrapper = dep.netns_cmd_wrapper
@@ -384,12 +390,11 @@ class IsolatedNetworkNamespace:
 
             # Bring up selected links.
             if mgmt_link_up:
-                self.mgmt_link.activate(wait_for_dad=False)
+                self.mgmt_link.activate()
             if ctrl_link_up:
-                self.ctrl_link.activate(wait_for_dad=False)
+                self.ctrl_link.activate()
             if app_link_up:
-                self.app_link.activate(wait_for_dad=False)
-            NetworkLink.wait_for_duplicate_address_detection()
+                self.app_link.activate()
         except BaseException as e:
             log.error("Encountered error while setting up network namespaces: %r", e)
             # Ensure that we leave a clean state on any exception.
