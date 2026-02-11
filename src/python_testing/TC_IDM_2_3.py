@@ -41,12 +41,10 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Attribute import AttributePath
-from matter.exceptions import ChipStackError
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -102,10 +100,10 @@ class TC_IDM_2_3(BasicCompositionTests):
         # Step 1: CapabilityMinima
         self.step(1)
         cluster_revision = await self.read_single_attribute_check_success(
-            cluster=Clusters.BasicInformation, 
+            cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.ClusterRevision
         )
-        
+
         # Default values for number of read paths and subscribe paths
         num_read_paths_supported = 9
         num_subscribe_paths_supported = 3
@@ -120,7 +118,7 @@ class TC_IDM_2_3(BasicCompositionTests):
                                         "ReadPathsSupported should be present when ClusterRevision >= 6")
             asserts.assert_is_not_none(capability_minima.subscribePathsSupported,
                                         "SubscribePathsSupported should be present when ClusterRevision >= 6")
-            
+
             # Extract values, providing defaults if optional fields are missing
             num_read_paths_supported = capability_minima.readPathsSupported
             num_subscribe_paths_supported = capability_minima.subscribePathsSupported
@@ -158,7 +156,7 @@ class TC_IDM_2_3(BasicCompositionTests):
 
         # Read requests must fit into 1 MTU, as reads cannot be chained across multiple packets. If a device reports
         # a number of read paths (or subscription paths) larger than what is possible on the controller side, we need to
-        # reduce the number of paths here to be as much as can fit in the request. 
+        # reduce the number of paths here to be as much as can fit in the request.
         async def conduct_request_with_potential_path_size_reduction(paths, num_paths, request_function):
             # TODO: The maximum here should be adjusted and be based upon the max size
             # of an AttributePath, as well as the size of the payload for the MTU. See Issue #43083
