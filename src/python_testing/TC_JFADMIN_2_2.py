@@ -115,36 +115,6 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             expected_output="CHIP task running",
             timeout=30)
 
-        # # Commission JF-ADMIN app with JF-Controller on Fabric A
-        self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {self.jfadmin_fabric_a_discriminator} --anchor true",
-            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
-            timeout=60)
-
-        # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
-        jfcStorage = ConfigParser()
-        jfcStorage.read(os.path.join(self.storage_fabric_a, 'chip_tool_config.alpha.ini'))
-        self.ecoACtrlStorage = {
-            "sdk-config": {
-                "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
-                "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
-                "ExampleCARootCert1": jfcStorage.get("Default", "ExampleCARootCert0"),
-                "ExampleCAIntermediateCert1": jfcStorage.get("Default", "ExampleCAIntermediateCert0"),
-            },
-            "repl-config": {
-                "caList": {
-                    "1": [
-                        {
-                            "fabricId": 1,
-                            "vendorId": self.jfctrl_fabric_a_vid
-                        }
-                    ]
-                }
-            }
-        }
-        # Extract CATs to be provided to the Python Controller later
-        self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
-
     def teardown_class(self):
         # Stop all Subprocesses that were started in this test case
         if self.fabric_a_admin is not None:
@@ -192,8 +162,37 @@ class TC_JFADMIN_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_JFADMIN_2_2(self):
 
-        # TODO: "Commission DUT to TH."
         self.step("1")
+
+        # Commission JF-ADMIN app with JF-Controller on Fabric A
+        self.fabric_a_ctrl.send(
+            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {self.jfadmin_fabric_a_discriminator} --anchor true",
+            expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
+            timeout=60)
+
+        # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
+        jfcStorage = ConfigParser()
+        jfcStorage.read(os.path.join(self.storage_fabric_a, 'chip_tool_config.alpha.ini'))
+        self.ecoACtrlStorage = {
+            "sdk-config": {
+                "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
+                "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
+                "ExampleCARootCert1": jfcStorage.get("Default", "ExampleCARootCert0"),
+                "ExampleCAIntermediateCert1": jfcStorage.get("Default", "ExampleCAIntermediateCert0"),
+            },
+            "repl-config": {
+                "caList": {
+                    "1": [
+                        {
+                            "fabricId": 1,
+                            "vendorId": self.jfctrl_fabric_a_vid
+                        }
+                    ]
+                }
+            }
+        }
+        # Extract CATs to be provided to the Python Controller later
+        self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
