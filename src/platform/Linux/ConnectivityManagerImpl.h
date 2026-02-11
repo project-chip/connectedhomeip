@@ -210,12 +210,11 @@ public:
                             uint8_t scan_max_time);
 private:
     std::set<NanPeerInfo> mNanScanPeers;
-    uint32_t mNanScanSubscribeId       = 0;
 
     // ProxyScanResponse is not sent back immediately, store state
     std::optional<chip::app::CommandHandler::Handle> mPendingProxyScanHandle;
     chip::app::ConcreteCommandPath mPendingProxyScanPath;
-    void FinishWiFiPAFScanAndRespond(void);
+    void FinishWiFiPAFScanAndRespond(guint subscribe_id);
 #endif
 
 private:

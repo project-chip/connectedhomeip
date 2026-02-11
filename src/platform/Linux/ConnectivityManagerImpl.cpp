@@ -1674,6 +1674,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSend(const WiFiPAF::WiFiPAFSession &
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
+    ChipLogError(DeviceLayer, "===SHM %s() id=%d role=%d", __func__, id, (int) role);
     switch (role)
     {
     case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
@@ -1967,10 +1968,12 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
 // Scan for Matter PAF devices, but don't connect
 void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
 {
+    ChipLogError(DeviceLayer, "===SHM: %s() DISCOVERY RESULT ",__func__);
     //uint32_t subscribe_id;
     uint32_t peer_publish_id;
     uint8_t peer_addr[6];
     uint32_t srv_proto_type;
+    uint32_t subscribe_id;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     if (g_variant_n_children(discov_info) == 0)
@@ -1984,7 +1987,8 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
 
     value = g_variant_lookup_value(discov_info, "subscribe_id", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);
-    g_variant_get(dataValue.get(), "u", &mNanScanSubscribeId);
+    g_variant_get(dataValue.get(), "u", &subscribe_id);
+    ChipLogError(DeviceLayer, "===SHM: %s() subscribe_id:%d ",__func__, (uint16_t) subscribe_id);
     value = g_variant_lookup_value(discov_info, "publish_id", G_VARIANT_TYPE_UINT32);
     dataValue.reset(value);
     g_variant_get(dataValue.get(), "u", &peer_publish_id);
@@ -2031,7 +2035,7 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
     }
 
     ChipLogProgress(DeviceLayer, "Discovered Device: %s() Subscribe_id:%u peer_publish_id:%u srv_proto_type:%u",
-        __func__, mNanScanSubscribeId, peer_publish_id, srv_proto_type);
+        __func__, subscribe_id, peer_publish_id, srv_proto_type);
     ChipLogProgress(DeviceLayer, "\tDiscriminator:%u Opcode:%u PID:0x%X VID:0x%X",
         pPublishSSI->DevInfo, pPublishSSI->DevOpCode, pPublishSSI->ProductId, pPublishSSI->VendorId);
     ChipLogProgress(DeviceLayer, "\tpeer_addr: [%02x:%02x:%02x:%02x:%02x:%02x]",
@@ -2085,6 +2089,14 @@ void ConnectivityManagerImpl::ScanNanSubscribeTerminated(guint subscribe_id, gch
     //PlatformMgr().PostEventOrDie(&event);
 }
 
+namespace {
+struct ScanTimerCtx
+{
+    chip::DeviceLayer::ConnectivityManagerImpl * self;
+    guint subscribe_id;
+};
+} // namespace
+
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Handle handle,
                                                  const chip::app::ConcreteCommandPath & path,
                                                  uint8_t scanMaxTime)
@@ -2109,7 +2121,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Hand
     struct PAFPublishSSI PafPublish_ssi;
 
     // Populate with values to indicate to wpa_suppliant that discovery is
-    // required on the nansubscribe interface ratther than a subscribe.
+    // required on the nansubscribe interface rather than a subscribe.
     // This is done as the current dbus/USD implemntation does not have a
     // dedicated discover interface. A small modification is required
     // in wpa_supplicantto look for this  ~/nan_de.c, function nan_de_rx_publish()
@@ -2133,12 +2145,15 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Hand
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
 
     ChipLogProgress(DeviceLayer, "Commissioning Proxy: subscribe_id: [%u], freq: %u", subscribe_id, freq);
-
-    WiFiPAFSession sessionInfo  = { .discriminator = PafPublish_ssi.DevInfo };
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
+    ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+
+    ChipLogError(Controller, "===SHM %s() pPafInfo:%p", __func__, (void *)pPafInfo);
     if (pPafInfo != nullptr)
     {
+        ChipLogError(Controller, "===SHM %s() pPafInfo!=NULL", __func__);
         pPafInfo->id   = subscribe_id;
         pPafInfo->role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber;
     }
@@ -2164,19 +2179,23 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Hand
 
     // Allow the given scan timeout before returning results
     ChipLogProgress(DeviceLayer, "===SHM %s() Timeout in %d seconds",__func__, scanMaxTime);
+    auto * ctx = new ScanTimerCtx{ this, subscribe_id };
+
     SystemLayer().StartTimer(
         System::Clock::Milliseconds32(scanMaxTime * 1000),
-        +[](System::Layer *, void * self) {
-            static_cast<ConnectivityManagerImpl *>(self)->FinishWiFiPAFScanAndRespond();
-        }, this);
+        +[](System::Layer *, void * context) {
+            auto * timerCtx = static_cast<ScanTimerCtx *>(context);
+            timerCtx->self->FinishWiFiPAFScanAndRespond(timerCtx->subscribe_id);
+            delete timerCtx; // one-shot timer, safe to delete after firing
+        }, ctx);
 
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(void)
+void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(guint subscribe_id)
 {
     using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
-    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout fired",__func__);
+    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout fired, subscribe_id:%d", __func__, subscribe_id);
 
     if (!mPendingProxyScanHandle.has_value())
     {
@@ -2191,13 +2210,13 @@ void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(void)
         return;
     }
 
-    WiFiPAFSession sessionInfo  = { .discriminator = 0xFFFF };
-    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    (void) WiFiPafLayer.RmPafSession(PafInfoAccess::kAccDisc, sessionInfo);
-
     // Stop the PAF discovery
-    (void) _WiFiPAFCancelSubscribe(mNanScanSubscribeId);
+    (void) _WiFiPAFCancelSubscribe(subscribe_id);
     (void) _WiFiPAFCancelIncompleteSubscribe();
+
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    (void) WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 
     chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::Type response;
     std::vector<ScanResultT> results;

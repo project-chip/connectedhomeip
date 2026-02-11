@@ -78,6 +78,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
+        ChipLogError(AppServer, "===SHM  %s() id=%d role=%d", __func__, id, (int)role);
             TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role);
         });
 #endif

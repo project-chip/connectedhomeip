@@ -41,10 +41,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 NamedPipeCommands sChipNamedPipeCommands;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-//CommissioningProxyAppCommandDelegate sCommissioningProxyAppCommandDelegate;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 } // namespace
 
 #if 0
@@ -89,21 +85,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 #if 0
 #if 0
-bool emberAfCommissioningProxyClusterProxyConnectRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyConnectRequest::DecodableType & commandData)
-{
-    ChipLogError(NotSpecified, "=== %s() Received ProxyConnectRequest", __func__);
-    return true;
-}
 
-bool emberAfCommissioningProxyClusterProxyDisconnectRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::DecodableType & commandData)
-{
-    ChipLogError(NotSpecified, "=== %s() Received ProxyDisconnectRequest", __func__);
-    return true;
-}
 
 bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -150,43 +132,6 @@ bool emberAfCommissioningProxyClusterProxyScanRequestCallback(
         ChipLogProgress(Controller, "===SHM %s() In", __func__);
     }
 
-#if 0
-    // Convert each NanPeerInfo -> ScanResultStruct::Type
-    for (const auto & p : peers)
-    {
-        ScanResultT r{};
-        r.address.SetNonNull(chip::ByteSpan(p.mac, 6));  // 6-byte MAC
-
-        // If you want to include SSI as extended data:
-        if (!p.ssi.empty()) {
-            r.extendedData.SetNonNull(chip::ByteSpan(p.ssi.data(), p.ssi.size()));
-        } else {
-            r.extendedData.SetNull();
-        }
-
-        // Fill anything else you can/need. Examples:
-        r.transport = chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF;
-        r.discriminator = 0; // unknown if you don't have it yet
-        r.vendorId = static_cast<chip::VendorId>(0);
-        r.productId = 0;
-
-        results.push_back(r);
-    }
-
-    ChipLogProgress(NotSpecified, "=== %s() Received ProxyScanRequest", __func__);
-    Clusters::CommissioningProxy::Commands::ProxyScanResponse::Type response;
-    List<const ScanResultT> list{ Span<const ScanResultT>(results.data(), results.size()) };
-    response.proxyScanResult = list;
-
-    // response.numberOfResults = results.size();
-    response.numberOfResults = static_cast<uint8_t>(response.proxyScanResult.size());
-
-    commandObj->AddResponse(commandPath, response);
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-
-//    commandObj->AddClusterSpecificFailure(commandPath,
-  //                                        to_underlying(Clusters::CommissioningProxy::ProxyErrorEnum::kProxyBusy));
-#endif
     return true;
 }
 
@@ -232,8 +177,10 @@ bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
 #include <app/clusters/device-energy-management-server/CodegenIntegration.h>
 #include "commissioning-proxy-delegate-impl.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include "CPAppCommandDelegate.h"
 
 // In a .cpp file
+CPAppCommandDelegate sCPAppCommandDelegate;
 // CommissioningProxyManager gCommissioningProxyManager;
 chip::app::Clusters::CommissioningProxy::MyCPDelegate gMyCPDelegate;
 
@@ -249,22 +196,16 @@ chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::Comm
 
 void ApplicationInit()
 {
-    // No need to manually bind gMyCPDelegate -> cluster here anymore:
-    // the cluster constructor calls mDelegate.SetServer(this).
-
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
-
-    // Register the Commissioning Proxy Code Driven mechanism
-    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == 
-        CHIP_NO_ERROR);
-
-#if 0
-    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sCommissioningProxyAppCommandDelegate) != CHIP_NO_ERROR))
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sCPAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
-#endif
+
+    // Register the Commissioning Proxy Code Driven mechanism
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == CHIP_NO_ERROR);
+
     ChipLogProgress(AppServer, "===SHM %s()", __func__);
     ChipLogProgress(AppServer, "%s(): Main function is Proxy Commissioner on endpoint %u",
             __func__, CommissioningProxyEndpoint);
@@ -279,46 +220,12 @@ void ApplicationShutdown()
 }
 
 
-#ifdef __NuttX__
-// NuttX requires the main function to be defined with C-linkage. However, marking
-// the main as extern "C" is not strictly conformant with the C++ standard. Since
-// clang >= 20 such code triggers -Wmain warning.
-extern "C" {
-#endif
-
 int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;
     }
-
-    // SHM Add the new Call in here
-
-    //CHIP_ERROR err = CommissioningProxyMgr().Init();
-    //if (err != CHIP_NO_ERROR)
-    //{
-    //    ChipLogError(AppServer, "Failed to initialize Commissioning Proxy manager: %" CHIP_ERROR_FORMAT, err.Format());
-    //    chip::DeviceLayer::PlatformMgr().Shutdown();
-    //    return -1;
-    //}
-
-#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-    example::Ui::ImguiUi ui;
-
-    ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
-    ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
-    ui.AddWindow(std::make_unique<example::Ui::Windows::Light>(chip::EndpointId(1)));
-
-    ChipLinuxAppMainLoop(&ui);
-#else
     ChipLinuxAppMainLoop();
-#endif
-
     return 0;
 }
-
-#ifdef __NuttX__
-}
-#endif

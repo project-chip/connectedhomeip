@@ -55,9 +55,7 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 }
 
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyScanRequest(
-    CapabilitiesBitmap transport,
-    WiFiBandBitmap wiFiBands,
-    app::CommandHandler * commandObj,
+    CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands, app::CommandHandler * commandObj,
     const DataModel::InvokeRequest & request)
 {
     ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBands:%d", __func__, (int)transport, (int)wiFiBands);
@@ -77,6 +75,8 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 
     // Create a Handle and move it into ConnectivityManagerImpl
     // This keeps the ProxyScanRequest open, so the scan can complete before the ProxyScanResponse is sent
+    // Scan results are processed in ConnectivityManagerImpl::ScanDiscoveryResult()
+    // scanMaxTime expiry handled in ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond()
     CommandHandler::Handle handle(commandObj);
     uint8_t scanMaxTime = GetScanMaxTime();
     err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), request.path, scanMaxTime);
@@ -96,223 +96,31 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::DeviceLayer;
-
 #if 0
-CommissioningProxyCommandHandler * CommissioningProxyCommandHandler::FromJSON(const char * json)
+bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::DecodableType & commandData)
 {
-    Json::Reader reader;
-    Json::Value value;
+    ChipLogError(NotSpecified, "=== %s() Received ProxyBackGroundScanStartRequest", __func__);
 
-    if (!reader.parse(json, value))
+    // Use the NodeId and fabric Index as unique identifiers for the background scan
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    NodeId localNodeId = kUndefinedNodeId;
+
+    fabricIndex = commandObj->GetAccessingFabricIndex();
+    if (IsValidFabricIndex(fabricIndex))
     {
-        ChipLogError(NotSpecified,
-                     "AllClusters App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
-        return nullptr;
-    }
-
-    if (value.empty() || !value.isObject())
-    {
-        ChipLogError(NotSpecified, "AllClusters App: Invalid JSON command received");
-        return nullptr;
-    }
-
-    if (!value.isMember("Name") || !value["Name"].isString())
-    {
-        ChipLogError(NotSpecified, "AllClusters App: Invalid JSON command received: command name is missing");
-        return nullptr;
-    }
-
-    return Platform::New<CommissioningProxyCommandHandler>(std::move(value));
-}
-
-void CommissioningProxyCommandHandler::HandleCommand(intptr_t context)
-{
-    auto * self      = reinterpret_cast<CommissioningProxyCommandHandler *>(context);
-    std::string name = self->mJsonValue["Name"].asString();
-
-    VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
-
-
-    if (name.rfind("Proxy", 0) == 0)
-    {
-        uint16_t endpoint = CommissioningProxyEndpoint;
-        if (self->mJsonValue.isMember("Endpoint"))
+        const auto * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        if (fabricInfo != nullptr)
         {
-            endpoint = static_cast<uint16_t>(self->mJsonValue["Endpoint"].asUInt());
+            localNodeId = fabricInfo->GetNodeId();
         }
-
-        ChipLogProgress(NotSpecified, "Endpoint %u: %s", endpoint, name.c_str());
-    }
-    else if (name == "SoftwareFault")
-    {
-        self->OnSoftwareFaultEventHandler(Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id);
-    }
-    else if (name == "HardwareFaultChange")
-    {
-        self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id);
-    }
-    else if (name == "RadioFaultChange")
-    {
-        self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id);
-    }
-    else if (name == "NetworkFaultChange")
-    {
-        self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id);
-    }
-    else if (name == "PowerOnReboot")
-    {
-        self->OnRebootSignalHandler(BootReasonType::kPowerOnReboot);
-    }
-    else if (name == "BrownOutReset")
-    {
-        self->OnRebootSignalHandler(BootReasonType::kBrownOutReset);
-    }
-    else if (name == "SoftwareWatchdogReset")
-    {
-        self->OnRebootSignalHandler(BootReasonType::kSoftwareWatchdogReset);
-    }
-    else if (name == "HardwareWatchdogReset")
-    {
-        self->OnRebootSignalHandler(BootReasonType::kHardwareWatchdogReset);
-    }
-    else if (name == "SoftwareUpdateCompleted")
-    {
-        self->OnRebootSignalHandler(BootReasonType::kSoftwareUpdateCompleted);
-    }
-    else if (name == "SoftwareReset")
-    {
-        self->OnRebootSignalHandler(BootReasonType::kSoftwareReset);
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Unhandled command: Should never happen: '%s'", name.c_str());
     }
 
-exit:
-    Platform::Delete(self);
-}
+    ChipLogProgress(AppServer,
+                    "===SHM %s(): fabricIndex=%u localNodeId=0x" ChipLogFormatX64, __func__,
+                    static_cast<unsigned>(fabricIndex), ChipLogValueX64(localNodeId));
 
-bool CommissioningProxyCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
-{
-    EnabledEndpointsWithServerCluster enabledEndpoints(clusterId);
-
-    return (enabledEndpoints.begin() != enabledEndpoints.end());
-}
-
-void CommissioningProxyCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
-{
-    if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
-    {
-        Server::GetInstance().GenerateShutDownEvent();
-        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
-            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Failed to store boot reason:%d", static_cast<uint32_t>(bootReason));
-    }
-}
-
-void CommissioningProxyCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
-{
-    if (!IsClusterPresentOnAnyEndpoint(Clusters::GeneralDiagnostics::Id))
-        return;
-
-    if (eventId == Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id)
-    {
-        GeneralFaults<kMaxHardwareFaults> previous;
-        GeneralFaults<kMaxHardwareFaults> current;
-
-        using GeneralDiagnostics::HardwareFaultEnum;
-
-        // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kRadio)));
-        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kPowerSource)));
-
-        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kRadio)));
-        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kSensor)));
-        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kPowerSource)));
-        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
-        Clusters::GeneralDiagnostics::GlobalNotifyHardwareFaultsDetect(previous, current);
-    }
-    else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
-    {
-        GeneralFaults<kMaxRadioFaults> previous;
-        GeneralFaults<kMaxRadioFaults> current;
-
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kWiFiFault)));
-        ReturnOnFailure(previous.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
-
-        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kWiFiFault)));
-        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kCellularFault)));
-        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
-        ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kNFCFault)));
-        Clusters::GeneralDiagnostics::GlobalNotifyRadioFaultsDetect(previous, current);
-    }
-    else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
-    {
-        GeneralFaults<kMaxNetworkFaults> previous;
-        GeneralFaults<kMaxNetworkFaults> current;
-
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
-        ReturnOnFailure(previous.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
-
-        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
-        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
-        ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kConnectionFailed)));
-        Clusters::GeneralDiagnostics::GlobalNotifyNetworkFaultsDetect(previous, current);
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Unknow event ID:%d", eventId);
-    }
-}
-
-void CommissioningProxyCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
-{
-    VerifyOrReturn(eventId == Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id,
-                   ChipLogError(NotSpecified, "Unknown software fault event received"));
-
-    if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
-        return;
-
-    Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
-    char threadName[kMaxThreadNameLength + 1];
-
-    softwareFault.id = static_cast<uint64_t>(getpid());
-    Platform::CopyString(threadName, std::to_string(softwareFault.id).c_str());
-
-    softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
-
-    std::time_t result = std::time(nullptr);
-    // Using size of 50 as it is double the expected 25 characters "Www Mmm dd hh:mm:ss yyyy\n".
-    char timeChar[50];
-    if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
-    {
-        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
-    }
-
-    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
-}
-
-
-void CommissioningProxyAppCommandDelegate::OnEventCommandReceived(const char * json)
-{
-    ChipLogProgress(NotSpecified, "===SHM %s()", __func__);
-    auto handler = CommissioningProxyCommandHandler::FromJSON(json);
-    if (nullptr == handler)
-    {
-        ChipLogError(NotSpecified, "AllClusters App: Unable to instantiate a command handler");
-        return;
-    }
-
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(CommissioningProxyCommandHandler::HandleCommand,
-                                                                           reinterpret_cast<intptr_t>(handler));
+    return true;
 }
 #endif

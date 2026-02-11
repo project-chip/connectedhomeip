@@ -36,6 +36,8 @@ config("includes") {
 
 executable("chip-commissioning-proxy-app") {
   sources = [
+    "CPAppCommandDelegate.cpp",
+    "CPAppCommandDelegate.h",
     "CommissioningProxyCommandDelegate.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
