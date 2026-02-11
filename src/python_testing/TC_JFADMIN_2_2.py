@@ -156,23 +156,44 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
     def steps_TC_JFADMIN_2_2(self) -> list[TestStep]:
         return [
+            TestStep("1", "Commission DUT to TH."),
             TestStep("2", "TH sends ICACCSRRequest command to DUT.",
-                     "DUT response contains status code FAILSAFE_REQUIRED."),
+                     "DUT response contains status code FAILSAFEREQUIRED."),
             TestStep("3", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
                      "DUT respond with ArmFailSafeResponse Command."),
             TestStep("4", "TH sends ICACCSRRequest command to DUT.",
-                     "DUT response contains an ICACCSR."),
-            TestStep("5", "Wait for ArmFailSafe to expire."),
-            TestStep("6", "TH sends AddICAC command to DUT using icac1 as parameter.",
-                     "DUT response contains status code FAILSAFE_REQUIRED."),
-            TestStep("7", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
+                     "DUT response contains status code VIDNotVerified."),
+            TestStep("5", "TH sends AddICAC command to DUT using icac1 as parameter.",
+                     "DUT responds with SUCCESS status."),
+            TestStep("6", "TH sends ICACCSRRequest command to DUT.",
+                     "DUT responds with status code CONSTRAINTERROR."),
+            TestStep("7", "Wait for ArmFailSafe to expire."),
+            TestStep("8", "TH sends AddICAC command to DUT using icac1 as parameter.",
+                     "DUT response contains status code FAILSAFEREQUIRED."),
+            TestStep("9", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 20 and Breadcrumb 1.",
                      "DUT respond with ArmFailSafeResponse Command."),
-            # TestStep("8", "[SKIP Missing SDK Implementation] TH sends AddICAC command to DUT using icac1 as parameter.",
-            #          "DUT ICACResponse contains status 2 (InvalidICAC).")
+            TestStep("10", "TH sends AddICAC command to DUT using icac1 as parameter.",
+                     "DUT responds with SUCCESS status."),
+            TestStep("11", "TH sends AddICAC command to DUT using icac1 as parameter.",
+                     "DUT responds with status code CONSTRAINTERROR."),
+            TestStep("12", "Wait for ArmFailSafe to expire."),
+            TestStep("13", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 20 and Breadcrumb 1.",
+                     "DUT respond with ArmFailSafeResponse Command."),
+            TestStep("14", "TH sends AddICAC command to DUT using an ICAC that is not associated with the RCAC of TH as parameter.",
+                     "DUT ICACResponse contains status 2 (InvalidICAC)."),
+            TestStep("15", "TH sends AddICAC command to DUT using an ICAC with a different public key than the public key present in ICACCSRResponse",
+                     "DUT ICACResponse contains status 1 (InvalidPublicKey)."),
+            TestStep("16", "TH sends AddICAC command to DUT using a certificate that doesn't follow DN encoding for ICAC",
+                     "DUT ICACResponse contains status 2 (InvalidICAC)."),
+            TestStep("17", "TH sends OJCW command to DUT (check Precondition 1)",
+                     "DUT responds with status code 0x06 (InvalidAdministratorFabricIndex)."),
         ]
 
     @async_test_body
     async def test_TC_JFADMIN_2_2(self):
+
+        # TODO: "Commission DUT to TH."
+        self.step("1")
 
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
@@ -186,6 +207,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
+        # TODO: "TH sends ICACCSRRequest command to DUT.", "DUT response contains status code FAILSAFEREQUIRED."
         self.step("2")
         try:
             await self.send_single_cmd(
@@ -199,12 +221,14 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         else:
             asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
+        # TODO: "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.", "DUT respond with ArmFailSafeResponse Command."
         self.step("3")
         await self.send_single_cmd(
             dev_ctrl=devCtrlEcoA,
             node_id=1,
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=10, breadcrumb=1))
 
+        # TODO: "TH sends ICACCSRRequest command to DUT.", "DUT response contains status code VIDNotVerified."
         self.step("4")
         response = await self.send_single_cmd(
             dev_ctrl=devCtrlEcoA,
@@ -213,10 +237,12 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
         asserts.assert_not_equal(response.icaccsr, b'', "No ICACSR was returned!")
 
+        # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT responds with SUCCESS status."
         self.step("5")
         # Wait for ArmFailSafe timer to expire
         await asyncio.sleep(11)
 
+        # TODO: "TH sends ICACCSRRequest command to DUT.", "DUT responds with status code CONSTRAINTERROR."
         self.step("6")
         # Get the ICAC from JF-Admin
         response = await devCtrlEcoA.ReadAttribute(
@@ -232,14 +258,15 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         else:
             asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
+        # TODO: "Wait for ArmFailSafe to expire."
         self.step("7")
         await self.send_single_cmd(
             dev_ctrl=devCtrlEcoA,
             node_id=1,
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
 
-        # TODO SDK Functionality is not finished. Uncomment when implementation is ready
-        # self.step("8")
+        # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT response contains status code FAILSAFEREQUIRED."
+        self.step("8")
         # cmd = Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
         # csr_update = await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd)
         # new_noc_chain = await devCtrlEcoA.IssueNOCChain(csr_update, 1)
@@ -255,6 +282,24 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         #                       str(e), f'Expected InvalidICAC error, but got {str(e)}')
         # else:
         #     asserts.assert_true(False, 'Expected InteractionModelError with InvalidICAC, but no exception occurred.')
+        # TODO: "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 20 and Breadcrumb 1.", "DUT respond with ArmFailSafeResponse Command."
+        self.step("9")
+        # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT responds with SUCCESS status."
+        self.step("10")
+        # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT responds with status code CONSTRAINTERROR."
+        self.step("11")
+        # TODO: "Wait for ArmFailSafe to expire."
+        self.step("12")
+        # TODO: "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 20 and Breadcrumb 1.", "DUT respond with ArmFailSafeResponse Command."
+        self.step("13")
+        # TODO: "TH sends AddICAC command to DUT using an ICAC that is not associated with the RCAC of TH as parameter.", "DUT ICACResponse contains status 2 (InvalidICAC)."
+        self.step("14")
+        # TODO: "TH sends AddICAC command to DUT using an ICAC with a different public key than the public key present in ICACCSRResponse", "DUT ICACResponse contains status 1 (InvalidPublicKey)."
+        self.step("15")
+        # TODO: "TH sends AddICAC command to DUT using a certificate that doesn't follow DN encoding for ICAC", "DUT ICACResponse contains status 2 (InvalidICAC)."
+        self.step("16")
+        # TODO: "TH sends OJCW command to DUT (check Precondition 1)", "DUT responds with status code 0x06 (InvalidAdministratorFabricIndex)."
+        self.step("17")
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
