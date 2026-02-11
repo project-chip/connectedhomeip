@@ -73,17 +73,17 @@ class WrappedProcess(ABC):
     DEFAULT_START_TIMEOUT = 2.0
     DEFAULT_STOP_TIMEOUT = 2.0
 
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, process_name_long: str,
-                 process_name_short: str | None = None, log_config: LogConfig = LogConfig(),
-                 state_changed: threading.Condition | None = None, cancel_event: threading.Event | None = None) -> None:
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+                 cancel_event: threading.Event, process_name_long: str, process_name_short: str | None = None,
+                 log_config: LogConfig = LogConfig()) -> None:
         # Neither mp_context or mp_manager should be saved in the instance, as they are not picklable between processes but they can
         # be used to initialize some shared resources.
 
         # Create state and cancel events.
-        self.state_changed = mp_manager.Condition() if state_changed is None else state_changed
+        self.state_changed = state_changed
         self.state = mp_manager.Value(object, ProcessState.NOT_STARTED)
         self.state_exception: ValueProxy[BaseException | None] = mp_manager.Value(object, None)
-        self.cancel_event = mp_manager.Event() if cancel_event is None else cancel_event
+        self.cancel_event = cancel_event
 
         # Create multiprocessing.Process in a given context.
         self.process_name_long = process_name_long
@@ -209,12 +209,11 @@ class WrappedProcess(ABC):
 
 
 class WrappedProcessContext(WrappedProcess):
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, process_name_long: str,
-                 process_name_short: str | None = None, log_config: LogConfig = LogConfig(),
-                 start_timeout: float | None = WrappedProcess.DEFAULT_START_TIMEOUT,
-                 stop_timeout: float = WrappedProcess.DEFAULT_STOP_TIMEOUT, state_changed: threading.Condition | None = None,
-                 cancel_event: threading.Event | None = None) -> None:
-        super().__init__(mp_context, mp_manager, process_name_long, process_name_short, log_config, state_changed, cancel_event)
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+                 cancel_event: threading.Event, process_name_long: str, process_name_short: str | None = None,
+                 log_config: LogConfig = LogConfig(), start_timeout: float | None = WrappedProcess.DEFAULT_START_TIMEOUT,
+                 stop_timeout: float = WrappedProcess.DEFAULT_STOP_TIMEOUT) -> None:
+        super().__init__(mp_context, mp_manager, state_changed, cancel_event, process_name_long, process_name_short, log_config)
         self._start_timeout = start_timeout
         self._stop_timeout = stop_timeout
 
@@ -270,6 +269,7 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT]):
             for id, _, exception in errors:
                 log.error("  %i: %r", id, exception)
             if raise_error:
+                # TODO: Exception grup
                 raise RuntimeError(f"Caught exceptions in processes: {', '.join(str(id) for id in errors)}")
             return True
         return False

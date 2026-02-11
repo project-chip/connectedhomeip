@@ -98,11 +98,11 @@ class WorkerProcess(WrappedProcess, ABC):
     WorkQueueT: TypeAlias = queue.Queue[TestDefinition | None]
     ResultQueueT: TypeAlias = queue.Queue[WorkerResult]
 
-    def __init__(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager,
-                 config: WorkerConfig, state_changed: threading.Condition, cancel_event: threading.Event,
-                 worker_ready_queue: queue.Queue[int], resp_queue: ResultQueueT) -> None:
-        super().__init__(mp_context, mp_manager, f"Worker {id}", f"W{id:0{len(str(config.concurrency))}}", config.logconfig,
-                         state_changed, cancel_event)
+    def __init__(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+                 cancel_event: threading.Event, config: WorkerConfig, worker_ready_queue: queue.Queue[int],
+                 resp_queue: ResultQueueT) -> None:
+        super().__init__(mp_context, mp_manager, state_changed, cancel_event, f"Worker {id}",
+                         f"W{id:0{len(str(config.concurrency))}}", config.logconfig)
         self.id = id
         self.config = config
 
@@ -300,7 +300,7 @@ class WorkerPool(WrappedProcessPoolContext[WorkerPoolProcessT]):
 
     def _init_process(self, process_cls: type[WorkerPoolProcessT], id: int, mp_context: SpawnContext, mp_manager: SyncManager,
                       state_changed: threading.Condition, cancel_event: threading.Event) -> WorkerPoolProcessT:
-        return process_cls(id, mp_context, mp_manager, self.config, state_changed, cancel_event, self.worker_ready_queue,
+        return process_cls(id, mp_context, mp_manager, state_changed, cancel_event, self.config, self.worker_ready_queue,
                            self.result_queue)
 
     @property
@@ -441,7 +441,8 @@ class TestPoolManager:
             log.debug("Enqueuing test %s to worker %i", test.name, wid)
             pool.put(wid, test)
 
-    def _process_result_queue(self, pool: WorkerPool, cancel_event: threading.Event,exception_queue: queue.Queue[Exception]) -> None:
+    def _process_result_queue(self, pool: WorkerPool, cancel_event: threading.Event,
+                              exception_queue: queue.Queue[Exception]) -> None:
         while not cancel_event.is_set():
             with pool.state_changed:
                 pool.state_changed.wait()

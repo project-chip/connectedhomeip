@@ -90,7 +90,7 @@ class AppsRegister:
         def run(self) -> None:
             log.debug("Starting server process")
             with (mp_wrapped_spawn_context(self.net_ns_wrapper) as ctx,
-                  AppsXmlRpcServer(ctx, self.mp_manager, self.log_config, self.state_changed, self.cancel_event) as server):
+                  AppsXmlRpcServer(ctx, self.mp_manager, self.state_changed, self.cancel_event, self.log_config) as server):
                 log.debug("XMLRPC Server process started")
                 with self.state_changed:
                     self.init_done.set()
@@ -272,11 +272,10 @@ class AppsXmlRpcServer(WrappedProcessContext):
     CommandQueue = queue.Queue[tuple[str, tuple[Any, ...]]]
     ResponseQueue = queue.Queue[bool | Exception]
 
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, log_config: LogConfig, state_changed: threading.Condition,
-                 cancel_event: threading.Event) -> None:
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
+                 cancel_event: threading.Event, log_config: LogConfig) -> None:
         proc_name_short = f"{log_config.process_name}/XMLRPC" if log_config.process_name is not None else "XMLRPC"
-        super().__init__(mp_context, mp_manager, "XML RPC Server", proc_name_short, log_config,
-                         state_changed=state_changed, cancel_event=cancel_event)
+        super().__init__(mp_context, mp_manager, state_changed, cancel_event, "XML RPC Server", proc_name_short, log_config)
 
         self.cmd_queue: AppsXmlRpcServer.CommandQueue = mp_manager.Queue()
         self.rsp_queue: AppsXmlRpcServer.ResponseQueue = mp_manager.Queue()
