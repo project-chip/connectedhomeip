@@ -56,7 +56,7 @@ public:
             .platformManager            = DeviceLayer::PlatformMgr(),
             .eventManagement            = EventManagement::GetInstance(),
         };
-        gServer.Create(endpointId, std::move(context));
+        gServer.Create(endpointId, context);
         return gServer.Registration();
     }
 

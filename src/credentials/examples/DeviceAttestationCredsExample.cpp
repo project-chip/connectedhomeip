@@ -48,6 +48,7 @@ CHIP_ERROR ExampleDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_da
 
 CHIP_ERROR ExampleDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
+    ChipLogProgress(Zcl, ">> INSIDE DECOUPLED EXAMPLE DAC PROVIDER <<");
     return CopySpanToMutableSpan(ByteSpan(DevelopmentCerts::kPaiCert), out_pai_buffer);
 }
 
