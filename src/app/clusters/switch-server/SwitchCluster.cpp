@@ -27,9 +27,8 @@ using namespace Switch::Attributes;
 
 SwitchCluster::SwitchCluster(EndpointId endpointId, const BitFlags<Feature> features,
                              const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Switch::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mNumberOfPositions(config.numberOfPositions),
-    mMultiPressMax(config.multiPressMax)
+    DefaultServerCluster({ endpointId, Switch::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mNumberOfPositions(config.numberOfPositions), mMultiPressMax(config.multiPressMax)
 {}
 
 DataModel::ActionReturnStatus SwitchCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -64,10 +63,15 @@ CHIP_ERROR SwitchCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyB
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes));
 }
 
-CHIP_ERROR SwitchCluster::SetCurrentPosition(uint8_t currentPosition)
+inline bool SwitchCluster::PositionIsValid(uint8_t position) const
 {
     // According to the spec, the valid range is zero to NumberOfPositions - 1.
-    VerifyOrReturnError(currentPosition <= mNumberOfPositions - 1, CHIP_ERROR_INVALID_ARGUMENT);
+    return (position <= mNumberOfPositions - 1);
+}
+
+CHIP_ERROR SwitchCluster::SetCurrentPosition(uint8_t currentPosition)
+{
+    VerifyOrReturnError(PositionIsValid(currentPosition), CHIP_ERROR_INVALID_ARGUMENT);
 
     SetAttributeValue(mCurrentPosition, currentPosition, CurrentPosition::Id);
     return CHIP_NO_ERROR;
@@ -75,35 +79,46 @@ CHIP_ERROR SwitchCluster::SetCurrentPosition(uint8_t currentPosition)
 
 std::optional<EventNumber> SwitchCluster::OnSwitchLatch(uint8_t newPosition)
 {
-    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kLatchingSwitch), std::nullopt);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kLatchingSwitch) && PositionIsValid(newPosition),
+                        std::nullopt);
+
     Events::SwitchLatched::Type event{ newPosition };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 std::optional<EventNumber> SwitchCluster::OnInitialPress(uint8_t newPosition)
 {
-    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitch), std::nullopt);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitch) && PositionIsValid(newPosition),
+                        std::nullopt);
+
     Events::InitialPress::Type event{ newPosition };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 std::optional<EventNumber> SwitchCluster::OnLongPress(uint8_t newPosition)
 {
-    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchLongPress), std::nullopt);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchLongPress) && PositionIsValid(newPosition),
+                        std::nullopt);
+
     Events::LongPress::Type event{ newPosition };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 std::optional<EventNumber> SwitchCluster::OnShortRelease(uint8_t previousPosition)
 {
-    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchRelease), std::nullopt);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchRelease) && PositionIsValid(previousPosition),
+                        std::nullopt);
+
     Events::ShortRelease::Type event{ previousPosition };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 std::optional<EventNumber> SwitchCluster::OnLongRelease(uint8_t previousPosition)
 {
-    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchLongPress), std::nullopt);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchLongPress) &&
+                            PositionIsValid(previousPosition),
+                        std::nullopt);
+
     Events::LongRelease::Type event{ previousPosition };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
@@ -111,15 +126,19 @@ std::optional<EventNumber> SwitchCluster::OnLongRelease(uint8_t previousPosition
 std::optional<EventNumber> SwitchCluster::OnMultiPressOngoing(uint8_t newPosition, uint8_t count)
 {
     VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchMultiPress) &&
-                            !mFeatures.Has(Feature::kActionSwitch),
+                            !mFeatures.Has(Feature::kActionSwitch) && PositionIsValid(newPosition),
                         std::nullopt);
+
     Events::MultiPressOngoing::Type event{ newPosition, count };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 std::optional<EventNumber> SwitchCluster::OnMultiPressComplete(uint8_t previousPosition, uint8_t count)
 {
-    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchMultiPress), std::nullopt);
+    VerifyOrReturnValue(mContext != nullptr && mFeatures.Has(Feature::kMomentarySwitchMultiPress) &&
+                            PositionIsValid(previousPosition),
+                        std::nullopt);
+
     Events::MultiPressComplete::Type event{ previousPosition, count };
     return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }

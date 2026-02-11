@@ -67,7 +67,7 @@ public:
 
     // Should be called to indicate how many times the momentary switch has been pressed
     // in a multi-press sequence, after it has been detected that the sequence has ended.
-    std::optional<EventNumber> OnMultiPressComplete(uint8_t newPosition, uint8_t count);
+    std::optional<EventNumber> OnMultiPressComplete(uint8_t previousPosition, uint8_t count);
 
 protected:
     const BitFlags<Switch::Feature> mFeatures;
@@ -75,6 +75,9 @@ protected:
     uint8_t mNumberOfPositions{};
     uint8_t mMultiPressMax{};
     uint8_t mCurrentPosition{};
+
+private:
+    bool PositionIsValid(uint8_t position) const;
 };
 
 } // namespace chip::app::Clusters
