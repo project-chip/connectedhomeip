@@ -50,7 +50,7 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-protected:
+private:
     FixedByteBuffer<32, uint8_t> mSsid;
     ByteSpan SsidSpan() const { return mSsid.span(); }
 
