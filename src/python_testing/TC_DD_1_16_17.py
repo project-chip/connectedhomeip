@@ -64,7 +64,9 @@ from mobly import asserts
 
 import matter.discovery
 from matter.setup_payload import SetupPayload
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 
 # TODO: set the default timeout to be larger because there's a manual step
 # TODO: force the linux app to actually not advertise when it's in user intent mode and add a trigger to start advertising

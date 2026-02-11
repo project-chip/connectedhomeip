@@ -24,7 +24,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.conformance import conformance_allowed
-from matter.testing.matter_testing import default_matter_test_main
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
                                          parse_single_device_type)
 from matter.tlv import uint

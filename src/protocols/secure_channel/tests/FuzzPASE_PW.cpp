@@ -195,12 +195,12 @@ void TestPASESession::SecurePairingHandshake(SessionManager & sessionManager, PA
                                                                             &pairingAccessory),
               CHIP_NO_ERROR);
 
-    pairingAccessory.WaitForPairing(sessionManager, verifier, pbkdf2IterCount, salt,
-                                    Optional<ReliableMessageProtocolConfig>::Missing(), &delegateAccessory);
+    RETURN_SAFELY_IGNORED pairingAccessory.WaitForPairing(sessionManager, verifier, pbkdf2IterCount, salt,
+                                                          Optional<ReliableMessageProtocolConfig>::Missing(), &delegateAccessory);
     DrainAndServiceIO();
 
-    pairingCommissioner.Pair(sessionManager, SetUpPINCode, Optional<ReliableMessageProtocolConfig>::Missing(), contextCommissioner,
-                             &delegateCommissioner);
+    RETURN_SAFELY_IGNORED pairingCommissioner.Pair(sessionManager, SetUpPINCode, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                                   contextCommissioner, &delegateCommissioner);
 
     DrainAndServiceIO();
 }
@@ -255,7 +255,7 @@ void PASESession_Unbounded(const uint32_t fuzzedSetupPasscode, const vector<uint
     ByteSpan fuzzedSaltSpan{ fuzzedSalt.data(), fuzzedSalt.size() };
 
     // Generating the Spake2+ verifier from fuzzed inputs
-    fuzzedSpake2pVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    RETURN_SAFELY_IGNORED fuzzedSpake2pVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
     TestPASESession PASELoopBack;
     TemporarySessionManager sessionManager(PASELoopBack);
@@ -355,7 +355,7 @@ void TestPASESession::FuzzHandlePBKDFParamRequest(vector<uint8_t> fuzzPBKDFLocal
 
     /*************************** Preparing Commissioner ***************************/
 
-    CallAllocateSecureSession(sessionManager, pairingCommissioner);
+    RETURN_SAFELY_IGNORED CallAllocateSecureSession(sessionManager, pairingCommissioner);
 
     ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                  System::Clock::Milliseconds16(4000));
@@ -412,7 +412,7 @@ void TestPASESession::FuzzHandlePBKDFParamRequest(vector<uint8_t> fuzzPBKDFLocal
               CHIP_NO_ERROR);
 
     // Adding PASESession::Init in order to AllocateSecureSession and have a localsessionID generated for pairingAccessory
-    pairingAccessory.Init(sessionManager, 0, &delegateAccessory);
+    RETURN_SAFELY_IGNORED pairingAccessory.Init(sessionManager, 0, &delegateAccessory);
 
     // This was done to have an exchange context
     pairingAccessory.mExchangeCtxt.Emplace(*contextAccessory);
@@ -422,7 +422,8 @@ void TestPASESession::FuzzHandlePBKDFParamRequest(vector<uint8_t> fuzzPBKDFLocal
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
 
-    pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory, std::move(req));
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory,
+                                                             std::move(req));
 
     DrainAndServiceIO();
 }
@@ -461,7 +462,7 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
 
     /*************************** Preparing Commissioner ***************************/
 
-    CallAllocateSecureSession(sessionManager, pairingCommissioner);
+    RETURN_SAFELY_IGNORED CallAllocateSecureSession(sessionManager, pairingCommissioner);
 
     ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
@@ -474,8 +475,8 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     pairingCommissioner.mLocalMRPConfig = MakeOptional(LocalMRPConfig);
 
     // preparing CommissioningHash needed for SetupSpake2p()
-    pairingCommissioner.mCommissioningHash.Begin();
-    pairingCommissioner.mCommissioningHash.AddData(ByteSpan(fuzzedSalt.data(), fuzzedSalt.size()));
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.Begin();
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.AddData(ByteSpan(fuzzedSalt.data(), fuzzedSalt.size()));
 
     // The Commissioner will check if the PBKDFLocalRandomData it received in TLV is same as the stored mPBKDFLocalRandomData. So we
     // inject it here to be able to pass that check
@@ -534,8 +535,8 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     payloadHeaderCommissioner.SetMessageType(Protocols::SecureChannel::MsgType::PBKDFParamResponse);
     pairingCommissioner.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PBKDFParamResponse);
 
-    pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(), payloadHeaderCommissioner,
-                                          std::move(resp));
+    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(),
+                                                                payloadHeaderCommissioner, std::move(resp));
 
     DrainAndServiceIO();
 }
@@ -585,15 +586,16 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     /*************************** Preparing Commissioner ***************************/
 
     // preparing CommissioningHash needed for SetupSpake2p()
-    pairingCommissioner.mCommissioningHash.Begin();
-    pairingCommissioner.mCommissioningHash.AddData(fuzzedSaltSpan);
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.Begin();
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.AddData(fuzzedSaltSpan);
     EXPECT_EQ(CHIP_NO_ERROR, pairingCommissioner.SetupSpake2p());
 
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
 
     // Compute serializedWS, to be used in BeginProver()
 
-    Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS));
+    RETURN_SAFELY_IGNORED Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS,
+                                                     sizeof(serializedWS));
 
     EXPECT_EQ(CHIP_NO_ERROR,
               pairingCommissioner.mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length,
@@ -628,13 +630,13 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
 
     // preparing CommissioningHash needed for SetupSpake2p()
-    pairingAccessory.mCommissioningHash.Begin();
-    pairingAccessory.mCommissioningHash.AddData(fuzzedSaltSpan);
+    RETURN_SAFELY_IGNORED pairingAccessory.mCommissioningHash.Begin();
+    RETURN_SAFELY_IGNORED pairingAccessory.mCommissioningHash.AddData(fuzzedSaltSpan);
     EXPECT_EQ(CHIP_NO_ERROR, pairingAccessory.SetupSpake2p());
 
     //  Compute mPASEVerifier (in order for mSpake2p.BeginVerifier() to use it, once it is called by the pairingAccessory through
     //  HandleMsg1_and_SendMsg2)
-    pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
     /************************Injecting Fuzzed Pake1 Message into PaseSession::OnMessageReceived*************************/
 
@@ -644,7 +646,8 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake1);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake1);
 
-    pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory, std::move(msg));
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory,
+                                                             std::move(msg));
 
     DrainAndServiceIO();
 }
@@ -695,7 +698,7 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
 
     /*************************** Preparing Commissioner ***************************/
 
-    CallAllocateSecureSession(sessionManager, pairingCommissioner);
+    RETURN_SAFELY_IGNORED CallAllocateSecureSession(sessionManager, pairingCommissioner);
 
     ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
@@ -706,14 +709,15 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
 
     // preparing CommissioningHash needed for SetupSpake2p()
-    pairingCommissioner.mCommissioningHash.Begin();
-    pairingCommissioner.mCommissioningHash.AddData(fuzzedSaltSpan);
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.Begin();
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.AddData(fuzzedSaltSpan);
     EXPECT_EQ(CHIP_NO_ERROR, pairingCommissioner.SetupSpake2p());
 
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
 
     // Compute serializedWS, to be used in BeginProver()
-    Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS));
+    RETURN_SAFELY_IGNORED Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS,
+                                                     sizeof(serializedWS));
 
     EXPECT_EQ(CHIP_NO_ERROR,
               pairingCommissioner.mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length,
@@ -723,21 +727,22 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     // mSpake2p.state = CHIP_SPAKE2P_STATE::R1), the computed values are not used in the test.
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
-    pairingCommissioner.mSpake2p.ComputeRoundOne(nullptr, 0, X, &X_len);
+    RETURN_SAFELY_IGNORED pairingCommissioner.mSpake2p.ComputeRoundOne(nullptr, 0, X, &X_len);
 
     /*************************** Preparing Accessory  ***************************/
 
     // Init mCommissioningHash; needed for SetupSpake2p()
-    pairingAccessory.mCommissioningHash.Begin();
-    pairingAccessory.mCommissioningHash.AddData(fuzzedSaltSpan);
+    RETURN_SAFELY_IGNORED pairingAccessory.mCommissioningHash.Begin();
+    RETURN_SAFELY_IGNORED pairingAccessory.mCommissioningHash.AddData(fuzzedSaltSpan);
     EXPECT_EQ(CHIP_NO_ERROR, pairingAccessory.SetupSpake2p());
 
     // Below Steps take place in HandleMsg1
     // Compute mPASEVerifier to be able to pass it to BeginVerifier()
-    pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
-    pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0, kP256_FE_Length,
-                                            pairingAccessory.mPASEVerifier.mL, kP256_Point_Length);
+    RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
+                                                                  kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,
+                                                                  kP256_Point_Length);
 
     /*********************** Constructing Fuzzed PAKE2 Message, to later inject it into PASE Session *********************/
 
@@ -769,8 +774,8 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderCommissioner.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake2);
     pairingCommissioner.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake2);
 
-    pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(), payloadHeaderCommissioner,
-                                          std::move(msg2));
+    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(),
+                                                                payloadHeaderCommissioner, std::move(msg2));
 
     DrainAndServiceIO();
 }
@@ -821,15 +826,16 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     /*************************** Preparing Commissioner  ***************************/
 
     // preparing CommissioningHash needed for SetupSpake2p()
-    pairingCommissioner.mCommissioningHash.Begin();
-    pairingCommissioner.mCommissioningHash.AddData(fuzzedSaltSpan);
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.Begin();
+    RETURN_SAFELY_IGNORED pairingCommissioner.mCommissioningHash.AddData(fuzzedSaltSpan);
     EXPECT_EQ(CHIP_NO_ERROR, pairingCommissioner.SetupSpake2p());
 
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
 
     // Compute serializedWS, to be used in BeginProver()
 
-    Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS, sizeof(serializedWS));
+    RETURN_SAFELY_IGNORED Spake2pVerifier::ComputeWS(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode, serializedWS,
+                                                     sizeof(serializedWS));
 
     EXPECT_EQ(CHIP_NO_ERROR,
               pairingCommissioner.mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &serializedWS[0], kSpake2p_WS_Length,
@@ -839,11 +845,11 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     // CHIP_SPAKE2P_STATE::R1), the computed values are not used.
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
-    pairingCommissioner.mSpake2p.ComputeRoundOne(nullptr, 0, X, &X_len);
+    RETURN_SAFELY_IGNORED pairingCommissioner.mSpake2p.ComputeRoundOne(nullptr, 0, X, &X_len);
 
     /*************************** Preparing Accessory ***************************/
 
-    CallAllocateSecureSession(sessionManager, pairingAccessory);
+    RETURN_SAFELY_IGNORED CallAllocateSecureSession(sessionManager, pairingAccessory);
 
     // One Limitation of using this is that contextAccessory will automatically be an Initiator, while in real-life it should be a
     // responder.
@@ -856,16 +862,17 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
 
     // preparing CommissioningHash needed for SetupSpake2p()
-    pairingAccessory.mCommissioningHash.Begin();
-    pairingAccessory.mCommissioningHash.AddData(fuzzedSaltSpan);
+    RETURN_SAFELY_IGNORED pairingAccessory.mCommissioningHash.Begin();
+    RETURN_SAFELY_IGNORED pairingAccessory.mCommissioningHash.AddData(fuzzedSaltSpan);
     EXPECT_EQ(CHIP_NO_ERROR, pairingAccessory.SetupSpake2p());
 
     // Below Steps take place in HandleMsg1
     //  compute mPASEVerifier to be able to pass it to BeginVerifier()
-    pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
 
-    pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0, kP256_FE_Length,
-                                            pairingAccessory.mPASEVerifier.mL, kP256_Point_Length);
+    RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
+                                                                  kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,
+                                                                  kP256_Point_Length);
 
     /*************************** Preparing Accessory for Receiving PAKE3 Message ***************************/
 
@@ -877,8 +884,8 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
 
     // These calls are usually done on the Accessory before sending Pake2. They are needed to make sure that the Accessory is at the
     // correct Spake2p state (CHIP_SPAKE2P_STATE::R2) to handle Pake3 Messages.
-    pairingAccessory.mSpake2p.ComputeRoundOne(X, X_len, Y, &Y_len);
-    pairingAccessory.mSpake2p.ComputeRoundTwo(X, X_len, verifier, &verifier_len);
+    RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.ComputeRoundOne(X, X_len, Y, &Y_len);
+    RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.ComputeRoundTwo(X, X_len, verifier, &verifier_len);
 
     /*********************** Constructing Fuzzed PAKE3 Message, to later inject it into PASE Session *********************/
 
@@ -908,7 +915,8 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake3);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake3);
 
-    pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory, std::move(msg3));
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory,
+                                                             std::move(msg3));
 
     DrainAndServiceIO();
 }

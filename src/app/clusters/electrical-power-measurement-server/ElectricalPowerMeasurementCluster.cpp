@@ -156,19 +156,21 @@ CHIP_ERROR ElectricalPowerMeasurementCluster::Attributes(const ConcreteClusterPa
                                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     DataModel::AttributeEntry optionalAttributes[] = {
-        Attributes::Ranges::kMetadataEntry,          //
-        Attributes::Voltage::kMetadataEntry,         //
-        Attributes::ActiveCurrent::kMetadataEntry,   //
-        Attributes::ReactiveCurrent::kMetadataEntry, //
-        Attributes::ApparentCurrent::kMetadataEntry, //
-        Attributes::ReactivePower::kMetadataEntry,   //
-        Attributes::ApparentPower::kMetadataEntry,   //
-        Attributes::RMSVoltage::kMetadataEntry,      //
-        Attributes::RMSCurrent::kMetadataEntry,      //
-        Attributes::RMSPower::kMetadataEntry,        //
-        Attributes::Frequency::kMetadataEntry,       //
-        Attributes::PowerFactor::kMetadataEntry,     //
-        Attributes::NeutralCurrent::kMetadataEntry,  //
+        Attributes::Ranges::kMetadataEntry,           //
+        Attributes::Voltage::kMetadataEntry,          //
+        Attributes::ActiveCurrent::kMetadataEntry,    //
+        Attributes::ReactiveCurrent::kMetadataEntry,  //
+        Attributes::ApparentCurrent::kMetadataEntry,  //
+        Attributes::ReactivePower::kMetadataEntry,    //
+        Attributes::ApparentPower::kMetadataEntry,    //
+        Attributes::RMSVoltage::kMetadataEntry,       //
+        Attributes::RMSCurrent::kMetadataEntry,       //
+        Attributes::RMSPower::kMetadataEntry,         //
+        Attributes::Frequency::kMetadataEntry,        //
+        Attributes::HarmonicCurrents::kMetadataEntry, //
+        Attributes::HarmonicPhases::kMetadataEntry,   //
+        Attributes::PowerFactor::kMetadataEntry,      //
+        Attributes::NeutralCurrent::kMetadataEntry,   //
     };
 
     AttributeListBuilder listBuilder(builder);

@@ -425,6 +425,7 @@ sl_status_t SetWifiConfigurations()
 {
     sl_status_t status = SL_STATUS_OK;
 
+    uint8_t join_feature_bitmap = SL_SI91X_JOIN_FEAT_LISTEN_INTERVAL_VALID; // initialize with default value
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     sl_wifi_listen_interval_v2_t sleep_interval = {
         .listen_interval = chip::ICDConfigurationData::GetInstance().GetSlowPollingInterval().count()
@@ -440,10 +441,7 @@ sl_status_t SetWifiConfigurations()
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_set_advanced_client_configuration failed: 0x%lx", status));
-
-    status = sl_si91x_set_join_configuration(
-        SL_WIFI_CLIENT_INTERFACE, (SL_SI91X_JOIN_FEAT_LISTEN_INTERVAL_VALID | SL_SI91X_JOIN_FEAT_PS_CMD_LISTEN_INTERVAL_VALID));
-    VerifyOrReturnError(status == SL_STATUS_OK, status);
+    join_feature_bitmap |= SL_SI91X_JOIN_FEAT_PS_CMD_LISTEN_INTERVAL_VALID;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     if (wfx_rsi.credentials.passkeyLength != 0)
@@ -494,7 +492,13 @@ sl_status_t SetWifiConfigurations()
         chip::MutableByteSpan bssidSpan(profile.config.bssid.octet, kWifiMacAddressLength);
         chip::ByteSpan inBssid(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
+        // Enabling quick-join since we have the channel and BSSID
+        join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
     }
+
+    status = sl_si91x_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, join_feature_bitmap);
+    VerifyOrReturnError(status == SL_STATUS_OK, status,
+                        ChipLogError(DeviceLayer, "sl_si91x_set_join_configuration failed: 0x%lx", status));
 
     status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));

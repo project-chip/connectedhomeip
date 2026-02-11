@@ -14,10 +14,14 @@
 #   limitations under the License.
 #
 
-rsource "../cmake/Kconfig.matter.common"
+rsource "../../common/cmake/Kconfig"
 rsource "../cmake/Kconfig.matter.nxp"
 rsource "../cmake/Kconfig.openthread.common"
 rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig"
+
+# See config/common/cmake/Kconfig for full definition
+config CHIP
+	select CHIP_SDK_DEPENDENCIES
 
 if CHIP
 
@@ -133,13 +137,6 @@ choice CHIP_CRYPTO
 			based on the PSA crypto API.
 endchoice
 
-config CHIP_TASK_STACK_SIZE
-	int "CHIP task stack size"
-	default 13000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
-	default 10240
-	help
-		Set the stack size for the CHIP task.
-
 config CHIP_USE_GENERATED_CONFIG
 	bool "Use generated config"
 	default y
@@ -158,22 +155,26 @@ config NET_L2_OPENTHREAD
 	help
 	  Enable OT support.
 
+config CHIP_OPENTHREAD_FTD
+	bool "App is an OpenThread FTD"
+	default y
+	depends on NET_L2_OPENTHREAD
+	help
+	  App is an OpenThread FTD
+
+config CHIP_USE_OT_ENDPOINT
+	bool "Use OpenThread TCP/UDP stack directly"
+	default y if !CHIP_WITH_LWIP
+	depends on NET_L2_OPENTHREAD
+	help
+	  Use OpenThread TCP/UDP stack directly
+
 config CHIP_DEVICE_USE_ZEPHYR_BLE
 	bool "Use Zephyr BLE implementation"
 	depends on BT
 	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
 	help
 		Use Zephyr implementation for BLE manager.
-
-config CHIP_WIFI
-	bool "Enable NXP Wi-Fi support"
-	help
-		Enable Matter-over-Wi-Fi.
-
-config CHIP_ETHERNET
-	bool "Enable NXP ethernet support"
-	help
-		Enable Matter-over-ethernet.
 
 config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
 	int "Define the minimum connection recovery time interval in milliseconds"
@@ -273,15 +274,6 @@ if NET_L2_OPENTHREAD
 
 endif # NET_L2_OPENTHREAD
 
-config CHIP_IPV4
-	bool "IPv4 support for Matter"
-	default n if NET_L2_OPENTHREAD && !CHIP_WIFI
-	default y
-	help
-		If disabled, it allows to build NXP SDK application
-		with IPv4 support independently of the Matter stack still
-		running over IPv6.
-
 # App specific
 
 config NETWORK_LAYER_BLE
@@ -369,5 +361,10 @@ config NXP_CUSTOM_UNIT_TESTS_DIR
 	Provide a path to the location of NXP custom Matter tests
 
 endif # CHIP_BUILD_TESTS
+
+config DEBUG
+	bool "Build Matter stack with debugging enabled"
+	help
+		Build Matter stack with debugging enabled.
 
 endif # CHIP

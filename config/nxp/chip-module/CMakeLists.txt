@@ -112,7 +112,7 @@ endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
-elseif(CONFIG_WIFI_NXP OR CONFIG_CHIP_ETHERNET)
+elseif(CONFIG_CHIP_WIFI OR CONFIG_CHIP_ETHERNET)
     matter_add_gn_arg_string("chip_mdns" "minimal")
 else()
     matter_add_gn_arg_string("chip_mdns" "none")
