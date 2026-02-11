@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "wifi-network-management-server.h"
+#include "WiFiNetworkManagementCluster.h"
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
