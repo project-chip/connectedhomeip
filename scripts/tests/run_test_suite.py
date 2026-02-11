@@ -123,10 +123,9 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What targets to skip (glob)'
 )
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestaps in log output')
 @click.option(
     '--root',
     default=DEFAULT_CHIP_ROOT,
@@ -176,10 +175,10 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
-         no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
+         log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
          exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
          chip_tool: Path | None) -> None:
-    log_config = LogConfig(log_level, not no_log_timestamps)
+    log_config = LogConfig(log_level, log_timestamps)
     log_config.set_log_fmt()
 
     if sys.platform == "linux":
