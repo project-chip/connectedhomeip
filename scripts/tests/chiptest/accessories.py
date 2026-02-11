@@ -69,22 +69,19 @@ def with_accessories_lock(fn: Callable[Concatenate[S, P], R]) -> Callable[Concat
 
 
 class AppsRegister:
-    def __init__(self, net_ns: str | None = None, log_config: LogConfig = LogConfig()) -> None:
+    def __init__(self, net_ns_wrapper: str | None = None, log_config: LogConfig = LogConfig()) -> None:
         self._accessories: dict[str, App] = {}
         self._accessories_lock = threading.RLock()
 
-        self._net_ns = net_ns
         self._log_config = log_config
 
-        self._server = AppsRegister.XmlRpcServerManager(net_ns, log_config)
+        self._server = AppsRegister.XmlRpcServerManager(net_ns_wrapper, log_config)
 
-    @dataclass
     class XmlRpcServerManager(threading.Thread):
-        net_ns: str | None
-        log_config: LogConfig
-
-        def __post_init__(self) -> None:
+        def __init__(self, net_ns_wrapper: str | None, log_config: LogConfig) -> None:
             super().__init__(name="XmlRpcServerManager")
+            self.net_ns_wrapper = net_ns_wrapper
+            self.log_config = log_config
             self.mp_manager = manager = multiprocessing.Manager()
             self.work_cancel_error = manager.Condition()
             self.cancel_event = manager.Event()
@@ -93,7 +90,7 @@ class AppsRegister:
         def run(self) -> None:
             log.debug("Starting server process")
             state_changed = self.mp_manager.Condition()
-            with (mp_wrapped_spawn_context(f"ip netns exec {self.net_ns}") as ctx,
+            with (mp_wrapped_spawn_context(self.net_ns_wrapper) as ctx,
                   AppsXmlRpcServer(ctx, self.mp_manager, self.log_config, state_changed, self.work_cancel_error,
                                    self.cancel_event) as server):
                 log.debug("XMLRPC Server process started")

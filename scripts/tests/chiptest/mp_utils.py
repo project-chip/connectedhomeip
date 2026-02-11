@@ -28,14 +28,15 @@ log = logging.getLogger(__name__)
 
 
 @contextmanager
-def mp_wrapped_spawn_context(wrapper: str, source_context: SpawnContext = multiprocessing.get_context("spawn")) -> Iterator[SpawnContext]:
+def mp_wrapped_spawn_context(wrapper: str | None,
+                             source_context: SpawnContext = multiprocessing.get_context("spawn")) -> Iterator[SpawnContext]:
     """Create platform-specific multiprocessing context.
 
     Linux:
     - We need to use spawn for the pool to have separate environment variables per runner, and to be able to use a wrapper script.
     - We need unshare wrapper script to have an option to mount per-worker /tmp.
     """
-    if sys.platform != "linux":
+    if sys.platform != "linux" or wrapper is None:
         yield source_context
         return
 

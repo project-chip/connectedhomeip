@@ -113,7 +113,7 @@ class WorkerProcess(WrappedProcess, ABC):
 
     def _proc_init(self) -> None:
         self._to_clean: queue.LifoQueue[Terminable] = queue.LifoQueue()
-        self.rpc_ns: str | None = None
+        self.mgmt_ns_wrapper: str | None = None
         self.ble_controller_app: int | None = None
         self.ble_controller_tool: int | None = None
         self.thread_ba_host: str | None = None
@@ -124,7 +124,7 @@ class WorkerProcess(WrappedProcess, ABC):
 
         # Finalize common parts.
         self.runner = chiptest.runner.Runner(executor)
-        self.apps_register = self._add_to_clean(apps := AppsRegister(self.rpc_ns, self.log_config))
+        self.apps_register = self._add_to_clean(apps := AppsRegister(self.mgmt_ns_wrapper, self.log_config))
         apps.init()
         with self.work_cancel_error:
             self.worker_ready_queue.put(self.id)
@@ -245,7 +245,7 @@ if sys.platform == "linux":
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
                 app_name='wlx-app' if self.config.wifi_required else 'eth-app'))
-            self.rpc_ns = net_ns.mgmt_ns.name
+            self.mgmt_ns_wrapper = net_ns.mgmt_ns.netns_cmd_wrapper
 
             if self.config.commissioning_method == 'ble-wifi':
                 self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
