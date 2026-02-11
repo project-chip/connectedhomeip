@@ -957,13 +957,6 @@ jobs:
             - name: ccache stats
               run: ccache -s
 
-            - name: Install push_av_server dependencies
-              run: >-
-                  ./scripts/run_in_python_env.sh out/venv \
-                  "python3 -m pip install -r src/tools/push_av_server/requirements.txt \
-                    && patch -d \$(python3 -m pip show hypercorn | grep 'Location: ' | sed 's/Location: //') -p0 < src/tools/push_av_server/hypercorn.patch \
-                  "
-
             # We archive ourselves since upload-artifact seems to lose permission bits
             # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
             - name: Archive artifacts
