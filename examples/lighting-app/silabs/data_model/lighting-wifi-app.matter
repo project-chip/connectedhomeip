@@ -2944,7 +2944,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type ma_powersource = 17, version 1;
-  device type ma_dimmablelight = 257, version 3;
+  device type ma_extendedcolorlight = 269, version 4;
 
 
   server cluster Identify {
