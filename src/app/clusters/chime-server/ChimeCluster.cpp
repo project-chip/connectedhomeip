@@ -210,9 +210,9 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
     {
         return Protocols::InteractionModel::Status::NotFound;
     }
+    VerifyOrReturnValue(mContext != nullptr, Protocols::InteractionModel::Status::Failure);
     if (SetAttributeValue(mSelectedChime, chimeID, Attributes::SelectedChime::Id))
     {
-        VerifyOrReturnValue(mContext != nullptr, Protocols::InteractionModel::Status::Failure);
         LogErrorOnFailure(
             mContext->attributeStorage.WriteValue({ mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id },
                                                   { reinterpret_cast<const uint8_t *>(&mSelectedChime), sizeof(mSelectedChime) }));
@@ -222,9 +222,9 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
 
 Status ChimeCluster::SetEnabled(bool enabled)
 {
+    VerifyOrReturnValue(mContext != nullptr, Protocols::InteractionModel::Status::Failure);
     if (SetAttributeValue(mEnabled, enabled, Attributes::Enabled::Id))
     {
-        VerifyOrReturnValue(mContext != nullptr, Protocols::InteractionModel::Status::Failure);
         LogErrorOnFailure(
             mContext->attributeStorage.WriteValue({ mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id },
                                                   { reinterpret_cast<const uint8_t *>(&mEnabled), sizeof(mEnabled) }));
