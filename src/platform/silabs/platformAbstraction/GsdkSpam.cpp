@@ -73,7 +73,7 @@ extern "C" {
 #if CHIP_ENABLE_OPENTHREAD
 #include "platform-efr32.h"
 
-#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
+#if defined(OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE) && OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #include "openthread/heap.h"
 #endif // OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 
@@ -81,7 +81,7 @@ extern "C" {
 
 #include "sl_component_catalog.h"
 #include "sl_mbedtls.h"
-#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if SILABS_LOG_OUT_UART || (defined (ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL) || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #ifdef SL_CATALOG_CLI_PRESENT
 #include "sl_iostream.h"
 #include "sl_iostream_stdio.h"
@@ -143,7 +143,7 @@ CHIP_ERROR SilabsPlatform::Init(void)
     SEGGER_SYSVIEW_Conf();
 #endif
 
-#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#if SILABS_LOG_OUT_UART || (defined (ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL) || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
     uartConsoleInit();
 #endif
 

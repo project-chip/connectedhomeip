@@ -23,7 +23,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 
-#if SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+#if defined (SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) &&  SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #else
 #include <platform/silabs/OTAImageProcessorImpl.h>

@@ -26,16 +26,19 @@ RUN set -x \
     && rm -rf /tmp/slt_install /tmp/sdk-pkg.slt \
     && : # last line
 
-# Trim Simplicity SDK: keep only top-level folders listed in simplicity_sdk_keep_folders.txt
-RUN grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | sort -u > /tmp/keep_list.txt \
+# Trim Simplicity SDK: keep only top-level folders and .a libraries listed in simplicity_sdk_keep_folders.txt; remove all other .a
+RUN grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | grep -v '\.a$' | sort -u > /tmp/keep_list.txt \
     && for d in /tmp/simplicity_sdk/*/ ; do \
          name=$(basename "$d"); \
          grep -qFx "$name" /tmp/keep_list.txt || rm -rf "$d"; \
        done \
-    && rm /tmp/keep_folders.txt /tmp/keep_list.txt \
-    && find /tmp/simplicity_sdk/platform -name "*.a" -type f -delete \
+    && grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | grep '\.a$' | sort -u > /tmp/keep_libs.txt \
+    && ( cd /tmp/simplicity_sdk && find . -name "*.a" -type f | while read f; do \
+         rel="${f#./}"; \
+         grep -qFx "$rel" /tmp/keep_libs.txt || rm -f "$f"; \
+       done ) \
+    && rm /tmp/keep_folders.txt /tmp/keep_list.txt /tmp/keep_libs.txt \
     && find /tmp/simplicity_sdk/openthread -name "*efr32mg21*" -delete \
-    && find /tmp/simplicity_sdk \( -name "libsl_platform_ftd_efr32mg2*" -o -name "libsl_ot_stack_mtd_efr32mg2*" \) -type f -delete \
     && find /tmp/simplicity_sdk/boards/hardware/board/config -mindepth 1 -maxdepth 1 -type d ! \( -name '*brd4186c*' -o -name '*brd4187c*' -o -name '*brd4186a*' -o -name '*brd4187a*' -o -name '*brd2601b*' -o -name '*brd2703a*' -o -name '*brd2704a*' -o -name '*component*' \
     -o -name '*brd4316a*' -o -name '*brd4317a*' -o -name '*brd4318a*' -o -name '*brd4319a*' -o -name '*brd4116a*' -o -name '*brd4117a*' -o -name '*brd4118a*' -o -name '*brd2608a*' -o -name '*brd4350a*' -o -name '*brd4351a*' -o -name '*brd2709a*' \
     -o -name '*brd1019a*' -o -name '*brd2719a*' -o -name '*brd4407a*' -o -name '*brd4408a*' \) -exec rm -rf {} + \

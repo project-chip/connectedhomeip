@@ -117,3 +117,19 @@
 // it cannot use "openthread" in the path to the included file.
 //
 #include "openthread-core-efr32-config.h"
+
+#ifndef OPENTHREAD_RADIO
+#define OPENTHREAD_RADIO 0
+#endif
+
+#ifndef SL_OPENTHREAD_COEX_COUNTER_ENABLE
+#define SL_OPENTHREAD_COEX_COUNTER_ENABLE 0
+#endif
+
+#ifndef RADIO_CONFIG_SUBGHZ_SUPPORT
+#define RADIO_CONFIG_SUBGHZ_SUPPORT 0
+#endif
+
+#ifndef TESTING
+#define TESTING 0
+#endif
