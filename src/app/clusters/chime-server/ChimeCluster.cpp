@@ -61,15 +61,19 @@ CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence persistence(context.attributeStorage);
     // Load Active Chime ID
-    VerifyOrReturnValue(persistence.LoadNativeEndianValue<uint8_t>(
-                            ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id), mSelectedChime, 0),
-                        CHIP_NO_ERROR);
+    if (!persistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id),
+                                                    mSelectedChime, 0))
+    {
+        ChipLogError(Zcl, "Chime: Failed to load SelectedChime from persistence, using default value");
+    }
     // Load Enabled
     // Specialization because some platforms `#define` true/false as 1/0 and we get;
     // error: no matching function for call to
     //   'chip::app::AttributePersistence::LoadNativeEndianValue(<brace-enclosed initializer list>, bool&, int)'
-    VerifyOrReturnValue(persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, true),
-                        CHIP_NO_ERROR);
+    if (!persistence.LoadNativeEndianValue<bool>({ mPath.mEndpointId, Chime::Id, Enabled::Id }, mEnabled, true))
+    {
+        ChipLogError(Zcl, "Chime: Failed to load Enabled from persistence, using default value");
+    }
 
     return CHIP_NO_ERROR;
 }
