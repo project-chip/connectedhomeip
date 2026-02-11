@@ -138,7 +138,7 @@ public:
 class TestValidateUrl : public ::testing::Test
 {
 public:
-    TestValidateUrl() : mClusterTester(mServer) {}
+    TestValidateUrl() : mServer{ 1, BitFlags<Feature>(1) }, mClusterTester(mServer) {}
 
     void SetUp() override
     {
@@ -237,10 +237,9 @@ public:
     }
 
 protected:
+    PushAvStreamTransportServer mServer;
     chip::Testing::ClusterTester mClusterTester;
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
-    app::SafeAttributePersistenceProvider * mPreviousPersistenceProvider = nullptr;
-    PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
 };
 
 TEST_F(TestUriExtractionHelpers, ExtractTextRange_ValidRange)

@@ -397,7 +397,6 @@ public:
 
 protected:
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
-    app::SafeAttributePersistenceProvider * mPreviousPersistenceProvider = nullptr;
     PushAvStreamTransportServer mServer{ 1, BitFlags<Feature>(1) };
     chip::Testing::ClusterTester mClusterTester;
 };
