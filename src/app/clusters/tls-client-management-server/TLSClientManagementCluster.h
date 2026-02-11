@@ -25,6 +25,7 @@
 #include <clusters/TlsClientManagement/Commands.h>
 #include <clusters/TlsClientManagement/Metadata.h>
 #include <clusters/TlsClientManagement/Structs.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -38,15 +39,23 @@ class TLSClientManagementDelegate;
 class TLSClientManagementCluster : public DefaultServerCluster, private chip::FabricTable::Delegate
 {
 public:
+    struct Context
+    {
+        FabricTable & fabricTable;
+    };
+
     /**
      * Creates a TLSClientManagement server instance.
+     * @param context The context containing injected dependencies.
+     *                           Note: the caller must ensure that the provided dependencies
+     *                           outlive this instance.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
      * @param certificateTable A reference to the certificate table for looking up certificates
      * @param maxProvisioned The maximum number of endpoints which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TLSClientManagementCluster(EndpointId endpointId, TLSClientManagementDelegate & delegate,
+    TLSClientManagementCluster(const Context & context, EndpointId endpointId, TLSClientManagementDelegate & delegate,
                                Tls::CertificateTable & certificateTable, uint8_t maxProvisioned);
     ~TLSClientManagementCluster();
 
@@ -75,6 +84,7 @@ public:
                                                                CommandHandler * handler) override;
 
 private:
+    Context mContext;
     TLSClientManagementDelegate & mDelegate;
     Tls::CertificateTable & mCertificateTable;
 

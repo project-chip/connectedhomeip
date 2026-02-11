@@ -553,6 +553,11 @@ DataModel::ActionReturnStatus CameraAVStreamManagementCluster::ReadAttribute(con
     case FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mEnabledFeatures));
         break;
+
+    case ClusterRevision::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(CameraAvStreamManagement::kRevision));
+        break;
+
     case MaxConcurrentEncoders::Id:
         VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
