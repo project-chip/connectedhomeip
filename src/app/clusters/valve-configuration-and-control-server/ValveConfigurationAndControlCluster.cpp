@@ -157,7 +157,8 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
         auto status = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mDefaultOpenDuration);
         if (status.IsSuccess())
         {
-            CallDelegatesForAttributeChange([this](auto & delegate) { delegate.OnDefaultOpenDurationChanged(mDefaultOpenDuration); });
+            CallDelegatesForAttributeChange(
+                [this](auto & delegate) { delegate.OnDefaultOpenDurationChanged(mDefaultOpenDuration); });
         }
         return status;
     }
