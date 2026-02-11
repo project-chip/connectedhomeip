@@ -28,7 +28,6 @@ from typing import Any, Protocol
 import chiptest
 import click
 import coloredlogs
-from chiptest import linux
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessKind
