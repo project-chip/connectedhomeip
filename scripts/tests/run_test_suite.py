@@ -505,7 +505,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             elif commissioning_method == 'ble-thread':
                 to_terminate.append(linux.DBusTestSystemBus())
                 to_terminate.append(linux.BluetoothMock())
-                to_terminate.append(linux.ThreadBorderRouter(ns, TEST_THREAD_DATASET))
+                to_terminate.append(linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 

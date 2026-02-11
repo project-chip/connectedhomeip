@@ -31,7 +31,7 @@ class ThreadBorderRouter:
     # The Thread radio simulation node id, choose other if there is a conflict.
     NODE_ID = 9
 
-    def __init__(self, ns: IsolatedNetworkNamespace, test_thread_dataset: str):
+    def __init__(self, test_thread_dataset: str, ns: IsolatedNetworkNamespace):
         self._event = threading.Event()
         self._pattern: Optional[Pattern[str]] = None
         self._event.set()
