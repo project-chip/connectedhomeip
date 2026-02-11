@@ -424,16 +424,15 @@ class Terminable(Protocol):
     help='TODO'
 )
 @click.pass_context
-def cmd_run(context: click.Context, dry_run: bool, iterations: int,
-            app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
+def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
+            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
+            commissioning_method: str, concurrency: int, concurrency_status: float, concurrency_fast: bool,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
             water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
-            chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, commissioning_method: str | None, concurrency: int,
-            concurrency_status: float, concurrency_fast: bool) -> None:
+            chip_tool_with_python: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -510,6 +509,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning_method parameter
+    # TODO: Make commissioning_method into StrEnum
     wifi_required = commissioning_method in ['ble-wifi']
     thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
 
@@ -519,8 +519,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
         log.info("Each test will be executed %d times", iterations)
 
-    config = WorkerConfig(ble_wifi, concurrency, concurrency_status, concurrency_fast, context.obj.dry_run, context.obj.log_config,
-                          paths, pics_file, context.obj.runtime, test_timeout_seconds)
+    config = WorkerConfig(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_fast,
+                          dry_run, context.obj.log_config, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds)
     pool = TestPoolManager(config, iterations, keep_going, expected_failures)
     try:
         pool.run_tests(context.obj.tests)

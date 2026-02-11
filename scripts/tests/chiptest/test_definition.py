@@ -21,6 +21,7 @@ import subprocess
 import tempfile
 import threading
 import time
+import typing
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime

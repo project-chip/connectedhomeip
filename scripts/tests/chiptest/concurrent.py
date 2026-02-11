@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import os
 import queue
 import subprocess
 import sys
@@ -26,7 +27,7 @@ elif sys.platform == "darwin":
 from .accessories import AppsRegister
 from .mp_utils import PROCESS_EXIT_STATES, LogConfig, WrappedProcess, WrappedProcessPoolContext, mp_wrapped_spawn_context
 from .runner import Executor
-from .test_definition import TestDefinition, TestRunTime
+from .test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime
 
 log = logging.getLogger(__name__)
 
@@ -49,13 +50,15 @@ class WorkerError(RuntimeError):
 @dataclass
 class WorkerConfig:
     """Worker configuration which is a subset of command line options."""
-    ble_wifi_enable: bool
+    wifi_required: bool
+    thread_required: bool
+    commissioning_method: str
     concurrency: int
     concurrency_status: float
     concurrency_fast: bool
     dry_run: bool
     logconfig: LogConfig
-    paths: chiptest.ApplicationPaths
+    subproc_info_repo: SubprocessInfoRepo
     pics_file: Path
     runtime: TestRunTime
     test_timeout_seconds: int | None
@@ -113,6 +116,8 @@ class WorkerProcess(WrappedProcess, ABC):
         self.rpc_ns: str | None = None
         self.ble_controller_app: int | None = None
         self.ble_controller_tool: int | None = None
+        self.thread_ba_host: str | None = None
+        self.thread_ba_port: int | None = None
 
         # Initialize platform-specific executor.
         self.executor = self._add_to_clean(executor := self._platform_init())
@@ -191,8 +196,13 @@ class WorkerProcess(WrappedProcess, ABC):
             log.info("Would run test" if self.config.dry_run else "Starting test")
             # TODO: Potentially intercept stdout/stderr to output it in one block.
             test_start = time.monotonic()
-            test.Run(self.runner, self.apps_register, self.config.paths, self.config.pics_file, self.config.test_timeout_seconds,
-                     self.config.dry_run, self.config.runtime, self.ble_controller_app, self.ble_controller_tool)
+            test.Run(self.runner, self.apps_register, self.config.subproc_info_repo, self.config.pics_file,
+                     self.config.test_timeout_seconds, self.config.dry_run, self.config.runtime,
+                     ble_controller_app=self.ble_controller_app,
+                     ble_controller_tool=self.ble_controller_tool,
+                     op_network='Thread' if self.config.thread_required else 'WiFi',
+                     thread_ba_host=self.thread_ba_host,
+                     thread_ba_port=self.thread_ba_port)
             result.runtime = time.monotonic() - test_start
 
             if not self.config.dry_run:
@@ -200,6 +210,10 @@ class WorkerProcess(WrappedProcess, ABC):
         except BaseException as e:
             result.runtime = time.monotonic() - test_start
             result.exception = e
+
+            if Path('thread.pcap').exists():
+                os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
+
             if isinstance(e, KeyboardInterrupt):
                 raise
             log.exception("❌ FAILED in %0.2f seconds", result.runtime, exc_info=True)
@@ -226,20 +240,29 @@ if sys.platform == "linux":
             self.net_ns = self._add_to_clean(net_ns := linux.IsolatedNetworkNamespace(
                 index=self.id,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                app_link_up=not self.config.ble_wifi_enable,
+                app_link_up=not self.config.wifi_required,
+                add_ula=not self.config.thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if self.config.ble_wifi_enable else 'eth-app',
-                wait_for_dad=False))
-            net_ns.wait_for_duplicate_address_detection()
-            self.rpc_ns = net_ns.rpc_ns
+                app_name='wlx-app' if self.config.wifi_required else 'eth-app'))
+            self.rpc_ns = net_ns.mgmt_ns.name
 
-            if self.config.ble_wifi_enable:
+            if self.config.commissioning_method == 'ble-wifi':
                 self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
                 self.bluetooth = self._add_to_clean(linux.BluetoothMock())
                 self.wifi = self._add_to_clean(linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", net_ns))
                 self.ble_controller_app = 0  # Bind app to the first BLE controller
                 self.ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif self.config.commissioning_method == 'ble-thread':
+                self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
+                self.bluetooth = self._add_to_clean(linux.BluetoothMock())
+                self.thread = self._add_to_clean(linux.ThreadBorderRouter(net_ns))
+                self.ble_controller_app = 0   # Bind app to the first BLE controller
+                self.ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif self.config.commissioning_method == 'thread-meshcop':
+                self.thread = self._add_to_clean(thread:=linux.ThreadBorderRouter(net_ns))
+                self.thread_ba_host = thread.get_border_agent_host()
+                self.thread_ba_port = thread.get_border_agent_port()
 
             return linux.LinuxNamespacedExecutor(net_ns)
 
