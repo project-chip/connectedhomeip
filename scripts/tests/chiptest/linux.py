@@ -51,5 +51,5 @@ class LinuxNamespacedExecutor(Executor):
 
     def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None,
             stderr: IO[Any] | LogPipe | None = None):
-        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind.name.lower()))
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess_kind(subproc.kind))
         return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)

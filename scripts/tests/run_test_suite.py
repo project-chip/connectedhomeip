@@ -36,14 +36,14 @@ from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
 
-DEFAULT_CHIP_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
-
 if sys.platform == 'linux':
     import chiptest.linux
 
 if sys.platform == 'darwin':
     import chiptest.darwin
+
+DEFAULT_CHIP_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..', '..'))
 
 class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
