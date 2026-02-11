@@ -291,12 +291,12 @@ class IsolatedNetworkNamespace:
         self.mgmt_link.register_dependencies(self.bridge)
 
         self.ctrl_ns = NetworkNamespace(f"ns-{ctrl_name}-{index}", self._cmd_history)
-        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", "10.10.10.2/24", "fe80::2/64 dev",
+        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", "10.10.10.2/24", "fe80::2/64",
                                      "fd00:0:1:1::2/64" if add_ula else None, self._cmd_history)
         self.ctrl_link.register_dependencies(self.bridge, self.ctrl_ns)
 
         self.app_ns = NetworkNamespace(f"ns-{app_name}-{index}", self._cmd_history)
-        self.app_link = NetworkLink(f"{app_name}-{index}", "10.10.10.1/24", "fe80::1/64 dev",
+        self.app_link = NetworkLink(f"{app_name}-{index}", "10.10.10.1/24", "fe80::1/64",
                                     "fd00:0:1:1::1/64" if add_ula else None, self._cmd_history)
         self.app_link.register_dependencies(self.bridge, self.app_ns)
 
