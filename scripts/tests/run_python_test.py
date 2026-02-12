@@ -364,13 +364,12 @@ def monitor_app_restart_requests(
         restart_flag_file):
     while True:
         # Try to read the restart flag file
-        try:
-            with open(restart_flag_file, 'r') as f:
-                flag_file_content = f.read().strip()
-        except FileNotFoundError:
-            # File doesn't exist yet, continue waiting
+        if not os.path.exists(restart_flag_file):
             time.sleep(0.5)
             continue
+
+        with open(restart_flag_file, 'r') as f:
+            flag_file_content = f.read().strip()
 
         # Successfully read the flag file, remove to prevent multiple restarts
         os.unlink(restart_flag_file)
@@ -393,9 +392,6 @@ def monitor_app_restart_requests(
 
         # Action complete, continue monitoring for additional restart requests
         log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
-
-        # Sleep to prevent tight loop
-        time.sleep(0.5)
 
 
 class FactoryResetType(enum.Enum):
