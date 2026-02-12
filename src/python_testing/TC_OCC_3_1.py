@@ -118,7 +118,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_3_1(self):
-        hold_time = 10 if not self.is_ci else 1 # 10 seconds for occupancy state hold time
+        hold_time = 10 if not self.is_ci else 1  # 10 seconds for occupancy state hold time
         endpoint_id = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
