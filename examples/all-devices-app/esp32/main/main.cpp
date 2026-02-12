@@ -389,6 +389,11 @@ extern "C" void app_main()
     CHIP_ERROR nvsErr =
         ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
 
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+    chip::Shell::DeviceCommands::GetInstance().Register();
+#endif // CONFIG_ENABLE_CHIP_SHELL
+
     if (nvsErr == CHIP_NO_ERROR && storedLen > 0)
     {
         ESP_LOGI(TAG, "==================================================");
@@ -399,10 +404,6 @@ extern "C" void app_main()
     }
     else
     {
-#if CONFIG_ENABLE_CHIP_SHELL
-        chip::LaunchShell();
-        chip::Shell::DeviceCommands::GetInstance().Register();
-#endif // CONFIG_ENABLE_CHIP_SHELL
         ESP_LOGI(TAG, "==================================================");
         ESP_LOGI(TAG, "No stored device type found.");
         ESP_LOGI(TAG, "Use command: devtype set <device-type>");
