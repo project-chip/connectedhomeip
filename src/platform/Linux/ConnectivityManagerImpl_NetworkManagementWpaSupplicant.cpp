@@ -51,6 +51,13 @@ namespace DeviceLayer {
 namespace {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+/*
+During stress tests  we observed a maximum of 5 retries to be enough for successful
+connection in all cases outside of a few outliers. Adding +50% more retries for headroom
+we set the number to 8.
+*/
+constexpr unsigned int kWpaAssocMaxRetries = 8;
+
 static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
 static constexpr char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -268,6 +275,8 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
 
+    ChipLogDetail(DeviceLayer, "wpa_supplicant: Interface properties changed, state is '%s'", state);
+
     if (g_strcmp0(state, "associating") == 0)
     {
         mAssociationStarted = true;
@@ -275,6 +284,12 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     else if (g_strcmp0(state, "disconnected") == 0)
     {
         int reason = wpa_supplicant_1_interface_get_disconnect_reason(iface);
+
+        ChipLogDetail(
+            DeviceLayer,
+            "wpa_supplicant: Disconnected with reason code=%d, assoc status code=%d, auth status code=%d (associationStarted=%d)",
+            reason, wpa_supplicant_1_interface_get_assoc_status_code(iface), wpa_supplicant_1_interface_get_auth_status_code(iface),
+            mAssociationStarted);
 
         if (delegate != nullptr)
         {
@@ -288,6 +303,32 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         {
             uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
             uint16_t status                 = WLAN_STATUS_UNSPECIFIED_FAILURE;
+
+            if (wpa_supplicant_1_interface_get_assoc_status_code(iface) == WLAN_STATUS_AUTH_TIMEOUT)
+            {
+                std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+                /* Handle intermittent association failures */
+                if (mAssociationRetriesLeft > 0)
+                {
+                    mAssociationRetriesLeft--;
+                    ChipLogDetail(DeviceLayer, "wpa_supplicant: Association timeout, %u retries left", mAssociationRetriesLeft);
+
+                    mAssociationStarted = false;
+
+                    GAutoPtr<GError> err;
+                    if (!wpa_supplicant_1_interface_call_select_network_sync(
+                            mWpaSupplicant.iface.get(), mWpaSupplicant.networkPath.get(), nullptr, &err.GetReceiver()))
+                    {
+                        // Fallthrough to existing error handling code as we could not retry.
+                        ChipLogError(DeviceLayer, "wpa_supplicant: Failed to select network: '%s'", err->message);
+                    }
+                    else
+                    {
+                        // Skip existing error handling code to not report error too early to the network commissioning cluster.
+                        return;
+                    }
+                }
+            }
 
             switch (abs(reason))
             {
@@ -823,6 +864,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     // the network we are connected and ignore any errors.
     wpa_supplicant_1_interface_call_disconnect_sync(mWpaSupplicant.iface.get(), nullptr, nullptr);
 
+    mAssociationRetriesLeft = kWpaAssocMaxRetries;
     if (!wpa_supplicant_1_interface_call_select_network_sync(mWpaSupplicant.iface.get(), mWpaSupplicant.networkPath.get(), nullptr,
                                                              &err.GetReceiver()))
     {
