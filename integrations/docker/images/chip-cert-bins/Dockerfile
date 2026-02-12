@@ -380,6 +380,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-controlle
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/closure-app apps/closure-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfc-app apps/jfc-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfa-app apps/jfa-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
 
 # Create symbolic links for now since this allows users to use existing configurations
 # for running just `app-name` instead of `apps/app-name`
@@ -394,11 +395,6 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
-
-# Copy PushAV Server to apps and install dependencies
-COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
-RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt \
-    && patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < apps/push_av_server/hypercorn.patch
 
 # Stage 3.2: Setup the Mock Server
 COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server mock_server

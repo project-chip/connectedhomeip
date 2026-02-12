@@ -886,6 +886,9 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     uint8_t mReadCommissioningInfoProgress = 0; // see ContinueReadingCommissioningInfo()
 
+    // Stores the PASE session address to use as fallback during operational discovery
+    Optional<AddressResolve::ResolveResult> mFallbackOperationalResolveResult;
+
     bool mRunCommissioningAfterConnection = false;
     Internal::InvokeCancelFn mInvokeCancelFn;
     Internal::WriteCancelFn mWriteCancelFn;

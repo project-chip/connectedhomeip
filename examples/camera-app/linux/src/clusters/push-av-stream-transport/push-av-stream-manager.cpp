@@ -638,6 +638,34 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
 
+    if (mPushAvStreamTransportServer)
+    {
+        for (const auto & transportConfig : mPushAvStreamTransportServer->GetLogic().mCurrentConnections)
+        {
+            uint16_t connectionID = transportConfig.connectionID;
+            ChipLogProgress(Zcl, "Re-allocating transport for connection ID: %u", connectionID);
+            const auto transportOptionsPtr = transportConfig.GetTransportOptionsPtr();
+            if (transportOptionsPtr)
+            {
+                Protocols::InteractionModel::Status status =
+                    this->AllocatePushTransport(*transportOptionsPtr, connectionID, transportConfig.GetFabricIndex());
+                if (status != Protocols::InteractionModel::Status::Success)
+                {
+                    ChipLogError(Zcl, "Failed to re-allocate transport for connection ID: %u, status: %u", connectionID,
+                                 to_underlying(status));
+                }
+            }
+            else
+            {
+                ChipLogError(Zcl, "TransportOptionsPtr is null for connection ID: %u", connectionID);
+            }
+        }
+    }
+    else
+    {
+        ChipLogError(Zcl, "PushAvStreamTransportServer is null!");
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -646,7 +674,7 @@ void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
     for (auto & pavst : mTransportMap)
     {
         int connectionId = pavst.first;
-        ChipLogError(Camera, "PushAV sending trigger to connection ID %d", connectionId);
+        ChipLogProgress(Camera, "PushAV sending trigger to connection ID %d", connectionId);
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {
