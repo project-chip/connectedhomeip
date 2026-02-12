@@ -339,6 +339,10 @@ LinuxNetworkRecoveryDataProvider gNetworkRecoveryDataProvider;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::DeviceLayer::AllClustersExampleDeviceInfoProviderImpl gAllClustersExampleDeviceInfoProvider;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+constexpr System::Clock::Seconds16 kFailSafeTimeoutPostCaseEstablishmentNetworkRecovery(60);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -356,6 +360,29 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
         break;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    case DeviceEventType::kSecureSessionEstablished: {
+        ChipLogProgress(DeviceLayer, "DeviceEventCallback: kSecureSessionEstablished %u", event->Type);
+        // If CASE was established over BLE (i.e commissioning channel),
+        // treat it as the session for Network Recovery and
+        // autonomously arm FailSafe for 60s.
+        using namespace chip::Transport;
+        if (event->SecureSessionEstablished.TransportType == to_underlying(Type::kBle) &&
+            event->SecureSessionEstablished.SecureSessionType == to_underlying(SecureSession::Type::kCASE))
+        {
+            auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+            CHIP_ERROR err         = failSafeContext.ArmFailSafe(event->SecureSessionEstablished.FabricIndex,
+                                                                 kFailSafeTimeoutPostCaseEstablishmentNetworkRecovery);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Error arming failsafe on CASE session establishment for Network Recovery");
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Network Recovery: Autonomous FailSafe armed for 60s");
+            }
+        }
+        break;
+    }
     case DeviceEventType::kWiFiConnectivityChange: {
         ChipLogProgress(DeviceLayer, "DeviceEventCallback: kWiFiConnectivityChange %u", event->Type);
         auto change = event->WiFiConnectivityChange.Result;
@@ -1206,7 +1233,7 @@ void WifiConnectivityChanged(chip::DeviceLayer::ConnectivityChange change)
     case ConnectivityChange::kConnectivity_Lost: {
         // platform retries connecting to configured wifi network
         // schedule call to recheck connectivity status after 120s as per spec
-        ChipLogProgress(DeviceLayer, "Network connectivity lost, scheduling network recovery advertisement");
+        ChipLogProgress(DeviceLayer, "Network connectivity lost");
         chip::DeviceLayer::SystemLayer().CancelTimer(CheckNetworkConnectivity, nullptr);
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(120000), CheckNetworkConnectivity, nullptr);
         break;
