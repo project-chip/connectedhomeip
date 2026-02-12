@@ -82,7 +82,6 @@ The buffer sizes can be configured through Kconfig options:
 -   `CONFIG_END_USER_BUFFER_SIZE`: Size of the buffer used to store diagnostic
     data in esp32_diagnostics backend.
 
-
 ### 3. Initialize the Log Provider
 
 Implement the diagnostic logs cluster initialization callback:
@@ -159,8 +158,7 @@ handles diagnostic data collection and transmission to ESP Insights.
 
 ## Insights Example Integration
 
-The `examples/lighting-app/esp32/` demonstrates proper
-integration:
+The `examples/lighting-app/esp32/` demonstrates proper integration:
 
 For more detailed information about insights integration refer to the README.md
 file in each application folder.
