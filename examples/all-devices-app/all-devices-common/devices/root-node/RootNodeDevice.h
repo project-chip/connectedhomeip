@@ -37,57 +37,57 @@
 namespace chip {
 namespace app {
 
-    class RootNodeDevice : public SingleEndpointDevice {
-    public:
-        struct Context {
-            CommissioningWindowManager & commissioningWindowManager;
-            DeviceLayer::ConfigurationManager & configurationManager;
-            DeviceLayer::DeviceControlServer & deviceControlServer;
-            FabricTable & fabricTable;
-            Access::AccessControl & accessControl;
-            PersistentStorageDelegate & persistentStorage;
-            FailSafeContext & failSafeContext;
-            DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
-            DeviceLayer::PlatformManager & platformManager;
-            Credentials::GroupDataProvider & groupDataProvider;
-            SessionManager & sessionManager;
-            DnssdServer & dnssdServer;
-            DeviceLoadStatusProvider & deviceLoadStatusProvider;
-            DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
-            TestEventTriggerDelegate * testEventTriggerDelegate;
-            SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
+class RootNodeDevice : public SingleEndpointDevice
+{
+public:
+    struct Context
+    {
+        CommissioningWindowManager & commissioningWindowManager;
+        DeviceLayer::ConfigurationManager & configurationManager;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
+        FabricTable & fabricTable;
+        Access::AccessControl & accessControl;
+        PersistentStorageDelegate & persistentStorage;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
+        DeviceLayer::PlatformManager & platformManager;
+        Credentials::GroupDataProvider & groupDataProvider;
+        SessionManager & sessionManager;
+        DnssdServer & dnssdServer;
+        DeviceLoadStatusProvider & deviceLoadStatusProvider;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        TestEventTriggerDelegate * testEventTriggerDelegate;
+        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            TermsAndConditionsProvider & termsAndConditionsProvider;
+        TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        };
-
-        RootNodeDevice(const Context & context)
-            : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1))
-            , mContext(context)
-        {
-        }
-        ~RootNodeDevice() override = default;
-
-        CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-            EndpointId parentId = kInvalidEndpointId) override;
-        void UnRegister(CodeDrivenDataModelProvider & provider) override;
-
-    protected:
-        Context mContext;
-
-        LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
-
-    private:
-        LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
-        LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
-            mAdministratorCommissioningCluster;
-        LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;
-        LazyRegisteredServerCluster<Clusters::GroupKeyManagementCluster> mGroupKeyManagementCluster;
-        LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
-        LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
-        LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
     };
+
+    RootNodeDevice(const Context & context) :
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
+    {}
+    ~RootNodeDevice() override = default;
+
+    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointId parentId = kInvalidEndpointId) override;
+    void UnRegister(CodeDrivenDataModelProvider & provider) override;
+
+protected:
+    Context mContext;
+
+    LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
+
+private:
+    LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
+    LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
+        mAdministratorCommissioningCluster;
+    LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;
+    LazyRegisteredServerCluster<Clusters::GroupKeyManagementCluster> mGroupKeyManagementCluster;
+    LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
+    LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
+    LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
+};
 
 } // namespace app
 } // namespace chip
