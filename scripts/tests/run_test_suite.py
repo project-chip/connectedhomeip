@@ -537,7 +537,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
             elif commissioning_method == 'thread-meshcop':
-                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(ns))
+                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                 thread_ba_host = tbr.get_border_agent_host()
                 thread_ba_port = tbr.get_border_agent_port()
 
