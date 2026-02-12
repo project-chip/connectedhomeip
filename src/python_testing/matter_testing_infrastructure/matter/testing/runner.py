@@ -728,11 +728,11 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
         if commissioning_method == 'thread-meshcop':
-            if args.border_agent_ip_addr is None or args.border_agent_port is None:
-                print("error: missing --border-agent-ip-addr or --border-agent-port for --commissioning-method thread-meshcop!")
+            if args.thread_ba_host is None or args.thread_ba_port is None:
+                print("error: missing --thread-ba-host or --thread-ba-port for --commissioning-method thread-meshcop!")
                 return False
-            config.border_agent_ip_addr = args.border_agent_ip_addr
-            config.border_agent_port = args.border_agent_port
+            config.thread_ba_host = args.thread_ba_host
+            config.thread_ba_port = args.thread_ba_port
     elif config.commissioning_method == "on-network-ip":
         if args.ip_addr is None:
             print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
@@ -914,9 +914,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
-    commission_group.add_argument('--border-agent-ip-addr', action="store", type=str,
+    commission_group.add_argument('--thread-ba-host', action="store", type=str,
                                   help="Border Agent IP address")
-    commission_group.add_argument('--border-agent-port', action="store", type=int,
+    commission_group.add_argument('--thread-ba-port', action="store", type=int,
                                   help="Border Agent port")
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
