@@ -36,8 +36,10 @@ CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
+    auto * safeAttributePersistenceProvider = GetSafeAttributePersistenceProvider();
+    VerifyOrReturnError(safeAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ChimeCluster::Context chimeContext{ .delegate                         = mDelegate,
-                                        .safeAttributePersistenceProvider = *GetSafeAttributePersistenceProvider() };
+                                        .safeAttributePersistenceProvider = *safeAttributePersistenceProvider };
     mChimeCluster.Create(endpoint, chimeContext);
     ReturnErrorOnFailure(provider.AddCluster(mChimeCluster.Registration()));
 
