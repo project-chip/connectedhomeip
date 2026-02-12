@@ -159,19 +159,30 @@ void MySensorHardwareCallback(bool isOccupied)
 
 ### Notes and Limitations for Legacy Usage
 
-Unlike the legacy implementation, the current implementation handles all timer
+* Unlike the legacy implementation, the current implementation handles all timer
 related functionality related to the `holdTime` attribute. So the application
 should no longer maintain any `holdTime` timer.
 
-The global attribute setter/getters are no longer available. This is now
+* The global attribute setter/getters are no longer available. This is now
 exclusively done using the public methods from the `OccupancySensingCluster`
 class.
 
-Post attribute change callback are now exclusively handled by implementing an
+* Post attribute change callback are now exclusively handled by implementing an
 `OccupancySensingDelegate`.
 
-The Feature map is hardcoded to 0 (defaults to PIR) when relying on
+* The Feature map is hardcoded to 0 (defaults to PIR) when relying on
 `CodegenIntegration.cpp` (ZAP) for legacy usage. If your application needs to
-enable other features, it MUST instantiate and configure the cluster directly
-using `config.WithFeatures(featureMap)`as shown in section
-[Instantiate Delegates and Cluster](#2-instantiate-delegates-and-cluster) .
+enable other features, it MUST instantiate and configure the cluster directly.
+The legacy API assumed there was only a single instance of Occupancy Sensor 
+and allowed the application to configure the feature map with:
+```
+OccupancySensing::Instance(Feature::kPassiveInfrared);
+```
+Now, this must be done using `config.WithFeatures(featureMap)`as shown in section
+[Instantiate Delegates and Cluster](#2-instantiate-delegates-and-cluster) through the constructor for each instance of the cluster:
+
+```
+auto config = Clusters::OccupancySensingCluster::Config(kYourEndpointId)
+
+RegisteredServerCluster<Clusters::OccupancySensingCluster> myOccupancyCluster(config.WithFeatures(Feature::kPassiveInfrared));
+```
