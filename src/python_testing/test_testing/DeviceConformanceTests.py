@@ -453,8 +453,13 @@ class DeviceConformanceTests(BasicCompositionTests):
             else:
                 fn = record_warning
             extra_clusters = set(server_clusters) - set(endpoint_clusters)
-            for extra in extra_clusters:
-                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra)
+            for extra_cluster_id in extra_clusters:
+                # TODO(#43099): Remove on 1.6 Data Model file generation
+                # Skip Groupcast cluster because missing from Data Model files
+                if extra_cluster_id == Clusters.Groupcast.id:
+                    continue
+
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra_cluster_id)
                 fn(location=location, problem=f"Extra cluster found on endpoint with device types {device_type_list}")
 
         return success, problems
