@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="6">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0202" name="Window Covering" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation"/>
@@ -65,8 +65,22 @@ Davis, CA 95616, USA
     <revision revision="4" summary="Scenes Management cluster was removed from Cluster Requirements"/>
     <revision revision="5" summary="Introduced conditions on Closure clusters"/>
     <revision revision="6" summary="Removed Zigbee related elements"/>
+    <revision revision="7" summary="Added Groupcast condition requirement"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="GroupcastListenerCond">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <condition name="Active"/>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>

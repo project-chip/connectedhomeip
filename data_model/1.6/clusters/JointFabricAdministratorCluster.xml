@@ -68,6 +68,44 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="JFPKI" scope="Node"/>
   <dataTypes>
+    <enum name="ICACCSRResponseStatusCodeEnum">
+      <item value="0" name="OK" summary="No error">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="1" name="Busy" summary="Could not be completed because another commissioning is in progress">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="2" name="PAKEParameterError" summary="Provided PAKE parameters were incorrectly formatted or otherwise invalid">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="3" name="WindowNotOpen" summary="The Joint Commissioning Method commissioning window is not currently open">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="4" name="VIDNotVerified" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="5" name="InvalidAdministratorFabricIndex" summary="OpenJointCommissioningWindow command has been invoked but the AdministratorFabricIndex field has the value of null">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+    </enum>
     <enum name="ICACResponseStatusEnum">
       <item value="0" name="OK" summary="No error">
         <mandatoryConform/>
@@ -77,38 +115,6 @@ Davis, CA 95616, USA
       </item>
       <item value="2" name="InvalidICAC" summary="ICAC chain validation failed / ICAC DN Encoding rules verification failed">
         <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="StatusCodeEnum">
-      <item value="0x02" name="Busy" summary="Could not be completed because another commissioning is in progress">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
-      </item>
-      <item value="0x03" name="PAKEParameterError" summary="Provided PAKE parameters were incorrectly formatted or otherwise invalid">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
-      </item>
-      <item value="0x04" name="WindowNotOpen" summary="No commissioning window was currently open">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
-      </item>
-      <item value="0x05" name="VIDNotVerified" summary="ICACCSRRequest command has been invoked by a peer against which Fabric Table VID Verification hasn&apos;t been executed">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
-      </item>
-      <item value="0x06" name="InvalidAdministratorFabricIndex" summary="OpenJointCommissioningWindow command has been invoked but the AdministratorFabricIndex field has the value of null">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
       </item>
     </enum>
     <enum name="TransferAnchorResponseStatusEnum">
@@ -152,8 +158,23 @@ Davis, CA 95616, USA
         <provisionalConform/>
         <mandatoryConform/>
       </otherwiseConform>
-      <field id="0" name="ICACCSR" type="octstr">
-        <mandatoryConform/>
+      <field id="0" name="StatusCode" type="ICACCSRResponseStatusCodeEnum">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </field>
+      <field id="1" name="ICACCSR" type="octstr">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <equalTerm>
+              <field name="StatusCode"/>
+              <status name="SUCCESS"/>
+            </equalTerm>
+          </mandatoryConform>
+          <optionalConform/>
+        </otherwiseConform>
         <constraint>
           <maxLength value="600"/>
         </constraint>

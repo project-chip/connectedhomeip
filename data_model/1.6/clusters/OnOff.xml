@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off Cluster" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off Cluster" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1555"/>
     <revision revision="2" summary="ZLO 1.0: StartUpOnOff"/>
@@ -65,6 +65,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="New data model format and notation"/>
     <revision revision="5" summary="Addition of Dead Front behavior and associated FeatureMap entry"/>
     <revision revision="6" summary="Addition of OffOnly feature and associated FeatureMap entry"/>
+    <revision revision="7" summary="Added Q quality to OnTime and OffWaitTime attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0006" name="On/Off"/>
@@ -152,12 +153,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4001" name="OnTime" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality quieterReporting="true"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x4002" name="OffWaitTime" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality quieterReporting="true"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>

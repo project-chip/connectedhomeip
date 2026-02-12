@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
+    <revision revision="3" summary="Refocus on pure key management; move group management to Groupcast cluster"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x003F" name="Group Key Management"/>
@@ -69,6 +70,9 @@ Davis, CA 95616, USA
   <features>
     <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP.">
       <provisionalConform/>
+    </feature>
+    <feature bit="1" code="GCAST" name="Groupcast" summary="The device supports groups using the Groupcast cluster.">
+      <mandatoryConform/>
     </feature>
   </features>
   <dataTypes>
@@ -85,9 +89,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="1" name="CacheAndSync" summary="Message counter synchronization using cache-and-sync">
-        <mandatoryConform>
-          <feature name="CS"/>
-        </mandatoryConform>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="CS"/>
+          </mandatoryConform>
+        </otherwiseConform>
       </item>
     </enum>
     <struct name="GroupInfoMapStruct">
@@ -172,6 +179,12 @@ Davis, CA 95616, USA
       </field>
       <access fabricScoped="true"/>
     </struct>
+    <struct name="GroupcastAdoptionStruct">
+      <field id="0" name="GroupcastAdopted" type="bool">
+        <mandatoryConform/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="GroupKeyMap" type="list" default="empty">
@@ -205,6 +218,17 @@ Davis, CA 95616, USA
           <from value="1"/>
           <to value="65535"/>
         </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="GroupcastAdoption" type="list">
+      <entry type="GroupcastAdoptionStruct"/>
+      <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="GCAST"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
       </constraint>
     </attribute>
   </attributes>

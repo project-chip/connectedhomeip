@@ -57,15 +57,29 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0045" name="Boolean State Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0045" name="Boolean State Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Removed P quality"/>
+    <revision revision="3" summary="Introduced ChangeEvent feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0045" name="Boolean State"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="BOOL" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="CHGEVENT" name="ChangeEvent" summary="Supports reporting change events">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="3"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
+      </otherwiseConform>
+    </feature>
+  </features>
   <attributes>
     <attribute id="0x0000" name="StateValue" type="bool">
       <access read="true" readPrivilege="view"/>
@@ -75,7 +89,12 @@ Davis, CA 95616, USA
   <events>
     <event id="0x00" name="StateChange" priority="info">
       <access readPrivilege="view"/>
-      <optionalConform/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="CHGEVENT"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
       <field id="0" name="StateValue" type="bool">
         <mandatoryConform/>
       </field>

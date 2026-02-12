@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -57,45 +57,73 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0203" name="Window Covering Controller" revision="5">
-  <revisionHistory>
-    <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
-    <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
-    <revision revision="4" summary="Removed Zigbee related elements and Scenes Management cluster was removed from Cluster Requirements"/>
-    <revision revision="5" summary="Added Groupcast condition requirement"/>
-  </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
-  <conditionRequirements>
-    <deviceType id="0x0016" name="Root Node">
-      <conditionRequirement name="GroupcastSenderCond">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <condition name="Active"/>
-          </mandatoryConform>
-          <optionalConform/>
-        </otherwiseConform>
-      </conditionRequirement>
-    </deviceType>
-  </conditionRequirements>
-  <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0003" name="Identify" side="client">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0004" name="Groups" side="client">
-      <otherwiseConform>
-        <mandatoryConform>
-          <condition name="Active"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0102" name="Window Covering" side="client">
-      <mandatoryConform/>
-    </cluster>
-  </clusters>
-</deviceType>
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x004A" name="Identified Sound">
+  <tags>
+    <tag id="0x0000" name="Unknown">
+      <description>Unidentifiable audio context is detected.</description>
+    </tag>
+    <tag id="0x0001" name="ObjectFall">
+      <description>Object falling to the floor is detected.</description>
+    </tag>
+    <tag id="0x0002" name="Snoring">
+      <description>Human snoring sound is detected.</description>
+    </tag>
+    <tag id="0x0003" name="Coughing">
+      <description>Human coughing sound is detected.</description>
+    </tag>
+    <tag id="0x0004" name="Barking">
+      <description>Dog barking sound is detected.</description>
+    </tag>
+    <tag id="0x0005" name="Shattering">
+      <description>Object shattering sound is detected.</description>
+    </tag>
+    <tag id="0x0006" name="BabyCrying">
+      <description>Baby crying sound is detected.</description>
+    </tag>
+    <tag id="0x0007" name="UtilityAlarm">
+      <description>Utility device alarming or warning sound is detected.</description>
+    </tag>
+    <tag id="0x0008" name="UrgentShouting">
+      <description>Urgent shouting sound is detected.</description>
+    </tag>
+    <tag id="0x0009" name="Doorbell">
+      <description>Doorbell ringing is detected.</description>
+    </tag>
+    <tag id="0x000A" name="Knocking">
+      <description>Door knocking sound is detected.</description>
+    </tag>
+    <tag id="0x000B" name="UrgentSiren">
+      <description>Urgent situational siren sound is detected.</description>
+    </tag>
+    <tag id="0x000C" name="FaucetRunning">
+      <description>Faucet water running sound is detected.</description>
+    </tag>
+    <tag id="0x000D" name="KettleBoiling">
+      <description>Kettle water boiling sound is detected.</description>
+    </tag>
+    <tag id="0x000E" name="FanDryer">
+      <description>Hair/hand fan dryer sound is detected.</description>
+    </tag>
+    <tag id="0x000F" name="Clapping">
+      <description>Hand clapping sound is detected.</description>
+    </tag>
+    <tag id="0x0010" name="FingerSnapping">
+      <description>Finger snapping sound is detected.</description>
+    </tag>
+    <tag id="0x0011" name="Meowing">
+      <description>Cat meowing sound is detected.</description>
+    </tag>
+    <tag id="0x0012" name="Laughing">
+      <description>Human laughing sound is detected.</description>
+    </tag>
+    <tag id="0x0013" name="GlassBreaking">
+      <description>Glass breaking sound is detected.</description>
+    </tag>
+    <tag id="0x0014" name="DoorKnocking">
+      <description>Door knocking sound is detected.</description>
+    </tag>
+    <tag id="0x0015" name="PersonTalking">
+      <description>Person talking sound is detected.</description>
+    </tag>
+  </tags>
+</namespace>

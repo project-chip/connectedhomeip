@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005C" name="Smoke CO Alarm Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005C" name="Smoke CO Alarm Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Inoperative to ExpressedStateEnum and added Unmounted attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x005C" name="Smoke CO Alarm"/>
@@ -138,6 +139,17 @@ Davis, CA 95616, USA
       </item>
       <item value="8" name="InterconnectCO" summary="Interconnected CO Alarm State">
         <optionalConform/>
+      </item>
+      <item value="9" name="Inoperative" summary="Hardware is not able to detect Smoke or CO">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform>
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+          </optionalConform>
+        </otherwiseConform>
       </item>
     </enum>
     <enum name="MuteStateEnum">
@@ -228,6 +240,18 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <optionalConform/>
+    </attribute>
+    <attribute id="0x000D" name="Unmounted" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </optionalConform>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>

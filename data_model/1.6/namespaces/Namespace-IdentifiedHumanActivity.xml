@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -57,45 +57,37 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0203" name="Window Covering Controller" revision="5">
-  <revisionHistory>
-    <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
-    <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
-    <revision revision="4" summary="Removed Zigbee related elements and Scenes Management cluster was removed from Cluster Requirements"/>
-    <revision revision="5" summary="Added Groupcast condition requirement"/>
-  </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
-  <conditionRequirements>
-    <deviceType id="0x0016" name="Root Node">
-      <conditionRequirement name="GroupcastSenderCond">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <condition name="Active"/>
-          </mandatoryConform>
-          <optionalConform/>
-        </otherwiseConform>
-      </conditionRequirement>
-    </deviceType>
-  </conditionRequirements>
-  <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0003" name="Identify" side="client">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0004" name="Groups" side="client">
-      <otherwiseConform>
-        <mandatoryConform>
-          <condition name="Active"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0102" name="Window Covering" side="client">
-      <mandatoryConform/>
-    </cluster>
-  </clusters>
-</deviceType>
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x004B" name="Identified Human Activity">
+  <tags>
+    <tag id="0x0000" name="Unknown">
+      <description>Unknown human activity is detected.</description>
+    </tag>
+    <tag id="0x0001" name="Fall">
+      <description>Human fall is detected.</description>
+    </tag>
+    <tag id="0x0002" name="Sleeping">
+      <description>Human sleeping is detected.</description>
+    </tag>
+    <tag id="0x0003" name="Walking">
+      <description>Human walking is detected.</description>
+    </tag>
+    <tag id="0x0004" name="Workout">
+      <description>Human workout is detected.</description>
+    </tag>
+    <tag id="0x0005" name="Sitting">
+      <description>Human sitting is detected.</description>
+    </tag>
+    <tag id="0x0006" name="Standing">
+      <description>Human standing is detected.</description>
+    </tag>
+    <tag id="0x0007" name="Dancing">
+      <description>Human dancing is detected.</description>
+    </tag>
+    <tag id="0x0008" name="PackageDelivery">
+      <description>Human delivery of package is detected.</description>
+    </tag>
+    <tag id="0x0009" name="PackageRetrieval">
+      <description>Human retrieval of package is detected.</description>
+    </tag>
+  </tags>
+</namespace>

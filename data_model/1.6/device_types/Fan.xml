@@ -57,14 +57,25 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002B" name="Fan" revision="4">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002B" name="Fan" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ability to be composed with a Thermostat for fan heaters"/>
     <revision revision="3" summary="Added On/Off cluster"/>
     <revision revision="4" summary="Moved FanModeSequence element requirement to Fan Control cluster"/>
+    <revision revision="5" summary="Added Groupcast condition requirement"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="GroupcastListenerCond">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>

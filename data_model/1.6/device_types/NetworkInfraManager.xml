@@ -57,13 +57,34 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0090" name="Network Infrastructure Manager" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0090" name="Network Infrastructure Manager" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
-    <revision revision="2" summary="Add Thread Network Diagnostics requirement; extend &quot;Other Requirements&quot; section"/>
+    <revision revision="2" summary="Added Thread Network Diagnostics requirement; extended &quot;Other Requirements&quot; section"/>
+    <revision revision="3" summary=""/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditionRequirements>
+    <deviceType name="Base Device Type">
+      <conditionRequirement name="IP">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="IPv4">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="IPv6">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="Ethernet">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="Wi-Fi">
+        <mandatoryConform/>
+      </conditionRequirement>
+      <conditionRequirement name="Thread">
+        <mandatoryConform/>
+      </conditionRequirement>
+    </deviceType>
     <deviceType id="0x0016" name="Root Node">
       <conditionRequirement name="ManagedAclAllowed">
         <optionalConform/>
@@ -74,6 +95,12 @@ Davis, CA 95616, USA
     <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
       <mandatoryConform/>
     </cluster>
+    <cluster id="0x0450" name="Network Identity Management" side="server">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
+    </cluster>
     <cluster id="0x0451" name="Wi-Fi Network Management" side="server">
       <mandatoryConform/>
     </cluster>
@@ -82,6 +109,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0453" name="Thread Network Directory" side="server">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0454" name="Thread Border Router Diagnostics" side="server">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>

@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="4">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0016" name="Root Node" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added Power Source to device type; Deprecated Power Source Configuration"/>
     <revision revision="3" summary="Added restriction on Managed Device feature of Access Control cluster"/>
     <revision revision="4" summary="Added conditions and cluster requirements for Time Sync, TLS, and Power Source clusters"/>
+    <revision revision="5" summary="Added conditions and cluster requirements for the Groupcast cluster"/>
   </revisionHistory>
   <classification class="node" scope="node"/>
   <conditions>
@@ -76,6 +77,8 @@ Davis, CA 95616, USA
     <condition name="TLSClientCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to use TLS Client Management. Since TLS requires basic Time Sync support, this will include that dependency."/>
     <condition name="PowerSourceCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs to have Power Source be on the Root Node."/>
     <condition name="ACLExtensionCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs the Access Control instance to have the Extension attribute."/>
+    <condition name="GroupcastListenerCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs the Groupcast Server cluster instance with the Listener feature. This condition SHALL be supported if any endpoint implements the Groups cluster server on an endpoint."/>
+    <condition name="GroupcastSenderCond" summary="The node has at least one endpoint where some Device Type present on the endpoint needs the Groupcast Server cluster instance with the Sender feature. This condition SHALL be supported if any endpoint implements the Bindings cluster server on an endpoint."/>
   </conditions>
   <clusters>
     <cluster id="0x001F" name="Access Control" side="server">
@@ -86,6 +89,11 @@ Davis, CA 95616, USA
           <optionalConform>
             <condition name="ManagedAclAllowed"/>
           </optionalConform>
+        </feature>
+        <feature code="AUX">
+          <mandatoryConform>
+            <condition name="GroupcastListenerCond"/>
+          </mandatoryConform>
         </feature>
       </features>
       <attributes>
@@ -297,6 +305,36 @@ Davis, CA 95616, USA
           <mandatoryConform>
             <condition name="LIT"/>
           </mandatoryConform>
+        </feature>
+      </features>
+    </cluster>
+    <cluster id="0x0065" name="Groupcast" side="server">
+      <quality singleton="true"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="GroupcastListenerCond"/>
+        </mandatoryConform>
+        <mandatoryConform>
+          <condition name="GroupcastSenderCond"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <features>
+        <feature code="LN">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="GroupcastListenerCond"/>
+            </mandatoryConform>
+            <optionalConform/>
+          </otherwiseConform>
+        </feature>
+        <feature code="SD">
+          <otherwiseConform>
+            <mandatoryConform>
+              <condition name="GroupcastSenderCond"/>
+            </mandatoryConform>
+            <optionalConform/>
+          </otherwiseConform>
         </feature>
       </features>
     </cluster>

@@ -57,13 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0028" name="Basic Information Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
     <revision revision="4" summary="Updated conformance for UniqueID to mandatory"/>
     <revision revision="5" summary="Added ConfigurationVersion attribute"/>
+    <revision revision="6"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0028" name="Basic Information"/>
@@ -161,7 +162,7 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="3"/>
-            <to value="1000"/>
+            <to value="10000"/>
           </between>
         </constraint>
       </field>
@@ -170,7 +171,63 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="3"/>
-            <to value="1000"/>
+            <to value="10000"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="SimultaneousInvocationsSupported" type="uint16">
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="6"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="10000"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="3" name="SimultaneousWritesSupported" type="uint16">
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="6"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="10000"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="ReadPathsSupported" type="uint16">
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="6"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="9"/>
+            <to value="10000"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="5" name="SubscribePathsSupported" type="uint16">
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="6"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+        <constraint>
+          <between>
+            <from value="3"/>
+            <to value="10000"/>
           </between>
         </constraint>
       </field>

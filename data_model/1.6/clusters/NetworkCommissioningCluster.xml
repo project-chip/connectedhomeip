@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Support determining capabilities for Wi-Fi and Thread interfaces. Additional Wi-Fi directed scanning requirements."/>
+    <revision revision="3" summary="Added support for Wi-Fi Per-Device Credentials (PDC feature; QueryIdentity and QueryIdentityResponse commands; PDC-related fields in commands)."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0031" name="Network Commissioning"/>
@@ -75,6 +76,14 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="2" code="ET" name="EthernetNetworkInterface" summary="Ethernet related features">
       <optionalConform choice="a"/>
+    </feature>
+    <feature bit="3" code="PDC" name="PerDeviceCredentials" summary="Wi-Fi Per-Device Credentials">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="WI"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -172,6 +181,12 @@ Davis, CA 95616, USA
       <bitfield name="WPA3-PERSONAL" bit="4" summary="Supports Wi-Fi using WPA3-Personal security">
         <mandatoryConform/>
       </bitfield>
+      <bitfield name="WPA3-Matter-PDC" bit="5" summary="Supports Wi-Fi using Per-Device Credentials">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </bitfield>
     </bitmap>
     <struct name="NetworkInfoStruct">
       <field id="0" name="NetworkID" type="octstr">
@@ -186,25 +201,43 @@ Davis, CA 95616, USA
       <field id="1" name="Connected" type="bool">
         <mandatoryConform/>
       </field>
+      <field id="2" name="NetworkIdentifier" type="octstr" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="PDC"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <allowed value="20"/>
+        </constraint>
+      </field>
+      <field id="3" name="ClientIdentifier" type="octstr" default="null">
+        <quality nullable="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="PDC"/>
+          </mandatoryConform>
+        </otherwiseConform>
+        <constraint>
+          <allowed value="20"/>
+        </constraint>
+      </field>
     </struct>
     <struct name="ThreadInterfaceScanResultStruct">
       <field id="0" name="PanId" type="uint16">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint>
           <max value="65534"/>
         </constraint>
       </field>
       <field id="1" name="ExtendedPanId" type="uint64">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </field>
       <field id="2" name="NetworkName" type="string">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint>
           <lengthBetween>
             <from value="1"/>
@@ -213,19 +246,13 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="3" name="Channel" type="uint16">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </field>
       <field id="4" name="Version" type="uint8">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </field>
       <field id="5" name="ExtendedAddress" type="hwadr">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint>
           <allowed value="6"/>
         </constraint>
@@ -234,52 +261,36 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="6" name="RSSI" type="int8">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </field>
       <field id="7" name="LQI" type="uint8">
-        <mandatoryConform>
-          <feature name="TH"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </field>
     </struct>
     <struct name="WiFiInterfaceScanResultStruct">
       <field id="0" name="Security" type="WiFiSecurityBitmap">
-        <mandatoryConform>
-          <feature name="WI"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </field>
       <field id="1" name="SSID" type="octstr">
-        <mandatoryConform>
-          <feature name="WI"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint>
           <maxLength value="32"/>
         </constraint>
       </field>
       <field id="2" name="BSSID" type="octstr">
-        <mandatoryConform>
-          <feature name="WI"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint>
           <allowed value="6"/>
         </constraint>
       </field>
       <field id="3" name="Channel" type="uint16">
-        <mandatoryConform>
-          <feature name="WI"/>
-        </mandatoryConform>
+        <mandatoryConform/>
       </field>
       <field id="4" name="WiFiBand" type="WiFiBandEnum">
-        <optionalConform>
-          <feature name="WI"/>
-        </optionalConform>
+        <optionalConform/>
       </field>
       <field id="5" name="RSSI" type="int8">
-        <optionalConform>
-          <feature name="WI"/>
-        </optionalConform>
+        <optionalConform/>
       </field>
     </struct>
   </dataTypes>
@@ -463,6 +474,30 @@ Davis, CA 95616, USA
       <field id="2" name="Breadcrumb" type="uint64">
         <optionalConform/>
       </field>
+      <field id="3" name="NetworkIdentity" type="octstr">
+        <optionalConform>
+          <feature name="PDC"/>
+        </optionalConform>
+        <constraint>
+          <maxLength value="140"/>
+        </constraint>
+      </field>
+      <field id="4" name="ClientIdentifier" type="octstr">
+        <optionalConform>
+          <field name="NetworkIdentity"/>
+        </optionalConform>
+        <constraint>
+          <allowed value="20"/>
+        </constraint>
+      </field>
+      <field id="5" name="PossessionNonce" type="octstr">
+        <optionalConform>
+          <field name="NetworkIdentity"/>
+        </optionalConform>
+        <constraint>
+          <allowed value="32"/>
+        </constraint>
+      </field>
     </command>
     <command id="0x03" name="AddOrUpdateThreadNetwork" direction="commandToServer" response="NetworkConfigResponse">
       <access invokePrivilege="admin"/>
@@ -538,6 +573,25 @@ Davis, CA 95616, USA
           </max>
         </constraint>
       </field>
+      <field id="3" name="ClientIdentity" type="octstr">
+        <mandatoryConform>
+          <command name="AddOrUpdateWiFiNetwork" field="NetworkIdentity"/>
+        </mandatoryConform>
+        <constraint>
+          <maxLength value="140"/>
+        </constraint>
+      </field>
+      <field id="4" name="PossessionSignature" type="octstr">
+        <mandatoryConform>
+          <andTerm>
+            <command name="AddOrUpdateWiFiNetwork" field="NetworkIdentity"/>
+            <command name="AddOrUpdateWiFiNetwork" field="PossessionNonce"/>
+          </andTerm>
+        </mandatoryConform>
+        <constraint>
+          <allowed value="64"/>
+        </constraint>
+      </field>
     </command>
     <command id="0x06" name="ConnectNetwork" direction="commandToServer" response="ConnectNetworkResponse">
       <access invokePrivilege="admin"/>
@@ -603,6 +657,51 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Breadcrumb" type="uint64">
         <optionalConform/>
+      </field>
+    </command>
+    <command id="0x09" name="QueryIdentity" direction="commandToServer" response="QueryIdentityResponse">
+      <access invokePrivilege="admin"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PDC"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="KeyIdentifier" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="20"/>
+        </constraint>
+      </field>
+      <field id="1" name="PossessionNonce" type="octstr">
+        <optionalConform/>
+        <constraint>
+          <allowed value="32"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0A" name="QueryIdentityResponse" direction="responseFromServer">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="PDC"/>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="Identity" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="140"/>
+        </constraint>
+      </field>
+      <field id="1" name="PossessionSignature" type="octstr">
+        <mandatoryConform>
+          <command name="QueryIdentity">
+            <field name="PossessionNonce"/>
+          </command>
+        </mandatoryConform>
+        <constraint>
+          <allowed value="64"/>
+        </constraint>
       </field>
     </command>
   </commands>

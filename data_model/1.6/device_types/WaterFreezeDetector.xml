@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0041" name="Water Freeze Detector" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0041" name="Water Freeze Detector" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added BooleanState ChangeEvent feature as mandatory"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
@@ -68,6 +69,16 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0045" name="Boolean State" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="CHGEVENT">
+          <mandatoryConform>
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+          </mandatoryConform>
+        </feature>
+      </features>
       <events>
         <event id="0x0000" name="StateChange">
           <mandatoryConform/>

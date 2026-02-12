@@ -57,14 +57,25 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010D" name="Extended Color Light" revision="4">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010D" name="Extended Color Light" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation; integrate DM CCB 3501"/>
     <revision revision="3" summary="Added optional occupancy sensing"/>
     <revision revision="4" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
+    <revision revision="5" summary="Added Groupcast condition requirement."/>
   </revisionHistory>
   <classification superset="Color Temperature Light" class="simple" scope="endpoint"/>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="GroupcastListenerCond">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
