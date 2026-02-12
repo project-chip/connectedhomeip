@@ -85,7 +85,7 @@ void ChimeCluster::LoadPersistentAttributes()
 {
     // Load Active Chime ID
     uint8_t storedSelectedChime = 0;
-    CHIP_ERROR err = mContext.safeAttributePersistenceProvider.ReadScalarValue(
+    CHIP_ERROR err              = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id), storedSelectedChime);
     if (err == CHIP_NO_ERROR)
     {
@@ -99,8 +99,8 @@ void ChimeCluster::LoadPersistentAttributes()
 
     // Load Enabled
     bool storedEnabled = false;
-    err = mContext.safeAttributePersistenceProvider.ReadScalarValue(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id),
-                                                                    storedEnabled);
+    err                = mContext.safeAttributePersistenceProvider.ReadScalarValue(
+        ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id), storedEnabled);
     if (err == CHIP_NO_ERROR)
     {
         mEnabled = storedEnabled;
