@@ -40,8 +40,8 @@ CHIP_ERROR ChimeServer::Init()
     SafeAttributePersistenceProvider * provider = GetSafeAttributePersistenceProvider();
     VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ChimeCluster::Context context{ .safeAttributePersistenceProvider = *provider };
-    mCluster.Create(mEndpointId, context, *mDelegate);
+    ChimeCluster::Context context{ .delegate = *mDelegate, .safeAttributePersistenceProvider = *provider };
+    mCluster.Create(mEndpointId, context);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 

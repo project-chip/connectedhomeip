@@ -72,11 +72,12 @@ MyChimeDelegate gMyChimeDelegate;
 chip::app::SafeAttributePersistenceProvider & persistenceProvider = /* ... */;
 
 chip::app::Clusters::ChimeCluster::Context chimeContext{
+    .delegate = gMyChimeDelegate,
     .safeAttributePersistenceProvider = persistenceProvider
 };
 
 chip::app::RegisteredServerCluster<chip::app::Clusters::ChimeCluster> gChimeCluster(
-    chip::EndpointId{ 1 }, chimeContext, gMyChimeDelegate);
+    chip::EndpointId{ 1 }, chimeContext);
 ```
 
 ### 3. Register the Cluster

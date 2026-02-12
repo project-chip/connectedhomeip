@@ -44,15 +44,15 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-ChimeCluster::ChimeCluster(EndpointId endpointId, const Context & context, ChimeDelegate & delegate) :
-    DefaultServerCluster({ endpointId, Chime::Id }), mContext(context), mDelegate(delegate)
+ChimeCluster::ChimeCluster(EndpointId endpointId, const Context & context) :
+    DefaultServerCluster({ endpointId, Chime::Id }), mContext(context)
 {
-    mDelegate.SetChimeCluster(this);
+    mContext.delegate.SetChimeCluster(this);
 }
 
 ChimeCluster::~ChimeCluster()
 {
-    mDelegate.SetChimeCluster(nullptr);
+    mContext.delegate.SetChimeCluster(nullptr);
 }
 
 CHIP_ERROR ChimeCluster::Startup(ServerClusterContext & context)
@@ -156,7 +156,7 @@ CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder:
         // CopyCharSpanToMutableCharSpan to copy data in
         char buffer[kMaxChimeSoundNameSize];
         MutableCharSpan name(buffer);
-        auto err = mDelegate.GetChimeSoundByIndex(i, chimeSound.chimeID, name);
+        auto err = mContext.delegate.GetChimeSoundByIndex(i, chimeSound.chimeID, name);
 
         // return if we've run off the end of the Chime Sound List on the delegate
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -185,7 +185,7 @@ CHIP_ERROR ChimeCluster::EncodeSupportedChimeSounds(const AttributeValueEncoder:
 bool ChimeCluster::IsSupportedChimeID(uint8_t chimeID)
 {
     uint8_t supportedChimeID;
-    for (uint8_t i = 0; mDelegate.GetChimeIDByIndex(i, supportedChimeID) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    for (uint8_t i = 0; mContext.delegate.GetChimeIDByIndex(i, supportedChimeID) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
     {
         if (supportedChimeID == chimeID)
         {
@@ -289,7 +289,7 @@ DataModel::ActionReturnStatus ChimeCluster::HandlePlayChimeSound(CommandHandler 
         chimeIDToUse = commandData.chimeID.Value();
     }
 
-    Status status = mDelegate.PlayChimeSound(chimeIDToUse);
+    Status status = mContext.delegate.PlayChimeSound(chimeIDToUse);
     if (status == Status::Success)
     {
         // Generate the event
