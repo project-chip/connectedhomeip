@@ -429,4 +429,20 @@ config CHIP_IM_PRETTY_PRINT
 	  Request). This option helps in debugging and development of message exchanges within the Matter
 	  protocol.
 
+config CHIP_CHIPOBLE_SINGLE_CONNECTION
+	bool "Single Connection Mode"
+	default y
+	depends on BT
+	help
+	  Limit support for chip-over-BLE (CHIPoBLE) to a single connection.
+	  When set, CHIPoBLE advertisements will stop while a CHIPoBLE connection is active.
+
+config CHIP_QSPI_NOR_POWER_MANAGEMENT_SUPPORT
+	bool "nRF QSPI NOR power management support"
+	default y
+	depends on PM_DEVICE && NORDIC_QSPI_NOR
+	help
+	  Enables management of nRF QSPI NOR external flash power state
+	  transitions during Matter operations.
+
 endif # CHIP
