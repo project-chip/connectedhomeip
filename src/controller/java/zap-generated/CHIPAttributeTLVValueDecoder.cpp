@@ -10938,6 +10938,66 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             return value;
         }
+        case Attributes::GroupcastAdoption::Id: {
+            using TypeInfo = Attributes::GroupcastAdoption::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_groupcastAdopted;
+                std::string newElement_0_groupcastAdoptedClassName     = "java/lang/Boolean";
+                std::string newElement_0_groupcastAdoptedCtorSignature = "(Z)V";
+                jboolean jninewElement_0_groupcastAdopted              = static_cast<jboolean>(entry_0.groupcastAdopted);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+                    newElement_0_groupcastAdoptedClassName.c_str(), newElement_0_groupcastAdoptedCtorSignature.c_str(),
+                    jninewElement_0_groupcastAdopted, newElement_0_groupcastAdopted);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(),
+                    jninewElement_0_fabricIndex, newElement_0_fabricIndex);
+
+                {
+                    jclass groupcastAdoptionStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupcastAdoptionStruct",
+                        groupcastAdoptionStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupcastAdoptionStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID groupcastAdoptionStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(env, groupcastAdoptionStructStructClass_1, "<init>",
+                                                                        "(Ljava/lang/Boolean;Ljava/lang/Integer;)V",
+                                                                        &groupcastAdoptionStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || groupcastAdoptionStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl,
+                                     "Could not find ChipStructs$GroupKeyManagementClusterGroupcastAdoptionStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 = env->NewObject(groupcastAdoptionStructStructClass_1, groupcastAdoptionStructStructCtor_1,
+                                                  newElement_0_groupcastAdopted, newElement_0_fabricIndex);
+                }
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

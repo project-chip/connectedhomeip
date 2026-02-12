@@ -31,6 +31,8 @@ class GroupKeyManagementClusterGroupKeySetStruct(
   val epochStartTime1: ULong?,
   val epochKey2: ByteArray?,
   val epochStartTime2: ULong?,
+  val groupKeyMulticastPolicy: UByte,
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeySetStruct {\n")
@@ -42,6 +44,8 @@ class GroupKeyManagementClusterGroupKeySetStruct(
     append("\tepochStartTime1 : $epochStartTime1\n")
     append("\tepochKey2 : $epochKey2\n")
     append("\tepochStartTime2 : $epochStartTime2\n")
+    append("\tgroupKeyMulticastPolicy : $groupKeyMulticastPolicy\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -80,6 +84,8 @@ class GroupKeyManagementClusterGroupKeySetStruct(
       } else {
         putNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
       }
+      put(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY), groupKeyMulticastPolicy)
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -93,6 +99,8 @@ class GroupKeyManagementClusterGroupKeySetStruct(
     private const val TAG_EPOCH_START_TIME1 = 5
     private const val TAG_EPOCH_KEY2 = 6
     private const val TAG_EPOCH_START_TIME2 = 7
+    private const val TAG_GROUP_KEY_MULTICAST_POLICY = 8
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupKeySetStruct {
       tlvReader.enterStructure(tlvTag)
@@ -141,6 +149,9 @@ class GroupKeyManagementClusterGroupKeySetStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
           null
         }
+      val groupKeyMulticastPolicy =
+        tlvReader.getUByte(ContextSpecificTag(TAG_GROUP_KEY_MULTICAST_POLICY))
+      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -153,6 +164,8 @@ class GroupKeyManagementClusterGroupKeySetStruct(
         epochStartTime1,
         epochKey2,
         epochStartTime2,
+        groupKeyMulticastPolicy,
+        fabricIndex,
       )
     }
   }

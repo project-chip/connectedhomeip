@@ -4788,6 +4788,17 @@ public class ClusterReadMapping {
           readGroupKeyManagementMaxGroupKeysPerFabricCommandParams
         );
         result.put("readMaxGroupKeysPerFabricAttribute", readGroupKeyManagementMaxGroupKeysPerFabricAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGroupKeyManagementGroupcastAdoptionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGroupKeyManagementGroupcastAdoptionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GroupKeyManagementCluster) cluster).readGroupcastAdoptionAttribute(
+              (ChipClusters.GroupKeyManagementCluster.GroupcastAdoptionAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedGroupKeyManagementClusterGroupcastAdoptionAttributeCallback(),
+          readGroupKeyManagementGroupcastAdoptionCommandParams
+        );
+        result.put("readGroupcastAdoptionAttribute", readGroupKeyManagementGroupcastAdoptionAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGroupKeyManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGroupKeyManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

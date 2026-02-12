@@ -2546,6 +2546,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxGroupKeysPerFabric";
             break;
 
+        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupcastAdoptionID:
+            result = @"GroupcastAdoption";
+            break;
+
         case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

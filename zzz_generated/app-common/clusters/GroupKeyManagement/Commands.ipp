@@ -34,7 +34,7 @@ namespace KeySetWrite {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupKeySet), groupKeySet);
+    encoder.EncodeRequestCommandFabricScopedStructField(to_underlying(Fields::kGroupKeySet), groupKeySet);
     return encoder.Finalize();
 }
 
@@ -51,6 +51,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         if (__context_tag == to_underlying(Fields::kGroupKeySet))
         {
             err = DataModel::Decode(reader, groupKeySet);
+            if (err == CHIP_NO_ERROR)
+            {
+                groupKeySet.SetFabricIndex(aAccessingFabricIndex);
+            }
         }
 
         ReturnErrorOnFailure(err);
@@ -90,7 +94,8 @@ namespace KeySetReadResponse {
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupKeySet), groupKeySet);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::kGroupKeySet), aWriter.mAccessingFabricIndex,
+                                                         groupKeySet);
     return encoder.Finalize();
 }
 
