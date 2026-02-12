@@ -231,20 +231,22 @@ class TC_SC_4_3(MatterBaseTest):
             log.info(f"kLongIdleTimeSupport set: {supports_lit}")
 
         # *** STEP 5 ***
-        # TH checks if TCP is supported by the DUT
-        supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
-
-        # *** STEP 6 ***
-        # TH checks if TCP is supported by the PICS
-        supports_tcp_pics = self.check_pics(TCP_PICS_STR)
-
-        # *** STEP 7 ***
         # TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the
         # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
         # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
-        self.step(7)
+        self.step(5)
         instance_name = self.get_dut_instance_name(log_result=True)
         instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
+
+        # *** STEP 6 ***
+        # TH checks if TCP is supported by the DUT
+        self.step(6)
+        supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
+
+        # *** STEP 7 ***
+        # TH checks if TCP is supported by the PICS
+        self.step(7)
+        supports_tcp_pics = self.check_pics(TCP_PICS_STR)
 
         # *** STEP 8 ***
         # TH performs a query for the SRV record against the qname instance_qname.
