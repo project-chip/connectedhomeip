@@ -43,6 +43,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
@@ -66,20 +67,24 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Read AttributeList attribute"),
             TestStep(3, "Verify AlarmsEnabled is supported"),
+            TestStep("3a", "Set up event subscription for BooleanStateConfiguration cluster"),
             TestStep(4, "Create enabledAlarms and set to 0"),
             TestStep("5a", "Enable VIS alarm in enabledAlarms"),
             TestStep("5b", "Enable AUD alarm in enabledAlarms"),
             TestStep("5c", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
             TestStep(6, "Send TestEventTrigger with SensorTrigger event"),
             TestStep(7, "Read AlarmsActive attribute"),
+            TestStep("7a", "If BOOLCFG.S.E00, verify AlarmsStateChanged event was generated"),
             TestStep(8, "Verify VIS alarm is active"),
             TestStep("9a", "Disable VIS alarm in enabledAlarms"),
             TestStep("9b", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
             TestStep(10, "Read AlarmsActive attribute"),
+            TestStep("10a", "If BOOLCFG.S.E00, verify AlarmsStateChanged event was generated after disabling VIS"),
             TestStep(11, "Verify AUD alarm is active"),
-            TestStep("12a", "Disable VIS alarm in enabledAlarms"),
+            TestStep("12a", "Disable AUD alarm in enabledAlarms"),
             TestStep("12b", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
             TestStep(13, "Read AlarmsActive attribute"),
+            TestStep("13a", "If BOOLCFG.S.E00, verify AlarmsStateChanged event was generated after disabling AUD"),
             TestStep(14, "Send TestEventTrigger with SensorUntrigger event"),
         ]
 
@@ -101,19 +106,25 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
                             "e.g. --hex-arg PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
         endpoint = self.get_endpoint()
+        node_id = self.dut_node_id
+        dev_ctrl = self.default_controller
         enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY']
 
         self.step(1)
-        attributes = Clusters.BooleanStateConfiguration.Attributes
+        cluster = Clusters.BooleanStateConfiguration
+        attributes = cluster.Attributes
 
         self.step("2a")
         feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
-        is_vis_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kVisual
-        is_aud_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible
+        is_vis_feature_supported = feature_map & cluster.Bitmaps.Feature.kVisual
+        is_aud_feature_supported = feature_map & cluster.Bitmaps.Feature.kAudible
 
         self.step("2b")
         attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+
+        # Check if AlarmsStateChanged event (BOOLCFG.S.E00) is supported
+        alarms_state_changed_event_supported = self.check_pics("BOOLCFG.S.E00")
 
         self.step(3)
         if attributes.AlarmsEnabled.attribute_id not in attribute_list:
@@ -127,18 +138,29 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
             return
         log.info("Test step skipped")
 
+        # Set up event subscription
+        self.step("3a")
+        event_listener = None
+        if alarms_state_changed_event_supported:
+            event_listener = EventSubscriptionHandler(expected_cluster=cluster)
+            await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+            log.info("Event subscription established for BooleanStateConfiguration cluster.")
+        else:
+            log.info("AlarmsStateChanged event not supported. Skipping event subscription setup.")
+            self.mark_current_step_skipped()
+
         self.step(4)
         enabledAlarms = 0
 
         self.step("5a")
         if is_vis_feature_supported:
-            enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual
+            enabledAlarms |= cluster.Bitmaps.AlarmModeBitmap.kVisual
         else:
             log.info("Test step skipped")
 
         self.step("5b")
         if is_aud_feature_supported:
-            enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible
+            enabledAlarms |= cluster.Bitmaps.AlarmModeBitmap.kAudible
         else:
             log.info("Test step skipped")
 
@@ -168,6 +190,21 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         else:
             log.info("Test step skipped")
 
+        # Verify AlarmsStateChanged event after trigger
+        self.step("7a")
+        if alarms_state_changed_event_supported and (is_vis_feature_supported or is_aud_feature_supported):
+            event = event_listener.wait_for_event_report(
+                cluster.Events.AlarmsStateChanged, timeout_sec=30.0)
+            asserts.assert_not_equal(event.alarmsActive, 0,
+                                     "AlarmsStateChanged event did not report non-zero alarmsActive after sensor trigger")
+            log.info(f"Received AlarmsStateChanged event with alarmsActive = {event.alarmsActive}")
+        else:
+            log.info("Test step skipped")
+            self.mark_current_step_skipped()
+
+        if event_listener is not None:
+            event_listener.reset()
+
         self.step(8)
         if is_vis_feature_supported:
             asserts.assert_not_equal((activeAlarms & 0b01), 0, "Bit 0 in AlarmsActive is not 1")
@@ -176,7 +213,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
 
         self.step("9a")
         if is_vis_feature_supported:
-            enabledAlarms &= ~(Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual)
+            enabledAlarms &= ~(cluster.Bitmaps.AlarmModeBitmap.kVisual)
         else:
             log.info("Test step skipped")
 
@@ -194,6 +231,21 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         else:
             log.info("Test step skipped")
 
+        # Verify AlarmsStateChanged event after disabling VIS
+        self.step("10a")
+        if alarms_state_changed_event_supported and is_vis_feature_supported:
+            event = event_listener.wait_for_event_report(
+                cluster.Events.AlarmsStateChanged, timeout_sec=30.0)
+            asserts.assert_equal((event.alarmsActive & 0b01), 0,
+                                 "AlarmsStateChanged event still reports VIS alarm active after disabling")
+            log.info(f"Received AlarmsStateChanged event with alarmsActive = {event.alarmsActive}")
+        else:
+            log.info("Test step skipped")
+            self.mark_current_step_skipped()
+
+        if event_listener is not None:
+            event_listener.reset()
+
         self.step(11)
         if is_aud_feature_supported:
             asserts.assert_not_equal((activeAlarms & 0b10), 0, "Bit 1 in AlarmsActive is not 1")
@@ -202,7 +254,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
 
         self.step("12a")
         if is_aud_feature_supported:
-            enabledAlarms &= ~(Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible)
+            enabledAlarms &= ~(cluster.Bitmaps.AlarmModeBitmap.kAudible)
         else:
             log.info("Test step skipped")
 
@@ -219,6 +271,18 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
             asserts.assert_equal((activeAlarms & 0b10), 0, "Bit 1 in AlarmsActive is not 0")
         else:
             log.info("Test step skipped")
+
+        # Verify AlarmsStateChanged event after disabling AUD
+        self.step("13a")
+        if alarms_state_changed_event_supported and is_aud_feature_supported:
+            event = event_listener.wait_for_event_report(
+                cluster.Events.AlarmsStateChanged, timeout_sec=30.0)
+            asserts.assert_equal(event.alarmsActive, 0,
+                                 "AlarmsStateChanged event did not report alarmsActive == 0 after disabling all alarms")
+            log.info(f"Received AlarmsStateChanged event with alarmsActive = {event.alarmsActive}")
+        else:
+            log.info("Test step skipped")
+            self.mark_current_step_skipped()
 
         self.step(14)
         if is_vis_feature_supported or is_aud_feature_supported:
