@@ -44,12 +44,14 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import CertificateAuthority
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import JFControllerSubprocess, JFAdministratorSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.tlv import TLVReader, TLVWriter
 
 log = logging.getLogger(__name__)
 
@@ -161,6 +163,8 @@ class TC_JFPKI_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_JFPKI_2_2(self):
+        _certAuthorityManagerA = None
+        _fabric_a_persistent_storage = None
 
         try:
             self.step("1")
@@ -225,11 +229,12 @@ class TC_JFPKI_2_2(MatterBaseTest):
 
             # TODO: "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.", "DUT respond with ArmFailSafeResponse Command."
             self.step("3")
+            failsafe_step_3_expiry = 10
             resp = await self.send_single_cmd(
                 dev_ctrl=devCtrlEcoA,
                 node_id=1,
                 endpoint=0,
-                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=10, breadcrumb=1))
+                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=failsafe_step_3_expiry, breadcrumb=1))
             asserts.assert_true(
                 isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                 f"Unexpected response type: {type(resp)}",
@@ -306,17 +311,29 @@ class TC_JFPKI_2_2(MatterBaseTest):
             # else:
             #     asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
-            # TODO: "Wait for ArmFailSafe to expire."
             self.step("7")
             # Wait for ArmFailSafe timer to expire
-            await asyncio.sleep(11)
+            await asyncio.sleep(failsafe_step_3_expiry + 1)
             # await self.send_single_cmd(
             #     dev_ctrl=devCtrlEcoA,
             #     node_id=1,
             #     cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
 
-            # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT response contains status code FAILSAFEREQUIRED."
             self.step("8")
+            try:
+                await self.send_single_cmd(
+                    dev_ctrl=devCtrlEcoA,
+                    node_id=1,
+                    endpoint=1,
+                    cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.FailsafeRequired,
+                    f'Expected FailsafeRequired error, but got {str(e)}',
+                )
+            else:
+                asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
             # cmd = Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
             # csr_update = await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd)
             # new_noc_chain = await devCtrlEcoA.IssueNOCChain(csr_update, 1)
@@ -332,29 +349,49 @@ class TC_JFPKI_2_2(MatterBaseTest):
             #                       str(e), f'Expected InvalidICAC error, but got {str(e)}')
             # else:
             #     asserts.assert_true(False, 'Expected InteractionModelError with InvalidICAC, but no exception occurred.')
-            # TODO: "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 20 and Breadcrumb 1.", "DUT respond with ArmFailSafeResponse Command."
             self.step("9")
-            # resp = await self.send_single_cmd(
-            #     dev_ctrl=devCtrlEcoA,
-            #     node_id=1,
-            #     endpoint=0,
-            #     cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=20, breadcrumb=1))
-            # asserts.assert_true(
-            #     isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
-            #     f"Unexpected response type: {type(resp)}",
-            # )
-            # asserts.assert_equal(
-            #     resp.errorCode,
-            #     Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            #     f"ArmFailSafeResponse error code not OK: {resp.errorCode}",
-            # )
-            # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT responds with SUCCESS status."
+            resp = await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=0,
+                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=20, breadcrumb=1))
+            asserts.assert_true(
+                isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+                f"Unexpected response type: {type(resp)}",
+            )
+            asserts.assert_equal(
+                resp.errorCode,
+                Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                f"ArmFailSafeResponse error code not OK: {resp.errorCode}",
+            )
+
             self.step("10")
-            # TODO: "TH sends AddICAC command to DUT using icac1 as parameter.", "DUT responds with status code CONSTRAINTERROR."
+            resp = await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
+
             self.step("11")
-            # TODO: "Wait for ArmFailSafe to expire."
+            try:
+                await self.send_single_cmd(
+                    dev_ctrl=devCtrlEcoA,
+                    node_id=1,
+                    endpoint=1,
+                    cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.ConstraintError,
+                    f'Expected ConstraintError status, but got {str(e)}',
+                )
+            else:
+                asserts.assert_true(False, 'Expected InteractionModelError with ConstraintError, but no exception occurred.')
+
             self.step("12")
-            # TODO: "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 20 and Breadcrumb 1.", "DUT respond with ArmFailSafeResponse Command."
+            # Wait for ArmFailSafe timer to expire
+            await asyncio.sleep(21)
+
             self.step("13")
             resp = await self.send_single_cmd(
                 dev_ctrl=devCtrlEcoA,
@@ -370,13 +407,115 @@ class TC_JFPKI_2_2(MatterBaseTest):
                 Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                 f"ArmFailSafeResponse error code not OK: {resp.errorCode}",
             )
-            # TODO: "TH sends AddICAC command to DUT using an ICAC that is not associated with the RCAC of TH as parameter.", "DUT ICACResponse contains status 2 (InvalidICAC)."
+
             self.step("14")
-            # TODO: "TH sends AddICAC command to DUT using an ICAC with a different public key than the public key present in ICACCSRResponse", "DUT ICACResponse contains status 1 (InvalidPublicKey)."
+            # Create a second CA to generate an ICAC that is valid but chained to a different RCAC than the TH controller fabric RCAC.
+            csr_nonce = random.randbytes(32)
+            csr_response = await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=0,
+                cmd=Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=csr_nonce, isForUpdateNOC=True))
+            other_ca = _certAuthorityManagerA.NewCertificateAuthority()
+            other_admin = other_ca.NewFabricAdmin(vendorId=self.jfctrl_fabric_a_vid, fabricId=0x1234)
+            other_ctrl = other_admin.NewController(nodeId=102)
+            other_chain = await other_ctrl.IssueNOCChain(csr_response, 1)
+            asserts.assert_true(other_chain.icacBytes is not None, "Unable to generate ICAC from alternate RCAC")
+            other_icac = other_chain.icacBytes
+
+            resp = await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(other_icac))
+            asserts.assert_true(
+                isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
+                f"Unexpected response type: {type(resp)}",
+            )
+            asserts.assert_equal(
+                resp.statusCode,
+                Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidICAC,
+                f"Expected InvalidICAC response status, but got {resp.statusCode}",
+            )
+
             self.step("15")
-            # TODO: "TH sends AddICAC command to DUT using a certificate that doesn't follow DN encoding for ICAC", "DUT ICACResponse contains status 2 (InvalidICAC)."
+
+            # Reset fail-safe context: AddICAC can only be invoked once per armed fail-safe session.
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=0,
+                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=0,
+                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=20, breadcrumb=1))
+
+            # Generate a new ICAC using the old CSR Response, which will have the wrong public key for this fail-safe context.
+            icac_wrong_public_key = await devCtrlEcoA.IssueNOCChain(csr_response, 1)
+
+            # Send AddICAC with the ICAC containing the wrong public key
+            resp = await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac_wrong_public_key.icacBytes))
+            asserts.assert_true(
+                isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
+                f"Unexpected response type: {type(resp)}",
+            )
+            asserts.assert_equal(
+                resp.statusCode,
+                Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidPublicKey,
+                f"Expected InvalidPublicKey response status, but got {resp.statusCode}",
+            )
+
             self.step("16")
-            # TODO: "TH sends OJCW command to DUT (check Precondition 1)", "DUT responds with status code 0x06 (InvalidAdministratorFabricIndex)."
+
+            # Reset fail-safe context: AddICAC can only be invoked once per armed fail-safe session.
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=0,
+                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=0,
+                cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=20, breadcrumb=1))
+
+            # Create a valid ICAC for the current fail-safe context.
+            csr_nonce = random.randbytes(32)
+            csr_response_step16 = await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=0,
+                cmd=Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=csr_nonce, isForUpdateNOC=True))
+            valid_icac_chain = await devCtrlEcoA.IssueNOCChain(csr_response_step16, 1)
+
+            # Corrupt Subject DN encoding by changing the Subject container from a DN path to a structure.
+            icac_tlv = TLVReader(valid_icac_chain.icacBytes).get()["Any"]
+            icac_tlv[6] = dict(icac_tlv[6])
+            writer = TLVWriter()
+            writer.put(None, icac_tlv)
+            invalid_dn_icac = bytes(writer.encoding)
+
+            resp = await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(invalid_dn_icac))
+            asserts.assert_true(
+                isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
+                f"Unexpected response type: {type(resp)}",
+            )
+            asserts.assert_equal(
+                resp.statusCode,
+                Clusters.JointFabricAdministrator.Enums.ICACResponseStatusEnum.kInvalidICAC,
+                f"Expected InvalidICAC response status, but got {resp.statusCode}",
+            )
+
             self.step("17")
         finally:
             # Ensure cleanup happens even if the test is interrupted
