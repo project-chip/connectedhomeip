@@ -298,8 +298,6 @@ bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
     JointFabricDatastoreCluster::Structs::DatastoreGroupKeySetStruct::DecodableType groupKeySet = commandData.groupKeySet;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID) == false,
-                 err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
     SuccessOrExit(err = jointFabricDatastore.AddGroupKeySetEntry(groupKeySet));
 
 exit:
@@ -324,7 +322,7 @@ bool emberAfJointFabricDatastoreClusterUpdateKeySetCallback(
     JointFabricDatastoreCluster::Structs::DatastoreGroupKeySetStruct::DecodableType groupKeySet = commandData.groupKeySet;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID), err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID), err = CHIP_IM_GLOBAL_STATUS(NotFound));
     SuccessOrExit(err = jointFabricDatastore.UpdateGroupKeySetEntry(groupKeySet));
 
 exit:
@@ -349,7 +347,7 @@ bool emberAfJointFabricDatastoreClusterRemoveKeySetCallback(
     uint16_t groupKeySetId                           = commandData.groupKeySetID;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySetId), err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySetId), err = CHIP_IM_GLOBAL_STATUS(NotFound));
     SuccessOrExit(err = jointFabricDatastore.RemoveGroupKeySetEntry(groupKeySetId));
 
 exit:

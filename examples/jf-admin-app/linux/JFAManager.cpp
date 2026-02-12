@@ -170,6 +170,33 @@ void JFAManager::HandleCommissioningCompleteEvent()
                     Clusters::JointFabricDatastore::DatastoreStateEnum::kPending,
                     static_cast<uint32_t>(System::SystemClock().GetMonotonicTimestamp().count()), 0);
 
+                Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type defaultGroupKeySetEntry{ 0 };
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddGroupKeySetEntry(defaultGroupKeySetEntry));
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddNodeKeySetEntry(0, nodeId));
+
+                // Add default group entry for the JFA itself
+                // Uses internal method that bypasses CAT restrictions since JFA setup needs both Admin and Anchor CATs
+                Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addGroupCommandData;
+                addGroupCommandData.groupID       = 0;
+                addGroupCommandData.friendlyName  = CharSpan::fromCharString("Default JFA Group");
+                addGroupCommandData.groupKeySetID = 0;
+                addGroupCommandData.groupCAT      = kAdminCATIdentifier; // Use Admin CAT for default group
+                addGroupCommandData.groupCATVersion.SetNonNull(1);
+                addGroupCommandData.groupPermission =
+                    Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kAdminister;
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
+                addGroupCommandData.groupID  = 1;
+                addGroupCommandData.groupCAT = kAnchorCATIdentifier; // Use Anchor CAT for second default group
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
+
+                Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type newAdmin;
+                newAdmin.nodeID       = nodeId;
+                newAdmin.friendlyName = CharSpan::fromCharString("Default JFA Admin");
+                newAdmin.vendorID     = vendorId;
+                newAdmin.icac         = ByteSpan(mICACBuffer, mICACBufferLen);
+
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddAdmin(newAdmin));
+
                 ChipLogProgress(JointFabric, "Joint Fabric Administrator commissioned on fabric index %d", fabricIndex);
             }
         }
