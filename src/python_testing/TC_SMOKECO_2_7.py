@@ -132,7 +132,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
 
         if has_unmounted:
             if self.is_ci:
-                # CI call to trigger unoccupied.
+                # CI call to trigger unmounted.
                 self.write_to_app_pipe({"Name": "SetUnmounted", "EndpointId": endpoint, "Unmounted": 1})
             else:
                 self.wait_for_user_input(
@@ -144,6 +144,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
             sub_handler.wait_for_attribute_report(timeout_sec=60)
             asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
                                  [0].value, 1, msg="Received unexpected value for Unmounted")
+            sub_handler.reset
 
         # Step 8, "TH reads ExpressedState attribute from DUT."
         self.step(8)
@@ -155,7 +156,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
         self.step(9)
         if has_unmounted:
             if self.is_ci:
-                # CI call to trigger unoccupied.
+                # CI call to trigger mounted.
                 self.write_to_app_pipe({"Name": "SetUnmounted", "EndpointId": endpoint, "Unmounted": 0})
             else:
                 self.wait_for_user_input(
