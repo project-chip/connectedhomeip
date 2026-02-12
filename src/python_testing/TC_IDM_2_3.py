@@ -206,7 +206,11 @@ class TC_IDM_2_3(BasicCompositionTests):
         sub_transaction.SetAttributeUpdateCallback(handler)
 
         # Write new NodeLabel to trigger a subscription report
-        new_label = initial_node_label + "_Updated"
+        # Generate a new label guaranteed different from initial state.
+        import random
+        new_label = initial_node_label
+        while new_label == initial_node_label:
+            new_label = str(random.randint(0, 999999))
         await self.write_single_attribute(
             Clusters.BasicInformation.Attributes.NodeLabel(value=new_label),
             endpoint_id=0
