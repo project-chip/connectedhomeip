@@ -368,6 +368,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
         NotifyWiFiConnectivityChange(kConnectivity_Lost);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        mPafChannelAvailable = true;
+#endif
+
         mAssociationStarted = false;
     }
     else if (g_strcmp0(state, "associated") == 0)
@@ -381,6 +385,9 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
     }
     else if (g_strcmp0(state, "completed") == 0)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        mPafChannelAvailable = true;
+#endif
         if (mAssociationStarted)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
@@ -411,11 +418,11 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
     {
         ChipLogProgress(DeviceLayer, "WPA supplicant: connected to wpa_supplicant interface proxy");
 
-        g_signal_connect(
-            mWpaSupplicant.iface.get(), "g-properties-changed",
-            G_CALLBACK(+[](WpaSupplicant1Interface * iface, GVariant * properties, const char * const * invalidatedProps,
-                           ConnectivityManagerImpl * self) { return self->_OnWpaPropertiesChanged(iface, properties); }),
-            this);
+        g_signal_connect(mWpaSupplicant.iface.get(), "properties-changed",
+                         G_CALLBACK(+[](WpaSupplicant1Interface * iface, GVariant * properties, ConnectivityManagerImpl * self) {
+                             return self->_OnWpaPropertiesChanged(iface, properties);
+                         }),
+                         this);
 
         g_signal_connect(mWpaSupplicant.iface.get(), "scan-done",
                          G_CALLBACK(+[](WpaSupplicant1Interface * iface, gboolean success, ConnectivityManagerImpl * self) {

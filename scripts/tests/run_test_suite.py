@@ -450,7 +450,7 @@ class Terminable(Protocol):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
     '--commissioning-method',
-    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
+    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop', 'wifipaf-wifi'], case_sensitive=False),
     default='on-network',
     help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.option(
@@ -539,7 +539,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning_method parameter
-    wifi_required = commissioning_method in ['ble-wifi']
+    wifi_required = commissioning_method in ['ble-wifi', 'wifipaf-wifi']
     thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
 
     if (wifi_required or thread_required) and sys.platform != "linux":
@@ -571,6 +571,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     try:
         if sys.platform == 'linux':
+            app_name = 'wlx-app' if wifi_required else 'eth-app'
+            tool_name = 'wlx-tool' if commissioning_method == 'wifipaf-wifi' else 'eth-tool'
+
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
@@ -578,14 +581,18 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if wifi_required else 'eth-app'))
+                app_link_name='wlx-app' if wifi_required else 'eth-app',
+                tool_link_name=tool_name))
 
             if commissioning_method == 'ble-wifi':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
+                interfaces_params = [
+                    {"name": app_name}
+                ]
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, interfaces_params))
             elif commissioning_method == 'ble-thread':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
@@ -596,6 +603,13 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
                 thread_ba_host = tbr.get_border_agent_host()
                 thread_ba_port = tbr.get_border_agent_port()
+            elif commissioning_method == 'wifipaf-wifi':
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                interfaces_params = [
+                    {"name": app_name},
+                    {"name": tool_name}
+                ]
+                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns, interfaces_params))
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -630,6 +644,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         op_network='Thread' if thread_required else 'WiFi',
                         thread_ba_host=thread_ba_host,
                         thread_ba_port=thread_ba_port,
+                        wifipaf_wifi=commissioning_method == 'wifipaf-wifi'
                     )
                     test_end = time.monotonic()
                     if dry_run:
