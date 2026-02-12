@@ -1638,10 +1638,14 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
 
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
+    // Zone events are per-zone - each zone needs its own event notification
     for (const auto & zoneId : zoneIds)
     {
         mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
     }
+    // Transport trigger is per-motion-event - all zones are passed together
+    // This deliberate asymmetry reflects that zone events track individual zone activity
+    // while transport triggers coordinate recording across all zones in a single motion event
     mPushAVTransportManager.HandleZoneTrigger(zoneIds);
 }
 

@@ -88,7 +88,7 @@ public:
     void SetTransportStatus(chip::app::Clusters::PushAvStreamTransport::TransportStatusEnum status);
 
     void TriggerTransport(chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
-                          const std::vector<int> & zoneIds, int sensitivity = kDefaultSensitivity);
+                          const std::vector<int> & zoneIds = { kInvalidZoneId }, int sensitivity = kDefaultSensitivity);
     // Get Transport status
     bool GetTransportStatus()
     {
