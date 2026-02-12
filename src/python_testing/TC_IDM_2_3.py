@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import random
 
 from mobly import asserts
 
@@ -207,7 +208,6 @@ class TC_IDM_2_3(BasicCompositionTests):
 
         # Write new NodeLabel to trigger a subscription report
         # Generate a new label guaranteed different from initial state.
-        import random
         new_label = initial_node_label
         while new_label == initial_node_label:
             new_label = str(random.randint(0, 999999))
