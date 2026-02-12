@@ -2013,6 +2013,39 @@ void GroupDataProviderImpl::GroupSessionIteratorImpl::Release()
     mProvider.mGroupSessionsIterator.ReleaseObject(this);
 }
 
+//
+// Groupcast
+//
+
+CHIP_ERROR GroupDataProviderImpl::getUsedMcastAddrCount(uint16_t & count)
+{
+    count = 0;
+    FabricList fabric_list;
+    CHIP_ERROR err = fabric_list.Load(mStorage);
+    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(err);
+
+    // Iterate all fabrics with groups
+    FabricData fabric(fabric_list.first_entry);
+    for (size_t i = 0; i < fabric_list.entry_count; i++)
+    {
+        // Count all the groups with Pergroup addresses
+        GroupInfoIterator * iter = IterateGroupInfo(fabric.fabric_index);
+        VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+        GroupInfo info;
+        while (iter->Next(info))
+        {
+            if (info.flags & chip::to_underlying(GroupInfo::Flags::kMcastAddrPolicy))
+            {
+                count++;
+            }
+        }
+        iter->Release();
+        fabric.fabric_index = fabric.next;
+    }
+    return CHIP_NO_ERROR;
+}
+
 namespace {
 
 GroupDataProvider * gGroupsProvider = nullptr;

@@ -81,6 +81,26 @@ CHIP_ERROR GroupcastLogic::ReadMaxMembershipCount(EndpointId endpoint, Attribute
     return aEncoder.Encode(groups.getMaxMembershipCount());
 }
 
+CHIP_ERROR GroupcastLogic::ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    GroupDataProvider & groups = Provider();
+    return aEncoder.Encode(groups.getMaxMcastAddrCount());
+}
+
+CHIP_ERROR GroupcastLogic::ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    GroupDataProvider & groups = Provider();
+    uint16_t count             = 0;
+    ReturnErrorOnFailure(groups.getUsedMcastAddrCount(count));
+    return aEncoder.Encode(count);
+}
+
+CHIP_ERROR GroupcastLogic::ReadFabricUnderTest(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    FabricIndex fabric_index = kUndefinedFabricIndex;
+    return aEncoder.Encode(fabric_index);
+}
+
 Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data)
 {
     GroupDataProvider & groups = Provider();
@@ -197,6 +217,7 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
         // Apply changes to all groups
         GroupInfoIterator * iter = groups.IterateGroupInfo(fabric_index);
         VerifyOrReturnError(nullptr != iter, Status::ResourceExhausted);
+        VerifyOrReturnError(iter->Count() > 0, Status::NotFound);
 
         GroupInfo info;
         while (iter->Next(info) && (Status::Success == err))
@@ -235,6 +256,9 @@ Status GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;
+
+    // AuxiliaryACL can only be present if LN feature is supported
+    VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
 
     // Get group info
     GroupDataProvider::GroupInfo info;
@@ -318,16 +342,8 @@ Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
     else
     {
         // Remove whole group (with all endpoints)
-        EndpointIterator * iter = groups.IterateEndpoints(fabric_index, data.groupID);
-        VerifyOrReturnError(nullptr != iter, Status::ResourceExhausted);
-        GroupEndpoint mapping;
-        while (iter->Next(mapping) && (endpoints.count < kMaxMembershipEndpoints))
-        {
-            stat = RemoveGroupEndpoint(fabric_index, group_id, mapping.endpoint_id, endpoints);
-            VerifyOrReturnError(Status::Success == stat, stat);
-        }
-        iter->Release();
-        CHIP_ERROR err = groups.RemoveGroupInfo(fabric_index, data.groupID);
+        CHIP_ERROR err = groups.RemoveGroupInfo(fabric_index, group_id);
+        VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     }
 

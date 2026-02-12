@@ -347,8 +347,10 @@ public:
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
 
-    // Groupcast MaxMembershipCount
-    virtual uint16_t getMaxMembershipCount() = 0;
+    // Groupcast
+    virtual uint16_t getMaxMembershipCount()                   = 0;
+    virtual uint16_t getMaxMcastAddrCount()                    = 0;
+    virtual CHIP_ERROR getUsedMcastAddrCount(uint16_t & count) = 0;
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)

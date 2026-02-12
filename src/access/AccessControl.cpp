@@ -23,6 +23,7 @@
 
 #include "AccessControl.h"
 
+#include <credentials/GroupDataProvider.h> // nogncheck
 #include <lib/core/Global.h>
 
 namespace chip {
@@ -349,6 +350,22 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif
 
+    if ((result != CHIP_NO_ERROR) && (Access::AuthMode::kGroup == subjectDescriptor.authMode) &&
+        (Access::RequestType::kCommandInvokeRequest == requestPath.requestType) &&
+        (Access::Privilege::kOperate == requestPrivilege))
+    {
+        // Groupcast
+        Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, result);
+
+        GroupId gid = GroupIdFromNodeId(subjectDescriptor.subject);
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(subjectDescriptor.fabricIndex, gid, info));
+        if (!(info.flags & static_cast<uint8_t>(Credentials::GroupDataProvider::GroupInfo::Flags::kMcastAddrPolicy)))
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
     return result;
 }
 
