@@ -74,13 +74,6 @@ public:
 
 private:
     const OperationalCredentialsCluster::Context mOpCredsContext;
-
-    FabricTable & GetFabricTable();
-    FailSafeContext & GetFailSafeContext();
-    Credentials::DeviceAttestationCredentialsProvider & GetDACProvider();
-    SessionManager & GetSessionManager();
-    DnssdServer & GetDNSSDServer();
-    CommissioningWindowManager & GetCommissioningWindowManager();
 };
 
 } // namespace Clusters

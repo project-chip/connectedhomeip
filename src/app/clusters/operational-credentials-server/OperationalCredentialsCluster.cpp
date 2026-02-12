@@ -1069,17 +1069,17 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
     // Session Context at the Server.
     if (nocAddedOrUpdatedDuringFailsafe)
     {
-        cluster->GetSessionManager().ExpireAllSessionsForFabric(fabricIndex);
+        cluster->mOpCredsContext.sessionManager.ExpireAllSessionsForFabric(fabricIndex);
     }
 
-    cluster->GetFabricTable().RevertPendingFabricData();
+    cluster->mOpCredsContext.fabricTable.RevertPendingFabricData();
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
     // against the Fabric Index stored in the Fail-Safe Context for the Fabric Index that was the subject of the AddNOC
     // command.
     if (nocAddedDuringFailsafe)
     {
-        CHIP_ERROR err = cluster->GetFabricTable().Delete(fabricIndex);
+        CHIP_ERROR err = cluster->mOpCredsContext.fabricTable.Delete(fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
@@ -1090,7 +1090,7 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
     {
         // Operational identities/records available may have changed due to NodeID update. Need to refresh all records.
         // The case of fabric removal that reverts AddNOC is handled by the `DeleteFabricFromTable` flow above.
-        cluster->GetDNSSDServer().StartServer();
+        cluster->mOpCredsContext.dnssdServer.StartServer();
     }
 }
 
@@ -1177,16 +1177,18 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     switch (request.path.mCommandId)
     {
     case OperationalCredentials::Commands::AttestationRequest::Id:
-        return HandleAttestationRequest(handler, request.path, input_arguments, GetDACProvider());
+        return HandleAttestationRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
     case OperationalCredentials::Commands::CertificateChainRequest::Id:
-        return HandleCertificateChainRequest(handler, request.path, input_arguments, GetDACProvider());
+        return HandleCertificateChainRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
     case OperationalCredentials::Commands::CSRRequest::Id:
-        return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
+        return HandleCSRRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext,
+                                mOpCredsContext.dacProvider);
     case OperationalCredentials::Commands::AddNOC::Id: {
         bool reportChange                                         = false;
         std::optional<DataModel::ActionReturnStatus> returnStatus = HandleAddNOC(
-            handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(),
-            GetCommissioningWindowManager(), mOpCredsContext.groupDataProvider, mOpCredsContext.accessControl, reportChange);
+            handler, request.path, input_arguments, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext,
+            mOpCredsContext.dnssdServer, mOpCredsContext.commissioningWindowManager, mOpCredsContext.groupDataProvider,
+            mOpCredsContext.accessControl, reportChange);
         if (reportChange)
         {
             // Notify the attributes containing fabric metadata can be read with new data
@@ -1197,10 +1199,11 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return returnStatus;
     }
     case OperationalCredentials::Commands::UpdateNOC::Id:
-        return HandleUpdateNOC(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer());
+        return HandleUpdateNOC(handler, input_arguments, request, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext,
+                               mOpCredsContext.dnssdServer);
     case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
         std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleUpdateFabricLabel(handler, input_arguments, request, GetFabricTable());
+            HandleUpdateFabricLabel(handler, input_arguments, request, mOpCredsContext.fabricTable);
         if (!returnStatus.has_value())
         {
             // Succeeded at updating the label, mark Fabrics table changed.
@@ -1209,13 +1212,14 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return returnStatus;
     }
     case OperationalCredentials::Commands::RemoveFabric::Id:
-        return HandleRemoveFabric(handler, request.path, input_arguments, GetFabricTable());
+        return HandleRemoveFabric(handler, request.path, input_arguments, mOpCredsContext.fabricTable);
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
-        return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext());
+        return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, mOpCredsContext.fabricTable,
+                                               mOpCredsContext.failSafeContext);
     case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
         bool reportChange                                         = false;
         std::optional<DataModel::ActionReturnStatus> returnStatus = HandleSetVIDVerificationStatement(
-            handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), reportChange);
+            handler, input_arguments, request, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext, reportChange);
         if (reportChange)
         {
             // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
@@ -1227,7 +1231,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return returnStatus;
     }
     case OperationalCredentials::Commands::SignVIDVerificationRequest::Id:
-        return HandleSignVIDVerificationRequest(handler, request.path, input_arguments, GetFabricTable());
+        return HandleSignVIDVerificationRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable);
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -1259,7 +1263,7 @@ void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTa
 
     // We need to withdraw the advertisement for the now-removed fabric, so need
     // to restart advertising altogether.
-    GetDNSSDServer().StartServer();
+    mOpCredsContext.dnssdServer.StartServer();
 
     TEMPORARY_RETURN_IGNORED mOpCredsContext.eventManagement.FabricRemoved(fabricIndex);
 
@@ -1271,36 +1275,6 @@ void OperationalCredentialsCluster::OnFabricUpdated(const FabricTable & fabricTa
 {
     NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
     NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
-}
-
-FabricTable & OperationalCredentialsCluster::GetFabricTable()
-{
-    return mOpCredsContext.fabricTable;
-}
-
-FailSafeContext & OperationalCredentialsCluster::GetFailSafeContext()
-{
-    return mOpCredsContext.failSafeContext;
-}
-
-Credentials::DeviceAttestationCredentialsProvider & OperationalCredentialsCluster::GetDACProvider()
-{
-    return mOpCredsContext.dacProvider;
-}
-
-SessionManager & OperationalCredentialsCluster::GetSessionManager()
-{
-    return mOpCredsContext.sessionManager;
-}
-
-DnssdServer & OperationalCredentialsCluster::GetDNSSDServer()
-{
-    return mOpCredsContext.dnssdServer;
-}
-
-CommissioningWindowManager & OperationalCredentialsCluster::GetCommissioningWindowManager()
-{
-    return mOpCredsContext.commissioningWindowManager;
 }
 
 void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)
