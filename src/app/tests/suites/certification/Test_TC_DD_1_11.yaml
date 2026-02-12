@@ -82,9 +82,12 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: Verify the DUT follows the correct order of onboarding the TH devices which must be from first to last starting from left to right.
-          Example - MT:<onboarding-base-38-content_bulb1>*<onboarding-base-38-content_bulb2>*<onboarding-base-38-content_bulb3>*<onboarding-base-38-content_bulb4>
-          content_bulb1 gets onboarded first, content_bulb2 gets onboarded second and so forth."
+          "Step 2: Verify the DUT follows the correct order of onboarding the TH
+          devices which must be from first to last starting from left to right.
+          Example -
+          MT:<onboarding-base-38-content_bulb1>*<onboarding-base-38-content_bulb2>*<onboarding-base-38-content_bulb3>*<onboarding-base-38-content_bulb4>
+          content_bulb1 gets onboarded first, content_bulb2 gets onboarded
+          second and so forth."
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1_INORDER
       verification: |
           Verify that the DUT (chip-tool) follows the correct onboarding order for the TH devices, which must proceed from first to last, left to right.
