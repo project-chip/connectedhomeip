@@ -144,9 +144,9 @@ void InsightsDelegate::RegisterMetric(const std::string & key, ValueType type)
     switch (type)
     {
     case ValueType::kUnsignedInteger: {
-        esp_err_t err =
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key.c_str() /* Unique key 8 */, key.c_str() /* label displayed on dashboard */,
-                                      "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        esp_err_t err = esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key.c_str() /* Unique key 8 */,
+                                                  key.c_str() /* label displayed on dashboard */,
+                                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
         if (err == ESP_OK)
         {
             ESP_LOGD(TAG, "Metric %s registered successfully", key.c_str());
@@ -155,9 +155,9 @@ void InsightsDelegate::RegisterMetric(const std::string & key, ValueType type)
     }
 
     case ValueType::kSignedInteger: {
-        esp_err_t err =
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key.c_str() /* Unique key 8 */, key.c_str() /* label displayed on dashboard */,
-                                      "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
+        esp_err_t err = esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key.c_str() /* Unique key 8 */,
+                                                  key.c_str() /* label displayed on dashboard */,
+                                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
         if (err == ESP_OK)
         {
             ESP_LOGD(TAG, "Metric %s registered successfully", key.c_str());

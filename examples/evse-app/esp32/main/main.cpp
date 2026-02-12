@@ -66,7 +66,6 @@ extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end
 using namespace chip::Insights;
 #endif // CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ESP_DIAGNOSTICS_ENABLED
 
-
 using namespace ::chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
