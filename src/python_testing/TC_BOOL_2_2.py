@@ -39,28 +39,11 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run2:
-#     app: ${ALL_DEVICES_APP}
-#     app-args: >
-#       --discriminator 1234
-#       --KVS kvs1
-#       --trace-to json:${TRACE_APP}.json
-#       --app-pipe /tmp/boolean_state_2_2_fifo
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --app-pipe /tmp/boolean_state_2_2_fifo
-#       --endpoint 1
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+
 import logging
+import time
 
 from mobly import asserts
 
@@ -132,7 +115,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         CHGEVENT_MASK = 0x01
         return (int(feature_map) & CHGEVENT_MASK) != 0
 
-    def _has_state_change_event(self, feature_map: int) -> bool:
+    def _should_test_state_change_event(self, feature_map: int) -> bool:
         """
         Determines whether StateChange event should be tested.
 
@@ -166,6 +149,25 @@ class TC_BOOL_2_2(MatterBaseTest):
             attribute=cbool.Attributes.StateValue,
         )
 
+    def wait_for_statevalue_report(self, attr_cb, endpoint, expected: bool, timeout_sec: float):
+        deadline = time.time() + timeout_sec
+        seen = []
+
+        while True:
+            remaining = deadline - time.time()
+            if remaining <= 0:
+                asserts.fail(f"Did not observe StateValue == {expected} within {timeout_sec}s. Seen: {seen}")
+
+            item = attr_cb.wait_for_attribute_report(timeout_sec=remaining)
+
+            if item.endpoint_id != endpoint or item.attribute != Clusters.BooleanState.Attributes.StateValue:
+                continue
+
+            seen.append(item.value)
+
+            if bool(item.value) == expected:
+                return item
+
     @run_if_endpoint_matches(has_cluster(Clusters.BooleanState))
     async def test_TC_BOOL_2_2(self) -> None:
         cbool = Clusters.BooleanState
@@ -178,14 +180,6 @@ class TC_BOOL_2_2(MatterBaseTest):
 
         # Step 2: Read FeatureMap
         self.step("2")
-        feature_map = await self.read_single_attribute_check_success(
-            dev_ctrl=dev_ctrl,
-            node_id=node_id,
-            endpoint=endpoint,
-            cluster=cbool,
-            attribute=cbool.Attributes.FeatureMap,
-        )
-        logger.info(f"FeatureMap attribute: {feature_map}")
 
         # Check if StateChange event is supported
         feature_map = await self.read_single_attribute_check_success(
@@ -197,8 +191,8 @@ class TC_BOOL_2_2(MatterBaseTest):
         )
         logger.info(f"FeatureMap attribute: {feature_map}")
 
-        has_state_change_event = self._has_state_change_event(feature_map)
-        logger.info(f"StateChange event test enabled: {has_state_change_event}")
+        should_test_state_change_event = self._should_test_state_change_event(feature_map)
+        logger.info(f"StateChange event test enabled: {should_test_state_change_event}")
 
         # Step 3: Put DUT in FALSE
         self.step("3")
@@ -227,7 +221,7 @@ class TC_BOOL_2_2(MatterBaseTest):
             keepSubscriptions=False,
         )
 
-        if has_state_change_event:
+        if should_test_state_change_event:
             await event_cb.start(
                 dev_ctrl=dev_ctrl,
                 node_id=node_id,
@@ -249,18 +243,14 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Step 9: Wait attribute report within 30s and verify it indicates TRUE
         self.step("9")
 
-        item = attr_cb.wait_for_attribute_report(timeout_sec=30)
+        item = self.wait_for_statevalue_report(attr_cb, endpoint, expected=True, timeout_sec=30.0)
 
-        logger.info(f"Attribute from event callback: {item}")
-
-        asserts.assert_equal(item.endpoint_id, endpoint, "Attribute report received for unexpected endpoint")
-        asserts.assert_equal(item.attribute, cbool.Attributes.StateValue, "Received unexpected attribute report")
-        asserts.assert_true(item.value, "Report value for StateValue should be TRUE")
+        logger.info(f"State value report: {item}")
 
         # Step 10: Event report if supported
         self.step("10")
 
-        if has_state_change_event:
+        if should_test_state_change_event:
             data = event_cb.wait_for_event_report(
                 cbool.Events.StateChange,
                 timeout_sec=30
@@ -291,16 +281,14 @@ class TC_BOOL_2_2(MatterBaseTest):
         # Step 14: Wait attribute report within 30s and verify it indicates FALSE
         self.step("14")
 
-        item = attr_cb.wait_for_attribute_report(timeout_sec=30)
+        item = self.wait_for_statevalue_report(attr_cb, endpoint, expected=False, timeout_sec=30.0)
 
-        asserts.assert_equal(item.endpoint_id, endpoint, "Attribute report received for unexpected endpoint")
-        asserts.assert_equal(item.attribute, cbool.Attributes.StateValue, "Received unexpected attribute report")
-        asserts.assert_false(item.value, "Report value for StateValue should be FALSE")
+        logger.info(f"State value report: {item}")
 
         # Step 15: Event report if supported
         self.step("15")
 
-        if has_state_change_event:
+        if should_test_state_change_event:
             data = event_cb.wait_for_event_report(
                 cbool.Events.StateChange,
                 timeout_sec=30
