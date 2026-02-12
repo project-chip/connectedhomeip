@@ -486,7 +486,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         last_progress = 0
 
         def check_ota_download_matcher(report):
-            """ Check for the UpdateStateProgress and confirms it downloaded the image when the 
+            """Check for the UpdateStateProgress and confirms it downloaded the image when the
                 status reach to NullValue
             Args:
                 report : Report value
@@ -498,8 +498,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                 last_progress = value
                 if not progress_seen:
                     progress_seen = True
-            if value is NullValue and progress_seen:
-                return True
+            return bool(value is NullValue and progress_seen)
 
         download_progress_attr_matcher_obj = AttributeMatcher.from_callable(
             description="Waiting Download to Complete ", matcher=check_ota_download_matcher)
