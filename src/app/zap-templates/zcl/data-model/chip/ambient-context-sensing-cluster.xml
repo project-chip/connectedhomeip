@@ -155,8 +155,8 @@ Alchemy: v1.6.9
       </mandatoryConform>
     </attribute>
     <event code="0x0000" name="AmbientContextDetectStarted" priority="info" side="server" optional="true">
-      <field fieldId="0" name="AmbientContextType" array="true" type="AmbientContextTypeStruct" optional="true"/>
-      <field fieldId="1" name="ObjectCount" type="int16u" optional="true" min="1"/>
+      <field id="0" name="AmbientContextType" array="true" type="AmbientContextTypeStruct" optional="true"/>
+      <field id="1" name="ObjectCount" type="int16u" optional="true" min="1"/>
       <description>This event SHALL be generated when there is at least one of HumanActivityDetected or ObjectIdentified or AudioContextDetected or ObjectCountReached attribute changes from False To True.</description>
       <otherwiseConform>
         <mandatoryConform>
@@ -175,7 +175,7 @@ Alchemy: v1.6.9
     </event>
 
     <event code="0x0001" name="AmbientContextDetectEnded" priority="info" side="server" optional="true">
-      <field fieldId="0" name="StartEventNumber" type="event_no"/>
+      <field id="0" name="StartEventNumber" type="event_no"/>
       <description>This event SHALL be generated when there is a negative Boolean state change from HumanActivityDetected or ObjectIdentified or AudioContextDetected or ObjectCountReached attribute.</description>
       <otherwiseConform>
         <mandatoryConform>
