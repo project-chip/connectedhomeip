@@ -33,15 +33,15 @@ tests:
 
     - label:
       verification: |
-          This step is required only for the reference platform(e,g: RPI). Please skip this step when validating with real devices.
+          This step is required only for the reference platform(e.g., RPI). Please skip this step when validating with real devices.
 
           The reference platform advertises only a single QR code, which is not sufficient to validate concatenated QR code onboarding payloads.
           Therefore, the QR code payloads must be manually generated using chip-tool.
         
           Use the following commands to generate individual QR codes:
         
-          ./chip-tool payload generate-qrcode   --discriminator 3840   --setup-pin-code 20202021   --vendor-id 65521   --product-id 32768
-          ./chip-tool payload generate-qrcode   --discriminator 3841   --setup-pin-code 20202021   --vendor-id 65522   --product-id 32770
+          ./chip-tool payload generate-qrcode --discriminator 3840 --setup-pin-code 20202021 --vendor-id 65521 --product-id 32768
+          ./chip-tool payload generate-qrcode --discriminator 3841 --setup-pin-code 20202021 --vendor-id 65522 --product-id 32770
         
           Save the generated QR codes for future validation.
         
@@ -54,7 +54,7 @@ tests:
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
           
-          ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>*<payload3>"
+          ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
         
           Example: ./chip-tool payload parse-setup-payload "MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00"
         
@@ -121,7 +121,7 @@ tests:
           Therefore, this test step is not verifiable on the RPI reference platform.
           
           This test step can be validated using real Commissioner devices that support user interaction and concatenated QR code handling when 
-          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) & MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
+          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) && MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
       disabled: true
 
     - label:
@@ -137,14 +137,14 @@ tests:
           Therefore, this test step is not verifiable on the RPI reference platform.
           
           This test step can be validated using real Commissioner devices that support user interaction and concatenated QR code handling when 
-          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) & !MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
+          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) && !MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
       disabled: true
 
     - label:
           "Step 5: Scan QR code using concatenation (which supports the
           commissioning of all the TH devices)"
       verification: |
-          ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>*<payload3>"
+          ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
         
           Example: ./chip-tool payload parse-setup-payload "MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00"
         
