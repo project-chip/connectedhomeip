@@ -19,7 +19,6 @@
 
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
