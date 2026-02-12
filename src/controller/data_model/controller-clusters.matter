@@ -8757,7 +8757,7 @@ provisional cluster SoilMeasurement = 1072 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster provides data modeling and protocol implementation of ambient context sensing features. */
+/** This server cluster provides an interface to ambient context sensing functionality. */
 provisional cluster AmbientContextSensing = 1073 {
   revision 1;
 
@@ -8810,7 +8810,7 @@ provisional cluster AmbientContextSensing = 1073 {
   readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
   readonly attribute optional boolean objectCountReached = 5;
   attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
-  readonly attribute access(write: manage) optional int16u objectCount = 7;
+  readonly attribute optional int16u objectCount = 7;
   attribute int8u simultaneousDetectionLimit = 8;
   attribute access(write: manage) int16u holdTime = 9;
   readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;

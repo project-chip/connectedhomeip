@@ -12954,7 +12954,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Ambient Context Sensing
  *
- * This cluster provides data modeling and protocol implementation of ambient context sensing features.
+ * This server cluster provides an interface to ambient context sensing functionality.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterAmbientContextSensing : MTRGenericBaseCluster
