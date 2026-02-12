@@ -52,7 +52,6 @@ using BoundDeviceContextReleaseHandler = PendingNotificationContextReleaseHandle
 
 struct ManagerInitParams
 {
-    Table * mBindingTable                    = nullptr;
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
     PersistentStorageDelegate * mStorage     = nullptr;
@@ -78,6 +77,7 @@ class Manager : public chip::FabricTable::Delegate
 {
 public:
     Manager() {}
+
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
     /*

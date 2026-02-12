@@ -112,8 +112,7 @@ CHIP_ERROR CastingServer::InitBindingHandlers()
 {
     auto & server = chip::Server::GetInstance();
     LogErrorOnFailure(app::Clusters::Binding::Manager::GetInstance().Init(
-        { &app::Clusters::Binding::Table::GetInstance(), &server.GetFabricTable(), server.GetCASESessionManager(),
-          &server.GetPersistentStorage() }));
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }));
     return CHIP_NO_ERROR;
 }
 

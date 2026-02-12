@@ -65,7 +65,7 @@ TEST_F(TestPendingNotificationMap, TestEmptyMap)
 
 TEST_F(TestPendingNotificationMap, TestAddRemove)
 {
-    PendingNotificationMap pendingMap((Binding::Table::GetInstance()));
+    PendingNotificationMap pendingMap(Binding::Table::GetInstance());
     ClearBindingTable(Binding::Table::GetInstance());
     CreateDefaultFullBindingTable(Binding::Table::GetInstance());
     for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)

@@ -42,7 +42,6 @@ CHIP_ERROR Manager::UnicastBindingRemoved(uint8_t bindingEntryId)
 CHIP_ERROR Manager::Init(const ManagerInitParams & params)
 {
     VerifyOrReturnError(params.mCASESessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(params.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mInitParams = params;
@@ -107,8 +106,6 @@ CHIP_ERROR Manager::EstablishConnection(const ScopedNodeId & nodeId)
 
 void Manager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    VerifyOrDie(mInitParams.mBindingTable != nullptr);
-
     FabricIndex fabricToRemove = kUndefinedFabricIndex;
     NodeId nodeToRemove        = kUndefinedNodeId;
 
@@ -155,7 +152,6 @@ void Manager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mInitParams.mBindingTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
 
     CHIP_ERROR error      = CHIP_NO_ERROR;
