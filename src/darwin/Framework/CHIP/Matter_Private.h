@@ -22,7 +22,6 @@
 #import <Matter/MTRBaseClusters_Private.h>
 #import <Matter/MTRClusterConstants_Private.h>
 #import <Matter/MTRClusters_Private.h>
-#import <Matter/MTRCommandPayloads_Private.h>
 #import <Matter/MTRCommandPayloadsObjc_Private.h>
 #import <Matter/MTRStructsObjc_Private.h>
 
