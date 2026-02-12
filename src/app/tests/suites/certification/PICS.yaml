@@ -310,6 +310,9 @@ PICS:
     - label: "Does Device support LwIP stack?"
       id: MCORE.SC.LWIP
 
+    - label: "Does Device support TCP transport?"
+      id: MCORE.SC.TCP
+
     - label:
           "Does Commissioner notify user that Commissionee is not a fully
           trusted device on device attestation failure?"
