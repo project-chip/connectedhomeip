@@ -313,6 +313,6 @@ void BindingHandler::SwitchWorkerHandler(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingData * data = reinterpret_cast<BindingData *>(context);
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data -> EndpointId, data->ClusterId,
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId,
                                                                                        static_cast<void *>(data));
 }
