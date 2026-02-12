@@ -95,7 +95,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
     mGroupcastCluster.Create(GroupcastContext{
-        .fabricTable  = mContext.fabricTable,
+        .fabricTable       = mContext.fabricTable,
         .groupDataProvider = mContext.groupDataProvider,
     });
     ReturnErrorOnFailure(provider.AddCluster(mGroupcastCluster.Registration()));
