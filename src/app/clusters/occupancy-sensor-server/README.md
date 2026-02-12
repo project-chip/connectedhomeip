@@ -121,9 +121,9 @@ void MySensorHardwareCallback(bool isOccupied)
 }
 ```
 
-## Legacy Usage (Not Recommended)
+## Compatibility with ZAP/Codegen
 
-For backwards compatibility with applications that rely on older ZAP-generated
+For backwards compatibility with applications that rely on ZAP-generated
 patterns (like the `all-clusters-app`), a compatibility layer is provided in
 `CodegenIntegration.h` and `CodegenIntegration.cpp`.
 
@@ -157,29 +157,41 @@ void MySensorHardwareCallback(bool isOccupied)
 }
 ```
 
-### Notes and Limitations for Legacy Usage
+## Migration from SDK versions < 1.6
 
-* Unlike the legacy implementation, the current implementation handles all timer
-related functionality related to the `holdTime` attribute. So the application
-should no longer maintain any `holdTime` timer.
+### Timer Handling
 
-* The global attribute setter/getters are no longer available. This is now
+The cluster implementation now handles all timer related functionality related to
+the `holdTime` attribute. Applications must not maintain any `holdTime` timer.
+
+### Attribute Access
+
+The global attribute setter/getters are no longer available. Attribute access is
 exclusively done using the public methods from the `OccupancySensingCluster`
 class.
 
-* Post attribute change callback are now exclusively handled by implementing an
+### Callbacks
+
+Post attribute change callbacks are exclusively handled by implementing an
 `OccupancySensingDelegate`.
 
-* The Feature map is hardcoded to 0 (defaults to PIR) when relying on
-`CodegenIntegration.cpp` (ZAP) for legacy usage. If your application needs to
-enable other features, it MUST instantiate and configure the cluster directly.
-The legacy API assumed there was only a single instance of Occupancy Sensor 
-and allowed the application to configure the feature map with:
+### Feature Map Configuration
+
+The Feature map is hardcoded to 0 (defaults to PIR) when relying on
+`CodegenIntegration.cpp` (ZAP) for backward compatibility. If your application
+needs to enable other features, it MUST instantiate and configure the cluster
+directly. The deprecated API assumed there was only a single instance of
+Occupancy Sensor and allowed the application to configure the feature map
+with:
+
 ```
 OccupancySensing::Instance(Feature::kPassiveInfrared);
 ```
-Now, this must be done using `config.WithFeatures(featureMap)`as shown in section
-[Instantiate Delegates and Cluster](#2-instantiate-delegates-and-cluster) through the constructor for each instance of the cluster:
+
+This must be done using `config.WithFeatures(featureMap)` as shown in
+section
+[Instantiate Delegates and Cluster](#2-instantiate-delegates-and-cluster)
+through the constructor for each instance of the cluster:
 
 ```
 auto config = Clusters::OccupancySensingCluster::Config(kYourEndpointId)
