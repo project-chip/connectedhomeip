@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Chime/Attributes.h>
 #include <clusters/Chime/Commands.h>
@@ -36,9 +37,11 @@ public:
      * Creates a Chime Cluster instance.
      * @param aEndpointId The endpoint on which this cluster exists.
      * @param aDelegate A reference to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aSafeAttributePersistenceProvider A reference to the SafeAttributePersistenceProvider to be used for persistence.
+     * Note: the caller must ensure that the delegate and SafeAttributePersistenceProvider live throughout the instance's lifetime.
      */
-    ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate);
+    ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate,
+                 SafeAttributePersistenceProvider & aSafeAttributePersistenceProvider);
     ~ChimeCluster();
 
     // Attribute Setters
@@ -90,11 +93,15 @@ public:
 
 private:
     ChimeDelegate & mDelegate;
+    SafeAttributePersistenceProvider & mSafeAttributePersistenceProvider;
 
     // Attribute local storage
     uint8_t mSelectedChime = 0;
     bool mEnabled          = true;
     // Helpers
+    // Loads all the persistent attributes from the KVS.
+    void LoadPersistentAttributes();
+
     // Checks if the chimeID is supported by the delegate
     bool IsSupportedChimeID(uint8_t chimeID);
 
