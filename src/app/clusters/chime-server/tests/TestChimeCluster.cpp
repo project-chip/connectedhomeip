@@ -89,14 +89,13 @@ struct TestChimeCluster : public ::testing::Test
 
     void SetUp() override
     {
-        VerifyOrDie(mPersistenceProvider.Init(&mTestContext.StorageDelegate()) == CHIP_NO_ERROR);
+        VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
     void TearDown() override {}
 
     MockChimeDelegate mMockDelegate;
-    TestServerClusterContext mTestContext;
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 
     ChimeCluster mCluster{ kTestEndpointId, mMockDelegate, mPersistenceProvider };
