@@ -203,7 +203,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     // Initialize the safe attribute persistence provider
     SuccessOrDie(gSafeAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
     SetSafeAttributePersistenceProvider(&gSafeAttributePersistenceProvider);
-    
+
     // Set the global DAC provider before server/cluster init so any integration path that
     // snapshots the provider during construction sees a valid implementation.
     SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
