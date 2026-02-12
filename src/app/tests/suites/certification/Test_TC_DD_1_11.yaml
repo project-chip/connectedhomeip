@@ -14,8 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    [TC-DD-1.11] Concatenation - QR Code Onboarding Payload Verification
-    [DUT - Commissioner]
+    [TC-DD-1.11] Concatenation - QR Code Onboarding Payload Verification [DUT - Commissioner]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
@@ -32,7 +31,7 @@ tests:
           Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
-      - label: "Note"
+    - label:
       verification: |
           This step is required only for the reference platform(e,g: RPI). Please skip this step when validating with real devices.
 
@@ -89,7 +88,7 @@ tests:
       verification: |
           Verify that the DUT (chip-tool) follows the correct onboarding order for the TH devices, which must proceed from first to last, left to right.
 
-          In this case, the QR code payload Y.K90-Q000KA0648G00 must be onboarded first, followed by 86PS061901KA0648G00.
+          In this case, the QR code payload Y.K90-Q000KA0648G00 must be onboarded first, followed by Y.K9061901KA0648G00.
         
         
           [1768813041.471] [132802:132802] [DL] ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
