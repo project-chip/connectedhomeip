@@ -287,7 +287,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
-        software_version_attr_handler.await_all_period_expected_report_matches(
+        software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
 
         software_version_attr_handler.flush_reports()
@@ -359,7 +359,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
-        software_version_attr_handler.await_all_period_expected_report_matches(
+        software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=spec_wait_time)
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
@@ -421,7 +421,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         software_version_match = AttributeMatcher.from_callable(
             f"Sofware Version should be: {current_sw_version}",
             lambda report: report.value == current_sw_version)
-        software_version_attr_handler.await_all_period_expected_report_matches(
+        software_version_attr_handler.wait_all_final_values_reported_persisted(
             expected_matchers=[software_version_match], timeout_sec=delayed_apply_action_time)
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
@@ -454,14 +454,20 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
+        download_progress_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress
+        )
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        await download_progress_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                                   fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
         # Wait Until Downloading
         update_state_match = AttributeMatcher.from_callable(
             "Waiting Update state is Downloading",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
-
         update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
 
         # This can be only be tested on CI or Locally, real devices might not have this path available.
@@ -475,10 +481,32 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             asserts.assert_equal(True, ota_file_data['exists'], f"File is was not downloaded  at {ota_file_data['path']}")
             asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
 
-        # Applying
-        update_state_match = AttributeMatcher.from_callable(
-            "Waiting Update state is Applying",
-            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        # Device is downloading the image
+        progress_seen = False
+        last_progress = 0
+
+        def check_ota_download_matcher(report):
+            """ Check for the UpdateStateProgress and confirms it downloaded the image when the 
+                status reach to NullValue
+            Args:
+                report : Report value
+            """
+            value = report.value
+            nonlocal progress_seen, last_progress
+            if value is not NullValue and isinstance(value, int) and 1 <= value <= 100:
+                # Just check if we see some progress to confirm is downloading
+                last_progress = value
+                if not progress_seen:
+                    progress_seen = True
+            if value is NullValue and progress_seen:
+                return True
+
+        download_progress_attr_matcher_obj = AttributeMatcher.from_callable(
+            description="Waiting Download to Complete ", matcher=check_ota_download_matcher)
+        download_progress_attr_handler.await_all_expected_report_matches(
+            [download_progress_attr_matcher_obj], timeout_sec=self.ota_image_download_timeout)
+        download_progress_attr_handler.reset()
+        download_progress_attr_handler.cancel()
 
         # Did not apply the software update
         update_state_attr_handler.await_all_expected_report_matches(
@@ -486,7 +514,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Waiting Update state is Idle",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=600)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=600)
         update_state_attr_handler.reset()
         update_state_attr_handler.cancel()
 

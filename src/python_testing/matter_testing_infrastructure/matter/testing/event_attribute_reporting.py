@@ -304,12 +304,12 @@ class AttributeSubscriptionHandler:
         asserts.assert_equal(item.attribute, self._expected_attribute,
                              f"[AttributeSubscriptionHandler] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}")
 
-    def await_all_period_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
-        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports until timeout.
+    def wait_all_final_values_reported_persisted(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+        """Expect that every predicate in `expected_matchers` matches, when run against all the incoming reports until timeout.
 
         Waits for all `timeout_sec` seconds.
 
-        Verify the matcher does not change the expected attribute report.
+        Verify the matcher does not change the expected attribute report during the timeout.
         """
         start_time = time.time()
         elapsed = 0.0
