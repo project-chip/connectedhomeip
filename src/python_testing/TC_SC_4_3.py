@@ -275,7 +275,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Request the TXT record. The device may opt not to return a TXT record if there are no mandatory TXT keys
         txt_record_returned = txt_record is not None and txt_record.txt is not None and bool(
             txt_record.txt)
-        txt_record_required = supports_icd or self.check_pics(TCP_PICS_STR)
+        txt_record_required = supports_icd or supports_tcp_pics
 
         if txt_record_required:
             asserts.assert_true(txt_record_returned, "TXT record is required and was not returned or contains no values")
@@ -291,7 +291,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify AAAA record is returned
         asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")
 
-        # # *** STEP 9 ***
+        # # *** STEP 11 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
         # hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the
         # ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the
@@ -363,6 +363,8 @@ class TC_SC_4_3(MatterBaseTest):
 
         # T TXT KEY
         t_key_present = 'T' in txt_record.txt
+        if supports_tcp_dut:
+            asserts.assert_true(t_key_present, "T key must be present if DUT supports TCP.")
         t_key = txt_record.txt.get('T', None)
         assert_valid_t_key(t_key, t_key_present, supports_tcp_dut, supports_tcp_pics, enforce_provisional=False)
 
