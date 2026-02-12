@@ -190,7 +190,7 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCaseSes
     auto result = tester.Invoke(request);
 
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetStatusCode(),
+    EXPECT_EQ(result.status.value().GetStatusCode(),
               Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
 }
 
@@ -208,7 +208,7 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCredent
     auto result = tester.Invoke(request);
 
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetStatusCode(),
+    EXPECT_EQ(result.status.value().GetStatusCode(),
               Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
 }
 
@@ -231,5 +231,5 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestSuccess)
 
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    EXPECT_TRUE(result.response->passphrase.data_equal(ByteSpan(passphraseData)));
+    EXPECT_TRUE(result.response.value().passphrase.data_equal(ByteSpan(passphraseData)));
 }
