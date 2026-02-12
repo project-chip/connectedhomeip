@@ -71,11 +71,7 @@ public:
     /**
      * @return The endpoint ID.
      */
-    EndpointId GetEndpointId()
-    {
-        VerifyOrDie(mCluster.IsConstructed());
-        return mCluster.Cluster().GetPaths()[0].mEndpointId;
-    }
+    EndpointId GetEndpointId() { return mEndpointId; }
 
     // Cluster constants from the spec
     static constexpr uint8_t kMaxChimeSoundNameSize = ChimeCluster::kMaxChimeSoundNameSize;
