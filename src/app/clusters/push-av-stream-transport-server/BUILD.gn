@@ -24,10 +24,14 @@ source_set("push-av-stream-transport-server") {
     "push-av-stream-transport-storage.h",
   ]
 
+  deps = [ "${chip_root}/src/app:attribute-persistence" ]
+
   public_deps = [
     "${chip_root}/src/app/",
     "${chip_root}/src/app/clusters/tls-certificate-management-server",
     "${chip_root}/src/app/clusters/tls-client-management-server",
+    "${chip_root}/src/app/persistence",
+    "${chip_root}/src/app/persistence:singleton",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/third_party/uriparser:uriparser",
