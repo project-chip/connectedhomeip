@@ -66,11 +66,8 @@ CHIP_ERROR WiFiNetworkManagementCluster::ClearNetworkCredentials()
     mSsid.clear();
     RETURN_SAFELY_IGNORED mPassphrase.SetLength(0);
 
-    if (IsStarted())
-    {
-        NotifyAttributeChanged(Ssid::Id);
-        NotifyAttributeChanged(PassphraseSurrogate::Id);
-    }
+    NotifyAttributeChanged(Ssid::Id);
+    NotifyAttributeChanged(PassphraseSurrogate::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -88,7 +85,7 @@ CHIP_ERROR WiFiNetworkManagementCluster::SetNetworkCredentials(ByteSpan ssid, By
     RETURN_SAFELY_IGNORED mPassphrase.SetLength(passphrase.size());
     memcpy(mPassphrase.Bytes(), passphrase.data(), passphrase.size());
 
-    if (ssidChanged && IsStarted())
+    if (ssidChanged)
     {
         NotifyAttributeChanged(Ssid::Id);
     }
@@ -100,10 +97,7 @@ CHIP_ERROR WiFiNetworkManagementCluster::SetNetworkCredentials(ByteSpan ssid, By
         {
             mPassphraseSurrogate = std::max(mPassphraseSurrogate, realtime.count());
         }
-        if (IsStarted())
-        {
-            NotifyAttributeChanged(PassphraseSurrogate::Id);
-        }
+    NotifyAttributeChanged(PassphraseSurrogate::Id);
     }
     return CHIP_NO_ERROR;
 }
