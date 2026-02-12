@@ -483,7 +483,8 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
                     (uint16_t) activationReason, zoneIds.size(), sensitivity);
 
     // Handle edge case where zoneIds is empty
-    if (zoneIds.empty()) {
+    if (zoneIds.empty())
+    {
         ChipLogProgress(Camera, "PushAVTransport trigger transport ignored - empty zoneIds list provided");
         return;
     }
