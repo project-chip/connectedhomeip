@@ -92,12 +92,12 @@ class TC_GCAST_2_3(MatterBaseTest):
             await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Send UpdateGroupKey command error should be {Status.NotFound} instead of {e.status}")
+                                 f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
 
         # remove any existing KeySetID on the DUT, except KeySetId 0 (IPK).
         resp: Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse = await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
 
-        read_group_key_ids: List[int] = resp.groupKeySetIDs
+        read_group_key_ids: list[int] = resp.groupKeySetIDs
         for key_set_id in read_group_key_ids:
             if key_set_id != 0:
                 await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRemove(key_set_id))
