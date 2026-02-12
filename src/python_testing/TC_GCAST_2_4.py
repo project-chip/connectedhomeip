@@ -93,12 +93,11 @@ class TC_GCAST_2_4(MatterBaseTest):
             endpoints_list = endpoints_list[:2]
 
         self.step("1b")
-        # LeaveGroup all groups. If There were no groups, it should fail with Status.NotFound.
-        try:
+        # Check if there are any groups on the DUT.
+        membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
+        if membership:
+            # LeaveGroup with groupID 0 will leave all groups on the fabric.
             await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
 
         # remove any existing KeySetID on the DUT, except KeySetId 0 (IPK).
         resp: Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse = await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
