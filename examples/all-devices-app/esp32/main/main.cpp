@@ -220,7 +220,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
         RootNodeDevice::Context {
-<<<<<<< HEAD
             .commissioningWindowManager           = Server::GetInstance().GetCommissioningWindowManager(),  //
                 .configurationManager             = DeviceLayer::ConfigurationMgr(),                        //
                 .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),   //
