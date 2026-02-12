@@ -41,7 +41,6 @@ set(APP_SRCS
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/WifiRootNodeDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/root-node/WifiRootNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
     # keep-sorted: end
