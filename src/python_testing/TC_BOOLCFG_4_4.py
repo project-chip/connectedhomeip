@@ -195,8 +195,8 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         if alarms_state_changed_event_supported and (is_vis_feature_supported or is_aud_feature_supported):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AlarmsStateChanged, timeout_sec=30.0)
-            asserts.assert_not_equal(event.alarmsActive, 0,
-                                     "AlarmsStateChanged event did not report non-zero alarmsActive after sensor trigger")
+            asserts.assert_equal(event.alarmsActive, activeAlarms,
+                                 "AlarmsStateChanged event alarmsActive does not match expected mask after sensor trigger")
             log.info(f"Received AlarmsStateChanged event with alarmsActive = {event.alarmsActive}")
         else:
             log.info("Test step skipped")

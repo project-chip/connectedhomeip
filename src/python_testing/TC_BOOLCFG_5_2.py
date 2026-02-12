@@ -178,8 +178,8 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
         if alarms_state_changed_event_supported and (is_vis_feature_supported or is_aud_feature_supported):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AlarmsStateChanged, timeout_sec=30.0)
-            asserts.assert_not_equal(event.alarmsActive, 0,
-                                     "AlarmsStateChanged event did not report non-zero alarmsActive after sensor trigger")
+            asserts.assert_equal(event.alarmsActive, enabledAlarms,
+                                 "AlarmsStateChanged event alarmsActive does not match expected enabledAlarms after sensor trigger")
             log.info(f"Received AlarmsStateChanged event with alarmsActive = {event.alarmsActive}")
         else:
             log.info("AlarmsStateChanged event not supported or no alarms enabled. Skipping step 6a.")
@@ -210,8 +210,8 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
         if alarms_state_changed_event_supported and is_vis_feature_supported:
             event = event_listener.wait_for_event_report(
                 cluster.Events.AlarmsStateChanged, timeout_sec=30.0)
-            asserts.assert_is_not_none(event.alarmsSuppressed,
-                                       "AlarmsStateChanged event missing alarmsSuppressed field after VIS suppress")
+            asserts.assert_equal(event.alarmsSuppressed, alarms_suppressed_dut,
+                                 "AlarmsStateChanged event alarmsSuppressed does not match expected value after VIS suppress")
             log.info(f"Received AlarmsStateChanged event with alarmsSuppressed = {event.alarmsSuppressed}")
         else:
             log.info("Test step skipped")
@@ -242,8 +242,8 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
         if alarms_state_changed_event_supported and is_aud_feature_supported:
             event = event_listener.wait_for_event_report(
                 cluster.Events.AlarmsStateChanged, timeout_sec=30.0)
-            asserts.assert_is_not_none(event.alarmsSuppressed,
-                                       "AlarmsStateChanged event missing alarmsSuppressed field after AUD suppress")
+            asserts.assert_equal(event.alarmsSuppressed, alarms_suppressed_dut,
+                                 "AlarmsStateChanged event alarmsSuppressed does not match expected value after AUD suppress")
             log.info(f"Received AlarmsStateChanged event with alarmsSuppressed = {event.alarmsSuppressed}")
         else:
             log.info("Test step skipped")
