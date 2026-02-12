@@ -212,7 +212,7 @@ class TC_IDM_2_3(BasicCompositionTests):
             endpoint_id=0
         )
 
-        # Verify the sequence: [Priming Report (initial), Subscription Update (new)]
+        # Verify change of NodeLabel received.
         handler.await_sequence_of_reports(
             attribute=Clusters.BasicInformation.Attributes.NodeLabel,
             sequence=[new_label],
