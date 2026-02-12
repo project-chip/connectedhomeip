@@ -2089,14 +2089,6 @@ void ConnectivityManagerImpl::ScanNanSubscribeTerminated(guint subscribe_id, gch
     //PlatformMgr().PostEventOrDie(&event);
 }
 
-namespace {
-struct ScanTimerCtx
-{
-    chip::DeviceLayer::ConnectivityManagerImpl * self;
-    guint subscribe_id;
-};
-} // namespace
-
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Handle handle,
                                                  const chip::app::ConcreteCommandPath & path,
                                                  uint8_t scanMaxTime)
@@ -2106,10 +2098,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Hand
 
     ChipLogProgress(Controller, "===SHM %s() Commissioning Proxy: Discover PAF devices", __func__);
     ChipLogProgress(Controller, "Commissioning Proxy: Discover PAF devices");
-
-    // Take ownership of the Handle; this defers the response.
-    mPendingProxyScanHandle.emplace(std::move(handle));
-    mPendingProxyScanPath = path;
 
     guint subscribe_id;
     GAutoPtr<GError> err;
@@ -2177,33 +2165,28 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Hand
         }),
         this);
 
-    // Allow the given scan timeout before returning results
     ChipLogProgress(DeviceLayer, "===SHM %s() Timeout in %d seconds",__func__, scanMaxTime);
-    auto * ctx = new ScanTimerCtx{ this, subscribe_id };
-
+    // Allow the given scan timeout before returning results
+    // Take ownership of the Handle; this defers the scan response.
+    auto * ctx = new ScanTimerCtx{ this, subscribe_id, std::move(handle), path };
     SystemLayer().StartTimer(
         System::Clock::Milliseconds32(scanMaxTime * 1000),
         +[](System::Layer *, void * context) {
             auto * timerCtx = static_cast<ScanTimerCtx *>(context);
-            timerCtx->self->FinishWiFiPAFScanAndRespond(timerCtx->subscribe_id);
-            delete timerCtx; // one-shot timer, safe to delete after firing
+            timerCtx->self->FinishWiFiPAFScanAndRespond(timerCtx);
+            // Releasing the Handle triggers sending the scan response.
+            delete timerCtx;
         }, ctx);
 
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(guint subscribe_id)
+void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(ScanTimerCtx * ctx)
 {
     using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
-    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout fired, subscribe_id:%d", __func__, subscribe_id);
+    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout fired, subscribe_id:%u", __func__, ctx->subscribe_id);
 
-    if (!mPendingProxyScanHandle.has_value())
-    {
-        ChipLogError(DeviceLayer, "Commissioning Proxy: Scan Handle not found");
-        return;
-    }
-
-    chip::app::CommandHandler * cmd = mPendingProxyScanHandle->Get();   // Could be null if session went away
+    chip::app::CommandHandler * cmd = ctx->PendingProxyScanHandle.Get();   // Could be null if session went away
     if (cmd == nullptr)
     {
         ChipLogError(DeviceLayer, "Commissioning Proxy: Scan Command Handle not found");
@@ -2211,10 +2194,10 @@ void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(guint subscribe_id)
     }
 
     // Stop the PAF discovery
-    (void) _WiFiPAFCancelSubscribe(subscribe_id);
+    (void) _WiFiPAFCancelSubscribe(ctx->subscribe_id);
     (void) _WiFiPAFCancelIncompleteSubscribe();
 
-    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = subscribe_id };
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
     (void) WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 
@@ -2248,18 +2231,13 @@ void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(guint subscribe_id)
 
     List<const ScanResultT> list{ Span<const ScanResultT>(results.data(), results.size()) };
     response.proxyScanResult = list;
-
-    // response.numberOfResults = results.size();
     response.numberOfResults = static_cast<uint8_t>(response.proxyScanResult.size());
-
-    cmd->AddResponse(mPendingProxyScanPath, response);
-    cmd->AddStatus(mPendingProxyScanPath, Protocols::InteractionModel::Status::Success);
+    cmd->AddResponse(ctx->PendingProxyScanPath, response);
+    cmd->AddStatus(ctx->PendingProxyScanPath, Protocols::InteractionModel::Status::Success);
 
     // Clear discovered devices cache
     mNanScanPeers.clear();
 
-    // Releasing the last Handle triggers sending the Invoke Response.
-    mPendingProxyScanHandle.reset();
     ChipLogProgress(DeviceLayer, "===SHM Leaving %s()",__func__);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY

@@ -122,6 +122,14 @@ struct NanPeerInfo
         return true;
     }
 };
+
+struct ScanTimerCtx
+{
+    chip::DeviceLayer::ConnectivityManagerImpl * self;
+    guint subscribe_id;
+    chip::app::CommandHandler::Handle PendingProxyScanHandle;
+    chip::app::ConcreteCommandPath PendingProxyScanPath;
+};
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -210,11 +218,7 @@ public:
                             uint8_t scan_max_time);
 private:
     std::set<NanPeerInfo> mNanScanPeers;
-
-    // ProxyScanResponse is not sent back immediately, store state
-    std::optional<chip::app::CommandHandler::Handle> mPendingProxyScanHandle;
-    chip::app::ConcreteCommandPath mPendingProxyScanPath;
-    void FinishWiFiPAFScanAndRespond(guint subscribe_id);
+    void FinishWiFiPAFScanAndRespond(ScanTimerCtx * ctx);
 #endif
 
 private:
