@@ -540,8 +540,7 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
     }
 
-    if (defined(invoker.chip_enable_openthread) &&
-        invoker.chip_enable_openthread) {
+    if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {
       defines += [
         "SL_OT_ENABLE=1",
 
@@ -615,8 +614,7 @@ template("efr32_sdk") {
         "SL_TRANSPORT_ACTIVE_INTERVAL=${sl_transport_active_interval_ms}",
       ]
 
-      if (defined(invoker.chip_enable_openthread) &&
-          invoker.chip_enable_openthread) {
+      if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {
         if (enable_synchronized_sed) {
           defines += [
             "CHIP_DEVICE_CONFIG_THREAD_SSED=1",
@@ -893,8 +891,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (defined(invoker.chip_enable_openthread) &&
-        invoker.chip_enable_openthread) {
+    if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {
       sources += [
         "${silabs_gen_folder}/autogen/sl_ot_custom_cli.c",
         "${silabs_gen_folder}/autogen/sl_ot_init.c",
