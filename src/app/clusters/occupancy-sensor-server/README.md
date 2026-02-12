@@ -157,6 +157,8 @@ void MySensorHardwareCallback(bool isOccupied)
 }
 ```
 
+### Notes and Limitations for Legacy Usage
+
 Unlike the legacy implementation, the current implementation handles all timer
 related functionality related to the `holdTime` attribute. So the application
 should no longer maintain any `holdTime` timer.
@@ -167,3 +169,9 @@ class.
 
 Post attribute change callback are now exclusively handled by implementing an
 `OccupancySensingDelegate`.
+
+The Feature map is hardcoded to 0 (defaults to PIR) when relying on
+`CodegenIntegration.cpp` (ZAP) for legacy usade. If your application needs to
+enable other features, it MUST instantiate and configure the cluster directly
+using `config.WithFeatures(featureMap)`as shown in section [Instantiate Delegates and Cluster](#2-instantiate-delegates-and-cluster)
+.
