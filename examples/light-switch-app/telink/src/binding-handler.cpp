@@ -435,9 +435,9 @@ static void RegisterSwitchCommands()
 void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init({ &app::Clusters::Binding::Table::GetInstance(),
-                                                                    &server.GetFabricTable(), server.GetCASESessionManager(),
-                                                                    &server.GetPersistentStorage() });
+    LogErrorOnFailure(
+        Binding::Manager::GetInstance().Init({ &app::Clusters::Binding::Table::GetInstance(), &server.GetFabricTable(),
+                                               server.GetCASESessionManager(), &server.GetPersistentStorage() }));
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
@@ -467,7 +467,7 @@ void SwitchWorkerFunction(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
-    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data -> localEndpointId, data->clusterId,
                                                                                        static_cast<void *>(data));
 }
 

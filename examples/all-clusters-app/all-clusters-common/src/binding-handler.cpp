@@ -117,8 +117,7 @@ static void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
     LogErrorOnFailure(Binding::Manager::GetInstance().Init({ &Binding::Table::GetInstance(), &server.GetFabricTable(),
-                                                                    server.GetCASESessionManager(),
-                                                                    &server.GetPersistentStorage() });
+                                                             server.GetCASESessionManager(), &server.GetPersistentStorage() }));
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler);
 }

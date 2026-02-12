@@ -155,9 +155,9 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    TEMPORARY_RETURN_IGNORED chip::app::Clusters::Binding::Manager::GetInstance().Init(
+    LogErrorOnFailure(chip::app::Clusters::Binding::Manager::GetInstance().Init(
         { &app::Clusters::Binding::Table::GetInstance(), &server.GetFabricTable(), server.GetCASESessionManager(),
-          &server.GetPersistentStorage() });
+          &server.GetPersistentStorage() }));
 
     // Set FabricDelegate
     TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
