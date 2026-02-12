@@ -62,7 +62,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -204,8 +204,10 @@ class TC_OCC_3_1(MatterBaseTest):
 
         self.step(11)
         # Wait for up to 30 seconds for attribute data report with Occupancy = 1
-        attrib_listener.await_sequence_of_reports(
-            attribute=cluster.Attributes.Occupancy, sequence=[1], timeout_sec=30.0)
+        attrib_listener.await_all_final_values_reported(
+            expected_final_values=[AttributeValue(endpoint_id=endpoint_id,
+                attribute=cluster.Attributes.Occupancy, value=1)],
+            timeout_sec=30.0)
         log.info("Received attribute report for Occupancy = 1 (Occupied).")
 
         self.step(12)
@@ -246,8 +248,10 @@ class TC_OCC_3_1(MatterBaseTest):
 
         self.step(16)
         # Wait for up to 30 seconds for attribute data report with Occupancy = 0
-        attrib_listener.await_sequence_of_reports(
-            attribute=cluster.Attributes.Occupancy, sequence=[0], timeout_sec=30.0)
+        attrib_listener.await_all_final_values_reported(
+            expected_final_values=[AttributeValue(endpoint_id=endpoint_id,
+                attribute=cluster.Attributes.Occupancy, value=0)],
+            timeout_sec=30.0)
         log.info("Received attribute report for Occupancy = 0 (Unoccupied).")
 
         self.step(17)
