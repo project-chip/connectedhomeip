@@ -19,66 +19,74 @@
 
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
-namespace Clusters {
+    namespace Clusters {
 
-class ChimeServer
-{
-public:
-    /**
-     * Creates a chime server instance. This is just a backwards compatibility wrapper around the ChimeCluster.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aDelegate A reference to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
-     */
-    ChimeServer(EndpointId endpointId, ChimeDelegate & delegate);
-    ~ChimeServer();
+        class ChimeServer {
+        public:
+            /**
+             * Creates a chime server instance. This is just a backwards compatibility wrapper around the ChimeCluster.
+             * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+             * @param aDelegate A reference to the delegate to be used by this server.
+             * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+             */
+            ChimeServer(EndpointId endpointId, ChimeDelegate & delegate);
+            ~ChimeServer();
 
-    /**
-     * Register the chime cluster instance with the codegen data model provider.
-     * @return Returns an error if registration fails.
-     */
-    CHIP_ERROR Init();
+            /**
+             * Register the chime cluster instance with the codegen data model provider.
+             * @return Returns an error if registration fails.
+             */
+            CHIP_ERROR Init();
 
-    // Attribute Setters
-    /**
-     * Sets the SelectedChime attribute. Note, this also handles writing the new value into non-volatile storage.
-     * @param chimeSoundID The value to which the SelectedChime  is to be set.
-     * @return Returns a ConstraintError if the chimeSoundID value is not valid. Returns Success otherwise.
-     */
-    Protocols::InteractionModel::Status SetSelectedChime(uint8_t chimeSoundID);
+            // Attribute Setters
+            /**
+             * Sets the SelectedChime attribute. Note, this also handles writing the new value into non-volatile storage.
+             * @param chimeSoundID The value to which the SelectedChime  is to be set.
+             * @return Returns a ConstraintError if the chimeSoundID value is not valid. Returns Success otherwise.
+             */
+            Protocols::InteractionModel::Status SetSelectedChime(uint8_t chimeSoundID);
 
-    /**
-     * Sets the Enabled attribute. Note, this also handles writing the new value into non-volatile storage.
-     * @param Enabled The value to which the Enabled  is to be set.
-     */
-    Protocols::InteractionModel::Status SetEnabled(bool Enabled);
+            /**
+             * Sets the Enabled attribute. Note, this also handles writing the new value into non-volatile storage.
+             * @param Enabled The value to which the Enabled  is to be set.
+             */
+            Protocols::InteractionModel::Status SetEnabled(bool Enabled);
 
-    // Attribute Getters
-    /**
-     * @return The Current SelectedChime.
-     */
-    uint8_t GetSelectedChime() const;
+            // Attribute Getters
+            /**
+             * @return The Current SelectedChime.
+             */
+            uint8_t GetSelectedChime() const;
 
-    /**
-     * @return The Enabled attribute..
-     */
-    bool GetEnabled() const;
+            /**
+             * @return The Enabled attribute..
+             */
+            bool GetEnabled() const;
 
-    /**
-     * @return The endpoint ID.
-     */
-    EndpointId GetEndpointId() { return mCluster.Cluster().GetPaths()[0].mEndpointId; }
+            /**
+             * @return The endpoint ID.
+             */
+            EndpointId GetEndpointId()
+            {
+                VerifyOrDie(mCluster.IsConstructed());
+                return mCluster.Cluster().GetPaths()[0].mEndpointId;
+            }
 
-    // Cluster constants from the spec
-    static constexpr uint8_t kMaxChimeSoundNameSize = ChimeCluster::kMaxChimeSoundNameSize;
+            // Cluster constants from the spec
+            static constexpr uint8_t kMaxChimeSoundNameSize = ChimeCluster::kMaxChimeSoundNameSize;
 
-    // The Code Driven ChimeCluster instance
-    chip::app::RegisteredServerCluster<ChimeCluster> mCluster;
-};
+            // The Code Driven ChimeCluster instance (lazy-initialized)
+            chip::app::LazyRegisteredServerCluster<ChimeCluster> mCluster;
 
-} // namespace Clusters
+        private:
+            EndpointId mEndpointId;
+            ChimeDelegate * mDelegate;
+        };
+
+    } // namespace Clusters
 } // namespace app
 } // namespace chip
