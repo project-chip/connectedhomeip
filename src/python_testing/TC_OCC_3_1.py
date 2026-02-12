@@ -206,15 +206,14 @@ class TC_OCC_3_1(MatterBaseTest):
         # Wait for up to 30 seconds for attribute data report with Occupancy = 1
         attrib_listener.await_all_final_values_reported(
             expected_final_values=[AttributeValue(endpoint_id=endpoint_id,
-                attribute=cluster.Attributes.Occupancy, value=1)],
+                                                  attribute=cluster.Attributes.Occupancy, value=1)],
             timeout_sec=30.0)
         log.info("Received attribute report for Occupancy = 1 (Occupied).")
 
         self.step(12)
         if occupancy_event_supported:
             # Wait for OccupancyChanged event with Occupancy = 1
-            event = event_listener.wait_for_event_report(
-                cluster.Events.OccupancyChanged, timeout_sec=30.0)
+            event = event_listener.wait_for_event_report(cluster.Events.OccupancyChanged, timeout_sec=30.0)
             asserts.assert_equal(event.occupancy, 1, "OccupancyChanged event did not report Occupancy = 1 (Occupied)")
             log.info("Received OccupancyChanged event with Occupancy = 1 (Occupied).")
         else:
@@ -229,7 +228,7 @@ class TC_OCC_3_1(MatterBaseTest):
         log.info("Cleared accumulated reports. Restarting accumulation.")
 
         self.step(14)
-        # Prompt operator to ensure no occupancy detection, wait for HoldTime if supported
+        # Prompt operator to ensure sensor no longer detects occupancy. Wait for HoldTime duration if supported
         if self.is_ci:
             # CI call to trigger unoccupied.
             self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": endpoint_id, "Occupancy": 0})
@@ -250,15 +249,14 @@ class TC_OCC_3_1(MatterBaseTest):
         # Wait for up to 30 seconds for attribute data report with Occupancy = 0
         attrib_listener.await_all_final_values_reported(
             expected_final_values=[AttributeValue(endpoint_id=endpoint_id,
-                attribute=cluster.Attributes.Occupancy, value=0)],
+                                                  attribute=cluster.Attributes.Occupancy, value=0)],
             timeout_sec=30.0)
         log.info("Received attribute report for Occupancy = 0 (Unoccupied).")
 
         self.step(17)
         if occupancy_event_supported:
             # Wait for OccupancyChanged event with Occupancy = 0
-            event = event_listener.wait_for_event_report(
-                cluster.Events.OccupancyChanged, timeout_sec=30.0)
+            event = event_listener.wait_for_event_report(cluster.Events.OccupancyChanged, timeout_sec=30.0)
             asserts.assert_equal(event.occupancy, 0, "OccupancyChanged event did not report Occupancy = 0 (Unoccupied)")
             log.info("Received OccupancyChanged event with Occupancy = 0 (Unoccupied).")
         else:
