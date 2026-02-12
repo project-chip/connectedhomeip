@@ -61,7 +61,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT.", is_commissioning=True),
                 TestStep(2, "TH1 reads DUT’s ClusterRevision global attribute in General Diagnostics cluster.",
                          "If the ClusterRevision is < 3, then skip the rest of the test steps."),
-                TestStep(3, "Ensure DUT is commissioned in TH2’s fabric.", "TH2 is able to communicate with DUT."),
+                TestStep(3, "Commission DUT to TH2's fabric.", "TH2 is able to communicate with DUT."),
                 TestStep(4, "TH1 reads the DUT’s DeviceLoadStatus attribute in General Diagnostics cluster.\n"
                          "Save the TotalInteractionModelMessagesSent field of the DeviceLoadStatus attribute as 'initialTotalInteractionModelMessageSent'.\n"
                          "Save the TotalInteractionModelMessagesReceived field of the DeviceLoadStatus attribute as 'initialTotalInteractionModelMessagesReceived'.\n"
@@ -105,7 +105,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
             self.mark_all_remaining_steps_skipped(3)
             return
 
-        # Ensure DUT is commissioned in TH2’s fabric.
+        # Commission DUT to TH2's fabric.
         self.step(3)
         logger.info("Setting up TH2")
         fabricId2 = self.th1.fabricId + 1
