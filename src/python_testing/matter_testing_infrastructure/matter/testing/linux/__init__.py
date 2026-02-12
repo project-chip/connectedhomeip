@@ -22,11 +22,11 @@ from .thread import ThreadBorderRouter
 from .wifi import WpaSupplicantMock
 
 __all__ = [
+    "ensure_network_namespace_availability",
+    "ensure_private_state",
     "BluetoothMock",
     "DBusTestSystemBus",
-    "ThreadBorderRouter",
-    "WpaSupplicantMock",
     "IsolatedNetworkNamespace",
-    "ensure_network_namespace_availability",
-    "ensure_private_state"
+    "ThreadBorderRouter",
+    "WpaSupplicantMock"
 ]

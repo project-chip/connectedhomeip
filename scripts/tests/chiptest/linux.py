@@ -33,14 +33,14 @@ with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infras
                                ensure_network_namespace_availability, ensure_private_state)
 
 __all__ = [
-    "IsolatedNetworkNamespace",
-    "DBusTestSystemBus",
-    "BluetoothMock",
-    "ThreadBorderRouter",
-    "WpaSupplicantMock",
     "ensure_network_namespace_availability",
     "ensure_private_state",
-    "LinuxNamespacedExecutor"
+    "BluetoothMock",
+    "DBusTestSystemBus",
+    "IsolatedNetworkNamespace",
+    "LinuxNamespacedExecutor",
+    "ThreadBorderRouter",
+    "WpaSupplicantMock"
 ]
 
 

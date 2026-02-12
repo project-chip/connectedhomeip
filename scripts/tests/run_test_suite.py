@@ -36,7 +36,7 @@ from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
 
-if sys.platform == 'linux':
+if sys.platform == "linux":
     import chiptest.linux
 
 if sys.platform == 'darwin':
