@@ -77,8 +77,7 @@ struct ManagerInitParams
 class Manager : public chip::FabricTable::Delegate
 {
 public:
-    Manager() : mFabricTableDelegate(*this) {}
-
+    Manager() {}
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
     /*

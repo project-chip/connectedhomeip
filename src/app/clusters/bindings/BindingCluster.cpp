@@ -235,26 +235,7 @@ CHIP_ERROR BindingCluster::CreateBindingEntry(const TargetStructType & entry, En
                                            entry.cluster.std_optional());
     }
 
-    CHIP_ERROR err = mClusterContext.bindingTable.Add(bindingEntry);
-    if (err == CHIP_ERROR_NO_MEMORY)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
-    }
-    ReturnErrorOnFailure(err);
-
-    if (bindingEntry.type == Binding::MATTER_UNICAST_BINDING)
-    {
-        err = mClusterContext.bindingManager.UnicastBindingCreated(bindingEntry.fabricIndex, bindingEntry.nodeId);
-        if (err != CHIP_NO_ERROR)
-        {
-            // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
-            ChipLogError(
-                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                ChipLogValueX64(bindingEntry.nodeId), err.Format());
-        }
-    }
-
-    return CHIP_NO_ERROR;
+    return mClusterContext.bindingManager.AddBindingEntry(bindingEntry);
 }
 
 } // namespace Clusters
