@@ -53,8 +53,8 @@ public:
         VerifyOrDie(groupDataProvider != nullptr); // we require app main to set this before cluster startup
 
         gServer.Create(GroupcastContext{
-            .fabrics  = Server::GetInstance().GetFabricTable(),
-            .provider = *groupDataProvider,
+            .fabricTable  = Server::GetInstance().GetFabricTable(),
+            .groupDataProvider = *groupDataProvider,
         });
         return gServer.Registration();
     }
