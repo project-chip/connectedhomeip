@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+from __future__ import annotations
+
 import asyncio
 import inspect
 import json
@@ -53,8 +55,13 @@ from matter.clusters import Attribute, ClusterObjects
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
-from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
-                                          get_setup_payload_info_config)
+
+# NOTE: Runtime imports from matter.testing.commissioning are placed at the end of this file
+# to avoid circular import issues. For type checking, we import them here under TYPE_CHECKING.
+if typing.TYPE_CHECKING:
+    from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters,
+                                              SetupPayloadInfo, commission_devices, get_setup_payload_info_config)
+
 from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
@@ -1604,3 +1611,8 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     ])
     return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
+
+
+# Import from commissioning module placed here to avoid circular import.
+# CommissionDeviceTest extends MatterBaseTest, so MatterBaseTest must be defined first.
+from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices, get_setup_payload_info_config)  # isort: skip  # noqa: E402
