@@ -98,7 +98,7 @@ struct TestChimeCluster : public ::testing::Test
     MockChimeDelegate mMockDelegate;
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 
-    ChimeCluster mCluster{ kTestEndpointId, mMockDelegate, mPersistenceProvider };
+    ChimeCluster mCluster{ kTestEndpointId, ChimeCluster::Context{ .safeAttributePersistenceProvider = mPersistenceProvider }, mMockDelegate };
 
     ClusterTester mClusterTester{ mCluster };
 };
@@ -259,7 +259,7 @@ TEST_F(TestChimeCluster, TestPersistence)
 
     // 1. Initial startup, verify default values
     {
-        ChimeCluster cluster(kTestEndpointId, mockDelegate, persistenceProvider);
+        ChimeCluster cluster(kTestEndpointId, ChimeCluster::Context{ .safeAttributePersistenceProvider = persistenceProvider }, mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
@@ -278,7 +278,7 @@ TEST_F(TestChimeCluster, TestPersistence)
 
     // 2. Restart (create new cluster instance), verify modified values are loaded
     {
-        ChimeCluster cluster(kTestEndpointId, mockDelegate, persistenceProvider);
+        ChimeCluster cluster(kTestEndpointId, ChimeCluster::Context{ .safeAttributePersistenceProvider = persistenceProvider }, mockDelegate);
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster);
 

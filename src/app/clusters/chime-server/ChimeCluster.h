@@ -33,15 +33,19 @@ class ChimeDelegate;
 class ChimeCluster : public DefaultServerCluster
 {
 public:
+    struct Context
+    {
+        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
+    };
+
     /**
      * Creates a Chime Cluster instance.
      * @param aEndpointId The endpoint on which this cluster exists.
-     * @param aDelegate A reference to the delegate to be used by this server.
-     * @param aSafeAttributePersistenceProvider A reference to the SafeAttributePersistenceProvider to be used for persistence.
-     * Note: the caller must ensure that the delegate and SafeAttributePersistenceProvider live throughout the instance's lifetime.
+     * @param context The context containing injected dependencies.
+     * @param delegate A reference to the delegate to be used by this server.
+     * Note: the caller must ensure that the provided dependencies and delegate live throughout the instance's lifetime.
      */
-    ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate,
-                 SafeAttributePersistenceProvider & aSafeAttributePersistenceProvider);
+    ChimeCluster(EndpointId endpointId, const Context & context, ChimeDelegate & delegate);
     ~ChimeCluster();
 
     // Attribute Setters
@@ -92,8 +96,8 @@ public:
                                                                CommandHandler * handler) override;
 
 private:
+    Context mContext;
     ChimeDelegate & mDelegate;
-    SafeAttributePersistenceProvider & mSafeAttributePersistenceProvider;
 
     // Attribute local storage
     uint8_t mSelectedChime = 0;

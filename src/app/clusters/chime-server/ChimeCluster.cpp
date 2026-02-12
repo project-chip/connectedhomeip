@@ -44,10 +44,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-ChimeCluster::ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate,
-                           SafeAttributePersistenceProvider & safeAttributePersistenceProvider) :
-    DefaultServerCluster({ endpointId, Chime::Id }),
-    mDelegate(delegate), mSafeAttributePersistenceProvider(safeAttributePersistenceProvider)
+ChimeCluster::ChimeCluster(EndpointId endpointId, const Context & context, ChimeDelegate & delegate) :
+    DefaultServerCluster({ endpointId, Chime::Id }), mContext(context), mDelegate(delegate)
 {
     mDelegate.SetChimeCluster(this);
 }
@@ -87,7 +85,7 @@ void ChimeCluster::LoadPersistentAttributes()
 {
     // Load Active Chime ID
     uint8_t storedSelectedChime = 0;
-    CHIP_ERROR err              = mSafeAttributePersistenceProvider.ReadScalarValue(
+    CHIP_ERROR err = mContext.safeAttributePersistenceProvider.ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, Chime::Id, SelectedChime::Id), storedSelectedChime);
     if (err == CHIP_NO_ERROR)
     {
@@ -101,8 +99,8 @@ void ChimeCluster::LoadPersistentAttributes()
 
     // Load Enabled
     bool storedEnabled = false;
-    err = mSafeAttributePersistenceProvider.ReadScalarValue(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id),
-                                                            storedEnabled);
+    err = mContext.safeAttributePersistenceProvider.ReadScalarValue(ConcreteAttributePath(mPath.mEndpointId, Chime::Id, Enabled::Id),
+                                                                    storedEnabled);
     if (err == CHIP_NO_ERROR)
     {
         mEnabled = storedEnabled;
@@ -232,7 +230,7 @@ Status ChimeCluster::SetSelectedChime(uint8_t chimeID)
     if (SetAttributeValue(mSelectedChime, chimeID, Attributes::SelectedChime::Id))
     {
         // TODO: Migrate to use context.attributeStorage
-        TEMPORARY_RETURN_IGNORED mSafeAttributePersistenceProvider.WriteScalarValue(
+        TEMPORARY_RETURN_IGNORED mContext.safeAttributePersistenceProvider.WriteScalarValue(
             { mPath.mEndpointId, Chime::Id, Attributes::SelectedChime::Id }, mSelectedChime);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -243,7 +241,7 @@ Status ChimeCluster::SetEnabled(bool enabled)
     if (SetAttributeValue(mEnabled, enabled, Attributes::Enabled::Id))
     {
         // TODO: Migrate to use context.attributeStorage
-        TEMPORARY_RETURN_IGNORED mSafeAttributePersistenceProvider.WriteScalarValue(
+        TEMPORARY_RETURN_IGNORED mContext.safeAttributePersistenceProvider.WriteScalarValue(
             { mPath.mEndpointId, Chime::Id, Attributes::Enabled::Id }, mEnabled);
     }
     return Protocols::InteractionModel::Status::Success;
