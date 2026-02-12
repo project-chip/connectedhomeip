@@ -115,7 +115,7 @@ class TC_GCAST_2_6(MatterBaseTest):
 
         self.step("1c")
         # Check if there are any groups on the DUT.
-        membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
+        membership = await self.read_single_attribute_check_success(groupcast_cluster, Clusters.Groupcast.Attributes.Membership)
         if membership:
             # LeaveGroup with groupID 0 will leave all groups on the fabric.
             await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
