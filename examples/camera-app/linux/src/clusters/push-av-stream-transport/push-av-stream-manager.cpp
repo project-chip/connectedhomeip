@@ -308,8 +308,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
     }
 
     // Pass zoneIDs with at least 1 invalidZoneId to match the earlier implementation
-    std::vector<int> zoneIds = { kInvalidZoneId };
-    mTransportMap[connectionID]->TriggerTransport(activationReason, zoneIds);
+    // Using the default parameter value { kInvalidZoneId } from the TriggerTransport function
+    mTransportMap[connectionID]->TriggerTransport(activationReason);
 
     return Status::Success;
 }
@@ -674,6 +674,15 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
 
 void PushAvStreamTransportManager::HandleZoneTrigger(const std::vector<uint16_t> & zoneIds)
 {
+    // Convert uint16_t zone IDs to int zone IDs for the transport API
+    // This conversion is done once outside the loop for efficiency
+    std::vector<int> intZoneIds;
+    intZoneIds.reserve(zoneIds.size());
+    for (const auto & zoneId : zoneIds)
+    {
+        intZoneIds.push_back(static_cast<int>(zoneId));
+    }
+
     for (auto & pavst : mTransportMap)
     {
         int connectionId = pavst.first;
@@ -681,15 +690,7 @@ void PushAvStreamTransportManager::HandleZoneTrigger(const std::vector<uint16_t>
 
         if (mTransportOptionsMap[connectionId].triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
         {
-            // Convert uint16_t zone IDs to int zone IDs for the transport API
-            std::vector<int> intZoneIds;
-            intZoneIds.reserve(zoneIds.size());
-            for (const auto & zoneId : zoneIds)
-            {
-                intZoneIds.push_back(static_cast<int>(zoneId));
-            }
-
-            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, intZoneIds, 10);
+            pavst.second->TriggerTransport(TriggerActivationReasonEnum::kAutomation, intZoneIds, kDefaultSensitivity);
         }
     }
 }

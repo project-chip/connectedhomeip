@@ -482,6 +482,12 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
     ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneIds count: [%zu], Sensitivity: [%d]",
                     (uint16_t) activationReason, zoneIds.size(), sensitivity);
 
+    // Handle edge case where zoneIds is empty
+    if (zoneIds.empty()) {
+        ChipLogProgress(Camera, "PushAVTransport trigger transport ignored - empty zoneIds list provided");
+        return;
+    }
+
     // For a single motion event with multiple zones, we need to check if any zone should trigger
     bool shouldProcessTrigger = false;
     bool hasManualTrigger     = false;
