@@ -90,11 +90,10 @@ struct TestChimeCluster : public ::testing::Test
     void SetUp() override
     {
         VerifyOrDie(mPersistenceProvider.Init(&mTestContext.StorageDelegate()) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+    void TearDown() override {}
 
     MockChimeDelegate mMockDelegate;
     TestServerClusterContext mTestContext;
@@ -257,7 +256,6 @@ TEST_F(TestChimeCluster, TestPersistence)
     TestServerClusterContext context;
     app::DefaultSafeAttributePersistenceProvider persistenceProvider;
     EXPECT_EQ(persistenceProvider.Init(&context.Get().storage), CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
     MockChimeDelegate mockDelegate;
 
     // 1. Initial startup, verify default values
