@@ -156,14 +156,12 @@ void JCMCommissionee::OnTrustVerificationComplete(TrustVerificationError error)
     {
         ChipLogProgress(JointFabric, "JCM: Administrator Device passed JCM Trust Verification");
 
-        Server::GetInstance().GetJointFabricAdministrator().SetVidVerificationForFabric(mAccessingFabricIndex);
         mOnCompletion(CHIP_NO_ERROR);
     }
     else
     {
         ChipLogError(JointFabric, "JCM: Failed in verifying JCM Trust Verification: err %s", EnumToString(error).c_str());
 
-        Server::GetInstance().GetJointFabricAdministrator().ClearVidVerificationForFabric();
         mOnCompletion(CHIP_ERROR_INTERNAL);
     }
 }

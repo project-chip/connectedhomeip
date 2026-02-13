@@ -239,6 +239,9 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
     ConcreteCommandPath cachedPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, ctx.mRequestPath.mCommandId);
     const FabricIndex accessingFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
+    // Ensure that the accessing fabric is not marked as verified before we proceed
+    Server::GetInstance().GetJointFabricAdministrator().ClearVidVerificationForFabric();
+
     auto onComplete = [this, cachedPath, accessingFabricIndex](const CHIP_ERROR & err) {
         if (mActiveCommandHandle.has_value())
         {
@@ -246,6 +249,7 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
             if (err == CHIP_NO_ERROR)
             {
                 ChipLogProgress(JointFabric, "Successfully verified trust against commissioning fabric administrator");
+                Server::GetInstance().GetJointFabricAdministrator().SetVidVerificationForFabric(accessingFabricIndex);
                 commandHandler->AddStatus(cachedPath, Status::Success);
             }
             else
