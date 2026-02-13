@@ -35,7 +35,7 @@ Alchemy: v1.6.4
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <!-- Current cluster version -->
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
     <!-- Cluster feature map -->
     <features>
       <feature bit="0" code="SMOKE" name="SmokeAlarm" summary="Supports Smoke alarm">
@@ -83,6 +83,13 @@ Alchemy: v1.6.4
     </attribute>
     <attribute side="server" code="0x000C" name="ExpiryDate" define="EXPIRY_DATE" type="epoch_s" optional="true">
       <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x000D" name="Unmounted" define="UNMOUNTED" type="boolean" optional="true" apiMaturity="provisional">
+      <optionalConform/>
+        <greaterOrEqualTerm>
+          <revision value="current"/>
+          <revision value="2"/>
+        </greaterOrEqualTerm>
     </attribute>
     <!-- Commands -->
     <command source="client" code="0x00" name="SelfTestRequest" optional="true">
@@ -182,6 +189,7 @@ Alchemy: v1.6.4
     <item value="6" name="EndOfService"/>
     <item value="7" name="InterconnectSmoke"/>
     <item value="8" name="InterconnectCO"/>
+    <item value="9" name="Inoperative"/>
   </enum>
 
   <enum name="MuteStateEnum" type="enum8">

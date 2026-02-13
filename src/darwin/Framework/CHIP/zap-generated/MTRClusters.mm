@@ -7239,6 +7239,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeCOAlarmID) attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUnmountedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeCOAlarmID) attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeUnmountedID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSmokeCOAlarmID) attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID) params:params];

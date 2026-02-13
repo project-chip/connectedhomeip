@@ -18051,6 +18051,7 @@ class SmokeCoAlarm(Cluster):
                 ClusterObjectFieldDescriptor(Label="contaminationState", Tag=0x0000000A, Type=typing.Optional[SmokeCoAlarm.Enums.ContaminationStateEnum]),
                 ClusterObjectFieldDescriptor(Label="smokeSensitivityLevel", Tag=0x0000000B, Type=typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]),
                 ClusterObjectFieldDescriptor(Label="expiryDate", Tag=0x0000000C, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="unmounted", Tag=0x0000000D, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -18071,6 +18072,7 @@ class SmokeCoAlarm(Cluster):
     contaminationState: typing.Optional[SmokeCoAlarm.Enums.ContaminationStateEnum] = None
     smokeSensitivityLevel: typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum] = None
     expiryDate: typing.Optional[uint] = None
+    unmounted: typing.Optional[bool] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -18118,11 +18120,12 @@ class SmokeCoAlarm(Cluster):
             kEndOfService = 0x06
             kInterconnectSmoke = 0x07
             kInterconnectCO = 0x08
+            kInoperative = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 9
+            kUnknownEnumValue = 10
 
         class MuteStateEnum(MatterIntEnum):
             kNotMuted = 0x00
@@ -18370,6 +18373,22 @@ class SmokeCoAlarm(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
             value: typing.Optional[uint] = None
+
+        @dataclass
+        class Unmounted(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000005C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000D
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
