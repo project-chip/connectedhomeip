@@ -16081,17 +16081,6 @@ public class ClusterReadMapping {
           readAmbientContextSensingAmbientContextTypeSupportedCommandParams
         );
         result.put("readAmbientContextTypeSupportedAttribute", readAmbientContextSensingAmbientContextTypeSupportedAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readAmbientContextSensingSimultaneousDetectionLimitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.AmbientContextSensingCluster) cluster).readSimultaneousDetectionLimitAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readAmbientContextSensingSimultaneousDetectionLimitCommandParams
-        );
-        result.put("readSimultaneousDetectionLimitAttribute", readAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountReachedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingObjectCountReachedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16103,6 +16092,28 @@ public class ClusterReadMapping {
           readAmbientContextSensingObjectCountReachedCommandParams
         );
         result.put("readObjectCountReachedAttribute", readAmbientContextSensingObjectCountReachedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientContextSensingObjectCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingObjectCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readObjectCountAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAmbientContextSensingObjectCountCommandParams
+        );
+        result.put("readObjectCountAttribute", readAmbientContextSensingObjectCountAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readAmbientContextSensingSimultaneousDetectionLimitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.AmbientContextSensingCluster) cluster).readSimultaneousDetectionLimitAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readAmbientContextSensingSimultaneousDetectionLimitCommandParams
+        );
+        result.put("readSimultaneousDetectionLimitAttribute", readAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readAmbientContextSensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAmbientContextSensingHoldTimeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

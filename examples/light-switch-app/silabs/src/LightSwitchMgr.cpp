@@ -160,7 +160,6 @@ void LightSwitchMgr::TriggerLevelControlAction(LevelControl::StepModeEnum stepMo
 
 void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
 {
-
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
 
     switch (data->event)
@@ -168,22 +167,32 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
     case Switch::Events::InitialPress::Id: {
         uint8_t currentPosition = 1;
 
-        // Set new attribute value
-        Clusters::Switch::Attributes::CurrentPosition::Set(data->endpoint, currentPosition);
-
-        // Trigger event
-        Clusters::SwitchServer::Instance().OnInitialPress(data->endpoint, currentPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
+        if (switchCluster != nullptr)
+        {
+            // Set new attribute value
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                // Trigger event
+                RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(currentPosition);
+            }
+        }
         break;
     }
     case Switch::Events::ShortRelease::Id: {
         uint8_t previousPosition = 1;
         uint8_t currentPosition  = 0;
 
-        // Set new attribute value
-        Clusters::Switch::Attributes::CurrentPosition::Set(data->endpoint, currentPosition);
-
-        // Trigger event
-        Clusters::SwitchServer::Instance().OnShortRelease(data->endpoint, previousPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
+        if (switchCluster != nullptr)
+        {
+            // Set new attribute value
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                // Trigger event
+                RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
+            }
+        }
         break;
     }
     default:

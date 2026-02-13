@@ -707,7 +707,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             return False
 
     wifi_args = ['ble-wifi', 'nfc-wifi']
-    thread_args = ['ble-thread', 'nfc-thread']
+    thread_args = ['ble-thread', 'nfc-thread', 'thread-meshcop']
     if commissioning_method in wifi_args:
         if args.wifi_ssid is None:
             print("error: missing --wifi-ssid <SSID> for --commissioning-method "
@@ -724,9 +724,15 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
-                  "--in-test-commissioning-method ble-thread or nfc-thread!")
+                  "--in-test-commissioning-method ble-thread, nfc-thread or thread-meshcop!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
+        if commissioning_method == 'thread-meshcop':
+            if args.border_agent_ip_addr is None or args.border_agent_port is None:
+                print("error: missing --border-agent-ip-addr or --border-agent-port for --commissioning-method thread-meshcop!")
+                return False
+            config.border_agent_ip_addr = args.border_agent_ip_addr
+            config.border_agent_port = args.border_agent_port
     elif config.commissioning_method == "on-network-ip":
         if args.ip_addr is None:
             print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
@@ -874,11 +880,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi", "thread-meshcop"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi", "thread-meshcop"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -908,6 +914,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
+    commission_group.add_argument('--border-agent-ip-addr', action="store", type=str,
+                                  help="Border Agent IP address")
+    commission_group.add_argument('--border-agent-port', action="store", type=int,
+                                  help="Border Agent port")
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")

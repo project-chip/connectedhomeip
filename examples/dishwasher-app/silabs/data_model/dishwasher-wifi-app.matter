@@ -1745,7 +1745,7 @@ cluster GroupKeyManagement = 63 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared struct LabelStruct {
     char_string<16> label = 0;
@@ -1762,7 +1762,7 @@ cluster UserLabel = 65 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
-  revision 1;
+  revision 3;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -1815,13 +1815,13 @@ cluster OperationalState = 96 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  /** This command SHALL be supported if the device supports remotely pausing the operation. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** This command SHALL be supported if the device supports remotely stopping the operation. */
   command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  /** This command SHALL be supported if the device supports remotely starting the operation. */
   command Start(): OperationalCommandResponse = 2;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  /** This command SHALL be supported if the device supports remotely resuming the operation. */
   command Resume(): OperationalCommandResponse = 3;
 }
 

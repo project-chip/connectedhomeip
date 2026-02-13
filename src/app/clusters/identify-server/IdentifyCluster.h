@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/identify-server/IdentifyIntegrationDelegate.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/support/TimerDelegate.h>
@@ -55,7 +56,7 @@ public:
     virtual bool IsTriggerEffectEnabled() const = 0;
 };
 
-class IdentifyCluster : public DefaultServerCluster, public TimerContext
+class IdentifyCluster : public DefaultServerCluster, public TimerContext, public IdentifyIntegrationDelegate
 {
 public:
     /**
@@ -130,6 +131,8 @@ public:
      * @brief Called when the identify timer fires.
      */
     void TimerFired() override;
+
+    bool IsIdentifying() override { return mIdentifyTime > 0; }
 
     /**
      * @brief Stops the identification process.

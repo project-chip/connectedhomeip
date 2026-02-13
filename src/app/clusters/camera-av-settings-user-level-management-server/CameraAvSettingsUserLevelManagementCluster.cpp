@@ -54,42 +54,6 @@ CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::Startup(ServerClusterCont
     mLogic.SetMarkDirtyCallback([this](AttributeId attributeId) { MarkAttributeDirty(attributeId); });
     return mLogic.Startup();
 }
-/**
- * Helper Read functions for complex attribute types
- */
-CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::ReadAndEncodeMPTZPresets(AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & mptzPresets : mLogic.mMptzPresetHelpers)
-        {
-            // Get the details to encode from the preset helper
-            //
-            CameraAvSettingsUserLevelManagement::Structs::MPTZPresetStruct::Type presetStruct;
-            std::string name      = mptzPresets.GetName();
-            uint8_t preset        = mptzPresets.GetPresetID();
-            presetStruct.presetID = preset;
-            presetStruct.name     = CharSpan(name.c_str(), name.size());
-            presetStruct.settings = mptzPresets.GetMptzPosition();
-            ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %s",
-                          presetStruct.presetID, NullTerminated(presetStruct.name).c_str());
-            ReturnErrorOnFailure(encoder.Encode(presetStruct));
-        }
-
-        return CHIP_NO_ERROR;
-    });
-}
-
-CHIP_ERROR CameraAvSettingsUserLevelManagementCluster::ReadAndEncodeDPTZStreams(AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & dptzStream : mLogic.mDptzStreams)
-        {
-            ReturnErrorOnFailure(encoder.Encode(dptzStream));
-        }
-
-        return CHIP_NO_ERROR;
-    });
-}
 
 DataModel::ActionReturnStatus
 CameraAvSettingsUserLevelManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -104,9 +68,9 @@ CameraAvSettingsUserLevelManagementCluster::ReadAttribute(const DataModel::ReadA
     case Attributes::MaxPresets::Id:
         return aEncoder.Encode(mLogic.mMaxPresets);
     case Attributes::MPTZPresets::Id:
-        return ReadAndEncodeMPTZPresets(aEncoder);
+        return mLogic.ReadAndEncodeMPTZPresets(aEncoder);
     case Attributes::DPTZStreams::Id:
-        return ReadAndEncodeDPTZStreams(aEncoder);
+        return mLogic.ReadAndEncodeDPTZStreams(aEncoder);
     case Attributes::ZoomMax::Id:
         return aEncoder.Encode(mLogic.mZoomMax);
     case Attributes::TiltMin::Id:
