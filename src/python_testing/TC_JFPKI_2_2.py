@@ -133,7 +133,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         ]
 
     def desc_TC_JFPKI_2_2(self):
-        return "354.1.2. [TC-JFADMIN-2.2] Validate commands behavior outside Joint Commissioning Method"
+        return "354.1.2. [TC-JFPKI-2.2] Validate commands behavior outside Joint Commissioning Method"
 
     def pics_TC_JFPKI_2_2(self):
         return ['JFPKI.S']
