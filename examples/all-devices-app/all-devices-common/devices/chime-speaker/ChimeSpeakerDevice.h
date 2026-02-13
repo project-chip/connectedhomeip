@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <devices/interface/DeviceInterface.h>
 #include <devices/chime/impl/LoggingChimeDevice.h>
+#include <devices/interface/DeviceInterface.h>
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
 
 namespace chip {
@@ -28,8 +28,7 @@ class ChimeSpeakerDevice : public DeviceInterface
 {
 public:
     ChimeSpeakerDevice(TimerDelegate & timerDelegate) :
-        DeviceInterface(Span<const DataModel::DeviceTypeEntry>{}),
-        mSpeakerDevice({ .timerDelegate = timerDelegate })
+        DeviceInterface(Span<const DataModel::DeviceTypeEntry>{}), mSpeakerDevice({ .timerDelegate = timerDelegate })
     {}
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
