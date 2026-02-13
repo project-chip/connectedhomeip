@@ -48,6 +48,9 @@ private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
+    static bool ParseEndpointId(const char * str, chip::EndpointId & endpoint);
+    static bool ParseDeviceConfig(const char * value, DeviceConfig & config);
+
     static std::vector<DeviceConfig> mDeviceConfigs;
     static bool mEnableWiFi;
 };

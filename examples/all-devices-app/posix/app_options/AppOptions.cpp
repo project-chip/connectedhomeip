@@ -41,42 +41,70 @@ const std::vector<AppOptions::DeviceConfig> & AppOptions::GetDeviceConfigs()
     return mDeviceConfigs;
 }
 
+bool AppOptions::ParseEndpointId(const char * str, chip::EndpointId & endpoint)
+{
+    char * endptr;
+    long val = strtol(str, &endptr, 10);
+
+    if (endptr == str || *endptr != '\0' || val < 0 || val > UINT16_MAX)
+    {
+        return false;
+    }
+
+    endpoint = static_cast<chip::EndpointId>(val);
+    return true;
+}
+
+bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
+{
+    if (value == nullptr)
+    {
+        return false;
+    }
+
+    config.endpoint = 1;
+
+    const char * colonPos = strchr(value, ':');
+    if (colonPos != nullptr)
+    {
+        size_t typeLen = static_cast<size_t>(colonPos - value);
+        if (typeLen >= sizeof(config.type))
+        {
+            ChipLogError(Support, "Device type too long: %s\n", value);
+            return false;
+        }
+
+        strncpy(config.type, value, typeLen);
+        config.type[typeLen] = '\0';
+
+        if (!ParseEndpointId(colonPos + 1, config.endpoint))
+        {
+            ChipLogError(Support, "Invalid endpoint ID in device config: %s\n", value);
+            return false;
+        }
+    }
+    else
+    {
+        if (strlen(value) >= sizeof(config.type))
+        {
+            ChipLogError(Support, "Device type too long: %s\n", value);
+            return false;
+        }
+        strcpy(config.type, value);
+    }
+    return true;
+}
+
 bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * options, int identifier, const char * name,
                                             const char * value)
 {
     switch (identifier)
     {
     case kOptionDeviceType: {
-        if (value == nullptr)
-        {
-            ChipLogError(Support, "INTERNAL ERROR: No device type value passed in.\n");
-            return false;
-        }
-
         DeviceConfig config;
-        config.endpoint = 1;
-
-        const char * colonPos = strchr(value, ':');
-        if (colonPos != nullptr)
+        if (!ParseDeviceConfig(value, config))
         {
-            size_t typeLen = static_cast<size_t>(colonPos - value);
-            if (typeLen >= sizeof(config.type))
-            {
-                ChipLogError(Support, "Device type too long: %s\n", value);
-                return false;
-            }
-            strncpy(config.type, value, typeLen);
-            config.type[typeLen] = '\0';
-            config.endpoint      = static_cast<chip::EndpointId>(atoi(colonPos + 1));
-        }
-        else
-        {
-            if (strlen(value) >= sizeof(config.type))
-            {
-                ChipLogError(Support, "Device type too long: %s\n", value);
-                return false;
-            }
-            strcpy(config.type, value);
+            return false;
         }
 
         ChipLogProgress(AppServer, "Adding device type %s on endpoint %d", config.type, config.endpoint);
@@ -84,12 +112,13 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         return true;
     }
     case kOptionEndpoint: {
-        if (value == nullptr)
+        chip::EndpointId ep;
+        if (value == nullptr || !ParseEndpointId(value, ep))
         {
-            ChipLogError(Support, "INTERNAL ERROR: No endpoint ID value passed in.\n");
+            ChipLogError(Support, "Invalid endpoint ID: %s\n", value ? value : "(null)");
             return false;
         }
-        chip::EndpointId ep = static_cast<EndpointId>(atoi(value));
+
         if (mDeviceConfigs.empty())
         {
             ChipLogError(Support, "Warning: --endpoint specified before --device. Creating default 'contact-sensor'.");
