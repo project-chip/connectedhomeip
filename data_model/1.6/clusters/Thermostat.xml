@@ -1259,26 +1259,6 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute id="0x0057" name="CriticalFreezeProtection" type="bool" default="false">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <feature name="HEAT"/>
-        </optionalConform>
-      </otherwiseConform>
-    </attribute>
-    <attribute id="0x0058" name="CriticalOverheatProtection" type="bool" default="false">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <feature name="COOL"/>
-        </optionalConform>
-      </otherwiseConform>
-    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="SetpointRaiseLower" direction="commandToServer" response="Y">

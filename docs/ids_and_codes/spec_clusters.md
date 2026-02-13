@@ -70,7 +70,6 @@ The following markers are used in this document (matches the ID master list):
 |96            |0x0060    |Operational State                                         |OPSTATE        |   |   |C  |C  |C  |C    |C          |C  |C              |C             |
 |97            |0x0061    |RVC Operational State                                     |RVCOPSTATE     |   |   |C  |C  |C  |C    |C          |C  |C              |C             |
 |98            |0x0062    |Scenes Management                                         |S              |   |   |   |P  |P  |P    |C          |C  |C              |C             |
-|99            |0x0063    |Thermostat Mode                                           |TSTATM         |   |   |   |   |   |     |           |   |               |C             |
 |100           |0x0064    |Temperature Alarm                                         |TEMPALM        |   |   |   |   |   |     |           |   |               |P             |
 |101           |0x0065    |Groupcast                                                 |GC             |   |   |   |   |   |     |           |   |               |C             |
 |113           |0x0071    |HEPA Filter Monitoring                                    |HEPAFREMON     |   |   |C  |C  |C  |C    |C          |C  |C              |C             |

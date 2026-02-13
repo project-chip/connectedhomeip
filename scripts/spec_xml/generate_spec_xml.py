@@ -53,7 +53,6 @@ CURRENT_IN_PROGRESS_DEFINES = [
     "groupcast",
     "hrap-pdc",
     "hrap-tbrd",
-    "hvac-critical-protection",
     "hvac-thermostat-events",
     "hvac-thermostat-suggestions",
     "improved-capabilities-tcr",
@@ -62,7 +61,6 @@ CURRENT_IN_PROGRESS_DEFINES = [
     "tcr-smokeco-unmounted-state",
     "temperature-alarm",
     "thread-commissioning",
-    "tstatmode",
 ]
 
 

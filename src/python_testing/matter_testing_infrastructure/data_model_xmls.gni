@@ -1761,7 +1761,6 @@ data_model_XMLS_1_6 = [
   "${chip_root}/data_model/1.6/clusters/Mode_RVCClean.xml",
   "${chip_root}/data_model/1.6/clusters/Mode_RVCRun.xml",
   "${chip_root}/data_model/1.6/clusters/Mode_Refrigerator.xml",
-  "${chip_root}/data_model/1.6/clusters/Mode_Thermostat.xml",
   "${chip_root}/data_model/1.6/clusters/Mode_WaterHeater.xml",
   "${chip_root}/data_model/1.6/clusters/NetworkCommissioningCluster.xml",
   "${chip_root}/data_model/1.6/clusters/NetworkIdentityManagement.xml",

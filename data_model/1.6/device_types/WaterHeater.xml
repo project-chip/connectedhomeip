@@ -57,38 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050F" name="Water Heater" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050F" name="Water Heater" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Added optional Thermostat Mode and Thermostat User Interface Configuration cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
-    </cluster>
-    <cluster id="0x0063" name="Thermostat Mode" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-      <attributes>
-        <attribute code="0x0002" name="StartUpMode">
-          <otherwiseConform>
-            <provisionalConform/>
-            <disallowConform/>
-          </otherwiseConform>
-        </attribute>
-        <attribute code="0x0000" name="SupportedModes">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-          <constraint>
-            <desc/>
-          </constraint>
-        </attribute>
-      </attributes>
     </cluster>
     <cluster id="0x0094" name="Water Heater Management" side="server">
       <mandatoryConform/>
@@ -103,9 +79,6 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </feature>
       </features>
-    </cluster>
-    <cluster id="0x0204" name="Thermostat User Interface Configuration" side="server">
-      <optionalConform/>
     </cluster>
   </clusters>
   <composedDeviceTypes>
@@ -124,29 +97,6 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0063" name="Thermostat Mode" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-      <attributes>
-        <attribute code="0x0002" name="StartUpMode">
-          <otherwiseConform>
-            <provisionalConform/>
-            <disallowConform/>
-          </otherwiseConform>
-        </attribute>
-        <attribute code="0x0000" name="SupportedModes">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-          <constraint>
-            <desc/>
-          </constraint>
-        </attribute>
-      </attributes>
-    </cluster>
     <cluster id="0x0094" name="Water Heater Management" side="server">
       <mandatoryConform/>
     </cluster>
@@ -160,9 +110,6 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </feature>
       </features>
-    </cluster>
-    <cluster id="0x0204" name="Thermostat User Interface Configuration" side="server">
-      <optionalConform/>
     </cluster>
   </composedDeviceTypes>
 </deviceType>
