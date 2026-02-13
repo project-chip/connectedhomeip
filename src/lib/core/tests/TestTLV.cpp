@@ -2815,6 +2815,9 @@ TEST_F(TestTLV, CheckTLVCharSpan)
         {  "This is a test case #3" IS1_CHAR,                                    "This is a test case #3"  },
         {  "Thé" IS1_CHAR,                                                       "Thé"                     },
         {  IS1_CHAR " abc " IS1_CHAR " def",                                     ""                        },
+        {""},
+        {"Post empty"},
+        {""},
     };
     // clang-format on
 

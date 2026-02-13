@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceIcdDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BridgedDeviceBasicInformation/ClusterId.h>
@@ -40,6 +41,7 @@ class BridgedDeviceBasicInformationCluster : public DefaultServerCluster
 public:
     struct Context
     {
+        BridgedDeviceBasicInformationDelegate & delegate;
         BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if NULL, ICD support feature is disabled
     };
 
@@ -53,7 +55,6 @@ public:
         std::optional<VendorId> vendorId;
         std::optional<std::string> productName;
         std::optional<uint16_t> productId;
-        std::optional<std::string> nodeLabel;
         std::optional<uint16_t> hardwareVersion;
         std::optional<std::string> hardwareVersionString;
         std::optional<uint32_t> softwareVersion;
@@ -64,7 +65,6 @@ public:
         std::optional<std::string> productLabel;
         std::optional<std::string> serialNumber;
         std::optional<BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type> productAppearance;
-        std::optional<uint32_t> configurationVersion;
     };
 
     /// Mandatory data for every bridged device
@@ -72,10 +72,11 @@ public:
     {
         std::string uniqueId;   // Fixed once set
         bool reachable = false; // initial value for reachable
+        std::string nodeLabel;
+        uint32_t configurationVersion = 1;
     };
 
-    BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
-                                         Context && context) :
+    BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData, Context && context) :
         DefaultServerCluster({ endpointId, BridgedDeviceBasicInformation::Id }),
         mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
 
@@ -87,6 +88,12 @@ public:
     const std::string & GetUniqueId() const { return mRequiredData.uniqueId; }
     const FixedData & GetFixedData() const { return mFixedData; }
 
+    const std::string & GetNodeLabel() const { return mRequiredData.nodeLabel; }
+    DataModel::ActionReturnStatus SetNodeLabel(CharSpan nodeLabel);
+
+    uint32_t GetConfigurationVersion() const { return mRequiredData.configurationVersion; }
+    void SetConfigurationVersion(uint32_t configurationVersion);
+
     void GenerateLeaveEvent();
     void GenerateActiveChangedEvent(uint32_t promisedActiveMs);
 
@@ -94,6 +101,8 @@ public:
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,

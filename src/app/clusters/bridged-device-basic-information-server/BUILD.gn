@@ -18,6 +18,7 @@ source_set("bridged-device-basic-information-server") {
   sources = [
     "BridgedDeviceBasicInformationCluster.cpp",
     "BridgedDeviceBasicInformationCluster.h",
+    "BridgedDeviceBasicInformationDelegate.h",
     "BridgedDeviceIcdDelegate.h",
   ]
 

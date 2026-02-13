@@ -16,6 +16,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
+#include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -32,6 +33,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/Constants.h>
+#include <string>
 
 namespace {
 
@@ -44,6 +46,19 @@ using namespace chip::Testing;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr EndpointId kTestEndpointId = 1;
+
+class MockDelegate : public BridgedDeviceBasicInformationDelegate
+{
+public:
+    void OnNodeLabelChanged(const std::string & newNodeLabel) override
+    {
+        mNodeLabelChangedCalled = true;
+        mLastNodeLabel          = newNodeLabel;
+    }
+
+    bool mNodeLabelChangedCalled = false;
+    std::string mLastNodeLabel;
+};
 
 class TestBridgedDeviceIcdDelegate : public BridgedDeviceIcdDelegate
 {
@@ -65,27 +80,30 @@ struct TestBridgedDeviceBasicInformationCluster : public ::testing::Test
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     TestServerClusterContext mContext;
+    MockDelegate mDelegate;
 };
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestEmptyAttributes)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true }, {}, {});
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true }, {},
+                                                 { .delegate = mDelegate });
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::UniqueID::kMetadataEntry,
                                             Attributes::Reachable::kMetadataEntry,
+                                            Attributes::NodeLabel::kMetadataEntry,
+                                            Attributes::ConfigurationVersion::kMetadataEntry,
                                         }));
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestPartialAttributes)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true },
-                                                 {
-                                                     .nodeLabel            = "mylabel",
-                                                     .partNumber           = "010203",
-                                                     .configurationVersion = 200,
-                                                 },
-                                                 {});
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true, .nodeLabel = "mylabel", .configurationVersion = 200u },
+        {
+            .partNumber = "010203",
+        },
+        { .delegate = mDelegate });
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::UniqueID::kMetadataEntry,
@@ -98,30 +116,29 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestPartialAttributes)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestAllAttributes)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true },
-                                                 {
-                                                     .vendorName            = "ACME",
-                                                     .vendorId              = VendorId::Common,
-                                                     .productName           = "Bridge",
-                                                     .productId             = 0x1234,
-                                                     .nodeLabel             = "Remote",
-                                                     .hardwareVersion       = 0x1122,
-                                                     .hardwareVersionString = "NewVersion-A",
-                                                     .softwareVersion       = 0x11223344,
-                                                     .softwareVersionString = "FancyBuild",
-                                                     .manufacturingDate     = "010203",
-                                                     .partNumber            = "A-B-C",
-                                                     .productUrl            = "http://example.com",
-                                                     .productLabel          = "New",
-                                                     .serialNumber          = "SN123456",
-                                                     .productAppearance =
-                                                         Structs::ProductAppearanceStruct::Type{
-                                                             .finish       = ProductFinishEnum::kPolished,
-                                                             .primaryColor = ColorEnum::kFuchsia,
-                                                         },
-                                                     .configurationVersion = 123,
-                                                 },
-                                                 {});
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true, .nodeLabel = "Remote", .configurationVersion = 123u },
+        {
+            .vendorName            = "ACME",
+            .vendorId              = VendorId::Common,
+            .productName           = "Bridge",
+            .productId             = 0x1234,
+            .hardwareVersion       = 0x1122,
+            .hardwareVersionString = "NewVersion-A",
+            .softwareVersion       = 0x11223344,
+            .softwareVersionString = "FancyBuild",
+            .manufacturingDate     = "010203",
+            .partNumber            = "A-B-C",
+            .productUrl            = "http://example.com",
+            .productLabel          = "New",
+            .serialNumber          = "SN123456",
+            .productAppearance =
+                Structs::ProductAppearanceStruct::Type{
+                    .finish       = ProductFinishEnum::kPolished,
+                    .primaryColor = ColorEnum::kFuchsia,
+                },
+        },
+        { .delegate = mDelegate });
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::VendorName::kMetadataEntry,
@@ -147,30 +164,29 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAllAttributes)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .reachable = true },
-                                                 {
-                                                     .vendorName            = "TestVendor",
-                                                     .vendorId              = VendorId::TestVendor1,
-                                                     .productName           = "TestProduct",
-                                                     .productId             = 0xABCD,
-                                                     .nodeLabel             = "TestLabel",
-                                                     .hardwareVersion       = 1,
-                                                     .hardwareVersionString = "v1.0",
-                                                     .softwareVersion       = 2,
-                                                     .softwareVersionString = "v2.0",
-                                                     .manufacturingDate     = "20240101",
-                                                     .partNumber            = "PN123",
-                                                     .productUrl            = "http://test.com",
-                                                     .productLabel          = "Test Product Label",
-                                                     .serialNumber          = "SN789",
-                                                     .productAppearance =
-                                                         Structs::ProductAppearanceStruct::Type{
-                                                             .finish       = ProductFinishEnum::kMatte,
-                                                             .primaryColor = ColorEnum::kRed,
-                                                         },
-                                                     .configurationVersion = 5,
-                                                 },
-                                                 {});
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "test-unique-id", .reachable = true, .nodeLabel = "TestLabel", .configurationVersion = 5u },
+        {
+            .vendorName            = "TestVendor",
+            .vendorId              = VendorId::TestVendor1,
+            .productName           = "TestProduct",
+            .productId             = 0xABCD,
+            .hardwareVersion       = 1,
+            .hardwareVersionString = "v1.0",
+            .softwareVersion       = 2,
+            .softwareVersionString = "v2.0",
+            .manufacturingDate     = "20240101",
+            .partNumber            = "PN123",
+            .productUrl            = "http://test.com",
+            .productLabel          = "Test Product Label",
+            .serialNumber          = "SN789",
+            .productAppearance =
+                Structs::ProductAppearanceStruct::Type{
+                    .finish       = ProductFinishEnum::kMatte,
+                    .primaryColor = ColorEnum::kRed,
+                },
+        },
+        { .delegate = mDelegate });
     ClusterTester tester(cluster);
 
     CharSpan charSpanVal;
@@ -223,7 +239,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
 {
     TestBridgedDeviceIcdDelegate delegate;
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {}, { .icdDelegate = &delegate });
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {},
+                                                 { .delegate = mDelegate, .icdDelegate = &delegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -240,7 +257,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestReachableChangedEvent)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "event-dev", .reachable = false }, {}, {});
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "event-dev", .reachable = false }, {},
+                                                 { .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     cluster.SetReachable(true);
@@ -259,7 +277,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestReachableChangedEvent)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestLeaveEvent)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "event-dev" }, {}, {});
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "event-dev" }, {}, { .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     cluster.GenerateLeaveEvent();
@@ -276,7 +294,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestLeaveEvent)
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestActiveChangedEvent)
 {
     TestBridgedDeviceIcdDelegate delegate;
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {}, { .icdDelegate = &delegate });
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {},
+                                                 { .delegate = mDelegate, .icdDelegate = &delegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     constexpr uint32_t promisedDuration = 5000;
@@ -298,7 +317,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestFeatureMap)
 {
     // Test without ICD delegate
     {
-        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "no-icd" }, {}, {});
+        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "no-icd" }, {}, { .delegate = mDelegate });
         EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
         BitFlags<Feature> featureMap;
@@ -309,13 +328,101 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestFeatureMap)
     // Test with ICD delegate
     {
         TestBridgedDeviceIcdDelegate delegate;
-        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd" }, {}, { .icdDelegate = &delegate });
+        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd" }, {},
+                                                     { .delegate = mDelegate, .icdDelegate = &delegate });
         EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
         BitFlags<Feature> featureMap;
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
         EXPECT_TRUE(featureMap.Has(Feature::kBridgedICDSupport));
     }
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabel)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
+                                                 { .delegate = mDelegate });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    EXPECT_EQ(cluster.SetNodeLabel("NewLabel"_span), Status::Success);
+    EXPECT_TRUE(mDelegate.mNodeLabelChangedCalled);
+    EXPECT_EQ(mDelegate.mLastNodeLabel, "NewLabel");
+    EXPECT_EQ(cluster.GetNodeLabel(), "NewLabel");
+
+    CharSpan nodeLabel;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, nodeLabel), CHIP_NO_ERROR);
+    EXPECT_TRUE(nodeLabel.data_equal(CharSpan::fromCharString("NewLabel")));
+
+    // Test no change
+    mDelegate.mNodeLabelChangedCalled = false;
+    EXPECT_EQ(cluster.SetNodeLabel("NewLabel"_span), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+    EXPECT_FALSE(mDelegate.mNodeLabelChangedCalled);
+
+    // Test set to empty/clear
+    EXPECT_EQ(cluster.SetNodeLabel({}), Status::Success);
+    EXPECT_TRUE(cluster.GetNodeLabel().empty());
+    EXPECT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, nodeLabel), CHIP_NO_ERROR);
+    EXPECT_TRUE(nodeLabel.empty());
+
+    // Test too long
+    std::string tooLongLabel(33, 'b');
+    EXPECT_EQ(cluster.SetNodeLabel(CharSpan::fromCharString(tooLongLabel.c_str())), Status::ConstraintError);
+    EXPECT_TRUE(cluster.GetNodeLabel().empty()); // Should not have changed
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetConfigurationVersion)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
+                                                 { .delegate = mDelegate });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    cluster.SetConfigurationVersion(2u);
+    EXPECT_EQ(cluster.GetConfigurationVersion(), 2u);
+
+    uint32_t configVersion;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ConfigurationVersion::Id, configVersion), CHIP_NO_ERROR);
+    EXPECT_EQ(configVersion, 2u);
+
+    // Test no change
+    cluster.SetConfigurationVersion(2u);
+    EXPECT_EQ(cluster.GetConfigurationVersion(), 2u);
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteNodeLabel)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
+                                                 { .delegate = mDelegate });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    EXPECT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, "WrittenLabel"_span), CHIP_NO_ERROR);
+    EXPECT_TRUE(mDelegate.mNodeLabelChangedCalled);
+    EXPECT_EQ(mDelegate.mLastNodeLabel, "WrittenLabel");
+    EXPECT_EQ(cluster.GetNodeLabel(), "WrittenLabel");
+
+    // Test max length
+    std::string longLabel(32, 'a');
+    EXPECT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, CharSpan::fromCharString(longLabel.c_str())), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetNodeLabel(), longLabel);
+
+    // Test too long
+    std::string tooLongLabel(33, 'b');
+    EXPECT_EQ(tester.WriteAttribute(Attributes::NodeLabel::Id, CharSpan::fromCharString(tooLongLabel.c_str())),
+              Status::ConstraintError);
+    EXPECT_EQ(cluster.GetNodeLabel(), longLabel); // Should not have changed
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteConfigurationVersion)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
+                                                 { .delegate = mDelegate });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    EXPECT_EQ(tester.WriteAttribute(Attributes::ConfigurationVersion::Id, 2u), Status::UnsupportedWrite);
+    EXPECT_EQ(cluster.GetConfigurationVersion(), 1u);
 }
 
 } // namespace

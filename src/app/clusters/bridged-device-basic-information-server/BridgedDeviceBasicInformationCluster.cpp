@@ -16,6 +16,8 @@
  */
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 
+#include <app/AttributeAccessInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/BridgedDeviceBasicInformation/Commands.h>
 #include <clusters/BridgedDeviceBasicInformation/Events.h>
@@ -30,16 +32,48 @@ namespace chip::app::Clusters {
 
 namespace {
 
+// TODO: These should come from the metadata
+constexpr size_t kNodeLabelMaxLength = 32;
+
+CharSpan ToSpan(const std::string & s)
+{
+    return CharSpan::fromCharString(s.c_str());
+}
+
 CharSpan ToSpan(const std::optional<std::string> & s)
 {
     if (!s.has_value())
     {
-        return ""_span;
+        // Return empty span if not present
+        return {};
     }
-    return CharSpan::fromCharString(s->c_str());
+    return ToSpan(*s);
 }
 
 } // namespace
+
+DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel(CharSpan nodeLabel)
+{
+    VerifyOrReturnError(nodeLabel.size() <= kNodeLabelMaxLength, Status::ConstraintError);
+
+    if (nodeLabel.data_equal(CharSpan::fromCharString(mRequiredData.nodeLabel.c_str())))
+    {
+        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    }
+
+    mRequiredData.nodeLabel = { nodeLabel.data(), nodeLabel.size() };
+    NotifyAttributeChanged(Attributes::NodeLabel::Id);
+    mClusterContext.delegate.OnNodeLabelChanged(mRequiredData.nodeLabel);
+    return Status::Success;
+}
+
+void BridgedDeviceBasicInformationCluster::SetConfigurationVersion(uint32_t configurationVersion)
+{
+    VerifyOrReturn(mRequiredData.configurationVersion != configurationVersion);
+
+    mRequiredData.configurationVersion = configurationVersion;
+    NotifyAttributeChanged(Attributes::ConfigurationVersion::Id);
+}
 
 DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                                   AttributeValueEncoder & encoder)
@@ -64,7 +98,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
     case ProductID::Id:
         return encoder.Encode(mFixedData.productId.value_or(0));
     case NodeLabel::Id:
-        return encoder.Encode(ToSpan(mFixedData.nodeLabel));
+        return encoder.Encode(ToSpan(mRequiredData.nodeLabel));
     case HardwareVersion::Id:
         return encoder.Encode(mFixedData.hardwareVersion.value_or(0));
     case HardwareVersionString::Id:
@@ -91,9 +125,27 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
         return encoder.Encode(
             mFixedData.productAppearance.value_or(BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type{}));
     case ConfigurationVersion::Id:
-        return encoder.Encode(mFixedData.configurationVersion.value_or(0));
+        return encoder.Encode(mRequiredData.configurationVersion);
     default:
         return Status::UnsupportedAttribute;
+    }
+}
+
+DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                                   AttributeValueDecoder & aDecoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case Attributes::NodeLabel::Id: {
+        CharSpan newNodeLabel;
+        ReturnErrorOnFailure(aDecoder.Decode(newNodeLabel));
+        return SetNodeLabel(newNodeLabel);
+    }
+    case Attributes::ConfigurationVersion::Id:
+        return Status::UnsupportedWrite; // Not writable via Matter
+    default:
+        // Other attributes are not writable.
+        return Status::UnsupportedWrite;
     }
 }
 
@@ -107,7 +159,7 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Attributes(const ConcreteCluste
         { mFixedData.vendorId.has_value(), VendorID::kMetadataEntry },
         { mFixedData.productName.has_value(), ProductName::kMetadataEntry },
         { mFixedData.productId.has_value(), ProductID::kMetadataEntry },
-        { mFixedData.nodeLabel.has_value(), NodeLabel::kMetadataEntry },
+        { true, NodeLabel::kMetadataEntry }, // Always present
         { mFixedData.hardwareVersion.has_value(), HardwareVersion::kMetadataEntry },
         { mFixedData.hardwareVersionString.has_value(), HardwareVersionString::kMetadataEntry },
         { mFixedData.softwareVersion.has_value(), SoftwareVersion::kMetadataEntry },
@@ -119,7 +171,7 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Attributes(const ConcreteCluste
         { mFixedData.serialNumber.has_value(), SerialNumber::kMetadataEntry },
         { true, UniqueID::kMetadataEntry }, // mandatory for new revisions
         { mFixedData.productAppearance.has_value(), ProductAppearance::kMetadataEntry },
-        { mFixedData.configurationVersion.has_value(), ConfigurationVersion::kMetadataEntry },
+        { true, ConfigurationVersion::kMetadataEntry }, // Always present
     };
 
     AttributeListBuilder listBuilder(builder);
