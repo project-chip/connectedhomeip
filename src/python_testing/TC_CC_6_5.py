@@ -38,7 +38,6 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
@@ -74,7 +73,7 @@ class TC_CC_6_5(MatterBaseTest):
             TestStep("0e", "TH reads ColorTempPhysicalMaxMireds attribute from DUT.",
                      "Verify that the DUT response contains the ColorTempPhysicalMaxMireds attribute value."),
             TestStep("1", "TH reads from the DUT the StartUpColorTemperatureMireds attribute",
-                     "Verify that the DUT response contains a uint16 [Min:1 Max:0xfeff or null]"),
+                     "Verify that the DUT response contains a uint16 [Min:1 Max:0xfeff]"),
             TestStep("2a", "TH writes to StartUpColorTemperatureMireds attribute with value",
                      "Verify DUT responds with a successful (value 0x00) status response."),
             TestStep("2b", "TH reads from the DUT the StartUpColorTemperatureMireds attribute",
@@ -138,13 +137,11 @@ class TC_CC_6_5(MatterBaseTest):
             cc_cluster, cc_attributes.StartUpColorTemperatureMireds, self.TH1, endpoint=self.endpoint)
         log.info(f"Extracted startup color temperature value: {startup_color_temp_mireds}")
 
-        asserts.assert_true(startup_color_temp_mireds is NullValue or matter_asserts.is_valid_uint_value(
-            startup_color_temp_mireds, 16), "Startup color is different from Int[] or NullValue")
-        if startup_color_temp_mireds is not NullValue:
-            asserts.assert_greater_equal(startup_color_temp_mireds, MIN_STARTUP_COLOR_TEMP,
-                                         f"Startup color temperature {startup_color_temp_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
-            asserts.assert_less_equal(startup_color_temp_mireds, MAX_STARTUP_COLOR_TEMP,
-                                      f"Startup color temperature {startup_color_temp_mireds} should be <= {MAX_STARTUP_COLOR_TEMP}")
+        matter_asserts.assert_valid_uint16(startup_color_temp_mireds, "Startup mireds value should be an integer")
+        asserts.assert_greater_equal(startup_color_temp_mireds, MIN_STARTUP_COLOR_TEMP,
+                                     f"Startup color temperature {startup_color_temp_mireds} should be >= {MIN_STARTUP_COLOR_TEMP}")
+        asserts.assert_less_equal(startup_color_temp_mireds, MAX_STARTUP_COLOR_TEMP,
+                                  f"Startup color temperature {startup_color_temp_mireds} should be <= {MAX_STARTUP_COLOR_TEMP}")
 
         self.step("2a")
         if ((colortemp_physical_max_mireds - colortemp_physical_min_mireds) // 2 + colortemp_physical_min_mireds) == color_temp_mireds:
