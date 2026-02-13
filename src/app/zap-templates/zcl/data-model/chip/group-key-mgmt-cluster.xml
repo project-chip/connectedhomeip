@@ -21,6 +21,11 @@ Parameters: zap specRoot ../../mains/connectedhomeip-spec sdkRoot . ../../mains/
 Git: 0.9-summer2026
 Alchemy: v1.6.9
 -->
+<!--
+TODO: GroupKeySetStruct has been manually modified to non-fabric-scoped.
+TODO: GroupKeySetStruct has been manually modified to remove GroupKeyMulticastPolicy field.
+Both changes have to be done in the spec or Alchemy's errata and then the file has to be regenerated.
+-->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
   <struct name="GroupKeyMapStruct" isFabricScoped="true">
@@ -48,7 +53,7 @@ Alchemy: v1.6.9
     <item name="CacheAndSync" value="0x01"/>
   </enum>
 
-  <struct name="GroupKeySetStruct" isFabricScoped="true">
+  <struct name="GroupKeySetStruct">
     <cluster code="0x003F"/>
     <item fieldId="0" name="GroupKeySetID" type="int16u"/>
     <item fieldId="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum" max="0x01"/>
@@ -58,7 +63,6 @@ Alchemy: v1.6.9
     <item fieldId="5" name="EpochStartTime1" type="epoch_us" isNullable="true"/>
     <item fieldId="6" name="EpochKey2" type="octet_string" length="16" isNullable="true" minLength="16"/>
     <item fieldId="7" name="EpochStartTime2" type="epoch_us" isNullable="true"/>
-    <item fieldId="8" name="GroupKeyMulticastPolicy" type="GroupKeyMulticastPolicyEnum" max="0x01"/>
   </struct>
 
   <struct name="GroupcastAdoptionStruct" apiMaturity="provisional" isFabricScoped="true">

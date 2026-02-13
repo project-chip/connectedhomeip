@@ -121,16 +121,14 @@ using DecodableType = Type;
 namespace GroupKeySetStruct {
 enum class Fields : uint8_t
 {
-    kGroupKeySetID           = 0,
-    kGroupKeySecurityPolicy  = 1,
-    kEpochKey0               = 2,
-    kEpochStartTime0         = 3,
-    kEpochKey1               = 4,
-    kEpochStartTime1         = 5,
-    kEpochKey2               = 6,
-    kEpochStartTime2         = 7,
-    kGroupKeyMulticastPolicy = 8,
-    kFabricIndex             = 254,
+    kGroupKeySetID          = 0,
+    kGroupKeySecurityPolicy = 1,
+    kEpochKey0              = 2,
+    kEpochStartTime0        = 3,
+    kEpochKey1              = 4,
+    kEpochStartTime1        = 5,
+    kEpochKey2              = 6,
+    kEpochStartTime2        = 7,
 };
 
 struct Type
@@ -144,22 +142,12 @@ public:
     DataModel::Nullable<uint64_t> epochStartTime1;
     DataModel::Nullable<chip::ByteSpan> epochKey2;
     DataModel::Nullable<uint64_t> epochStartTime2;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = static_cast<GroupKeyMulticastPolicyEnum>(0);
-    chip::FabricIndex fabricIndex                       = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 using DecodableType = Type;

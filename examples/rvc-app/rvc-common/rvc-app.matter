@@ -1388,7 +1388,7 @@ cluster GroupKeyManagement = 63 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_scoped struct GroupKeySetStruct {
+  struct GroupKeySetStruct {
     int16u groupKeySetID = 0;
     GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
     nullable octet_string<16> epochKey0 = 2;
@@ -1397,8 +1397,6 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
-    fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct GroupcastAdoptionStruct {
