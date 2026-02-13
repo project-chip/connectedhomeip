@@ -16580,6 +16580,32 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeAmbientContextTypeSupportedID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectCountReachedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectCountConfigWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID) params:params];
+}
+
+- (void)writeAttributeObjectCountConfigWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeObjectCountConfigWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeObjectCountConfigWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectCountWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSimultaneousDetectionLimitWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID) params:params];
@@ -16594,11 +16620,6 @@ using chip::System::Clock::Timeout;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeObjectCountReachedWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientContextSensingID) attributeID:@(MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeHoldTimeWithParams:(MTRReadParams * _Nullable)params

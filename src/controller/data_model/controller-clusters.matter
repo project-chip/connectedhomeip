@@ -8756,7 +8756,7 @@ provisional cluster SoilMeasurement = 1072 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster provides data modeling and protocol implementation of ambient context sensing features. */
+/** This server cluster provides an interface to ambient context sensing functionality. */
 provisional cluster AmbientContextSensing = 1073 {
   revision 1;
 
@@ -8771,14 +8771,17 @@ provisional cluster AmbientContextSensing = 1073 {
   struct AmbientContextTypeStruct {
     SemanticTagStruct ambientContextSensed[] = 0;
     optional epoch_s detectionStartTime = 1;
-    optional int16u objectCountThreshold = 2;
-    optional int16u objectCount = 3;
   }
 
   struct HoldTimeLimitsStruct {
     int16u holdTimeMin = 0;
     int16u holdTimeMax = 1;
     int16u holdTimeDefault = 2;
+  }
+
+  struct ObjectCountConfigStruct {
+    SemanticTagStruct countingObject = 0;
+    int16u objectCountThreshold = 1;
   }
 
   struct PredictedActivityStruct {
@@ -8790,8 +8793,13 @@ provisional cluster AmbientContextSensing = 1073 {
     percent confidence = 5;
   }
 
-  info event AmbientContextDetected = 0 {
-    AmbientContextTypeStruct ambientContextType[] = 0;
+  info event AmbientContextDetectStarted = 0 {
+    optional AmbientContextTypeStruct ambientContextType[] = 0;
+    optional int16u objectCount = 1;
+  }
+
+  info event AmbientContextDetectEnded = 1 {
+    event_no startEventNumber = 0;
   }
 
   readonly attribute optional boolean humanActivityDetected = 0;
@@ -8799,11 +8807,13 @@ provisional cluster AmbientContextSensing = 1073 {
   readonly attribute optional boolean audioContextDetected = 2;
   readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
   readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
-  attribute int8u simultaneousDetectionLimit = 5;
-  readonly attribute optional boolean objectCountReached = 6;
-  attribute access(write: manage) int16u holdTime = 7;
-  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 8;
-  readonly attribute access(write: manage) optional PredictedActivityStruct predictedActivity[] = 9;
+  readonly attribute optional boolean objectCountReached = 5;
+  attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
+  readonly attribute optional int16u objectCount = 7;
+  attribute int8u simultaneousDetectionLimit = 8;
+  attribute access(write: manage) int16u holdTime = 9;
+  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
+  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

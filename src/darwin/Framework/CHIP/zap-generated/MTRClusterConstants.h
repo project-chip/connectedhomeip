@@ -3511,11 +3511,13 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeAudioContextDetectedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeAmbientContextTypeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeAmbientContextTypeSupportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeLimitsID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRAttributeIDTypeClusterAmbientContextSensingAttributePredictedActivityID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeLimitsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterAmbientContextSensingAttributePredictedActivityID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -6957,7 +6959,8 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterOccupancySensingEventOccupancyChangedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
 
     // Cluster AmbientContextSensing events
-    MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectStartedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectEndedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster TargetNavigator deprecated event names
 

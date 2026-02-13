@@ -2002,8 +2002,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRAmbientContextSensingClusterAmbientContextTypeStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull ambientContextSensed MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable detectionStartTime MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable objectCountThreshold MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable objectCount MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2011,6 +2009,12 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeMin MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeMax MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull holdTimeDefault MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAmbientContextSensingClusterObjectCountConfigStruct : NSObject <NSCopying>
+@property (nonatomic, copy) MTRDataTypeSemanticTagStruct * _Nonnull countingObject MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull objectCountThreshold MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -2024,8 +2028,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRAmbientContextSensingClusterAmbientContextDetectedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull ambientContextType MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSArray * _Nullable ambientContextType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable objectCount MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull startEventNumber MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))

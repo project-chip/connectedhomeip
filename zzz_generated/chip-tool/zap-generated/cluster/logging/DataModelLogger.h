@@ -372,6 +372,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
          const chip::app::Clusters::AmbientContextSensing::Structs::PredictedActivityStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -956,8 +960,12 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Events::ActivePresetChange::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetected::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetectStarted::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetectEnded::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TargetNavigator::Events::TargetUpdated::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

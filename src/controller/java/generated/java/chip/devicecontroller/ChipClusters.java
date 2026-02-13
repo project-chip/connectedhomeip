@@ -52001,11 +52001,13 @@ public class ChipClusters {
     private static final long AUDIO_CONTEXT_DETECTED_ATTRIBUTE_ID = 2L;
     private static final long AMBIENT_CONTEXT_TYPE_ATTRIBUTE_ID = 3L;
     private static final long AMBIENT_CONTEXT_TYPE_SUPPORTED_ATTRIBUTE_ID = 4L;
-    private static final long SIMULTANEOUS_DETECTION_LIMIT_ATTRIBUTE_ID = 5L;
-    private static final long OBJECT_COUNT_REACHED_ATTRIBUTE_ID = 6L;
-    private static final long HOLD_TIME_ATTRIBUTE_ID = 7L;
-    private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 8L;
-    private static final long PREDICTED_ACTIVITY_ATTRIBUTE_ID = 9L;
+    private static final long OBJECT_COUNT_REACHED_ATTRIBUTE_ID = 5L;
+    private static final long OBJECT_COUNT_CONFIG_ATTRIBUTE_ID = 6L;
+    private static final long OBJECT_COUNT_ATTRIBUTE_ID = 7L;
+    private static final long SIMULTANEOUS_DETECTION_LIMIT_ATTRIBUTE_ID = 8L;
+    private static final long HOLD_TIME_ATTRIBUTE_ID = 9L;
+    private static final long HOLD_TIME_LIMITS_ATTRIBUTE_ID = 10L;
+    private static final long PREDICTED_ACTIVITY_ATTRIBUTE_ID = 11L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -52028,6 +52030,10 @@ public class ChipClusters {
 
     public interface AmbientContextTypeSupportedAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.AmbientContextSensingClusterSemanticTagStruct> value);
+    }
+
+    public interface ObjectCountConfigAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.AmbientContextSensingClusterObjectCountConfigStruct value);
     }
 
     public interface HoldTimeLimitsAttributeCallback extends BaseAttributeCallback {
@@ -52180,6 +52186,93 @@ public class ChipClusters {
         }, AMBIENT_CONTEXT_TYPE_SUPPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
+    public void readObjectCountReachedAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_REACHED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OBJECT_COUNT_REACHED_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeObjectCountReachedAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_REACHED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OBJECT_COUNT_REACHED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readObjectCountConfigAttribute(
+        ObjectCountConfigAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_CONFIG_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.AmbientContextSensingClusterObjectCountConfigStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OBJECT_COUNT_CONFIG_ATTRIBUTE_ID, true);
+    }
+
+    public void writeObjectCountConfigAttribute(DefaultClusterCallback callback, ChipStructs.AmbientContextSensingClusterObjectCountConfigStruct value) {
+      writeObjectCountConfigAttribute(callback, value, 0);
+    }
+
+    public void writeObjectCountConfigAttribute(DefaultClusterCallback callback, ChipStructs.AmbientContextSensingClusterObjectCountConfigStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value.encodeTlv();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), OBJECT_COUNT_CONFIG_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeObjectCountConfigAttribute(
+        ObjectCountConfigAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_CONFIG_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.AmbientContextSensingClusterObjectCountConfigStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OBJECT_COUNT_CONFIG_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readObjectCountAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OBJECT_COUNT_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeObjectCountAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OBJECT_COUNT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
     public void readSimultaneousDetectionLimitAttribute(
         IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SIMULTANEOUS_DETECTION_LIMIT_ATTRIBUTE_ID);
@@ -52213,32 +52306,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SIMULTANEOUS_DETECTION_LIMIT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readObjectCountReachedAttribute(
-        BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_REACHED_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OBJECT_COUNT_REACHED_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeObjectCountReachedAttribute(
-        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OBJECT_COUNT_REACHED_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, OBJECT_COUNT_REACHED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readHoldTimeAttribute(

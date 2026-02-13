@@ -76,6 +76,10 @@
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+#include <controller/ThreadMeshcopCommissionProxy.h>
+#endif
+
 namespace chip {
 
 namespace Controller {
@@ -1137,6 +1141,10 @@ private:
 
     bool IsAttestationInformationMissing(const CommissioningParameters & params);
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    CHIP_ERROR PairThreadMeshcop(RendezvousParameters & rendezvousParams, CommissioningParameters & commissioningParams);
+#endif
+
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -1161,6 +1169,10 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     Optional<Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
     EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
+#endif
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    ThreadMeshcopCommissionProxy mThreadMeshcopCommissionProxy;
 #endif
 };
 
