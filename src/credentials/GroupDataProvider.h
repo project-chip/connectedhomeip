@@ -95,6 +95,9 @@ public:
                 SetName(other.name);
             }
         }
+        bool HasAuxiliaryACL() const { return (flags & static_cast<uint8_t>(Flags::kHasAuxiliaryACL)); }
+        bool UsePerGroupAddress() const { return (flags & static_cast<uint8_t>(Flags::kMcastAddrPolicy)); }
+
         bool operator==(const GroupInfo & other) const
         {
             return (this->group_id == other.group_id) && !strncmp(this->name, other.name, kGroupNameMax);
@@ -347,8 +350,9 @@ public:
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
 
-    // Groupcast MaxMembershipCount
+    // Groupcast
     virtual uint16_t getMaxMembershipCount() = 0;
+    virtual uint16_t getMaxMcastAddrCount()  = 0;
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
