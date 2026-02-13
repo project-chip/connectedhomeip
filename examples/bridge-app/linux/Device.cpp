@@ -19,9 +19,10 @@
 
 #include "Device.h"
 
+#include <app/clusters/basic-information/CodegenIntegration.h>
 #include <crypto/RandUtils.h>
-#include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <string>
 #include <sys/types.h>
@@ -29,40 +30,60 @@
 using namespace chip;
 using namespace chip::app::Clusters::Actions;
 
+// We cannot use the prox since we need ember support.
+// As a result we update the version at runtime by fetching the basicinfo cluster
+// during processing.
+class EmberBridgeVersionUpdate : public chip::app::Clusters::ConfigurationVersionDelegate
+{
+public:
+    CHIP_ERROR IncreaseConfigurationVersion() override
+    {
+        auto cluster = app::Clusters::BasicInformation::GetClusterInstance();
+        VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
+        return cluster->IncreaseConfigurationVersion();
+    }
+};
+
+static EmberBridgeVersionUpdate gEmberVersionUpdate;
+
 Device::Device(const char * szDeviceName, std::string szLocation)
 {
     chip::Platform::CopyString(mName, szDeviceName);
     chip::Platform::CopyString(mUniqueId, "");
-    mLocation             = szLocation;
-    mReachable            = false;
-    mConfigurationVersion = 1;
-    mEndpointId           = 0;
+    mLocation = szLocation;
+}
+
+app::ServerClusterRegistration &
+Device::CreateBridgedDeviceInfo(chip::EndpointId endpointId,
+                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::RequiredData && required,
+                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixed)
+{
+    VerifyOrDie(!mBridgedDevice.IsConstructed());
+
+    static chip::app::DefaultTimerDelegate timerDelegate;
+
+    mBridgedDevice.Create(endpointId, std::move(required), std::move(fixed),
+                          app::Clusters::BridgedDeviceBasicInformationCluster::Context{
+                              .parentVersionConfiguration = gEmberVersionUpdate,
+                              .delegate                   = *this,
+                              .timerDelegate              = timerDelegate,
+                          });
+    return mBridgedDevice.Registration();
 }
 
 bool Device::IsReachable()
 {
-    return mReachable;
+    return mBridgedDevice.IsConstructed() && mBridgedDevice.Cluster().GetReachable();
 }
 
 void Device::SetReachable(bool aReachable)
 {
-    bool changed = (mReachable != aReachable);
+    VerifyOrReturn(mBridgedDevice.IsConstructed());
+    VerifyOrReturn(mBridgedDevice.Cluster().GetReachable() != aReachable);
 
-    mReachable = aReachable;
-
-    if (aReachable)
-    {
-        ChipLogProgress(DeviceLayer, "Device[%s]: ONLINE", mName);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Device[%s]: OFFLINE", mName);
-    }
-
-    if (changed)
-    {
-        HandleDeviceChange(this, kChanged_Reachable);
-    }
+    mBridgedDevice.Cluster().SetReachable(aReachable);
+    ChipLogProgress(DeviceLayer, "Device[%s]: %s", mName, aReachable ? "ONLINE" : "OFFLINE");
+    HandleDeviceChange(this, kChanged_Reachable);
 }
 
 void Device::SetName(const char * szName)
@@ -241,8 +262,7 @@ void DeviceSwitch::HandleDeviceChange(Device * device, Device::Changed_t changeM
 
 DeviceTempSensor::DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max,
                                    int16_t measuredValue) :
-    Device(szDeviceName, szLocation),
-    mMin(min), mMax(max), mMeasurement(measuredValue)
+    Device(szDeviceName, szLocation), mMin(min), mMax(max), mMeasurement(measuredValue)
 {}
 
 void DeviceTempSensor::SetMeasuredValue(int16_t measurement)

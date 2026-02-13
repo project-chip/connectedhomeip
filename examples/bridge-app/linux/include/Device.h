@@ -18,18 +18,18 @@
 
 #pragma once
 
+#include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 
 #include <cstdint>
-#include <stdbool.h>
-#include <stdint.h>
 
 #include <functional>
 #include <string>
 #include <sys/types.h>
 #include <vector>
 
-class Device
+class Device : public chip::app::Clusters::BridgedDeviceBasicInformationDelegate
 {
 public:
     static const int kDeviceNameSize     = 32;
@@ -45,7 +45,7 @@ public:
     } Changed;
 
     Device(const char * szDeviceName, std::string szLocation);
-    virtual ~Device() {}
+    ~Device() override = default;
 
     bool IsReachable();
     void SetReachable(bool aReachable);
@@ -65,18 +65,33 @@ public:
     inline std::string GetZone() { return mZone; };
     inline void SetZone(std::string zone) { mZone = zone; };
 
+    chip::app::ServerClusterRegistration &
+    CreateBridgedDeviceInfo(chip::EndpointId endpointId,
+                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::RequiredData && required,
+                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixed
+
+    );
+
+    // BridedDeviceBasicInformationDelegate
+    chip::Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel) override
+    {
+        chip::Platform::CopyString(mName, newNodeLabel.c_str());
+        return chip::Protocols::InteractionModel::Status::Success;
+    }
+
 private:
     virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
 
 protected:
-    bool mReachable                         = false;
     char mName[kDeviceNameSize + 1]         = { 0 };
     char mUniqueId[kDeviceUniqueIdSize + 1] = { 0 };
-    uint32_t mConfigurationVersion;
+    uint32_t mConfigurationVersion          = 1;
     std::string mLocation;
-    chip::EndpointId mEndpointId;
+    chip::EndpointId mEndpointId = 0;
     chip::EndpointId mParentEndpointId;
     std::string mZone;
+
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::BridgedDeviceBasicInformationCluster> mBridgedDevice;
 };
 
 class DeviceOnOff : public Device
@@ -169,7 +184,7 @@ private:
 class ComposedDevice : public Device
 {
 public:
-    ComposedDevice(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation){};
+    ComposedDevice(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation) {};
 
     using DeviceCallback_fn = std::function<void(ComposedDevice *, ComposedDevice::Changed_t)>;
 
@@ -194,8 +209,7 @@ public:
 
     DevicePowerSource(const char * szDeviceName, std::string szLocation,
                       chip::BitFlags<chip::app::Clusters::PowerSource::Feature> aFeatureMap) :
-        Device(szDeviceName, szLocation),
-        mFeatureMap(aFeatureMap){};
+        Device(szDeviceName, szLocation), mFeatureMap(aFeatureMap) {};
 
     using DeviceCallback_fn = std::function<void(DevicePowerSource *, DevicePowerSource::Changed_t)>;
     void SetChangeCallback(DeviceCallback_fn aChanged_CB) { mChanged_CB = aChanged_CB; }
