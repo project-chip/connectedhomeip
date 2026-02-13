@@ -40,6 +40,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.discovery as Discovery
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import JFAdministratorSubprocess
 from matter.testing.decorators import async_test_body
@@ -399,31 +400,27 @@ class TC_JFPKI_2_2(MatterBaseTest):
 
         self.step("17")
         # Ensure OJCW does not fail with Busy due to an active fail-safe context from prior steps.
-        # await self.send_single_cmd(
-        #     dev_ctrl=self.default_controller,
-        #     node_id=self.dut_node_id,
-        #     endpoint=0,
-        #     cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
+        await self._expire_failsafe()
 
-        # try:
-        #     await self.default_controller.OpenJointCommissioningWindow(
-        #         nodeId=self.dut_node_id,
-        #         endpointId=1,
-        #         timeout=400,
-        #         iteration=random.randint(1000, 100000),
-        #         discriminator=random.randint(0, 4095),
-        #     )
-        # except ChipStackError as e:  # chipstack-ok: OpenJointCommissioningWindow surfaces IM errors as ChipStackError
-        #     asserts.assert_equal(
-        #         e.err & 0xFF,
-        #         Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kInvalidAdministratorFabricIndex,
-        #         f'Expected InvalidAdministratorFabricIndex status code (0x06), but got 0x{(e.err & 0xFF):02x} ({str(e)})',
-        #     )
-        # else:
-        #     asserts.assert_true(
-        #         False,
-        #         'Expected ChipStackError with InvalidAdministratorFabricIndex, but no exception occurred.',
-        #     )
+        try:
+            await self.default_controller.OpenJointCommissioningWindow(
+                nodeId=self.dut_node_id,
+                endpointId=1,
+                timeout=400,
+                iteration=random.randint(1000, 100000),
+                discriminator=random.randint(0, 4095),
+            )
+        except ChipStackError as e:
+            asserts.assert_equal(
+                e.err & 0xFF,
+                Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kInvalidAdministratorFabricIndex,
+                f'Expected InvalidAdministratorFabricIndex status code (0x06), but got 0x{(e.err & 0xFF):02x} ({str(e)})',
+            )
+        else:
+            asserts.assert_true(
+                False,
+                'Expected ChipStackError with InvalidAdministratorFabricIndex, but no exception occurred.',
+            )
 
     async def _arm_failsafe(self, expiry_length_seconds):
         resp = await self.send_single_cmd(

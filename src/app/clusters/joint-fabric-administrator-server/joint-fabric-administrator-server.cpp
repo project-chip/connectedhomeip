@@ -179,6 +179,7 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
     Optional<StatusCodeEnum> status = Optional<StatusCodeEnum>::Missing();
     Status globalStatus             = Status::Success;
     Spake2pVerifier verifier;
+    DataModel::Nullable<FabricIndex> administratorFabricIndex;
 
     ChipLogProgress(Zcl, "Received command to open joint commissioning window");
 
@@ -188,6 +189,11 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(Attributes::AdministratorFabricIndex::Get(ctx.mRequestPath.mEndpointId, administratorFabricIndex) ==
+                     Status::Success,
+                 globalStatus = Status::Failure);
+    VerifyOrExit(!administratorFabricIndex.IsNull() && administratorFabricIndex.Value() != 0,
+                 status.Emplace(StatusCodeEnum::kInvalidAdministratorFabricIndex));
     VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCodeEnum::kBusy));
 
     VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCodeEnum::kBusy));
