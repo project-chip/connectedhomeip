@@ -110,8 +110,6 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::Read(const ConcreteReadAttrib
 
     switch (aPath.mAttributeId)
     {
-    case Attributes::AdministratorFabricIndex::Id:
-        return ReadAdministratorFabricIndex(aEncoder);
     default:
         break;
     }
@@ -121,12 +119,7 @@ CHIP_ERROR JointFabricAdministratorGlobalInstance::Read(const ConcreteReadAttrib
 
 CHIP_ERROR JointFabricAdministratorGlobalInstance::ReadAdministratorFabricIndex(AttributeValueEncoder & aEncoder)
 {
-    FabricIndex fabricIndex = aEncoder.AccessingFabricIndex();
-    if (fabricIndex == kUndefinedFabricIndex)
-    {
-        return aEncoder.Encode(DataModel::Nullable<FabricIndex>());
-    }
-    return aEncoder.Encode(DataModel::MakeNullable(fabricIndex));
+    return CHIP_NO_ERROR;
 }
 
 void JointFabricAdministratorGlobalInstance::InvokeCommand(HandlerContext & handlerContext)
