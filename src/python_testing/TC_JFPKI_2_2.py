@@ -309,7 +309,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         # Ensure OJCW does not fail with Busy due to an active fail-safe context from prior steps.
         await self._expire_failsafe()
 
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await self.default_controller.OpenJointCommissioningWindow(
                 nodeId=self.dut_node_id,
                 endpointId=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
@@ -317,14 +317,13 @@ class TC_JFPKI_2_2(MatterBaseTest):
                 iteration=random.randint(1000, 100000),
                 discriminator=random.randint(0, 4095),
             )
-        except ChipStackError as e:
-            asserts.assert_equal(
-                e.err & 0xFF,
-                Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kInvalidAdministratorFabricIndex,
-                f'Expected InvalidAdministratorFabricIndex status code (0x06), but got 0x{(e.err & 0xFF):02x} ({str(e)})',
-            )
-        else:
-            asserts.fail('Expected ChipStackError with InvalidAdministratorFabricIndex, but no exception occurred.')
+        # This is a packed error code, so we get the lowest 8 bits to check the cluster status code
+        cluster_status = cm.exception.err & 0xFF
+        asserts.assert_equal(
+            cluster_status,
+            Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kInvalidAdministratorFabricIndex,
+            f'Expected InvalidAdministratorFabricIndex status code (0x06), but got 0x{(cluster_status):02x} ({str(cm.exception)})',
+        )
 
     async def _arm_failsafe(self, expiry_length_seconds):
         """
@@ -356,27 +355,24 @@ class TC_JFPKI_2_2(MatterBaseTest):
         await self._arm_failsafe(0)
 
     async def _assert_im_error(self, cmd, expected_status, expected_cluster_status=None, error_label=None):
-        try:
+        expected_error = error_label if error_label is not None else expected_status
+        with asserts.assert_raises(InteractionModelError, f"Expected InteractionModelError with {expected_error}, but no exception occurred.") as cm:
             await self.send_single_cmd(
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
                 endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
                 cmd=cmd)
-        except InteractionModelError as e:
+        asserts.assert_equal(
+            cm.exception.status,
+            expected_status,
+            f"Expected {expected_status} status, but got {str(cm.exception)}",
+        )
+        if expected_cluster_status is not None:
             asserts.assert_equal(
-                e.status,
-                expected_status,
-                f"Expected {expected_status} status, but got {str(e)}",
+                cm.exception.clusterStatus,
+                expected_cluster_status,
+                f"Expected {expected_cluster_status} cluster status, but got {str(cm.exception)}",
             )
-            if expected_cluster_status is not None:
-                asserts.assert_equal(
-                    e.clusterStatus,
-                    expected_cluster_status,
-                    f"Expected {expected_cluster_status} cluster status, but got {str(e)}",
-                )
-        else:
-            expected_error = error_label if error_label is not None else expected_status
-            asserts.fail(f"Expected InteractionModelError with {expected_error}, but no exception occurred.")
 
 
 if __name__ == "__main__":
