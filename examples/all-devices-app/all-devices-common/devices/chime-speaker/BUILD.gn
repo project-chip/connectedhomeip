@@ -20,7 +20,7 @@ source_set("chime-speaker") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/chime/impl:logging",
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker/impl:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:device-interface",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/speaker/impl:logging",
   ]
 }
