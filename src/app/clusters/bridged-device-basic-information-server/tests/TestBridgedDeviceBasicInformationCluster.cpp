@@ -81,7 +81,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestPartialAttributes)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true },
                                                  {
-                                                     .nodeLabel            = "mylable",
+                                                     .nodeLabel            = "mylabel",
                                                      .partNumber           = "010203",
                                                      .configurationVersion = 200,
                                                  },
