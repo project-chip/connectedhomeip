@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -2408,7 +2408,7 @@ cluster GroupKeyManagement = 63 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared struct LabelStruct {
     char_string<16> label = 0;
@@ -2549,241 +2549,6 @@ cluster ZoneManagement = 1360 {
   command access(invoke: manage) CreateOrUpdateTrigger(CreateOrUpdateTriggerRequest): DefaultSuccess = 4;
   /** This command SHALL remove the Trigger for the provided ZoneID. */
   command access(invoke: manage) RemoveTrigger(RemoveTriggerRequest): DefaultSuccess = 5;
-}
-
-/** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-cluster CameraAvSettingsUserLevelManagement = 1362 {
-  revision 1;
-
-  enum PhysicalMovementEnum : enum8 {
-    kIdle = 0;
-    kMoving = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kDigitalPTZ = 0x1;
-    kMechanicalPan = 0x2;
-    kMechanicalTilt = 0x4;
-    kMechanicalZoom = 0x8;
-    kMechanicalPresets = 0x10;
-  }
-
-  struct MPTZStruct {
-    optional int16s pan = 0;
-    optional int16s tilt = 1;
-    optional int8u zoom = 2;
-  }
-
-  struct MPTZPresetStruct {
-    int8u presetID = 0;
-    char_string<32> name = 1;
-    MPTZStruct settings = 2;
-  }
-
-  struct DPTZStruct {
-    int16u videoStreamID = 0;
-    ViewportStruct viewport = 1;
-  }
-
-  readonly attribute optional MPTZStruct MPTZPosition = 0;
-  readonly attribute optional int8u maxPresets = 1;
-  readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
-  readonly attribute optional DPTZStruct DPTZStreams[] = 3;
-  readonly attribute optional int8u zoomMax = 4;
-  readonly attribute optional int16s tiltMin = 5;
-  readonly attribute optional int16s tiltMax = 6;
-  readonly attribute optional int16s panMin = 7;
-  readonly attribute optional int16s panMax = 8;
-  readonly attribute optional PhysicalMovementEnum movementState = 9;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct MPTZSetPositionRequest {
-    optional int16s pan = 0;
-    optional int16s tilt = 1;
-    optional int8u zoom = 2;
-  }
-
-  request struct MPTZRelativeMoveRequest {
-    optional int16s panDelta = 0;
-    optional int16s tiltDelta = 1;
-    optional int8s zoomDelta = 2;
-  }
-
-  request struct MPTZMoveToPresetRequest {
-    int8u presetID = 0;
-  }
-
-  request struct MPTZSavePresetRequest {
-    optional int8u presetID = 0;
-    char_string<32> name = 1;
-  }
-
-  request struct MPTZRemovePresetRequest {
-    int8u presetID = 0;
-  }
-
-  request struct DPTZSetViewportRequest {
-    int16u videoStreamID = 0;
-    ViewportStruct viewport = 1;
-  }
-
-  request struct DPTZRelativeMoveRequest {
-    int16u videoStreamID = 0;
-    optional int16s deltaX = 1;
-    optional int16s deltaY = 2;
-    optional int8s zoomDelta = 3;
-  }
-
-  /** This command SHALL move the camera to the provided values for pan, tilt, and zoom in the mechanical PTZ. */
-  command MPTZSetPosition(MPTZSetPositionRequest): DefaultSuccess = 0;
-  /** This command SHALL move the camera by the delta values relative to the currently defined position. */
-  command MPTZRelativeMove(MPTZRelativeMoveRequest): DefaultSuccess = 1;
-  /** This command SHALL move the camera to the positions specified by the Preset passed. */
-  command MPTZMoveToPreset(MPTZMoveToPresetRequest): DefaultSuccess = 2;
-  /** This command allows creating a new preset or updating the values of an existing one. */
-  command MPTZSavePreset(MPTZSavePresetRequest): DefaultSuccess = 3;
-  /** This command SHALL remove a preset entry from the PresetMptzTable. */
-  command MPTZRemovePreset(MPTZRemovePresetRequest): DefaultSuccess = 4;
-  /** This command allows for setting the digital viewport for a specific Video Stream. */
-  command DPTZSetViewport(DPTZSetViewportRequest): DefaultSuccess = 5;
-  /** This command SHALL change the per stream viewport by the amount specified in a relative fashion. */
-  command DPTZRelativeMove(DPTZRelativeMoveRequest): DefaultSuccess = 6;
-}
-
-/** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
-cluster WebRTCTransportProvider = 1363 {
-  revision 2;
-
-  bitmap Feature : bitmap32 {
-    kMetadata = 0x1;
-  }
-
-  struct SFrameStruct {
-    int16u cipherSuite = 0;
-    octet_string<128> baseKey = 1;
-    octet_string<8> kid = 2;
-  }
-
-  readonly attribute access(read: manage) WebRTCSessionStruct currentSessions[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SolicitOfferRequest {
-    StreamUsageEnum streamUsage = 0;
-    endpoint_no originatingEndpointID = 1;
-    optional nullable int16u videoStreamID = 2;
-    optional nullable int16u audioStreamID = 3;
-    optional ICEServerStruct ICEServers[] = 4;
-    optional char_string<16> ICETransportPolicy = 5;
-    optional boolean metadataEnabled = 6;
-    optional SFrameStruct SFrameConfig = 7;
-    optional int16u videoStreams[] = 8;
-    optional int16u audioStreams[] = 9;
-  }
-
-  response struct SolicitOfferResponse = 1 {
-    int16u webRTCSessionID = 0;
-    boolean deferredOffer = 1;
-    optional nullable int16u videoStreamID = 2;
-    optional nullable int16u audioStreamID = 3;
-  }
-
-  request struct ProvideOfferRequest {
-    nullable int16u webRTCSessionID = 0;
-    char_string sdp = 1;
-    StreamUsageEnum streamUsage = 2;
-    endpoint_no originatingEndpointID = 3;
-    optional nullable int16u videoStreamID = 4;
-    optional nullable int16u audioStreamID = 5;
-    optional ICEServerStruct ICEServers[] = 6;
-    optional char_string<16> ICETransportPolicy = 7;
-    optional boolean metadataEnabled = 8;
-    optional SFrameStruct SFrameConfig = 9;
-    optional int16u videoStreams[] = 10;
-    optional int16u audioStreams[] = 11;
-  }
-
-  response struct ProvideOfferResponse = 3 {
-    int16u webRTCSessionID = 0;
-    optional nullable int16u videoStreamID = 1;
-    optional nullable int16u audioStreamID = 2;
-  }
-
-  request struct ProvideAnswerRequest {
-    int16u webRTCSessionID = 0;
-    char_string sdp = 1;
-  }
-
-  request struct ProvideICECandidatesRequest {
-    int16u webRTCSessionID = 0;
-    ICECandidateStruct ICECandidates[] = 1;
-  }
-
-  request struct EndSessionRequest {
-    int16u webRTCSessionID = 0;
-    WebRTCEndReasonEnum reason = 1;
-  }
-
-  /** Requests that the Provider initiates a new session with the Offer / Answer flow in a way that allows for options to be passed and work with devices needing the standby flow. */
-  fabric command SolicitOffer(SolicitOfferRequest): SolicitOfferResponse = 0;
-  /** This command allows an SDP Offer to be set and start a new session. */
-  fabric command ProvideOffer(ProvideOfferRequest): ProvideOfferResponse = 2;
-  /** This command SHALL be initiated from a Node in response to an Offer that was previously received from a remote peer. */
-  fabric command ProvideAnswer(ProvideAnswerRequest): DefaultSuccess = 4;
-  /** This command allows for string based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
-  fabric command ProvideICECandidates(ProvideICECandidatesRequest): DefaultSuccess = 5;
-  /** This command instructs the stream provider to end the WebRTC session. */
-  fabric command EndSession(EndSessionRequest): DefaultSuccess = 6;
-}
-
-/** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
-cluster WebRTCTransportRequestor = 1364 {
-  revision 2;
-
-  readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct OfferRequest {
-    int16u webRTCSessionID = 0;
-    char_string sdp = 1;
-    optional ICEServerStruct ICEServers[] = 2;
-    optional char_string<16> ICETransportPolicy = 3;
-  }
-
-  request struct AnswerRequest {
-    int16u webRTCSessionID = 0;
-    char_string sdp = 1;
-  }
-
-  request struct ICECandidatesRequest {
-    int16u webRTCSessionID = 0;
-    ICECandidateStruct ICECandidates[] = 1;
-  }
-
-  request struct EndRequest {
-    int16u webRTCSessionID = 0;
-    WebRTCEndReasonEnum reason = 1;
-  }
-
-  /** This command provides the stream requestor with WebRTC session details. */
-  command Offer(OfferRequest): DefaultSuccess = 0;
-  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer), It is the next command in the Offer/Answer flow to the ProvideOffer command. */
-  command Answer(AnswerRequest): DefaultSuccess = 1;
-  /** This command allows for the object based ICE candidates generated after the initial Offer / Answer exchange, via a JSEP onicecandidate event, a DOM rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
-  command ICECandidates(ICECandidatesRequest): DefaultSuccess = 2;
-  /** This command notifies the stream requestor that the provider has ended the WebRTC session. */
-  command End(EndRequest): DefaultSuccess = 3;
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
@@ -3611,7 +3376,6 @@ endpoint 0 {
 endpoint 1 {
   device type ma_camera = 322, version 1;
 
-  binding cluster WebRTCTransportRequestor;
 
   server cluster Identify {
     callback attribute identifyTime;
@@ -3678,47 +3442,6 @@ endpoint 1 {
     handle command RemoveZone;
     handle command CreateOrUpdateTrigger;
     handle command RemoveTrigger;
-  }
-
-  server cluster CameraAvSettingsUserLevelManagement {
-    callback attribute MPTZPosition;
-    callback attribute maxPresets;
-    callback attribute MPTZPresets;
-    callback attribute DPTZStreams;
-    callback attribute zoomMax;
-    callback attribute tiltMin;
-    callback attribute tiltMax;
-    callback attribute panMin;
-    callback attribute panMax;
-    callback attribute movementState;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-
-    handle command MPTZSetPosition;
-    handle command MPTZRelativeMove;
-    handle command MPTZMoveToPreset;
-    handle command MPTZSavePreset;
-    handle command MPTZRemovePreset;
-    handle command DPTZSetViewport;
-    handle command DPTZRelativeMove;
-  }
-
-  server cluster WebRTCTransportProvider {
-    callback attribute currentSessions;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-
-    handle command SolicitOffer;
-    handle command ProvideOffer;
-    handle command ProvideAnswer;
-    handle command ProvideICECandidates;
-    handle command EndSession;
   }
 
   server cluster PushAvStreamTransport {

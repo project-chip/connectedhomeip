@@ -278,7 +278,8 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
 
     TestCameraAVStreamManagementCluster() :
         mMockDelegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams),
-        mServer(mMockDelegate, kTestEndpointId,
+        mServer(CameraAvStreamManagement::CameraAVStreamManagementCluster::Context{ mPersistenceProvider }, mMockDelegate,
+                kTestEndpointId,
                 chip::BitFlags<CameraAvStreamManagement::Feature>(
                     CameraAvStreamManagement::Feature::kVideo, CameraAvStreamManagement::Feature::kAudio,
                     CameraAvStreamManagement::Feature::kSnapshot, CameraAvStreamManagement::Feature::kSpeaker,
@@ -302,21 +303,18 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
     void SetUp() override
     {
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
         EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
         EXPECT_EQ(InitializeCameraAVSMDefaults(mServer), CHIP_NO_ERROR);
         EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
-
     std::vector<VideoStreamStruct> mVideoStreams;
     std::vector<AudioStreamStruct> mAudioStreams;
     std::vector<SnapshotStreamStruct> mSnapshotStreams;
     MockCameraAVStreamManagementDelegate mMockDelegate;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
     CameraAvStreamManagement::CameraAVStreamManagementCluster mServer;
     ClusterTester mClusterTester;
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)

@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -3026,7 +3026,7 @@ cluster GroupKeyManagement = 63 {
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
 cluster FixedLabel = 64 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared struct LabelStruct {
     char_string<16> label = 0;
@@ -3043,7 +3043,7 @@ cluster FixedLabel = 64 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared struct LabelStruct {
     char_string<16> label = 0;
@@ -3093,7 +3093,11 @@ cluster ProxyValid = 68 {
 
 /** This cluster provides an interface to a boolean state called StateValue. */
 cluster BooleanState = 69 {
-  revision 1;
+  revision 3;
+
+  bitmap Feature : bitmap32 {
+    kChangeEvent = 0x1;
+  }
 
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -3252,7 +3256,7 @@ provisional cluster Timer = 71 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
 cluster OvenCavityOperationalState = 72 {
-  revision 1;
+  revision 2;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -3305,9 +3309,9 @@ cluster OvenCavityOperationalState = 72 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** This command SHALL be supported if the device supports remotely stopping the operation. */
   command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  /** This command SHALL be supported if the device supports remotely starting the operation. */
   command Start(): OperationalCommandResponse = 2;
 }
 
@@ -3488,7 +3492,7 @@ cluster LaundryWasherMode = 81 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
-  revision 2;
+  revision 3;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3533,8 +3537,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3625,11 +3628,10 @@ cluster RvcRunMode = 84 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -3687,11 +3689,10 @@ cluster RvcCleanMode = 85 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
@@ -4075,7 +4076,7 @@ cluster MicrowaveOvenControl = 95 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
-  revision 1;
+  revision 3;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -4128,19 +4129,19 @@ cluster OperationalState = 96 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  /** This command SHALL be supported if the device supports remotely pausing the operation. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  /** This command SHALL be supported if the device supports remotely stopping the operation. */
   command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  /** This command SHALL be supported if the device supports remotely starting the operation. */
   command Start(): OperationalCommandResponse = 2;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  /** This command SHALL be supported if the device supports remotely resuming the operation. */
   command Resume(): OperationalCommandResponse = 3;
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
-  revision 1;
+  revision 3;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -4215,9 +4216,9 @@ cluster RvcOperationalState = 97 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  /** This command SHALL be supported if the device supports remotely pausing the operation. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  /** This command SHALL be supported if the device supports remotely resuming the operation. */
   command Resume(): OperationalCommandResponse = 3;
   /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
   command GoHome(): OperationalCommandResponse = 128;
@@ -4639,7 +4640,7 @@ cluster WaterTankLevelMonitoring = 121 {
 
 /** This cluster is used to configure a boolean sensor. */
 cluster BooleanStateConfiguration = 128 {
-  revision 1;
+  revision 2;
 
   bitmap AlarmModeBitmap : bitmap8 {
     kVisual = 0x1;
@@ -4651,6 +4652,7 @@ cluster BooleanStateConfiguration = 128 {
     kAudible = 0x2;
     kAlarmSuppress = 0x4;
     kSensitivityLevel = 0x8;
+    kFaultEvents = 0x10;
   }
 
   bitmap SensorFaultBitmap : bitmap16 {
@@ -4688,9 +4690,9 @@ cluster BooleanStateConfiguration = 128 {
     AlarmModeBitmap alarmsToEnableDisable = 0;
   }
 
-  /** This command is used to suppress the specified alarm mode. */
+  /** This command will suppress the alarm modes specified. */
   command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
-  /** This command is used to enable or disable the specified alarm mode. */
+  /** This command allows setting the enable or disable value for the specified alarm modes. */
   command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 
@@ -8110,7 +8112,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** The server cluster provides an interface to occupancy sensing functionality based on one or more sensing modalities, including configuration and provision of notifications of occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 5;
+  revision 7;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0 [spec_name = "PIR"];
@@ -8128,6 +8130,8 @@ cluster OccupancySensing = 1030 {
     kRadar = 0x20;
     kRFSensing = 0x40;
     kVision = 0x80;
+    kPrediction = 0x100;
+    kOccupancyEvent = 0x200;
   }
 
   bitmap OccupancyBitmap : bitmap8 {
@@ -8146,6 +8150,13 @@ cluster OccupancySensing = 1030 {
     int16u holdTimeDefault = 2;
   }
 
+  struct PredictedOccupancyStruct {
+    epoch_s startTimestamp = 0;
+    epoch_s endTimestamp = 1;
+    OccupancyBitmap occupancy = 2;
+    percent confidence = 3;
+  }
+
   info event OccupancyChanged = 0 {
     OccupancyBitmap occupancy = 0;
   }
@@ -8155,6 +8166,7 @@ cluster OccupancySensing = 1030 {
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) optional int16u holdTime = 3;
   readonly attribute optional HoldTimeLimitsStruct holdTimeLimits = 4;
+  provisional readonly attribute optional PredictedOccupancyStruct predictedOccupancy[] = 5;
   attribute access(write: manage) optional int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) optional int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) optional int8u PIRUnoccupiedToOccupiedThreshold = 18;

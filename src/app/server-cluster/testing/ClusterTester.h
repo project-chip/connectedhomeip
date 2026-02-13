@@ -25,6 +25,7 @@
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/StringBuilderAdapters.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/List.h>
@@ -40,6 +41,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>

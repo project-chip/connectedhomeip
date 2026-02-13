@@ -126,6 +126,7 @@ jobs:
           "./scripts/tests/run_test_suite.py \
              --runner darwin_framework_tool_python \
              --target-skip-glob '{TestAccessControlConstraints}' \
+             --test-order random \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \

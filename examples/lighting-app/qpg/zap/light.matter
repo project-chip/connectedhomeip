@@ -415,7 +415,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -2302,7 +2302,7 @@ cluster GroupKeyManagement = 63 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared struct LabelStruct {
     char_string<16> label = 0;

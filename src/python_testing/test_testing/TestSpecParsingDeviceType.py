@@ -577,17 +577,17 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         # 4 -> 3
         # 5 - all alone
         # 6 - utility endpoint
-        one = XmlDeviceType('one', 1, [], [], 'simple', 'endpoint',
+        one = XmlDeviceType('one', 1, [], [], 'simple', 'endpoint', {1: ""},
                             superset_of_device_type_name='two', superset_of_device_type_id=2)
-        two = XmlDeviceType('two', 1, [], [], 'simple', 'endpoint',
+        two = XmlDeviceType('two', 1, [], [], 'simple', 'endpoint', {1: ""},
                             superset_of_device_type_name='three', superset_of_device_type_id=3)
-        three = XmlDeviceType('three', 1, [], [], 'simple', 'endpoint',
+        three = XmlDeviceType('three', 1, [], [], 'simple', 'endpoint', {1: ""},
                               superset_of_device_type_name=None, superset_of_device_type_id=0)
-        four = XmlDeviceType('four', 1, [], [], 'simple', 'endpoint',
+        four = XmlDeviceType('four', 1, [], [], 'simple', 'endpoint', {1: ""},
                              superset_of_device_type_name='three', superset_of_device_type_id=3)
-        five = XmlDeviceType('five', 1, [], [], 'simple', 'endpoint',
+        five = XmlDeviceType('five', 1, [], [], 'simple', 'endpoint', {1: ""},
                              superset_of_device_type_name=None, superset_of_device_type_id=0)
-        six = XmlDeviceType('six', 1, [], [], 'utility', 'endpoint',
+        six = XmlDeviceType('six', 1, [], [], 'utility', 'endpoint', {1: ""},
                             superset_of_device_type_name=None, superset_of_device_type_id=0)
         return {1: one, 2: two, 3: three, 4: four, 5: five, 6: six}
 
