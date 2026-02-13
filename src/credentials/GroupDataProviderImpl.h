@@ -106,7 +106,6 @@ public:
     // Groupcast
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
     uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
-    CHIP_ERROR getUsedMcastAddrCount(uint16_t & count) override;
 
 protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator

@@ -674,6 +674,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             return mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                                            .SetAddressType(Inet::IPAddressType::kIPv6)
                                                            .SetListenPort(port)
+                                                           .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
                                               ,
                                           Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -689,6 +690,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err              = mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                                   .SetAddressType(Inet::IPAddressType::kIPv6)
                                                   .SetListenPort(mCdcListenPort)
+                                                  .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
                                                   ,
                                               Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -800,9 +802,8 @@ void Server::RejoinExistingMulticastGroups()
             // GroupDataProvider was able to allocate rescources for an iterator
             while (iterator->Next(groupInfo))
             {
-                bool use_iana_addr =
-                    !(groupInfo.flags & static_cast<uint8_t>(Credentials::GroupDataProvider::GroupInfo::Flags::kMcastAddrPolicy));
-                if (use_iana_addr and groupcast_joined)
+                bool use_iana_addr = !groupInfo.UsePerGroupAddress();
+                if (use_iana_addr && groupcast_joined)
                 {
                     // Already joined groupcast address
                     continue;
