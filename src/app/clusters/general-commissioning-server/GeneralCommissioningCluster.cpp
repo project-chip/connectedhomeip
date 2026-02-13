@@ -230,9 +230,18 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
         return encoder.Encode(outUpdateAcceptanceDeadline.Value());
     }
 #endif
-
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    case RecoveryIdentifier::Id: {
+        chip::MutableByteSpan aRecoveryIdentifier(mRecoveryIdentifier, sizeof(mRecoveryIdentifier));
+        return encoder.Encode(aRecoveryIdentifier);
+    }
+    case NetworkRecoveryReason::Id: {
+        return encoder.Encode(mNetworkRecoveryReasonValue);
+    }
+#else  // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
     case RecoveryIdentifier::Id:
     case NetworkRecoveryReason::Id:
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
     case IsCommissioningWithoutPower::Id:
         // TODO: implement the above - they are currently PROVISIONAL and not supported by AAI
     default:
@@ -337,7 +346,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
             TCUpdateDeadline::kMetadataEntry,
         }));
     }
-
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
     if constexpr (kFeatures.Has(GeneralCommissioning::Feature::kNetworkRecovery))
     {
         ReturnErrorOnFailure(builder.AppendElements({
@@ -345,6 +354,7 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
             NetworkRecoveryReason::kMetadataEntry,
         }));
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
 
     static constexpr DataModel::AttributeEntry optionalEntries[] = {
         IsCommissioningWithoutPower::kMetadataEntry,
@@ -356,22 +366,26 @@ CHIP_ERROR GeneralCommissioningCluster::Attributes(const ConcreteClusterPath & p
 
 void GeneralCommissioningCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
     // related data on the node which was created since it was commissioned.
     if (fabricTable.FabricCount() == 0)
     {
         ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
                         static_cast<unsigned>(fabricIndex));
-
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
         TermsAndConditionsState initialState, updatedState;
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
         VerifyOrReturn(CHIP_NO_ERROR == tcProvider.ResetAcceptance());
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
         NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
-    }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+        // Set the NetworkRecoveryReason to Null, and discard the old RecoveryIdentifier by genrating new one.
+        mNetworkRecoveryReasonValue.SetNull();
+        GenerateAndSetRecoveryIdentifier();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    }
 }
 
 void GeneralCommissioningCluster::SetBreadCrumb(uint64_t value)
@@ -385,6 +399,13 @@ CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    // Generate RecoveryIdentifier if it is the first time
+    if (mClusterContext.fabricTable.FabricCount() == 0)
+    {
+        GenerateAndSetRecoveryIdentifier();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
     return mClusterContext.fabricTable.AddFabricDelegate(this);
 }
 
@@ -674,5 +695,42 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
     return std::nullopt;
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+void GeneralCommissioningCluster::SetNetworkRecoveryReasonValue(
+    GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type value)
+{
+    mNetworkRecoveryReasonValue = value;
+}
+void GeneralCommissioningCluster::GetNetworkRecoveryReasonValue(
+    GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type & value)
+{
+    value = mNetworkRecoveryReasonValue;
+}
+void GeneralCommissioningCluster::GenerateAndSetRecoveryIdentifier(void)
+{
+    uint8_t aRecoveryIdentifier[8];
+    // Generate a random byte array for the recovery identifier
+    for (uint8_t i = 0; i < 3; i++)
+    { // avoid the identifer is zero, when is zero, try more times.
+        auto err = Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(aRecoveryIdentifier), sizeof(aRecoveryIdentifier));
+        (void) err;
+        if (!chip::Encoding::BigEndian::Get64(aRecoveryIdentifier))
+        {
+            break;
+        }
+    }
+    std::memcpy(mRecoveryIdentifier, aRecoveryIdentifier, sizeof(aRecoveryIdentifier));
+}
+uint64_t GeneralCommissioningCluster::GetRecoveryIdentifier(void)
+{
+    chip::MutableByteSpan aRecoveryIdentifier(mRecoveryIdentifier, sizeof(mRecoveryIdentifier));
+    if (aRecoveryIdentifier.size() == 0)
+    {
+        return 0;
+    }
+    return chip::Encoding::BigEndian::Get64(aRecoveryIdentifier.data());
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
 
 } // namespace chip::app::Clusters

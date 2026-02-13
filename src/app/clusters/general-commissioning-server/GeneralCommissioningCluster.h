@@ -23,11 +23,13 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <clusters/GeneralCommissioning/AttributeIds.h>
+#include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/GeneralCommissioning/ClusterId.h>
 #include <clusters/GeneralCommissioning/Commands.h>
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
@@ -64,7 +66,11 @@ public:
     GeneralCommissioningCluster(Context && context, const OptionalAttributes & attrs) :
         DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mClusterContext(std::move(context)),
         mOptionalAttributes(attrs)
-    {}
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+        mNetworkRecoveryReasonValue.SetNull();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    }
 
     Context & ClusterContext() { return mClusterContext; }
 
@@ -93,9 +99,18 @@ public:
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures =
         BitFlags<GeneralCommissioning::Feature>(GeneralCommissioning::Feature::kTermsAndConditions);
+
+#elif CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures =
+        BitFlags<GeneralCommissioning::Feature>(GeneralCommissioning::Feature::kNetworkRecovery);
+
+    void SetNetworkRecoveryReasonValue(GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type value);
+    void GetNetworkRecoveryReasonValue(GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type & value);
+    void GenerateAndSetRecoveryIdentifier(void);
+    uint64_t GetRecoveryIdentifier(void);
 #else
     static constexpr BitFlags<GeneralCommissioning::Feature> kFeatures = BitFlags<GeneralCommissioning::Feature>(0);
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
 
 private:
     Context mClusterContext;
@@ -116,6 +131,11 @@ private:
     HandleSetTCAcknowledgements(const DataModel::InvokeRequest & request, CommandHandler * handler,
                                 const GeneralCommissioning::Commands::SetTCAcknowledgements::DecodableType & commandData);
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
+    GeneralCommissioning::Attributes::NetworkRecoveryReason::TypeInfo::Type mNetworkRecoveryReasonValue;
+    uint8_t mRecoveryIdentifier[8]{};
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_RECOVERY
 };
 
 } // namespace chip::app::Clusters
