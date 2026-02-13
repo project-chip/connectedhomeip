@@ -27,6 +27,7 @@
 #       --string-arg jfa_server_app:${JF_ADMIN_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -130,6 +131,12 @@ class TC_JFPKI_2_2(MatterBaseTest):
             TestStep("17", "TH sends OJCW command to DUT (check Precondition 1)",
                      "DUT responds with status code 0x06 (InvalidAdministratorFabricIndex)."),
         ]
+
+    def desc_TC_JFPKI_2_2(self):
+        return "354.1.2. [TC-JFADMIN-2.2] Validate commands behavior outside Joint Commissioning Method"
+
+    def pics_TC_JFPKI_2_2(self):
+        return ['JFPKI.S']
 
     @async_test_body
     async def test_TC_JFPKI_2_2(self):
