@@ -1212,6 +1212,162 @@ subsequent connections to that TV.
    is similar to item (3) - the pin code flow will be attempted and fail, the
    cached credential will be deleted which allows the next attempt to succeed.
    Some middleware providers may handle this scenario differently.
+### Handling Passcode Failures and Passcode Length
+
+#### Detecting Passcode Failure
+
+When commissioning fails due to an incorrect passcode, the Casting Client can detect this condition in the `onFailure` `ConnectionCallback`. The failure will be indicated by a `MatterError` with `errorCode = 0x38`, which corresponds to `CHIP_ERROR_INVALID_PASE_PARAMETER`.
+
+When this error occurs, the Casting Client should:
+1. Inform the user that the passcode was incorrect
+2. Prompt the user to re-enter the passcode
+3. Retry the connection with the new passcode
+
+On Linux, you can detect passcode failures in the connection failure callback:
+
+```c
+void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
+{
+    if(err == CHIP_ERROR_INVALID_PASE_PARAMETER)  // 0x38
+    {
+        ChipLogError(AppServer, "ConnectionHandler: Invalid passcode provided");
+        // Prompt user to re-enter the passcode and retry connection
+        ...
+    }
+    else if(err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ConnectionHandler: Connection failed with err %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+```
+
+On Android, you can detect passcode failures in the `MatterCallback<MatterError>`:
+
+```java
+new MatterCallback<MatterError>() {
+    @Override
+    public void handle(MatterError err) {
+        if (err.getErrorCode() == 0x38) {  // CHIP_ERROR_INVALID_PASE_PARAMETER
+            Log.e(TAG, "Invalid passcode provided");
+            // Prompt user to re-enter the passcode and retry connection
+            getActivity().runOnUiThread(() -> {
+                // Show dialog to re-enter passcode
+                displayPasscodeInputDialog(getActivity());
+            });
+        } else {
+            Log.e(TAG, "CastingPlayer connection failed: " + err);
+        }
+    }
+}
+```
+
+On iOS, you can detect passcode failures in the connection completion callback:
+
+```swift
+let connectionCompleteCallback: (Swift.Error?) -> Void = { err in
+    if let error = err as? MatterError, error.code == 0x38 {  // CHIP_ERROR_INVALID_PASE_PARAMETER
+        self.Log.error("Invalid passcode provided")
+        DispatchQueue.main.async {
+            // Prompt user to re-enter the passcode and retry connection
+            self.connectionStatus = "Invalid passcode. Please try again."
+            self.displayPasscodeInputDialog(on: topViewController, continueConnecting: { newPasscode in
+                // Retry connection with new passcode
+                ...
+            })
+        }
+    } else if err != nil {
+        self.Log.error("Connection failed with error: \(String(describing: err))")
+        DispatchQueue.main.async {
+            self.connectionSuccess = false
+            self.connectionStatus = "Connection failed: \(String(describing: err))"
+        }
+    }
+}
+```
+
+#### Determining Passcode Length for Entry Dialog
+
+The `passcodeLength` field is provided in the `CertificationDeclaration` sent by the TV during the commissioning process. This field indicates the expected length of the passcode that should be entered by the user.
+
+When implementing the passcode entry dialog:
+- If `passcodeLength` is `0` or not provided, the Casting Client should provide a variable-length input field for passcode entry
+- If `passcodeLength` has a specific value (e.g., 8), the Casting Client should configure the input field to accept exactly that many digits
+
+On Linux, you can access the passcode length from the `CommissionerDeclaration`:
+
+```c
+void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source,
+                                     chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
+{
+    uint8_t passcodeLength = cd.GetPasscodeLength();
+    
+    if (passcodeLength == 0) {
+        ChipLogProgress(AppServer, "Variable-length passcode expected");
+        // Display variable-length input field
+    } else {
+        ChipLogProgress(AppServer, "Fixed-length passcode expected: %d digits", passcodeLength);
+        // Display fixed-length input field with passcodeLength digits
+    }
+    
+    if (cd.GetCommissionerPasscode()) {
+        // Prompt user to enter the passcode displayed on the CastingPlayer
+        ...
+    }
+}
+```
+
+On Android, you can access the passcode length from the `CommissionerDeclaration`:
+
+```java
+new MatterCallback<CommissionerDeclaration>() {
+    @Override
+    public void handle(CommissionerDeclaration cd) {
+        int passcodeLength = cd.getPasscodeLength();
+        
+        if (cd.getCommissionerPasscode()) {
+            getActivity().runOnUiThread(() -> {
+                if (passcodeLength == 0) {
+                    Log.d(TAG, "Variable-length passcode expected");
+                    // Display variable-length input field
+                    displayPasscodeInputDialog(getActivity(), /* variableLength= */ true);
+                } else {
+                    Log.d(TAG, "Fixed-length passcode expected: " + passcodeLength + " digits");
+                    // Display fixed-length input field
+                    displayPasscodeInputDialog(getActivity(), passcodeLength);
+                }
+            });
+        }
+    }
+}
+```
+
+On iOS, you can access the passcode length from the `MCCommissionerDeclaration`:
+
+```swift
+let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { commissionerDeclarationMessage in
+    DispatchQueue.main.async {
+        let passcodeLength = commissionerDeclarationMessage.passcodeLength
+        
+        if commissionerDeclarationMessage.commissionerPasscode {
+            if let topViewController = self.getTopMostViewController() {
+                if passcodeLength == 0 {
+                    self.Log.info("Variable-length passcode expected")
+                    // Display variable-length input field
+                    self.displayPasscodeInputDialog(on: topViewController, variableLength: true, continueConnecting: { userEnteredPasscode in
+                        ...
+                    })
+                } else {
+                    self.Log.info("Fixed-length passcode expected: \(passcodeLength) digits")
+                    // Display fixed-length input field
+                    self.displayPasscodeInputDialog(on: topViewController, fixedLength: Int(passcodeLength), continueConnecting: { userEnteredPasscode in
+                        ...
+                    })
+                }
+            }
+        }
+    }
+}
+```
 
 ### Detecting App Presence on Casting Player (Optional)
 
