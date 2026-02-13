@@ -19,6 +19,9 @@ import("${chip_root}/src/system/system.gni")
 
 import("device.gni")
 
+assert(chip_enable_openthread == "DEPRECATED",
+       "chip_enable_openthread is deprecated. Please use chip_enable_thread!")
+
 if (chip_device_platform != "none" && chip_device_platform != "external") {
   declare_args() {
     # Extra header to include in CHIPDeviceConfig.h for project.
@@ -128,13 +131,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # This is used to identify which platforms implement their ThreadStackManager
     # with the otbr posix dbus api.
     chip_device_uses_otbr_posix_dbus =
-        chip_enable_openthread &&
+        chip_enable_thread &&
         (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
          chip_device_platform == "webos")
 
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
-      "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
+      "CHIP_ENABLE_OPENTHREAD=${chip_enable_thread}",
       "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
       "CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER=${chip_openthread_border_router}",
       "CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK=${chip_device_uses_otbr_posix_dbus}",
@@ -419,7 +422,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
 
-    if (chip_enable_openthread &&
+    if (chip_enable_thread &&
         (chip_device_platform != "linux" ||
          chip_system_config_use_openthread_inet_endpoints) &&
         chip_device_platform != "tizen" && chip_device_platform != "webos") {
@@ -570,7 +573,7 @@ if (chip_device_platform != "none") {
     }
 
     # Linux has its own NetworkCommissioningThreadDriver
-    if (chip_enable_openthread && chip_device_platform != "linux" &&
+    if (chip_enable_thread && chip_device_platform != "linux" &&
         chip_device_platform != "tizen" && chip_device_platform != "webos") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",

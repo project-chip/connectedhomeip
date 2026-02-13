@@ -80,6 +80,10 @@ void MatterEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoi
 
 void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterSwitchClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterSwitchClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
