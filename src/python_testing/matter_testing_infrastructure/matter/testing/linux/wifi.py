@@ -577,7 +577,9 @@ class WpaSupplicantMock(threading.Thread):
         log.info("WiFi-PAF mode enabled with NAN simulator")
 
     def get_interface_index(self, name: str) -> int:
-        """Return the index of the inteface containing given 'name'. Return -1 otherwise."""
+        """Return the index of the inteface containing given 'name'.
+        If no match is found, returns the index of the last available interface.
+        """
         name_lower = name.lower()
         for idx, param_dict in enumerate(self.interfaces_params):
             if param_dict['name'] in name_lower:  # Case-insensitive match
