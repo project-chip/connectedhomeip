@@ -2986,7 +2986,7 @@ cluster GroupKeyManagement = 63 {
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
 cluster FixedLabel = 64 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared struct LabelStruct {
     char_string<16> label = 0;
@@ -3003,7 +3003,7 @@ cluster FixedLabel = 64 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 cluster UserLabel = 65 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared struct LabelStruct {
     char_string<16> label = 0;
@@ -3982,7 +3982,7 @@ cluster OperationalState = 96 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
-  revision 1;
+  revision 3;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -4057,9 +4057,9 @@ cluster RvcOperationalState = 97 {
     ErrorStateStruct commandResponseState = 0;
   }
 
-  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  /** This command SHALL be supported if the device supports remotely pausing the operation. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  /** This command SHALL be supported if the device supports remotely resuming the operation. */
   command Resume(): OperationalCommandResponse = 3;
   /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
   command GoHome(): OperationalCommandResponse = 128;
@@ -8435,9 +8435,9 @@ endpoint 1 {
   server cluster Switch {
     emits event SwitchLatched;
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
+    callback attribute currentPosition;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster FixedLabel {
@@ -9760,10 +9760,10 @@ endpoint 3 {
     emits event LongRelease;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition default = 0;
+    callback attribute currentPosition;
     ram      attribute multiPressMax default = 3;
     ram      attribute featureMap default = 58;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 }
 endpoint 4 {
@@ -9795,10 +9795,10 @@ endpoint 4 {
 
   server cluster Switch {
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition default = 0;
+    callback attribute currentPosition;
     ram      attribute multiPressMax default = 3;
     ram      attribute featureMap default = 30;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 }
 

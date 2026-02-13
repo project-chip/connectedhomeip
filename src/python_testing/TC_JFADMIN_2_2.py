@@ -63,6 +63,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         self.fabric_a_ctrl = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_a_server_app = None
+        self.cert_authority_manager_a = None
 
         jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not jfc_server_app:
@@ -150,6 +151,10 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         if self.fabric_a_ctrl is not None:
             self.fabric_a_ctrl.terminate()
 
+        if self.cert_authority_manager_a is not None:
+            self.cert_authority_manager_a.Shutdown()
+            self.cert_authority_manager_a = None
+
         super().teardown_class()
 
     def steps_TC_JFADMIN_2_2(self) -> list[TestStep]:
@@ -175,11 +180,11 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
-        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
+        self.cert_authority_manager_a = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
-        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+        self.cert_authority_manager_a.LoadAuthoritiesFromStorage()
+        devCtrlEcoA = self.cert_authority_manager_a.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])

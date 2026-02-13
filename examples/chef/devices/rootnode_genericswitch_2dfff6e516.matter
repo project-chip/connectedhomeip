@@ -1946,12 +1946,12 @@ endpoint 1 {
     emits event ShortRelease;
     emits event LongRelease;
     persist  attribute numberOfPositions default = 3;
-    persist  attribute currentPosition default = 0;
+    callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0xE;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 }
 

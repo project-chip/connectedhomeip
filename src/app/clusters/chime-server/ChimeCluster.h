@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Chime/Attributes.h>
 #include <clusters/Chime/Commands.h>
@@ -32,13 +33,19 @@ class ChimeDelegate;
 class ChimeCluster : public DefaultServerCluster
 {
 public:
+    struct Context
+    {
+        ChimeDelegate & delegate;
+        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
+    };
+
     /**
      * Creates a Chime Cluster instance.
      * @param aEndpointId The endpoint on which this cluster exists.
-     * @param aDelegate A reference to the delegate to be used by this server.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param context The context containing injected dependencies.
+     * Note: the caller must ensure that the provided dependencies live throughout the instance's lifetime.
      */
-    ChimeCluster(EndpointId endpointId, ChimeDelegate & delegate);
+    ChimeCluster(EndpointId endpointId, const Context & context);
     ~ChimeCluster();
 
     // Attribute Setters
@@ -89,7 +96,7 @@ public:
                                                                CommandHandler * handler) override;
 
 private:
-    ChimeDelegate & mDelegate;
+    Context mContext;
 
     // Attribute local storage
     uint8_t mSelectedChime = 0;
