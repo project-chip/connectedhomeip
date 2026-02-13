@@ -20,23 +20,57 @@
 #include "bridge_cmd_defs.h"
 #include "webrtc_bridge.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
+#include "freertos/task.h"
 
 extern int query_snapshot_command_register_response_handler(void);
 static uint8_t s_last_quality = 1;
+
+// Structure to hold snapshot data for queue
+struct SnapshotData {
+    uint8_t* data;
+    size_t len;
+    esp_err_t status;
+};
+
+// FreeRTOS queue to pass snapshot data from callback to CaptureSnapshot
+static QueueHandle_t s_snapshot_queue = nullptr;
+static constexpr int SNAPSHOT_QUEUE_SIZE = 1;
+static constexpr TickType_t SNAPSHOT_TIMEOUT_MS = pdMS_TO_TICKS(5000); // 5 second timeout
+
 static void snapshot_response_cb(uint32_t cmd_id, uint32_t seq_id, esp_err_t status, uint8_t * resp_data, size_t resp_len)
 {
     (void) cmd_id;
     (void) seq_id;
 
+    if (!s_snapshot_queue)
+    {
+        ESP_LOGE("snapshot_response_cb", "Snapshot queue not initialized");
+        if (resp_data) free(resp_data);
+        return;
+    }
+
+    SnapshotData snapshot;
+    snapshot.status = status;
+
     if (status != ESP_OK)
     {
         ESP_LOGE("snapshot_response_cb", "Snapshot request failed: %s", esp_err_to_name(status));
+        snapshot.data = nullptr;
+        snapshot.len = 0;
+        xQueueSend(s_snapshot_queue, &snapshot, 0);
+        if (resp_data) free(resp_data);
         return;
     }
 
     if (!resp_data || resp_len == 0)
     {
         ESP_LOGE("snapshot_response_cb", "Empty snapshot response");
+        snapshot.data = nullptr;
+        snapshot.len = 0;
+        snapshot.status = ESP_ERR_INVALID_RESPONSE;
+        xQueueSend(s_snapshot_queue, &snapshot, 0);
         return;
     }
 
@@ -49,8 +83,16 @@ static void snapshot_response_cb(uint32_t cmd_id, uint32_t seq_id, esp_err_t sta
         ESP_LOGW("snapshot_response_cb", "Snapshot data received but JPEG header not found (%zu bytes)", resp_len);
     }
 
-    printf("Snapshot: %zu bytes (quality=%u)\n", resp_len, s_last_quality);
-    free(resp_data);
+    // Store the snapshot data (don't free it here - it will be freed after use in CaptureSnapshot)
+    snapshot.data = resp_data;
+    snapshot.len = resp_len;
+
+    // Send to queue (non-blocking, should always succeed since queue size is 1 and we wait in CaptureSnapshot)
+    if (xQueueSend(s_snapshot_queue, &snapshot, 0) != pdTRUE)
+    {
+        ESP_LOGE("snapshot_response_cb", "Failed to send snapshot to queue");
+        free(resp_data);
+    }
 }
 
 using namespace chip::app::Clusters;
@@ -78,6 +120,16 @@ void CameraDevice::Init()
     /* Initialize bridge command framework (bridge is started inside app_webrtc_run) */
     if (bridge_cmd_init() != ESP_OK) {
         ESP_LOGE("CameraDevice::Init", "Failed to initialize bridge command subsystem");
+    }
+
+    // Create queue for snapshot data
+    if (!s_snapshot_queue)
+    {
+        s_snapshot_queue = xQueueCreate(SNAPSHOT_QUEUE_SIZE, sizeof(SnapshotData));
+        if (!s_snapshot_queue)
+        {
+            ESP_LOGE("CameraDevice::Init", "Failed to create snapshot queue");
+        }
     }
 
     bridge_cmd_register_response_handler(BRIDGE_CMD_GET_SNAPSHOT, snapshot_response_cb);
@@ -171,20 +223,23 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         matchedCodec = it->snapshotStreamParams.imageCodec;
     }
 
-    // Create a dummy JPEG image
-    static const uint8_t dummy_jpeg[] = {
-        0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00,
-        // 0x00, 0xFF, 0xDB, 0x00, 0x43, 0x00, 0x08, 0x06, 0x06, 0x07, 0x06, 0x05, 0x08, 0x07, 0x07, 0x07, 0x09, 0x09, 0x08,
-        // 0x0A, 0x0C, 0x14, 0x0D, 0x0C, 0x0B, 0x0B, 0x0C, 0x19, 0x12, 0x13, 0x0F, 0x14, 0x1D, 0x1A, 0x1F, 0x1E, 0x1D, 0x1A,
-        // 0x1C, 0x1C, 0x20, 0x24, 0x2E, 0x27, 0x20, 0x22, 0x2C, 0x23, 0x1C, 0x1C, 0x28, 0x37, 0x29, 0x2C, 0x30, 0x31, 0x34,
-        // 0x34, 0x34, 0x1F, 0x27, 0x39, 0x3D, 0x38, 0x32, 0x3C, 0x2E, 0x33, 0x34, 0x32, 0xFF, 0xC0, 0x00, 0x11, 0x08, 0x00,
-        // 0x20, 0x00, 0x20, 0x01, 0x11, 0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, 0xFF, 0xC4, 0x00, 0x14, 0x00, 0x01, 0x00,
-        // 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0xFF, 0xC4, 0x00,
-        // 0x14, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        // 0xFF, 0xDA, 0x00, 0x0C, 0x03, 0x01, 0x00, 0x02, 0x11, 0x03, 0x11, 0x00, 0x3F, 0x00, 0x80, 0xFF, 0xD9
-    };
-
     ESP_LOGI("CameraDevice::CaptureSnapshot", "Requesting JPEG snapshot from streaming device (quality=%u)...", s_last_quality);
+
+    if (!s_snapshot_queue)
+    {
+        ESP_LOGE("CameraDevice::CaptureSnapshot", "Snapshot queue not initialized");
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    // Clear any pending data in the queue
+    SnapshotData dummy;
+    while (xQueueReceive(s_snapshot_queue, &dummy, 0) == pdTRUE)
+    {
+        if (dummy.data)
+        {
+            free(dummy.data);
+        }
+    }
 
     bridge_cmd_snapshot_req_t req = {
         .quality = s_last_quality,
@@ -195,16 +250,39 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     if (err != ESP_OK)
     {
         ESP_LOGE("CameraDevice::CaptureSnapshot", "Failed to send snapshot request: %s", esp_err_to_name(err));
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
-    printf("Request sent. Snapshot will be printed when the response is received.\n");
+    // Wait for snapshot data from callback
+    SnapshotData snapshot;
+    if (xQueueReceive(s_snapshot_queue, &snapshot, SNAPSHOT_TIMEOUT_MS) != pdTRUE)
+    {
+        ESP_LOGE("CameraDevice::CaptureSnapshot", "Timeout waiting for snapshot response");
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
 
-    // Copy the dummy JPEG data to the output
-    outImageSnapshot.data.assign(dummy_jpeg, dummy_jpeg + sizeof(dummy_jpeg));
+    // Check if snapshot was successful
+    if (snapshot.status != ESP_OK || !snapshot.data || snapshot.len == 0)
+    {
+        ESP_LOGE("CameraDevice::CaptureSnapshot", "Snapshot failed: status=%s, data=%p, len=%zu",
+                 esp_err_to_name(snapshot.status), snapshot.data, snapshot.len);
+        if (snapshot.data)
+        {
+            free(snapshot.data);
+        }
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    // Copy the actual snapshot data to the output
+    outImageSnapshot.data.assign(snapshot.data, snapshot.data + snapshot.len);
+
+    // Free the snapshot data now that we've copied it
+    free(snapshot.data);
 
     outImageSnapshot.imageRes   = matchedRes;
     outImageSnapshot.imageCodec = matchedCodec;
 
+    ESP_LOGI("CameraDevice::CaptureSnapshot", "Snapshot captured successfully: %zu bytes", snapshot.len);
     return CameraError::SUCCESS;
 }
 
