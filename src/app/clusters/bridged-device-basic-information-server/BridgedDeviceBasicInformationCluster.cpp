@@ -88,7 +88,8 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
     case UniqueID::Id:
         return encoder.Encode(ToSpan(mRequiredData.uniqueId));
     case ProductAppearance::Id:
-        return encoder.Encode(mFixedData.productAppearance.value_or({}));
+        return encoder.Encode(
+            mFixedData.productAppearance.value_or(BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type{}));
     case ConfigurationVersion::Id:
         return encoder.Encode(mFixedData.configurationVersion.value_or(0));
     default:
