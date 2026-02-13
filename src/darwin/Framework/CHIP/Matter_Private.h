@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRCommandPayloadsObjc.h>
-#import <Matter/MTRDefines.h>
-#import <Matter/MTRStructsObjc.h>
+#import <Matter/Matter.h>
+
+#define MTR_INCLUDED_FROM_PRIVATE_UMBRELLA_HEADER
+
+#import <Matter/MTRBaseClusters_Private.h>
+#import <Matter/MTRClusterConstants_Private.h>
+#import <Matter/MTRClusters_Private.h>
+#import <Matter/MTRCommandPayloadsObjc_Private.h>
 #import <Matter/MTRStructsObjc_Private.h>
 
-NS_ASSUME_NONNULL_BEGIN
-// Nothing here for now, but leaving this file in place in case we need to add
-// something.
-
-NS_ASSUME_NONNULL_END
+#undef MTR_INCLUDED_FROM_PRIVATE_UMBRELLA_HEADER
