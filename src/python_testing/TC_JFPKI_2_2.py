@@ -42,7 +42,7 @@ import matter.clusters as Clusters
 import matter.discovery as Discovery
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.apps import JFAdministratorSubprocess
+from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
@@ -52,12 +52,16 @@ log = logging.getLogger(__name__)
 
 
 class TC_JFPKI_2_2(MatterBaseTest):
+    _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
+    _OPERATIONAL_CREDENTIALS_ENDPOINT = 0
+    _GENERAL_COMMISSIONING_ENDPOINT = 0
 
     @async_test_body
     async def setup_class(self):
         super().setup_class()
 
-        self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
+        self.fabric_storage = self.user_params.get("fabric_storage", None)
+        self.storage_directory_ecosystem_a = None
 
         self.jfa_server_app = self.user_params.get("jfa_server_app", None)
         if not self.jfa_server_app:
@@ -65,38 +69,31 @@ class TC_JFPKI_2_2(MatterBaseTest):
         if not os.path.exists(self.jfa_server_app):
             asserts.fail(f"The path {self.jfa_server_app} does not exist")
 
-        # Create a temporary storage directory for both ecosystems to keep KVS files if not already provided by user.
-        if self.storage_fabric_a is None:
+        # Create a temporary storage directory to keep KVS files if not already provided by user.
+        if self.fabric_storage is None:
             self.storage_directory_ecosystem_a = tempfile.TemporaryDirectory(prefix=self.__class__.__name__+"_A_")
-            self.storage_fabric_a = self.storage_directory_ecosystem_a.name
-            log.info("Temporary storage directory: %s", self.storage_fabric_a)
+            self.fabric_storage = self.storage_directory_ecosystem_a.name
+            log.info("Temporary storage directory: %s", self.fabric_storage)
 
-        #####################################################################################################################################
-        #
-        # Initialize Ecosystem A
-        #
-        #####################################################################################################################################
-        self.jfadmin_fabric_a_passcode = random.randint(20202021, 20202099)
-        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
+        self.admin_passcode = random.randint(20202021, 20202099)
+        self.admin_discriminator = random.randint(0, 4095)
 
-        # Start Fabric A JF-Administrator App
-        self.fabric_a_admin = JFAdministratorSubprocess(
+        # Start JF-Administrator App
+        self.jf_admin = AppServerSubprocess(
             self.jfa_server_app,
-            "JFA_A",
-            storage_dir=self.storage_fabric_a,
+            storage_dir=self.fabric_storage,
             port=random.randint(5001, 5999),
-            discriminator=self.jfadmin_fabric_a_discriminator,
-            passcode=self.jfadmin_fabric_a_passcode,
+            discriminator=self.admin_discriminator,
+            passcode=self.admin_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
-        self.fabric_a_admin.start(
+        self.jf_admin.start(
             expected_output="Server initialization complete",
             timeout=10)
 
     def teardown_class(self):
-        # Stop all Subprocesses that were started in this test case
-        if self.fabric_a_admin is not None:
-            self.fabric_a_admin.terminate()
-
+        self.jf_admin.terminate()
+        if self.storage_directory_ecosystem_a is not None:
+            self.storage_directory_ecosystem_a.cleanup()
         super().teardown_class()
 
     def steps_TC_JFPKI_2_2(self) -> list[TestStep]:
@@ -140,176 +137,90 @@ class TC_JFPKI_2_2(MatterBaseTest):
 
         await self.default_controller.CommissionOnNetwork(
             nodeId=self.dut_node_id,
-            setupPinCode=self.jfadmin_fabric_a_passcode,
+            setupPinCode=self.admin_passcode,
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
-            filter=self.jfadmin_fabric_a_discriminator,
+            filter=self.admin_discriminator,
         )
 
         self.step("2")
-        try:
-            await self.send_single_cmd(
-                dev_ctrl=self.default_controller,
-                node_id=self.dut_node_id,
-                endpoint=1,
-                cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.FailsafeRequired,
-                f'Expected FailsafeRequired error, but got {str(e)}',
-            )
-        else:
-            asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
+        await self._assert_im_error(
+            cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest(),
+            expected_status=Status.FailsafeRequired,
+            error_label="FailsafeRequired",
+        )
 
         self.step("3")
-        expiry_failsafe_step_3 = 10
-        await self._arm_failsafe(expiry_failsafe_step_3)
+        await self._arm_failsafe(10)
 
         self.step("4")
-        try:
-            await self.send_single_cmd(
-                dev_ctrl=self.default_controller,
-                node_id=self.dut_node_id,
-                endpoint=1,
-                cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.Failure,
-                f'Expected Failure status for VIDNotVerified, but got {str(e)}',
-            )
-            asserts.assert_equal(
-                e.clusterStatus,
-                Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kVIDNotVerified,
-                f'Expected VIDNotVerified error, but got {str(e)}',
-            )
-        else:
-            asserts.assert_true(False, 'Expected InteractionModelError with VIDNotVerified, but no exception occurred.')
+        await self._assert_im_error(
+            cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest(),
+            expected_status=Status.Failure,
+            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kVIDNotVerified,
+            error_label="VIDNotVerified",
+        )
 
         self.step("5")
         response = await self.default_controller.ReadAttribute(
             nodeId=self.dut_node_id,
-            attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            attributes=[(self._OPERATIONAL_CREDENTIALS_ENDPOINT, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         icac1 = response[0][Clusters.OperationalCredentials].NOCs[0].icac
         await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=1,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
 
         self.step("6")
-        try:
-            await self.send_single_cmd(
-                dev_ctrl=self.default_controller,
-                node_id=self.dut_node_id,
-                endpoint=1,
-                cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.ConstraintError,
-                f'Expected ConstraintError status, but got {str(e)}',
-            )
-        else:
-            asserts.assert_true(False, 'Expected InteractionModelError with ConstraintError, but no exception occurred.')
-
-        # # Get the ICAC from JF-Admin
-        # response = await self.default_controller.ReadAttribute(
-        #     nodeId=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
-        #     returnClusterObject=True)
-        # _icac = response[0][Clusters.OperationalCredentials].NOCs[0].icac
-        # cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(_icac)
-        # try:
-        #     await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd, endpoint=1)
-        # except InteractionModelError as e:
-        #     asserts.assert_equal(
-        #         e.status,
-        #         Status.FailsafeRequired,
-        #         f'Expected FailsafeRequired error, but got {str(e)}',
-        #     )
-        # else:
-        #     asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
+        await self._assert_im_error(
+            cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest(),
+            expected_status=Status.ConstraintError,
+            error_label="ConstraintError",
+        )
 
         self.step("7")
         await self._expire_failsafe()
-        # await self.send_single_cmd(
-        #     dev_ctrl=self.default_controller,
-        #     node_id=self.dut_node_id,
-        #     cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
 
         self.step("8")
-        try:
-            await self.send_single_cmd(
-                dev_ctrl=self.default_controller,
-                node_id=self.dut_node_id,
-                endpoint=1,
-                cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.FailsafeRequired,
-                f'Expected FailsafeRequired error, but got {str(e)}',
-            )
-        else:
-            asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
-        # cmd = Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
-        # csr_update = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
-        # new_noc_chain = await self.default_controller.IssueNOCChain(csr_update, self.dut_node_id)
-        # cmd = Clusters.JointFabricAdministrator.Commands.AnnounceJointFabricAdministrator(1)
-        # await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd, endpoint=1)
-        # cmd = Clusters.JointFabricAdministrator.Commands.ICACCSRRequest()
-        # await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd, endpoint=1)
-        # cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(new_noc_chain.icacBytes)
-        # try:
-        #    await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd, endpoint=1)
-        # except InteractionModelError as e:
-        #     asserts.assert_in('InvalidICAC (0x02)',
-        #                       str(e), f'Expected InvalidICAC error, but got {str(e)}')
-        # else:
-        #     asserts.assert_true(False, 'Expected InteractionModelError with InvalidICAC, but no exception occurred.')
+        await self._assert_im_error(
+            cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1),
+            expected_status=Status.FailsafeRequired,
+            error_label="FailsafeRequired",
+        )
+
         self.step("9")
 
-        expiry_failsafe_step_9 = 20
-        await self._arm_failsafe(expiry_failsafe_step_9)
+        await self._arm_failsafe(20)
 
         self.step("10")
-        resp = await self.send_single_cmd(
+        await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=1,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
 
         self.step("11")
-        try:
-            await self.send_single_cmd(
-                dev_ctrl=self.default_controller,
-                node_id=self.dut_node_id,
-                endpoint=1,
-                cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.ConstraintError,
-                f'Expected ConstraintError status, but got {str(e)}',
-            )
-        else:
-            asserts.assert_true(False, 'Expected InteractionModelError with ConstraintError, but no exception occurred.')
+        await self._assert_im_error(
+            cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac1),
+            expected_status=Status.ConstraintError,
+            error_label="ConstraintError",
+        )
 
         self.step("12")
         await self._expire_failsafe()
 
         self.step("13")
-        expiry_failsafe_step_13 = 20
-        await self._arm_failsafe(expiry_failsafe_step_13)
+        await self._arm_failsafe(20)
 
         self.step("14")
+
         # Create a second CA to generate an ICAC that is valid but chained to a different RCAC than the TH controller fabric RCAC.
         csr_nonce = random.randbytes(32)
         csr_response = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=0,
+            endpoint=self._OPERATIONAL_CREDENTIALS_ENDPOINT,
             cmd=Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=csr_nonce, isForUpdateNOC=True))
         other_ca = self.certificate_authority_manager.NewCertificateAuthority()
         other_admin = other_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=0x1234)
@@ -321,7 +232,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=1,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(other_icac))
         asserts.assert_true(
             isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
@@ -334,11 +245,9 @@ class TC_JFPKI_2_2(MatterBaseTest):
         )
 
         self.step("15")
-        expiry_failsafe_step_15 = 20
-
         # Reset fail-safe context: AddICAC can only be invoked once per armed fail-safe session.
         await self._expire_failsafe()
-        await self._arm_failsafe(expiry_failsafe_step_15)
+        await self._arm_failsafe(20)
 
         # Generate a new ICAC using the old CSR Response, which will have the wrong public key for this fail-safe context.
         icac_wrong_public_key = await self.default_controller.IssueNOCChain(csr_response, self.dut_node_id)
@@ -347,7 +256,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=1,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(icac_wrong_public_key.icacBytes))
         asserts.assert_true(
             isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
@@ -361,18 +270,16 @@ class TC_JFPKI_2_2(MatterBaseTest):
 
         self.step("16")
 
-        expiry_failsafe_step_16 = 20
-
         # Reset fail-safe context: AddICAC can only be invoked once per armed fail-safe session.
         await self._expire_failsafe()
-        await self._arm_failsafe(expiry_failsafe_step_16)
+        await self._arm_failsafe(20)
 
         # Create a valid ICAC for the current fail-safe context.
         csr_nonce = random.randbytes(32)
         csr_response_step16 = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=0,
+            endpoint=self._OPERATIONAL_CREDENTIALS_ENDPOINT,
             cmd=Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=csr_nonce, isForUpdateNOC=True))
         valid_icac_chain = await self.default_controller.IssueNOCChain(csr_response_step16, self.dut_node_id)
 
@@ -386,7 +293,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=1,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
             cmd=Clusters.JointFabricAdministrator.Commands.AddICAC(invalid_dn_icac))
         asserts.assert_true(
             isinstance(resp, Clusters.JointFabricAdministrator.Commands.ICACResponse),
@@ -405,7 +312,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         try:
             await self.default_controller.OpenJointCommissioningWindow(
                 nodeId=self.dut_node_id,
-                endpointId=1,
+                endpointId=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
                 timeout=400,
                 iteration=random.randint(1000, 100000),
                 discriminator=random.randint(0, 4095),
@@ -417,16 +324,17 @@ class TC_JFPKI_2_2(MatterBaseTest):
                 f'Expected InvalidAdministratorFabricIndex status code (0x06), but got 0x{(e.err & 0xFF):02x} ({str(e)})',
             )
         else:
-            asserts.assert_true(
-                False,
-                'Expected ChipStackError with InvalidAdministratorFabricIndex, but no exception occurred.',
-            )
+            asserts.fail('Expected ChipStackError with InvalidAdministratorFabricIndex, but no exception occurred.')
 
     async def _arm_failsafe(self, expiry_length_seconds):
+        """
+        Sends the ArmFailSafe command to the General Commissioning Cluster of the DUT, with breadcrumb=1 and expiryLengthSeconds
+        passed in as an argument.
+        """
         resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            endpoint=0,
+            endpoint=self._GENERAL_COMMISSIONING_ENDPOINT,
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=expiry_length_seconds, breadcrumb=1))
         asserts.assert_true(
             isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
@@ -446,6 +354,29 @@ class TC_JFPKI_2_2(MatterBaseTest):
         > for side-effects of expiration).
         """
         await self._arm_failsafe(0)
+
+    async def _assert_im_error(self, cmd, expected_status, expected_cluster_status=None, error_label=None):
+        try:
+            await self.send_single_cmd(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id,
+                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+                cmd=cmd)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                expected_status,
+                f"Expected {expected_status} status, but got {str(e)}",
+            )
+            if expected_cluster_status is not None:
+                asserts.assert_equal(
+                    e.clusterStatus,
+                    expected_cluster_status,
+                    f"Expected {expected_cluster_status} cluster status, but got {str(e)}",
+                )
+        else:
+            expected_error = error_label if error_label is not None else expected_status
+            asserts.fail(f"Expected InteractionModelError with {expected_error}, but no exception occurred.")
 
 
 if __name__ == "__main__":
