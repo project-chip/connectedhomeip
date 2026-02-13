@@ -1,4 +1,4 @@
-module Matter.Private {
+framework module Matter_Private [system] {
     umbrella header "Matter_Private.h"
     export *
 
