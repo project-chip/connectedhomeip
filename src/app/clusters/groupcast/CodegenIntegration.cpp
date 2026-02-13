@@ -52,10 +52,12 @@ public:
         Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
         VerifyOrDie(groupDataProvider != nullptr); // we require app main to set this before cluster startup
 
-        gServer.Create(GroupcastContext{
-            .fabrics  = Server::GetInstance().GetFabricTable(),
-            .provider = *groupDataProvider,
-        });
+        gServer.Create(
+            GroupcastContext{
+                .fabrics  = Server::GetInstance().GetFabricTable(),
+                .provider = *groupDataProvider,
+            },
+            BitFlags<Groupcast::Feature>(featureMap));
         return gServer.Registration();
     }
 
@@ -84,7 +86,7 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
             .clusterId                 = Groupcast::Id,
             .fixedClusterInstanceCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
