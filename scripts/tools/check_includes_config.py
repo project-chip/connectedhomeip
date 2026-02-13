@@ -55,6 +55,19 @@ IGNORE: Set[str] = {
     '/platform/ASR/',
     '/platform/NuttX/',
     r'POSIX\.h$',
+
+    # These running on large systems, so no restrictions
+    #   - bridges
+    #   - cameras
+    # keep-sorted: start
+    'src/app/clusters/bridged-device-basic-information-server/',
+    'src/app/clusters/camera-av-settings-user-level-management-server/',
+    'src/app/clusters/camera-av-stream-management-server/',
+    'src/app/clusters/push-av-stream-transport-server/',
+    'src/app/clusters/webrtc-transport-provider-server/',
+    'src/app/clusters/webrtc-transport-requestor-server/',
+    'src/app/clusters/zone-management-server/',
+    # keep-sorted: end
 }
 
 
@@ -136,20 +149,6 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/media-input-server/media-input-delegate.h': {'list'},
     'src/app/clusters/media-playback-server/media-playback-delegate.h': {'list'},
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
-    # WebRTCTransportProvider is for Camera and is intended to run on devices that are capable of handling these types.
-    'src/app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h': {'string', 'vector'},
-    # Camera AV Stream Management and Camera AV Settings User Level Management clusters are expected to run on resource-capable devices
-    'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h': {'vector'},
-    'src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp': {'set'},
-    'src/app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementCluster.h': {'string', 'vector'},
-    'src/app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h': {'string', 'vector'},
-    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
-    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
-    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
-    'src/app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.cpp': {'set'},
-    'src/app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h': {'vector'},
-    'src/app/clusters/zone-management-server/zone-management-server.h': {'vector'},
-    'src/app/clusters/zone-management-server/zone-geometry.h': {'vector', 'set'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
     'src/credentials/attestation_verifier/TestDACRevocationDelegateImpl.cpp': {'fstream'},
