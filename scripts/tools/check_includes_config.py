@@ -56,7 +56,7 @@ IGNORE: Set[str] = {
     '/platform/NuttX/',
     r'POSIX\.h$',
 
-    # These running on large systems, so no restrictions
+    # These run on large systems, so no restrictions
     #   - bridges
     #   - cameras
     #   - commissioners
@@ -83,6 +83,7 @@ IGNORE: Set[str] = {
     'src/app/clusters/webrtc-transport-requestor-server/',
     'src/app/clusters/zone-management-server/',
     'src/controller/',
+    'src/credentials/jcm/',
     'src/lib/support/jsontlv/',
     'src/setup_payload/',
     'src/tracing/esp32_diagnostics/',
@@ -161,9 +162,6 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Uses platform-define to switch between list and array
     'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
-
-    'src/credentials/jcm/TrustVerification.h': {'string'},
-    'src/credentials/jcm/VendorIdVerificationClient.h': {'string'},
 
     # Not intended for embedded clients
     'src/app/PendingResponseTrackerImpl.h': {'unordered_set'},
