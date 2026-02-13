@@ -75,6 +75,7 @@ public:
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    void OnFailSafeTimerExpired();
 
 private:
     CHIP_ERROR ReadAdministratorFabricIndex(AttributeValueEncoder & aEncoder);
@@ -103,6 +104,18 @@ private:
 };
 
 JointFabricAdministratorGlobalInstance gJointFabricAdministratorGlobalInstance;
+
+namespace {
+void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        auto * instance = reinterpret_cast<JointFabricAdministratorGlobalInstance *>(arg);
+        VerifyOrReturn(instance != nullptr);
+        instance->OnFailSafeTimerExpired();
+    }
+}
+} // anonymous namespace
 
 CHIP_ERROR JointFabricAdministratorGlobalInstance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -252,8 +265,6 @@ void JointFabricAdministratorGlobalInstance::HandleAnnounceJointFabricAdministra
             }
         }
 
-        // TODO: Potential edge case: if TrustVerification is interrupted such that this callback isn't invoked,
-        // CleanupAnnounceJFA wouldn't run and HandleAnnounceJointFabricAdministrator will permanently return Status::Busy.
         CleanupAnnounceJFA();
     };
 
@@ -281,6 +292,13 @@ void JointFabricAdministratorGlobalInstance::CleanupAnnounceJFA()
 {
     mActiveCommissionee.reset();
     mActiveCommandHandle.reset();
+}
+
+void JointFabricAdministratorGlobalInstance::OnFailSafeTimerExpired()
+{
+    CleanupAnnounceJFA();
+    Server::GetInstance().GetJointFabricAdministrator().ClearVidVerificationForFabric();
+    Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(kInvalidEndpointId);
 }
 
 void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext & ctx,
@@ -458,10 +476,13 @@ void MatterJointFabricAdministratorPluginServerInitCallback()
     ChipLogProgress(DataManagement, "JointFabricAdministrator: initializing");
     AttributeAccessInterfaceRegistry::Instance().Register(&gJointFabricAdministratorGlobalInstance);
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gJointFabricAdministratorGlobalInstance));
+    ReturnOnFailure(DeviceLayer::PlatformMgr().AddEventHandler(
+        OnPlatformEventHandler, reinterpret_cast<intptr_t>(&gJointFabricAdministratorGlobalInstance)));
 }
 
 void MatterJointFabricAdministratorPluginServerShutdownCallback()
 {
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler);
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gJointFabricAdministratorGlobalInstance);
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gJointFabricAdministratorGlobalInstance));
 }
