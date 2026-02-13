@@ -20,7 +20,7 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 app_data_model = "${chip_root}/examples/evse-app/evse-common"
 chip_enable_ota_requestor = false
-chip_enable_openthread = true
+chip_enable_thread = true
 
 sl_enable_test_event_trigger = true
 

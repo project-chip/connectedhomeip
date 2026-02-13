@@ -20,7 +20,7 @@ import("../factory_data_config.gni")
 
 assert(chip_device_platform == "cc13x4_26x4")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -85,7 +85,7 @@ static_library("cc13x4_26x4") {
     sources += [ "OTAImageProcessorImpl.cpp" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti",

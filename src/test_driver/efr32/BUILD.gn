@@ -96,7 +96,7 @@ source_set("efr32_test_main") {
   ]
 
   # OpenThread Settings
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
