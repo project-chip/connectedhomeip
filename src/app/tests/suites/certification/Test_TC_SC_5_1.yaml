@@ -84,7 +84,7 @@ tests:
           2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
           00000000000000000000000000000001 4)EpochStartTime0: 111 5)EpochKey1:
           00000000000000000000000000000002 6)EpochStartTime1: 222 7)EpochKey2:
-          00000000000000000000000000000003 8)EpochStartTime2: 333 
+          00000000000000000000000000000003 8)EpochStartTime2: 333
           9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
