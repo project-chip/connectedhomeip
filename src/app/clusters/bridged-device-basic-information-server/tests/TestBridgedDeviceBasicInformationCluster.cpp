@@ -294,7 +294,6 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestActiveChangedEvent)
     // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
-
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestFeatureMap)
 {
     // Test without ICD delegate
