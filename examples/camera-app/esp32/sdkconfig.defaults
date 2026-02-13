@@ -65,7 +65,7 @@ CONFIG_MBEDTLS_HKDF_C=y
 CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
 
 
-#Singnling Specific config
+#Signaling Specific config
 
 # Signalling only defaults to C6
 CONFIG_IDF_TARGET="esp32c6"

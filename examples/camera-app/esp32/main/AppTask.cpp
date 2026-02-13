@@ -28,7 +28,7 @@
 
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10
-#define APP_TASK_STACK_SIZE (3072)
+#define APP_TASK_STACK_SIZE (1024*6)
 #define BUTTON_PRESSED 1
 
 using namespace ::chip;
@@ -83,8 +83,8 @@ CHIP_ERROR AppTask::Init()
     CameraAppInit(&gCameraDevice);
     PlatformMgr().UnlockChipStack();
 
-    standbyButton.Init();
-    standbyButton.SetButtonPressCallback(ButtonEventHandler);
+    // standbyButton.Init();
+    // standbyButton.SetButtonPressCallback(ButtonEventHandler);
 
     return err;
 }
