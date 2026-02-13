@@ -29,7 +29,7 @@ class BridgedDeviceIcdDelegate
 public:
     virtual ~BridgedDeviceIcdDelegate() = default;
 
-    /// Notification taht a keep active was requested.
+    /// Notification that a keep active was requested.
     ///
     /// NOTE: Specification requires an `ActiveChanged` event to be generated once the device is active.
     ///       Implementations should ensure that the bridged device `GenerateActiveChangedEvent` is triggered
