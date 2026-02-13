@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericCluster
 
 {{> commandDeclarations}}
