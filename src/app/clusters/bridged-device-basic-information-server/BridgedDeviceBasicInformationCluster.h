@@ -88,7 +88,7 @@ public:
     const FixedData & GetFixedData() const { return mFixedData; }
 
     void GenerateLeaveEvent();
-    void GenerateActiveChangedEvent(uint32_t promoisedActiveMs);
+    void GenerateActiveChangedEvent(uint32_t promisedActiveMs);
 
     /// ServerClusterInterface (DefaultServerCluster overrides)
 

@@ -171,12 +171,12 @@ void BridgedDeviceBasicInformationCluster::GenerateLeaveEvent()
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void BridgedDeviceBasicInformationCluster::GenerateActiveChangedEvent(uint32_t promoisedActiveMs)
+void BridgedDeviceBasicInformationCluster::GenerateActiveChangedEvent(uint32_t promisedActiveMs)
 {
     VerifyOrReturn(mContext != nullptr);
 
     BridgedDeviceBasicInformation::Events::ActiveChanged::Type event;
-    event.promisedActiveDuration = promoisedActiveMs;
+    event.promisedActiveDuration = promisedActiveMs;
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
