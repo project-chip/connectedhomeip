@@ -22,9 +22,8 @@ Git: 0.9-summer2026
 Alchemy: v1.6.9
 -->
 <!--
-TODO: GroupKeySetStruct has been manually modified to non-fabric-scoped.
-TODO: GroupKeySetStruct has been manually modified to remove GroupKeyMulticastPolicy field.
-Both changes have to be done in the spec or Alchemy's errata and then the file has to be regenerated.
+TODO: GroupKeySetStruct has been manually modified to non-fabric-scoped. 
+The change has to be done in the spec or Alchemy's errata.
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
@@ -63,6 +62,7 @@ Both changes have to be done in the spec or Alchemy's errata and then the file h
     <item fieldId="5" name="EpochStartTime1" type="epoch_us" isNullable="true"/>
     <item fieldId="6" name="EpochKey2" type="octet_string" length="16" isNullable="true" minLength="16"/>
     <item fieldId="7" name="EpochStartTime2" type="epoch_us" isNullable="true"/>
+    <item fieldId="8" name="GroupKeyMulticastPolicy" type="GroupKeyMulticastPolicyEnum" max="0x01"/>
   </struct>
 
   <struct name="GroupcastAdoptionStruct" apiMaturity="provisional" isFabricScoped="true">

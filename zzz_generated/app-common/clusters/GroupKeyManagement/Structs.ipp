@@ -156,6 +156,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kEpochStartTime1), epochStartTime1);
     encoder.Encode(to_underlying(Fields::kEpochKey2), epochKey2);
     encoder.Encode(to_underlying(Fields::kEpochStartTime2), epochStartTime2);
+    encoder.Encode(to_underlying(Fields::kGroupKeyMulticastPolicy), groupKeyMulticastPolicy);
     return encoder.Finalize();
 }
 
@@ -200,6 +201,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEpochStartTime2))
         {
             err = DataModel::Decode(reader, epochStartTime2);
+        }
+        else if (__context_tag == to_underlying(Fields::kGroupKeyMulticastPolicy))
+        {
+            err = DataModel::Decode(reader, groupKeyMulticastPolicy);
         }
 
         ReturnErrorOnFailure(err);
