@@ -146,6 +146,7 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Scenes Management
     - Software Diagnostics
+    - Switch
     - TLS Certificate Management
     - TLS Client Management
     - Thread Network Diagnostics

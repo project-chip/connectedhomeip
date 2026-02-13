@@ -4805,86 +4805,106 @@ static id _Nullable DecodeEventPayloadForAmbientContextSensingCluster(EventId aE
 {
     using namespace Clusters::AmbientContextSensing;
     switch (aEventId) {
-    case Events::AmbientContextDetected::Id: {
-        Events::AmbientContextDetected::DecodableType cppValue;
+    case Events::AmbientContextDetectStarted::Id: {
+        Events::AmbientContextDetectStarted::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
 
-        __auto_type * value = [MTRAmbientContextSensingClusterAmbientContextDetectedEvent new];
+        __auto_type * value = [MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.ambientContextType.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    MTRAmbientContextSensingClusterAmbientContextTypeStruct * newElement_0;
-                    newElement_0 = [MTRAmbientContextSensingClusterAmbientContextTypeStruct new];
-                    { // Scope for our temporary variables
-                        auto * array_2 = [NSMutableArray new];
-                        auto iter_2 = entry_0.ambientContextSensed.begin();
-                        while (iter_2.Next()) {
-                            auto & entry_2 = iter_2.GetValue();
-                            MTRDataTypeSemanticTagStruct * newElement_2;
-                            newElement_2 = [MTRDataTypeSemanticTagStruct new];
-                            if (entry_2.mfgCode.IsNull()) {
-                                newElement_2.mfgCode = nil;
-                            } else {
-                                newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
-                            }
-                            newElement_2.namespaceID = [NSNumber numberWithUnsignedChar:entry_2.namespaceID];
-                            newElement_2.tag = [NSNumber numberWithUnsignedChar:entry_2.tag];
-                            if (entry_2.label.HasValue()) {
-                                if (entry_2.label.Value().IsNull()) {
-                                    newElement_2.label = nil;
+            NSArray * _Nullable memberValue;
+            if (cppValue.ambientContextType.HasValue()) {
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.ambientContextType.Value().begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        MTRAmbientContextSensingClusterAmbientContextTypeStruct * newElement_1;
+                        newElement_1 = [MTRAmbientContextSensingClusterAmbientContextTypeStruct new];
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = entry_1.ambientContextSensed.begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                MTRDataTypeSemanticTagStruct * newElement_3;
+                                newElement_3 = [MTRDataTypeSemanticTagStruct new];
+                                if (entry_3.mfgCode.IsNull()) {
+                                    newElement_3.mfgCode = nil;
                                 } else {
-                                    newElement_2.label = AsString(entry_2.label.Value().Value());
-                                    if (newElement_2.label == nil) {
-                                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                                        *aError = err;
-                                        return nil;
-                                    }
+                                    newElement_3.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_3.mfgCode.Value())];
                                 }
-                            } else {
-                                newElement_2.label = nil;
+                                newElement_3.namespaceID = [NSNumber numberWithUnsignedChar:entry_3.namespaceID];
+                                newElement_3.tag = [NSNumber numberWithUnsignedChar:entry_3.tag];
+                                if (entry_3.label.HasValue()) {
+                                    if (entry_3.label.Value().IsNull()) {
+                                        newElement_3.label = nil;
+                                    } else {
+                                        newElement_3.label = AsString(entry_3.label.Value().Value());
+                                        if (newElement_3.label == nil) {
+                                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                            *aError = err;
+                                            return nil;
+                                        }
+                                    }
+                                } else {
+                                    newElement_3.label = nil;
+                                }
+                                [array_3 addObject:newElement_3];
                             }
-                            [array_2 addObject:newElement_2];
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_1.ambientContextSensed = array_3;
                         }
-                        CHIP_ERROR err = iter_2.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            *aError = err;
-                            return nil;
+                        if (entry_1.detectionStartTime.HasValue()) {
+                            newElement_1.detectionStartTime = [NSNumber numberWithUnsignedInt:entry_1.detectionStartTime.Value()];
+                        } else {
+                            newElement_1.detectionStartTime = nil;
                         }
-                        newElement_0.ambientContextSensed = array_2;
+                        [array_1 addObject:newElement_1];
                     }
-                    if (entry_0.detectionStartTime.HasValue()) {
-                        newElement_0.detectionStartTime = [NSNumber numberWithUnsignedInt:entry_0.detectionStartTime.Value()];
-                    } else {
-                        newElement_0.detectionStartTime = nil;
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
                     }
-                    if (entry_0.objectCountThreshold.HasValue()) {
-                        newElement_0.objectCountThreshold = [NSNumber numberWithUnsignedShort:entry_0.objectCountThreshold.Value()];
-                    } else {
-                        newElement_0.objectCountThreshold = nil;
-                    }
-                    if (entry_0.objectCount.HasValue()) {
-                        newElement_0.objectCount = [NSNumber numberWithUnsignedShort:entry_0.objectCount.Value()];
-                    } else {
-                        newElement_0.objectCount = nil;
-                    }
-                    [array_0 addObject:newElement_0];
+                    memberValue = array_1;
                 }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
+            } else {
+                memberValue = nil;
             }
             value.ambientContextType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.objectCount.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.objectCount.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.objectCount = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::AmbientContextDetectEnded::Id: {
+        Events::AmbientContextDetectEnded::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.startEventNumber];
+            value.startEventNumber = memberValue;
         } while (0);
 
         return value;

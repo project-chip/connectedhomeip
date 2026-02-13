@@ -166,7 +166,7 @@ tests:
           to TH on EP0"
       PICS: GRPKEY.C.C00.Tx
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 419,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 419,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, "groupKeyMulticastPolicy": 0 }' 1 0
 
           Verify that  KeySetWrite command on TH(Reference app)log:
 

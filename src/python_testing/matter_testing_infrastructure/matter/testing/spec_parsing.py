@@ -27,7 +27,7 @@ import zipfile
 from copy import deepcopy
 from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
-from importlib.abc import Traversable
+from importlib.resources.abc import Traversable
 from typing import Optional, Union
 
 import matter.clusters as Clusters
