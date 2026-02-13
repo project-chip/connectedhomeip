@@ -22,14 +22,25 @@
 #include <lib/core/DataModelTypes.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <string>
+#include <vector>
+
 class AppOptions
 {
 public:
+    struct DeviceConfig
+    {
+        char type[64];
+        chip::EndpointId endpoint;
+    };
+
     static chip::ArgParser::OptionSet * GetOptions();
 
-    static const char * GetDeviceType() { return mDeviceTypeName; }
+    static const std::vector<DeviceConfig> & GetDeviceConfigs();
 
-    static chip::EndpointId GetDeviceEndpoint() { return mDeviceEndpoint; }
+    static const char * GetDeviceType() { return GetDeviceConfigs().front().type; }
+
+    static chip::EndpointId GetDeviceEndpoint() { return GetDeviceConfigs().front().endpoint; }
 
     static bool EnableWiFi() { return mEnableWiFi; }
 
@@ -37,7 +48,6 @@ private:
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 
-    static const char * mDeviceTypeName;
-    static chip::EndpointId mDeviceEndpoint;
+    static std::vector<DeviceConfig> mDeviceConfigs;
     static bool mEnableWiFi;
 };
