@@ -31,7 +31,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import os
 import random
@@ -91,7 +90,6 @@ class TC_JFPKI_2_2(MatterBaseTest):
         self.fabric_a_admin.start(
             expected_output="Server initialization complete",
             timeout=10)
-
 
     def teardown_class(self):
         # Stop all Subprocesses that were started in this test case
@@ -162,23 +160,9 @@ class TC_JFPKI_2_2(MatterBaseTest):
         else:
             asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
-        # TODO: "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.", "DUT respond with ArmFailSafeResponse Command."
         self.step("3")
         expiry_failsafe_step_3 = 10
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=expiry_failsafe_step_3, breadcrumb=1))
-        asserts.assert_true(
-            isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
-            f"Unexpected response type: {type(resp)}",
-        )
-        asserts.assert_equal(
-            resp.errorCode,
-            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            f"ArmFailSafeResponse error code not OK: {resp.errorCode}",
-        )
+        await self._arm_failsafe(expiry_failsafe_step_3)
 
         self.step("4")
         try:
@@ -247,8 +231,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         #     asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
         self.step("7")
-        # Wait for ArmFailSafe timer to expire
-        await asyncio.sleep(expiry_failsafe_step_3 + 1)
+        await self._expire_failsafe()
         # await self.send_single_cmd(
         #     dev_ctrl=self.default_controller,
         #     node_id=self.dut_node_id,
@@ -287,21 +270,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
         self.step("9")
 
         expiry_failsafe_step_9 = 20
-
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=expiry_failsafe_step_9, breadcrumb=1))
-        asserts.assert_true(
-            isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
-            f"Unexpected response type: {type(resp)}",
-        )
-        asserts.assert_equal(
-            resp.errorCode,
-            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            f"ArmFailSafeResponse error code not OK: {resp.errorCode}",
-        )
+        await self._arm_failsafe(expiry_failsafe_step_9)
 
         self.step("10")
         resp = await self.send_single_cmd(
@@ -327,24 +296,11 @@ class TC_JFPKI_2_2(MatterBaseTest):
             asserts.assert_true(False, 'Expected InteractionModelError with ConstraintError, but no exception occurred.')
 
         self.step("12")
-        # Wait for ArmFailSafe timer to expire
-        await asyncio.sleep(expiry_failsafe_step_9 + 1)
+        await self._expire_failsafe()
 
         self.step("13")
-        resp = await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=20, breadcrumb=1))
-        asserts.assert_true(
-            isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
-            f"Unexpected response type: {type(resp)}",
-        )
-        asserts.assert_equal(
-            resp.errorCode,
-            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-            f"ArmFailSafeResponse error code not OK: {resp.errorCode}",
-        )
+        expiry_failsafe_step_13 = 20
+        await self._arm_failsafe(expiry_failsafe_step_13)
 
         self.step("14")
         # Create a second CA to generate an ICAC that is valid but chained to a different RCAC than the TH controller fabric RCAC.
@@ -377,18 +333,11 @@ class TC_JFPKI_2_2(MatterBaseTest):
         )
 
         self.step("15")
+        expiry_failsafe_step_15 = 20
 
         # Reset fail-safe context: AddICAC can only be invoked once per armed fail-safe session.
-        await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
-        await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=20, breadcrumb=1))
+        await self._expire_failsafe()
+        await self._arm_failsafe(expiry_failsafe_step_15)
 
         # Generate a new ICAC using the old CSR Response, which will have the wrong public key for this fail-safe context.
         icac_wrong_public_key = await self.default_controller.IssueNOCChain(csr_response, self.dut_node_id)
@@ -411,17 +360,11 @@ class TC_JFPKI_2_2(MatterBaseTest):
 
         self.step("16")
 
+        expiry_failsafe_step_16 = 20
+
         # Reset fail-safe context: AddICAC can only be invoked once per armed fail-safe session.
-        await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
-        await self.send_single_cmd(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=0,
-            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=20, breadcrumb=1))
+        await self._expire_failsafe()
+        await self._arm_failsafe(expiry_failsafe_step_16)
 
         # Create a valid ICAC for the current fail-safe context.
         csr_nonce = random.randbytes(32)
@@ -482,15 +425,30 @@ class TC_JFPKI_2_2(MatterBaseTest):
         #         'Expected ChipStackError with InvalidAdministratorFabricIndex, but no exception occurred.',
         #     )
 
-    async def arm_failsafe(self, expiry_length_seconds):
-        await self.send_single_cmd(
+    async def _arm_failsafe(self, expiry_length_seconds):
+        resp = await self.send_single_cmd(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=0,
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=expiry_length_seconds, breadcrumb=1))
+        asserts.assert_true(
+            isinstance(resp, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+            f"Unexpected response type: {type(resp)}",
+        )
+        asserts.assert_equal(
+            resp.errorCode,
+            Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+            f"ArmFailSafeResponse error code not OK: {resp.errorCode}",
+        )
 
-    async def expire_failsafe(self):
-        await self.arm_failsafe(0)
+    async def _expire_failsafe(self):
+        """
+        From the spec on ArmFailSafe (11.10.7.2):
+        > If ExpiryLengthSeconds is 0 and the fail-safe timer was already armed and the accessing fabric matches the Fabric
+        > currently associated with the fail-safe context, then the fail-safe timer SHALL be immediately expired (see further below
+        > for side-effects of expiration).
+        """
+        await self._arm_failsafe(0)
 
 
 if __name__ == "__main__":
