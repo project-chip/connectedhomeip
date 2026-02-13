@@ -41,9 +41,13 @@ public:
     // Define the Context struct with References
     struct Context
     {
+        // https://github.com/project-chip/connectedhomeip/blob/master/src/app/InteractionModelEngine.cpp#L61
+        static constexpr uint16_t kMaxNumSubscriptionsPerFabric = 10000;
+
         DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::PlatformManager & platformManager;
+        uint16_t subscriptionsPerFabric = kMaxNumSubscriptionsPerFabric;
     };
 
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
