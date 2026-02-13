@@ -203,6 +203,9 @@ jobs:
             - name: Build example Bridge App
               run: scripts/examples/esp_example.sh bridge-app
 
+            - name: Build example All Devices App
+              run: scripts/examples/esp_example.sh all-devices-app sdkconfig.defaults
+
             - name: Build example Persistent Storage App
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
 

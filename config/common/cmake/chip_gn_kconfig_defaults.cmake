@@ -20,7 +20,7 @@
 #
 
 matter_add_gn_arg_bool("chip_logging" CONFIG_LOG)
-matter_add_gn_arg_bool("chip_enable_openthread" CONFIG_NET_L2_OPENTHREAD)
+matter_add_gn_arg_bool("chip_enable_thread" CONFIG_NET_L2_OPENTHREAD)
 matter_add_gn_arg_bool("chip_with_lwip" CONFIG_CHIP_WITH_LWIP)
 matter_add_gn_arg_bool("chip_config_network_layer_ble" CONFIG_BT)
 matter_add_gn_arg_bool("chip_inet_config_enable_ipv4" CONFIG_CHIP_IPV4)

@@ -3308,13 +3308,13 @@ endpoint 2 {
     emits event MultiPressOngoing;
     emits event MultiPressComplete;
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition default = 0;
+    callback attribute currentPosition;
     ram      attribute multiPressMax default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 30;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 }
 

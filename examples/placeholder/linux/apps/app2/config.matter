@@ -9010,13 +9010,13 @@ endpoint 0 {
 
   server cluster Switch {
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
+    callback attribute currentPosition;
     ram      attribute multiPressMax default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 
   server cluster AdministratorCommissioning {

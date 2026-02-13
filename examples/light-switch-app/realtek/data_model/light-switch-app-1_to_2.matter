@@ -3181,12 +3181,12 @@ endpoint 4 {
   server cluster Switch {
     emits event InitialPress;
     ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition default = 0;
+    callback attribute currentPosition;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
   }
 }
 
