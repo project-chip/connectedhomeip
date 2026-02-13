@@ -1,4 +1,9 @@
 module Matter.Private {
     umbrella header "Matter_Private.h"
     export *
+
+    explicit module LocalTestStorage {
+        header "MTRDeviceControllerLocalTestStorage.h"
+        export *
+    }
 }
