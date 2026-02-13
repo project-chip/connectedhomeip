@@ -111,7 +111,7 @@ DENY: Set[str] = {
     'istream',
     'list',
     'locale',
-    'locale.h',
+    'locae.h',
     'map',
     'multimap',
     'multiset',
@@ -173,7 +173,6 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/icd/client/DefaultICDClientStorage.cpp': {'vector'},
     'src/app/icd/client/DefaultICDClientStorage.h': {'vector'},
     'src/app/icd/client/DefaultICDStorageKey.h': {'vector'},
-    'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
     'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
     # nrfconnect test runner
