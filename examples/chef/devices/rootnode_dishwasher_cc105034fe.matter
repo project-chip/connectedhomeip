@@ -1902,6 +1902,7 @@ endpoint 0 {
     callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

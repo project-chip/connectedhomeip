@@ -1811,6 +1811,7 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
