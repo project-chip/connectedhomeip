@@ -4963,7 +4963,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
-    { { 0x00000011, 1 }, { 0x00000016, 1 }, { 0x00000100, 1 }, { 0x00000011, 1 },                                                  \
+    { { 0x00000011, 1 }, { 0x00000016, 5 }, { 0x00000100, 1 }, { 0x00000011, 1 },                                                  \
       { 0x00000100, 1 }, { 0x00000011, 1 }, { 0x00000019, 1 } }
 
 // Array of device type offsets

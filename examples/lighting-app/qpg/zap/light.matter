@@ -2909,7 +2909,7 @@ cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 5;
   device type ma_powersource = 17, version 0;
   device type ma_otarequestor = 18, version 1;
 

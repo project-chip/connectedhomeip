@@ -1754,7 +1754,7 @@ cluster ValveConfigurationAndControl = 129 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
