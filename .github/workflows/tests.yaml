@@ -1119,8 +1119,9 @@ jobs:
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
+              #TODO: remove --keep-going , ADDED FOR TESTING
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --keep-going --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
 
             - name: Execute Jupyter Notebooks
               if: ${{matrix.filter == ''}}
