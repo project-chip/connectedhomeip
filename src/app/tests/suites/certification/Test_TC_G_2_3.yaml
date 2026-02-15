@@ -51,9 +51,9 @@ tests:
           d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 1 EpochKey1:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 18446744073709551613
           EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2:
-          18446744073709551614"
+          18446744073709551614 GroupKeyMulticastPolicy: 0"
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614, "groupKeyMulticastPolicy": 0}' 1 0
 
 
           Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:

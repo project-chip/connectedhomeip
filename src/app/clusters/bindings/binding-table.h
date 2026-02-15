@@ -179,12 +179,10 @@ public:
     void SetPersistentStorage(PersistentStorageDelegate * storage) { mStorage = storage; }
 
     CHIP_ERROR LoadFromStorage();
-
-    static Table & GetInstance() { return sInstance; }
+    // prefer to use binding manager instead
+    static Table & GetInstance();
 
 private:
-    static Table sInstance;
-
     static constexpr uint32_t kStorageVersion  = 1;
     static constexpr uint8_t kEntryStorageSize = TLV::EstimateStructOverhead(
         sizeof(FabricIndex), sizeof(EndpointId), sizeof(ClusterId), sizeof(EndpointId), sizeof(NodeId), sizeof(uint8_t));

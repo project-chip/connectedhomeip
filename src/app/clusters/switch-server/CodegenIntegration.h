@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024-2025 NXP
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,23 +16,12 @@
  *    limitations under the License.
  */
 
-#if CONFIG_CHIP_CRYPTO_PSA
-#define MBEDTLS_PSA_CRYPTO_DRIVERS
-#endif /* CONFIG_CHIP_CRYPTO_PSA */
+#pragma once
 
-#if CONFIG_MCUX_ELS_PKC
+#include <app/clusters/switch-server/SwitchCluster.h>
 
-#define MBEDTLS_CIPHER_PADDING_PKCS7
+namespace chip::app::Clusters::Switch {
 
-#if CONFIG_WIFI_NXP
-#include "wpa_supp_els_pkc_mbedtls_config.h"
-#endif /* CONFIG_WIFI_NXP && CONFIG_WPA_SUPP */
+SwitchCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
-#if CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC
-#define PSA_CRYPTO_DRIVER_ELS_PKC
-#endif /* CONFIG_MCUX_PSA_CRYPTO_DRIVER_ELS_PKC */
-
-#endif /* CONFIG_MCUX_ELS_PKC */
-
-#undef MBEDTLS_MD4_C
-#undef MBEDTLS_ARC4_C
+} // namespace chip::app::Clusters::Switch

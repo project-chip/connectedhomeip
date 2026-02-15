@@ -2963,18 +2963,18 @@
       "id": 2,
       "name": "MA-dimmablelight",
       "deviceTypeRef": {
-        "code": 257,
+        "code": 269,
         "profileId": 259,
-        "label": "MA-dimmablelight",
-        "name": "MA-dimmablelight",
+        "label": "MA-extendedcolorlight",
+        "name": "MA-extendedcolorlight",
         "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
-          "code": 257,
+          "code": 269,
           "profileId": 259,
-          "label": "MA-dimmablelight",
-          "name": "MA-dimmablelight",
+          "label": "MA-extendedcolorlight",
+          "name": "MA-extendedcolorlight",
           "deviceTypeOrder": 0
         },
         {
@@ -2986,15 +2986,15 @@
         }
       ],
       "deviceVersions": [
-        3,
+        4,
         1
       ],
       "deviceIdentifiers": [
-        257,
+        269,
         17
       ],
-      "deviceTypeName": "MA-dimmablelight",
-      "deviceTypeCode": 257,
+      "deviceTypeName": "MA-extendedcolorlight",
+      "deviceTypeCode": 269,
       "deviceTypeProfileId": 259,
       "clusters": [
         {

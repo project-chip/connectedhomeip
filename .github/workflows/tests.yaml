@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:183
+            image: ghcr.io/project-chip/chip-build:184
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -120,6 +120,7 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
@@ -282,6 +283,7 @@ jobs:
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT} \
+                        --target linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -314,6 +316,8 @@ jobs:
                    -DCMAKE_BUILD_TYPE=Debug \
                    -DOTBR_BORDER_ROUTING=ON \
                    -DOTBR_MDNS=openthread \
+                   -DOTBR_VENDOR_NAME=MatterTest \
+                   -DOTBR_PRODUCT_NAME=MatterTest \
                    -DOT_POSIX_SETTINGS_PATH='\"tmp\"' \
                    -DOT_FIREWALL=OFF \
                    -DOT_LOG_LEVEL=INFO \
@@ -365,9 +369,29 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
                      --commissioning-method ble-thread \
                   "
+                  rm -rf tmp/
+
+            - name: Run Thread-MeshCoP commissioning test
+              env:
+                TSAN_OPTIONS: report_bugs=0
+              run: |
+                  PATH=$PWD/objdir-clone:$PATH ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
+                     --runner chip_tool_python \
+                     --target TestOperationalState \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --commissioning-method thread-meshcop \
+                  "
+                  rm -rf tmp/
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -934,13 +958,6 @@ jobs:
 
             - name: ccache stats
               run: ccache -s
-
-            - name: Install push_av_server dependencies
-              run: >-
-                  ./scripts/run_in_python_env.sh out/venv \
-                  "python3 -m pip install -r src/tools/push_av_server/requirements.txt \
-                    && patch -d \$(python3 -m pip show hypercorn | grep 'Location: ' | sed 's/Location: //') -p0 < src/tools/push_av_server/hypercorn.patch \
-                  "
 
             # We archive ourselves since upload-artifact seems to lose permission bits
             # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
