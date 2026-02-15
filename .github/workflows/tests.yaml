@@ -825,7 +825,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-devices-${BUILD_VARIANT}-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-all-devices-asan-clang"
+                  && rm -rf out/linux-x64-all-devices-${BUILD_VARIANT}-asan-clang"
 
             - name: Build linux-x64-lit-icd
               run: >-
