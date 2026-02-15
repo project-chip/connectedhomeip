@@ -522,8 +522,10 @@ jobs:
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
-
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+        # No need to run this job for pull requests since Codecov is disabled and the generated 
+        # coverage reports are not used anywhere. Running coverage build post-merge is sufficient for the moment.
+        # Original issue tracking Codecov integration: #36556
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && github.event.pull_request.number == null
         # Use namespace to get more disk space and slightly better performance (Compile and unit tests
         # are CPU bound)
         runs-on: namespace-profile-4x8
