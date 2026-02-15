@@ -1617,6 +1617,9 @@ static BOOL AttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttribu
     case Attributes::MaxGroupKeysPerFabric::Id: {
         return YES;
     }
+    case Attributes::GroupcastAdoption::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

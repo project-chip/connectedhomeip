@@ -15967,6 +15967,7 @@ public class ChipClusters {
     private static final long GROUP_TABLE_ATTRIBUTE_ID = 1L;
     private static final long MAX_GROUPS_PER_FABRIC_ATTRIBUTE_ID = 2L;
     private static final long MAX_GROUP_KEYS_PER_FABRIC_ATTRIBUTE_ID = 3L;
+    private static final long GROUPCAST_ADOPTION_ATTRIBUTE_ID = 4L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -16093,6 +16094,10 @@ public class ChipClusters {
 
     public interface GroupTableAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct> value);
+    }
+
+    public interface GroupcastAdoptionAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -16228,6 +16233,46 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, MAX_GROUP_KEYS_PER_FABRIC_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readGroupcastAdoptionAttribute(
+        GroupcastAdoptionAttributeCallback callback) {
+      readGroupcastAdoptionAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readGroupcastAdoptionAttributeWithFabricFilter(
+        GroupcastAdoptionAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GROUPCAST_ADOPTION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GROUPCAST_ADOPTION_ATTRIBUTE_ID, isFabricFiltered);
+    }
+
+    public void writeGroupcastAdoptionAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value) {
+      writeGroupcastAdoptionAttribute(callback, value, 0);
+    }
+
+    public void writeGroupcastAdoptionAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
+      writeAttribute(new WriteAttributesCallbackImpl(callback), GROUPCAST_ADOPTION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeGroupcastAdoptionAttribute(
+        GroupcastAdoptionAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GROUPCAST_ADOPTION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, GROUPCAST_ADOPTION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

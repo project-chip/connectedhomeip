@@ -5141,6 +5141,34 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+    case Attributes::GroupcastAdoption::Id: {
+        using TypeInfo = Attributes::GroupcastAdoption::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRGroupKeyManagementClusterGroupcastAdoptionStruct * newElement_0;
+                newElement_0 = [MTRGroupKeyManagementClusterGroupcastAdoptionStruct new];
+                newElement_0.groupcastAdopted = [NSNumber numberWithBool:entry_0.groupcastAdopted];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known GroupKeyManagement attribute.
         break;

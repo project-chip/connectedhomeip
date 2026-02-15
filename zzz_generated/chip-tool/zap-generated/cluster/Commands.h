@@ -4116,6 +4116,7 @@ private:
 | * GroupTable                                                        | 0x0001 |
 | * MaxGroupsPerFabric                                                | 0x0002 |
 | * MaxGroupKeysPerFabric                                             | 0x0003 |
+| * GroupcastAdoption                                                 | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -22327,6 +22328,7 @@ void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "group-table", Attributes::GroupTable::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "max-groups-per-fabric", Attributes::MaxGroupsPerFabric::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "max-group-keys-per-fabric", Attributes::MaxGroupKeysPerFabric::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "groupcast-adoption", Attributes::GroupcastAdoption::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
@@ -22343,6 +22345,9 @@ void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerComm
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "max-group-keys-per-fabric", 0, UINT16_MAX, Attributes::MaxGroupKeysPerFabric::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type>>>(
+            Id, "groupcast-adoption", Attributes::GroupcastAdoption::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -22360,6 +22365,7 @@ void registerClusterGroupKeyManagement(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "max-groups-per-fabric", Attributes::MaxGroupsPerFabric::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "max-group-keys-per-fabric", Attributes::MaxGroupKeysPerFabric::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "groupcast-adoption", Attributes::GroupcastAdoption::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
