@@ -1914,6 +1914,7 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 

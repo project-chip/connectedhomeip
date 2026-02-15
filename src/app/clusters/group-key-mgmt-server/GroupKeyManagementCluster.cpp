@@ -675,8 +675,11 @@ CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & pat
                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata),
-                              Span<const AttributeListBuilder::OptionalAttributeEntry>());
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { IsGCASTSupported(), GroupcastAdoption::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
 CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
