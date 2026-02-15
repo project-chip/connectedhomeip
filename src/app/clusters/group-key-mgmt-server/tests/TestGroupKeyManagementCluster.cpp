@@ -172,7 +172,7 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
                                                                     GroupKeyManagement::Attributes::kMandatoryMetadata.end());
 
     // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
-    // TODO: Fix the assert below including the optional attribute. 
+    // TODO: Fix the assert below including the optional attribute.
     // The assert is disabled because an optional attribute, GroupcastAdoption, was added to the cluster.
     //ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(mCluster, std::move(mandatoryAttributes)));
 }
