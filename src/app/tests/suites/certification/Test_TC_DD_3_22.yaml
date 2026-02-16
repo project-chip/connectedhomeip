@@ -16,7 +16,7 @@ name: 3.3.22. [TC-DD-3.22] NFC-based commissioning [DUT as Commissioner]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
-    - MCORE.DD.NFC
+    - MCORE.DD.SCAN_NFC
     - MCORE.DD.NTL
 
 config:
