@@ -1155,7 +1155,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC (CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT / 2)
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC (3 + 1) // support 3 KeySets + IPK per fabric
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
