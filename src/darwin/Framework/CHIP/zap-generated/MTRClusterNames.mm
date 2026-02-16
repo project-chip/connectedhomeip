@@ -3434,6 +3434,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ExpiryDate";
             break;
 
+        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeUnmountedID:
+            result = @"Unmounted";
+            break;
+
         case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

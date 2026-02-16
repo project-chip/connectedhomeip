@@ -1897,6 +1897,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000000A,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeSensitivityLevelID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000000B,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000000C,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeUnmountedID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,

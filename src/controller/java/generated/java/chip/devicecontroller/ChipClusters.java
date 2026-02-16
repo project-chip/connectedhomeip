@@ -22021,6 +22021,7 @@ public class ChipClusters {
     private static final long CONTAMINATION_STATE_ATTRIBUTE_ID = 10L;
     private static final long SMOKE_SENSITIVITY_LEVEL_ATTRIBUTE_ID = 11L;
     private static final long EXPIRY_DATE_ATTRIBUTE_ID = 12L;
+    private static final long UNMOUNTED_ATTRIBUTE_ID = 13L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -22410,6 +22411,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, EXPIRY_DATE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readUnmountedAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNMOUNTED_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, UNMOUNTED_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeUnmountedAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNMOUNTED_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, UNMOUNTED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
