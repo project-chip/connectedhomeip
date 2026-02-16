@@ -379,7 +379,7 @@ void BLEManagerImpl::NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId)
 
 void BLEManagerImpl::NotifyHandleConnectFailed(CHIP_ERROR error)
 {
-    ChipLogProgress(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
+    ChipLogError(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
     if (mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformTizenBLECentralConnectFailed,
@@ -499,8 +499,8 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
+    ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
     BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-    ChipLogDetail(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
