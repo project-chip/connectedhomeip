@@ -15,31 +15,31 @@
 name: 3.3.22 [TC-DD-3.22] NFC-based commissioning [DUT as Commissioner]
 
 PICS:
-  - MCORE.ROLE.COMMISSIONER
-  - MCORE.DD.NFC
-  - MCORE.DD.NTL
+    - MCORE.ROLE.COMMISSIONER
+    - MCORE.DD.NFC
+    - MCORE.DD.NTL
 
 config:
-  nodeId: 0x12344321
-  cluster: "Basic Information"
-  endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
 
 tests:
-  - label:
-      "Step 1: Power up the TH Device and put the TH Device in commissioning
-      mode"
-    verification: |
-      1. Power up the TH device.
-      2. Put the TH device into commissioning mode as per the device-specific procedure.
-      3. Verify that the TH device indicates it is in commissioning mode
-         (e.g., via LED pattern, display, or log output).
-    disabled: true
+    - label:
+          "Step 1: Power up the TH Device and put the TH Device in commissioning
+          mode"
+      verification: |
+          1. Power up the TH device.
+          2. Put the TH device into commissioning mode as per the device-specific procedure.
+          3. Verify that the TH device indicates it is in commissioning mode
+             (e.g., via LED pattern, display, or log output).
+      disabled: true
 
-  - label: "Step 2: Bring the DUT close to the NFC tag for the TH Device"
-    verification: |
-      1. Bring and hold the DUT close to the NFC tag on the TH Device.
-      2. Verify on the DUT that onboarding information is read via NFC and a
-         commissioning flow is initiated.
-      3. Complete any on-screen/on-UI prompts on the DUT to finish commissioning.
-      4. Check on the TH Device that commissioning is completed successfully
-    disabled: true
+    - label: "Step 2: Bring the DUT close to the NFC tag for the TH Device"
+      verification: |
+          1. Bring and hold the DUT close to the NFC tag on the TH Device.
+          2. Verify on the DUT that onboarding information is read via NFC and a
+             commissioning flow is initiated.
+          3. Complete any on-screen/on-UI prompts on the DUT to finish commissioning.
+          4. Check on the TH Device that commissioning is completed successfully
+      disabled: true
