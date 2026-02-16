@@ -644,6 +644,7 @@ tests:
                         EpochStartTime1: 3110001,
                         EpochKey2: "\xf1\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
                         EpochStartTime2: 3110002,
+                        GroupKeyMulticastPolicy: 0,
                     }
       response:
           error: RESOURCE_EXHAUSTED
