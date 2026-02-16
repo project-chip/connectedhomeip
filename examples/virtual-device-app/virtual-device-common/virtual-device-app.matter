@@ -3959,7 +3959,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflight = 256, version 1;
+  device type ma_onofflight = 256, version 4;
 
 
   server cluster Identify {
