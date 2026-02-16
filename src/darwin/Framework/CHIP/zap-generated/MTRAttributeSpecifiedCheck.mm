@@ -1617,6 +1617,9 @@ static BOOL AttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttribu
     case Attributes::MaxGroupKeysPerFabric::Id: {
         return YES;
     }
+    case Attributes::GroupcastAdoption::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5368,10 +5371,16 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::AmbientContextTypeSupported::Id: {
         return YES;
     }
-    case Attributes::SimultaneousDetectionLimit::Id: {
+    case Attributes::ObjectCountReached::Id: {
         return YES;
     }
-    case Attributes::ObjectCountReached::Id: {
+    case Attributes::ObjectCountConfig::Id: {
+        return YES;
+    }
+    case Attributes::ObjectCount::Id: {
+        return YES;
+    }
+    case Attributes::SimultaneousDetectionLimit::Id: {
         return YES;
     }
     case Attributes::HoldTime::Id: {

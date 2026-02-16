@@ -1393,6 +1393,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MaxGroupsPerFabric";
         case chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
             return "MaxGroupKeysPerFabric";
+        case chip::app::Clusters::GroupKeyManagement::Attributes::GroupcastAdoption::Id:
+            return "GroupcastAdoption";
         case chip::app::Clusters::GroupKeyManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GroupKeyManagement::Attributes::AcceptedCommandList::Id:
@@ -3969,10 +3971,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AmbientContextType";
         case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextTypeSupported::Id:
             return "AmbientContextTypeSupported";
-        case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
-            return "SimultaneousDetectionLimit";
         case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountReached::Id:
             return "ObjectCountReached";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCountConfig::Id:
+            return "ObjectCountConfig";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
+            return "ObjectCount";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
+            return "SimultaneousDetectionLimit";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTime::Id:
             return "HoldTime";
         case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTimeLimits::Id:

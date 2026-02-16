@@ -199,6 +199,7 @@ public:
     GroupSessionIterator * IterateGroupSessions(uint16_t) override { return nullptr; }
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex, GroupId) override { return nullptr; }
     uint16_t getMaxMembershipCount() override { return 0; }
+    uint16_t getMaxMcastAddrCount() override { return 0; }
 
     bool mHasEndpoint = true;
 };
