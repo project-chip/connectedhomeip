@@ -653,7 +653,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
     case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
         return ReadMaxGroupKeysPerFabric(mContext.groupDataProvider, encoder);
     case GroupKeyManagement::Attributes::GroupcastAdoption::Id:
-        return encoder.EncodeList([](const auto & encoder) { return CHIP_NO_ERROR; });
+        return encoder.EncodeList([](const auto & e) { return CHIP_NO_ERROR; });
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
