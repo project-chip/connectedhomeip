@@ -20,6 +20,7 @@
 #   run1:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "Server initialization complete"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
