@@ -203,8 +203,12 @@ class TC_JFPKI_2_3(MatterBaseTest):
         )
 
         self.step("3")
-        # TODO: DUT performs Fabric Table VID Verification Procedure command against TH.
-        # Expected: DUT performs with success Fabric Table VID Verification Procedure command against TH.
+        await self.send_single_cmd(
+            dev_ctrl=self.dev_ctrl_eco_a,
+            node_id=self.dut_node_id,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+            cmd=Clusters.JointFabricAdministrator.Commands.AnnounceJointFabricAdministrator(
+                endpointID=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT))
 
         self.step("4")
         # TODO: TH sends ICACCSRRequest command to DUT.
