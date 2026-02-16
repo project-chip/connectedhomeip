@@ -23,7 +23,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Tuple, Any
+
 
 import sdbus
 
@@ -45,9 +46,9 @@ class NANSimulator:
 
     def __init__(self, discovery_delay: float = 0.1):
         self.discovery_delay = discovery_delay
-        self.interfaces: dict = {}  # {name: WpaInterface}
-        self.publishers: dict = {}  # {pub_id: (iface_name, args)}
-        self.subscribers: dict = {}  # {sub_id: (iface_name, args)}
+        self.interfaces: Dict[str, WpaSupplicantMock.WpaInterface] = {}
+        self.publishers: Dict[str, Tuple[str, Any]] = {}
+        self.subscribers: Dict[str, Tuple[str, Any]] = {}
         self._lock = threading.Lock()
 
     def register_interface(self, name: str, interface: 'WpaSupplicantMock.WpaInterface'):
@@ -128,7 +129,7 @@ class NANSimulator:
                 'srv_proto_type': ('u', pub_args.get('srv_proto_type', 3)),
                 'ssi': ('ay', pub_args.get('ssi', b'')),
             }
-            sub_iface.emit_nan_discovery_result(discovery_args)
+            sub_iface.NANDiscoveryResult.emit(discovery_args)
 
             # Emit NANReplied to publisher
             replied_args = {
@@ -138,7 +139,8 @@ class NANSimulator:
                 'srv_proto_type': ('u', sub_args.get('srv_proto_type', 3)),
                 'ssi': ('ay', sub_args.get('ssi', b'')),
             }
-            pub_iface.emit_nan_replied(replied_args)
+            log.debug("Interface[%d] Emitting NANReplied: %s", pub_iface.index, replied_args)
+            pub_iface.NANReplied.emit(replied_args)
 
     async def on_transmit(self, sender_iface: 'WpaSupplicantMock.WpaInterface', handle: int,
                           req_instance_id: int, peer_addr: str, ssi: bytes):
@@ -164,7 +166,8 @@ class NANSimulator:
             'peer_addr': ('s', sender_iface.mock_mac),
             'ssi': ('ay', ssi),
         }
-        receiver.emit_nan_receive(receive_args)
+        log.debug("Interface[%d] Emitting NANReceive: %s", receiver.index, receive_args)
+        receiver.NANReceive.emit(receive_args)
 
 
 class WpaSupplicantMock(threading.Thread):
@@ -470,37 +473,6 @@ class WpaSupplicantMock(threading.Thread):
         @sdbus.dbus_signal_async("a{sv}")
         def PropertiesChanged(self) -> dict:
             raise NotImplementedError
-
-        # =====================================================================
-        # NAN Signal Emission Helpers (called by NANSimulator)
-        # =====================================================================
-
-        def emit_nan_discovery_result(self, args: dict):
-            """Emit NANDiscoveryResult signal."""
-            log.debug("Interface[%d] Emitting NANDiscoveryResult: %s", self.index, args)
-            self.NANDiscoveryResult.emit(args)
-
-        def emit_nan_replied(self, args: dict):
-            """Emit NANReplied signal."""
-            log.debug("Interface[%d] Emitting NANReplied: %s", self.index, args)
-            self.NANReplied.emit(args)
-
-        def emit_nan_receive(self, args: dict):
-            """Emit NANReceive signal."""
-            log.debug("Interface[%d] Emitting NANReceive: %s", self.index, args)
-            self.NANReceive.emit(args)
-
-        def emit_nan_publish_terminated(self, publish_id: int, reason: str):
-            """Emit NANPublishTerminated signal."""
-            log.debug("Interface[%d] Emitting NANPublishTerminated: pub_id=%d, reason=%s",
-                      self.index, publish_id, reason)
-            self.NANPublishTerminated.emit((publish_id, reason))
-
-        def emit_nan_subscribe_terminated(self, subscribe_id: int, reason: str):
-            """Emit NANSubscribeTerminated signal."""
-            log.debug("Interface[%d] Emitting NANSubscribeTerminated: sub_id=%d, reason=%s",
-                      self.index, subscribe_id, reason)
-            self.NANSubscribeTerminated.emit((subscribe_id, reason))
 
         # =====================================================================
         # Properties
