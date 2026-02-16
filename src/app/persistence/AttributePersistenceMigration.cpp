@@ -57,7 +57,7 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         {
             migrationError = CHIP_ERROR_HAD_FAILURES;
             ChipLogError(NotSpecified,
-                         "AttributeMigration: Error writing Attribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI 
+                         "AttributeMigration: Error writing Attribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI
                          "' (err=%" CHIP_ERROR_FORMAT ")",
                          ChipLogValueMEI(attr), ChipLogValueMEI(cluster.mClusterId), attributeMigrationError.Format());
         }

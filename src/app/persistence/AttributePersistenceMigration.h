@@ -92,7 +92,7 @@ template <class T>
 static CHIP_ERROR ScalarValue(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer)
 {
     VerifyOrReturnError(sizeof(T) <= buffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    
+
     T value;
     ReturnErrorOnFailure(provider.ReadScalarValue(attrPath, value));
     buffer.reduce_size(sizeof(T));
