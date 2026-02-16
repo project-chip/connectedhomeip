@@ -30,6 +30,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server:joint_fabric",
+    "${chip_root}/src/app/server:thread_rendezvous_announcement",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support:testing",
   ]
