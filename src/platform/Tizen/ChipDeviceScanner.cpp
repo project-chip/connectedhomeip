@@ -151,7 +151,6 @@ CHIP_ERROR ChipDeviceScanner::StartScan(ScanFilterType filterType, const ScanFil
 exit:
     ChipLogError(DeviceLayer, "Start CHIP Scan could not succeed fully! Stop Scan...");
     TEMPORARY_RETURN_IGNORED StopScan();
-    UnRegisterScanFilter();
     return err;
 }
 
@@ -183,6 +182,7 @@ void ChipDeviceScanner::UnRegisterScanFilter()
     if (mScanFilter)
     {
         bt_adapter_le_scan_filter_unregister(mScanFilter);
+        bt_adapter_le_scan_filter_destroy(mScanFilter);
         mScanFilter = nullptr;
     }
 }
