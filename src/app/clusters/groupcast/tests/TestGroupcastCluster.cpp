@@ -369,7 +369,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
 
-    // Join grojups
+    // Join groups
     {
         // Group 1
         Commands::JoinGroup::Type data;
@@ -494,11 +494,10 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         }
     }
 
-    // LeaveGroup (all)
+    // LeaveGroup a List of endpoints from all groups
     {
         Commands::LeaveGroup::Type data;
 
-        // Update existing key (invalid)
         data.groupID = 0;
         data.endpoints =
             MakeOptional(chip::app::DataModel::List<const EndpointId>(kLeaveEndpoints2, MATTER_ARRAY_SIZE(kLeaveEndpoints2)));
@@ -546,6 +545,26 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
             ASSERT_EQ(found, static_cast<size_t>(0));
             group_id++;
         }
+    }
+
+    // LeaveGroup all groups completely.
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID = 0;
+        auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+    }
+
+    // Read Membership
+    {
+        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+        size_t memershipCount = 0;
+        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
+        ASSERT_EQ(memershipCount, 0u);
     }
 }
 
