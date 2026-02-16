@@ -531,7 +531,7 @@ class WpaSupplicantMock(threading.Thread):
         self.wpa = WpaSupplicantMock.Wpa(self)
         self.wpa.export_to_dbus(self.wpa.path)
         # Create and export multiple interfaces
-        for i in range(self.num_interfaces):
+        for i in range(len(self.interfaces_params)):
             iface = WpaSupplicantMock.WpaInterface(self, i)
             iface.export_to_dbus(iface.path)
             self.interfaces.append(iface)
@@ -543,7 +543,7 @@ class WpaSupplicantMock(threading.Thread):
         self.nan_simulator = NANSimulator(discovery_delay=0.1)
 
         # Assign interfaces to given names
-        for i in range(self.num_interfaces):
+        for i in range(len(self.interfaces_params)):
             self.nan_simulator.register_interface(self.interfaces_params[i]['name'], self.interfaces[i])
 
         log.info("WiFi-PAF mode enabled with NAN simulator")
@@ -564,7 +564,6 @@ class WpaSupplicantMock(threading.Thread):
         self.ssid = ssid
         self.password = password
         self.networking = ns
-        self.num_interfaces = len(interfaces_params)
         self.interfaces_params = interfaces_params
         self.interfaces: list = []  # List of WpaInterface instances
         self.networks: list = []    # List of WpaNetwork instances
