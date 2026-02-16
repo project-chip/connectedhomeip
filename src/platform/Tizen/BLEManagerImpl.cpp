@@ -697,16 +697,11 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     ChipLogProgress(DeviceLayer, "Stop Advertising");
 
     int ret = bt_adapter_le_stop_advertising(mAdvertiser);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_le_stop_advertising() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        NotifyBLEPeripheralAdvStopComplete(MATTER_PLATFORM_ERROR(ret)));
 
     mAdvReqInProgress = true;
     return CHIP_NO_ERROR;
-
-exit:
-    auto err = MATTER_PLATFORM_ERROR(ret);
-    NotifyBLEPeripheralAdvStopComplete(err);
-    return err;
 }
 
 static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle, void * data)
@@ -938,26 +933,18 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
-    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer()));
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(
+        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BLEManagerImpl * self) { return self->_InitImpl(); }, this));
 
     mFlags.Set(Flags::kTizenBLELayerInitialized);
-
-    err = DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
-
-exit:
-    return err;
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 void BLEManagerImpl::_Shutdown()
