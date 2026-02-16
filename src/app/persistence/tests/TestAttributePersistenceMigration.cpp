@@ -198,6 +198,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationTwice)
         EXPECT_EQ(ramProvider.ReadValue(path, readBuffer), CHIP_NO_ERROR);
 
         uint32_t readValue = 0;
+        ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
         memcpy(&readValue, readBuffer.data(), sizeof(uint32_t));
         EXPECT_EQ(readValue, kNewValue);
     }
@@ -243,6 +244,7 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesMixedPresence)
         EXPECT_EQ(ramProvider.ReadValue(pathB, readBuffer), CHIP_NO_ERROR);
 
         uint32_t readValue = 0;
+        ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
         memcpy(&readValue, readBuffer.data(), sizeof(uint32_t));
         EXPECT_EQ(readValue, kValueB);
     }
@@ -289,6 +291,7 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesAllPresent)
         EXPECT_EQ(ramProvider.ReadValue(pathA, readBuffer), CHIP_NO_ERROR);
 
         uint32_t readValue = 0;
+        ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
         memcpy(&readValue, readBuffer.data(), sizeof(uint32_t));
         EXPECT_EQ(readValue, kValueA);
     }
@@ -298,6 +301,7 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesAllPresent)
         EXPECT_EQ(ramProvider.ReadValue(pathB, readBuffer), CHIP_NO_ERROR);
 
         uint32_t readValue = 0;
+        ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
         memcpy(&readValue, readBuffer.data(), sizeof(uint32_t));
         EXPECT_EQ(readValue, kValueB);
     }
@@ -361,6 +365,7 @@ TEST(TestAttributePersistenceMigration, TestTemplateOverload)
         EXPECT_EQ(ramProvider.ReadValue(path, readBuffer), CHIP_NO_ERROR);
 
         uint32_t readValue = 0;
+        ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
         memcpy(&readValue, readBuffer.data(), sizeof(uint32_t));
         EXPECT_EQ(readValue, kValueToStore);
     }

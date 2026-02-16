@@ -47,8 +47,8 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
             migrationError = CHIP_ERROR_HAD_FAILURES;
             ChipLogError(NotSpecified,
                          "AttributeMigration: Error reading SafeAttribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI
-                         "'",
-                         ChipLogValueMEI(attr), ChipLogValueMEI(cluster.mClusterId));
+                         "' (err=%" CHIP_ERROR_FORMAT ")",
+                         ChipLogValueMEI(attr), ChipLogValueMEI(cluster.mClusterId), attributeMigrationError.Format());
             continue;
         }
 
@@ -57,8 +57,9 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         {
             migrationError = CHIP_ERROR_HAD_FAILURES;
             ChipLogError(NotSpecified,
-                         "AttributeMigration: Error writing Attribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI "'",
-                         ChipLogValueMEI(attr), ChipLogValueMEI(cluster.mClusterId));
+                         "AttributeMigration: Error writing Attribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI 
+                         "' (err=%" CHIP_ERROR_FORMAT ")",
+                         ChipLogValueMEI(attr), ChipLogValueMEI(cluster.mClusterId), attributeMigrationError.Format());
         }
     }
     return migrationError;
