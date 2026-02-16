@@ -420,26 +420,16 @@ void BLEManagerImpl::HandleConnectionTimeout(System::Layer *, void * appState)
 
 CHIP_ERROR BLEManagerImpl::ConnectChipThing(const char * address)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int ret;
-
     ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", StringOrNullMarker(address));
 
-    ret = bt_gatt_client_create(address, &mGattClient);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client: %s", get_error_message(ret));
-                 err = MATTER_PLATFORM_ERROR(ret));
+    int ret = bt_gatt_client_create(address, &mGattClient);
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret), NotifyHandleConnectFailed(MATTER_PLATFORM_ERROR(ret)));
 
     ret = bt_gatt_connect(address, false);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "Failed to issue GATT connect request: %s", get_error_message(ret));
-                 err = MATTER_PLATFORM_ERROR(ret));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret), NotifyHandleConnectFailed(MATTER_PLATFORM_ERROR(ret)));
 
     ChipLogProgress(DeviceLayer, "GATT Connect Issued");
-
-exit:
-    if (err != CHIP_NO_ERROR)
-        NotifyHandleConnectFailed(err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
