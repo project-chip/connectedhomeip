@@ -585,8 +585,8 @@ tests:
                 constraints:
                     # Note: There's always an IPK keyset with index 0
                     contains: [0x01a1, 0x01a2, 0]
-    
-    # TODO: This is really hardcoded based on the default value of CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC. 
+
+    # TODO: This is really hardcoded based on the default value of CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC.
     # Logic should be added to handle configurations variability.
     # To do so, this whole test should be moved to python tests for better flexibility.
     - label: "Write additional KeySets to reach fabric 1 capacity"
