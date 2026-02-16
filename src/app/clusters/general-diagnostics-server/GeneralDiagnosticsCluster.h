@@ -136,7 +136,7 @@ public:
 protected:
     OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
-    BitFlags<GeneralDiagnostics::d> mFeatureFlags;
+    BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
     Context mDiagnosticsContext;
 
     System::Clock::Milliseconds64 TimeSinceNodeStartup() const;
