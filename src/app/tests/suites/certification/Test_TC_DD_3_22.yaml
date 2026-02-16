@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.3.22 [TC-DD-3.22] NFC-based commissioning [DUT as Commissioner]
+name: 3.3.22. [TC-DD-3.22] NFC-based commissioning [DUT as Commissioner]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
