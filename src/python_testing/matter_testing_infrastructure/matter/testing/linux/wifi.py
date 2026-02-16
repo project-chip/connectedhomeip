@@ -23,8 +23,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
-from typing import Dict, Optional, Union, Tuple, Any
-
+from typing import Any, Dict, Optional, Tuple, Union
 
 import sdbus
 
