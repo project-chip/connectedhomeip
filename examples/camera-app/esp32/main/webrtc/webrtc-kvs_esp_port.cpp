@@ -29,7 +29,7 @@ using namespace chip::app::Clusters::WebRTCTransportProvider;
 
 using namespace Camera;
 
-static size_t gSDPLength       = CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES;
+static size_t gSDPLength       = 8192;
 static size_t gCandidateLength = 1024;
 static char peerClientId[SS_MAX_SIGNALING_CLIENT_ID_LEN + 1];
 
@@ -89,7 +89,12 @@ void KVSWebRTCPeerConnection::SetRemoteDescription(const std::string & sdp, SDPT
 {
     // handles SDP Offer received from webrtc requestor.
     // Send SDP to KVSWebRTCManager.
-    char * sdp_json = (char *) malloc(gSDPLength);
+    char * sdp_json = (char *) heap_caps_malloc_prefer(gSDPLength,2,MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM,MALLOC_CAP_INTERNAL);
+    if (sdp_json == nullptr)
+    {
+        ChipLogError(Camera, "SetRemoteDescription: failed to allocate sdp_json");
+        return;
+    }
     std::unique_ptr<signaling_msg_t> message(new (std::nothrow) signaling_msg_t());
     if (message == nullptr)
     {
@@ -129,6 +134,7 @@ void KVSWebRTCPeerConnection::SetRemoteDescription(const std::string & sdp, SDPT
     ChipLogProgress(Camera, "SDP LENGTH: %d", serialized_len);
 
     free(sdp_json);
+
 }
 
 void KVSWebRTCPeerConnection::AddRemoteCandidate(const std::string & candidate, const std::string & mid)

@@ -24,8 +24,7 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 
-extern int query_snapshot_command_register_response_handler(void);
-static uint8_t s_last_quality = 1;
+static uint8_t s_last_quality = 8;
 
 // Structure to hold snapshot data for queue
 struct SnapshotData {

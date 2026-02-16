@@ -33,7 +33,7 @@ using namespace Camera;
 
 static const char * TAG = "webrtc-kvs_esp_port_utils";
 
-static size_t gSDPLength = CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES;
+static size_t gSDPLength = 8192;
 static char peerClientId[SS_MAX_SIGNALING_CLIENT_ID_LEN + 1];
 
 extern CameraDevice gCameraDevice;
@@ -242,23 +242,29 @@ void webrtc_bridge_message_received_cb(void * data, int len)
 
     deserialize_signaling_message((const char *) data, len, msg.get());
 
-    char sdp_buf[gSDPLength];
+    char* sdp_buf = (char *) heap_caps_malloc_prefer(gSDPLength,2,MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM,MALLOC_CAP_INTERNAL);
+    if (sdp_buf == nullptr)
+    {
+        ChipLogError(Camera, "webrtc_bridge_message_received_cb: failed to allocate sdp_buf");
+        return;
+    }
+
     switch (msg->messageType)
     {
     case SIGNALING_MSG_TYPE_OFFER:
-        if (extract_sdp(msg->payload, sdp_buf, sizeof(sdp_buf)) == 0)
+        if (extract_sdp(msg->payload, sdp_buf, gSDPLength) == 0)
         {
             ESP_LOGD(TAG, "Extracted SDP:\n%s\n", sdp_buf);
         }
         break;
     case SIGNALING_MSG_TYPE_ANSWER:
-        if (extract_sdp(msg->payload, sdp_buf, sizeof(sdp_buf)) == 0)
+        if (extract_sdp(msg->payload, sdp_buf, gSDPLength) == 0)
         {
             ESP_LOGD(TAG, "Extracted SDP:\n%s\n", sdp_buf);
         }
         break;
     case SIGNALING_MSG_TYPE_ICE_CANDIDATE:
-        if (extract_candidate(msg->payload, sdp_buf, sizeof(sdp_buf)) == 0)
+        if (extract_candidate(msg->payload, sdp_buf, gSDPLength) == 0)
         {
             ESP_LOGD(TAG, "Extracted Candidate:\n%s\n", sdp_buf);
         }
@@ -356,6 +362,10 @@ cleanup:
     if (msg->payload)
     {
         free(msg->payload);
+    }
+    if (sdp_buf)
+    {
+        heap_caps_free(sdp_buf);
     }
 }
 
