@@ -156,7 +156,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                                                        GeneralDiagnostics::Commands::TimeSnapshotResponse::Id,
                                                    }));
 
-        // Everything is unimplemented, so attributes are just the global and mandatory ones
+        // Everything is unimplemented, so attributes are just the global and mandatory ones.
         ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
                                                 GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
