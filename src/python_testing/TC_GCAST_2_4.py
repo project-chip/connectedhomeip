@@ -93,7 +93,19 @@ class TC_GCAST_2_4(MatterBaseTest):
             endpoints_list = endpoints_list[:2]
 
         self.step("1b")
-        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        # Check if there are any groups on the DUT.
+        membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
+        if membership:
+            # LeaveGroup with groupID 0 will leave all groups on the fabric.
+            await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+
+        # remove any existing KeySetID on the DUT, except KeySetId 0 (IPK).
+        resp: Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse = await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
+
+        read_group_key_ids: list[int] = resp.groupKeySetIDs
+        for key_set_id in read_group_key_ids:
+            if key_set_id != 0:
+                await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRemove(key_set_id))
 
         self.step("1c")
         sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)

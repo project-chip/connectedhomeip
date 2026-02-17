@@ -879,6 +879,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             wifi_ssid=self.matter_test_config.wifi_ssid,
             tc_version_to_simulate=self.matter_test_config.tc_version_to_simulate,
             tc_user_response_to_simulate=self.matter_test_config.tc_user_response_to_simulate,
+            border_agent_ip_addr=self.matter_test_config.border_agent_ip_addr,
+            border_agent_port=self.matter_test_config.border_agent_port,
         )
 
         return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)

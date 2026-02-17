@@ -87,6 +87,8 @@ class CommissioningInfo:
     wifi_ssid: Optional[str] = None
     tc_version_to_simulate: Optional[int] = None
     tc_user_response_to_simulate: Optional[int] = None
+    border_agent_ip_addr: Optional[str] = None
+    border_agent_port: Optional[int] = None
 
 
 @dataclass
@@ -230,6 +232,33 @@ async def commission_device(
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "thread-meshcop":
+        try:
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
+                                       "Thread dataset must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_operational_dataset is not None
+            asserts.assert_is_not_none(commissioning_info.border_agent_ip_addr,
+                                       "border_agent_ip_addr must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.border_agent_ip_addr is not None
+            asserts.assert_is_not_none(commissioning_info.border_agent_port,
+                                       "border_agent_port must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.border_agent_port is not None
+
+            await dev_ctrl.CommissionThreadMeshcop(
+                node_id,
+                info.passcode,
+                info.filter_value,
+                commissioning_info.border_agent_ip_addr,
+                commissioning_info.border_agent_port,
+                commissioning_info.thread_operational_dataset,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
 
@@ -339,6 +368,8 @@ class CommissionDeviceTest(base_test.BaseTestClass):
             wifi_ssid=meta_config['wifi_ssid'],
             tc_version_to_simulate=meta_config['tc_version_to_simulate'],
             tc_user_response_to_simulate=meta_config['tc_user_response_to_simulate'],
+            border_agent_ip_addr=meta_config['border_agent_ip_addr'],
+            border_agent_port=meta_config['border_agent_port'],
         )
         self.setup_payloads: List[SetupPayloadInfo] = get_setup_payload_info_config(
             global_stash.unstash_globally(test_config.user_params['matter_test_config']))

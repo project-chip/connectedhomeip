@@ -17,7 +17,14 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/UDPEndPointImplOpenThread.h>
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 #include <inet/UDPEndPointImplSockets.h>
+#endif
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -50,6 +57,7 @@ namespace chip {
 namespace DeviceLayer {
 
 namespace {
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & address,
                                    UDPEndPointImplSockets::MulticastOperation operation)
 {
@@ -93,6 +101,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 } // namespace
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
@@ -107,6 +116,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
     UDPEndPointImplSockets::SetMulticastGroupHandler(
         [](InterfaceId interfaceId, const IPAddress & address, UDPEndPointImplSockets::MulticastOperation operation) {
             if (interfaceId.IsPresent())
@@ -125,6 +135,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
             return CHIP_NO_ERROR;
         });
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     return CHIP_NO_ERROR;

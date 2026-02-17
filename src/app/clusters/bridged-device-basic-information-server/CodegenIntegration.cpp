@@ -48,21 +48,16 @@ void ReachableChanged(EndpointId endpointId)
 
     Events::ReachableChanged::Type event{ reachable };
     EventNumber eventNumber;
-    if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
-    {
-        ChipLogError(Zcl, "ReachableChanged: Failed to record ReachableChanged event");
-    }
+    LogErrorOnFailure(LogEvent(event, endpointId, eventNumber));
 }
 
 } // anonymous namespace
 
 void MatterBridgedDeviceBasicInformationClusterServerAttributeChangedCallback(const ConcreteAttributePath & attributePath)
 {
-    if (attributePath.mClusterId != BridgedDeviceBasicInformation::Id)
-    {
-        ChipLogError(Zcl, "MatterBridgedDeviceBasicClusterServerAttributeChangedCallback: Incorrect cluster ID");
-        return;
-    }
+    // just verify without logging - in practice this callback is correctly invoked by the framework since this is based
+    // on generated code.
+    VerifyOrReturn(attributePath.mClusterId == BridgedDeviceBasicInformation::Id);
 
     switch (attributePath.mAttributeId)
     {
