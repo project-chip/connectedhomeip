@@ -53,7 +53,8 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
         }
 
         // Write value from SafeAttributePersistence into AttributePersistence
-        if (normProvider.WriteValue(attrPath, copyOfBuffer) != CHIP_NO_ERROR)
+        attributeMigrationError = normProvider.WriteValue(attrPath, copyOfBuffer);
+        if (attributeMigrationError != CHIP_NO_ERROR)
         {
             migrationError = CHIP_ERROR_HAD_FAILURES;
             ChipLogError(NotSpecified,
