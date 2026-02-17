@@ -18,6 +18,7 @@
 
 #include <app_options/AppOptions.h>
 #include <devices/device-factory/DeviceFactory.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
 #include <cstdlib>
@@ -69,10 +70,7 @@ bool AppOptions::ParseEndpointId(const char * str, chip::EndpointId & endpoint)
  */
 bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
 {
-    if (value == nullptr)
-    {
-        return false;
-    }
+    VerifyOrReturnValue(value != nullptr, false);
 
     config.endpoint = 1;
 
