@@ -79,7 +79,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{},
-                                      BitFlags<GeneralDiagnostics::Feature>(GeneralDiagnostics::Feature::kDeviceLoad),
+                                      BitFlags<GeneralDiagnostics::Feature>{},
                                       GeneralDiagnosticsCluster::Context{
                                           .deviceLoadStatusProvider = mContext.deviceLoadStatusProvider,
                                           .diagnosticDataProvider   = mContext.diagnosticDataProvider,
