@@ -106,8 +106,8 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
 
     case Attributes::RoutingRole::Id: {
         using ThreadNetworkDiagnostics::RoutingRoleEnum;
-        RoutingRoleEnum routingRole;
-        otDeviceRole otRole = otThreadGetDeviceRole(otInst);
+        RoutingRoleEnum routingRole = RoutingRoleEnum::kUnspecified;
+        otDeviceRole otRole         = otThreadGetDeviceRole(otInst);
 
         if (otRole == OT_DEVICE_ROLE_DISABLED)
         {
