@@ -2848,7 +2848,7 @@ TEST_F(TestTLV, CheckTLVCharSpan)
         ASSERT_EQ(err, CHIP_NO_ERROR);
 
         EXPECT_EQ(strlen(testCase.expectedString), readerSpan.size());
-        EXPECT_EQ(memcmp(readerSpan.data(), testCase.expectedString, strlen(testCase.expectedString)), 0);
+        EXPECT_TRUE(readerSpan.data_equal(CharSpan::fromCharString(testCase.expectedString)));
     }
 }
 

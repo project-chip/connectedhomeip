@@ -378,7 +378,7 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
     if (bytes == nullptr)
     {
         // Calling memchr further down with bytes == nullptr would have undefined behaviour, exiting early.
-        lsid = {}; // empty data
+        // This treats null/empty LSID as a NullOptional (we clear the value at the start)
         return CHIP_NO_ERROR;
     }
 
@@ -387,6 +387,7 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
     const uint8_t * infoSeparator1 = static_cast<const uint8_t *>(memchr(bytes, kUnicodeInformationSeparator1, len));
     if (infoSeparator1 == nullptr)
     {
+        // This treats null/empty LSID as a NullOptional (we clear the value at the start)
         return CHIP_NO_ERROR;
     }
 
@@ -400,6 +401,7 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
     }
     if (len == 0)
     {
+        // This treats null/empty LSID as a NullOptional (we clear the value at the start)
         return CHIP_NO_ERROR;
     }
     VerifyOrReturnError(len <= kMaxLocalizedStringIdentifierLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
