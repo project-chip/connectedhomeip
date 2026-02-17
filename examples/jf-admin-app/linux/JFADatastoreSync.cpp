@@ -37,12 +37,12 @@ using namespace chip::app::Clusters::JointFabricDatastore;
 
 extern DeviceCommissioner * GetDeviceCommissioner();
 
-constexpr uint8_t kJFAvailableShift = 0;
-constexpr uint8_t kJFAdminShift     = 1;
-constexpr uint8_t kJFAnchorShift    = 2;
-constexpr uint8_t kJFDatastoreShift = 3;
+[[maybe_unused]] constexpr uint8_t kJFAvailableShift = 0;
+[[maybe_unused]] constexpr uint8_t kJFAdminShift     = 1;
+[[maybe_unused]] constexpr uint8_t kJFAnchorShift    = 2;
+[[maybe_unused]] constexpr uint8_t kJFDatastoreShift = 3;
 
-static constexpr EndpointId kJFDatastoreClusterEndpointId = 1;
+[[maybe_unused]] static constexpr EndpointId kJFDatastoreClusterEndpointId = 1;
 
 JFADatastoreSync JFADatastoreSync::sJFDS;
 
