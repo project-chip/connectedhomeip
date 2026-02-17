@@ -75,6 +75,7 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
     @run_if_endpoint_matches(has_cluster(Clusters.LevelControl))
     async def test_TC_IDM_5_2(self):
         self.step(0)
+        self.endpoint = self.get_endpoint()
 
         # Test Setup with robust endpoint/cluster discovery
         await self.setup_class_helper(allow_pase=False)
