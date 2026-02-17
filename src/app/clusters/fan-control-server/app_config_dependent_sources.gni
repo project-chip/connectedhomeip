@@ -13,6 +13,6 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "fan-control-delegate.h",
-  "fan-control-server.cpp",
-  "fan-control-server.h",
+  "FanControlCluster.cpp",
+  "FanControlCluster.h",
 ]
