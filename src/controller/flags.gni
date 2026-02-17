@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/config/recommended.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 
 declare_args() {
   # Build controller (set to false for a device)
@@ -20,4 +23,10 @@ declare_args() {
 
   # Build controller with webrtc python bindings
   chip_support_webrtc_python_bindings = false
+
+  # Disable Thread MeshCoP if cross-compiling by default.
+  chip_support_thread_meshcop =
+      matter_enable_recommended && chip_device_platform == "linux" &&
+      !chip_system_config_use_openthread_inet_endpoints &&
+      current_cpu == host_cpu && current_os == host_os
 }

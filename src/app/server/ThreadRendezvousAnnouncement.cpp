@@ -23,11 +23,9 @@
 
 #include <lib/support/CodeUtils.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
-#include <lib/dnssd/minimal_mdns/ResponseBuilder.h> // nogncheck
-#include <lib/dnssd/minimal_mdns/records/Srv.h>     // nogncheck
-#include <lib/dnssd/minimal_mdns/records/Txt.h>     // nogncheck
-#endif
+#include <lib/dnssd/minimal_mdns/ResponseBuilder.h>
+#include <lib/dnssd/minimal_mdns/records/Srv.h>
+#include <lib/dnssd/minimal_mdns/records/Txt.h>
 
 namespace chip {
 namespace app {
@@ -113,7 +111,6 @@ CHIP_ERROR TxtStringsBuilder::FormatAndAdd(const char * format, ...)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 CHIP_ERROR BuildThreadRendezvousAnnouncement(const Dnssd::CommissionAdvertisingParameters & params,
                                              System::PacketBufferHandle & outBuffer)
 {
@@ -143,7 +140,6 @@ CHIP_ERROR BuildThreadRendezvousAnnouncement(const Dnssd::CommissionAdvertisingP
 
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
 } // namespace app
 } // namespace chip

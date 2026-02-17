@@ -4959,6 +4959,7 @@ public class ClusterIDMapping {
             GroupTable(1L),
             MaxGroupsPerFabric(2L),
             MaxGroupKeysPerFabric(3L),
+            GroupcastAdoption(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -7520,6 +7521,7 @@ public class ClusterIDMapping {
             ContaminationState(10L),
             SmokeSensitivityLevel(11L),
             ExpiryDate(12L),
+            Unmounted(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -15216,11 +15218,13 @@ public class ClusterIDMapping {
             AudioContextDetected(2L),
             AmbientContextType(3L),
             AmbientContextTypeSupported(4L),
-            SimultaneousDetectionLimit(5L),
-            ObjectCountReached(6L),
-            HoldTime(7L),
-            HoldTimeLimits(8L),
-            PredictedActivity(9L),
+            ObjectCountReached(5L),
+            ObjectCountConfig(6L),
+            ObjectCount(7L),
+            SimultaneousDetectionLimit(8L),
+            HoldTime(9L),
+            HoldTimeLimits(10L),
+            PredictedActivity(11L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -15246,7 +15250,8 @@ public class ClusterIDMapping {
         }
 
         public enum Event {
-            AmbientContextDetected(0L),;
+            AmbientContextDetectStarted(0L),
+            AmbientContextDetectEnded(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;
