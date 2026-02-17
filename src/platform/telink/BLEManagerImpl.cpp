@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2024 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -696,12 +696,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleBleConnectionClosed(event);
         break;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    case DeviceEventType::kThreadStateChange:
-        err = HandleThreadStateChange(event);
-        break;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
     default:
         break;
     }
@@ -956,28 +950,6 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
 
     return CHIP_NO_ERROR;
 }
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    ChipLogDetail(DeviceLayer, "HandleThreadStateChange");
-
-    if (event->Type == DeviceEventType::kThreadStateChange && event->ThreadStateChange.RoleChanged)
-    {
-        ChipDeviceEvent attachEvent;
-        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
-        attachEvent.ThreadConnectivityChange.Result = kConnectivity_Established;
-
-        error = PlatformMgr().PostEvent(&attachEvent);
-        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
-    }
-
-exit:
-    return error;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 } // namespace Internal
 } // namespace DeviceLayer
