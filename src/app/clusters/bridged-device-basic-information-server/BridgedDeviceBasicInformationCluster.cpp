@@ -56,20 +56,15 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
 {
     VerifyOrReturnError(nodeLabel.size() <= kNodeLabelMaxLength, Status::ConstraintError);
 
-    if (nodeLabel.data_equal(CharSpan::fromCharString(mRequiredData.nodeLabel.c_str())))
+    // std::string may not like a nullptr .data() when the charspan is empty.
+    const std::string newValue = nodeLabel.empty() ? std::string() : std::string{ nodeLabel.data(), nodeLabel.size() };
+
+    if (mRequiredData.nodeLabel == newValue)
     {
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
     }
 
-    // std::string may not like a nullptr .data() when the charspan is empty.
-    if (nodeLabel.empty())
-    {
-        mRequiredData.nodeLabel.clear();
-    }
-    else
-    {
-        mRequiredData.nodeLabel = { nodeLabel.data(), nodeLabel.size() };
-    }
+    mRequiredData.nodeLabel = newValue;
     NotifyAttributeChanged(Attributes::NodeLabel::Id);
     mClusterContext.delegate.OnNodeLabelChanged(mRequiredData.nodeLabel);
     return Status::Success;
