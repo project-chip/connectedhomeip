@@ -107,13 +107,12 @@ class TC_GCAST_2_2(MatterBaseTest):
         if not endpoints_list:
             self.mark_step_range_skipped("1b", 8)
 
-        # LeaveGroup all groups. If There were no groups, it should fail with Status.NotFound.
         self.step("1b")
-        try:
+        # Check if there are any groups on the DUT.
+        membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
+        if membership:
+            # LeaveGroup with groupID 0 will leave all groups on the fabric.
             await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.NotFound,
-                                 f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
 
         # remove any existing KeySetID on the DUT, except KeySetId 0 (IPK).
         resp: Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse = await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
@@ -153,7 +152,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("3b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl="false")
+            group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a
@@ -167,14 +166,13 @@ class TC_GCAST_2_2(MatterBaseTest):
             groupID=groupID1,
             endpoints=endpoints_list[0:2],
             keySetID=keySetID1,
-            key=inputKey1,
             useAuxiliaryACL=False)
         )
 
         # TH awaits subscription report of new membership within max interval
         self.step("4c")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID1, endpoints=endpoints_list[0:2], key_set_id=keySetID1, has_auxiliary_acl="false")
+            group_id=groupID1, endpoints=endpoints_list[0:2], key_set_id=keySetID1, has_auxiliary_acl=False)
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 with existing Key1 and using Auxiliary ACL
@@ -191,7 +189,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("5b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID2, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl="true")
+            group_id=groupID2, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=True)
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G2 with new Key
@@ -210,7 +208,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         # TH awaits subscription report of new membership within max interval
         self.step("6b")
         membership_matcher = generate_membership_entry_matcher(
-            group_id=groupID2, key_set_id=keySetID2, endpoints=[endpoint1], has_auxiliary_acl="true")
+            group_id=groupID2, key_set_id=keySetID2, endpoints=[endpoint1], has_auxiliary_acl=True)
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         # Attempt to join Group G3 using a new Key but providing existing KeySetID (result: already exists)
@@ -261,20 +259,18 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # If Sender is supported in DUT, skip this step. Else, attempt to join Group G3 with an empty endpoints list (result: constraint error)
         self.step(10)
-        if sd_enabled:
-            self.skip_step(10)
-
-        endpoints_list_empty = []
-        try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-                groupID=groupID3,
-                endpoints=endpoints_list_empty,
-                keySetID=keySetID1)
-            )
-            asserts.fail("JoinGroup command should have failed because endpoints list is empty, but it still succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError,
-                                 f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
+        if not sd_enabled:
+            endpoints_list_empty = []
+            try:
+                await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                    groupID=groupID3,
+                    endpoints=endpoints_list_empty,
+                    keySetID=keySetID1)
+                )
+                asserts.fail("JoinGroup command should have failed because endpoints list is empty, but it still succeeded")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.ConstraintError,
+                                     f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
 
         # If DUT has more than 20 endpoints, attempt to join Group G3 with 21 endpoints (result: constraint error)
         self.step(11)
