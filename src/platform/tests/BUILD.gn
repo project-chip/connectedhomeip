@@ -68,7 +68,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       }
     }
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       # FIXME: TestThreadStackMgr requires ot-br-posix daemon to be running
       # test_sources += [ "TestThreadStackMgr.cpp" ]
       # configs = [ "//${chip_root}/third_party/ot-br-posix:dbus_config" ]

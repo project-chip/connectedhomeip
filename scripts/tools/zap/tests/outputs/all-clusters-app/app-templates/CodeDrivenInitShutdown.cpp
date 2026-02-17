@@ -79,6 +79,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::TimeSynchronization::Id:
         MatterTimeSynchronizationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Switch::Id:
+        MatterSwitchClusterInitCallback(endpoint);
+        break;
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterInitCallback(endpoint);
         break;
@@ -196,6 +199,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::TimeSynchronization::Id:
         MatterTimeSynchronizationClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::Switch::Id:
+        MatterSwitchClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterShutdownCallback(endpoint, shutdownType);
