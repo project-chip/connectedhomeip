@@ -607,19 +607,32 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
         data.groupID  = 2;
         data.keySetID = kKeyset1;
         data.key      = MakeOptional(ByteSpan(key1));
-
-        auto result = tester.Invoke(Commands::UpdateGroupKey::Id, data);
+        auto result   = tester.Invoke(Commands::UpdateGroupKey::Id, data);
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::AlreadyExists);
 
-        // Update existing keyset (valid)
+        // Update without key (always valid)
+        data.groupID  = 2;
         data.keySetID = kKeyset1;
         data.key.ClearValue();
         result = tester.Invoke(Commands::UpdateGroupKey::Id, data);
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+
+        // Create a new key (valid, if i <= mProvider.GetMaxGroupKeysPerFabric())
+        // 2 keysets already in use
+        data.key = MakeOptional(ByteSpan(key1));
+        for (uint16_t i = 3; i <= mProvider.GetMaxGroupKeysPerFabric() + 1; ++i)
+        {
+            data.keySetID = kKeyset2 + i;
+            result        = tester.Invoke(Commands::UpdateGroupKey::Id, data);
+            ASSERT_TRUE(result.status.has_value());
+            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                      i > mProvider.GetMaxGroupKeysPerFabric() ? Protocols::InteractionModel::Status::ResourceExhausted
+                                                               : Protocols::InteractionModel::Status::Success);
+        }
     }
 
     // Read Membership
@@ -630,9 +643,10 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
         auto iter        = memberships.begin();
         while (iter.Next())
         {
-            auto item = iter.GetValue();
+            auto item            = iter.GetValue();
+            KeysetId expected_id = (1 == item.groupID) ? kKeyset1 : kKeyset2 + mProvider.GetMaxGroupKeysPerFabric();
             ASSERT_EQ(item.groupID, group_id);
-            ASSERT_EQ(item.keySetID, kKeyset1);
+            ASSERT_EQ(item.keySetID, expected_id);
             group_id++;
         }
     }
@@ -676,6 +690,21 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
             ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
             ASSERT_FALSE(item.hasAuxiliaryACL.Value());
         }
+    }
+
+    // Update Sender (false to true), invalid
+    {
+        chip::Testing::ClusterTester sender_tester(mSender);
+        sender_tester.SetFabricIndex(kTestFabricIndex);
+
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = kGroupId;
+        data.useAuxiliaryACL = true;
+
+        auto result = sender_tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ConstraintError);
     }
 
     // Update (false to true)

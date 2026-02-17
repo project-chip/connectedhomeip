@@ -29,6 +29,7 @@ class GroupDataProviderImpl : public GroupDataProvider
 public:
     static constexpr size_t kIteratorsMax         = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
     static constexpr uint16_t kMaxMembershipCount = 10;
+    static constexpr uint16_t kMaxMcastAddrCount  = 4;
 
     GroupDataProviderImpl() = default;
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
@@ -102,8 +103,9 @@ public:
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) override;
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
-    // Groupcast MaxMembershipCount
+    // Groupcast
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
+    uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
 
 protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator

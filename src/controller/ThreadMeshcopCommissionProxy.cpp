@@ -16,7 +16,7 @@
  *
  */
 
-#include "CommissionProxy.h"
+#include "ThreadMeshcopCommissionProxy.h"
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/TxtFields.h>
@@ -26,7 +26,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
-#include <error.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -46,7 +46,7 @@ class CommissionerLogger : public ot::commissioner::Logger
 public:
     void Log(ot::commissioner::LogLevel level, const std::string & region, const std::string & message) override
     {
-        ChipLogProgress(chipTool, "[ot-commissioner][%u][%s] %s", static_cast<unsigned>(level), region.c_str(), message.c_str());
+        ChipLogProgress(Controller, "[ot-commissioner][%u][%s] %s", static_cast<unsigned>(level), region.c_str(), message.c_str());
     }
 };
 
@@ -66,12 +66,15 @@ std::vector<uint8_t> DiscoveryCodeToVector(Thread::DiscoveryCode code)
 }
 } // namespace
 
-CommissionProxy::CommissionProxy() : mState(State::kConnecting), mPromiseFulfilled(false)
+namespace chip {
+namespace Controller {
+
+ThreadMeshcopCommissionProxy::ThreadMeshcopCommissionProxy() : mState(State::kConnecting), mPromiseFulfilled(false)
 {
     mCommissioner = ot::commissioner::Commissioner::Create(*this);
 }
 
-CommissionProxy::~CommissionProxy()
+ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 {
     if (mProxyFd != -1)
     {
@@ -85,29 +88,29 @@ CommissionProxy::~CommissionProxy()
     }
 }
 
-void CommissionProxy::SetState(State state)
+void ThreadMeshcopCommissionProxy::SetState(State state)
 {
     mState = state;
 }
 
-void CommissionProxy::OnHeader(mdns::Minimal::ConstHeaderRef & header)
+void ThreadMeshcopCommissionProxy::OnHeader(mdns::Minimal::ConstHeaderRef & header)
 {
-    ChipLogDetail(chipTool, "mDNS Response: ID=%u, Answers=%u, Additional=%u", header.GetMessageId(), header.GetAnswerCount(),
+    ChipLogDetail(Controller, "mDNS Response: ID=%u, Answers=%u, Additional=%u", header.GetMessageId(), header.GetAnswerCount(),
                   header.GetAdditionalCount());
 }
 
-void CommissionProxy::OnQuery(const mdns::Minimal::QueryData & data)
+void ThreadMeshcopCommissionProxy::OnQuery(const mdns::Minimal::QueryData & data)
 {
     if (mState != State::kDiscovering)
     {
-        ChipLogProgress(chipTool, "Received mDNS query but proxy is not in discovery state");
+        ChipLogProgress(Controller, "Received mDNS query but proxy is not in discovery state");
     }
 
-    ChipLogDetail(chipTool, "mDNS query: %s", mdns::Minimal::QNameString(data.GetName()).c_str());
+    ChipLogDetail(Controller, "mDNS query: %s", mdns::Minimal::QNameString(data.GetName()).c_str());
     mNodeData.Set<Dnssd::CommissionNodeData>();
 }
 
-void CommissionProxy::OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data)
+void ThreadMeshcopCommissionProxy::OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data)
 {
     if (mState != State::kDiscovering)
     {
@@ -130,13 +133,13 @@ void CommissionProxy::OnResource(mdns::Minimal::ResourceType section, const mdns
         mdns::Minimal::SrvRecord srv;
         if (!srv.Parse(data.GetData(), mDnsPacket))
         {
-            ChipLogError(chipTool, "Failed to parse mDNS SRV record");
+            ChipLogError(Controller, "Failed to parse mDNS SRV record");
             return;
         }
 
         if (!name.EndsWith(kMatterCServiceSuffix))
         {
-            ChipLogDetail(chipTool, "Ignoring non-Matter service: %s", name.c_str());
+            ChipLogDetail(Controller, "Ignoring non-Matter service: %s", name.c_str());
             return;
         }
 
@@ -156,7 +159,7 @@ void CommissionProxy::OnResource(mdns::Minimal::ResourceType section, const mdns
             CHIP_ERROR err = CreateProxySocket(commissionData);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(chipTool, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(Controller, "Failed to setup proxy socket: %" CHIP_ERROR_FORMAT, err.Format());
                 SetState(State::kAborted);
             }
         }
@@ -172,7 +175,7 @@ void CommissionProxy::OnResource(mdns::Minimal::ResourceType section, const mdns
     }
 }
 
-CHIP_ERROR CommissionProxy::CreateProxySocket(chip::Dnssd::CommissionNodeData & commissionData)
+CHIP_ERROR ThreadMeshcopCommissionProxy::CreateProxySocket(chip::Dnssd::CommissionNodeData & commissionData)
 {
     mProxyFd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     VerifyOrReturnError(mProxyFd >= 0, CHIP_ERROR_POSIX(errno));
@@ -202,11 +205,11 @@ CHIP_ERROR CommissionProxy::CreateProxySocket(chip::Dnssd::CommissionNodeData & 
     commissionData.ipAddress[0] = Inet::IPAddress::FromSockAddr(addr);
     commissionData.interfaceId  = Inet::InterfaceId::FromIPAddress(commissionData.ipAddress[0]);
 
-    ChipLogProgress(chipTool, "Proxy socket created on port %u", commissionData.port);
+    ChipLogProgress(Controller, "Proxy socket created on port %u", commissionData.port);
     return CHIP_NO_ERROR;
 }
 
-void CommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
+void ThreadMeshcopCommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
 {
     ByteSpan key(name.Start(), name.Size());
     ByteSpan val(value.Start(), value.Size());
@@ -214,8 +217,8 @@ void CommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdn
     Dnssd::FillNodeDataFromTxt(key, val, mNodeData.Get<Dnssd::CommissionNodeData>());
 }
 
-void CommissionProxy::ProcessAnnouncement(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
-                                          const std::vector<uint8_t> & payload)
+void ThreadMeshcopCommissionProxy::ProcessAnnouncement(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
+                                                       const std::vector<uint8_t> & payload)
 {
     std::lock_guard<std::recursive_mutex> lock(mMutex);
 
@@ -229,16 +232,16 @@ void CommissionProxy::ProcessAnnouncement(const std::vector<uint8_t> & joinerIdB
 
     if (!mdns::Minimal::ParsePacket(mDnsPacket, this))
     {
-        ChipLogError(chipTool, "Failed to parse joiner mDNS announcement");
+        ChipLogError(Controller, "Failed to parse joiner mDNS announcement");
         return;
     }
 
     uint32_t discoveredDiscriminator = mNodeData.Get<Dnssd::CommissionNodeData>().longDiscriminator;
-    ChipLogProgress(chipTool, "Discovered joiner with discriminator: %u", discoveredDiscriminator);
+    ChipLogProgress(Controller, "Discovered joiner with discriminator: %u", discoveredDiscriminator);
 
     if (!mExpectedDiscriminator.MatchesLongDiscriminator(static_cast<uint16_t>(discoveredDiscriminator)))
     {
-        ChipLogProgress(chipTool, "Discriminator mismatch (Expected %u, Got %u). Ignoring announcement.",
+        ChipLogProgress(Controller, "Discriminator mismatch (Expected %u, Got %u). Ignoring announcement.",
                         mExpectedDiscriminator.GetLongValue(), discoveredDiscriminator);
         return;
     }
@@ -267,7 +270,7 @@ void CommissionProxy::ProcessAnnouncement(const std::vector<uint8_t> & joinerIdB
                 int rval = connect(mProxyFd, reinterpret_cast<struct sockaddr *>(&addr), len);
                 if (rval < 0)
                 {
-                    ChipLogError(chipTool, "Failed to connect to Matter Commissioner: %s", strerror(errno));
+                    ChipLogError(Controller, "Failed to connect to Matter Commissioner: %s", strerror(errno));
                     continue;
                 }
                 SetState(State::kCommissioning);
@@ -280,21 +283,21 @@ void CommissionProxy::ProcessAnnouncement(const std::vector<uint8_t> & joinerIdB
                 auto error = mCommissioner->SendToJoiner(id, mServicePort, pkt);
                 if (error != ot::commissioner::ErrorCode::kNone)
                 {
-                    ChipLogError(chipTool, "Failed to send packet to joiner: %s", error.GetMessage().c_str());
+                    ChipLogError(Controller, "Failed to send packet to joiner: %s", error.GetMessage().c_str());
                     return;
                 }
                 break;
             }
             default:
-                ChipLogError(chipTool, "Invalid CommissionProxy state: %d", static_cast<int>(mState.load()));
+                ChipLogError(Controller, "Invalid CommissionProxy state: %d", static_cast<int>(mState.load()));
                 return;
             }
         }
     });
 }
 
-void CommissionProxy::OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
-                                      const std::vector<uint8_t> & payload)
+void ThreadMeshcopCommissionProxy::OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
+                                                   const std::vector<uint8_t> & payload)
 {
     std::lock_guard<std::recursive_mutex> lock(mMutex);
 
@@ -304,7 +307,7 @@ void CommissionProxy::OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes
     }
 
     uint64_t joinerId = JoinerIdFromBytes(joinerIdBytes);
-    ChipLogDetail(chipTool, "Message from joiner 0x%" PRIx64 " on port %u", joinerId, joinerPort);
+    ChipLogDetail(Controller, "Message from joiner 0x%" PRIx64 " on port %u", joinerId, joinerPort);
 
     if (mJoinerId == 0)
     {
@@ -312,7 +315,7 @@ void CommissionProxy::OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes
     }
     else if (mJoinerId != joinerId)
     {
-        ChipLogProgress(chipTool, "Ignoring message from unexpected joiner 0x%" PRIx64, joinerId);
+        ChipLogProgress(Controller, "Ignoring message from unexpected joiner 0x%" PRIx64, joinerId);
         return;
     }
 
@@ -323,7 +326,7 @@ void CommissionProxy::OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes
         {
             if (send(mProxyFd, payload.data(), payload.size(), 0) < 0)
             {
-                ChipLogError(chipTool, "Failed to forward packet to local proxy: %s", strerror(errno));
+                ChipLogError(Controller, "Failed to forward packet to local proxy: %s", strerror(errno));
                 SetState(State::kAborted);
             }
         }
@@ -338,12 +341,12 @@ void CommissionProxy::OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes
         ProcessAnnouncement(joinerIdBytes, joinerPort, payload);
         break;
     case State::kDiscovered:
-        ChipLogProgress(chipTool, "WARNING ignore unsolicited messages after joiner is already discovered");
+        ChipLogProgress(Controller, "WARNING ignore unsolicited messages after joiner is already discovered");
         break;
     }
 }
 
-ot::commissioner::CommissionerDataset CommissionProxy::MakeCommissionerDataset(Thread::DiscoveryCode code)
+ot::commissioner::CommissionerDataset ThreadMeshcopCommissionProxy::MakeCommissionerDataset(Thread::DiscoveryCode code)
 {
     ot::commissioner::CommissionerDataset dataset;
 
@@ -366,29 +369,32 @@ ot::commissioner::CommissionerDataset CommissionProxy::MakeCommissionerDataset(T
     dataset.mPresentFlags |= ot::commissioner::CommissionerDataset::kSteeringDataBit;
     return dataset;
 }
-CHIP_ERROR CommissionProxy::InitializeCommissioner(uint8_t (&pskc)[Thread::kSizePSKc])
+CHIP_ERROR ThreadMeshcopCommissionProxy::InitializeCommissioner(ByteSpan & pskc)
 {
+    VerifyOrReturnError(pskc.size() == Thread::kSizePSKc, CHIP_ERROR_INVALID_ARGUMENT);
     ot::commissioner::Config config;
     config.mLogger    = std::make_shared<CommissionerLogger>();
     config.mEnableCcm = false;
     config.mProxyMode = true;
-    config.mPSKc      = std::vector<uint8_t>(pskc, pskc + Thread::kSizePSKc);
+    config.mPSKc      = std::vector<uint8_t>(pskc.begin(), pskc.end());
 
     auto error = mCommissioner->Init(config);
     if (error != ot::commissioner::ErrorCode::kNone)
     {
-        ChipLogError(chipTool, "OT Commissioner Init failed: %s", error.GetMessage().c_str());
+        ChipLogError(Controller, "OT Commissioner Init failed: %s", error.GetMessage().c_str());
         return CHIP_ERROR_INTERNAL;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissionProxy::Discover(uint8_t (&pskc)[Thread::kSizePSKc], const char * host, uint16_t port,
-
-                                     const Thread::DiscoveryCode code, SetupDiscriminator expectedDiscriminator,
-
-                                     Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout)
+CHIP_ERROR ThreadMeshcopCommissionProxy::Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr,
+                                                  const Thread::DiscoveryCode code, SetupDiscriminator expectedDiscriminator,
+                                                  Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout)
 {
+    using ot::commissioner::Error;
+
+    Error error;
+
     // Reset the promise and state for a new discovery session
     std::future<Dnssd::DiscoveredNodeData> future;
     {
@@ -403,34 +409,41 @@ CHIP_ERROR CommissionProxy::Discover(uint8_t (&pskc)[Thread::kSizePSKc], const c
 
     ReturnErrorOnFailure(InitializeCommissioner(pskc));
 
-    ChipLogProgress(chipTool, "Petitioning Thread Border Agent at %s:%u", host, port);
-    std::string id;
-    auto error = mCommissioner->Petition(id, std::string(host), port);
-    if (error != ot::commissioner::ErrorCode::kNone)
     {
-        ChipLogError(chipTool, "Petition failed: %s", error.GetMessage().c_str());
-        SetState(State::kAborted);
-        return CHIP_ERROR_INTERNAL;
-    }
+        std::string id;
+        char host[Inet::IPAddress::kMaxStringLength];
+        peerAddr.GetIPAddress().ToString(host);
 
-    ChipLogProgress(chipTool, "Thread Commissioner active with ID: %s", id.c_str());
+        ChipLogProgress(Controller, "Petitioning Thread Border Agent at %s:%u", host, peerAddr.GetPort());
+        error = mCommissioner->Petition(id, std::string(host), peerAddr.GetPort());
+        if (error != ot::commissioner::ErrorCode::kNone)
+        {
+            ChipLogError(Controller, "Petition failed: %s", error.GetMessage().c_str());
+            SetState(State::kAborted);
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        ChipLogProgress(Controller, "Thread Commissioner active with ID: %s", id.c_str());
+    }
 
     error = mCommissioner->SetCommissionerDataset(MakeCommissionerDataset(code));
     if (error != ot::commissioner::ErrorCode::kNone)
     {
-        ChipLogError(chipTool, "Failed to set Steering Data: %s", error.GetMessage().c_str());
+        ChipLogError(Controller, "Failed to set Steering Data: %s", error.GetMessage().c_str());
         SetState(State::kAborted);
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipLogProgress(chipTool, "Waiting for mDNS announcement from joiner...");
+    ChipLogProgress(Controller, "Waiting for mDNS announcement from joiner...");
     auto waitDuration = std::chrono::seconds(timeout);
     if (future.wait_for(waitDuration) == std::future_status::timeout)
     {
-        ChipLogError(chipTool, "Timed out waiting for joiner mDNS announcement after %u seconds", timeout);
+        ChipLogError(Controller, "Timed out waiting for joiner mDNS announcement after %u seconds", timeout);
         SetState(State::kAborted);
         return CHIP_ERROR_TIMEOUT;
     }
     nodeData = future.get();
     return CHIP_NO_ERROR;
 }
+} // namespace Controller
+} // namespace chip

@@ -43,6 +43,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import CertificateAuthority
+from matter.interaction_model import InteractionModelError, Status
 # from matter.interaction_model import InteractionModelError
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
@@ -62,6 +63,9 @@ class TC_JFDS_2_2(MatterBaseTest):
         self.fabric_a_ctrl = None
         self.storage_fabric_a = self.user_params.get("fabric_a_storage", None)
         self.fabric_a_server_app = None
+        self.devCtrlEcoA = None
+        self.certAuthorityManagerA = None
+        self.fabric_a_persistent_storage = None
 
         jfc_server_app = self.user_params.get("jfc_server_app", None)
         if not jfc_server_app:
@@ -143,6 +147,18 @@ class TC_JFDS_2_2(MatterBaseTest):
         self.ecoACATs = base64.b64decode(jfcStorage.get("Default", "CommissionerCATs"))[::-1].hex().strip('0')
 
     def teardown_class(self):
+        # Shutdown in the correct order: Controller -> CertificateAuthorityManager -> PersistentStorage
+        if self.devCtrlEcoA is not None:
+            self.devCtrlEcoA.Shutdown()
+            self.devCtrlEcoA = None
+
+        if self.certAuthorityManagerA is not None:
+            self.certAuthorityManagerA.Shutdown()
+            self.certAuthorityManagerA = None
+
+        if self.fabric_a_persistent_storage is not None:
+            self.fabric_a_persistent_storage.Shutdown()
+            self.fabric_a_persistent_storage = None
         # Stop all Subprocesses that were started in this test case
         if self.fabric_a_admin is not None:
             self.fabric_a_admin.terminate()
@@ -160,48 +176,58 @@ class TC_JFDS_2_2(MatterBaseTest):
             TestStep("2", "TH sends AddKeySet command to DUT with GroupKeySetID=0x000a.",
                      "Verify that the DUT responds with Status as SUCCESS"),
             TestStep("3", "TH reads KeySetList attribute from DUT",
-                     "Verify that one entry has been added"),
-            # TODO UpdateKeySetID is not implemented in SDK yet
-            # TestStep("4", "TH sends UpdateKeySet command to DUT with GroupKeySetID=0x000a and other values different from values used in step 2.",
-            #          "Verify that the DUT responds with Status as SUCCESS"),
-            # TestStep("5", "TH reads KeySetList attribute from DUT",
-            #          "Verify that the entry with GroupKeySetID=0x000a has values matching values added in step 4"),
-            TestStep("6", "TH sends RemoveKeySet command to DUT with GroupKeySetID=0x000a.",
-                     "Verify that the DUT responds with Status as SUCCESS"),
+                     "Verify that one entry has been added and has values matching values added in step 2."),
+            TestStep("4", "TH sends AddKeySet command to DUT with GroupKeySetID=0x000a.",
+                     "Verify that the DUT responds with Status as CONSTRAINT_ERROR"),
+            TestStep("5", "TH sends UpdateKeySet command to DUT with GroupKeySetID=0x000a.",
+                     "Verify that the DUT responds with Status as SUCCESS and the respective DatastoreNodeKeySetEntry entry is set to Committed."),
+            TestStep("6", "TH sends UpdateKeySet command to DUT with GroupKeySetID=0x000a and wrong GroupKeySecurityPolicy value.",
+                     "Verify that the DUT responds with Status as CONSTRAINT_ERROR and the respective DatastoreNodeKeySetEntry entry is set to CommitFailed."),
             TestStep("7", "TH reads KeySetList attribute from DUT",
-                     "Verify that no entry with GroupKeySetID=0x000a exists in the list."),
-            # TestStep("8", "TH sends AddKeySet command to DUT with GroupKeySetID=0x0000.",
-            #          "Verify that the DUT responds with Status code CONSTRAINT_ERROR")
+                     "Verify that the entry with GroupKeySetID=0x000a exists in the list and matches values added in step 5."),
+            TestStep("8", "TH sends UpdateKeySet command to DUT with GroupKeySetID=0x0FFF.",
+                     "Verify that the DUT responds with Status code NOT_FOUND."),
+            TestStep("9", "TH sends RemoveKeySet command to DUT with GroupKeySetID=0x0FFF.",
+                     "Verify that the DUT responds with Status code NOT_FOUND."),
+            TestStep("10", "TH sends RemoveKeySet command to DUT with GroupKeySetID=0x0000.",
+                     "Verify that the DUT responds with Status code CONSTRAINT_ERROR."),
+            TestStep("11", "TH sends RemoveKeySet command to DUT with GroupKeySetID=0x000a.",
+                     "Verify that the DUT responds with Status as SUCCESS."),
+            TestStep("12", "TH reads KeySetList attribute from DUT",
+                     "Verify that the entry with GroupKeySetID=0x000a no longer exists in the list."),
+            TestStep("13", "TH sends AddKeySet command to DUT with GroupKeySetID=0x0000.",
+                     "Verify that the DUT responds with Status code CONSTRAINT_ERROR."),
+            TestStep("14", "TH sends RemoveKeySet command to DUT with GroupKeySetID=0x0000.",
+                     "Verify that the DUT responds with Status code CONSTRAINT_ERROR."),
         ]
 
     @async_test_body
     async def test_TC_JFDS_2_2(self):
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+        self.fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
             self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
-        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
+        self.certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_a_persistent_storage)
-        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+            persistentStorage=self.fabric_a_persistent_storage)
+        self.certAuthorityManagerA.LoadAuthoritiesFromStorage()
+        self.devCtrlEcoA = self.certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
         self.step("1")
-        response = await devCtrlEcoA.ReadAttribute(
+        response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
-        _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
-        step1_groupKeySetListLength = len(_groupKetSetList)
-        # TODO GroupKeySet is not populated yet. Missing SDK implementation. Uncomment this validation step when ready
-        # asserts.assert_greater_equal(step1_groupKeySetListLength, 1, "GroupKeySetList must contain at least one entry!")
-        # _found = False
-        # for _entry in _groupKetSetList:
-        #     if _entry["GroupKeySetID"] == 0:
-        #         _found = True
-        #         break
-        # asserts.assert_true(_found, "No GroupKeySetID=0 entry found!")
+        _groupKeySetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
+        step1_groupKeySetListLength = len(_groupKeySetList)
+        asserts.assert_greater_equal(step1_groupKeySetListLength, 1, "GroupKeySetList must contain at least one entry!")
+        _found = False
+        for _entry in _groupKeySetList:
+            if _entry.groupKeySetID == 0:
+                _found = True
+                break
+        asserts.assert_true(_found, "No GroupKeySetID=0 entry found!")
 
         self.step("2")
         step2_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
@@ -214,83 +240,163 @@ class TC_JFDS_2_2(MatterBaseTest):
             epochKey2=b'22222222222222222222222222222222',
             epochStartTime2=2220002)
         cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step2_groupKeySet)
-        await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
+        await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
 
         self.step("3")
-        response = await devCtrlEcoA.ReadAttribute(
+        response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
-        _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
-        asserts.assert_greater_equal(len(_groupKetSetList), step1_groupKeySetListLength,
-                                     "An new entry was not added in groupKeySetList")
+        _groupKeySetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
+        asserts.assert_greater(len(_groupKeySetList), step1_groupKeySetListLength,
+                               "An new entry was not added in groupKeySetList")
         _found = False
-        for _item in _groupKetSetList:
+        for _item in _groupKeySetList:
             if _item == step2_groupKeySet:
                 _found = True
                 break
         asserts.assert_true(_found, "GroupKeySet from step2 was not found on DUT!")
 
-        # TODO Uncomment step 4 and 5 when UpdateKeySet command will work propery
-        # self.step("4")
-        # step4_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
-        #     groupKeySetID=0x000a,
-        #     groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-        #     epochKey0=b'00000000000000000000000000000000',
-        #     epochStartTime0=2220001,
-        #     epochKey1=b'11111111111111111111111111111111',
-        #     epochStartTime1=2220002,
-        #     epochKey2=b'99999999999999999999999999999999',
-        #     epochStartTime2=22200023)
-        # cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step4_groupKeySet)
-        # await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
+        self.step("4")
+        step4_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x000a,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=b'00000000000000000000000000000000',
+            epochStartTime0=2220000,
+            epochKey1=b'11111111111111111111111111111111',
+            epochStartTime1=2220001,
+            epochKey2=b'99999999999999999999999999999999',
+            epochStartTime2=2220002)
+        cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step4_groupKeySet)
+        # Verify that the DUT responds with Status as CONSTRAINT_ERROR
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
 
-        # self.step("5")
-        # response = await devCtrlEcoA.ReadAttribute(
-        #     nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
-        #     returnClusterObject=True)
-        # _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
-
-        # _found = False
-        # for _item in _groupKetSetList:
-        #     if _item == step4_groupKeySet:
-        #         _found = True
-        #         break
-        # asserts.assert_true(_found, "GroupKeySet from step4 was not found on DUT!")
+        self.step("5")
+        step5_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x000a,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=b'00000000000000000000000000000000',
+            epochStartTime0=2220001,
+            epochKey1=b'11111111111111111111111111111111',
+            epochStartTime1=2220002,
+            epochKey2=b'99999999999999999999999999999999',
+            epochStartTime2=2220003)
+        cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step5_groupKeySet)
+        await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
 
         self.step("6")
-        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x000a)
-        await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
+        step6_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x000a,
+            groupKeySecurityPolicy=2,
+            epochKey0=b'00000000000000000000000000000000',
+            epochStartTime0=2220001,
+            epochKey1=b'11111111111111111111111111111111',
+            epochStartTime1=2220002,
+            epochKey2=b'99999999999999999999999999999999',
+            epochStartTime2=2220003)
+        cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step6_groupKeySet)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
 
         self.step("7")
-        response = await devCtrlEcoA.ReadAttribute(
+        response = await self.devCtrlEcoA.ReadAttribute(
             nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
             returnClusterObject=True)
-        _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
-        for _item in _groupKetSetList:
-            asserts.assert_equal(0x000a, _item.groupKeySetID)
+        _groupKeySetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
 
-        # TODO: Validation not implemented in SDK. Uncomment when it will be ready
-        # self.step("8")
-        # _groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
-        #     groupKeySetID=0x0000,
-        #     groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-        #     epochKey0=b'00000000000000000000000000000000',
-        #     epochStartTime0=2220000,
-        #     epochKey1=b'11111111111111111111111111111111',
-        #     epochStartTime1=2220001,
-        #     epochKey2=b'22222222222222222222222222222222',
-        #     epochStartTime2=2220002)
-        # cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(_groupKeySet)
-        # try:
-        #     await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
-        # except InteractionModelError as e:
-        #     asserts.assert_in('CONSTRANT_ERROR (0x87)',
-        #                       str(e), f'Expected CONSTRANT_ERROR error, but got {str(e)}')
-        # else:
-        #     asserts.assert_true(False, 'Expected InteractionModelError with CONSTRANT_ERROR, but no exception occurred!')
+        _found = False
+        for _item in _groupKeySetList:
+            if _item == step5_groupKeySet:
+                _found = True
+                break
+        asserts.assert_true(_found, "GroupKeySet from step5 was not found on DUT!")
 
-        # Shutdown the Python Controllers started at the beginning of this script
-        devCtrlEcoA.Shutdown()
+        self.step("8")
+        step8_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x0FFF,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=b'00000000000000000000000000000000',
+            epochStartTime0=2220001,
+            epochKey1=b'11111111111111111111111111111111',
+            epochStartTime1=2220002,
+            epochKey2=b'99999999999999999999999999999999',
+            epochStartTime2=2220003)
+        cmd = Clusters.JointFabricDatastore.Commands.UpdateKeySet(step8_groupKeySet)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            asserts.fail("Expected NOT_FOUND but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Expected NOT_FOUND but got {e.status}")
+
+        self.step("9")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x0fff)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            asserts.fail("Expected NOT_FOUND but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound,
+                                 f"Expected NOT_FOUND but got {e.status}")
+
+        self.step("10")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x0000)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
+
+        self.step("11")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x000a)
+        await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+
+        self.step("12")
+        response = await self.devCtrlEcoA.ReadAttribute(
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            returnClusterObject=True)
+        _groupKeySetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
+        _found = False
+        for _item in _groupKeySetList:
+            if _item.groupKeySetID == 0x000a:
+                _found = True
+                break
+        asserts.assert_false(_found, "GroupKeySetID=0x000a should not exist in the list")
+
+        self.step("13")
+        _groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x0000,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=b'00000000000000000000000000000000',
+            epochStartTime0=2220000,
+            epochKey1=b'11111111111111111111111111111111',
+            epochStartTime1=2220001,
+            epochKey2=b'22222222222222222222222222222222',
+            epochStartTime2=2220002)
+        cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(_groupKeySet)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
+
+        self.step("14")
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x0000)
+        try:
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=self.devCtrlEcoA, node_id=1, endpoint=1)
+            asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR but got {e.status}")
 
 
 if __name__ == "__main__":

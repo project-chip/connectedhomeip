@@ -41,6 +41,8 @@ set(APP_SRCS
     "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light/LoggingOnOffLightDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
     "${ALL_DEVICES_COMMON_DIR}/devices/root-node/WifiRootNodeDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/SpeakerDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl/LoggingSpeakerDevice.cpp"
     # keep-sorted: end
 
     # Providers
@@ -107,6 +109,7 @@ set(CLUSTER_SRCS
     "${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/groups-server/GroupsCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/identify-server/IdentifyCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/level-control/LevelControlCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/network-commissioning/NetworkCommissioningCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/network-commissioning/WifiScanResponse.cpp"
     "${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/OccupancySensingCluster.cpp"
@@ -117,7 +120,7 @@ set(CLUSTER_SRCS
     "${CHIP_ROOT}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp"
     "${CHIP_ROOT}/src/app/clusters/scenes-server/ScenesManagementCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/scenes-server/SceneTableImpl.cpp"
-    "${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.cpp"
+    "${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-fault-listener.cpp"
     "${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.cpp"
     # keep-sorted: end
