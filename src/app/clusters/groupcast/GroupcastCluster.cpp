@@ -80,7 +80,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::LeaveGroupResponse::Type response;
         GroupcastLogic::EndpointList endpoints;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        Protocols::InteractionModel::Status status = mLogic.LeaveGroup(fabric_index, data, endpoints);
+        status = mLogic.LeaveGroup(fabric_index, data, endpoints);
         if (Protocols::InteractionModel::Status::Success == status)
         {
             NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
