@@ -42,7 +42,6 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
     mRadioBlocked               = false;
-    mReadyToAttach              = false;
     otInstance * const instance = openthread_get_default_instance();
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
@@ -52,6 +51,30 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::StartNonConcurrentThreadManagement()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    ChipLogProgress(DeviceLayer, "Switch to Thread");
+
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(false);
+    ThreadStackMgrImpl().SetRadioBlocked(false);
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ChipDeviceEvent opEvent;
+    opEvent.Type = DeviceEventType::kOperationalNetworkStarted;
+
+    error = PlatformMgr().PostEvent(&opEvent);
+    VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
+#endif
+
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().CommitConfiguration();
+
+exit:
+    return error;
 }
 
 void ThreadStackManagerImpl::_LockThreadStack()
@@ -90,36 +113,6 @@ CHIP_ERROR ThreadStackManagerImpl::CommitConfiguration(void)
     CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName());
 
     return error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? CHIP_NO_ERROR : error;
-}
-
-CHIP_ERROR
-ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
-                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
-{
-    CHIP_ERROR result = CHIP_NO_ERROR;
-
-    Thread::OperationalDataset current_dataset;
-    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadProvision(current_dataset);
-    if (dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && callback == nullptr)
-        return CHIP_NO_ERROR;
-
-    if (mRadioBlocked || mReadyToAttach)
-    {
-        /* On Telink platform it's not possible to rise Thread network when its used by BLE,
-           so just mark that it's provisioned and rise Thread after BLE disconnect */
-        result = SetThreadProvision(dataset.AsByteSpan());
-        if (result == CHIP_NO_ERROR)
-        {
-            mReadyToAttach = true;
-            callback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-        }
-    }
-    else
-    {
-        result =
-            Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_AttachToThreadNetwork(dataset, callback);
-    }
-    return result;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)

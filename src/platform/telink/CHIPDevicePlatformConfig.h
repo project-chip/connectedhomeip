@@ -120,6 +120,10 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 #endif
 
+#if defined(CONFIG_SOC_RISCV_TELINK_TLX) || defined(CONFIG_SOC_RISCV_TELINK_B9X)
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 0
+#endif
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Zephyr platforms.

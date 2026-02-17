@@ -681,14 +681,8 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     LOG_INF("StartThreadHandler");
     if (!sIsNetworkProvisioned)
     {
-        // Switch context from BLE to Thread
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        Internal::BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-#else
         ThreadStackMgrImpl().SetRadioBlocked(false);
         ThreadStackMgrImpl().SetThreadEnabled(true);
-#endif
         StartDefaultThreadNetwork();
     }
     else

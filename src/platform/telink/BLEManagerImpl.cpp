@@ -49,6 +49,10 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#include <platform/DeviceControlServer.h>
+#endif
+
 extern "C" {
 #if defined(CONFIG_BT_B9X)
 extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
@@ -160,7 +164,6 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init(void)
 {
     mBLERadioInitialized  = false;
-    mReadyToAttachThread  = false;
     mconId                = NULL;
     mInternalScanCallback = new InternalScanCallback(this);
 
@@ -697,10 +700,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kThreadStateChange:
         err = HandleThreadStateChange(event);
         break;
-
-    case DeviceEventType::kOperationalNetworkEnabled:
-        err = HandleOperationalNetworkEnabled(event);
-        break;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     default:
@@ -780,7 +779,23 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    TEMPORARY_RETURN_IGNORED CloseConnection(conId);
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mState == kState_NotInitialized)
+    {
+        TEMPORARY_RETURN_IGNORED CloseConnection(conId);
+    }
+#endif
+}
+
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mState == kState_Disconnecting)
+    {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::DeviceControlServer::DeviceControlSvr()
+            .PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+    }
+#endif
 }
 
 bool BLEManagerImpl::IsSubscribed(bt_conn * conn)
@@ -928,7 +943,6 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
-    // Deinit BLE
     bt_disable();
     mBLERadioInitialized = false;
 
@@ -937,50 +951,12 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (ThreadStackMgrImpl().IsReadyToAttach())
-    {
-        SwitchToIeee802154();
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().StartNonConcurrentThreadManagement();
+#endif
 
     return CHIP_NO_ERROR;
 }
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
-{
-    ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
-
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    /* On first commissioning BLE disconnects before switching to Thread operational network.
-       All subsequent Thread operational network changes are handled in a bit different way */
-    if (!mReadyToAttachThread)
-    {
-        error = MapErrorZephyr(bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN));
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Close BLEConn err: %" CHIP_ERROR_FORMAT, error.Format());
-        }
-        mReadyToAttachThread = true;
-    }
-    else
-    {
-        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(false);
-        SwitchToIeee802154();
-
-        ChipDeviceEvent attachEvent;
-        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
-        attachEvent.ThreadConnectivityChange.Result = kConnectivity_Established;
-
-        error = PlatformMgr().PostEvent(&attachEvent);
-        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
-
-        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().CommitConfiguration();
-    }
-
-exit:
-    return error;
-}
 
 CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)
 {
@@ -1000,15 +976,6 @@ CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event
 
 exit:
     return error;
-}
-
-void BLEManagerImpl::SwitchToIeee802154(void)
-{
-    ChipLogProgress(DeviceLayer, "Switch context from BLE to Thread");
-
-    // Init Thread
-    ThreadStackMgrImpl().SetRadioBlocked(false);
-    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 

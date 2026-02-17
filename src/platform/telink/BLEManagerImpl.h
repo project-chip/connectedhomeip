@@ -80,6 +80,7 @@ private:
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void CheckNonConcurrentBleClosing() override;
 
     // ===== Private members reserved for use by this class only.
 
@@ -108,7 +109,6 @@ private:
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
     bool mBLERadioInitialized;
-    bool mReadyToAttachThread;
     bool mNeedToResetFailSafeTimer;
 
     void DriveBLEState(void);
@@ -122,16 +122,8 @@ private:
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
     CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
 
-    /*
-        WORKAROUND: Due to abscense of non-cuncurrent mode in Matter
-        we are emulating connection to Thread with this events and manually
-        disconnect BLE ass soon as OperationalNetworkEnabled occures.
-        This functionality shall be removed as soon as non-cuncurrent mode
-        would be implemented
-     */
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     InternalScanCallback * mInternalScanCallback;
@@ -171,11 +163,6 @@ public:
 
     bool NeedToResetFailSafeTimer(void);
     void ClearResetFailSafeTimerFlag(void);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    // Switch context from BLE to Thread
-    void SwitchToIeee802154(void);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     CHIP_ERROR StartAdvertisingProcess(void);
 };
