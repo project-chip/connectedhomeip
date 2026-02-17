@@ -33,7 +33,7 @@ import sys
 import threading
 import time
 from collections import deque
-from typing import IO, Any, Pattern, Union
+from typing import IO, Any, Pattern, Self, Union
 
 import sdbus
 
@@ -74,167 +74,118 @@ def ensure_private_state():
 
 
 @dataclasses.dataclass
-class NetworkCmd:
+class WrappableCmd:
     """Command used to set up some network resource with optional cleanup command."""
 
-    up_cmd: str
-    """Set up the network resource."""
+    cmd: str
+    ns_wrapper: bool = False
 
-    down_cmd: str | None = None
-    """Optionally clean up the network resource."""
+    def run(self, ns) -> None:  # Cannot specify NetworkNamespace here as it's not defined yet
+        if self.ns_wrapper and ns:
+            _cmd = ns.wrap_cmd(self.cmd)
+        else:
+            _cmd = self.cmd
 
-    ns_wrapper: str | bool = False
-    """Optional network namespace command wrapper.
-
-    Possible values:
-    - str() -- wrap the up/down command with this value.
-    - False -- disable optional command wrapper (means that it shouldn't be modified).
-    - True -- the wrapper can be modified but is not set (yet).
-    """
-
-    def up(self) -> None:
-        self._run_cmd(self.up_cmd)
-
-    def down(self) -> None:
-        if self.down_cmd is not None:
-            self._run_cmd(self.down_cmd)
-
-    def _run_cmd(self, command: str) -> None:
-        if isinstance(self.ns_wrapper, str):
-            command = f"{self.ns_wrapper} {command}"
-
-        log.debug("Executing: '%s'", command)
-        if subprocess.run(shlex.split(command)).returncode != 0:
-            raise RuntimeError(f"Failed to execute '{command}'. Are you using --privileged if running in docker?")
+        log.debug("Executing: '%s'", _cmd)
+        if subprocess.run(shlex.split(_cmd)).returncode != 0:
+            raise RuntimeError(f"Failed to execute '{_cmd}'. Are you using --privileged if running in docker?")
 
 
-class NetworkCmdHandler:
-    def __init__(self, cmd_history: deque[NetworkCmd]) -> None:
-        """Create a command handler for a network resource.
+@dataclasses.dataclass
+class NetworkResource:
 
-        Note: Currently, there is no option to "reset" the command handler, as there is no requirement in the test suite to
-        repeatedly initialize/terminate network resources. This means that once a network is terminated, it cannot be reinitialized.
-        """
-        # External history of executed commands.
-        self._cmd_history = cmd_history
+    setup_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    teardown_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    up_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    down_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    deps: list[Self] = dataclasses.field(default_factory=list)
+    ns = None  # NetworkNamespace is not defined yet
 
-        # Commands used to setup and activate the network resource.
-        self._setup_cmds: deque[NetworkCmd] = deque()
-        self._activate_cmds: deque[NetworkCmd] = deque()
-
-        # Dependencies of this network resource. Before executing any command we ensure that the dependencies are in proper state.
-        self._dependencies: list[NetworkCmdHandler] = []
-
-    def _run_up(self, cmds: deque[NetworkCmd]):
-        while cmds:
-            self._cmd_history.append(cmd := cmds.popleft())
-            cmd.up()
-
-    def setup(self) -> None:
-        """Set up the network resource without bringing it up."""
-        for dep in self._dependencies:
+    def setup(self):
+        # log.debug(f"SETUP[{self}]")
+        for dep in self.deps:
             dep.setup()
-        self._run_up(self._setup_cmds)
 
-    def activate(self, *args: Any, **kwargs: Any) -> None:
-        """Activate the network resource (in case of a link, make it "up").
+        for cmd in self.setup_cmds:
+            cmd.run(self.ns)
 
-        Subclasses might add additional arguments.
-        """
-        # Ensure that the interface is set up. Effectively a noop if already done.
-        self.setup()
+    def teardown(self):
+        # log.debug(f"TEARDOWN[{self}]")
+        for cmd in self.teardown_cmds:
+            cmd.run(self.ns)
 
-        for dep in self._dependencies:
-            dep.activate()
-        self._run_up(self._activate_cmds)
+        for dep in self.deps:
+            dep.teardown()
 
-    def register_dependencies(self, *deps: NetworkCmdHandler):
-        """Register dependencies of this network resource."""
-        self._dependencies.extend(deps)
+    def up(self):
+        # log.debug(f"UP[{self}]")
+        for cmd in self.up_cmds:
+            cmd.run(self.ns)
 
-
-class NetworkBridge(NetworkCmdHandler):
-    def __init__(self, name: str, cmd_history: deque[NetworkCmd]) -> None:
-        super().__init__(cmd_history)
-        self._name = name
-        self._setup_cmds.append(NetworkCmd(f"ip link add {name} type bridge", f"ip link delete {name}"))
-        self._activate_cmds.append(NetworkCmd(f"ip link set {name} up", f"ip link set {name} down"))
-
-    @property
-    def name(self) -> str:
-        return self._name
+    def down(self):
+        # log.debug(f"DOWN[{self}]")
+        for cmd in self.down_cmds:
+            cmd.run(self.ns)
 
 
-class NetworkNamespace(NetworkCmdHandler):
-    def __init__(self, name: str, cmd_history: deque[NetworkCmd]) -> None:
-        super().__init__(cmd_history)
-        self._name = name
-        self._setup_cmds.append(NetworkCmd(f"ip netns add {name}", f"ip netns del {name}"))
-
-    @property
-    def name(self) -> str:
-        return self._name
+class NetworkNamespace(NetworkResource):
+    def __init__(self, name: str) -> None:
+        self.name = name
+        super().__init__(setup_cmds=[
+            WrappableCmd(f"ip netns add {name}")
+        ],
+            teardown_cmds=[
+            WrappableCmd(f"ip netns del {name}")
+        ])
 
     @property
     def netns_cmd_wrapper(self) -> str:
-        return f"ip netns exec {self._name}"
+        return f"ip netns exec {self.name}"
+
+    def wrap_cmd(self, cmd: str) -> str:
+        return f"{self.netns_cmd_wrapper} {cmd}"
 
 
-class NetworkLink(NetworkCmdHandler):
-    def __init__(self, link_name: str, ipv4: str, ipv6: str, ipv6_ula: str | None, cmd_history: deque[NetworkCmd]) -> None:
-        super().__init__(cmd_history)
+class NetworkLink(NetworkResource):
+    def __init__(self, link_name: str, ipv4_addrs: list[str], ipv6_addrs: list[str]) -> None:
 
-        self._link_name = link_name
-        self._switch_name = switch_name = f"{link_name}-sw"
-        self._ipv4 = ipv4
-        self._ipv6 = ipv6
-        self._ipv6_ula = ipv6_ula
-        self._ns_wrapper: str | None = None
+        self.link_name = link_name
+        self.switch_name = f"{link_name}-sw"
+        self.ipv4_addrs = ipv4_addrs
+        self.ipv6_addrs = ipv6_addrs
+        self.ns = None
 
-        self._setup_cmds.append(
-            NetworkCmd(f"ip link add {link_name} type veth peer name {switch_name}", f"ip link delete {switch_name}")
-        )
-        self._activate_cmds.extend((
-            NetworkCmd(f"ip addr add {ipv4} dev {link_name}", f"ip addr del {ipv4} dev {link_name}", ns_wrapper=True),
-            NetworkCmd(f"ip link set dev {link_name} up", f"ip link set dev {link_name} down", ns_wrapper=True),
-            NetworkCmd(f"ip link set dev {switch_name} up", f"ip link set dev {switch_name} down", ns_wrapper=False),
+        up_cmds = [
+            WrappableCmd(f"ip link set dev {self.switch_name} up"),
+            WrappableCmd(f"ip link set dev {self.link_name} up", ns_wrapper=True),
+            WrappableCmd("ip link set dev lo up", ns_wrapper=True),
+            WrappableCmd(f"ip -6 addr flush {self.link_name}", ns_wrapper=True),
+        ]
+        up_cmds.extend([WrappableCmd(f"ip addr add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv4_addrs])
+        up_cmds.extend([WrappableCmd(f"ip -6 a add {addr} dev {self.link_name}",
+                       ns_wrapper=True) for addr in self.ipv6_addrs])
 
-            NetworkCmd(f"ip -6 addr flush {link_name}", ns_wrapper=True),
-            NetworkCmd(f"ip -6 a add {ipv6} dev {link_name}", ns_wrapper=True),
+        up_cmds.extend([WrappableCmd(cmd, ns_wrapper=True) for cmd in [
+            "sysctl -w net.ipv6.conf.all.forwarding=1",
+            "sysctl -w net.ipv6.conf.default.forwarding=1",
+            f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra=1",
+            f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra_rt_info_max_plen=64"
+        ]])
 
-            NetworkCmd("sysctl -w net.ipv6.conf.all.forwarding=1", ns_wrapper=True),
-            NetworkCmd("sysctl -w net.ipv6.conf.default.forwarding=1", ns_wrapper=True),
-            NetworkCmd(f"sysctl -w net.ipv6.conf.{link_name}.accept_ra=2", ns_wrapper=True),
-            NetworkCmd(f"sysctl -w net.ipv6.conf.{link_name}.accept_ra_rt_info_max_plen=64", ns_wrapper=True),
-        ))
+        super().__init__(
+            setup_cmds=[WrappableCmd(f"ip link add {self.link_name} type veth peer name {self.switch_name}")],
+            teardown_cmds=[WrappableCmd(f"ip link delete {self.switch_name}")],
+            up_cmds=up_cmds,
+            down_cmds=[
+                WrappableCmd(f"ip link set dev {self.link_name} down", ns_wrapper=True),
+                WrappableCmd(f"ip link set dev {self.switch_name} down")
+            ])
 
-        if ipv6_ula is not None:
-            self._activate_cmds.append(NetworkCmd(f"ip -6 a add {ipv6_ula} dev {link_name}", ns_wrapper=True))
+    def attach_to_ns(self, ns: NetworkNamespace):
+        self.ns = ns
+        self.deps.append(ns)
 
-    @property
-    def link_name(self) -> str:
-        return self._link_name
-
-    @property
-    def switch_name(self) -> str:
-        return self._switch_name
-
-    @property
-    def ipv4(self) -> str:
-        return self._ipv4
-
-    @property
-    def ipv6(self) -> str:
-        return self._ipv6
-
-    @property
-    def ipv6_ula(self) -> str | None:
-        return self._ipv6_ula
-
-    def activate(self, wait_for_dad: bool = True) -> None:
-        super().activate()
-        if wait_for_dad:
-            self.wait_for_duplicate_address_detection()
+        self.setup_cmds.append(WrappableCmd(f"ip link set {self.link_name} netns {ns.name}"))
 
     def wait_for_duplicate_address_detection(self) -> bool:
         # IPv6 does Duplicate Address Detection even though we know ULAs provided are isolated.
@@ -242,8 +193,8 @@ class NetworkLink(NetworkCmdHandler):
         log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
 
         cmd = "ip addr"
-        if self._ns_wrapper:
-            cmd = f"{self._ns_wrapper} {cmd}"
+        if self.ns:
+            cmd = self.ns.wrap_cmd(cmd)
         cmd_list = shlex.split(cmd)
 
         # Wait at most 10 seconds.
@@ -257,21 +208,26 @@ class NetworkLink(NetworkCmdHandler):
         log.warning("Some addresses look to still be tentative")
         return False
 
-    def register_dependencies(self, *deps: NetworkCmdHandler):
-        super().register_dependencies(*deps)
-        for dep in deps:
-            match dep:
-                case NetworkBridge():
-                    self._setup_cmds.append(NetworkCmd(f"ip link set {self._switch_name} master {dep.name}"))
-                case NetworkNamespace():
-                    self._setup_cmds.append(NetworkCmd(f"ip link set {self._link_name} netns {dep.name}"))
-                    self._activate_cmds.append(NetworkCmd("ip link set dev lo up", ns_wrapper=True))
-                    self._ns_wrapper = dep.netns_cmd_wrapper
-                    for cmd in itertools.chain(self._setup_cmds, self._activate_cmds):
-                        if cmd.ns_wrapper:
-                            cmd.ns_wrapper = dep.netns_cmd_wrapper
-                case _:
-                    log.warning("Unsupported network resource dependency type %s", type(dep).__name__)
+    def up(self, wait_for_dad: bool = True):
+        super().up()
+        if wait_for_dad:
+            self.wait_for_duplicate_address_detection()
+
+
+class NetworkBridge(NetworkResource):
+    def __init__(self, name: str):
+        self.name = name
+        super().__init__(setup_cmds=[WrappableCmd(f"ip link add {name} type bridge")],
+                         teardown_cmds=[WrappableCmd(f"ip link delete {name}")],
+                         up_cmds=[WrappableCmd(f"ip link set {name} up")],
+                         down_cmds=[WrappableCmd(f"ip link set {name} down")]
+                         )
+
+    def attach_link(self, link: NetworkLink):
+        self.setup_cmds.append(WrappableCmd(f"ip link set {link.switch_name} master {self.name}"))
+        self.teardown_cmds.insert(0, WrappableCmd(f"ip link set {link.switch_name} nomaster"))
+
+        self.deps.append(link)
 
 
 class IsolatedNetworkNamespace:
@@ -282,42 +238,51 @@ class IsolatedNetworkNamespace:
         """Initialize isolated network namespaces.
 
         - mgmt -- management network for the RPC server.
-        - ctrl -- control network for the chip_tool.
+        - ctrl -- controller network for chip-tool.
         - app -- network for tested application(s).
         """
         self.index = index
 
-        # Global history of executed commands used for cleanup in terminate().
-        self._cmd_history: deque[NetworkCmd] = deque()
+        app_ipv6 = ["fe80::1/64"]
+        if add_ula:
+            app_ipv6.append("fd00:0:1:1::1/64")
+        self.app_link = NetworkLink(f"{app_name}-{index}", ipv4_addrs=["10.10.10.1/24"], ipv6_addrs=app_ipv6)
 
-        self.bridge = NetworkBridge(f"br-{index}", self._cmd_history)
+        ctrl_ipv6 = ["fe80::2/64"]
+        if add_ula:
+            ctrl_ipv6.append("fd00:0:1:1::2/64")
+        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=ctrl_ipv6)
 
-        self.mgmt_link = NetworkLink(f"{mgmt_name}-{index}", "10.10.10.5/24", "fe80::5/64",
-                                     "fd00:0:1:1::5/64" if add_ula else None, self._cmd_history)
-        self.mgmt_link.register_dependencies(self.bridge)
+        mgmt_ipv6 = ["fe80::5/64"]
+        if add_ula:
+            mgmt_ipv6.append("fd00:0:1:1::5/64")
+        self.mgmt_link = NetworkLink(f"{mgmt_name}-{index}", ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6)
 
-        self.ctrl_ns = NetworkNamespace(f"ns-{ctrl_name}-{index}", self._cmd_history)
-        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", "10.10.10.2/24", "fe80::2/64",
-                                     "fd00:0:1:1::2/64" if add_ula else None, self._cmd_history)
-        self.ctrl_link.register_dependencies(self.bridge, self.ctrl_ns)
+        self.bridge = NetworkBridge(f"br-{index}")
+        self.bridge.attach_link(self.app_link)
+        self.bridge.attach_link(self.ctrl_link)
+        self.bridge.attach_link(self.mgmt_link)
 
-        self.app_ns = NetworkNamespace(f"ns-{app_name}-{index}", self._cmd_history)
-        self.app_link = NetworkLink(f"{app_name}-{index}", "10.10.10.1/24", "fe80::1/64",
-                                    "fd00:0:1:1::1/64" if add_ula else None, self._cmd_history)
-        self.app_link.register_dependencies(self.bridge, self.app_ns)
+        self.app_ns = NetworkNamespace(f"ns-{app_name}-{index}")
+        self.ctrl_ns = NetworkNamespace(f"ns-{ctrl_name}-{index}")
+
+        self.app_link.attach_to_ns(self.app_ns)
+        self.ctrl_link.attach_to_ns(self.ctrl_ns)
 
         try:
-            # We only need to iterate through the links, because other resources are registered as their dependencies.
-            for link in (self.mgmt_link, self.ctrl_link, self.app_link):
-                link.setup()
+            # Bridge is the root of the dependency tree
+            self.bridge.setup()
 
             # Bring up selected links.
             if mgmt_link_up:
-                self.mgmt_link.activate()
+                self.mgmt_link.up()
             if ctrl_link_up:
-                self.ctrl_link.activate()
+                self.ctrl_link.up()
             if app_link_up:
-                self.app_link.activate()
+                self.app_link.up()
+
+            self.bridge.up()
+
         except BaseException as e:
             log.error("Encountered error while setting up network namespaces: %r", e)
             # Ensure that we leave a clean state on any exception.
@@ -335,11 +300,10 @@ class IsolatedNetworkNamespace:
 
     def terminate(self):
         """Execute all down commands in reverse order, gracefully omitting errors."""
-        while self._cmd_history:
-            try:
-                self._cmd_history.pop().down()
-            except Exception as e:
-                log.warning("Encountered an error during termination of network resources: %r", e)
+        try:
+            self.bridge.teardown()
+        except Exception as e:
+            log.warning("Encountered an error during termination of network resources: %r", e)
 
 
 class LinuxNamespacedExecutor(Executor):
