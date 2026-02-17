@@ -20,23 +20,19 @@ Handles linux-specific functionality for running test cases
 
 from __future__ import annotations
 
-import asyncio
 import dataclasses
-import itertools
 import logging
 import os
-import pathlib
-import re
 import shlex
 import subprocess
 import sys
-import threading
 import time
-from collections import deque
-from typing import IO, Any, Pattern, Self, Union
+from typing import IO, Any, Self
 
-from chiptest.runner import Executor, LogPipe, SubprocessInfo
+from chiptest.runner import Executor, LogPipe, SubprocessInfo, SubprocessKind
 from python_path import PythonPath
+
+log = logging.getLogger(__name__)
 
 root_dir = os.path.dirname(
     os.path.dirname(
