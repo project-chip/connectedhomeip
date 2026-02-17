@@ -82,7 +82,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: Commission each TH device one by one using parsed payload data"
+          "Step 2: Commission each TH device one by one using parsed payload
+          data"
       verification: |
 
           Commission the TH devices one by one using parsed payloads in Step-1.
