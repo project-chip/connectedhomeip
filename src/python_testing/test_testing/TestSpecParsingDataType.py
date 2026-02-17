@@ -32,8 +32,8 @@ LOGGER = logging.getLogger(__name__)
 
 class TestSpecParsingDataType(MatterBaseTest):
     def setup_class(self):
-        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
-        self.xml_global_data_types, self.xml_global_problems = build_xml_global_data_types(PrebuiltDataModelDirectory.k1_5)
+        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
+        self.xml_global_data_types, self.xml_global_problems = build_xml_global_data_types(PrebuiltDataModelDirectory.k1_6)
 
         # Setup templates for testing struct, enum, and bitmap data types
         self.cluster_id = 0xABCD
@@ -701,6 +701,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         one_four_one, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
         one_four_two, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
         one_five, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+        one_six, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
 
         # Sample cluster ID to check for data types (Basic Information)
         cluster_id = uint(Clusters.BasicInformation.id)
@@ -711,6 +712,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true(cluster_id in one_four_one, "Basic Information cluster not found in 1.4.1")
         asserts.assert_true(cluster_id in one_four_two, "Basic Information cluster not found in 1.4.2")
         asserts.assert_true(cluster_id in one_five, "Basic Information cluster not found in 1.5")
+        asserts.assert_true(cluster_id in one_six, "Basic Information cluster not found in 1.6")
 
         # Compare struct counts (should generally increase or stay the same over versions)
         asserts.assert_less_equal(len(one_three[cluster_id].structs), len(one_five[cluster_id].structs),
@@ -721,6 +723,8 @@ class TestSpecParsingDataType(MatterBaseTest):
                                   "1.5 should have at least as many structs as 1.4.1")
         asserts.assert_less_equal(len(one_four_two[cluster_id].structs), len(one_five[cluster_id].structs),
                                   "1.5 should have at least as many structs as 1.4.2")
+        asserts.assert_less_equal(len(one_five[cluster_id].structs), len(one_six[cluster_id].structs),
+                                  "1.6 should have at least as many structs as 1.5")
 
     def test_find_complex_bitmaps(self):
         """Find and test bitmaps with multi-bit fields in the data model"""

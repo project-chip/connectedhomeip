@@ -224,10 +224,8 @@ public:
     using KeySetIterator       = CommonIterator<KeySet>;
     using GroupSessionIterator = CommonIterator<GroupSession>;
 
-    GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
-                      uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
-        mMaxGroupsPerFabric(maxGroupsPerFabric),
-        mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
+    GroupDataProvider(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
+        mMaxGroupsPerFabric(maxGroupsPerFabric), mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
     {}
 
     virtual ~GroupDataProvider() = default;

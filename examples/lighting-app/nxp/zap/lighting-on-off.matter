@@ -2009,7 +2009,7 @@ cluster GroupKeyManagement = 63 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2111,6 +2111,7 @@ endpoint 0 {
     callback attribute rebootCount;
     callback attribute upTime;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2234,6 +2235,7 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2244,7 +2246,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_onofflight = 256, version 1;
+  device type ma_onofflight = 256, version 4;
 
 
   server cluster Identify {
