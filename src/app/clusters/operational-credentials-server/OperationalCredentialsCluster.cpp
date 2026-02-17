@@ -544,6 +544,8 @@ exit:
         // but a better impl of the innards of FabricTable::CommitPendingFabricData would make it work.
         fabricTable.RevertPendingOpCertsExceptRoot();
 
+        // Revert IPK and ACL entries added, ignoring errors, since some steps may have been skipped
+        // and error handling does not assist.
         (void) groupDataProvider.RemoveFabric(newFabricIndex);
         (void) accessControl.DeleteAllEntriesForFabric(newFabricIndex);
 
