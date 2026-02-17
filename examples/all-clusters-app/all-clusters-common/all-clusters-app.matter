@@ -7329,7 +7329,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 2;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command TestEventTrigger;
@@ -9010,5 +9010,3 @@ endpoint 65534 {
     handle command ReorderNetwork;
   }
 }
-
-
