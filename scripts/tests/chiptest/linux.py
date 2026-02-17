@@ -169,7 +169,7 @@ class NetworkLink(NetworkResource):
         up_cmds.extend([WrappableCmd(cmd, ns_wrapper=True) for cmd in [
             "sysctl -w net.ipv6.conf.all.forwarding=1",
             "sysctl -w net.ipv6.conf.default.forwarding=1",
-            f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra=1",
+            f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra=2",
             f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra_rt_info_max_plen=64"
         ]])
 
