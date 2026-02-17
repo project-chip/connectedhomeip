@@ -63,7 +63,8 @@ public:
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
                               Context && context) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>().ForceSet<GeneralDiagnostics::Attributes::DeviceLoadStatus::Id>()),
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()
+                                  .ForceSet<GeneralDiagnostics::Attributes::DeviceLoadStatus::Id>()),
         mFeatureFlags(featureFlags), mDiagnosticsContext(std::move(context))
     {}
 
