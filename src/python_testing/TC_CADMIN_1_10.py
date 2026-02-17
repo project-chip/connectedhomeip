@@ -37,12 +37,12 @@
 
 
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
 from matter.testing.runner import TestStep, default_matter_test_main
-from support_modules.cadmin_support import CADMINBaseTest
 
 
 class TC_CADMIN_1_10(CADMINBaseTest):
