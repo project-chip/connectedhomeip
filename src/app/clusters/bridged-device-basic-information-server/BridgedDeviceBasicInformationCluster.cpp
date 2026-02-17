@@ -61,7 +61,15 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
     }
 
-    mRequiredData.nodeLabel = { nodeLabel.data(), nodeLabel.size() };
+    // std::string may not like a nullptr .data() when the charspan is empty.
+    if (nodeLabel.empty())
+    {
+        mRequiredData.nodeLabel.clear();
+    }
+    else
+    {
+        mRequiredData.nodeLabel = { nodeLabel.data(), nodeLabel.size() };
+    }
     NotifyAttributeChanged(Attributes::NodeLabel::Id);
     mClusterContext.delegate.OnNodeLabelChanged(mRequiredData.nodeLabel);
     return Status::Success;
