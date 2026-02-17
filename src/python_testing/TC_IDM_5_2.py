@@ -82,24 +82,24 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
         # Step 1: TH sends a Timed Request Message with timeout (e.g., 200ms) for an invoke command
         self.step(1)
         await self.default_controller.SendCommand(
-            nodeId = self.dut_node_id,
-            endpoint = self.endpoint,
-            payload = Clusters.LevelControl.Commands.MoveToLevel(19),
-            timedRequestTimeoutMs = 200,
+            nodeId=self.dut_node_id,
+            endpoint=self.endpoint,
+            payload=Clusters.LevelControl.Commands.MoveToLevel(19),
+            timedRequestTimeoutMs=200,
         )
 
         # Step 2: TH sends a Timed Request Message (Timed Write Transaction) with timeout,
         # waits for status response, then sends Write Request
         self.step(2)
-        write_result= await self.default_controller.WriteAttribute(
-           self.dut_node_id,
-            attributes = [(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(21))],
-            timedRequestTimeoutMs = 500
+        write_result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            attributes=[(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(21))],
+            timedRequestTimeoutMs=500
         )
 
         # Verify write was successful
         asserts.assert_equal(write_result[0].Status, Status.Success,
-                            f"Step 2: Timed write should succeed, got {write_result[0].Status}")
+                             f"Step 2: Timed write should succeed, got {write_result[0].Status}")
 
         # Read back to verify the write was performed
         read_result = await self.default_controller.ReadAttribute(
@@ -107,9 +107,9 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
             [(self.endpoint, Clusters.LevelControl.Attributes.OnLevel)]
         )
 
-        new_value= read_result[self.endpoint][Clusters.LevelControl][Clusters.LevelControl.Attributes.OnLevel]
+        new_value = read_result[self.endpoint][Clusters.LevelControl][Clusters.LevelControl.Attributes.OnLevel]
         asserts.assert_equal(new_value, 21,
-                f"Step 2: Read back value after timed write should be 21, got {new_value}")
+                             f"Step 2: Read back value after timed write should be 21, got {new_value}")
 
         # Step 3: TH sends a Timed Request Message (Timed Invoke Transaction) with timeout,
         # waits for status response, waits 5 seconds (timer expired), then sends Invoke Request
@@ -121,17 +121,17 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
             asserts.fail(f'Unknown SpecificationVersion {spec_version:08X}')
         try:
             await self.default_controller.SendCommand(
-                nodeId = self.dut_node_id,
-                endpoint = self.endpoint,
-                payload = Clusters.LevelControl.Commands.MoveToLevel(23),
-                timedRequestTimeoutMs = 500,
-                busyWaitMs = 1000  # Wait longer than timeout to trigger TIMEOUT error
+                nodeId=self.dut_node_id,
+                endpoint=self.endpoint,
+                payload=Clusters.LevelControl.Commands.MoveToLevel(23),
+                timedRequestTimeoutMs=500,
+                busyWaitMs=1000  # Wait longer than timeout to trigger TIMEOUT error
             )
             asserts.fail("Step 3: Command should timeout but succeeded unexpectedly")
         except InteractionModelError as e:
             if spec_version >= 0x00010400:  # Matter release 1.4 or later
                 asserts.assert_equal(e.status, Status.Timeout,
-                                    f"SendCommand should return TIMEOUT, got {e.status}")
+                                     f"SendCommand should return TIMEOUT, got {e.status}")
             else:  # Matter release 1.3 or earlier
                 asserts.assert_in(e.status, [Status.Timeout, Status.UnsupportedAccess],
                                   f"SendCommand should return TIMEOUT or UNSUPPORTED_ACCESS, got {e.status}")
@@ -140,20 +140,21 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
         # waits for status response, waits 5 seconds (timer expired), then sends Write Request
         self.step(4)
         try:
-            write_result= await self.default_controller.WriteAttribute(
+            write_result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
-                attributes = [(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(25))],
-                timedRequestTimeoutMs = 500,
-                busyWaitMs = 1000  # Wait longer than timeout to trigger TIMEOUT error
+                attributes=[(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(25))],
+                timedRequestTimeoutMs=500,
+                busyWaitMs=1000  # Wait longer than timeout to trigger TIMEOUT error
             )
             asserts.fail("Step 4: Write should timeout but succeeded unexpectedly")
         except InteractionModelError as e:
             if spec_version >= 0x00010400:  # Matter release 1.4 or later
                 asserts.assert_equal(e.status, Status.Timeout,
-                                f"WriteAttribute should return TIMEOUT, got {e.status}")
-            else: # Matter release 1.3 or earlier
+                                     f"WriteAttribute should return TIMEOUT, got {e.status}")
+            else:  # Matter release 1.3 or earlier
                 asserts.assert_in(e.status, [Status.Timeout, Status.UnsupportedAccess],
-                                f"WriteAttribute should return TIMEOUT or UNSUPPORTED_ACCESS, got {e.status}")
+                                  f"WriteAttribute should return TIMEOUT or UNSUPPORTED_ACCESS, got {e.status}")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
