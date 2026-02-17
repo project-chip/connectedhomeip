@@ -44,6 +44,7 @@ from support_modules.idm_support import IDMBaseTest
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.conformance import ConformanceException
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.spec_parsing import dm_from_spec_version
