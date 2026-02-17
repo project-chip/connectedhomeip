@@ -358,6 +358,8 @@ template("siwx917_sdk") {
 
   if (chip_crypto == "platform") {
     if (sl_si91x_crypto_flavor == "psa") {
+      assert(chip_crypto_keystore == "psa",
+             "chip_crypto_keystore must be set to psa")
       _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
 
       sl_si91x_psa_crypto_path =
@@ -365,13 +367,14 @@ template("siwx917_sdk") {
 
       config("sl_si91x_psa_crypto_config") {
         defines = [
-          "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
-          "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"siwx917-chip-psa-config.h\"",
+          "MBEDTLS_CONFIG_FILE=<siwx917-chip-mbedtls-config.h>",
+          "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=<siwx917-chip-psa-config.h>",
 
           # WISECONNECT 3 SDK
           "SLI_AEAD_DEVICE_SI91X=1",
           "SLI_CIPHER_DEVICE_SI91X=1",
           "SLI_ECDH_DEVICE_SI91X=1",
+          "SLI_ECDSA_DEVICE_SI91X=1",
           "SLI_MAC_DEVICE_SI91X=1",
           "SLI_SHA_DEVICE_SI91X=1",
           "SLI_TRNG_DEVICE_SI91X=1",
@@ -427,6 +430,7 @@ template("siwx917_sdk") {
           "${_mbedtls_root}/library/base64.c",
           "${_mbedtls_root}/library/bignum.c",
           "${_mbedtls_root}/library/bignum_core.c",
+          "${_mbedtls_root}/library/block_cipher.c",
           "${_mbedtls_root}/library/ccm.c",
           "${_mbedtls_root}/library/cipher.c",
           "${_mbedtls_root}/library/cipher_wrap.c",
@@ -531,7 +535,7 @@ template("siwx917_sdk") {
       config("siwx917_tinycrypt_config") {
         defines = [
           "SL_MBEDTLS_USE_TINYCRYPT",
-          "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
+          "MBEDTLS_CONFIG_FILE=<siwx917-chip-mbedtls-config.h>",
         ]
 
         include_dirs = [

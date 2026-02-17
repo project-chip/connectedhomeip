@@ -148,14 +148,8 @@ int AppTask::Init()
             ;
     }
 
-    // Init ZCL Data Model and start server
-    PLAT_LOG("Initialize Server");
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
     PLAT_LOG("Initialize device attestation config");
 #ifdef CC32XX_ATTESTATION_CREDENTIALS
     SetDeviceAttestationCredentialsProvider(CC32XX::GetCC32XXDacProvider());
@@ -163,6 +157,13 @@ int AppTask::Init()
 
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
+
+    // Init ZCL Data Model and start server
+    PLAT_LOG("Initialize Server");
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     // Initialize BoltLock module
     PLAT_LOG("Initialize BoltLock");
