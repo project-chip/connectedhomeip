@@ -37,7 +37,7 @@ tests:
           This step is required only for the reference platform(e.g., RPI). Please skip this step when validating with real devices.
 
           The reference platform advertises only a single QR code per device, which is not sufficient to validate concatenated QR code onboarding payloads. Therefore, QR code payloads must be collected from two separate devices and combined for validation.
-          
+
           RPI 1:
           Advertise the TH: ./chip-all-clusters-app --discriminator 3841 --passcode 20202021
 
@@ -87,26 +87,26 @@ tests:
 
           Commission the TH devices one by one using parsed payloads in Step-1.
 
-          Example commands to commission the TH devices: 
-        
+          Example commands to commission the TH devices:
+
           TH device 1:
           ./chip-tool pairing onnetwork 1 20202021
-        
+
           Verify the DUT (chip-tool) successfully commissions the TH device using the parsed payload data.
-        
+
           [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000001: success
           [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
           [1771308802.157] [9230:9232] [DMG] ICR moving to [AwaitingDe]
-        
-          TH device 2: 
+
+          TH device 2:
           ./chip-tool pairing onnetwork 2 20202022
-        
+
           Verify the DUT (chip-tool) successfully commissions the TH device using the parsed payload data.
-        
+
           [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000002: success
           [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
           [1771308802.157] [9230:9232] [DMG] ICR moving to [AwaitingDe]
-        
+
           Note: Update the passcode values according to the parsed QR payload data of each TH device.
 
       disabled: true
