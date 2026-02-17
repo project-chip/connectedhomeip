@@ -73,9 +73,9 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
                      "If the device being certified is Matter release 1.4 or later, {resDutTimeout}. If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either {stTimeout} or {stUnsupportedAccess}."),
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.LevelControl)])
-        async def test_TC_IDM_5_2(self):
-    self.step(0)
+    @run_if_endpoint_matches(has_cluster(Clusters.LevelControl))
+    async def test_TC_IDM_5_2(self):
+        self.step(0)
 
         # Test Setup with robust endpoint/cluster discovery
         await self.setup_class_helper(allow_pase=False)
