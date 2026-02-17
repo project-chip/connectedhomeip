@@ -64,14 +64,17 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
 {
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
     FabricIndex fabric_index = handler->GetAccessingFabricIndex();
+
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
+
     switch (request.path.mCommandId)
     {
     case Groupcast::Commands::JoinGroup::Id: {
         Groupcast::Commands::JoinGroup::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
-        return mLogic.JoinGroup(fabric_index, data);
+        status = mLogic.JoinGroup(fabric_index, data);
     }
+    break;
     case Groupcast::Commands::LeaveGroup::Id: {
         Groupcast::Commands::LeaveGroup::DecodableType data;
         Groupcast::Commands::LeaveGroupResponse::Type response;
@@ -84,23 +87,32 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
             response.groupID   = data.groupID;
             response.endpoints = DataModel::List<const chip::EndpointId>(endpoints.entries, endpoints.count);
             handler->AddResponse(request.path, response);
+            return std::nullopt; // Response added, must return nullopt.
         }
-        return status;
     }
+    break;
     case Groupcast::Commands::UpdateGroupKey::Id: {
         Groupcast::Commands::UpdateGroupKey::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
-        return mLogic.UpdateGroupKey(fabric_index, data);
+        status = mLogic.UpdateGroupKey(fabric_index, data);
     }
+    break;
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
+        status = mLogic.ConfigureAuxiliaryACL(fabric_index, data);
+    }
+    break;
+    default:
+        break;
+    }
+
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
         NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
-        return mLogic.ConfigureAuxiliaryACL(fabric_index, data);
     }
-    }
-    return Protocols::InteractionModel::Status::UnsupportedCommand;
+
+    return status;
 }
 
 CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
