@@ -72,7 +72,7 @@ bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
 {
     VerifyOrReturnValue(value != nullptr, false);
 
-    config.endpoint = 1;
+    config.endpoint = 1; // Default to endpoint 1
 
     const char * colonPos = strchr(value, ':');
     if (colonPos != nullptr)
