@@ -120,11 +120,7 @@ static bool __IsScanFilterSupported()
 
 CHIP_ERROR ChipDeviceScanner::SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData)
 {
-    if (!__IsScanFilterSupported())
-    {
-        ChipLogProgress(DeviceLayer, "BLE scan filter is not supported. Proceeding with filterless scan.");
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(__IsScanFilterSupported(), MATTER_PLATFORM_ERROR(BT_ERROR_NOT_SUPPORTED));
 
     int ret = bt_adapter_le_scan_filter_create(&mScanFilter);
     VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret));
@@ -135,23 +131,20 @@ CHIP_ERROR ChipDeviceScanner::SetupScanFilter(ScanFilterType filterType, const S
 
 CHIP_ERROR ChipDeviceScanner::StartScan(ScanFilterType filterType, const ScanFilterData & filterData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     // Setup scan filter if supported. Otherwise, do filterless scan.
-    RETURN_SAFELY_IGNORED SetupScanFilter(filterType, filterData);
+    CHIP_ERROR err = SetupScanFilter(filterType, filterData);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to set up scan filter: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogProgress(DeviceLayer, "Proceeding with filterless scan");
+    }
 
-    // All set to trigger LE Scan
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
-    SuccessOrExit(err);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, TEMPORARY_RETURN_IGNORED StopScan());
 
     return CHIP_NO_ERROR;
-
-exit:
-    ChipLogError(DeviceLayer, "Start CHIP Scan could not succeed fully! Stop Scan...");
-    TEMPORARY_RETURN_IGNORED StopScan();
-    return err;
 }
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
