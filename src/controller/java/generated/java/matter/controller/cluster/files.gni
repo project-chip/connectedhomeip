@@ -118,6 +118,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/GeneralDiagnosticsClusterDeviceLoadStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/GeneralDiagnosticsClusterNetworkInterface.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/GroupcastClusterMembershipStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/GroupKeyManagementClusterGroupcastAdoptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/GroupKeyManagementClusterGroupInfoMapStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/GroupKeyManagementClusterGroupKeyMapStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/GroupKeyManagementClusterGroupKeySetStruct.kt",
