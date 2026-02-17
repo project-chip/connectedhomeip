@@ -773,7 +773,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-        TEMPORARY_RETURN_IGNORED CloseConnection(conId);
+    TEMPORARY_RETURN_IGNORED CloseConnection(conId);
 }
 
 void BLEManagerImpl::CheckNonConcurrentBleClosing()
