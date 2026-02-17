@@ -315,6 +315,8 @@ Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, c
     GroupDataProvider::KeySet ks;
 
     CHIP_ERROR err = groups.GetKeySet(fabric_index, keyset_id, ks);
+    VerifyOrReturnError(CHIP_NO_ERROR != err, Status::AlreadyExists); // Cannot set an existing key
+
     if (CHIP_ERROR_NOT_FOUND == err)
     {
         // New key
@@ -340,14 +342,10 @@ Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, c
             VerifyOrReturnError(CHIP_ERROR_INVALID_LIST_LENGTH != err, Status::ResourceExhausted);
             VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
         }
-    }
-    else if (CHIP_NO_ERROR == err)
-    {
-        // Cannot set an existing key
-        return Status::AlreadyExists;
+        return Status::Success;
     }
 
-    return Status::Success;
+    return Status::Failure;
 }
 
 Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
