@@ -66,6 +66,7 @@ static_library("access") {
   public_deps = [
     ":access_config",
     ":types",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",

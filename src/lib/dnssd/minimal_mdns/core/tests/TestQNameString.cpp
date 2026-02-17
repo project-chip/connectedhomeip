@@ -64,4 +64,17 @@ TEST_F(TestQNameString, EndsWith)
     EXPECT_FALSE(qName.EndsWith("test"));
     EXPECT_FALSE(qName.EndsWith("abc.test"));
 }
+
+TEST_F(TestQNameString, LongQName)
+{
+    const testing::TestQName<10> kLong({ "label1234567890", "label1234567890", "label1234567890", "label1234567890",
+                                         "label1234567890", "label1234567890", "label1234567890", "label1234567890",
+                                         "label1234567890", "label1234567890" });
+    QNameString qName(kLong.Serialized());
+
+    // QNameString buffer is 128 bytes. 10 * 15 + 9 = 159 bytes.
+    EXPECT_FALSE(qName.Fit());
+    // EndsWith should return false if Fit() is false, even if the suffix matches what's in the buffer
+    EXPECT_FALSE(qName.EndsWith("label1234567890"));
+}
 } // namespace
