@@ -28,6 +28,12 @@
 class AppOptions
 {
 public:
+    /**
+     * @brief Configuration for a single device instance.
+     *
+     * This structure holds the device type string (e.g. "on-off-light") and the
+     * endpoint ID where this device should be instantiated.
+     */
     struct DeviceConfig
     {
         std::string type;
