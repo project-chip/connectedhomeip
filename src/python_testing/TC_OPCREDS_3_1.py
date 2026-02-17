@@ -637,7 +637,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
-        self.print_step(74, "TH3 Sends CSRRequest command with a random 32-byte nonce and saves the response as`csrResponseNoIcac`")
+        self.print_step(74, "TH3 Sends CSRRequest command with a random 32-byte nonce and saves the response as `csrResponseNoIcac`")
         nonce = random.randbytes(32)
         csrResponseNoIcac = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=opcreds.Commands.CSRRequest(CSRNonce=nonce, isForUpdateNOC=False))
 
@@ -645,6 +645,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         # Save RCAC as `Root_CA_Certificate_TH3`
         # Save NOC as `Node_Operational_Certificate_TH3`
         TH3_certs = await TH3.IssueNOCChain(csrResponseNoIcac, TH3_dut_nodeid)
+        asserts.assert_is_none(TH3_certs.icacBytes,
+                               "IssueNOCChain returned an ICAC, but Step 75 requires omitting the ICAC from the certificate chain")
         if (TH3_certs.rcacBytes is None or TH3_certs.nocBytes is None or TH3_certs.ipkBytes is None):
             # Expiring the failsafe timer in an attempt to clean up.
             await TH3.SendCommand(TH3_dut_nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
