@@ -110,6 +110,12 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                               .sessionManager             = mContext.sessionManager,
                                               .dnssdServer                = mContext.dnssdServer,
                                               .commissioningWindowManager = mContext.commissioningWindowManager,
+                                              .dacProvider                = mContext.dacProvider,
+                                              .groupDataProvider          = mContext.groupDataProvider,
+                                              .accessControl              = mContext.accessControl,
+                                              .platformManager            = mContext.platformManager,
+                                              .eventManagement            = mContext.eventManagement,
+
                                           });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 

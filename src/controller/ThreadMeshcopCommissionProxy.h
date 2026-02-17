@@ -34,17 +34,20 @@
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/ThreadDiscoveryCode.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <transport/raw/PeerAddress.h>
 
-#include "../third_party/ot-commissioner/repo/include/commissioner/commissioner.hpp"
+#include <commissioner/commissioner.hpp>
 
+namespace chip {
+namespace Controller {
 /**
  * CommissionProxy acts as a bridge between the OpenThread Commissioner and Matter commissioning.
  * It handles Thread-specific commissioning (MeshCoP) and proxies mDNS discovery data
  * to facilitate the transition into Matter's operational commissioning flow.
  */
-class CommissionProxy : public ot::commissioner::CommissionerHandler,
-                        public mdns::Minimal::ParserDelegate,
-                        public mdns::Minimal::TxtRecordDelegate
+class ThreadMeshcopCommissionProxy : public ot::commissioner::CommissionerHandler,
+                                     public mdns::Minimal::ParserDelegate,
+                                     public mdns::Minimal::TxtRecordDelegate
 {
 public:
     enum class State
@@ -56,15 +59,14 @@ public:
         kAborted,       // Error or user cancellation
     };
 
-    CommissionProxy();
-    ~CommissionProxy() override;
+    ThreadMeshcopCommissionProxy();
+    ~ThreadMeshcopCommissionProxy() override;
 
     /**
      * Entry point to start the Thread commissioning and discover the device.
      */
-    CHIP_ERROR Discover(uint8_t (&pskc)[chip::Thread::kSizePSKc], const char * host, uint16_t port,
-                        const chip::Thread::DiscoveryCode code, chip::SetupDiscriminator expectedDiscriminator,
-                        chip::Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout);
+    CHIP_ERROR Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr, const Thread::DiscoveryCode code,
+                        chip::SetupDiscriminator expectedDiscriminator, Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout);
 
     // ot::commissioner::CommissionerHandler
     void OnJoinerMessage(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort,
@@ -80,12 +82,12 @@ public:
 
 private:
     // Internal Helper Methods
-    CHIP_ERROR InitializeCommissioner(uint8_t (&pskc)[chip::Thread::kSizePSKc]);
-    CHIP_ERROR CreateProxySocket(chip::Dnssd::CommissionNodeData & commissionData);
+    CHIP_ERROR InitializeCommissioner(ByteSpan & pskc);
+    CHIP_ERROR CreateProxySocket(Dnssd::CommissionNodeData & commissionData);
     void ProcessAnnouncement(const std::vector<uint8_t> & joinerIdBytes, uint16_t joinerPort, const std::vector<uint8_t> & payload);
     void SetState(State state);
 
-    ot::commissioner::CommissionerDataset MakeCommissionerDataset(chip::Thread::DiscoveryCode code);
+    ot::commissioner::CommissionerDataset MakeCommissionerDataset(Thread::DiscoveryCode code);
 
     // Member Variables
     chip::Dnssd::DiscoveredNodeData mNodeData;
@@ -100,8 +102,11 @@ private:
 
     std::recursive_mutex mMutex;
     bool mPromiseFulfilled = false;
-    std::promise<chip::Dnssd::DiscoveredNodeData> mDiscoveredNodePromise;
+    std::promise<Dnssd::DiscoveredNodeData> mDiscoveredNodePromise;
 
     std::shared_ptr<ot::commissioner::Commissioner> mCommissioner;
     std::thread mProxyThread;
 };
+
+} // namespace Controller
+} // namespace chip

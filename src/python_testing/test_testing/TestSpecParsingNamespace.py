@@ -17,7 +17,7 @@
 
 import xml.etree.ElementTree as ElementTree
 import zipfile
-from importlib.abc import Traversable
+from importlib.resources.abc import Traversable
 
 from jinja2 import Template
 from mobly import asserts

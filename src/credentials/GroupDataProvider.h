@@ -95,6 +95,9 @@ public:
                 SetName(other.name);
             }
         }
+        bool HasAuxiliaryACL() const { return (flags & static_cast<uint8_t>(Flags::kHasAuxiliaryACL)); }
+        bool UsePerGroupAddress() const { return (flags & static_cast<uint8_t>(Flags::kMcastAddrPolicy)); }
+
         bool operator==(const GroupInfo & other) const
         {
             return (this->group_id == other.group_id) && !strncmp(this->name, other.name, kGroupNameMax);
@@ -221,10 +224,8 @@ public:
     using KeySetIterator       = CommonIterator<KeySet>;
     using GroupSessionIterator = CommonIterator<GroupSession>;
 
-    GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
-                      uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
-        mMaxGroupsPerFabric(maxGroupsPerFabric),
-        mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
+    GroupDataProvider(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
+        mMaxGroupsPerFabric(maxGroupsPerFabric), mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
     {}
 
     virtual ~GroupDataProvider() = default;
@@ -347,8 +348,9 @@ public:
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
 
-    // Groupcast MaxMembershipCount
+    // Groupcast
     virtual uint16_t getMaxMembershipCount() = 0;
+    virtual uint16_t getMaxMcastAddrCount()  = 0;
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
