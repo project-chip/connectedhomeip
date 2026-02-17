@@ -69,6 +69,8 @@ public:
     Status UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
     Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
+    void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
+
 private:
     Credentials::GroupDataProvider & Provider() { return mContext.provider; }
     chip::FabricTable & Fabrics() { return mContext.fabrics; }
@@ -80,6 +82,7 @@ private:
 
     GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;
+    DataModel::Provider * mDataModelProvider = nullptr;
 };
 
 } // namespace Clusters

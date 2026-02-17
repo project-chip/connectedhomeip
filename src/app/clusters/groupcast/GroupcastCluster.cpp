@@ -19,6 +19,15 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 } // namespace
 
+CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    mLogic.SetDataModelProvider(context.provider);
+
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)
 {
@@ -60,6 +69,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::JoinGroup::Id: {
         Groupcast::Commands::JoinGroup::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
+        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
         return mLogic.JoinGroup(fabric_index, data);
     }
     case Groupcast::Commands::LeaveGroup::Id: {
@@ -70,6 +80,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Protocols::InteractionModel::Status status = mLogic.LeaveGroup(fabric_index, data, endpoints);
         if (Protocols::InteractionModel::Status::Success == status)
         {
+            NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
             response.groupID   = data.groupID;
             response.endpoints = DataModel::List<const chip::EndpointId>(endpoints.entries, endpoints.count);
             handler->AddResponse(request.path, response);
@@ -79,11 +90,13 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::UpdateGroupKey::Id: {
         Groupcast::Commands::UpdateGroupKey::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
+        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
         return mLogic.UpdateGroupKey(fabric_index, data);
     }
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
+        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
         return mLogic.ConfigureAuxiliaryACL(fabric_index, data);
     }
     }

@@ -146,12 +146,27 @@ Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Comm
     }
     // Verify endpoint values
     {
-        auto iter = data.endpoints.begin();
+        // The endpoint list SHALL not contain the root endpoint and must be a valid endpoint on the device.
+        VerifyOrDie(mDataModelProvider != nullptr);
+        ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsBuilder;
+        VerifyOrReturnError(CHIP_NO_ERROR == mDataModelProvider->Endpoints(endpointsBuilder), Status::Failure);
+        auto endpointsSpan = endpointsBuilder.TakeBuffer();
+        auto iter          = data.endpoints.begin();
         while (iter.Next())
         {
-            EndpointId ep = iter.GetValue();
-            VerifyOrReturnError((ep > 0) && (kInvalidEndpointId != ep), Status::ConstraintError);
-            // VerifyOrReturnError(nullptr != emberAfFindEndpointType(ep), Status::ConstraintError);
+            bool foundEndpoint = false;
+            EndpointId ep      = iter.GetValue();
+            VerifyOrReturnError((ep > kRootEndpointId), Status::UnsupportedEndpoint);
+            for (const auto & epEntry : endpointsSpan)
+            {
+                if (epEntry.id == ep)
+                {
+                    foundEndpoint = true;
+                    break;
+                }
+            }
+
+            VerifyOrReturnError(foundEndpoint, Status::UnsupportedEndpoint);
         }
     }
 
