@@ -773,12 +773,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (mState == kState_NotInitialized)
-    {
         TEMPORARY_RETURN_IGNORED CloseConnection(conId);
-    }
-#endif
 }
 
 void BLEManagerImpl::CheckNonConcurrentBleClosing()
