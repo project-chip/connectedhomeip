@@ -23,6 +23,7 @@
 #include "commands/common/CHIPCommand.h"
 #include "commands/common/Command.h"
 #include "commands/common/Commands.h"
+#include <clusters/Groupcast/Enums.h>
 
 class ShowControllerGroups : public CHIPCommand
 {
@@ -88,6 +89,7 @@ public:
     {
         AddArgument("groupName", &groupName);
         AddArgument("groupId", chip::kUndefinedGroupId, UINT16_MAX, &groupId);
+        AddArgument("addressPolicy", 0, 1, &addressPolicy);
     }
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(20); }
 
@@ -104,6 +106,12 @@ public:
 
         group.SetName(groupName);
         group.group_id = groupId;
+        group.flags    = 0;
+        if (!addressPolicy.HasValue() ||
+            (chip::to_underlying(chip::app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup) == addressPolicy.Value()))
+        {
+            group.flags |= static_cast<uint8_t>(chip::Credentials::GroupDataProvider::GroupInfo::Flags::kMcastAddrPolicy);
+        }
         ReturnErrorOnFailure(groupDataProvider->SetGroupInfo(fabricIndex, group));
 
         SetCommandExitStatus(CHIP_NO_ERROR);
@@ -113,6 +121,7 @@ public:
 private:
     char * groupName;
     chip::GroupId groupId;
+    chip::Optional<uint8_t> addressPolicy;
 };
 
 class RemoveGroup : public CHIPCommand
