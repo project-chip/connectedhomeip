@@ -647,7 +647,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH3_certs = await TH3.IssueNOCChain(csrResponseNoIcac, TH3_dut_nodeid)
         if (TH3_certs.rcacBytes is None or TH3_certs.nocBytes is None or TH3_certs.ipkBytes is None):
             # Expiring the failsafe timer in an attempt to clean up.
-            await TH1.SendCommand(TH3_dut_nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
+            await TH3.SendCommand(TH3_dut_nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
             asserts.fail("Unable to generate NOC chain for DUT - this is a script failure, please report this as a bug")
 
         self.print_step(76, "TH3 sends the AddTrustedRootCert command using the certs generated in step 75")
@@ -666,7 +666,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kInvalidNOC, "Failure when adding NOC")
 
         self.print_step(
-            78, "TH1 sends the AddNOC Command to DUT using the certs generated in step 75. This time, the ICAC is omitted | Verify that DUT responds with status code OK")
+            78, "TH3 sends the AddNOC Command to DUT using the certs generated in step 75. This time, the ICAC is omitted | Verify that DUT responds with status code OK")
         # NOCValue as `Node_Operational_Certificate_TH3`
         # ICACValue as `None`
         # CaseAdminSubject as the NodeID of TH3
