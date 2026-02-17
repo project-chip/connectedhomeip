@@ -421,7 +421,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteConfigurationVersion)
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
-    EXPECT_EQ(tester.WriteAttribute(Attributes::ConfigurationVersion::Id, 2u), Status::UnsupportedWrite);
+    EXPECT_EQ(tester.WriteAttribute<uint32_t>(Attributes::ConfigurationVersion::Id, 2u), Status::UnsupportedWrite);
     EXPECT_EQ(cluster.GetConfigurationVersion(), 1u);
 }
 
