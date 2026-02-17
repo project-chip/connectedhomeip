@@ -32,7 +32,12 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
         {
             // Group Key
             KeysetId keyset_id = 0;
-            ReturnErrorOnFailure(groups->GetGroupKey(fabric_index, info.group_id, keyset_id));
+            status             = groups->GetGroupKey(fabric_index, info.group_id, keyset_id);
+            if (CHIP_NO_ERROR != status)
+            {
+                group_iter->Release();
+                return status;
+            }
 
             // Endpoints
             EndpointIterator * end_iter = groups->IterateEndpoints(fabric_index, info.group_id);
