@@ -44,23 +44,24 @@ public:
             kHasAuxiliaryACL = 0b00000001,
             kMcastAddrPolicy = 0b00000010,
         };
+        static constexpr uint8_t kFlagsDefault = to_underlying(GroupInfo::Flags::kMcastAddrPolicy);
 
         // Identifies group within the scope of the given Fabric
         GroupId group_id = kUndefinedGroupId;
         // Lastest group name written for a given GroupId on any Endpoint via the Groups cluster
         char name[kGroupNameMax + 1] = { 0 };
-        uint8_t flags                = 0;
+        uint8_t flags                = kFlagsDefault;
         uint16_t count               = 0;
 
         GroupInfo() { SetName(nullptr); }
         GroupInfo(const GroupInfo & other) { Copy(other); }
         GroupInfo(const char * groupName) { SetName(groupName); }
         GroupInfo(const CharSpan & groupName) { SetName(groupName); }
-        GroupInfo(GroupId id, const char * groupName, uint8_t groupFlags = 0) : group_id(id), flags(groupFlags)
+        GroupInfo(GroupId id, const char * groupName, uint8_t groupFlags = kFlagsDefault) : group_id(id), flags(groupFlags)
         {
             SetName(groupName);
         }
-        GroupInfo(GroupId id, const CharSpan & groupName, uint8_t groupFlags = 0) : group_id(id), flags(groupFlags)
+        GroupInfo(GroupId id, const CharSpan & groupName, uint8_t groupFlags = kFlagsDefault) : group_id(id), flags(groupFlags)
         {
             SetName(groupName);
         }
