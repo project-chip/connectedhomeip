@@ -111,7 +111,7 @@ DENY: Set[str] = {
     'istream',
     'list',
     'locale',
-    'locae.h',
+    'locale.h',
     'map',
     'multimap',
     'multiset',
