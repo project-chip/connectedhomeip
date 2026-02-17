@@ -66,7 +66,6 @@ class TC_CADMIN_1_10(CADMINBaseTest):
         ]
 
     def pics_TC_CADMIN_1_10(self) -> list[str]:
-        # TODO check if this is correct
         return ["CADMIN.S"]
 
     @async_test_body
