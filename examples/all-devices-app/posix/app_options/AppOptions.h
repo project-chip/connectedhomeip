@@ -30,7 +30,7 @@ class AppOptions
 public:
     struct DeviceConfig
     {
-        char type[64];
+        std::string type;
         chip::EndpointId endpoint;
     };
 
@@ -38,7 +38,7 @@ public:
 
     static const std::vector<DeviceConfig> & GetDeviceConfigs();
 
-    static const char * GetDeviceType() { return GetDeviceConfigs().front().type; }
+    static const char * GetDeviceType() { return GetDeviceConfigs().front().type.c_str(); }
 
     static chip::EndpointId GetDeviceEndpoint() { return GetDeviceConfigs().front().endpoint; }
 

@@ -20,6 +20,9 @@
 #include <devices/device-factory/DeviceFactory.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <cstring>
+#include <cstdlib>
+
 using namespace chip;
 using namespace chip::ArgParser;
 
@@ -67,15 +70,7 @@ bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
     const char * colonPos = strchr(value, ':');
     if (colonPos != nullptr)
     {
-        size_t typeLen = static_cast<size_t>(colonPos - value);
-        if (typeLen >= sizeof(config.type))
-        {
-            ChipLogError(Support, "Device type too long: %s\n", value);
-            return false;
-        }
-
-        strncpy(config.type, value, typeLen);
-        config.type[typeLen] = '\0';
+        config.type.assign(value, colonPos - value);
 
         if (!ParseEndpointId(colonPos + 1, config.endpoint))
         {
@@ -85,12 +80,7 @@ bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
     }
     else
     {
-        if (strlen(value) >= sizeof(config.type))
-        {
-            ChipLogError(Support, "Device type too long: %s\n", value);
-            return false;
-        }
-        strcpy(config.type, value);
+        config.type = value;
     }
     return true;
 }
@@ -107,8 +97,8 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             return false;
         }
 
-        ChipLogProgress(AppServer, "Adding device type %s on endpoint %d", config.type, config.endpoint);
-        mDeviceConfigs.push_back(config);
+        ChipLogProgress(AppServer, "Adding device type %s on endpoint %d", config.type.c_str(), config.endpoint);
+        mDeviceConfigs.push_back(std::move(config));
         return true;
     }
     case kOptionEndpoint: {
@@ -123,9 +113,9 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         {
             ChipLogError(Support, "Warning: --endpoint specified before --device. Creating default 'contact-sensor'.");
             DeviceConfig config;
-            strcpy(config.type, "contact-sensor");
+            config.type     = "contact-sensor";
             config.endpoint = ep;
-            mDeviceConfigs.push_back(config);
+            mDeviceConfigs.push_back(std::move(config));
         }
         else
         {
