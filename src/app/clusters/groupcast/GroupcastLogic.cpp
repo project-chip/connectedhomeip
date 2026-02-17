@@ -31,41 +31,44 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
         while (group_iter->Next(info) && (CHIP_NO_ERROR == status))
         {
             // Group Key
-            KeysetId keyset_id = 0;
-            ReturnErrorOnFailure(groups->GetGroupKey(fabric_index, info.group_id, keyset_id));
-
-            // Endpoints
-            EndpointIterator * end_iter = groups->IterateEndpoints(fabric_index, info.group_id);
-            if (nullptr == end_iter)
+            KeysetId keyset_id = kInvalidKeysetId;
+            status             = groups->GetGroupKey(fabric_index, info.group_id, keyset_id);
+            // Since keys are managed by the GroupKeyManagement cluster, groups may not have an associated keyset
+            VerifyOrDo(CHIP_ERROR_NOT_FOUND != status, status = CHIP_NO_ERROR);
+            if (CHIP_NO_ERROR == status)
             {
-                status = CHIP_ERROR_NO_MEMORY;
-                break;
-            }
-
-            // Return endpoints in kMaxMembershipEndpoints chunks or less
-            size_t group_total = end_iter->Count();
-            size_t group_count = 0;
-            size_t split_count = 0;
-            GroupEndpoint mapping;
-            while (end_iter->Next(mapping) && (CHIP_NO_ERROR == status))
-            {
-                group_count++;
-                endpoints.entries[split_count++] = mapping.endpoint_id;
-                if ((group_count == group_total) || (split_count == kMaxMembershipEndpoints))
+                // Endpoints
+                EndpointIterator * end_iter = groups->IterateEndpoints(fabric_index, info.group_id);
+                if (nullptr == end_iter)
                 {
-                    Groupcast::Structs::MembershipStruct::Type group;
-                    group.fabricIndex     = fabric_index;
-                    group.groupID         = info.group_id;
-                    group.keySetID        = keyset_id;
-                    group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
-                    group.mcastAddrPolicy = info.UsePerGroupAddress() ? Groupcast::MulticastAddrPolicyEnum::kPerGroup
-                                                                      : Groupcast::MulticastAddrPolicyEnum::kIanaAddr;
-                    group.endpoints       = MakeOptional(DataModel::List<const chip::EndpointId>(endpoints.entries, split_count));
-                    status                = encoder.Encode(group);
-                    split_count           = 0;
+                    status = CHIP_ERROR_NO_MEMORY;
+                    break;
                 }
+                // Return endpoints in kMaxMembershipEndpoints chunks or less
+                size_t group_total = end_iter->Count();
+                size_t group_count = 0;
+                size_t split_count = 0;
+                GroupEndpoint mapping;
+                while (end_iter->Next(mapping) && (CHIP_NO_ERROR == status))
+                {
+                    group_count++;
+                    endpoints.entries[split_count++] = mapping.endpoint_id;
+                    if ((group_count == group_total) || (split_count == kMaxMembershipEndpoints))
+                    {
+                        Groupcast::Structs::MembershipStruct::Type group;
+                        group.fabricIndex     = fabric_index;
+                        group.groupID         = info.group_id;
+                        group.keySetID        = keyset_id;
+                        group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
+                        group.mcastAddrPolicy = info.UsePerGroupAddress() ? Groupcast::MulticastAddrPolicyEnum::kPerGroup
+                                                                          : Groupcast::MulticastAddrPolicyEnum::kIanaAddr;
+                        group.endpoints = MakeOptional(DataModel::List<const chip::EndpointId>(endpoints.entries, split_count));
+                        status          = encoder.Encode(group);
+                        split_count     = 0;
+                    }
+                }
+                end_iter->Release();
             }
-            end_iter->Release();
         }
         group_iter->Release();
 
