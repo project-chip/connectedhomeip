@@ -20,8 +20,8 @@
 #include <devices/device-factory/DeviceFactory.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 
 using namespace chip;
 using namespace chip::ArgParser;
