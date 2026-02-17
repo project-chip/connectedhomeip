@@ -3544,6 +3544,13 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000004: {
+                "attributeName": "GroupcastAdoption",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -4927,6 +4934,12 @@ class ChipClusters:
                 "attributeName": "ExpiryDate",
                 "attributeId": 0x0000000C,
                 "type": "int",
+                "reportable": True,
+            },
+            0x0000000D: {
+                "attributeName": "Unmounted",
+                "attributeId": 0x0000000D,
+                "type": "bool",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -11488,34 +11501,47 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "SimultaneousDetectionLimit",
-                "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000006: {
                 "attributeName": "ObjectCountReached",
-                "attributeId": 0x00000006,
+                "attributeId": 0x00000005,
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000006: {
+                "attributeName": "ObjectCountConfig",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000007: {
-                "attributeName": "HoldTime",
+                "attributeName": "ObjectCount",
                 "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "SimultaneousDetectionLimit",
+                "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000008: {
+            0x00000009: {
+                "attributeName": "HoldTime",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000A: {
                 "attributeName": "HoldTimeLimits",
-                "attributeId": 0x00000008,
+                "attributeId": 0x0000000A,
                 "type": "",
                 "reportable": True,
             },
-            0x00000009: {
+            0x0000000B: {
                 "attributeName": "PredictedActivity",
-                "attributeId": 0x00000009,
+                "attributeId": 0x0000000B,
                 "type": "",
                 "reportable": True,
             },

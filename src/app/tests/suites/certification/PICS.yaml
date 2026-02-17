@@ -5261,6 +5261,12 @@ PICS:
       id: OCC.S.A0032
 
     #
+    # server / Events
+    #
+    - label: "Does the device implement the OccupancyChanged event?"
+      id: OCC.S.E00
+
+    #
     # server / manually
     #
     - label:

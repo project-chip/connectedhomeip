@@ -165,6 +165,7 @@ public:
 class MockGroupDataProvider : public GroupDataProvider
 {
 public:
+    MockGroupDataProvider() : GroupDataProvider(0, 0) {}
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
     void Finish() override {}
     CHIP_ERROR SetGroupInfo(FabricIndex, const GroupInfo &) override { return CHIP_NO_ERROR; }
@@ -199,6 +200,7 @@ public:
     GroupSessionIterator * IterateGroupSessions(uint16_t) override { return nullptr; }
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex, GroupId) override { return nullptr; }
     uint16_t getMaxMembershipCount() override { return 0; }
+    uint16_t getMaxMcastAddrCount() override { return 0; }
 
     bool mHasEndpoint = true;
 };
