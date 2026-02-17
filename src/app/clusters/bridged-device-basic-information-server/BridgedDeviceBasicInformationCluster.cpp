@@ -37,7 +37,7 @@ constexpr size_t kNodeLabelMaxLength = 32;
 
 CharSpan ToSpan(const std::string & s)
 {
-    return CharSpan::fromCharString(s.c_str());
+    return {s.data(), s.size()};
 }
 
 CharSpan ToSpan(const std::optional<std::string> & s)
