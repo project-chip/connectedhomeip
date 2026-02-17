@@ -61,6 +61,8 @@ bool AppOptions::ParseEndpointId(const char * str, chip::EndpointId & endpoint)
 /**
  * Parses a device configuration string in the format "type" or "type:endpoint".
  *
+ * Example: "speaker:2" -> type="speaker", endpoint=2
+ *
  * @param value The string to parse.
  * @param config The DeviceConfig structure to populate.
  * @return true on success, false on failure (e.g. invalid format or endpoint ID).
