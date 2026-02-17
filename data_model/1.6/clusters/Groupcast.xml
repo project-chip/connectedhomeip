@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release, replacing functionality previously in Groups and Group Key Management clusters and addressing issues with application of those clusters (TCR 11433)"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0065" name="Groupcast"/>
+    <clusterId id="0x0065" name="Groupcast">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="GC" scope="Node"/>
   <features>

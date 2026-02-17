@@ -71,7 +71,7 @@ The following markers are used in this document (matches the ID master list):
 |97            |0x0061    |RVC Operational State                                     |RVCOPSTATE     |   |   |C  |C  |C  |C    |C          |C  |C              |C             |
 |98            |0x0062    |Scenes Management                                         |S              |   |   |   |P  |P  |P    |C          |C  |C              |C             |
 |100           |0x0064    |Temperature Alarm                                         |TEMPALM        |   |   |   |   |   |     |           |   |               |P             |
-|101           |0x0065    |Groupcast                                                 |GC             |   |   |   |   |   |     |           |   |               |C             |
+|101           |0x0065    |Groupcast                                                 |GC             |   |   |   |   |   |     |           |   |               |P             |
 |113           |0x0071    |HEPA Filter Monitoring                                    |HEPAFREMON     |   |   |C  |C  |C  |C    |C          |C  |C              |C             |
 |114           |0x0072    |Activated Carbon Filter Monitoring                        |ACFREMON       |   |   |C  |C  |C  |C    |C          |C  |C              |C             |
 |121           |0x0079    |Water Tank Level Monitoring                               |REPM           |   |   |   |   |C  |C    |C          |C  |C              |C             |
