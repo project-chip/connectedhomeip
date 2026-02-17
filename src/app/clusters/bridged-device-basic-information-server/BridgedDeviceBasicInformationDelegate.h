@@ -20,12 +20,13 @@
 
 namespace chip::app::Clusters {
 
-class BridgedDeviceBasicInformationDelegate {
+class BridgedDeviceBasicInformationDelegate
+{
 public:
     virtual ~BridgedDeviceBasicInformationDelegate() = default;
 
     // Called when the NodeLabel attribute is changed.
-    virtual void OnNodeLabelChanged(const std::string& newNodeLabel) {}
+    virtual void OnNodeLabelChanged(const std::string & newNodeLabel) {}
 };
 
 } // namespace chip::app::Clusters

@@ -76,7 +76,8 @@ public:
         uint32_t configurationVersion = 1;
     };
 
-    BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData, Context && context) :
+    BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
+                                         Context && context) :
         DefaultServerCluster({ endpointId, BridgedDeviceBasicInformation::Id }),
         mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
 
@@ -102,7 +103,7 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                AttributeValueDecoder & aDecoder) override;
+                                                 AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
