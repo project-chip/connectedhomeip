@@ -24,7 +24,7 @@ import("${chip_root}/src/crypto/crypto.gni")
 
 assert(chip_device_platform == "webos")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -95,7 +95,7 @@ static_library("webos") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
 
@@ -157,7 +157,7 @@ static_library("webos") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",

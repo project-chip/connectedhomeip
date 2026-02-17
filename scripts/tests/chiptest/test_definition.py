@@ -510,7 +510,8 @@ class TestDefinition:
                     if op_network == 'Thread':
                         # The node id must not conflict with ThreadBorderRouter.NODE_ID
                         subproc = subproc.with_args("--thread-node-id=2")
-                    elif ble_controller_app is not None:
+
+                    if ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(ble_controller_app))
                         if op_network == 'WiFi':
                             subproc = subproc.with_args("--wifi")
@@ -576,7 +577,7 @@ class TestDefinition:
                         pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 elif op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
                     pairing_cmd = pairing_cmd.with_args(
-                        "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
+                        "pairing", "thread-meshcop", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
                         "--thread-ba-host", thread_ba_host, "--thread-ba-port", str(thread_ba_port))
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)

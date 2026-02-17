@@ -90,19 +90,19 @@ struct TestChimeCluster : public ::testing::Test
     void SetUp() override
     {
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+    void TearDown() override {}
 
     MockChimeDelegate mMockDelegate;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 
-    ChimeCluster mCluster{ kTestEndpointId, mMockDelegate };
+    ChimeCluster mCluster{ kTestEndpointId,
+                           ChimeCluster::Context{ .delegate                         = mMockDelegate,
+                                                  .safeAttributePersistenceProvider = mPersistenceProvider } };
 
     ClusterTester mClusterTester{ mCluster };
-
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestChimeCluster, TestAttributesList)
@@ -257,12 +257,13 @@ TEST_F(TestChimeCluster, TestPersistence)
     TestServerClusterContext context;
     app::DefaultSafeAttributePersistenceProvider persistenceProvider;
     EXPECT_EQ(persistenceProvider.Init(&context.Get().storage), CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
     MockChimeDelegate mockDelegate;
 
     // 1. Initial startup, verify default values
     {
-        ChimeCluster cluster(kTestEndpointId, mockDelegate);
+        ChimeCluster cluster(
+            kTestEndpointId,
+            ChimeCluster::Context{ .delegate = mockDelegate, .safeAttributePersistenceProvider = persistenceProvider });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
@@ -281,7 +282,9 @@ TEST_F(TestChimeCluster, TestPersistence)
 
     // 2. Restart (create new cluster instance), verify modified values are loaded
     {
-        ChimeCluster cluster(kTestEndpointId, mockDelegate);
+        ChimeCluster cluster(
+            kTestEndpointId,
+            ChimeCluster::Context{ .delegate = mockDelegate, .safeAttributePersistenceProvider = persistenceProvider });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster);
 

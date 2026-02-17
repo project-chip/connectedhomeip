@@ -28,6 +28,10 @@
 #include <vector>
 
 namespace chip {
+
+// Forward declaration for friend class
+class JFAManager;
+
 namespace app {
 
 namespace datastore {
@@ -352,6 +356,8 @@ public:
     CHIP_ERROR TestAddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId, NodeId nodeId);
     CHIP_ERROR TestAddEndpointEntry(EndpointId endpointId, NodeId nodeId, CharSpan friendlyName);
 
+    CHIP_ERROR ForceAddNodeKeySetEntry(uint16_t groupKeySetId, NodeId nodeId);
+
     const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> & GetGroupKeySetList()
     {
         return mGroupKeySetList;
@@ -432,6 +438,11 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mEndpointEntries;
 
     Listener * mListeners = nullptr;
+
+    friend class chip::JFAManager;
+
+    CHIP_ERROR
+    ForceAddGroup(const Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType & commandData);
 
     CHIP_ERROR IsNodeIDInDatastore(NodeId nodeId, size_t & index);
 

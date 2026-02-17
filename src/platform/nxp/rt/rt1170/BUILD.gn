@@ -151,7 +151,7 @@ static_library("nxp_platform") {
     }
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
       "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
