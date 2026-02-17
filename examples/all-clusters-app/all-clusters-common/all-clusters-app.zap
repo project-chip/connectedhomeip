@@ -62,7 +62,7 @@
       ],
       "deviceVersions": [
         1,
-        3
+        5
       ],
       "deviceIdentifiers": [
         17,
@@ -5548,6 +5548,22 @@
               "reportableChange": 0
             },
             {
+              "name": "GroupcastAdoption",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -5973,7 +5989,7 @@
         }
       ],
       "deviceVersions": [
-        1,
+        4,
         1
       ],
       "deviceIdentifiers": [
@@ -21274,7 +21290,7 @@
         }
       ],
       "deviceVersions": [
-        1,
+        4,
         1
       ],
       "deviceIdentifiers": [

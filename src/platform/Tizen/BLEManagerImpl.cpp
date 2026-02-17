@@ -1286,11 +1286,11 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     /* Send StartScan Request to Scanner Class */
     strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
     err = mDeviceScanner.StartScan(ScanFilterType::kServiceData, data);
-    SuccessOrExitAction(err, ChipLogFailure(err, Ble, "Failed to start BLE scan"));
+    SuccessOrExitAction(err, ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimeout, this);
     SuccessOrExitAction(err, TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
-                        ChipLogFailure(err, Ble, "Failed to start BLE scan timeout"));
+                        ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format()));
 
     mBLEScanConfig.mBleScanState = scanType;
     return;

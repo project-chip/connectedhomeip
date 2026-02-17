@@ -4394,7 +4394,7 @@ provisional cluster ScenesManagement = 98 {
 }
 
 /** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
-cluster Groupcast = 101 {
+provisional cluster Groupcast = 101 {
   revision 1;
 
   enum GroupcastTestResultEnum : enum8 {

@@ -24,6 +24,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <credentials/GroupDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -43,12 +44,18 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        OperationalCredentialsCluster::Context context = { .fabricTable     = Server::GetInstance().GetFabricTable(),
-                                                           .failSafeContext = Server::GetInstance().GetFailSafeContext(),
-                                                           .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
-                                                           .dnssdServer     = app::DnssdServer::Instance(),
-                                                           .commissioningWindowManager =
-                                                               Server::GetInstance().GetCommissioningWindowManager() };
+        OperationalCredentialsCluster::Context context = {
+            .fabricTable                = Server::GetInstance().GetFabricTable(),
+            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+            .dnssdServer                = app::DnssdServer::Instance(),
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
+            .groupDataProvider          = *Credentials::GetGroupDataProvider(),
+            .accessControl              = Server::GetInstance().GetAccessControl(),
+            .platformManager            = DeviceLayer::PlatformMgr(),
+            .eventManagement            = EventManagement::GetInstance(),
+        };
         gServer.Create(endpointId, context);
         return gServer.Registration();
     }
