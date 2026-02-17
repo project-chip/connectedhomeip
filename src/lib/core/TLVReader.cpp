@@ -331,6 +331,7 @@ CHIP_ERROR TLVReader::Get(CharSpan & v) const
     if (bytes == nullptr)
     {
         // Calling memchr further down with bytes == nullptr would have undefined behaviour, exiting early.
+        v = {}; // empty data
         return CHIP_NO_ERROR;
     }
 
@@ -377,6 +378,7 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
     if (bytes == nullptr)
     {
         // Calling memchr further down with bytes == nullptr would have undefined behaviour, exiting early.
+        lsid = {}; // empty data
         return CHIP_NO_ERROR;
     }
 
