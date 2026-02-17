@@ -154,9 +154,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         # TODO: Remove this once we have a scrape without items not going to the test events
         # These are clusters that weren't part of the 1.3 or 1.4 spec that landed in the SDK before the branch cut
         # They're not marked provisional, but are present in the ToT spec under an ifdef.
-
-        # TODO(#43099): Remove Groupcast from the list
-        provisional_cluster_ids.extend([Clusters.Groupcast.id])
+        provisional_cluster_ids.extend([])
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
@@ -472,13 +470,8 @@ class DeviceConformanceTests(BasicCompositionTests):
             else:
                 fn = record_warning
             extra_clusters = set(server_clusters) - set(endpoint_clusters)
-            for extra_cluster_id in extra_clusters:
-                # TODO(#43099): Remove on 1.6 Data Model file generation
-                # Skip Groupcast cluster because missing from Data Model files
-                if extra_cluster_id == Clusters.Groupcast.id:
-                    continue
-
-                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra_cluster_id)
+            for extra in extra_clusters:
+                location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra)
                 fn(location=location, problem=f"Extra cluster found on endpoint with device types {device_type_list}")
 
         return success, problems
