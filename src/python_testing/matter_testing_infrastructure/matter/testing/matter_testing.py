@@ -1518,6 +1518,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 # The test runner will automatically wait for the app-ready-pattern before continuing
 
                 # Expire sessions and re-establish connections
+                await asyncio.sleep(1)
                 self._expire_sessions_on_all_controllers()
                 LOGGER.info("App restart completed successfully")
 
