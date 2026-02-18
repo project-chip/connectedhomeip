@@ -94,6 +94,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
     def pics_TC_BOOLCFG_6_1(self) -> list[str]:
         return [
             "BOOLCFG.S",
+            "BOOLCFG.S.E01",
         ]
 
     async def _trigger_sensor_fault(self, endpoint: int, fault_value: int) -> None:
@@ -102,13 +103,19 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
             self.write_to_app_pipe({"Name": "SetBooleanStateSensorFault", "EndpointId": endpoint, "SensorFault": fault_value})
         else:
             if fault_value != 0:
-                self.wait_for_user_input(
+                result = self.wait_for_user_input(
                     prompt_msg="Cause a sensor fault to be reported on the endpoint under test "
-                               "as instructed by the DUT's manufacturer.")
+                               "as instructed by the DUT's manufacturer. Were you able to cause a sensor fault?",
+                    prompt_msg_placeholder="Enter 'y' or 'n'",
+                    default_value="n")
+                asserts.assert_equal(result, "y", "Operator was not able to cause a sensor fault")
             else:
-                self.wait_for_user_input(
+                result = self.wait_for_user_input(
                     prompt_msg="Clear the sensor fault reported on the endpoint under test "
-                               "as instructed by the DUT's manufacturer.")
+                               "as instructed by the DUT's manufacturer. Were you able to clear the sensor fault?",
+                    prompt_msg_placeholder="Enter 'y' or 'n'",
+                    default_value="n")
+                asserts.assert_equal(result, "y", "Operator was not able to clear the sensor fault")
 
     def _wait_for_sensor_fault_attribute_report(self, attr_cb, endpoint: int, expected_nonzero: bool, timeout_sec: float):
         deadline = time.time() + timeout_sec
@@ -164,8 +171,8 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 3: Guard - skip if FAULTEV not supported
         self.step("3")
-        if not is_fault_events_supported:
-            logger.info("FAULTEV feature not supported, skipping remaining steps")
+        if not is_fault_events_supported or not self.check_pics("BOOLCFG.S.E01"):
+            logger.info("FAULTEV feature or SensorFault event not supported, skipping remaining steps")
             self.mark_all_remaining_steps_skipped("4")
             return
 
