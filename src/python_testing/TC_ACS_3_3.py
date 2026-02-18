@@ -36,7 +36,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time, asyncio
+import time
+import asyncio
 import numpy as np
 
 from mobly import asserts
@@ -559,4 +560,5 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
