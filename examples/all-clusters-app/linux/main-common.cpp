@@ -219,8 +219,8 @@ void ApplicationInit()
 
     gGroupcastCluster.Create(
         Clusters::GroupcastContext{
-            .fabrics  = Server::GetInstance().GetFabricTable(),
-            .provider = *Credentials::GetGroupDataProvider(),
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .groupDataProvider = *Credentials::GetGroupDataProvider(),
         },
         BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender,
                                                Clusters::Groupcast::Feature::kPerGroup));
