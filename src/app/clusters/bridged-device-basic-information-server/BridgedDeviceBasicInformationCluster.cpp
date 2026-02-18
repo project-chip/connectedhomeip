@@ -16,8 +16,6 @@
  */
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 
-#include <app/AttributeAccessInterface.h>
-#include <app/ConcreteAttributePath.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/BridgedDeviceBasicInformation/Commands.h>
 #include <clusters/BridgedDeviceBasicInformation/Events.h>
