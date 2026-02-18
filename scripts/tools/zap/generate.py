@@ -77,8 +77,10 @@ def checkDirExists(path):
 
 
 def getFilePath(name, prefix_chip_root_dir=True):
-    if prefix_chip_root_dir:
+    if prefix_chip_root_dir and not os.path.isabs(name):
         fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isfile(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
     else:
         fullpath = name
     checkFileExists(fullpath)
@@ -86,7 +88,12 @@ def getFilePath(name, prefix_chip_root_dir=True):
 
 
 def getDirPath(name):
-    fullpath = os.path.join(CHIP_ROOT_DIR, name)
+    if not os.path.isabs(name):
+        fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isdir(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
+    else:
+        fullpath = name
     checkDirExists(fullpath)
     return fullpath
 
