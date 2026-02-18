@@ -48,6 +48,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
+
 class TC_ACS_3_1(MatterBaseTest):
     def desc_TC_ACS_3_1(self) -> str:
         return "[TC-ACS-3.1] Multiple Detection Functionality & Simultaneous Detection Limit Check with DUT as a server"
@@ -66,8 +67,9 @@ class TC_ACS_3_1(MatterBaseTest):
                      "Verify that TH reads the HoldTimeMax of HoldTime attribute with a value of 50."),
             TestStep("5", "TH writes DUT HoldTime attribute with with PIXIT.ACS.HoldTimeTest,"
                      "Verify TH reads the HoldTime attribute with a value of 30."),
-            TestStep("6","Trigger one DUT supporting ambient sensing feature with PIXIT.ACS.AmbientContextSensed_1."),
-            TestStep("7", "TH reads the AmbientContextType attribute.", "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match the triggering sensing context from the step 6."),
+            TestStep("6", "Trigger one DUT supporting ambient sensing feature with PIXIT.ACS.AmbientContextSensed_1."),
+            TestStep("7", "TH reads the AmbientContextType attribute.",
+                     "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID that match the triggering sensing context from the step 6."),
             TestStep("8", "Within HoldTime seconds from the step 6, trigger another DUT supporting ambient sensing feature with PIXIT.ACS.AmbientContextSensed_2, which is different from the step 6."),
             TestStep("9", "TH reads the AmbientContextType attribute.",
                      "Verify that Verify that the AmbientContextSensed field data of The AmbientContextType attribute contains the list size of 2.",
@@ -97,7 +99,6 @@ class TC_ACS_3_1(MatterBaseTest):
         time.sleep(0.001)
 
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
-
     async def test_TC_ACS_3_1(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
@@ -133,7 +134,7 @@ class TC_ACS_3_1(MatterBaseTest):
                                 "Different SimultaneousDetectionLimit value is read.")
 
             self.step("4")
-            PIXITHoldTimeMax = 50  #50 sec hold time max
+            PIXITHoldTimeMax = 50  # 50 sec hold time max
             await self.write_single_attribute(attr.HoldTimeLimits.holTimeMax(PIXITHoldTimeMax))
 
             holdTimeMax = await self.read_single_attribute_check_success(
@@ -143,7 +144,7 @@ class TC_ACS_3_1(MatterBaseTest):
                                 "Different HoldTimeMax value is read.")
 
             self.step("5")
-            PIXITHoldTime = 30 #30 sec hold time
+            PIXITHoldTime = 30  # 30 sec hold time
             await self.write_single_attribute(attr.HoldTime(PIXITHoldTime))
 
             holdTime = await self.read_single_attribute_check_success(
@@ -152,13 +153,14 @@ class TC_ACS_3_1(MatterBaseTest):
             asserts.assert_true(holdTime == PIXITHoldTime,
                                 "Different HoldTime value is read.")
 
-            self.step("6") # Trigger ambient sensing
+            self.step("6")  # Trigger ambient sensing
             # PIXIT.ACS.AmbientContextSensed_1 = Human activity walking
             PIXITNamespaceID1 = 0x4B
             PIXITTag1 = 0x03
             # CI call to trigger on
             if self.is_ci:
-                self.write_to_app_pipe('{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":75, "TagId":3}}')
+                self.write_to_app_pipe(
+                    '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":75, "TagId":3}}')
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -176,7 +178,7 @@ class TC_ACS_3_1(MatterBaseTest):
             asserts.assert_true(nsID_1 == PIXITNamespaceID1 & tagID_1 == PIXITTag1,
                                 "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
-            self.step("8") # Trigger another ambient sensing
+            self.step("8")  # Trigger another ambient sensing
             # PIXIT.ACS.AmbientContextSensed_2 = Object Identification person
             PIXITNamespaceID2 = 0x49
             PIXITTag2 = 0x03
@@ -208,7 +210,7 @@ class TC_ACS_3_1(MatterBaseTest):
             asserts.assert_true(nsID_2_1 == PIXITNamespaceID1 & tagID_2_1 == PIXITTag1,
                                 "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
-            self.step("10") # Trigger another ambient sensing
+            self.step("10")  # Trigger another ambient sensing
             # PIXIT.ACS.AmbientContextSensed_2 = Sound Identification barking
             PIXITNamespaceID3 = 0x4A
             PIXITTag3 = 0x04
@@ -272,6 +274,8 @@ class TC_ACS_3_1(MatterBaseTest):
             self.skip_step("12")
             self.skip_step("13")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
+
 
