@@ -53,6 +53,7 @@ max_value_uint16 = np.iinfo(np.uint16).max
 min_value_uint32 = np.iinfo(np.uint32).min
 max_value_uint32 = np.iinfo(np.uint32).max
 
+
 class TC_ACS_2_1(MatterBaseTest):
     def desc_TC_ACS_2_1(self) -> str:
         return "[TC-ACS-2.1] Attributes with DUT as a server"
@@ -63,11 +64,14 @@ class TC_ACS_2_1(MatterBaseTest):
     def steps_TC_ACS_2_1(self) -> list[TestStep]:
         return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads the HumanActivityDetected attribute.", "If DUT supports HumanActivity feature, then TH reads the HumanActivityDetected attribute containing Boolean True or False."),
-            TestStep("3", "TH reads the ObjectIdentified attribute.", "If DUT supports ObjectIdentification feature, then TH reads the ObjectIdentified attribute containing Boolean True or False."),
-            TestStep("4", "TH reads the AudioContextDetected attribute.", "If DUT supports SoundIdentification feature, then TH reads the AudioContextDetected attribute containing Boolean True or False."),
+            TestStep("2", "TH reads the HumanActivityDetected attribute.",
+                     "If DUT supports HumanActivity feature, then TH reads the HumanActivityDetected attribute containing Boolean True or False."),
+            TestStep("3", "TH reads the ObjectIdentified attribute.",
+                     "If DUT supports ObjectIdentification feature, then TH reads the ObjectIdentified attribute containing Boolean True or False."),
+            TestStep("4", "TH reads the AudioContextDetected attribute.",
+                     "If DUT supports SoundIdentification feature, then TH reads the AudioContextDetected attribute containing Boolean True or False."),
             TestStep("5", "TH reads the AmbientContextType attribute.",
-            "Verify that DUT response contains the list size is less than SimultaneousDetectionLimit and AmbientContextSensed struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces."),
+                     "Verify that DUT response contains the list size is less than SimultaneousDetectionLimit and AmbientContextSensed struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces."),
             TestStep("5a", "If DUT supports DetectionStartTime field, TH reads DetectedStartTime field.", "An epoch-s data type is read"),
             TestStep("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextTypeSupported attribute.",
                      "Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces.",
@@ -79,12 +83,14 @@ class TC_ACS_2_1(MatterBaseTest):
             TestStep("9", "If DUT supports ObjectCounting and ObjectIdentification feature and ObjectCount attribute, verity that DUT response contains uint16 value."),
             TestStep("10", "TH reads the SimultaneousDetectionLimit attribute.",
                      "Verify that the DUT response contains a value less than equal to 10."),
-            TestStep("11", "TH reads the HoldTime attribute.", "Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax"),
+            TestStep("11", "TH reads the HoldTime attribute.",
+                     "Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax"),
             TestStep("12", "TH reads the HoldTimeLimits attribute.",
                      "Verify that DUT response contains HoldTimeMin (>=1), HolTimeMax (min maxOf(HoldTimeMin, 10)) and HoldTimeDefault (between HoldTimeMin and HoldTimeMax)"),
             TestStep("13", "If DUT supports PredictedActivity feature, then TH reads the PredictedActivity attribute.",
                      "Verify that DUT response contains StartTimestamp that is epoch-s data and less than equal to EndTimestamp-1, and EndTimestamp that is epoch-s data and greater than equal to StartTimestamp-1, and verify that DUT response contains Confidence field that is a percentage data between 0 and 100."),
-            TestStep("13a", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data.", "They include namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces."),
+            TestStep("13a", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, then TH reads a list of SemanticTagStruct data.",
+                     "They include namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces."),
             TestStep("13b", "If DUT supports ObjectCounting feature, then then TH reads CrowdDetected field.", "Boolean true or false is read.",
                      "If DUT supports ObjectCounting feature and CrowdCount field, then TH reads an uint8 value between 1 and 254.")
         ]
@@ -155,15 +161,15 @@ class TC_ACS_2_1(MatterBaseTest):
 
             if self.HumanActivitySupported:
                 asserts.assert_true((nsID == 0x4B) and (tagID <= 0x09),
-                                "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
+                                    "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
 
             if self.ObjectIdentificationSupported:
                 asserts.assert_true((nsID == 0x49) and (tagID <= 0x0C),
-                                "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                                    "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
 
             if self.SoundIdentificationSupported:
                 asserts.assert_true((nsID == 0x4A) and (tagID <= 0x16),
-                                "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                                    "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
 
             if "detectionStartTime" in ambientContextType:
                 self.step("5a")
@@ -189,15 +195,15 @@ class TC_ACS_2_1(MatterBaseTest):
 
                 if self.HumanActivitySupported:
                     asserts.assert_true(nsID == 0x4B & tagID <= 0x09,
-                                    "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
+                                        "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
 
                 if self.ObjectIdentificationSupported:
                     asserts.assert_true(nsID == 0x49 & tagID <= 0x0C,
-                                    "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                                        "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
 
                 if self.SoundIdentificationSupported:
                     asserts.assert_true(nsID == 0x4A & tagID <= 0x16,
-                                    "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                                        "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("6")
@@ -240,8 +246,8 @@ class TC_ACS_2_1(MatterBaseTest):
             # ObjectCount should be uint16
             if "objectCount" in objectCountConfig:
                 asserts.assert_true((type(objectCountConfig.objectCount) is int) and (
-                            min_value_uint16 <= objectCountConfig.objectCount <= max_value_uint16),
-                                    "ObjectCount must be an unsigned 16-bit integer.")
+                    min_value_uint16 <= objectCountConfig.objectCount <= max_value_uint16),
+                    "ObjectCount must be an unsigned 16-bit integer.")
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
             self.skip_step("9")
@@ -310,13 +316,16 @@ class TC_ACS_2_1(MatterBaseTest):
                     tagID = acts.tag
 
                     if self.HumanActivitySupported:
-                        asserts.assert_true(nsID == 0x4B & tagID <= 0x09, "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
+                        asserts.assert_true(nsID == 0x4B & tagID <= 0x09,
+                                            "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
 
                     if self.ObjectIdentificationSupported:
-                        asserts.assert_true(nsID == 0x49 & tagID <= 0x0C, "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                        asserts.assert_true(nsID == 0x49 & tagID <= 0x0C,
+                                            "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
 
                     if self.SoundIdentificationSupported:
-                        asserts.assert_true(nsID == 0x4A & tagID <= 0x16, "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                        asserts.assert_true(nsID == 0x4A & tagID <= 0x16,
+                                            "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
             else:
                 log.info("Test step 13a skipped")
                 self.skip_step("13a")
@@ -325,12 +334,14 @@ class TC_ACS_2_1(MatterBaseTest):
                 self.step("13b")
                 # CrowdDetected
                 log.info(f"Rx'd CrowdDetected: {predictedActivity.crowdDetected}")
-                asserts.assert_true(predictedActivity.crowdDetected is True | predictedActivity.crowdDetected is False, "Expected True or False Boolean value.")
+                asserts.assert_true(predictedActivity.crowdDetected is True |
+                                    predictedActivity.crowdDetected is False, "Expected True or False Boolean value.")
 
                 # CrowdCount
                 if "crowdCount" in predictedActivity:
                     log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
-                    asserts.assert_true(min_value_uint8 <= predictedActivity.crowdCount <= max_value_uint8, "CrowdCount is expected to be between 1 and 254.")
+                    asserts.assert_true(min_value_uint8 <= predictedActivity.crowdCount <=
+                                        max_value_uint8, "CrowdCount is expected to be between 1 and 254.")
             else:
                 log.info("Test step 13b skipped")
                 self.skip_step("13b")
@@ -341,7 +352,9 @@ class TC_ACS_2_1(MatterBaseTest):
             self.skip_step("13a")
             self.skip_step("13b")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
