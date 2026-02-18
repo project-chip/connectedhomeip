@@ -27,7 +27,7 @@ std::string DefaultFilesystemStorageLocationProviderImpl::GetCountersDataLocatio
 
 std::string DefaultFilesystemStorageLocationProviderImpl::GetKVSDataLocation() const
 {
-    return countersroot;
+    return kvsroot;
 }
 
 DefaultFilesystemStorageLocationProviderImpl & DefaultFilesystemStorageLocationProviderImpl::GetDefaultInstance()
