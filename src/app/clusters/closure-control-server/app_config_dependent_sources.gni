@@ -13,10 +13,10 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "closure-control-cluster-delegate.h",
-  "closure-control-cluster-logic.cpp",
+  "ClosureControlClusterLogic.cpp",
   "closure-control-cluster-logic.h",
   "closure-control-cluster-matter-context.h",
   "closure-control-cluster-objects.h",
-  "closure-control-server.cpp",
+  "ClosureControlCluster.cpp",
   "closure-control-server.h",
 ]
