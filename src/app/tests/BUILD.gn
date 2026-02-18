@@ -216,8 +216,8 @@ source_set("app-test-stubs") {
 
 source_set("closure-control-test-srcs") {
   sources = [
+    "${chip_root}/src/app/clusters/closure-control-server/ClosureControlClusterLogic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-delegate.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-objects.h",

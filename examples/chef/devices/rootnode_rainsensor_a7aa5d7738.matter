@@ -1316,7 +1316,6 @@ cluster GeneralDiagnostics = 51 {
 
   bitmap Feature : bitmap32 {
     kDataModelTest = 0x1;
-    kDeviceLoad = 0x2;
   }
 
   struct DeviceLoadStruct {
@@ -1767,7 +1766,7 @@ cluster BooleanStateConfiguration = 128 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 5;
 
 
   server cluster Descriptor {
@@ -1867,6 +1866,7 @@ endpoint 0 {
     callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -1912,6 +1912,7 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 

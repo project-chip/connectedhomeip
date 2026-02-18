@@ -16,12 +16,15 @@
  */
 #pragma once
 
+#include <access/AccessControl.h>
+#include <app/EventManagement.h>
 #include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <clusters/OperationalCredentials/ClusterId.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/GroupDataProvider.h>
 
 namespace chip {
 namespace app {
@@ -37,6 +40,11 @@ public:
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
         CommissioningWindowManager & commissioningWindowManager;
+        Credentials::DeviceAttestationCredentialsProvider & dacProvider;
+        Credentials::GroupDataProvider & groupDataProvider;
+        Access::AccessControl & accessControl;
+        DeviceLayer::PlatformManager & platformManager;
+        app::EventManagement & eventManagement;
     };
 
     OperationalCredentialsCluster(EndpointId endpoint, const Context context) :
@@ -66,13 +74,6 @@ public:
 
 private:
     const OperationalCredentialsCluster::Context mOpCredsContext;
-
-    FabricTable & GetFabricTable();
-    FailSafeContext & GetFailSafeContext();
-    Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
-    SessionManager & GetSessionManager();
-    DnssdServer & GetDNSSDServer();
-    CommissioningWindowManager & GetCommissioningWindowManager();
 };
 
 } // namespace Clusters
