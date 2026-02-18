@@ -123,7 +123,10 @@ class DeviceConformanceTests(BasicCompositionTests):
         ignore_attributes: dict[int, list[int]] = {}
         if ignore_in_progress:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
-            in_progress_attributes = {Clusters.ThreadNetworkDiagnostics.id: [0x3F, 0x40]}
+            in_progress_attributes = {
+                Clusters.ThreadNetworkDiagnostics.id: [0x3F, 0x40],
+                Clusters.BasicInformation.id: [0x18],
+            }
             ignore_attributes.update(in_progress_attributes)
 
         if is_ci:
@@ -132,6 +135,19 @@ class DeviceConformanceTests(BasicCompositionTests):
             ci_ignore_attributes = {Clusters.NetworkCommissioning.id: [
                 Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds.attribute_id, Clusters.NetworkCommissioning.Attributes.ConnectMaxTimeSeconds.attribute_id]}
             ignore_attributes.update(ci_ignore_attributes)
+
+        ignore_feature_masks: dict[int, list[int]] = {}
+        if ignore_in_progress:
+            # The General Diagnostics cluster on the SDK has the DeviceLoad feature enabled, but the feature is not present
+            # in the spec.
+            # This is a manually curated list of features that are in-progress in the SDK, but have landed in the spec
+            in_progress_features = {Clusters.GeneralDiagnostics.id: [0x02]}
+            ignore_feature_masks.update(in_progress_features)
+
+        if is_ci:
+            # This is a manually curated list of features that are present in the SDK, but not in the spec.
+            ci_ignore_features = {}
+            ignore_feature_masks.update(ci_ignore_features)
 
         success = True
         provisional_cluster_ids = []
@@ -169,6 +185,9 @@ class DeviceConformanceTests(BasicCompositionTests):
                                                  attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
                 feature_masks = [1 << i for i in range(32) if feature_map & (1 << i)]
                 for f in feature_masks:
+                    if cluster_id in ignore_feature_masks and f in ignore_feature_masks[cluster_id]:
+                        continue
+
                     if cluster_id == Clusters.AccessControl.id and f == Clusters.AccessControl.Bitmaps.Feature.kManagedDevice:
                         # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
                         if not self._has_device_type_supporting_macl():

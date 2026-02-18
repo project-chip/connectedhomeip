@@ -31,12 +31,12 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
         while (group_iter->Next(info) && (CHIP_NO_ERROR == status))
         {
             // Group Key
-            KeysetId keyset_id = 0;
-            status             = groups->GetGroupKey(fabric_index, info.group_id, keyset_id);
+            KeysetId keyset_id = kInvalidKeysetId;
+            // Since keys are managed by the GroupKeyManagement cluster, groups may not have an associated keyset
+            status = groups->GetGroupKey(fabric_index, info.group_id, keyset_id).NoErrorIf(CHIP_ERROR_NOT_FOUND);
             if (CHIP_NO_ERROR != status)
             {
-                group_iter->Release();
-                return status;
+                break;
             }
 
             // Endpoints

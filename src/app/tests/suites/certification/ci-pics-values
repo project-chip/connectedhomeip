@@ -3181,3 +3181,13 @@ WEBRTCR.S.C00.Rsp=1  # Offer
 WEBRTCR.S.C01.Rsp=1  # Answer  
 WEBRTCR.S.C02.Rsp=1  # ICECandidates
 WEBRTCR.S.C03.Rsp=1  # End
+
+# Joint Fabric Administrator Cluster
+# Server
+JFPKI.S=1
+
+# Client
+JFPKI.C=1
+
+# Attributes
+JFPKI.S.A0000=1 #AdministratorFabricIndex

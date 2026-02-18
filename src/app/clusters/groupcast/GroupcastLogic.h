@@ -70,10 +70,11 @@ public:
     Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
+    void ResetDataModelProvider() { mDataModelProvider = nullptr; }
 
 private:
-    Credentials::GroupDataProvider & Provider() { return mContext.provider; }
-    chip::FabricTable & Fabrics() { return mContext.fabrics; }
+    Credentials::GroupDataProvider & Provider() { return mContext.groupDataProvider; }
+    chip::FabricTable & Fabrics() { return mContext.fabricTable; }
 
     Status SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key);
     Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,

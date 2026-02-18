@@ -30,9 +30,8 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
+    mLogic.ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
-    mContext = nullptr;
-    mLogic.SetDataModelProvider(nullptr);
 }
 
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

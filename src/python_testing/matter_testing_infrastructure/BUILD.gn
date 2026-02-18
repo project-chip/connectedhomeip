@@ -153,6 +153,15 @@ pw_zip("data_model_zip_1_5_1") {
   output = "${root_out_dir}/data_model/zip_1_5_1.zip"
 }
 
+pw_zip("data_model_zip_1_6") {
+  inputs = []
+  foreach(file, data_model_XMLS_1_6) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.6/", "/")
+    inputs += [ "${file} > /${zip_path}" ]
+  }
+  output = "${root_out_dir}/data_model/zip_1_6.zip"
+}
+
 pw_zip("credential_zip_development") {
   inputs = []
   foreach(file, credentials_development) {
@@ -192,6 +201,7 @@ pw_python_distribution("matter-testing") {
     ":data_model_zip_1_4_2",
     ":data_model_zip_1_5",
     ":data_model_zip_1_5_1",
+    ":data_model_zip_1_6",
   ]
 
   extra_files = [
@@ -203,6 +213,7 @@ pw_python_distribution("matter-testing") {
     "${root_out_dir}/data_model/zip_1_4_2.zip > matter/testing/data_model/1.4.2/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_5.zip > matter/testing/data_model/1.5/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_5_1.zip > matter/testing/data_model/1.5.1/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_6.zip > matter/testing/data_model/1.6/allfiles.zip",
     "${root_out_dir}/credentials/zip_development.zip > matter/testing/credentials/development/allfiles.zip",
     "${root_out_dir}/credentials/zip_production.zip > matter/testing/credentials/production/allfiles.zip",
   ]

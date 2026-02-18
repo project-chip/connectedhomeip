@@ -142,12 +142,19 @@ jobs:
 
             - name: Build example Telink (W91) Lighting App with OTA, Factory Data
               # Run test for master and all PRs
+              #
+              # TODO: full logging is not enabled here; logging is reduced to progress/error
+              #       (via the *-log-progress target) because with full logging this runs
+              #       out of flash. This is generally NOT expected/intentional.
+              #       At the time this was checked:
+              #         - a 4K flash increase occurred due to the group cast cluster
+              #         - flash runs out by about 1.2K
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data-log-progress' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9118bdk40d lighting-app-ota-factory-data \
-                    out/telink-tlsr9118bdk40d-light-ota-factory-data/zephyr/zephyr.elf \
+                    out/telink-tlsr9118bdk40d-light-ota-factory-data-log-progress/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -194,12 +201,19 @@ jobs:
 
             - name: Build example Telink (tl721x) Lighting App with OTA, Shell, Factory Data
               # Run test for master and all PRs
+              #
+              # TODO: full logging is not enabled here; logging is reduced to progress/error
+              #       (via the *-log-progress target) because with full logging this runs
+              #       out of flash. This is generally NOT expected/intentional.
+              #       At the time this was checked:
+              #         - a 4K flash increase occurred due to the group cast cluster
+              #         - flash runs out by about 1.2K
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-shell-factory-data-log-progress' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tl7218x light-app-ota-shell-factory-data \
-                    out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    out/telink-tl7218x-light-ota-shell-factory-data-log-progress/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
