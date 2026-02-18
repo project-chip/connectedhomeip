@@ -203,7 +203,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 # If has_valid_time is False, TH sends Time Synchronization command to DUT using a time source.
                 try:
                     code = 0
-                    await self.send_single_cmd(cmd=time_cluster.Commands.SetUTCTime(UTCTime=get_epoch_utc_time(), granularity=time_cluster.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=0)
+                    await self.send_single_cmd(cmd=time_cluster.Commands.SetUTCTime(UTCTime=get_epoch_utc_time() * 1_000_000, granularity=time_cluster.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=0)
                 except InteractionModelError as e:
                     # The python layer discards the cluster specific portion of the status IB, so for now we just expect a generic FAILURE error
                     # see #26521
