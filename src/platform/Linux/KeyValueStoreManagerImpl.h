@@ -48,7 +48,6 @@ private:
     {
         return DeviceLayer::Internal::PosixConfig::GetStorageForNamespace(DeviceLayer::Internal::PosixConfig::kConfigKey_KVS);
     }
-    // DeviceLayer::Internal::ChipLinuxStorage mStorage;
 
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
