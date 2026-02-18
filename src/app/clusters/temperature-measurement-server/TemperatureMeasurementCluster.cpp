@@ -30,7 +30,8 @@ constexpr int16_t kMaximumMinMeasuredValue = 32766;
 TemperatureMeasurementCluster::TemperatureMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }),
+    mOptionalAttributeSet(optionalAttributeSet)
 {
     VerifyOrDie(config.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue) >= kMinimumMinMeasuredValue &&
                 config.minMeasuredValue.ValueOr(kMaximumMinMeasuredValue) <= kMaximumMinMeasuredValue);
