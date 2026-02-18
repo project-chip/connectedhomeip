@@ -1287,7 +1287,7 @@ let connectionCompleteCallback: (Swift.Error?) -> Void = { err in
 
 #### Determining Passcode Length for Entry Dialog
 
-The `passcodeLength` field is provided in the `CertificationDeclaration` sent by the TV during the commissioning process. This field indicates the expected length of the passcode that should be entered by the user.
+The `passcodeLength` field is provided in the `CommissionerDeclaration` sent by the TV during the commissioning process. This field indicates the expected length of the passcode that should be entered by the user.
 
 When implementing the passcode entry dialog:
 - If `passcodeLength` is `0` or not provided, the Casting Client should provide a variable-length input field for passcode entry
