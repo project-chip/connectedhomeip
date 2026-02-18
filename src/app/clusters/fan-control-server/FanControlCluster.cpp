@@ -26,7 +26,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/fan-control-server/FanControlCluster.h>
+#include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/CodeUtils.h>

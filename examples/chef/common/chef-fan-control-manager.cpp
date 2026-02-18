@@ -21,7 +21,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/clusters/fan-control-server/FanControlCluster.h>
+#include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
@@ -143,7 +143,7 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
             percentSetting.SetNull();
         }
 
-        // The cluster code in FanControlCluster.cpp is the only one allowed to set PercentSetting to null.
+        // The cluster code in fan-control-server.cpp is the only one allowed to set PercentSetting to null.
         // This happens as a consequence of setting the FanMode to kAuto. In auto mode, percentCurrent should continue to report the
         // real fan speed percentage. In this example, we set PercentCurrent to 0 here as we don't have a real value for the Fan
         // speed or a FanAutoMode simulator.
@@ -164,7 +164,7 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
             speedSetting.SetNull();
         }
 
-        // The cluster code in FanControlCluster.cpp is the only one allowed to set speedSetting to null.
+        // The cluster code in fan-control-server.cpp is the only one allowed to set speedSetting to null.
         // This happens as a consequence of setting the FanMode to kAuto. In auto mode, speedCurrent should continue to report the
         // real fan speed. In this example, we set SpeedCurrent to 0 here as we don't have a real value for the Fan speed or a
         // FanAutoMode simulator.
