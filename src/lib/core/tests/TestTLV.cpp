@@ -2815,8 +2815,15 @@ TEST_F(TestTLV, CheckTLVCharSpan)
         {  "This is a test case #3" IS1_CHAR,                                    "This is a test case #3"  },
         {  "Thé" IS1_CHAR,                                                       "Thé"                     },
         {  IS1_CHAR " abc " IS1_CHAR " def",                                     ""                        },
+        {"", ""},
+        {"Post empty", "Post empty"},
+        {"", ""},
     };
     // clang-format on
+
+    // Important: declared in the outer scope to ensure that each read correctly
+    // resets the values.
+    chip::CharSpan readerSpan;
 
     for (auto & testCase : sCharSpanTestCases)
     {
@@ -2837,12 +2844,11 @@ TEST_F(TestTLV, CheckTLVCharSpan)
         err = reader.Next();
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
-        chip::CharSpan readerSpan;
         err = reader.Get(readerSpan);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
 
         EXPECT_EQ(strlen(testCase.expectedString), readerSpan.size());
-        EXPECT_EQ(memcmp(readerSpan.data(), testCase.expectedString, strlen(testCase.expectedString)), 0);
+        EXPECT_TRUE(readerSpan.data_equal(CharSpan::fromCharString(testCase.expectedString)));
     }
 }
 
