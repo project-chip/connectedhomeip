@@ -15,7 +15,9 @@
 # limitations under the License.
 
 import contextlib
+import dataclasses
 import datetime
+import enum
 import glob
 import io
 import logging
@@ -93,33 +95,40 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
         os.unlink(path)
 
 
+@dataclasses.dataclass
+class TestRunConfig:
+    """Configuration for the app under test."""
+    app: str
+    app_args: str
+    script_args: str
+    app_ready_pattern: typing.Optional[str]
+    stream_output: typing.BinaryIO
+    app_stdin_pipe: typing.Optional[str] = None
+
+
 class AppProcessManager:
-    def __init__(self, app: str, app_args: str, app_ready_pattern: typing.Optional[str], stream_output: typing.BinaryIO, app_stdin_pipe: typing.Optional[str] = None):
-        self.app = app
-        self.app_args = app_args
-        self.app_ready_pattern = app_ready_pattern
-        self.stream_output = stream_output
-        self.app_stdin_pipe = app_stdin_pipe
+    def __init__(self, config: TestRunConfig):
+        self.config = config
         self.app_process = None
         self.stdin_thread = None
         self.stdin_stop_event = threading.Event()
 
     def start(self):
-        log.info("Starting app with args: '%s'", self.app_args)
-        if self.app_ready_pattern and isinstance(self.app_ready_pattern, str):
-            ready_pattern = re.compile(self.app_ready_pattern.encode())
+        log.info("Starting app with args: '%s'", self.config.app_args)
+        if self.config.app_ready_pattern and isinstance(self.config.app_ready_pattern, str):
+            ready_pattern = re.compile(self.config.app_ready_pattern.encode())
         else:
-            ready_pattern = self.app_ready_pattern
-        self.app_process = Subprocess(self.app, *shlex.split(self.app_args),
+            ready_pattern = self.config.app_ready_pattern
+        self.app_process = Subprocess(self.config.app, *shlex.split(self.config.app_args),
                                       output_cb=process_chip_app_output,
-                                      f_stdout=self.stream_output,
-                                      f_stderr=self.stream_output)
+                                      f_stdout=self.config.stream_output,
+                                      f_stderr=self.config.stream_output)
         self.app_process.start(expected_output=ready_pattern, timeout=30)
-        if self.app_stdin_pipe:
-            log.info("Forwarding stdin from '%s' to app", self.app_stdin_pipe)
+        if self.config.app_stdin_pipe:
+            log.info("Forwarding stdin from '%s' to app", self.config.app_stdin_pipe)
             self.stdin_stop_event.clear()
             self.stdin_thread = threading.Thread(
-                target=forward_fifo, args=(self.app_stdin_pipe, self.app_process.p.stdin, self.stdin_stop_event))
+                target=forward_fifo, args=(self.config.app_stdin_pipe, self.app_process.p.stdin, self.stdin_stop_event))
             self.stdin_thread.start()
         else:
             self.app_process.p.stdin.close()
@@ -233,21 +242,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
+    # Remove app config and storage if factory reset is requested
     if factory_reset or factory_reset_app_only:
-        # Remove native app config
-        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
-            pathlib.Path(path).unlink(missing_ok=True)
-
-        # Remove native app KVS if that was used
-        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
-            log.info("Removing KVS path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
-
-    if factory_reset:
-        # Remove Python test admin storage if provided
-        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
-            log.info("Removing storage path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
+        reset_type = FactoryResetType.AppAndController if factory_reset else FactoryResetType.AppOnly
+        factory_reset_config_removal(reset_type, app_args, script_args)
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
@@ -260,7 +258,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
-        app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        app_manager = AppProcessManager(app_config)
         app_manager.start()
         app_manager_ref = [app_manager]
         restart_monitor_thread = threading.Thread(
@@ -268,11 +267,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             args=(
                 app_manager_ref,
                 app_manager_lock,
-                app,
-                app_args,
-                app_ready_pattern,
-                stream_output,
-                app_stdin_pipe,
+                app_config,
                 restart_flag_file),
             daemon=True)
         restart_monitor_thread.start()
@@ -364,28 +359,66 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 def monitor_app_restart_requests(
         app_manager_ref,
         app_manager_lock,
-        app,
-        app_args,
-        app_ready_pattern,
-        stream_output,
-        app_stdin_pipe,
+        config: TestRunConfig,
         restart_flag_file):
     while True:
-        try:
-            if os.path.exists(restart_flag_file):
-                log.info("App restart requested by test script")
-                # Remove the flag file immediately to prevent multiple restarts
-                os.unlink(restart_flag_file)
-
-                new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
-                app_manager_ref[0].stop()
-                with app_manager_lock:
-                    new_app_manager.start()
-                    app_manager_ref[0] = new_app_manager
-                    log.info("App restart completed")
+        # Try to read the restart flag file
+        if not os.path.exists(restart_flag_file):
             time.sleep(0.5)
-        except Exception as e:
-            log.error("Error in app restart monitor: %r", e)
+            continue
+
+        with open(restart_flag_file, 'r') as f:
+            flag_file_content = f.read().strip()
+
+        # Successfully read the flag file, remove to prevent multiple restarts
+        os.unlink(restart_flag_file)
+        log.info("%s requested by test script", flag_file_content.capitalize())
+
+        # Determine reset type and remove app/ctrl config and storage
+        if flag_file_content == "factory reset":
+            reset_type = FactoryResetType.AppAndController
+        elif flag_file_content == "factory reset app only":
+            reset_type = FactoryResetType.AppOnly
+        factory_reset_config_removal(reset_type, config.app_args, config.script_args)
+
+        # Restart the app
+        log.info("Restarting app '%s'...", config.app)
+        new_app_manager = AppProcessManager(config)
+        app_manager_ref[0].stop()
+        with app_manager_lock:
+            new_app_manager.start()
+            app_manager_ref[0] = new_app_manager
+
+        # Action complete, continue monitoring for additional restart requests
+        log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
+
+
+class FactoryResetType(enum.Enum):
+    """Type of factory reset to perform."""
+    AppOnly = 0
+    AppAndController = 1
+
+    def config_files(self, app_args: str, script_args: str) -> typing.Generator[str, None, None]:
+        """Yield paths of config/storage files to remove for this reset type."""
+
+        # App config files and KVS
+        yield from glob.glob('/tmp/chip*')
+        yield from glob.glob('/tmp/repl*')
+
+        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
+            yield match.group("path")
+
+        if self == FactoryResetType.AppAndController:
+            # Controller storage
+            if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
+                yield match.group("path")
+
+
+def factory_reset_config_removal(reset_type: FactoryResetType, app_args: str, script_args: str):
+    """Handles app factory reset requests by removing configuration and storage files."""
+    for path in reset_type.config_files(app_args, script_args):
+        log.info("Removing config/storage file, path: '%s'...", path)
+        pathlib.Path(path).unlink(missing_ok=True)
 
 
 if __name__ == '__main__':

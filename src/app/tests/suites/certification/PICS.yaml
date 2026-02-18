@@ -345,6 +345,23 @@ PICS:
       id: MCORE.FS
 
     #
+    # Joint Fabric Administrator
+    #
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          server?"
+      id: JFPKI.S
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          client?"
+      id: JFPKI.C
+
+    - label: "Does the device implement AdministratorFabricIndex attribute?"
+      id: JFPKI.S.A0000
+
+    #
     #IDM
     #
     - label: "Does the device implement the ICD Management cluster as a server?"
