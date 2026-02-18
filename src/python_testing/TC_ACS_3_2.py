@@ -91,7 +91,6 @@ class TC_ACS_3_2(MatterBaseTest):
         time.sleep(0.001)
 
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
-
     async def test_TC_ACS_3_2(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
@@ -182,7 +181,7 @@ class TC_ACS_3_2(MatterBaseTest):
                             "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
         self.step("8")  # wait until 40 seconds from the step 4
-        #time.sleep(40)
+        # time.sleep(40)
         await asyncio.sleep(40)
 
         self.step("9")
@@ -206,8 +205,10 @@ class TC_ACS_3_2(MatterBaseTest):
             asserts.assert_true(audioContextDetected is False,
                                 "Expected a False Boolean value.")
 
+
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
 
