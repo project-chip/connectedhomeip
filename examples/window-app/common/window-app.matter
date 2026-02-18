@@ -2849,7 +2849,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x001F;
+    ram      attribute featureMap default = 0x0017;
     callback attribute clusterRevision;
 
     handle command UpOrOpen;
