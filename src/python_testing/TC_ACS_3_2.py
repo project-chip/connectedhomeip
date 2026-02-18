@@ -36,7 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
+import asyncio
 
 from mobly import asserts
 
@@ -181,28 +181,30 @@ class TC_ACS_3_2(MatterBaseTest):
                             "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
         self.step("8")  # wait until 40 seconds from the step 4
-        time.sleep(40)
+        #time.sleep(40)
+        await asyncio.sleep(40)
 
         self.step("9")
         if self.HumanActivitySupported:
             humanActivityDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
             )
-            asserts.assert_true(humanActivityDetected == False,
+            asserts.assert_true(humanActivityDetected is False,
                                 "Expected a False Boolean value.")
 
         if self.ObjectIdentificationSupported:
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
             )
-            asserts.assert_true(objectIdentified == False,
+            asserts.assert_true(objectIdentified is False,
                                 "Expected a False Boolean value.")
         if self.SoundIdentificationSupported:
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
-            asserts.assert_true(audioContextDetected == False,
+            asserts.assert_true(audioContextDetected is False,
                                 "Expected a False Boolean value.")
 
 if __name__ == "__main__":
     default_matter_test_main()
+
