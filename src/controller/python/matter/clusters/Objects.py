@@ -8055,7 +8055,6 @@ class GeneralDiagnostics(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kDataModelTest = 0x1
-            kDeviceLoad = 0x2
 
     class Structs:
         @dataclass

@@ -97,6 +97,8 @@ class TC_GCAST_2_7(MatterBaseTest):
         if not pga_enabled:
             logger.info("PerGroup feature is not enabled, skip remaining steps.")
             self.mark_all_remaining_steps_skipped("1b")
+            return
+
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
         if len(endpoints_list) > 1:
             endpoints_list = [endpoints_list[0]]
@@ -183,68 +185,68 @@ class TC_GCAST_2_7(MatterBaseTest):
         self.step("6a")
         if A_max < math.floor(M_max / 2):
             self.mark_step_range_skipped("6b", "8")
+        else:
+            self.step("6b")
+            self.th1 = self.default_controller
+            self.discriminatorTH2 = random.randint(0, 4095)
+            # Create TH2 controller
+            th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+            th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+            self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
-        self.step("6b")
-        self.th1 = self.default_controller
-        self.discriminatorTH2 = random.randint(0, 4095)
-        # Create TH2 controller
-        th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+            # Open commissioning window on TH1
+            params = await self.th1.OpenCommissioningWindow(
+                nodeId=self.dut_node_id,
+                timeout=900,
+                iteration=1000,
+                discriminator=self.discriminatorTH2,
+                option=1
+            )
 
-        # Open commissioning window on TH1
-        params = await self.th1.OpenCommissioningWindow(
-            nodeId=self.dut_node_id,
-            timeout=900,
-            iteration=1000,
-            discriminator=self.discriminatorTH2,
-            option=1
-        )
+            # Commission TH2
+            await self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id,
+                setupPinCode=params.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=self.discriminatorTH2
+            )
 
-        # Commission TH2
-        await self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
-            setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=self.discriminatorTH2
-        )
-
-        self.step("7a")
-        groupID3 = 3
-        keySetID3 = 3
-        inputKey3 = secrets.token_bytes(16)
-        await self.send_single_cmd(dev_ctrl=self.th2, cmd=Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID3,
-            endpoints=endpoints_list,
-            keySetID=keySetID3,
-            key=inputKey3,
-            mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
-        )
-        f2_current_group_count = 1
-
-        self.step("7b")
-        f2_max_groups = math.floor(M_max / 2)
-        for i in range(f2_current_group_count, f2_max_groups):
-            groupID = i + 3
+            self.step("7a")
+            groupID3 = 3
+            keySetID3 = 3
+            inputKey3 = secrets.token_bytes(16)
             await self.send_single_cmd(dev_ctrl=self.th2, cmd=Clusters.Groupcast.Commands.JoinGroup(
-                groupID=groupID,
+                groupID=groupID3,
                 endpoints=endpoints_list,
                 keySetID=keySetID3,
+                key=inputKey3,
                 mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
             )
-            f2_current_group_count += 1
+            f2_current_group_count = 1
 
-        self.step(8)
-        total_per_group_count = f1_current_group_count + f2_current_group_count
-        for i in range(total_per_group_count, A_max):
-            groupID = i + 1
-            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.JoinGroup(
-                groupID=groupID,
-                endpoints=endpoints_list,
-                keySetID=keySetID1,
-                mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
-            )
-            f1_current_group_count += 1
+            self.step("7b")
+            f2_max_groups = math.floor(M_max / 2)
+            for i in range(f2_current_group_count, f2_max_groups):
+                groupID = i + 3
+                await self.send_single_cmd(dev_ctrl=self.th2, cmd=Clusters.Groupcast.Commands.JoinGroup(
+                    groupID=groupID,
+                    endpoints=endpoints_list,
+                    keySetID=keySetID3,
+                    mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
+                )
+                f2_current_group_count += 1
+
+            self.step(8)
+            total_per_group_count = f1_current_group_count + f2_current_group_count
+            for i in range(total_per_group_count, A_max):
+                groupID = i + 1
+                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.JoinGroup(
+                    groupID=groupID,
+                    endpoints=endpoints_list,
+                    keySetID=keySetID1,
+                    mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
+                )
+                f1_current_group_count += 1
 
         self.step("9")
         usedMcastAddrCount_matcher = generate_usedMcastAddrCount_entry_matcher(A_max)

@@ -234,6 +234,7 @@ slow_tests:
     - { name: TC_DRLK_2_3.py, duration: 30 seconds }
     - { name: TC_EEVSE_2_6.py, duration: 30 seconds }
     - { name: TC_FAN_3_1.py, duration: 15 seconds }
+    - { name: TC_JFPKI_2_4.py, duration: 5 minutes }
     - { name: TC_MCORE_FS_1_4.py, duration: 20 seconds }
     - { name: TC_OPSTATE_2_5.py, duration: 1.25 minutes }
     - { name: TC_OPSTATE_2_6.py, duration: 35 seconds }

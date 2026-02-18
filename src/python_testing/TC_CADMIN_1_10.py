@@ -37,24 +37,41 @@
 
 
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TestRevokeCommissioningClearsPASE(MatterBaseTest):
+class TC_CADMIN_1_10(CADMINBaseTest):
+
+    def steps_TC_CADMIN_1_10(self) -> list[TestStep]:
+        return [
+            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "TH1 sends an OpenCommissioningWindow command, to allow TH2 to establish a PASE session with the DUT"),
+            TestStep(2, "TH2 establishes a PASE session with DUT"),
+            TestStep(3, "Read VendorName from BasicInformation Cluster using TH2 over PASE, to ensure PASE session is established",
+                     "Verify that the read is successful, and VendorName is present in the response"),
+            TestStep(4, "TH1 Sends RevokeCommissioning command (over CASE) to clear PASE session on DUT"),
+            TestStep(5, "Ensure that the PASE Session got cleared, by attempting to read VendorName using TH2 (over PASE)",
+                     "Verify that attempting to read VendorName attribute over PASE results in a timeout error"),
+            TestStep(6, "recreate Second Controller; to establish a new PASE session and repeat test, but sending RevokeCommissioning over PASE this time"),
+            TestStep(7, "TH1 sends an OpenCommissioningWindow command to DUT, to allow TH2 to establish a PASE session with the DUT"),
+            TestStep(8, "TH2 establishes a PASE session with DUT"),
+            TestStep(9, "TH2 Sends RevokeCommissioning command (Over PASE) to clear PASE session on DUT"),
+            TestStep(10, "Ensure that the PASE Session got cleared, by attempting to read VendorName using TH2 (over PASE)",
+                     "Verify that attempting to read VendorName attribute over PASE results in a timeout error"),
+        ]
+
+    def pics_TC_CADMIN_1_10(self) -> list[str]:
+        return ["CADMIN.S"]
 
     @async_test_body
-    async def test_TestRevokeCommissioningClearsPASE(self):
-
-        self.print_step("precondition", "Commissioning - already done")
+    async def test_TC_CADMIN_1_10(self):
 
         self.TH1 = self.default_controller
-
-        self.print_step("precondition", "Create Second Controller")
 
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
         self.TH2_nodeid = self.matter_test_config.controller_node_id + 1
@@ -63,15 +80,17 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
         )
 
-        self.print_step(1, "TH1 sends an OpenCommissioningWindow command to DUT to allow it to be commissioned by TH2")
+        self.step("precondition")
+        # Commission DUT - already done
+
+        self.step(1)
         resp = await self.open_commissioning_window()
 
-        self.print_step(2, "TH2 establishes a PASE session with DUT")
+        self.step(2)
         pase_node_id = self.dut_node_id + 1
         await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=pase_node_id)
 
-        self.print_step(3, "Read VendorName from BasicInformation Cluster using TH2 over PASE, to ensure PASE session is established")
-
+        self.step(3)
         VendorNameAttr = Clusters.BasicInformation.Attributes.VendorName
         ROOT_NODE_ENDPOINT_ID = 0
 
@@ -86,13 +105,11 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
             "VendorName should be present in the read response"
         )
 
-        self.print_step(4, "TH1 Sends RevokeCommissioning (over CASE) to clear PASE session on DUT")
+        self.step(4)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.TH1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
-        self.print_step(
-            5, "Ensure that the PASE Session got cleared, by attempting to read VendorName using TH2 (over PASE) and Ensuring that the Command times out")
-
+        self.step(5)
         _CHIP_TIMEOUT_ERROR = 50
 
         with asserts.assert_raises(ChipStackError) as e:
@@ -104,9 +121,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
 
         # ---------------------------- Repeat test, but sending RevokeCommissioning over PASE this time --------------------------------
 
-        self.print_step(
-            6, "recreate Second Controller; to establish a new PASE session and repeat test, but sending RevokeCommissioning over PASE this time")
-
+        self.step(6)
         self.TH2.Shutdown()
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
         self.TH2_nodeId = self.matter_test_config.controller_node_id + 1
@@ -115,19 +130,16 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
         )
 
-        self.print_step(7, "TH1 sends an OpenCommissioningWindow command to DUT to allow it to be commissioned by TH2")
+        self.step(7)
         resp = await self.open_commissioning_window()
 
-        self.print_step(8, "TH2 establishes a PASE session with DUT")
+        self.step(8)
         await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=pase_node_id)
 
-        self.print_step(9, "TH2 Sends RevokeCommissioning (Over PASE) to clear PASE session on DUT")
-
+        self.step(9)
         await self.TH2.SendCommand(nodeId=pase_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
-        self.print_step(
-            10, "Ensure that the PASE Session got cleared, by attempting to read VendorName using TH2 (over PASE) and Ensuring that the Command times out")
-
+        self.step(10)
         with asserts.assert_raises(ChipStackError) as e:
             await self.TH2.ReadAttribute(
                 nodeId=pase_node_id,
