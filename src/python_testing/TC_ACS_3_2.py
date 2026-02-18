@@ -35,9 +35,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import time
-import asyncio
 
 from mobly import asserts
 
@@ -208,7 +208,4 @@ class TC_ACS_3_2(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-
-
 
