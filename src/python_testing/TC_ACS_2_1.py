@@ -144,7 +144,7 @@ class TC_ACS_2_1(MatterBaseTest):
             log.info("SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("4")
 
-        if self.HumanActivitySupported | self.ObjectIdentificationSupported | self.SoundIdentificationSupported:
+        if self.HumanActivitySupported or self.ObjectIdentificationSupported or self.SoundIdentificationSupported:
             self.step("5")
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType
@@ -154,15 +154,15 @@ class TC_ACS_2_1(MatterBaseTest):
             tagID = ambientContextType.ambientContextSensed.tag
 
             if self.HumanActivitySupported:
-                asserts.assert_true(nsID == 0x4B & tagID <= 0x09,
+                asserts.assert_true((nsID == 0x4B) and (tagID <= 0x09),
                                 "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
 
             if self.ObjectIdentificationSupported:
-                asserts.assert_true(nsID == 0x49 & tagID <= 0x0C,
+                asserts.assert_true((nsID == 0x49) and (tagID <= 0x0C),
                                 "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
 
             if self.SoundIdentificationSupported:
-                asserts.assert_true(nsID == 0x4A & tagID <= 0x16,
+                asserts.assert_true((nsID == 0x4A) and (tagID <= 0x16),
                                 "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
 
             if "detectionStartTime" in ambientContextType:
@@ -181,7 +181,7 @@ class TC_ACS_2_1(MatterBaseTest):
             )
             log.info(f"Rx'd AmbientContextTypeSupported: {ambientContextTypeSupported}")
             asserts.assert_true(len(ambientContextTypeSupported) <= 50,
-                                "AmbientContextTypeSupported should be less than 100.")
+                                "AmbientContextTypeSupported should be less than equalt to 50.")
 
             for acts in ambientContextTypeSupported:
                 nsID = acts.namespaceID
@@ -268,7 +268,7 @@ class TC_ACS_2_1(MatterBaseTest):
 
         minformax = max(holdTimeLimits.holdTimeMin, 10)
         asserts.assert_true(holdTimeLimits.holdTimeMax >= minformax,
-                            "Expected HoldTimeMin to be greater than equal to max(holdTimeLimits.holdTimeMin, 10).")
+                            "Expected HoldTimeMax to be greater than equal to max(holdTimeLimits.holdTimeMin, 10).")
 
         asserts.assert_true(holdTimeLimits.holdTimeMin <= holdTimeLimits.holdTimeDefault <= holdTimeLimits.holdTimeMax,
                             "Expected HoldTimeMin to be between HoldTimeMin and HoldTimeMax.")
@@ -343,4 +343,5 @@ class TC_ACS_2_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
