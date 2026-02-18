@@ -35,14 +35,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
+import base64
 import logging
 import os
 import random
 import tempfile
-import base64
 from configparser import ConfigParser
 
-import asyncio
 from mobly import asserts
 
 import matter.clusters as Clusters
