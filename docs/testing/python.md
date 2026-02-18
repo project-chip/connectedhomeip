@@ -938,9 +938,10 @@ Runs the test step only if the endpoint has the cluster that supports the given
 command:
 
 Example:
+
 ```python
 cmd_should_be_there = await self.command_guard(endpoint=self.endpoint, command=commands.Resume)
-````
+```
 
 ## Additional Test Guards
 
