@@ -57,7 +57,7 @@ if (chip_enable_ble) {
   }
 }
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   pkg_config("capi-network-thread") {
     packages = [ "capi-network-thread" ]
   }
@@ -83,7 +83,7 @@ source_set("tizen") {
     public_configs += [ ":capi-network-bluetooth" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_configs += [ ":capi-network-thread" ]
   }
 }

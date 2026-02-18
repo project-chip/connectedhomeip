@@ -381,10 +381,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         ConcreteAttributePath readPath;
 
         ChipLogDetail(DataManagement,
-                      "Building Reports for ReadHandler with LastReportGeneration = 0x" ChipLogFormatX64
-                      " DirtyGeneration = 0x" ChipLogFormatX64,
-                      ChipLogValueX64(apReadHandler->mPreviousReportsBeginGeneration),
-                      ChipLogValueX64(apReadHandler->mDirtyGeneration));
+                      "Building Reports for ReadHandler with LastReportGeneration = 0x%08lX DirtyGeneration = 0x%08lX",
+                      static_cast<long>(apReadHandler->mPreviousReportsBeginGeneration.Raw()),
+                      static_cast<long>(apReadHandler->mDirtyGeneration.Raw()));
 
         // This ReadHandler is not generating reports, so we reset the iterator for a clean start.
         if (!apReadHandler->IsReporting())
@@ -410,7 +409,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         // We don't need to worry about paths that were already marked dirty before the last time this read handler
                         // started a report that it completed: those paths already got reported.
-                        if (dirtyPath->mGeneration > apReadHandler->mPreviousReportsBeginGeneration)
+                        if (dirtyPath->mGeneration.After(apReadHandler->mPreviousReportsBeginGeneration))
                         {
                             concretePathDirty = true;
                             return Loop::Break;
@@ -994,7 +993,7 @@ bool Engine::ClearTombPaths()
 {
     bool pathReleased = false;
     mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
-        if (path->mGeneration == 0)
+        if (path->mGeneration.IsZero())
         {
             mGlobalDirtySet.ReleaseObject(path);
             pathReleased = true;
@@ -1007,7 +1006,7 @@ bool Engine::ClearTombPaths()
 bool Engine::MergeDirtyPathsUnderSameCluster()
 {
     mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
-        if (outerPath->HasWildcardClusterId() || outerPath->mGeneration == 0)
+        if (outerPath->HasWildcardClusterId() || outerPath->mGeneration.IsZero())
         {
             return Loop::Continue;
         }
@@ -1022,7 +1021,7 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
             {
                 return Loop::Continue;
             }
-            if (innerPath->mGeneration > outerPath->mGeneration)
+            if (innerPath->mGeneration.After(outerPath->mGeneration))
             {
                 outerPath->mGeneration = innerPath->mGeneration;
             }
@@ -1030,7 +1029,7 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
 
             // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
             // generation to 0 and then clear it later.
-            innerPath->mGeneration = 0;
+            innerPath->mGeneration.Clear();
             return Loop::Continue;
         });
         return Loop::Continue;
@@ -1042,7 +1041,7 @@ bool Engine::MergeDirtyPathsUnderSameCluster()
 bool Engine::MergeDirtyPathsUnderSameEndpoint()
 {
     mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
-        if (outerPath->HasWildcardEndpointId() || outerPath->mGeneration == 0)
+        if (outerPath->HasWildcardEndpointId() || outerPath->mGeneration.IsZero())
         {
             return Loop::Continue;
         }
@@ -1055,7 +1054,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
             {
                 return Loop::Continue;
             }
-            if (innerPath->mGeneration > outerPath->mGeneration)
+            if (innerPath->mGeneration.After(outerPath->mGeneration))
             {
                 outerPath->mGeneration = innerPath->mGeneration;
             }
@@ -1064,7 +1063,7 @@ bool Engine::MergeDirtyPathsUnderSameEndpoint()
 
             // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
             // generation to 0 and then clear it later.
-            innerPath->mGeneration = 0;
+            innerPath->mGeneration.Clear();
             return Loop::Continue;
         });
         return Loop::Continue;

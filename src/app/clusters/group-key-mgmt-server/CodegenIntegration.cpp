@@ -16,9 +16,13 @@
  */
 
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
 #include <app/util/config.h>
+#include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/support/CodeUtils.h>
 
 namespace {
 using namespace chip;
@@ -38,7 +42,13 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create();
+        Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+        VerifyOrDie(groupDataProvider != nullptr); // we require app main to set this before cluster startup
+
+        gServer.Create(GroupKeyManagementCluster::Context{
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .groupDataProvider = *groupDataProvider,
+        });
         return gServer.Registration();
     }
 

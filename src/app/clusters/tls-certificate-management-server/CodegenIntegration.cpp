@@ -19,6 +19,7 @@
 #include "CodegenIntegration.h"
 
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -35,11 +36,11 @@ namespace {
 
 CertificateTableImpl gDefaultCertificateTable;
 
-TlsCertificateManagementDelegate * gDelegate      = nullptr;
+TLSCertificateManagementDelegate * gDelegate      = nullptr;
 CertificateDependencyChecker * gDependencyChecker = nullptr;
 CertificateTableImpl * gCertificateTable          = &gDefaultCertificateTable;
 
-LazyRegisteredServerCluster<TlsCertificateManagementCluster> gClusterInstance;
+LazyRegisteredServerCluster<TLSCertificateManagementCluster> gClusterInstance;
 
 } // anonymous namespace
 
@@ -47,7 +48,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-void MatterTlsCertificateManagementSetDelegate(TlsCertificateManagementDelegate & delegate)
+void MatterTlsCertificateManagementSetDelegate(TLSCertificateManagementDelegate & delegate)
 {
     gDelegate = &delegate;
 }
@@ -109,7 +110,10 @@ void MatterTlsCertificateManagementClusterInitCallback(EndpointId endpointId)
 
     LogErrorOnFailure(gCertificateTable->SetEndpoint(endpointId));
 
-    gClusterInstance.Create(endpointId, *gDelegate, *gDependencyChecker, *gCertificateTable,
+    TLSCertificateManagementCluster::Context context = {
+        Server::GetInstance().GetFabricTable(),
+    };
+    gClusterInstance.Create(context, endpointId, *gDelegate, *gDependencyChecker, *gCertificateTable,
                             static_cast<uint8_t>(kMaxRootCertificatesPerFabric),
                             static_cast<uint8_t>(kMaxClientCertificatesPerFabric));
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gClusterInstance.Registration());

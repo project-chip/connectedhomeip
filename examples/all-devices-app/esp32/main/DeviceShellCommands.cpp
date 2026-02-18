@@ -16,6 +16,7 @@
  */
 
 #include <DeviceShellCommands.h>
+#include <devices/device-factory/DeviceFactory.h>
 #include <lib/shell/streamer.h>
 
 // Forward declaration of the function defined in main.cpp
@@ -43,8 +44,14 @@ CHIP_ERROR DeviceCommands::SetDeviceTypeHandler(int argc, char ** argv)
 {
     if (argc != 1)
     {
+        const auto supportedDeviceTypes = chip::app::DeviceFactory::GetInstance().SupportedDeviceTypes();
         streamer_printf(streamer_get(), "Usage: devtype set <device-type>\r\n");
         streamer_printf(streamer_get(), "Example: devtype set contact-sensor\r\n");
+        streamer_printf(streamer_get(), "Supported device types:\r\n");
+        for (const auto & deviceType : supportedDeviceTypes)
+        {
+            streamer_printf(streamer_get(), "  - %s\r\n", deviceType.c_str());
+        }
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

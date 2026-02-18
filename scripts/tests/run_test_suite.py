@@ -17,12 +17,13 @@
 import enum
 import logging
 import os
+import random
 import sys
 import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import chiptest
 import click
@@ -30,12 +31,11 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.runner import Executor, SubprocessKind
-from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
+from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
 
-# If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
     import chiptest.linux
 
@@ -82,6 +82,20 @@ class DeprecatedOption(click.Option):
         self.replacement = kwargs.pop('replacement')
         kwargs['help'] += f" (DEPRECATED: Use '{self.replacement}')"
         super().__init__(*args, **kwargs, callback=deprecation_warning)
+
+
+def validate_test_order(ctx: click.Context, param: click.Parameter, value: Any) -> str | None:
+    if not isinstance(value, str):
+        raise click.BadParameter("Test order needs to be a string.")
+    if value == "alphabetic":
+        return None
+    if (value_split := value.split(":", maxsplit=1))[0] == "random":
+        if len(value_split) == 1:
+            return str(time.time_ns())
+        if not value_split[1]:
+            raise click.BadParameter("Random seed not specified. Should be: 'random[:seed]'.")
+        return value_split[1]
+    raise click.BadParameter("Wrong format of test order. Should be: 'alphabetic' or 'random[:seed]'.")
 
 
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
@@ -139,6 +153,14 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--test-order', 'test_order_seed',
+    type=click.UNPROCESSED,
+    callback=validate_test_order,
+    default="alphabetic",
+    show_default=True,
+    help="Order in which tests should be executed. Possible values: 'alphabetic', 'random[:seed]'."
+)
+@click.option(
     '--find-path',
     default=[DEFAULT_CHIP_ROOT],
     multiple=True,
@@ -156,7 +178,8 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.pass_context
 def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], find_path: list[str], runner: str, chip_tool: Path | None) -> None:
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
+         chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
@@ -239,7 +262,13 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
 
         tests_filtered.append(test)
 
-    tests_filtered.sort(key=lambda x: x.name)
+    if test_order_seed is None:
+        log.info('Executing the tests in alphabetic order')
+        tests_filtered.sort(key=lambda x: x.name)
+    else:
+        log.info('Using the following seed for test order randomization: %s', test_order_seed)
+        random.seed(test_order_seed)
+        random.shuffle(tests_filtered)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
                              runtime=runtime, find_path=find_path)
@@ -319,8 +348,11 @@ class Terminable(Protocol):
     '--energy-gateway-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-gateway:<path>',
     help='what energy-gateway app to use')
 @click.option(
-    '--energy-management-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-management:<path>',
-    help='what energy-management app to use')
+    '--water-heater-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path water-heater:<path>',
+    help='what water-heater app to use')
+@click.option(
+    '--evse-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path evse:<path>',
+    help='what evse app to use')
 @click.option(
     '--closure-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path closure:<path>',
     help='what closure app to use')
@@ -374,11 +406,10 @@ class Terminable(Protocol):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
-    '--ble-wifi',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
+    '--commissioning-method',
+    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
+    default='on-network',
+    help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
@@ -386,13 +417,14 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
-            energy_management_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
+            water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
             chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, ble_wifi: bool) -> None:
+            expected_failures: int, commissioning_method: str | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
-        raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
+        raise click.BadOptionUsage("--expected-failures",
+                                   f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
@@ -420,7 +452,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     handle_deprecated_pathopt('rvc', rvc_app, SubprocessKind.APP)
     handle_deprecated_pathopt('network-manager', network_manager_app, SubprocessKind.APP)
     handle_deprecated_pathopt('energy-gateway', energy_gateway_app, SubprocessKind.APP)
-    handle_deprecated_pathopt('energy-management', energy_management_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('water-heater', water_heater_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
     handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)
@@ -457,11 +490,18 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     except (ValueError, LookupError) as e:
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
-    if ble_wifi and sys.platform != "linux":
-        raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
+    # Derive boolean flags from commissioning_method parameter
+    wifi_required = commissioning_method in ['ble-wifi']
+    thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
+
+    if (wifi_required or thread_required) and sys.platform != "linux":
+        raise click.BadOptionUsage("commissioning-method",
+                                   f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
     ble_controller_app = None
     ble_controller_tool = None
+    thread_ba_host = None
+    thread_ba_port = None
     to_terminate: list[Terminable] = []
 
     def cleanup() -> None:
@@ -478,17 +518,28 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not ble_wifi,
+                setup_app_link_up=not wifi_required,
+                add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if ble_wifi else 'eth-app'))
+                app_link_name='wlx-app' if wifi_required else 'eth-app'))
 
-            if ble_wifi:
+            if commissioning_method == 'ble-wifi':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
                 to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif commissioning_method == 'ble-thread':
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                ble_controller_app = 0   # Bind app to the first BLE controller
+                ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif commissioning_method == 'thread-meshcop':
+                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                thread_ba_host = tbr.get_border_agent_host()
+                thread_ba_port = tbr.get_border_agent_port()
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -520,11 +571,16 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
+                        op_network='Thread' if thread_required else 'WiFi',
+                        thread_ba_host=thread_ba_host,
+                        thread_ba_port=thread_ba_port,
                     )
                     if not dry_run:
                         test_end = time.monotonic()
                         log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
                 except Exception:
+                    if os.path.exists('thread.pcap'):
+                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                     observed_failures += 1
@@ -532,7 +588,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         sys.exit(2)
 
             if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
+                log.error("Iteration %d: expected failure count %d, but got %d",
+                          i, expected_failures, observed_failures)
                 sys.exit(2)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")

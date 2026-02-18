@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/tls-client-management-server/TlsClientManagementCluster.h>
+#include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 #include <app/storage/FabricTableImpl.h>
 #include <vector>
 
@@ -47,10 +47,10 @@ struct TlsEndpointId
     bool operator==(const TlsEndpointId & other) const { return (mEndpointId == other.mEndpointId); }
 };
 
-class EndpointTable : public app::Storage::FabricTableImpl<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>
+class EndpointTable : public app::Storage::FabricTableImpl<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<TlsEndpointId, TlsClientManagementDelegate::EndpointStructType>;
+    using Super = app::Storage::FabricTableImpl<TlsEndpointId, TLSClientManagementDelegate::EndpointStructType>;
 
     EndpointTable() : Super(kMaxProvisionedEndpoints, UINT16_MAX) {}
     ~EndpointTable() { Finish(); };
@@ -59,7 +59,7 @@ public:
 /**
  * The application delegate to define the options & implement commands.
  */
-class TlsClientManagementCommandDelegate : public TlsClientManagementDelegate
+class TlsClientManagementCommandDelegate : public TLSClientManagementDelegate
 {
     struct Provisioned
     {

@@ -180,7 +180,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
-        "Ambient Context Sensing": ["HoldTimeLimits"],
+        "Ambient Context Sensing": ["HoldTimeLimits", "ObjectCountConfig"],
         "Basic Information": [
             "FeatureMap",
             "ClusterRevision",
@@ -359,6 +359,11 @@
             "IdentifyTime",
             "IdentifyType"
         ],
+        "Illuminance Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -407,6 +412,7 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
+        "Switch": ["ClusterRevision", "CurrentPosition"],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",
@@ -769,7 +775,17 @@
         ],
         "Power Topology": ["FeatureMap"],
         "Power Source": ["ClusterRevision"],
-        "Valve Configuration and Control": ["RemainingDuration"],
+        "Valve Configuration and Control": [
+            "OpenDuration",
+            "AutoCloseTime",
+            "RemainingDuration",
+            "CurrentState",
+            "TargetState",
+            "CurrentLevel",
+            "TargetLevel",
+            "ValveFault",
+            "ClusterRevision"
+        ],
         "Boolean State Configuration": [
             "AlarmsActive",
             "AlarmsEnabled",
@@ -833,7 +849,17 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Camera AV Settings User Level Management": [
+            "FeatureMap",
+            "MPTZPosition",
+            "MaxPresets",
+            "ZoomMax",
+            "TiltMin",
+            "TiltMax",
+            "PanMin",
+            "PanMax",
+            "MovementState"
+        ],
         "Fixed Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Soil Measurement": [
             "SoilMoistureMeasurementLimits",

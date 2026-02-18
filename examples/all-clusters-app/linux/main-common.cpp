@@ -22,7 +22,6 @@
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
-#include "camera-av-settings-user-level-management-instance.h"
 #include "dishwasher-mode.h"
 #include "include/diagnostic-logs-provider-delegate-impl.h"
 #include "include/tv-callbacks.h"
@@ -52,7 +51,7 @@
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>

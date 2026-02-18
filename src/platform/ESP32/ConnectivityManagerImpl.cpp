@@ -65,7 +65,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     TEMPORARY_RETURN_IGNORED InitWiFi();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    InitEthernet();
+    TEMPORARY_RETURN_IGNORED InitEthernet();
 #endif
     return CHIP_NO_ERROR;
 }

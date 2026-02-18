@@ -50,17 +50,15 @@ enum class ModeTag : uint16_t
     kConvectionRoast = 0x4006,
     kWarming         = 0x4007,
     kProofing        = 0x4008,
+    kSteam           = 0x4009,
+    kAirFry          = 0x400A,
+    kAirSousVide     = 0x400B,
+    kFrozenFood      = 0x400C,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 10,
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kOnOff = 0x1,
 };
 } // namespace OvenMode
 } // namespace Clusters

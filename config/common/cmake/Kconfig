@@ -625,6 +625,39 @@ config CHIP_ENABLE_WIFI_AP
       Enable Wi-Fi Access Point mode for SoftAP commissioning.
       This allows the device to create its own Wi-Fi network for onboarding.
 
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+		Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+		Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+		Specifies the maximum number of connection recovery attempts.
+		If set to 0, no limitation is applied and attempts
+		to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+		Specifies the maximum connection recovery jitter interval (in milliseconds).
+		Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+		within a range of +/- the value of this option.
+
 # Platform additions and configuration
 
 config CHIP_SYSTEM_THREAD_LOCAL_STORAGE
@@ -727,5 +760,11 @@ config CHIP_INET_ENABLE_TCP_ENDPOINT
 	default y if CHIP_BUILD_TESTS
 	help
 	  Enable TCP endpoint support in the Matter Inet layer.
+
+config NETWORK_LAYER_BLE
+	bool "Should be replaced by CONFIG_BT. Keep it for backwards compatibility"
+	default y if BT
+	help
+		Will be deprecated once application files replace CONFIG_NETWORK_LAYER_BLE with CONFIG_BT
 
 endif # CHIP
