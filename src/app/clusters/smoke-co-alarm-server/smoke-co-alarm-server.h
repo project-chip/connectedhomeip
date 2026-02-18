@@ -76,7 +76,16 @@ public:
     bool SetInterconnectCOAlarm(chip::EndpointId endpointId, AlarmStateEnum newInterconnectCOAlarm);
     bool SetContaminationState(chip::EndpointId endpointId, ContaminationStateEnum newContaminationState);
     bool SetSmokeSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum newSmokeSensitivityLevel);
+    /**
+     * @brief Sets unmounted attribute and updates expressed state respectively.
+     * @param endpointId ID of the endpoint
+     * @param isUnmounted unmounted state
+     * @return true on success, false on failure
+     */
     bool SetUnmountedState(chip::EndpointId endpointId, bool isUnmounted);
+    /**
+     * @brief If set to true, unmounting the device leads to inoperative state.
+     */
     void SetInoperativeWhenUnmounted(bool inoperative) { mInoperativeWhenUnmounted = inoperative; }
 
     bool GetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum & expressedState);
