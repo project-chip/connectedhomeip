@@ -151,13 +151,14 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 4: Set up subscription
         self.step("4")
-        attr_cb = AttributeSubscriptionHandler(expected_attribute=attributes.SensorFault)
+        attr_cb = None
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+            attr_cb = AttributeSubscriptionHandler(expected_attribute=attributes.SensorFault)
+            await attr_cb.start(
+                dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
+                min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
         event_cb = EventSubscriptionHandler(expected_cluster=cluster)
-
-        await attr_cb.start(
-            dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
-            min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
-
         await event_cb.start(
             dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
             min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
@@ -193,7 +194,8 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
             asserts.assert_not_equal(item.value, 0, "SensorFault attribute report should be non-zero")
 
         # Reset accumulated reports before clearing the fault
-        attr_cb.reset()
+        if attr_cb is not None:
+            attr_cb.reset()
         event_cb.reset()
 
         # Step 10: Clear sensor fault
