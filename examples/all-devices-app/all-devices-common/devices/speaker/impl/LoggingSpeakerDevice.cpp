@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <inttypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
 
