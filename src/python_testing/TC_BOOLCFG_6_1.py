@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
 
 from mobly import asserts
 
@@ -65,7 +64,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
             TestStep("1", "Commission DUT to TH", is_commissioning=True),
             TestStep("2a", "TH reads FeatureMap attribute.", "DUT replies with FeatureMap attribute."),
             TestStep("2b", "TH reads AttributeList attribute.", "DUT replies with AttributeList attribute."),
-            TestStep("3", "If FAULTEV feature is not supported or BOOLCFG.S.E01(SensorFault) is not set, "
+            TestStep("3", "If FAULTEV feature is not supported, "
                      "skip remaining steps and end test case."),
             TestStep("4", "Set up a wildcard subscription for attributes and events of the Boolean State Configuration Cluster, "
                      "with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false.",
@@ -94,7 +93,6 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
     def pics_TC_BOOLCFG_6_1(self) -> list[str]:
         return [
             "BOOLCFG.S",
-            "BOOLCFG.S.E01",
         ]
 
     async def _trigger_sensor_fault(self, endpoint: int, fault_value: int) -> None:
@@ -108,37 +106,14 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
                                "as instructed by the DUT's manufacturer. Were you able to cause a sensor fault?",
                     prompt_msg_placeholder="Enter 'y' or 'n'",
                     default_value="n")
-                asserts.assert_equal(result, "y", "Operator was not able to cause a sensor fault")
+                asserts.assert_equal(result.lower(), "y", "Operator was not able to cause a sensor fault")
             else:
                 result = self.wait_for_user_input(
                     prompt_msg="Clear the sensor fault reported on the endpoint under test "
                                "as instructed by the DUT's manufacturer. Were you able to clear the sensor fault?",
                     prompt_msg_placeholder="Enter 'y' or 'n'",
                     default_value="n")
-                asserts.assert_equal(result, "y", "Operator was not able to clear the sensor fault")
-
-    def _wait_for_sensor_fault_attribute_report(self, attr_cb, endpoint: int, expected_nonzero: bool, timeout_sec: float):
-        deadline = time.time() + timeout_sec
-        seen = []
-
-        while True:
-            remaining = deadline - time.time()
-            if remaining <= 0:
-                asserts.fail(
-                    f"Did not observe SensorFault {'!= 0' if expected_nonzero else '== 0'} "
-                    f"within {timeout_sec}s. Seen: {seen}")
-
-            item = attr_cb.wait_for_attribute_report(timeout_sec=remaining)
-
-            if item.endpoint_id != endpoint or item.attribute != Clusters.BooleanStateConfiguration.Attributes.SensorFault:
-                continue
-
-            seen.append(item.value)
-
-            if expected_nonzero and item.value != 0:
-                return item
-            if not expected_nonzero and item.value == 0:
-                return item
+                asserts.assert_equal(result.lower(), "y", "Operator was not able to clear the sensor fault")
 
     @run_if_endpoint_matches(has_cluster(Clusters.BooleanStateConfiguration))
     async def test_TC_BOOLCFG_6_1(self) -> None:
@@ -167,18 +142,16 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
             cluster=cluster, attribute=attributes.AttributeList)
         logger.info("AttributeList: %s", attribute_list)
 
-        has_sensor_fault_attr = attributes.SensorFault.attribute_id in attribute_list
-
         # Step 3: Guard - skip if FAULTEV not supported
         self.step("3")
-        if not is_fault_events_supported or not self.check_pics("BOOLCFG.S.E01"):
-            logger.info("FAULTEV feature or SensorFault event not supported, skipping remaining steps")
+        if not is_fault_events_supported:
+            logger.info("FAULTEV feature not supported, skipping remaining steps")
             self.mark_all_remaining_steps_skipped("4")
             return
 
         # Step 4: Set up subscription
         self.step("4")
-        attr_cb = AttributeSubscriptionHandler(expected_cluster=cluster)
+        attr_cb = AttributeSubscriptionHandler(expected_attribute=attributes.SensorFault)
         event_cb = EventSubscriptionHandler(expected_cluster=cluster)
 
         await attr_cb.start(
@@ -187,7 +160,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         await event_cb.start(
             dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
-            min_interval_sec=0, max_interval_sec=30)
+            min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # Step 5: Start accumulating reports
         self.step("5")
@@ -198,14 +171,12 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 7: Read SensorFault attribute - should be non-zero
         self.step("7")
-        if has_sensor_fault_attr:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
             sensor_fault = await self.read_single_attribute_check_success(
                 dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
                 cluster=cluster, attribute=attributes.SensorFault)
             logger.info("SensorFault attribute: 0x%04x", sensor_fault)
             asserts.assert_not_equal(sensor_fault, 0, "SensorFault should not be 0 after triggering fault")
-        else:
-            logger.info("SensorFault attribute not supported, skipping")
 
         # Step 8: Wait for SensorFault event report with non-zero value
         self.step("8")
@@ -216,11 +187,10 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 9: Wait for SensorFault attribute report with non-zero value
         self.step("9")
-        if has_sensor_fault_attr:
-            item = self._wait_for_sensor_fault_attribute_report(attr_cb, endpoint, expected_nonzero=True, timeout_sec=30)
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+            item = attr_cb.wait_for_attribute_report(timeout_sec=30)
             logger.info("Received SensorFault attribute report: 0x%04x", item.value)
-        else:
-            logger.info("SensorFault attribute not supported, skipping")
+            asserts.assert_not_equal(item.value, 0, "SensorFault attribute report should be non-zero")
 
         # Reset accumulated reports before clearing the fault
         attr_cb.reset()
@@ -232,14 +202,12 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 11: Read SensorFault attribute - should be 0
         self.step("11")
-        if has_sensor_fault_attr:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
             sensor_fault = await self.read_single_attribute_check_success(
                 dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
                 cluster=cluster, attribute=attributes.SensorFault)
             logger.info("SensorFault attribute: 0x%04x", sensor_fault)
             asserts.assert_equal(sensor_fault, 0, "SensorFault should be 0 after clearing fault")
-        else:
-            logger.info("SensorFault attribute not supported, skipping")
 
         # Step 12: Wait for SensorFault event report with zero value
         self.step("12")
@@ -250,11 +218,10 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 13: Wait for SensorFault attribute report with zero value
         self.step("13")
-        if has_sensor_fault_attr:
-            item = self._wait_for_sensor_fault_attribute_report(attr_cb, endpoint, expected_nonzero=False, timeout_sec=30)
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+            item = attr_cb.wait_for_attribute_report(timeout_sec=30)
             logger.info("Received SensorFault attribute report: 0x%04x", item.value)
-        else:
-            logger.info("SensorFault attribute not supported, skipping")
+            asserts.assert_equal(item.value, 0, "SensorFault attribute report should be zero")
 
 
 if __name__ == "__main__":
