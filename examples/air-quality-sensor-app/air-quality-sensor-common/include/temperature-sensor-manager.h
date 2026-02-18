@@ -13,12 +13,15 @@ class TemperatureSensorManager
 public:
     TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId)
     {
-        Protocols::InteractionModel::Status status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, -5);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(mEndpointId);
+        VerifyOrReturn(temperatureMeasurement != nullptr);
+
+        CHIP_ERROR err = temperatureMeasurement->SetMinMeasuredValue(-5);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
 
-        status = TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 60);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+        err = temperatureMeasurement->SetMaxMeasuredValue(60);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
     };
 

@@ -48,10 +48,18 @@ CHIP_ERROR AppTask::Init(void)
     k_timer_start(&sTemperatureMeasurementUpdateTimer, K_MSEC(kTemperatureMeasurementUpdateTimerPeriodMs), K_NO_WAIT);
 
     PlatformMgr().LockChipStack();
-    app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(kExampleEndpointId,
-                                                                             SensorMgr().GetMinMeasuredTempValue());
-    app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(kExampleEndpointId,
-                                                                             SensorMgr().GetMaxMeasuredTempValue());
+
+    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(kExampleEndpointId);
+    VerifyOrReturn(temperatureMeasurement != nullptr);
+
+    CHIP_ERROR err = temperatureMeasurement->SetMinMeasuredValue(SensorMgr().GetMinMeasuredTempValue());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
+
+    CHIP_ERROR err = temperatureMeasurement->SetMaxMeasuredValue(SensorMgr().GetMaxMeasuredTempValue());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
+
     PlatformMgr().UnlockChipStack();
 
     return CHIP_NO_ERROR;

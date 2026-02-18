@@ -30,26 +30,28 @@ constexpr int16_t kMaximumMinMeasuredValue = 32766;
 TemperatureMeasurementCluster::TemperatureMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
+    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet)
 {
-    VerifyOrDie(mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue) >= kMinimumMinMeasuredValue &&
-                mConfig.minMeasuredValue.ValueOr(kMaximumMinMeasuredValue) <= kMaximumMinMeasuredValue);
+    VerifyOrDie(config.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue) >= kMinimumMinMeasuredValue &&
+                config.minMeasuredValue.ValueOr(kMaximumMinMeasuredValue) <= kMaximumMinMeasuredValue);
 
-    VerifyOrDie(mConfig.maxMeasuredValue.ValueOr(mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1)) >=
-                mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1));
+    VerifyOrDie(config.maxMeasuredValue.ValueOr(config.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue) + 1) >=
+                config.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue) + 1);
 
-    VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || mConfig.tolerance <= 2048);
+    VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || config.tolerance <= 2048);
 
-    if (!mConfig.measuredValue.IsNull())
+    if (!config.measuredValue.IsNull())
     {
-        VerifyOrDie(mConfig.measuredValue.Value() >= mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue));
+        VerifyOrDie(config.measuredValue.Value() >= config.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue));
 
-        VerifyOrDie(mConfig.measuredValue.Value() <=
-                    mConfig.maxMeasuredValue.ValueOr(mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1)));
-
-        mMeasuredValue = mConfig.measuredValue;
+        VerifyOrDie(config.measuredValue.Value() <=
+                    config.maxMeasuredValue.ValueOr(config.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1)));
     }
+
+    mMeasuredValue    = config.measuredValue;
+    mMinMeasuredValue = config.minMeasuredValue;
+    mMaxMeasuredValue = config.maxMeasuredValue;
+    mTolerance        = config.tolerance;
 }
 
 DataModel::ActionReturnStatus TemperatureMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -64,11 +66,11 @@ DataModel::ActionReturnStatus TemperatureMeasurementCluster::ReadAttribute(const
     case MeasuredValue::Id:
         return encoder.Encode(mMeasuredValue);
     case MinMeasuredValue::Id:
-        return encoder.Encode(mConfig.minMeasuredValue);
+        return encoder.Encode(mMinMeasuredValue);
     case MaxMeasuredValue::Id:
-        return encoder.Encode(mConfig.maxMeasuredValue);
+        return encoder.Encode(mMaxMeasuredValue);
     case Tolerance::Id:
-        return encoder.Encode(mConfig.tolerance);
+        return encoder.Encode(mTolerance);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -90,15 +92,41 @@ CHIP_ERROR TemperatureMeasurementCluster::SetMeasuredValue(DataModel::Nullable<i
 {
     if (!measuredValue.IsNull())
     {
-        VerifyOrReturnError(measuredValue.Value() >= mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue),
+        VerifyOrReturnError(measuredValue.Value() >= mMinMeasuredValue.ValueOr(kMinimumMinMeasuredValue),
                             CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrReturnError(measuredValue.Value() <=
-                                mConfig.maxMeasuredValue.ValueOr(mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1)),
+                                mMaxMeasuredValue.ValueOr(mMinMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1)),
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     SetAttributeValue(mMeasuredValue, measuredValue, MeasuredValue::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TemperatureMeasurementCluster::SetMinMeasuredValue(DataModel::Nullable<int16_t> minMeasuredValue)
+{
+    if (!minMeasuredValue.IsNull())
+    {
+        VerifyOrReturnError(minMeasuredValue.ValueOr(kMinimumMinMeasuredValue) >= kMinimumMinMeasuredValue &&
+                                minMeasuredValue.ValueOr(kMaximumMinMeasuredValue) <= kMaximumMinMeasuredValue,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    SetAttributeValue(mMinMeasuredValue, minMeasuredValue, MinMeasuredValue::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TemperatureMeasurementCluster::SetMaxMeasuredValue(DataModel::Nullable<int16_t> maxMeasuredValue)
+{
+    if (!maxMeasuredValue.IsNull())
+    {
+        VerifyOrReturnError(maxMeasuredValue.ValueOr(mMinMeasuredValue.ValueOr(kMinimumMinMeasuredValue) + 1) >=
+                                mMinMeasuredValue.ValueOr(kMinimumMinMeasuredValue) + 1,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    SetAttributeValue(mMaxMeasuredValue, maxMeasuredValue, MaxMeasuredValue::Id);
     return CHIP_NO_ERROR;
 }
 

@@ -47,16 +47,16 @@ public:
         TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
+        // Try to read the default value for the mandatory attributes but do not fail if the operation is not successful.
+        // This is because not all apps are setting a default value for them in ember.
         DataModel::Nullable<int16_t> measuredValue{};
-        // We try to read the default value for this attribute but we do not fail if we can not read it.
-        // This is because some apps may have a default value for this attribute in ember but not all of them.
         MeasuredValue::Get(endpointId, measuredValue);
 
         DataModel::Nullable<int16_t> minMeasuredValue{};
-        VerifyOrDie(MinMeasuredValue::Get(endpointId, minMeasuredValue) == Status::Success);
+        MinMeasuredValue::Get(endpointId, minMeasuredValue);
 
         DataModel::Nullable<int16_t> maxMeasuredValue{};
-        VerifyOrDie(MaxMeasuredValue::Get(endpointId, maxMeasuredValue) == Status::Success);
+        MaxMeasuredValue::Get(endpointId, maxMeasuredValue);
 
         uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))

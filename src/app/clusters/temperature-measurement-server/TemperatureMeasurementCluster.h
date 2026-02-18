@@ -48,10 +48,18 @@ public:
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<int16_t> measuredValue);
     DataModel::Nullable<int16_t> GetMeasuredValue() const { return mMeasuredValue; }
 
+    CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<int16_t> minMeasuredValue);
+    DataModel::Nullable<int16_t> GetMinMeasuredValue() const { return mMinMeasuredValue; }
+
+    CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<int16_t> maxmeasuredValue);
+    DataModel::Nullable<int16_t> GetMaxMeasuredValue() const { return mMaxMeasuredValue; }
+
 protected:
     const OptionalAttributeSet mOptionalAttributeSet;
-    const StartupConfiguration mConfig;
     DataModel::Nullable<int16_t> mMeasuredValue{};
+    DataModel::Nullable<int16_t> mMinMeasuredValue{};
+    DataModel::Nullable<int16_t> mMaxMeasuredValue{};
+    uint16_t mTolerance{};
 };
 
 } // namespace chip::app::Clusters

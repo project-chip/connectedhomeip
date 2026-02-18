@@ -29,15 +29,20 @@ namespace Clusters {
 class TemperatureSensorManager
 {
 public:
-    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
+    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
 
     void Init()
     {
-        // MinMeasuredValue is a mandatory attribute that needs to have an appropriate default value in ember.
-        // The cluster will take the value as a configuration value that can not be changed.
+        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(mEndpointId);
+        VerifyOrReturn(temperatureMeasurement != nullptr);
 
-        // MaxMeasuredValue is a mandatory attribute that needs to have an appropriate default value in ember.
-        // The cluster will take the value as a configuration value that can not be changed.
+        CHIP_ERROR err = temperatureMeasurement->SetMinMeasuredValue(-500);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
+
+        err = temperatureMeasurement->SetMaxMeasuredValue(6000);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
     }
 
     void OnTemperatureChangeHandler(int16_t newValue)
