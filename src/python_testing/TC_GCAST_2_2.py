@@ -41,6 +41,7 @@ from mobly import asserts
 from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
+from matter.tlv import uint
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
@@ -235,7 +236,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID3,
-                endpoints=[endpoint1],
+                endpoints=[uint(endpoint1)],
                 keySetID=keySetID3)
             )
             asserts.fail("JoinGroup command should have failed because no Key found, but it still succeeded")
@@ -245,7 +246,7 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # Attempt to join Group G3 with invalid endpoint (result: unsupported endpoint)
         self.step(9)
-        endpoint_invalid = -1
+        endpoint_invalid = uint(0xFFFF)
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupID3,
@@ -259,8 +260,10 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # If Sender is supported in DUT, skip this step. Else, attempt to join Group G3 with an empty endpoints list (result: constraint error)
         self.step(10)
-        if not sd_enabled:
-            endpoints_list_empty = []
+        endpoints_list_empty = []
+        if sd_enabled:
+            self.skip_step(10)
+        else:
             try:
                 await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
                     groupID=groupID3,
@@ -274,22 +277,25 @@ class TC_GCAST_2_2(MatterBaseTest):
 
         # If DUT has more than 20 endpoints, attempt to join Group G3 with 21 endpoints (result: constraint error)
         self.step(11)
-        if len(endpoints_list) > 20:
-            exceeding_endpoint = 21
-            while exceeding_endpoint in endpoints_list:
-                exceeding_endpoint += 1
-            endpoints_list_exceeds_DUT_endpoints = endpoints_list + [exceeding_endpoint]
-            try:
-                await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-                    groupID=groupID3,
-                    endpoints=endpoints_list_exceeds_DUT_endpoints,
-                    keySetID=keySetID2)
-                )
-                asserts.fail(
-                    "JoinGroup command should have failed because endpoints list has more endpoints than DUT provides, but it still succeeded")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError,
-                                     f"Send JoinGroup command error should be {Status.ConstraintError} instead of {e.status}")
+        if sd_enabled:
+            self.skip_step(11)
+        else:
+            if len(endpoints_list) > 20:
+                exceeding_endpoint = 21
+                while exceeding_endpoint in endpoints_list:
+                    exceeding_endpoint += 1
+                endpoints_list_exceeds_DUT_endpoints = endpoints_list + [exceeding_endpoint]
+                try:
+                    await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                        groupID=groupID3,
+                        endpoints=endpoints_list_exceeds_DUT_endpoints,
+                        keySetID=keySetID2)
+                    )
+                    asserts.fail(
+                        "JoinGroup command should have failed because endpoints list has more endpoints than DUT provides, but it still succeeded")
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.UnsupportedEndpoint,
+                                         f"Send JoinGroup command error should be {Status.UnsupportedEndpoint} instead of {e.status}")
 
         # If Sender is not supported in DUT, skip to step 18
         self.step(12)
