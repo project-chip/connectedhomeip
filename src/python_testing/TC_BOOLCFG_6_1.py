@@ -163,8 +163,11 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
             dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
             min_interval_sec=0, max_interval_sec=30)
 
-        # Step 5: Start accumulating reports
+        # Step 5: Start accumulating reports - flush any priming reports received during subscription setup
         self.step("5")
+        if attr_cb is not None:
+            attr_cb.reset()
+        event_cb.reset()
 
         # Step 6: Trigger sensor fault
         self.step("6")
@@ -181,7 +184,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 8: Wait for SensorFault event report with non-zero value
         self.step("8")
-        event_data = event_cb.wait_for_event_report(cluster.Events.SensorFault, timeout_sec=30)
+        event_data = event_cb.wait_for_event_type_report(cluster.Events.SensorFault, timeout_sec=30)
         logger.info("Received SensorFault event: sensorFault=0x%04x", event_data.sensorFault)
         asserts.assert_not_equal(event_data.sensorFault, 0,
                                  "SensorFault event should contain a non-zero sensorFault value")
@@ -213,7 +216,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 12: Wait for SensorFault event report with zero value
         self.step("12")
-        event_data = event_cb.wait_for_event_report(cluster.Events.SensorFault, timeout_sec=30)
+        event_data = event_cb.wait_for_event_type_report(cluster.Events.SensorFault, timeout_sec=30)
         logger.info("Received SensorFault event: sensorFault=0x%04x", event_data.sensorFault)
         asserts.assert_equal(event_data.sensorFault, 0,
                              "SensorFault event should contain a zero sensorFault value after clearing")
