@@ -38,6 +38,7 @@
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x0000003E, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -66,6 +67,7 @@
     0x00000006, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000007, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x00000000, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -94,6 +96,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -131,6 +134,7 @@
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000041, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000005C, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000099, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -185,6 +189,7 @@
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000000, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000000B, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000009, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -239,6 +244,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
