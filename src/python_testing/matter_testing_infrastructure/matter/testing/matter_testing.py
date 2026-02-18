@@ -1583,6 +1583,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 asserts.fail("App %s did not complete within timeout (flag file still exists)" % restart_flag_text)
             await asyncio.sleep(0.1)
 
+
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     """Runs an async function within the test's event loop with a timeout.
 

@@ -422,6 +422,7 @@ def factory_reset_config_removal(app_args: str, script_args: str, reset_type: Fa
         log.info("Removing config/storage file, path: '%s'...", path)
         pathlib.Path(path).unlink(missing_ok=True)
 
+
 if __name__ == '__main__':
     coloredlogs.install(level='INFO')
     main(auto_envvar_prefix='CHIP')
