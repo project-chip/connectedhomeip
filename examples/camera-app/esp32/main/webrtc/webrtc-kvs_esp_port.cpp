@@ -89,7 +89,7 @@ void KVSWebRTCPeerConnection::SetRemoteDescription(const std::string & sdp, SDPT
 {
     // handles SDP Offer received from webrtc requestor.
     // Send SDP to KVSWebRTCManager.
-    char * sdp_json = (char *) heap_caps_malloc_prefer(gSDPLength,2,MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM,MALLOC_CAP_INTERNAL);
+    char * sdp_json = (char *) heap_caps_malloc_prefer(gSDPLength, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
     if (sdp_json == nullptr)
     {
         ChipLogError(Camera, "SetRemoteDescription: failed to allocate sdp_json");
@@ -134,7 +134,6 @@ void KVSWebRTCPeerConnection::SetRemoteDescription(const std::string & sdp, SDPT
     ChipLogProgress(Camera, "SDP LENGTH: %d", serialized_len);
 
     free(sdp_json);
-
 }
 
 void KVSWebRTCPeerConnection::AddRemoteCandidate(const std::string & candidate, const std::string & mid)

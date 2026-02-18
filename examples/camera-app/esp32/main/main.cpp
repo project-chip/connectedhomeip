@@ -35,9 +35,9 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#include "esp_hosted_coprocessor.h"
 #include "esp_webrtc_time.h"
 #include "esp_work_queue.h"
-#include "esp_hosted_coprocessor.h"
 #include "host_power_save.h"
 #include "signaling_serializer.h"
 #include "webrtc_bridge.h"
@@ -119,9 +119,9 @@ static void InitServer(intptr_t context)
 }
 
 #ifdef CONFIG_ESP_HOSTED_NETWORK_SPLIT_ENABLED
-static esp_netif_t *sta_netif = NULL;
+static esp_netif_t * sta_netif = NULL;
 
-static esp_netif_t* create_slave_sta_netif(void)
+static esp_netif_t * create_slave_sta_netif(void)
 {
     /* Create "almost" default station, but with un-flagged DHCP client */
     /* Use static to ensure the config persists after function returns */
@@ -129,10 +129,10 @@ static esp_netif_t* create_slave_sta_netif(void)
     memcpy(&netif_cfg, ESP_NETIF_BASE_DEFAULT_WIFI_STA, sizeof(netif_cfg));
 
     esp_netif_config_t cfg_sta = {
-        .base = &netif_cfg,
+        .base  = &netif_cfg,
         .stack = ESP_NETIF_NETSTACK_DEFAULT_WIFI_STA,
     };
-    esp_netif_t *netif_sta = esp_netif_new(&cfg_sta);
+    esp_netif_t * netif_sta = esp_netif_new(&cfg_sta);
     ESP_LOGI(TAG, "Created netif_sta: %p (if_key: %s)", netif_sta, netif_cfg.if_key);
     assert(netif_sta);
 
@@ -161,7 +161,6 @@ extern "C" void app_main()
     sta_netif = create_slave_sta_netif();
 #endif
 
-
     signaling_serializer_init();
     esp_hosted_coprocessor_init();
 
@@ -171,7 +170,6 @@ extern "C" void app_main()
     esp_work_queue_start();
 
     webrtc_bridge_start();
-
 
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-camera-example starting");

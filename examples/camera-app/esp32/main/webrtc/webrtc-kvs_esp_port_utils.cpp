@@ -242,7 +242,7 @@ void webrtc_bridge_message_received_cb(void * data, int len)
 
     deserialize_signaling_message((const char *) data, len, msg.get());
 
-    char* sdp_buf = (char *) heap_caps_malloc_prefer(gSDPLength,2,MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM,MALLOC_CAP_INTERNAL);
+    char * sdp_buf = (char *) heap_caps_malloc_prefer(gSDPLength, 2, MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM, MALLOC_CAP_INTERNAL);
     if (sdp_buf == nullptr)
     {
         ChipLogError(Camera, "webrtc_bridge_message_received_cb: failed to allocate sdp_buf");

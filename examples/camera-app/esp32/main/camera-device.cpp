@@ -18,24 +18,25 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "bridge_cmd_defs.h"
-#include "webrtc_bridge.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"
+#include "webrtc_bridge.h"
 
 static uint8_t s_last_quality = 8;
 
 // Structure to hold snapshot data for queue
-struct SnapshotData {
-    uint8_t* data;
+struct SnapshotData
+{
+    uint8_t * data;
     size_t len;
     esp_err_t status;
 };
 
 // FreeRTOS queue to pass snapshot data from callback to CaptureSnapshot
-static QueueHandle_t s_snapshot_queue = nullptr;
-static constexpr int SNAPSHOT_QUEUE_SIZE = 1;
+static QueueHandle_t s_snapshot_queue           = nullptr;
+static constexpr int SNAPSHOT_QUEUE_SIZE        = 1;
 static constexpr TickType_t SNAPSHOT_TIMEOUT_MS = pdMS_TO_TICKS(5000); // 5 second timeout
 
 static void snapshot_response_cb(uint32_t cmd_id, uint32_t seq_id, esp_err_t status, uint8_t * resp_data, size_t resp_len)
@@ -46,7 +47,8 @@ static void snapshot_response_cb(uint32_t cmd_id, uint32_t seq_id, esp_err_t sta
     if (!s_snapshot_queue)
     {
         ESP_LOGE("snapshot_response_cb", "Snapshot queue not initialized");
-        if (resp_data) free(resp_data);
+        if (resp_data)
+            free(resp_data);
         return;
     }
 
@@ -57,17 +59,18 @@ static void snapshot_response_cb(uint32_t cmd_id, uint32_t seq_id, esp_err_t sta
     {
         ESP_LOGE("snapshot_response_cb", "Snapshot request failed: %s", esp_err_to_name(status));
         snapshot.data = nullptr;
-        snapshot.len = 0;
+        snapshot.len  = 0;
         xQueueSend(s_snapshot_queue, &snapshot, 0);
-        if (resp_data) free(resp_data);
+        if (resp_data)
+            free(resp_data);
         return;
     }
 
     if (!resp_data || resp_len == 0)
     {
         ESP_LOGE("snapshot_response_cb", "Empty snapshot response");
-        snapshot.data = nullptr;
-        snapshot.len = 0;
+        snapshot.data   = nullptr;
+        snapshot.len    = 0;
         snapshot.status = ESP_ERR_INVALID_RESPONSE;
         xQueueSend(s_snapshot_queue, &snapshot, 0);
         return;
@@ -84,7 +87,7 @@ static void snapshot_response_cb(uint32_t cmd_id, uint32_t seq_id, esp_err_t sta
 
     // Store the snapshot data (don't free it here - it will be freed after use in CaptureSnapshot)
     snapshot.data = resp_data;
-    snapshot.len = resp_len;
+    snapshot.len  = resp_len;
 
     // Send to queue (non-blocking, should always succeed since queue size is 1 and we wait in CaptureSnapshot)
     if (xQueueSend(s_snapshot_queue, &snapshot, 0) != pdTRUE)
@@ -117,7 +120,8 @@ void CameraDevice::Init()
     InitializeStreams();
     mWebRTCProviderManager.Init();
     /* Initialize bridge command framework (bridge is started inside app_webrtc_run) */
-    if (bridge_cmd_init() != ESP_OK) {
+    if (bridge_cmd_init() != ESP_OK)
+    {
         ESP_LOGE("CameraDevice::Init", "Failed to initialize bridge command subsystem");
     }
 
@@ -263,8 +267,8 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     // Check if snapshot was successful
     if (snapshot.status != ESP_OK || !snapshot.data || snapshot.len == 0)
     {
-        ESP_LOGE("CameraDevice::CaptureSnapshot", "Snapshot failed: status=%s, data=%p, len=%zu",
-                 esp_err_to_name(snapshot.status), snapshot.data, snapshot.len);
+        ESP_LOGE("CameraDevice::CaptureSnapshot", "Snapshot failed: status=%s, data=%p, len=%zu", esp_err_to_name(snapshot.status),
+                 snapshot.data, snapshot.len);
         if (snapshot.data)
         {
             free(snapshot.data);
