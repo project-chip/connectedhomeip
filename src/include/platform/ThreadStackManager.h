@@ -35,11 +35,16 @@ namespace chip {
 namespace Dnssd {
 struct TextEntry;
 struct DnssdService;
+class CommissionAdvertisingParameters;
 } // namespace Dnssd
 
 namespace Thread {
 class OperationalDataset;
 } // namespace Thread
+
+namespace Transport {
+class PeerAddress;
+} // namespace Transport
 
 namespace DeviceLayer {
 
@@ -47,6 +52,14 @@ class PlatformManagerImpl;
 class ThreadStackManagerImpl;
 class ConfigurationManagerImpl;
 class DeviceControlServer;
+
+/**
+ * Provides a callback to send a Rendezvous announcement to a peer.
+ *
+ * @param[in] context A pointer to a context provided by the caller.
+ * @param[in] peerAddr The address of the peer to send the announcement to.
+ */
+typedef CHIP_ERROR (*RendezvousAnnouncementRequestCallback)(void * context, const Transport::PeerAddress & peerAddr);
 
 namespace Internal {
 class NFCCommissioningManagerImpl;
@@ -105,6 +118,12 @@ public:
     CHIP_ERROR GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetThreadVersion(uint16_t & version);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    CHIP_ERROR RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context);
+    void RendezvousStop();
+    void CancelRendezvousAnnouncement();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
@@ -425,6 +444,23 @@ inline CHIP_ERROR ThreadStackManager::GetThreadVersion(uint16_t & version)
 {
     return static_cast<ImplClass *>(this)->_GetThreadVersion(version);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+inline CHIP_ERROR ThreadStackManager::RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context)
+{
+    return static_cast<ImplClass *>(this)->_RendezvousStart(announcementRequest, context);
+}
+
+inline void ThreadStackManager::RendezvousStop()
+{
+    static_cast<ImplClass *>(this)->_RendezvousStop();
+}
+
+inline void ThreadStackManager::CancelRendezvousAnnouncement()
+{
+    static_cast<ImplClass *>(this)->_CancelRendezvousAnnouncement();
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
 inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
 {

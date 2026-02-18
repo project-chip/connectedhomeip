@@ -119,10 +119,11 @@ class TC_SU_4_1(SoftwareUpdateBaseTest):
             ),
         ]
 
+    @async_test_body
     async def teardown_test(self):
         # Clear provider KVS after test to avoid interference with subsequent tests
         self.clear_kvs()
-        await super().teardown_test()
+        super().teardown_test()
 
     @async_test_body
     async def test_TC_SU_4_1(self):

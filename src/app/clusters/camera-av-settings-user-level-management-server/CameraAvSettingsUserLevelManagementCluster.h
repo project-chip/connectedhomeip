@@ -170,17 +170,6 @@ public:
      */
     virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 
-    /**
-     *  Delegate functions to load the Presets and DPTZRelativeMove valid set of video stream IDs.
-     *  The delegate application is responsible for creating and persisting this data. The overall
-     *  application is already handling the persistence of the allocated video streams themselves.
-     *  hese Load APIs would be used to load the known presets and stream ids into the cluster
-     *  server list, at initialization.
-     */
-    virtual CHIP_ERROR LoadMPTZPresets(std::vector<CameraAvSettingsUserLevelManagement::MPTZPresetHelper> & mptzPresetHelpers) = 0;
-    virtual CHIP_ERROR
-    LoadDPTZStreams(std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> & dptzStreams) = 0;
-
 private:
     friend class CameraAvSettingsUserLevelManagementCluster;
 
@@ -287,19 +276,11 @@ public:
 
 private:
     CameraAvSettingsUserLevelMgmtServerLogic mLogic;
-    BitFlags<CameraAvSettingsUserLevelManagement::Feature> mFeatures;
-
-    std::vector<CameraAvSettingsUserLevelManagement::MPTZPresetHelper> mMptzPresetHelpers;
-    std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct::Type> mDptzStreams;
 
     // Holding variables for values subject to successful physical movement
     Optional<int16_t> mTargetPan;
     Optional<int16_t> mTargetTilt;
     Optional<uint8_t> mTargetZoom;
-
-    // Helper Read functions for complex attribute types
-    CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder);
 };
 
 } // namespace Clusters

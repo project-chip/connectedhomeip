@@ -24,7 +24,7 @@ import("${matter_support_root}/provision/args.gni")
 
 assert(chip_device_platform == "efr32")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -109,7 +109,7 @@ static_library("efr32") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
     deps += [

@@ -2546,6 +2546,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxGroupKeysPerFabric";
             break;
 
+        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupcastAdoptionID:
+            result = @"GroupcastAdoption";
+            break;
+
         case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -3428,6 +3432,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID:
             result = @"ExpiryDate";
+            break;
+
+        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeUnmountedID:
+            result = @"Unmounted";
             break;
 
         case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID:
@@ -6526,6 +6534,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"HoldTimeLimits";
             break;
 
+        case MTRAttributeIDTypeClusterOccupancySensingAttributePredictedOccupancyID:
+            result = @"PredictedOccupancy";
+            break;
+
         case MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID:
             result = @"PIROccupiedToUnoccupiedDelay";
             break;
@@ -7414,12 +7426,20 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AmbientContextTypeSupported";
             break;
 
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID:
-            result = @"SimultaneousDetectionLimit";
-            break;
-
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID:
             result = @"ObjectCountReached";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID:
+            result = @"ObjectCountConfig";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountID:
+            result = @"ObjectCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID:
+            result = @"SimultaneousDetectionLimit";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeID:
@@ -16041,8 +16061,12 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         switch (eventID) {
 
             // Cluster AmbientContextSensing events
-        case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectedID:
-            result = @"AmbientContextDetected";
+        case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectStartedID:
+            result = @"AmbientContextDetectStarted";
+            break;
+
+        case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectEndedID:
+            result = @"AmbientContextDetectEnded";
             break;
 
         default:
