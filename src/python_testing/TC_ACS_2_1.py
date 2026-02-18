@@ -96,7 +96,6 @@ class TC_ACS_2_1(MatterBaseTest):
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
-
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
@@ -355,6 +354,4 @@ class TC_ACS_2_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-
 
