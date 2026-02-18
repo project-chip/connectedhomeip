@@ -19,6 +19,7 @@
 #include "chef-pump.h"
 #include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -79,8 +80,12 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexTemperatureMeasurement(endpointId);
     if (epIndex < kTemperatureMeasurementCount)
     {
-        auto updatedTemperature = onOff ? TemperatureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
-        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedTemperature);
+        auto updatedTemperature     = onOff ? TemperatureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
+        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
+        VerifyOrReturn(temperatureMeasurement != nullptr);
+
+        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(updatedTemperature);
+
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -148,7 +153,11 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     {
         DataModel::Nullable<int16_t> updatedTemperature =
             LevelToSetpoint(level, TemperatureRangeMin[epIndex], TemperatureRangeMax[epIndex]);
-        TemperatureMeasurement::Attributes::MeasuredValue::Set(endpointId, updatedTemperature);
+        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
+        VerifyOrReturn(temperatureMeasurement != nullptr);
+
+        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(updatedTemperature);
+
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
     }
@@ -281,8 +290,14 @@ void init()
         epIndex = getIndexTemperatureMeasurement(endpointId);
         if (epIndex < kTemperatureMeasurementCount)
         {
-            VerifyOrDieWithMsg(TemperatureMeasurement::Attributes::MeasuredValue::SetNull(endpointId) == Status::Success,
-                               DeviceLayer, "Failed to initialize Temperature Measured Value to NULL for Endpoint: %d", endpointId);
+            auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
+            VerifyOrDieWithMsg(temperatureMeasurement != nullptr, DeviceLayer,
+                               "Failed to find Temperature Measurement Cluster for Endpoint: %d", endpointId);
+
+            DataModel::Nullable<int16_t> temp;
+            CHIP_ERROR err = temperatureMeasurement->SetMeasuredValue(temp);
+            VerifyOrDieWithMsg(err == CHIP_NO_ERROR, DeviceLayer,
+                               "Failed to initialize Temperature Measured Value to NULL for Endpoint: %d", endpointId);
             if (TemperatureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, TemperatureRangeMin[epIndex]) !=
                     Status::Success ||
                 TemperatureRangeMin[epIndex].IsNull())

@@ -26,6 +26,7 @@
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -160,8 +161,11 @@ public:
             sprintf(buffer, "%d", n);
             if (name == "Temperature")
             {
+                auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
+                VerifyOrReturn(temperatureMeasurement != nullptr);
+
                 // update the temp attribute here for hardcoded endpoint 1
-                chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(n * 100));
             }
             else if (name == "Color Current Level")
             {
@@ -525,8 +529,13 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
-    // write the temp attribute
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
+
+    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
+    if (temperatureMeasurement != nullptr)
+    {
+        // write the temp attribute
+        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100));
+    }
 
     AddDevice("Door Lock");
     AddEndpoint("Default");
@@ -578,7 +587,14 @@ void SetupPretendDevices()
     AddDevice("Thermostat");
     AddEndpoint("1");
     AddCluster("Thermostat");
-    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
+
+    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
+    if (temperatureMeasurement != nullptr)
+    {
+        // write the temp attribute
+        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100));
+    }
+
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, app::Clusters::Thermostat::SystemModeEnum::kHeat);

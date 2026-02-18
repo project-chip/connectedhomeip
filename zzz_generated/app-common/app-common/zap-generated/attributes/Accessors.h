@@ -3970,17 +3970,6 @@ Get(EndpointId endpoint,
 namespace TemperatureMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
-                                        MarkAttributeDirty markDirty);
-} // namespace MeasuredValue
-
 namespace MinMeasuredValue {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
 Protocols::InteractionModel::Status Set(EndpointId endpoint, int16_t value);
@@ -4008,18 +3997,6 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace Tolerance
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
 
 } // namespace Attributes
 } // namespace TemperatureMeasurement

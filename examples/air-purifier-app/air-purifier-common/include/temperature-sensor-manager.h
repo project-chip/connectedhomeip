@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -28,7 +29,7 @@ namespace Clusters {
 class TemperatureSensorManager
 {
 public:
-    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
+    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
 
     void Init()
     {
@@ -43,8 +44,11 @@ public:
 
     void OnTemperatureChangeHandler(int16_t newValue)
     {
-        Protocols::InteractionModel::Status status = TemperatureMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(mEndpointId);
+        VerifyOrReturn(temperatureMeasurement != nullptr);
+
+        CHIP_ERROR err = temperatureMeasurement->SetMeasuredValue(newValue);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue attribute"));
         ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
     }

@@ -18,6 +18,7 @@
 
 #include "AppTask.h"
 #include "SensorManagerCommon.h"
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -89,7 +90,11 @@ void AppTask::TemperatureMeasurementUpdateTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Current temperature is (%d*0.01)°C", temperature);
 
     PlatformMgr().LockChipStack();
-    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(kExampleEndpointId, temperature);
+    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(kExampleEndpointId);
+    if (temperatureMeasurement != nullptr)
+    {
+        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(temperature);
+    }
     PlatformMgr().UnlockChipStack();
 
     // Start next timer to handle temp sensor.
