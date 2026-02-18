@@ -897,49 +897,62 @@ execution.
 
 # Test Module Guards
 
-Guards let you run test steps only when certain conditions are met (e.g., a cluster has a feature, attribute, or command). 
+Guards let you run test steps only when certain conditions are met (e.g., a
+cluster has a feature, attribute, or command).
 
 ## Cluster Guards
-The following are inherited from the `matter_testing` module, so they do not need to be imported. For more examples on these guards, see `src/python_testing/TC_TestAttrAvail.py`.
 
-Use these to skip a test step when the endpoint or cluster does not support the feature, attribute, or command under test.
+The following are inherited from the `matter_testing` module, so they do not
+need to be imported. For more examples on these guards, see
+`src/python_testing/TC_TestAttrAvail.py`.
+
+Use these to skip a test step when the endpoint or cluster does not support the
+feature, attribute, or command under test.
 
 ### Attribute Guard
 
 Runs the test step only if the endpoint and cluster contain the given attribute:
 
 Example:
+
 ```python
 attr_should_be_there = await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState)
 ```
 
 ### Feature Guard
 
-Runs the test step only if the cluster on the endpoint supports the given feature:
+Runs the test step only if the cluster on the endpoint supports the given
+feature:
 
 Example:
+
 ```python
 feat_should_be_there = await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
 ```
 
 ### Command Guard
 
-Runs the test step only if the endpoint has the cluster that supports the given command:
+Runs the test step only if the endpoint has the cluster that supports the given
+command:
 
 Example:
+
 ```python
 cmd_should_be_there = await self.command_guard(endpoint=self.endpoint, command=commands.Resume)
 ```
 
 ## Additional Test Guards
 
-This section covers the PICS guard and the `run_if_endpoint_matches` decorator, with an example for each.
+This section covers the PICS guard and the `run_if_endpoint_matches` decorator,
+with an example for each.
 
 ### PICS Guard
 
-Inherited from `matter_testing` (no import needed). Runs the test step only if the given PICS key is enabled in the PICS file:
+Inherited from `matter_testing` (no import needed). Runs the test step only if
+the given PICS key is enabled in the PICS file:
 
 Example:
+
 ```python
 if self.pics_guard(self.check_pics("CC.S.F04")):
 ```
@@ -947,13 +960,17 @@ if self.pics_guard(self.check_pics("CC.S.F04")):
 ### run_if_endpoint_matches decorator
 
 Import the decorator and the check functions from `matter.testing.decorators`:
+
 ```python
 from matter.testing.decorators import has_feature, has_command, has_attribute, has_cluster, run_if_endpoint_matches
 ```
 
-Skips the whole test if the specified endpoint does not have the required cluster, feature, attribute, or command. Apply the decorator above the test function.
+Skips the whole test if the specified endpoint does not have the required
+cluster, feature, attribute, or command. Apply the decorator above the test
+function.
 
 Examples:
+
 ```python
 #Feature:
 @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning,
