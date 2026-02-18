@@ -494,7 +494,7 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
         storage = &gChipLinuxFactoryStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetFactoryDataLocation());
         path /= "/chip_factory.ini";
-        err = storage->Init(fn.c_str());
+        err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
