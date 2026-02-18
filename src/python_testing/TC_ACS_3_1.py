@@ -37,6 +37,7 @@
 
 import logging
 import time
+import asyncio
 
 from mobly import asserts
 
@@ -128,7 +129,7 @@ class TC_ACS_3_1(MatterBaseTest):
             simultaneousDetectionLimit = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit
             )
-            asserts.assert_true(simultaneousDetectionLimit == PIXITsimultaneousDetectionLimit,
+            asserts.assert_true(simultaneousDetectionLimit == PIXITSimultaneousDetectionLimit,
                                 "Different SimultaneousDetectionLimit value is read.")
 
             self.step("4")
@@ -242,7 +243,8 @@ class TC_ACS_3_1(MatterBaseTest):
                                 "Namespace ID and Tag ID must reflect step 8 sensing context.")
 
             self.step("12")
-            time.sleep(PIXITHoldTime)
+            # time.sleep(PIXITHoldTime)
+            await asyncio.sleep(PIXITHoldTime)
 
             self.step("13")
             ambientContextType = await self.read_single_attribute_check_success(
@@ -272,3 +274,4 @@ class TC_ACS_3_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
