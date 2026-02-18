@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -304,6 +305,7 @@ struct TestBasicInformationReadWrite : public ::testing::Test
         .deviceInstanceInfoProvider = mDeviceInfoProvider,
         .configurationManager       = mMockConfigurationManager,
         .platformManager            = chip::DeviceLayer::PlatformMgr(),
+        .subscriptionsPerFabric     = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
     };
 };
 
