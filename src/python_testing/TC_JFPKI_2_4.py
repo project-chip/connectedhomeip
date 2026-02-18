@@ -61,6 +61,17 @@ log = logging.getLogger(__name__)
 class TC_JFPKI_2_4(MatterBaseTest):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
     _GENERAL_COMMISSIONING_ENDPOINT = 0
+    _MIN_COMMISSIONING_TIMEOUT = 60
+    _DEFAULT_OJCW_TIMEOUT = 60
+    # TODO: Seems like the OJCW Discriminator should be randomized, but the test plan explicitly requires this number.
+    _DEFAULT_OJCW_DISCRIMINATOR = 3840
+    _DEFAULT_OJCW_ITERATIONS = 2000
+    _VALID_97_BYTE_VERIFIER = bytes.fromhex(
+        "b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+    )
+    _VALID_16_BYTE_SALT = b"SPAKE2P Key Salt"
+    _REQUEST_TIMEOUT_MS = 5000
+    _TIMEOUT_STEP_2 = 180
 
     def desc_TC_JFPKI_2_4(self) -> str:
         return "[TC-JFPKI-2.4] Validate OpenJointCommissioningWindow Command correct behavior"
@@ -70,8 +81,67 @@ class TC_JFPKI_2_4(MatterBaseTest):
 
     @property
     def default_timeout(self) -> int:
-        """We extend the timeout to support steps where we wait for the commissioning timeout to expire."""
-        return 270
+        """
+        We override the test timeout to support steps where we wait for the commissioning timeout to expire.
+        """
+
+        return self._TIMEOUT_STEP_2 + (self._DEFAULT_OJCW_TIMEOUT * 2) + 30
+
+    async def assert_ojcw(
+        self,
+        *,
+        commissioning_timeout=_DEFAULT_OJCW_TIMEOUT,
+        pake_passcode_verifier=_VALID_97_BYTE_VERIFIER,
+        discriminator=_DEFAULT_OJCW_DISCRIMINATOR,
+        iterations=_DEFAULT_OJCW_ITERATIONS,
+        salt=_VALID_16_BYTE_SALT,
+        expected_error_status=None,
+        expected_cluster_status=None,
+        expected_error_message=None,
+    ):
+        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
+            commissioningTimeout=commissioning_timeout,
+            PAKEPasscodeVerifier=pake_passcode_verifier,
+            discriminator=discriminator,
+            iterations=iterations,
+            salt=salt,
+        )
+
+        if expected_error_status is None:
+            await self.send_single_cmd(
+                cmd=cmd,
+                dev_ctrl=self.dev_ctrl_eco_a,
+                node_id=self.dut_node_id,
+                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+                timedRequestTimeoutMs=self._REQUEST_TIMEOUT_MS,
+            )
+            return
+
+        assertion_message = expected_error_message or f"Expected {expected_error_status}."
+        with asserts.assert_raises(InteractionModelError, assertion_message) as cm:
+            await self.send_single_cmd(
+                cmd=cmd,
+                dev_ctrl=self.dev_ctrl_eco_a,
+                node_id=self.dut_node_id,
+                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+                timedRequestTimeoutMs=self._REQUEST_TIMEOUT_MS,
+            )
+        asserts.assert_equal(cm.exception.status, expected_error_status,
+                             f"Expected {expected_error_status}, got {cm.exception.status}")
+        if expected_cluster_status is not None:
+            asserts.assert_equal(cm.exception.clusterStatus, expected_cluster_status,
+                                 f"Expected cluster status {expected_cluster_status}, got {cm.exception.clusterStatus}")
+
+    async def discover_commissionable_nodes(self):
+        return await self.dev_ctrl_eco_a.DiscoverCommissionableNodes(
+            filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
+            filter=self._DEFAULT_OJCW_DISCRIMINATOR,
+            stopOnFirst=True,
+        )
+
+    async def sleep(self, duration_sec):
+        log.info(f"Sleeping for {duration_sec} seconds...")
+        await asyncio.sleep(duration_sec)
 
     @async_test_body
     async def setup_class(self):
@@ -113,7 +183,7 @@ class TC_JFPKI_2_4(MatterBaseTest):
             port=random.randint(5001, 5999),
             discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
-            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033", "--min_commissioning_timeout", f"{self._MIN_COMMISSIONING_TIMEOUT}"])
         self.fabric_a_admin.start(
             expected_output="Updating services using commissioning mode 1",
             timeout=30)
@@ -226,319 +296,127 @@ class TC_JFPKI_2_4(MatterBaseTest):
             catTags=[self.eco_a_cats])
 
         self.step("2")
-        valid_97_byte_verifier = bytes.fromhex(
-            "b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf")
-        valid_16_byte_salt = b"SPAKE2P Key Salt"
-        timeout_step_2 = 180
-        discriminator_step_2 = 3840
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=timeout_step_2,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=2000,
-            salt=valid_16_byte_salt,
-        )
-        await self.send_single_cmd(
-            cmd=cmd,
-            dev_ctrl=self.dev_ctrl_eco_a,
-            node_id=self.dut_node_id,
-            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-            timedRequestTimeoutMs=5000,
-        )
+        await self.assert_ojcw(commissioning_timeout=self._TIMEOUT_STEP_2)
 
         self.step("3")
-        responses = await self.dev_ctrl_eco_a.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
-            filter=discriminator_step_2,
-            stopOnFirst=True,
-        )
+        responses = await self.discover_commissionable_nodes()
         asserts.assert_greater_equal(
             len(responses), 1, "DUT should advertise commissioning service with discriminator 3840"
         )
 
         self.step("4")
-        sleep_seconds = timeout_step_2 + 1
-        log.info(f"Waiting {sleep_seconds} seconds for CommissioningTimeout to expire...")
-        await asyncio.sleep(sleep_seconds)
-        responses = await self.dev_ctrl_eco_a.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
-            filter=discriminator_step_2,
-            stopOnFirst=True,
-        )
+        await self.sleep(self._TIMEOUT_STEP_2 + 1)
+        responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
             len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3840"
         )
 
         self.step("5")
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=0,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=2000,
-            salt=valid_16_byte_salt,
+        await self.assert_ojcw(
+            commissioning_timeout=0,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for CommissioningTimeout=0.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for CommissioningTimeout=0.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("6")
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=65535,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=2000,
-            salt=valid_16_byte_salt,
+        await self.assert_ojcw(
+            commissioning_timeout=65535,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for CommissioningTimeout=65535.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for CommissioningTimeout=65535.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("7")
-        invalid_96_byte_verifier = valid_97_byte_verifier[:-1]
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=invalid_96_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=2000,
-            salt=valid_16_byte_salt,
+        invalid_96_byte_verifier = self._VALID_97_BYTE_VERIFIER[:-1]
+        await self.assert_ojcw(
+            pake_passcode_verifier=invalid_96_byte_verifier,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for PAKEPasscodeVerifier length=96.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for PAKEPasscodeVerifier length=96.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("8")
-        invalid_98_byte_verifier = valid_97_byte_verifier + bytes([0x00])
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=invalid_98_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=2000,
-            salt=valid_16_byte_salt,
+        invalid_98_byte_verifier = self._VALID_97_BYTE_VERIFIER + bytes([0xff])
+        await self.assert_ojcw(
+            pake_passcode_verifier=invalid_98_byte_verifier,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for PAKEPasscodeVerifier length=98.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for PAKEPasscodeVerifier length=98.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("9")
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
+        await self.assert_ojcw(
             discriminator=4096,
-            iterations=2000,
-            salt=valid_16_byte_salt,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for Discriminator=4096.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for Discriminator=4096.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("10")
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
+        await self.assert_ojcw(
             iterations=999,
-            salt=valid_16_byte_salt,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for Iterations=999.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for Iterations=999.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("11")
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
+        await self.assert_ojcw(
             iterations=100001,
-            salt=valid_16_byte_salt,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for Iterations=100001.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for Iterations=100001.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("12")
-        invalid_15_byte_salt = valid_16_byte_salt[:-1]
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=2000,
+        invalid_15_byte_salt = self._VALID_16_BYTE_SALT[:-1]
+        await self.assert_ojcw(
             salt=invalid_15_byte_salt,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for Salt length=15.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for Salt length=15.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("13")
-        invalid_33_byte_salt = valid_16_byte_salt + bytes(range(17))
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=2000,
+        invalid_33_byte_salt = self._VALID_16_BYTE_SALT + bytes(range(17))
+        await self.assert_ojcw(
             salt=invalid_33_byte_salt,
+            expected_error_status=Status.InvalidCommand,
+            expected_error_message="Expected INVALID_COMMAND for Salt length=33.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected INVALID_COMMAND for Salt length=33.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.InvalidCommand,
-                             f"Expected {Status.InvalidCommand}, got {cm.exception.status}")
 
         self.step("14")
-        valid_32_byte_salt = valid_16_byte_salt + bytes(range(16))
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=1000,
-            salt=valid_32_byte_salt,
-        )
-        await self.send_single_cmd(
-            cmd=cmd,
-            dev_ctrl=self.dev_ctrl_eco_a,
-            node_id=self.dut_node_id,
-            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-            timedRequestTimeoutMs=5000,
-        )
+        valid_32_byte_salt = self._VALID_16_BYTE_SALT + bytes(range(16))
+        await self.assert_ojcw(iterations=1000, salt=valid_32_byte_salt)
 
         self.step("15")
-        responses = await self.dev_ctrl_eco_a.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
-            filter=discriminator_step_2,
-            stopOnFirst=True,
-        )
+        responses = await self.discover_commissionable_nodes()
         asserts.assert_greater_equal(
             len(responses), 1, "DUT should advertise commissioning service with discriminator 3840"
         )
 
         self.step("16")
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
+        await self.assert_ojcw(
             iterations=1000,
             salt=valid_32_byte_salt,
+            expected_error_status=Status.Failure,
+            expected_cluster_status=Clusters.JointFabricAdministrator.Enums.StatusCodeEnum.kBusy,
+            expected_error_message="Expected BUSY cluster status while commissioning window is already open.",
         )
-        with asserts.assert_raises(InteractionModelError, "Expected BUSY while commissioning window is already open.") as cm:
-            await self.send_single_cmd(
-                cmd=cmd,
-                dev_ctrl=self.dev_ctrl_eco_a,
-                node_id=self.dut_node_id,
-                endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                timedRequestTimeoutMs=5000,
-            )
-        asserts.assert_equal(cm.exception.status, Status.Busy,
-                             f"Expected {Status.Busy}, got {cm.exception.status}")
 
         self.step("17")
-        await asyncio.sleep(61)
-        responses = await self.dev_ctrl_eco_a.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
-            filter=discriminator_step_2,
-            stopOnFirst=True,
-        )
+        await self.sleep(self._DEFAULT_OJCW_TIMEOUT + 1)
+        responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
             len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3840"
         )
-        # TODO: Investigate whether the discriminator should be randomized to reduce the likelihood of flakiness due to multiple physical devices advertising
-        # or can we do some other filtering?
 
         self.step("18")
-        valid_24_byte_salt = valid_16_byte_salt + bytes(range(8))
-        cmd = Clusters.JointFabricAdministrator.Commands.OpenJointCommissioningWindow(
-            commissioningTimeout=60,
-            PAKEPasscodeVerifier=valid_97_byte_verifier,
-            discriminator=discriminator_step_2,
-            iterations=50000,
-            salt=valid_24_byte_salt,
-        )
-        await self.send_single_cmd(
-            cmd=cmd,
-            dev_ctrl=self.dev_ctrl_eco_a,
-            node_id=self.dut_node_id,
-            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-            timedRequestTimeoutMs=5000,
-        )
+        valid_24_byte_salt = self._VALID_16_BYTE_SALT + bytes(range(8))
+        await self.assert_ojcw(iterations=50000, salt=valid_24_byte_salt)
 
         self.step("19")
-        responses = await self.dev_ctrl_eco_a.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
-            filter=discriminator_step_2,
-            stopOnFirst=True,
-        )
+        responses = await self.discover_commissionable_nodes()
         asserts.assert_greater_equal(
             len(responses), 1, "DUT should advertise commissioning service with discriminator 3840"
         )
 
         self.step("20")
-        sleep_seconds = 61
-        log.info(f"Waiting {sleep_seconds} seconds for CommissioningTimeout to expire...")
-        await asyncio.sleep(sleep_seconds)
-        responses = await self.dev_ctrl_eco_a.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
-            filter=discriminator_step_2,
-            stopOnFirst=True,
-        )
+        await self.sleep(self._DEFAULT_OJCW_TIMEOUT + 1)
+        responses = await self.discover_commissionable_nodes()
         asserts.assert_equal(
             len(responses), 0, "DUT should have stopped advertising commissioning service with discriminator 3840"
         )
