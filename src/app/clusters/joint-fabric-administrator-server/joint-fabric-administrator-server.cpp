@@ -212,6 +212,7 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
     VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
     VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = Status::InvalidCommand);
 
+    VerifyOrExit(pakeVerifier.size() == kSpake2p_VerifierSerialized_Length, globalStatus = Status::InvalidCommand);
     VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, globalStatus = Status::InvalidCommand);
     VerifyOrExit(commissionMgr.OpenJointCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
                                                             fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
