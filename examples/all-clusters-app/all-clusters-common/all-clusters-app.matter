@@ -8112,7 +8112,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0B;
+    ram      attribute featureMap default = 0x17;
     callback attribute clusterRevision;
 
     handle command UpOrOpen;
