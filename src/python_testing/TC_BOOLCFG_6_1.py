@@ -161,7 +161,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
         event_cb = EventSubscriptionHandler(expected_cluster=cluster)
         await event_cb.start(
             dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
-            min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+            min_interval_sec=0, max_interval_sec=30)
 
         # Step 5: Start accumulating reports
         self.step("5")
