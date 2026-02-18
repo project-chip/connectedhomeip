@@ -424,8 +424,7 @@
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Temperature Measurement": [
             "ClusterRevision",
-            "FeatureMap",
-            "MeasuredValue"
+            "FeatureMap"
         ],
         "Thread Border Router Management": [
             "BorderRouterName",

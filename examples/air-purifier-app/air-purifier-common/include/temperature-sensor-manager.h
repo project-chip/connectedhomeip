@@ -29,17 +29,15 @@ namespace Clusters {
 class TemperatureSensorManager
 {
 public:
-    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
+    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
 
     void Init()
     {
-        Protocols::InteractionModel::Status status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, -500);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
+        // MinMeasuredValue is a mandatory attribute that needs to have an appropriate default value in ember.
+        // The cluster will take the value as a configuration value that can not be changed.
 
-        status = TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 6000);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
+        // MaxMeasuredValue is a mandatory attribute that needs to have an appropriate default value in ember.
+        // The cluster will take the value as a configuration value that can not be changed.
     }
 
     void OnTemperatureChangeHandler(int16_t newValue)

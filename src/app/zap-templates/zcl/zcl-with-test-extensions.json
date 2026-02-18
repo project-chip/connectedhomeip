@@ -424,8 +424,7 @@
         ],
         "Temperature Measurement": [
             "ClusterRevision",
-            "FeatureMap",
-            "MeasuredValue"
+            "FeatureMap"
         ],
         "Thread Border Router Management": [
             "BorderRouterName",

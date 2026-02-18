@@ -31,6 +31,7 @@ public:
 
     struct StartupConfiguration
     {
+        DataModel::Nullable<int16_t> measuredValue{};
         DataModel::Nullable<int16_t> minMeasuredValue{};
         DataModel::Nullable<int16_t> maxMeasuredValue{};
         uint16_t tolerance{};
@@ -48,9 +49,9 @@ public:
     DataModel::Nullable<int16_t> GetMeasuredValue() const { return mMeasuredValue; }
 
 protected:
-    DataModel::Nullable<int16_t> mMeasuredValue{};
     const OptionalAttributeSet mOptionalAttributeSet;
     const StartupConfiguration mConfig;
+    DataModel::Nullable<int16_t> mMeasuredValue{};
 };
 
 } // namespace chip::app::Clusters

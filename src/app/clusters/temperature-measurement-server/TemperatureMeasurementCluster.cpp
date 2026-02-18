@@ -30,14 +30,25 @@ constexpr int16_t kMaximumMinMeasuredValue = 32766;
 TemperatureMeasurementCluster::TemperatureMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
+    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet), mConfig(config)
 {
     VerifyOrDie(mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue) >= kMinimumMinMeasuredValue &&
                 mConfig.minMeasuredValue.ValueOr(kMaximumMinMeasuredValue) <= kMaximumMinMeasuredValue);
+
     VerifyOrDie(mConfig.maxMeasuredValue.ValueOr(mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1)) >=
                 mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1));
+
     VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || mConfig.tolerance <= 2048);
+
+    if (!mConfig.measuredValue.IsNull())
+    {
+        VerifyOrDie(mConfig.measuredValue.Value() >= mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue));
+
+        VerifyOrDie(mConfig.measuredValue.Value() <=
+                    mConfig.maxMeasuredValue.ValueOr(mConfig.minMeasuredValue.ValueOr(kMinimumMinMeasuredValue + 1)));
+
+        mMeasuredValue = mConfig.measuredValue;
+    }
 }
 
 DataModel::ActionReturnStatus TemperatureMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

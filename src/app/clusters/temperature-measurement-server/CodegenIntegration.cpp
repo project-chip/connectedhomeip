@@ -47,6 +47,11 @@ public:
         TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
+        DataModel::Nullable<int16_t> measuredValue{};
+        // We try to read the default value for this attribute but we do not fail if we can not read it.
+        // This is because some apps may have a default value for this attribute in ember but not all of them.
+        MeasuredValue::Get(endpointId, measuredValue);
+
         DataModel::Nullable<int16_t> minMeasuredValue{};
         VerifyOrDie(MinMeasuredValue::Get(endpointId, minMeasuredValue) == Status::Success);
 
@@ -61,6 +66,7 @@ public:
 
         gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,
                                               TemperatureMeasurementCluster::StartupConfiguration{
+                                                  .measuredValue    = measuredValue,
                                                   .minMeasuredValue = minMeasuredValue,
                                                   .maxMeasuredValue = maxMeasuredValue,
                                                   .tolerance        = tolerance,

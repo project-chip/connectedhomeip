@@ -9262,7 +9262,7 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    callback attribute measuredValue;
+    ram      attribute measuredValue default = 0x8000;
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
     ram      attribute tolerance;
