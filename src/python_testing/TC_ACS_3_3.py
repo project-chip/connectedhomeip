@@ -36,7 +36,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
+import time, asyncio
+import numpy as np
 
 from mobly import asserts
 import matter.clusters as Clusters
@@ -47,7 +48,6 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-import numpy as np
 min_value_uint8 = np.iinfo(np.uint8).min
 max_value_uint8 = np.iinfo(np.uint8).max
 min_value_uint16 = np.iinfo(np.uint16).min
@@ -183,11 +183,11 @@ class TC_ACS_3_3(MatterBaseTest):
 
         # Set up wildcard subscription for attributes and events
         # MinIntervalFloor = 0, MaxIntervalCeiling = 30, KeepSubscriptions = false (EventSubscriptionHandler has True hardcoded and can't be changed)
-        attrib_listener = ClusterAttributeChangeAccumulator(Clusters.Objects.AmbientContextSensing)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # start event listener
-        event_listener = EventChangeCallback(Clusters.Objects.AmbientContextSensing)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
         if self.HumanActivitySupported:
@@ -195,7 +195,7 @@ class TC_ACS_3_3(MatterBaseTest):
             humanActivityDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
             )
-            asserts.assert_true(humanActivityDetected == True, "Expected False Boolean value.")
+            asserts.assert_true(humanActivityDetected is True, "Expected False Boolean value.")
 
             self.step("3b")
             attrib_listener.reset()
@@ -246,7 +246,8 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("3e")
             # Let HoldTime pass by
-            time.sleep(PIXITHoldTimeTest)
+            # time.sleep(PIXITHoldTimeTest)
+            await asyncio.sleep(PIXITHoldTimeTest)
 
             self.step("3f")
             event = event_listener.wait_for_event_report(
@@ -272,7 +273,7 @@ class TC_ACS_3_3(MatterBaseTest):
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
             )
-            asserts.assert_true(objectIdentified == True, "Expected False Boolean value.")
+            asserts.assert_true(objectIdentified is True, "Expected False Boolean value.")
 
             self.step("4b")
             attrib_listener.reset()
@@ -325,7 +326,8 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("4e")
             # Let HoldTime pass by
-            time.sleep(PIXITHoldTimeTest)
+            # time.sleep(PIXITHoldTimeTest)
+            await asyncio.sleep(PIXITHoldTimeTest)
 
             self.step("4f")
             event = event_listener.wait_for_event_report(
@@ -350,7 +352,7 @@ class TC_ACS_3_3(MatterBaseTest):
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
-            asserts.assert_true(audioContextDetected == True, "Expected False Boolean value.")
+            asserts.assert_true(audioContextDetected is True, "Expected False Boolean value.")
 
             self.step("5b")
             attrib_listener.reset()
@@ -403,7 +405,8 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("5e")
             # Let HoldTime pass by
-            time.sleep(PIXITHoldTimeTest)
+            # time.sleep(PIXITHoldTimeTest)
+            await asyncio(PIXITHoldTimeTest)
 
             self.step("5f")
             event = event_listener.wait_for_event_report(
@@ -431,7 +434,7 @@ class TC_ACS_3_3(MatterBaseTest):
             objectCountReached = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountReached
             )
-            asserts.assert_true(objectCountReached == True, "Expected False Boolean value.")
+            asserts.assert_true(objectCountReached is True, "Expected False Boolean value.")
 
             self.step("6b")
             attrib_listener.reset()
@@ -494,7 +497,8 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("6e")
             # Let HoldTime pass by
-            time.sleep(PIXITHoldTimeTest)
+            # time.sleep(PIXITHoldTimeTest)
+            await asyncio(PIXITHoldTimeTest)
 
             self.step("6f")
             event = event_listener.wait_for_event_report(
@@ -521,6 +525,7 @@ class TC_ACS_3_3(MatterBaseTest):
         )
 
         self.step("7b")
+        asserts.assert_true(simultaneousDetectionLimit == PIXITSimultaneousDetectionLimit, "Expected a different value from 7a.")
         await self.write_single_attribute(attr.SimultaneousDetectionLimit(PIXITSimultaneousDetectionLimit))
 
         self.step("7c")
@@ -539,6 +544,7 @@ class TC_ACS_3_3(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
 
         self.step("8b")
+        asserts.assert_true(holdTime == PIXITHoldTimeTest, "Expected a different value from 8a.")
         await self.write_single_attribute(attr.HoldTime(PIXITHoldTimeTest))
 
         self.step("8c")
@@ -553,3 +559,4 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
