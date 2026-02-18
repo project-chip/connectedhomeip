@@ -768,6 +768,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
 
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
+#if ENABLE_SE05X_DEVICE_ATTESTATION
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleSe05xDACProvider());
+#else
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
     se05xInstance.Init(initParams.persistentStorageDelegate);
@@ -812,13 +820,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-
-    // Initialize device attestation config
-#if ENABLE_SE05X_DEVICE_ATTESTATION
-    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleSe05xDACProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
-#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");
