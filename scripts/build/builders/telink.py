@@ -270,7 +270,7 @@ class TelinkBuilder(Builder):
         elif self.log_level == TelinkLogLevel.NONE:
             flags.append("-DTLNK_LOG_LEVEL=none")
         else:
-            raise Exception("Unknown log level: %r", self.log_level)
+            raise Exception("Unknown log level: %r" % self.log_level)
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
