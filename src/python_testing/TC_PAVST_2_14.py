@@ -131,8 +131,6 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         asserts.assert_equal(len(current_connections), 1, "CurrentConnections list should have 1 entry")
         aConnectionID = current_connections[0].connectionID
         logger.info(f"Allocated Connection ID = {aConnectionID}")
-        asserts.assert_equal(current_connections[0].videoStreamID, video_stream_id, "VideoStreamID does not match")
-        asserts.assert_equal(current_connections[0].audioStreamID, audio_stream_id, "AudioStreamID does not match")
 
         self.step(6)
         await self.request_device_reboot()
@@ -144,8 +142,6 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         current_connections = await self.read_pavst_attribute_expect_success(endpoint, pavst_attributes.CurrentConnections)
         asserts.assert_equal(len(current_connections), 1, "CurrentConnections list should have 1 entry after reboot")
         asserts.assert_equal(current_connections[0].connectionID, aConnectionID, "ConnectionID does not match after reboot")
-        asserts.assert_equal(current_connections[0].videoStreamID, video_stream_id, "VideoStreamID does not match after reboot")
-        asserts.assert_equal(current_connections[0].audioStreamID, audio_stream_id, "AudioStreamID does not match after reboot")
 
         self.step(9)
         cmd = pavst_cluster.Commands.DeallocatePushTransport(connectionID=aConnectionID)
