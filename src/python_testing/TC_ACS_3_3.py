@@ -56,6 +56,7 @@ max_value_uint16 = np.iinfo(np.uint16).max
 min_value_uint32 = np.iinfo(np.uint32).min
 max_value_uint32 = np.iinfo(np.uint32).max
 
+
 class TC_ACS_3_3(MatterBaseTest):
     def desc_TC_ACS_3_3(self) -> str:
         return "[TC-ACS-3.3] Attribute Subscription and Event Functionality with DUT as a server"
@@ -128,6 +129,7 @@ class TC_ACS_3_3(MatterBaseTest):
                      "Verify that the value of HoldTime attribute is the input value from 8b.")
         ]
     # Sends and out-of-band command to the all-clusters-app
+    
     def write_to_app_pipe(self, command):
         # CI app pipe id creation
         self.app_pipe = "/tmp/acs_fifo_"
@@ -143,7 +145,6 @@ class TC_ACS_3_3(MatterBaseTest):
         time.sleep(0.001)
 
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
-
     async def test_TC_ACS_3_3(self):
         node_id = self.dut_node_id
         endpoint = self.get_endpoint()
@@ -205,7 +206,7 @@ class TC_ACS_3_3(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe(
                     '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":75, "TagId":3}}'
-                ) # 0x4B => 75
+                )  # 0x4B => 75
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -213,7 +214,7 @@ class TC_ACS_3_3(MatterBaseTest):
                     prompt_msg="Type any letter and press ENTER after a desired ambient sensing is triggered.")
 
             self.step("3c")
-            post_prompt_settle_delay_seconds = 10 # seconds
+            post_prompt_settle_delay_seconds = 10  # seconds
 
             # Wait for attribute data reporting
             attrib_listener.await_all_final_values_reported(
@@ -283,7 +284,7 @@ class TC_ACS_3_3(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe(
                     '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":73, "TagId":3}}'
-                ) # 0x49 => 73
+                )  # 0x49 => 73
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -362,7 +363,7 @@ class TC_ACS_3_3(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe(
                     '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":74, "TagId":4}}'
-                ) # 0x4A => 74
+                )  # 0x4A => 74
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -444,8 +445,8 @@ class TC_ACS_3_3(MatterBaseTest):
             if self.is_ci:
                 self.write_to_app_pipe(
                     '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":73, "TagId":3}}'
-                ) # 0x49
-                if attr.ObjectCount in attribute_list: # Need to add ci
+                )  # 0x49
+                if attr.ObjectCount in attribute_list:  # Need to add ci
                     self.write_to_app_pipe(
                         '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":73, "TagId":3}}'
                     )  # 0x49
@@ -491,7 +492,8 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
             if attr.ObjectCount in attribute_list:
-                asserts.assert_true(event.objectCount >= PIXITObjectCountThreshold, "Object Count number is greater than or equal to ObjectCountThreshold.")
+                asserts.assert_true(event.objectCount >= PIXITObjectCountThreshold,
+                                    "Object Count number is greater than or equal to ObjectCountThreshold.")
 
             # store the event number
             event_number = event.event_id
@@ -558,8 +560,10 @@ class TC_ACS_3_3(MatterBaseTest):
         log.info("Received attribute report for HoldTime.")
         attrib_listener.reset()
 
+
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
 
