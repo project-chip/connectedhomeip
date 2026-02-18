@@ -911,9 +911,7 @@ feature, attribute, or command under test.
 
 ### Attribute Guard
 
-attr_should_be_there = await self.attribute_guard(endpoint=self.endpoint,
-attribute=Clusters.OperationalState.Attributes.OperationalState) Runs the test
-step only if the endpoint and cluster contain the given attribute:
+Runs the test step only if the endpoint and cluster contain the given attribute:
 
 Example:
 
