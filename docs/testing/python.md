@@ -910,7 +910,7 @@ Use these to skip a test step when the endpoint or cluster does not support the
 feature, attribute, or command under test.
 
 ### Attribute Guard
-
+attr_should_be_there = await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.OperationalState.Attributes.OperationalState)
 Runs the test step only if the endpoint and cluster contain the given attribute:
 
 Example:
@@ -928,7 +928,7 @@ Example:
 
 ```python
 feat_should_be_there = await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
-```
+cmd_should_be_there = await self.command_guard(endpoint=self.endpoint, command=Clusters.OperationalState.Commands.Resume)
 
 ### Command Guard
 
