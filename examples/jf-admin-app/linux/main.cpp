@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include "AppOptions.h"
 #include "JFADatastoreSync.h"
 #include "JFAManager.h"
-#include "AppOptions.h"
 #include "rpc/RpcServer.h"
 #include <AppMain.h>
 
