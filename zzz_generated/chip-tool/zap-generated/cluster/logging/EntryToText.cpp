@@ -1907,6 +1907,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SmokeSensitivityLevel";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::ExpiryDate::Id:
             return "ExpiryDate";
+        case chip::app::Clusters::SmokeCoAlarm::Attributes::Unmounted::Id:
+            return "Unmounted";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::SmokeCoAlarm::Attributes::AcceptedCommandList::Id:

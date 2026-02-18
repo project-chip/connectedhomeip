@@ -1836,7 +1836,7 @@ cluster FanControl = 514 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1952,6 +1952,7 @@ endpoint 0 {
     callback attribute totalOperationalHours;
     callback attribute bootReason;
     ram      attribute testEventTriggersEnabled;
+    callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2013,6 +2014,7 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute groupcastAdoption;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

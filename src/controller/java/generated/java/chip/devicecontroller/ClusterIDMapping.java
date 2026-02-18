@@ -7521,6 +7521,7 @@ public class ClusterIDMapping {
             ContaminationState(10L),
             SmokeSensitivityLevel(11L),
             ExpiryDate(12L),
+            Unmounted(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
