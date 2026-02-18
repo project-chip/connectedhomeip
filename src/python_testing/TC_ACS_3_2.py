@@ -70,7 +70,7 @@ class TC_ACS_3_2(MatterBaseTest):
             TestStep("7", "TH reads the AmbientContextType attribute.",
                      "Verify that DUT response contains the AmbientContextSensed struct data including the namespace ID and its tag ID of PIXIT.ACS.AmbientContextSensed_1 from the step 6.",
                      "Verify that DUT response contains the size of AmbientContextType list is 1."),
-            TestStep("8", "Wait until PIXIT.ACS.HoldTimeMaxTest seconds are passe from the step 4 execution."),
+            TestStep("8", "Wait until PIXIT.ACS.HoldTimeMaxTest seconds are passed from the step 4 execution."),
             TestStep("9", "TH reads the AmbientContextType attribute and check a Boolean attribute related to the step 6.",
                      "Verify that DUT response contains the Boolean attribute (HumanActivityDetected, ObjectIdentified, AudioContextDetected) is read False.")
         ]
@@ -208,5 +208,6 @@ class TC_ACS_3_2(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
