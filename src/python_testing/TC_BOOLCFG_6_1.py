@@ -153,7 +153,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
         self.step("4")
         attr_cb = None
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
-            attr_cb = AttributeSubscriptionHandler(expected_attribute=attributes.SensorFault)
+            attr_cb = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.SensorFault)
             await attr_cb.start(
                 dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
                 min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
