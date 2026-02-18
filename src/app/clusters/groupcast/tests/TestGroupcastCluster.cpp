@@ -77,7 +77,7 @@ public:
     {
         static constexpr size_t kEndpointCount                                       = 300;
         static const std::array<DataModel::EndpointEntry, kEndpointCount> kEndpoints = []() {
-            std::array<DataModel::EndpointEntry, kEndpointCount> endpoints{};
+            std::array<DataModel::EndpointEntry, kEndpointCount> endpoints;
 
             for (size_t i = 0; i < kEndpointCount; i++)
             {
