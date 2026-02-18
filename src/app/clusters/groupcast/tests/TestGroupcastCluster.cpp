@@ -25,6 +25,8 @@
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/util/mock/Constants.h>
+#include <app/util/mock/Functions.h>
 #include <clusters/Groupcast/Enums.h>
 #include <clusters/Groupcast/Metadata.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -35,6 +37,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
+#include <array>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -42,6 +45,7 @@
 namespace {
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::Testing;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters::Groupcast;
@@ -65,6 +69,31 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
 }
 
 chip::FabricIndex kTestFabricIndex = Testing::kTestFabricIndex;
+class CustomDataModel : public EmptyProvider
+{
+public:
+    // Override of the EmptyProvider to mock a large Endpoint list in the data model that will be used in the following tests.
+    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder) override
+    {
+        static constexpr size_t kEndpointCount                                       = 300;
+        static const std::array<DataModel::EndpointEntry, kEndpointCount> kEndpoints = []() {
+            std::array<DataModel::EndpointEntry, kEndpointCount> endpoints;
+
+            for (size_t i = 0; i < kEndpointCount; i++)
+            {
+                endpoints[i] = DataModel::EndpointEntry{
+                    .id                 = static_cast<EndpointId>(i + 1),
+                    .parentId           = kInvalidEndpointId,
+                    .compositionPattern = DataModel::EndpointCompositionPattern::kTree,
+                };
+            }
+
+            return endpoints;
+        }();
+
+        return builder.ReferenceExisting(Span<const DataModel::EndpointEntry>(kEndpoints.data(), kEndpoints.size()));
+    }
+};
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestGroupcastCluster : public ::testing::Test
@@ -75,6 +104,8 @@ struct TestGroupcastCluster : public ::testing::Test
     TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mProvider;
     Crypto::DefaultSessionKeystore mKeystore;
+    CustomDataModel customDataModel;
+    std::unique_ptr<ServerClusterContext> clusterContext;
     FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
     app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider }, BitFlags<Feature>{ Feature::kSender } };
     app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider },
@@ -86,8 +117,18 @@ struct TestGroupcastCluster : public ::testing::Test
         mProvider.SetSessionKeystore(&mKeystore);
         ASSERT_EQ(mProvider.Init(), CHIP_NO_ERROR);
 
-        ASSERT_EQ(mSender.Startup(mTestContext.Get()), CHIP_NO_ERROR);
-        ASSERT_EQ(mListener.Startup(mTestContext.Get()), CHIP_NO_ERROR);
+        // Replace the DataModel Provider in the ServerClusterContext provided to the cluster implementation
+        // with our Mock DataModel Provider so we can test endpoints validations on JoinGroup command.
+        ServerClusterContext context = mTestContext.Get();
+        clusterContext               = std::make_unique<ServerClusterContext>(ServerClusterContext{
+                          .provider           = customDataModel,
+                          .storage            = context.storage,
+                          .attributeStorage   = context.attributeStorage,
+                          .interactionContext = context.interactionContext,
+        });
+
+        ASSERT_EQ(mSender.Startup(*clusterContext), CHIP_NO_ERROR);
+        ASSERT_EQ(mListener.Startup(*clusterContext), CHIP_NO_ERROR);
 
         CHIP_ERROR err = mFabricHelper.SetUpTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
@@ -98,6 +139,7 @@ struct TestGroupcastCluster : public ::testing::Test
     {
         mSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
         mListener.Shutdown(app::ClusterShutdownType::kClusterShutdown);
+        clusterContext.reset();
         Credentials::SetGroupDataProvider(nullptr);
         CHIP_ERROR err = mFabricHelper.TearDownTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
@@ -333,6 +375,24 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+
+        // Join group with root endpoint: Invalid Endpoint
+        const EndpointId kRootEndpoint[] = { kRootEndpointId };
+        data.groupID                     = 3;
+        data.endpoints = chip::app::DataModel::List<const EndpointId>(kRootEndpoint, MATTER_ARRAY_SIZE(kRootEndpoint));
+        result         = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::UnsupportedEndpoint);
+
+        // Join group with an invalid endpoint in the data model
+        const EndpointId kInvalidEndpoint[] = { 301 };
+        data.groupID                        = 3;
+        data.endpoints = chip::app::DataModel::List<const EndpointId>(kInvalidEndpoint, MATTER_ARRAY_SIZE(kInvalidEndpoint));
+        result         = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::UnsupportedEndpoint);
     }
 
     // Sender

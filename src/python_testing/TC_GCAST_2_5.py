@@ -83,6 +83,8 @@ class TC_GCAST_2_5(MatterBaseTest):
         if not ln_enabled:
             logger.info("Listener feature is not enabled, skip remaining steps.")
             self.mark_all_remaining_steps_skipped("1b")
+            return
+
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
         endpoints_list = [endpoints_list[0]]
 
@@ -152,6 +154,7 @@ class TC_GCAST_2_5(MatterBaseTest):
 
         if not sd_enabled:
             self.mark_all_remaining_steps_skipped("7")
+            return
 
         self.step(7)
         groupID2 = 2
