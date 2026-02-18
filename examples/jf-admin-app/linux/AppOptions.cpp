@@ -33,8 +33,15 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
     switch (identifier)
     {
     case kOptionMinCommissioningTimeout: {
+        uint16_t timeout;
+        if (!chip::ArgParser::ParseInt(value, timeout))
+        {
+            chip::ArgParser::PrintArgError("%s: Invalid value for %s: %s\n", program, name, value);
+            retval = false;
+            break;
+        }
         auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
-        commissionMgr.OverrideMinCommissioningTimeout(chip::System::Clock::Seconds16(static_cast<uint16_t>(atoi(value))));
+        commissionMgr.OverrideMinCommissioningTimeout(chip::System::Clock::Seconds16(timeout));
         break;
     }
     default:
