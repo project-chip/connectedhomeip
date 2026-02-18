@@ -107,6 +107,8 @@ set(CLUSTER_SRCS
     "${CHIP_ROOT}/src/app/clusters/general-commissioning-server/GeneralCommissioningCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/groupcast/GroupcastCluster.cpp"
+    "${CHIP_ROOT}/src/app/clusters/groupcast/GroupcastLogic.cpp"
     "${CHIP_ROOT}/src/app/clusters/groups-server/GroupsCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/identify-server/IdentifyCluster.cpp"
     "${CHIP_ROOT}/src/app/clusters/level-control/LevelControlCluster.cpp"
