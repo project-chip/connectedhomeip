@@ -30,6 +30,9 @@ namespace chip::app::Clusters {
 
 namespace {
 
+static constexpr uint32_t kMinKeepActiveTimeoutMs = 30 * 1000;
+static constexpr uint32_t kMaxKeepActiveTimeoutMs = 3600 * 1000;
+
 // TODO: These should come from the metadata
 constexpr size_t kNodeLabelMaxLength = 32;
 
@@ -210,6 +213,8 @@ BridgedDeviceBasicInformationCluster::InvokeCommand(const DataModel::InvokeReque
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
         VerifyOrReturnError(mClusterContext.icdDelegate != nullptr, Status::UnsupportedCommand);
+        VerifyOrReturnError(commandData.timeoutMs >= kMinKeepActiveTimeoutMs, Status::ConstraintError);
+        VerifyOrReturnError(commandData.timeoutMs <= kMaxKeepActiveTimeoutMs, Status::ConstraintError);
         return mClusterContext.icdDelegate->OnKeepActive(commandData);
     }
     default:

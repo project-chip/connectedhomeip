@@ -255,6 +255,29 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     EXPECT_EQ(delegate.mLastKeepActiveRequest.timeoutMs, 30000u);
 }
 
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandTimeoutDomain)
+{
+    TestBridgedDeviceIcdDelegate delegate;
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {},
+                                                 { .delegate = mDelegate, .icdDelegate = &delegate });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    constexpr uint32_t kInvalidTimeouts[] = { 123, 100000000 };
+
+    for (uint32_t timeoutMs : kInvalidTimeouts)
+    {
+        Commands::KeepActive::Type request;
+        request.stayActiveDuration = 1000;
+        request.timeoutMs          = timeoutMs;
+
+        auto response = tester.Invoke<Commands::KeepActive::Type>(request);
+        EXPECT_FALSE(response.IsSuccess());
+        EXPECT_EQ(response.status, Status::ConstraintError);
+        EXPECT_EQ(delegate.mOnKeepActiveCalled, 0u);
+    }
+}
+
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestReachableChangedEvent)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "event-dev", .reachable = false }, {},
