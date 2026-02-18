@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import numpy as np
 
 from mobly import asserts
 import matter.clusters as Clusters
@@ -45,7 +46,6 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-import numpy as np
 min_value_uint8 = np.iinfo(np.uint8).min
 max_value_uint8 = np.iinfo(np.uint8).max
 min_value_uint16 = np.iinfo(np.uint16).min
@@ -96,9 +96,6 @@ class TC_ACS_2_1(MatterBaseTest):
         cluster = Clusters.AmbientContextSensing
         attr = Clusters.AmbientContextSensing.Attributes
 
-        attribute_list = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AttributeList)
-
         self.step("1")
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations
@@ -117,7 +114,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
             )
             log.info(f"Rx'd HumanActivityDetected: {humanActivityDetected}")
-            asserts.assert_true(humanActivityDetected == True | humanActivityDetected == False,
+            asserts.assert_true(humanActivityDetected is True | humanActivityDetected is False,
                                 "Expected True or False Boolean value.")
         else:
             log.info("HumanActivity Feature not supported. Test steps skipped")
@@ -129,7 +126,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
             )
             log.info(f"Rx'd ObjectIdentified: {objectIdentified}")
-            asserts.assert_true(objectIdentified == True | objectIdentified == False,
+            asserts.assert_true(objectIdentified is True | objectIdentified is False,
                                 "Expected True or False Boolean value.")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
@@ -141,7 +138,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
             )
             log.info(f"Rx'd AudioContextDetected: {audioContextDetected}")
-            asserts.assert_true(audioContextDetected == True | audioContextDetected == False,
+            asserts.assert_true(audioContextDetected is True | audioContextDetected is False,
                                 "Expected True or False Boolean value.")
         else:
             log.info("SoundIdentification Feature not supported. Test steps skipped")
@@ -211,7 +208,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountReached
             )
             log.info(f"Rx'd ObjectCountReached: {objectCountReached}")
-            asserts.assert_true(objectCountReached == True | objectCountReached == False,
+            asserts.assert_true(objectCountReached is True | objectCountReached is False,
                                 "Expected True or False Boolean value.")
         else:
             log.info("Object Counting & Object Identification Feature not supported. Test steps skipped")
@@ -328,7 +325,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 self.step("13b")
                 # CrowdDetected
                 log.info(f"Rx'd CrowdDetected: {predictedActivity.crowdDetected}")
-                asserts.assert_true(predictedActivity.crowdDetected == True | predictedActivity.crowdDetected == False, "Expected True or False Boolean value.")
+                asserts.assert_true(predictedActivity.crowdDetected is True | predictedActivity.crowdDetected is False, "Expected True or False Boolean value.")
 
                 # CrowdCount
                 if "crowdCount" in predictedActivity:
@@ -346,3 +343,4 @@ class TC_ACS_2_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
