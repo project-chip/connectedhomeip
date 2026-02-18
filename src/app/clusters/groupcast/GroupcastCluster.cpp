@@ -28,6 +28,13 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
+void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    DefaultServerCluster::Shutdown(shutdownType);
+    mContext = nullptr;
+    mLogic.SetDataModelProvider(nullptr);
+}
+
 DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                               AttributeValueEncoder & encoder)
 {

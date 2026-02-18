@@ -40,6 +40,7 @@ public:
     virtual ~GroupcastCluster() {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

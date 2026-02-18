@@ -118,7 +118,7 @@ struct TestGroupcastCluster : public ::testing::Test
         ASSERT_EQ(mProvider.Init(), CHIP_NO_ERROR);
 
         // Replace the DataModel Provider in the ServerClusterContext provided to the cluster implementation
-        // By our Mock DataModel Providerso we can test endpoints validations on JoinGroup command.
+        // with our Mock DataModel Provider so we can test endpoints validations on JoinGroup command.
         ServerClusterContext context = mTestContext.Get();
         clusterContext               = std::make_unique<ServerClusterContext>(ServerClusterContext{
                           .provider           = customDataModel,
