@@ -143,8 +143,9 @@ jobs:
             - name: Build example Telink (W91) Lighting App with OTA, Factory Data
               # Run test for master and all PRs
               #
-              # TODO: logging is DISABLED here because with logging this runs out of flash
-              #       this is generally NOT expected/intentional.
+              # TODO: full logging is not enabled here; logging is reduced to progress/error
+              #       (via the *-log-progress target) because with full logging this runs
+              #       out of flash. This is generally NOT expected/intentional.
               #       At the time this was checked:
               #         - a 4K flash increase occurred due to the group cast cluster
               #         - flash runs out by about 1.2K
