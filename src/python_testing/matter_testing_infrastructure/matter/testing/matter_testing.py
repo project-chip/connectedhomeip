@@ -1580,7 +1580,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         start_time = time.time()
         while os.path.exists(restart_flag_file):
             if time.time() - start_time > timeout_sec:
-                asserts.fail("App %s did not complete within timeout (flag file still exists)" % restart_flag_text)
+                asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
             await asyncio.sleep(0.1)
 
 
