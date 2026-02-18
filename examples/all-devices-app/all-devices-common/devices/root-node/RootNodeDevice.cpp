@@ -19,6 +19,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/groupcast/GroupcastCluster.h>
+#include <app/clusters/groupcast/GroupcastContext.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -93,6 +95,14 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     });
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
+    mGroupcastCluster.Create(
+        GroupcastContext{
+            .fabricTable       = mContext.fabricTable,
+            .groupDataProvider = mContext.groupDataProvider,
+        },
+        BitFlags<Groupcast::Feature>{ Groupcast::Feature::kListener });
+    ReturnErrorOnFailure(provider.AddCluster(mGroupcastCluster.Registration()));
+
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsServerCluster::OptionalAttributeSet{},
                                              mContext.diagnosticDataProvider);
     ReturnErrorOnFailure(provider.AddCluster(mSoftwareDiagnosticsServerCluster.Registration()));
@@ -126,45 +136,52 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
-    if (mBasicInformationCluster.IsConstructed())
+
+    // De-init in reverse order as init, in case there were data dependencies.
+    if (mOperationalCredentialsCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mBasicInformationCluster.Cluster()));
-        mBasicInformationCluster.Destroy();
-    }
-    if (mGeneralCommissioningCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster()));
-        mGeneralCommissioningCluster.Destroy();
-    }
-    if (mAdministratorCommissioningCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster()));
-        mAdministratorCommissioningCluster.Destroy();
-    }
-    if (mGeneralDiagnosticsCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster()));
-        mGeneralDiagnosticsCluster.Destroy();
-    }
-    if (mGroupKeyManagementCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster()));
-        mGroupKeyManagementCluster.Destroy();
-    }
-    if (mSoftwareDiagnosticsServerCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster()));
-        mSoftwareDiagnosticsServerCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
+        mOperationalCredentialsCluster.Destroy();
     }
     if (mAccessControlCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mAccessControlCluster.Cluster()));
         mAccessControlCluster.Destroy();
     }
-    if (mOperationalCredentialsCluster.IsConstructed())
+    if (mSoftwareDiagnosticsServerCluster.IsConstructed())
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mOperationalCredentialsCluster.Cluster()));
-        mOperationalCredentialsCluster.Destroy();
+        LogErrorOnFailure(provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster()));
+        mSoftwareDiagnosticsServerCluster.Destroy();
+    }
+    if (mGroupcastCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupcastCluster.Cluster()));
+        mGroupcastCluster.Destroy();
+    }
+    if (mGroupKeyManagementCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster()));
+        mGroupKeyManagementCluster.Destroy();
+    }
+    if (mGeneralDiagnosticsCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralDiagnosticsCluster.Cluster()));
+        mGeneralDiagnosticsCluster.Destroy();
+    }
+    if (mAdministratorCommissioningCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mAdministratorCommissioningCluster.Cluster()));
+        mAdministratorCommissioningCluster.Destroy();
+    }
+    if (mGeneralCommissioningCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mGeneralCommissioningCluster.Cluster()));
+        mGeneralCommissioningCluster.Destroy();
+    }
+    if (mBasicInformationCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mBasicInformationCluster.Cluster()));
+        mBasicInformationCluster.Destroy();
     }
 }
 

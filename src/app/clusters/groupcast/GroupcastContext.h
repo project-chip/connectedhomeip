@@ -25,8 +25,8 @@ namespace Clusters {
 
 struct GroupcastContext
 {
-    chip::FabricTable & fabrics;
-    chip::Credentials::GroupDataProvider & provider;
+    chip::FabricTable & fabricTable;
+    chip::Credentials::GroupDataProvider & groupDataProvider;
 };
 
 } // namespace Clusters
