@@ -13,6 +13,7 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
+if(CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION)
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
@@ -22,6 +23,12 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/scenes-server.h"
+)
+endif()
+
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
 
     # these below would be pulled by GN (.gni file) dependency. CMAKE needs these directly
     "${CLUSTER_DIR}/AttributeValuePairValidator.h"
