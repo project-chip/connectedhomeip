@@ -33,6 +33,8 @@
 #include <platform/Linux/FilesystemStorageLocationProvider.h>
 #include <platform/Linux/PosixConfig.h>
 
+#include <filesystem>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -107,10 +109,9 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
 CHIP_ERROR PosixConfig::Init()
 {
-    std::string fn = chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation();
-    fn += "/";
-    fn += CHIP_DEFAULT_DATA_FILENAME;
-    return PersistedStorage::KeyValueStoreMgrImpl().Init(fn.c_str());
+    std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetKVSDataLocation());
+    path /= CHIP_DEFAULT_DATA_FILENAME;
+    return PersistedStorage::KeyValueStoreMgrImpl().Init(path.c_str());
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
@@ -490,24 +491,24 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
 
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
     {
-        storage        = &gChipLinuxFactoryStorage;
-        std::string fn = chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetFactoryDataLocation();
-        fn += "/chip_factory.ini";
+        storage = &gChipLinuxFactoryStorage;
+        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetFactoryDataLocation());
+        path /= "/chip_factory.ini";
         err = storage->Init(fn.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
-        storage        = &gChipLinuxConfigStorage;
-        std::string fn = chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetConfigDataLocation();
-        fn += "/chip_config.ini";
-        err = storage->Init(fn.c_str());
+        storage = &gChipLinuxConfigStorage;
+        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetConfigDataLocation());
+        path /= "/chip_config.ini";
+        err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
-        storage        = &gChipLinuxCountersStorage;
-        std::string fn = chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetCountersDataLocation();
-        fn += "/chip_counters.ini";
-        err = storage->Init(fn.c_str());
+        storage = &gChipLinuxCountersStorage;
+        std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetCountersDataLocation());
+        path /= "/chip_counters.ini";
+        err = storage->Init(path.c_str());
     }
 
     SuccessOrExit(err);

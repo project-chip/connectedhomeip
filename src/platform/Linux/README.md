@@ -58,7 +58,7 @@ code will have parallels in any new adaptation.
 -   Class API specifically designed to work in conjunction with the
     GenericConfigurationManagerImpl<> class.
 
-`platform/Linux/StorageBackend.cpp`
+`platform/Linux/CHIPLinuxStorage.cpp`
 
 -   Provides services to PosixConfig
 -   Controls datastore used to store KV pairs (file system, database, etc.)
