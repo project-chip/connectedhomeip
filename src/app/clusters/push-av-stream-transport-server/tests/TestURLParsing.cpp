@@ -22,10 +22,13 @@
 #include <uriparser/Uri.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
@@ -135,13 +138,22 @@ public:
 class TestValidateUrl : public ::testing::Test
 {
 public:
+    TestValidateUrl() : mServer{ 1, BitFlags<Feature>(1) }, mClusterTester(mServer) {}
+
     void SetUp() override
     {
         CHIP_ERROR err = chip::Platform::MemoryInit();
         assert(err == CHIP_NO_ERROR);
+
+        ASSERT_EQ(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage), CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
     }
 
-    void TearDown() override { chip::Platform::MemoryShutdown(); }
+    void TearDown() override
+    {
+        app::SetSafeAttributePersistenceProvider(nullptr);
+        chip::Platform::MemoryShutdown();
+    }
 
     TransportOptionsDecodableStruct CreateTransportOptionsWithUrl(const std::string & urlInput, const std::string & trackName)
     {
@@ -172,7 +184,6 @@ public:
 
     bool TestUrlValidation(const std::string & urlInput, bool shouldSucceed)
     {
-        PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
         TestValidateUrlDelegate mockDelegate;
         TestValidateUrlTLSDelegate tlsClientManagementDelegate;
 
@@ -185,10 +196,11 @@ public:
         std::string trackName        = "test-track";
         commandData.transportOptions = CreateTransportOptionsWithUrl(url, trackName);
 
-        server.GetLogic().SetDelegate(&mockDelegate);
-        server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+        mServer.GetLogic().SetDelegate(&mockDelegate);
+        mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+        EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
 
-        auto result = server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
+        auto result = mServer.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData);
 
         // HandleAllocatePushTransport always returns std::nullopt.
         // On success, it sets a response via the handler.
@@ -200,11 +212,34 @@ public:
 
         if (shouldSucceed)
         {
-            return commandHandler.HasResponse();
+            EXPECT_TRUE(commandHandler.HasResponse());
+            // Call deallocate to remove the allocated transport for cleanup
+            ConcreteCommandPath kDeallocateCommandPath{ 1, Clusters::PushAvStreamTransport::Id,
+                                                        Commands::DeallocatePushTransport::Id };
+            Commands::DeallocatePushTransport::DecodableType deallocateCommandData;
+
+            // Decode response using MockCommandHandler helper
+            Commands::AllocatePushTransportResponse::DecodableType decodedResponse;
+            CHIP_ERROR err = commandHandler.DecodeResponse(decodedResponse);
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+            deallocateCommandData.connectionID = decodedResponse.transportConfiguration.connectionID;
+
+            EXPECT_EQ(
+                mServer.GetLogic().HandleDeallocatePushTransport(commandHandler, kDeallocateCommandPath, deallocateCommandData),
+                std::nullopt);
+
+            EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+
+            return true;
         }
 
         return commandHandler.HasStatus();
     }
+
+protected:
+    PushAvStreamTransportServer mServer;
+    chip::Testing::ClusterTester mClusterTester;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestUriExtractionHelpers, ExtractTextRange_ValidRange)

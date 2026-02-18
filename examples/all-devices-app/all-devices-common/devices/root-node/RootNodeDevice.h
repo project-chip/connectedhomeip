@@ -16,6 +16,9 @@
  */
 #pragma once
 
+#include <app/DeviceLoadStatusProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
@@ -23,15 +26,14 @@
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
-#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
+#include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
-#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
-#include <platform/NetworkCommissioning.h>
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace app {
@@ -45,17 +47,28 @@ public:
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::DeviceControlServer & deviceControlServer;
         FabricTable & fabricTable;
-        FailSafeContext & failsafeContext;
+        Access::AccessControl & accessControl;
+        PersistentStorageDelegate & persistentStorage;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::PlatformManager & platformManager;
         Credentials::GroupDataProvider & groupDataProvider;
         SessionManager & sessionManager;
         DnssdServer & dnssdServer;
-
+        DeviceLoadStatusProvider & deviceLoadStatusProvider;
+        DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
+        TestEventTriggerDelegate * testEventTriggerDelegate;
+        Credentials::DeviceAttestationCredentialsProvider & dacProvider;
+        EventManagement & eventManagement;
+        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 
+    RootNodeDevice(const Context & context) :
+        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
+    {}
     ~RootNodeDevice() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -63,48 +76,20 @@ public:
     void UnRegister(CodeDrivenDataModelProvider & provider) override;
 
 protected:
-    // Most implementations require network commissioning, so only subclasses have access to this.
-    RootNodeDevice(const Context & context) :
-        SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)), mContext(context)
-    {}
+    Context mContext;
+
     LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
-    Context mContext;
-
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;
     LazyRegisteredServerCluster<Clusters::GroupKeyManagementCluster> mGroupKeyManagementCluster;
+    LazyRegisteredServerCluster<Clusters::GroupcastCluster> mGroupcastCluster;
     LazyRegisteredServerCluster<Clusters::SoftwareDiagnosticsServerCluster> mSoftwareDiagnosticsServerCluster;
     LazyRegisteredServerCluster<Clusters::AccessControlCluster> mAccessControlCluster;
     LazyRegisteredServerCluster<Clusters::OperationalCredentialsCluster> mOperationalCredentialsCluster;
-};
-
-class WifiRootNodeDevice : public RootNodeDevice
-{
-public:
-    struct WifiContext
-    {
-        DeviceLayer::NetworkCommissioning::WiFiDriver & wifiDriver;
-    };
-
-    WifiRootNodeDevice(const Context & context, const WifiContext & wifiContext) :
-        RootNodeDevice(context), mWifiContext(wifiContext)
-    {}
-
-    ~WifiRootNodeDevice() override = default;
-
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
-    void UnRegister(CodeDrivenDataModelProvider & provider) override;
-
-private:
-    WifiContext mWifiContext;
-
-    LazyRegisteredServerCluster<Clusters::NetworkCommissioningCluster> mNetworkCommissioningCluster;
-    LazyRegisteredServerCluster<Clusters::WiFiDiagnosticsServerCluster> mWifiDiagnosticsCluster;
 };
 
 } // namespace app

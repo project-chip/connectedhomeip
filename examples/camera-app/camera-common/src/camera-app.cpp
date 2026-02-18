@@ -19,6 +19,7 @@
 #include "data-model-providers/codegen/CodegenDataModelProvider.h"
 #include "tls-certificate-management-instance.h"
 #include "tls-client-management-instance.h"
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
@@ -277,7 +278,8 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
-    mAVStreamMgmtServer.Create(mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs,
+    mAVStreamMgmtServer.Create(CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
+                               mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs,
                                maxConcurrentVideoEncoders, maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport,
                                rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities, spkrCapabilities,
                                twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
@@ -339,6 +341,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
         ChipLogError(Camera, "CameraAVStreamMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     mAVStreamMgmtServer.Destroy();
+
+    err = CodegenDataModelProvider::Instance().Registry().Unregister(&mAVSettingsUserLevelMgmtServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "CameraAVSettingsUserLevelMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mAVSettingsUserLevelMgmtServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

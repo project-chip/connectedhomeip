@@ -151,7 +151,7 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestorCluster.cpp
     ${chip_dir}/examples/platform/realtek/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
