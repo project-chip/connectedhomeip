@@ -318,7 +318,6 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
     return true;
 }
 
-
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     NPercent percent;
