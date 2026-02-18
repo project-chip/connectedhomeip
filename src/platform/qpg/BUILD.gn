@@ -18,7 +18,7 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "qpg")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -63,7 +63,7 @@ static_library("qpg") {
 
   public_configs = []
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
     public_configs += [

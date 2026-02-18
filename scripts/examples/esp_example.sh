@@ -35,7 +35,7 @@ if [ "$app" = "camera-app" ]; then
     export KVS_SDK_PATH="$PWD/third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"
 fi
 
-supported_idf_target=("esp32" "esp32c3" "esp32c2" "esp32c6" "esp32s3" "esp32h2")
+supported_idf_target=("esp32" "esp32c3" "esp32c2" "esp32c6" "esp32s3" "esp32h2" "esp32p4")
 
 if [ -z "$idf_target" ] || [[ ! "${supported_idf_target[*]}" =~ "$idf_target" ]]; then
     idf_target="esp32"

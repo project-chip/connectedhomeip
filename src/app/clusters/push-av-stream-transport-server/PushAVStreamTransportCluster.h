@@ -40,13 +40,15 @@ public:
      * and used by the interaction model.
      *
      * @param aEndpointId The endpoint on which this cluster exists (must match zap configuration)
-     * @param aFeatures   Bitflags indicating which features are supported by this instance
+     * @param aFeatures   BitFlags indicating which features are supported by this instance
      *
      * @note The caller must ensure the delegate lives throughout the instance's lifetime
      */
     PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
         DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mLogic(aEndpointId, aFeatures)
-    {}
+    {
+        mLogic.SetCluster(this);
+    }
 
     PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
 
@@ -65,6 +67,8 @@ public:
     {
         mLogic.SetTLSCertificateManagementDelegate(delegate);
     }
+
+    void ReportAttributeChange(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
 
     /**
      * @brief API for application layer to notify when transport has started

@@ -290,13 +290,16 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struc
 {
     err_t lwipErr = ERR_OK;
     otError otErr;
-    otMessage * pktMsg                  = NULL;
-    const otMessageSettings msgSettings = { true, OT_MESSAGE_PRIORITY_NORMAL };
+    otMessage * pktMsg            = NULL;
+    otMessageSettings msgSettings = {};
     uint16_t remainingLen;
 
     // Lock the OpenThread stack.
     // Note that at this point the LwIP core lock is also held.
     ThreadStackMgrImpl().LockThreadStack();
+
+    msgSettings.mLinkSecurityEnabled = otThreadGetDeviceRole(ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_DISABLED;
+    msgSettings.mPriority            = OT_MESSAGE_PRIORITY_NORMAL;
 
     // Allocate an OpenThread message
     pktMsg = otIp6NewMessage(ThreadStackMgrImpl().OTInstance(), &msgSettings);
