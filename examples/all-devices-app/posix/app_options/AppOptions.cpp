@@ -77,7 +77,7 @@ bool AppOptions::ParseDeviceConfig(const char * value, DeviceConfig & config)
     const char * colonPos = strchr(value, ':');
     if (colonPos != nullptr)
     {
-        config.type.assign(value, colonPos - value);
+        config.type.assign(value, static_cast<size_t>(colonPos - value));
 
         if (!ParseEndpointId(colonPos + 1, config.endpoint))
         {
