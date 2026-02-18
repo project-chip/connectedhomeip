@@ -245,7 +245,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     # Remove app config and storage if factory reset is requested
     if factory_reset or factory_reset_app_only:
         reset_type = FactoryResetType.AppAndController if factory_reset else FactoryResetType.AppOnly
-        factory_reset_config_removal(reset_type, app_args, script_args)
+        factory_reset_config_removal(app_args, script_args, reset_type)
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
@@ -371,13 +371,13 @@ def monitor_app_restart_requests(
         with open(restart_flag_file, 'r') as f:
             flag_file_content = f.read().strip()
 
-      
         # Determine reset type and remove app/ctrl config and storage
         if flag_file_content == "factory reset":
             reset_type = FactoryResetType.AppAndController
+            factory_reset_config_removal(config.app_args, config.script_args, reset_type)
         elif flag_file_content == "factory reset app only":
             reset_type = FactoryResetType.AppOnly
-        factory_reset_config_removal(reset_type, config.app_args, config.script_args)
+            factory_reset_config_removal(config.app_args, config.script_args, reset_type)
 
         # Restart the app
         log.info("Restarting app '%s'...", config.app)
@@ -403,8 +403,8 @@ class FactoryResetType(enum.Enum):
     def config_files(self, app_args: str, script_args: str) -> typing.Generator[str, None, None]:
         """Yield paths of config/storage files to remove for this reset type."""
 
-        # App config files and KVS
-        yield from glob.glob('/tmp/chip*')
+        # App config files and KVS, exclude restart flag file
+        yield from (f for f in glob.glob('/tmp/chip*') if not os.path.basename(f).startswith('chip_test_restart_app'))
         yield from glob.glob('/tmp/repl*')
 
         if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
@@ -416,7 +416,7 @@ class FactoryResetType(enum.Enum):
                 yield match.group("path")
 
 
-def factory_reset_config_removal(reset_type: FactoryResetType, app_args: str, script_args: str):
+def factory_reset_config_removal(app_args: str, script_args: str, reset_type: FactoryResetType = None):
     """Handles app factory reset requests by removing configuration and storage files."""
     for path in reset_type.config_files(app_args, script_args):
         log.info("Removing config/storage file, path: '%s'...", path)
