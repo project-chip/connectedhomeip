@@ -36,9 +36,10 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import numpy as np
 
+import numpy as np
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterBaseTest
