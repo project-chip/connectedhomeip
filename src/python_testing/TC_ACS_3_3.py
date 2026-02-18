@@ -35,16 +35,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import time
-import asyncio
-import numpy as np
 
+import numpy as np
 from mobly import asserts
+
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, AttributeValue
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest 
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -129,7 +130,7 @@ class TC_ACS_3_3(MatterBaseTest):
                      "Verify that the value of HoldTime attribute is the input value from 8b.")
         ]
     # Sends and out-of-band command to the all-clusters-app
-    
+
     def write_to_app_pipe(self, command):
         # CI app pipe id creation
         self.app_pipe = "/tmp/acs_fifo_"
@@ -563,7 +564,3 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-
-
-
