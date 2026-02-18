@@ -18,6 +18,7 @@
 
 #include "JFADatastoreSync.h"
 #include "JFAManager.h"
+#include "AppOptions.h"
 #include "rpc/RpcServer.h"
 #include <AppMain.h>
 
@@ -120,7 +121,7 @@ int main(int argc, char * argv[])
 {
     LinuxDeviceOptions::GetInstance().rpcServerPort = RPC_SERVER_PORT;
 
-    if (ChipLinuxAppInit(argc, argv) != 0)
+    if (ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) != 0)
     {
         return -1;
     }
