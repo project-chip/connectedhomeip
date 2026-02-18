@@ -60,7 +60,6 @@ log = logging.getLogger(__name__)
 
 class TC_JFPKI_2_4(MatterBaseTest):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
-    _GENERAL_COMMISSIONING_ENDPOINT = 0
     _MIN_COMMISSIONING_TIMEOUT = 60
     _DEFAULT_OJCW_TIMEOUT = 60
     # TODO: Seems like the OJCW Discriminator should be randomized, but the test plan explicitly requires this number.
