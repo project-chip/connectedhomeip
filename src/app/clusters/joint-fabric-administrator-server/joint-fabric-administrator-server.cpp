@@ -203,19 +203,20 @@ void JointFabricAdministratorGlobalInstance::HandleOJCW(HandlerContext & ctx,
     VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCodeEnum::kBusy));
 
     VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCodeEnum::kBusy));
-    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
-    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCodeEnum::kPAKEParameterError));
-    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
-    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, globalStatus = Status::InvalidCommand);
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, globalStatus = Status::InvalidCommand);
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, globalStatus = Status::InvalidCommand);
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, globalStatus = Status::InvalidCommand);
 
     VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(), globalStatus = Status::InvalidCommand);
     VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(), globalStatus = Status::InvalidCommand);
     VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = Status::InvalidCommand);
 
-    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, status.Emplace(StatusCodeEnum::kPAKEParameterError));
+    VerifyOrExit(pakeVerifier.size() == kSpake2p_VerifierSerialized_Length, globalStatus = Status::InvalidCommand);
+    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, globalStatus = Status::InvalidCommand);
     VerifyOrExit(commissionMgr.OpenJointCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
                                                             fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
-                 status.Emplace(StatusCodeEnum::kPAKEParameterError));
+                 globalStatus = Status::InvalidCommand);
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
 exit:

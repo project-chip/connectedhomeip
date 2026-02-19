@@ -54,8 +54,8 @@ public:
 
         gServer.Create(
             GroupcastContext{
-                .fabrics  = Server::GetInstance().GetFabricTable(),
-                .provider = *groupDataProvider,
+                .fabricTable       = Server::GetInstance().GetFabricTable(),
+                .groupDataProvider = *groupDataProvider,
             },
             BitFlags<Groupcast::Feature>(featureMap));
         return gServer.Registration();
