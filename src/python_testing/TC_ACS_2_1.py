@@ -185,8 +185,10 @@ class TC_ACS_2_1(MatterBaseTest):
 
             if "detectionStartTime" in ambientContextType:
                 self.step("5a")
-                asserts.assert_less_equal(min_value_uint32, ambientContextType.detectionStartTime, "DetectionStartTime is not uint32.")
-                asserts.assert_less_equal(ambientContextType.detectionStartTime, max_value_uint32, "DetectionStartTime is not uint32.")
+                asserts.assert_less_equal(min_value_uint32, ambientContextType.detectionStartTime,
+                                          "DetectionStartTime is not uint32.")
+                asserts.assert_less_equal(ambientContextType.detectionStartTime, max_value_uint32,
+                                          "DetectionStartTime is not uint32.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
@@ -199,7 +201,7 @@ class TC_ACS_2_1(MatterBaseTest):
             )
             log.info(f"Rx'd AmbientContextTypeSupported: {ambientContextTypeSupported}")
             asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
-                                "AmbientContextTypeSupported should be less than equalt to 50.")
+                                      "AmbientContextTypeSupported should be less than equalt to 50.")
 
             for acts in ambientContextTypeSupported:
                 nsID = acts.namespaceID
@@ -244,11 +246,13 @@ class TC_ACS_2_1(MatterBaseTest):
             log.info(f"Rx'd ObjectCountConfig: {objectCountConfig}")
             asserts.assert_equal(nsID, OBJECTIDENTIFICATIONNAMESPACEID, "Not Identified Object Namespace ID")
             asserts.assert_less_equal(tagID, OBJECTIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
-            
+
             # ObjectCountThreshold should be uint16
             asserts.assert_true((type(objectCountConfig.objectCountThreshold) is int), "Threshold value should be uint16 data.")
-            asserts.assert_less_equal(min_value_uint16, objectCountConfig.objectCountThreshold, "Threshold value should be uint16 data.")
-            asserts.assert_less_equal(objectCountConfig.objectCountThreshold, max_value_uint16, "Threshold value should be uint16 data.")
+            asserts.assert_less_equal(min_value_uint16, objectCountConfig.objectCountThreshold,
+                                      "Threshold value should be uint16 data.")
+            asserts.assert_less_equal(objectCountConfig.objectCountThreshold, max_value_uint16,
+                                      "Threshold value should be uint16 data.")
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
             self.skip_step("8")
@@ -259,8 +263,10 @@ class TC_ACS_2_1(MatterBaseTest):
             # ObjectCount should be uint16
             if "objectCount" in objectCountConfig:
                 asserts.assert_true((type(objectCountConfig.objectCount) is int), "ObjectCount value should be uint16 data.")
-                asserts.assert_less_equal(min_value_uint16, objectCountConfig.objectCount, "ObjectCount value should be uint16 data.")
-                asserts.assert_less_equal(objectCountConfig.objectCount, max_value_uint16, "ObjectCount value should be uint16 data.")
+                asserts.assert_less_equal(min_value_uint16, objectCountConfig.objectCount,
+                                          "ObjectCount value should be uint16 data.")
+                asserts.assert_less_equal(objectCountConfig.objectCount, max_value_uint16,
+                                          "ObjectCount value should be uint16 data.")
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
             self.skip_step("9")
@@ -283,14 +289,16 @@ class TC_ACS_2_1(MatterBaseTest):
         self.step("12")
         log.info(f"Rx'd HoldTimeLimits: {holdTimeLimits}")
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, 1,
-                            "Expected HoldTimeMin to be greater than equal to 1.")
+                                  "Expected HoldTimeMin to be greater than equal to 1.")
 
         minformax = max(holdTimeLimits.holdTimeMin, 10)
-        sserts.assert_less_equal(holdTimeLimits.holdTimeMax, minformax,
-                            "Expected HoldTimeMax to be greater than equal to max(holdTimeLimits.holdTimeMin, 10).")
+        asserts.assert_less_equal(holdTimeLimits.holdTimeMax, minformax,
+                                  "Expected HoldTimeMax to be greater than equal to max(holdTimeLimits.holdTimeMin, 10).")
 
-        asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTimeLimits.holdTimeDefault, "Expected to be between HoldTimeMin and HoldTimeMax.")
-        asserts.assert_less_equal(holdTimeLimits.holdTimeDefault, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTimeLimits.holdTimeDefault,
+                                  "Expected to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTimeLimits.holdTimeDefault, holdTimeLimits.holdTimeMax,
+                                  "Expected to be between HoldTimeMin and HoldTimeMax.")
 
         if self.PredictedActivitySupported:
             self.step("13")
@@ -313,9 +321,9 @@ class TC_ACS_2_1(MatterBaseTest):
 
             # Confidence
             asserts.assert_less_equal(0, predictedActivity.confidence,
-                                "Expected the percentage to be between 0 and 100.")
+                                      "Expected the percentage to be between 0 and 100.")
             asserts.assert_less_equal(predictedActivity.confidence, 100,
-                                "Expected the percentage to be between 0 and 100.")
+                                      "Expected the percentage to be between 0 and 100.")
 
             if self.HumanActivitySupported | self.ObjectIdentificationSupported | self.SoundIdentificationSupported:
                 self.step("13a")
@@ -334,7 +342,7 @@ class TC_ACS_2_1(MatterBaseTest):
                     if self.ObjectIdentificationSupported:
                         asserts.assert_equal(nsID, OBJECTIDENTIFICATIONNAMESPACEID, "Not Identified Object Namespace ID")
                         asserts.assert_less_equal(tagID, OBJECTIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
-    
+
                     if self.SoundIdentificationSupported:
                         asserts.assert_equal(nsID, SOUNDIDENTIFICATIONNAMESPACEID, "Not Identifid Sound Namespace ID")
                         asserts.assert_less_equal(tagID, SOUNDIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
@@ -352,8 +360,10 @@ class TC_ACS_2_1(MatterBaseTest):
                 # CrowdCount
                 if "crowdCount" in predictedActivity:
                     log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
-                    asserts.assert_less_equal(min_value_uint8, predictedActivity.crowdCount, "CrowdCount is expected to be between 1 and 254.")
-                    asserts.assert_less_equal(predictedActivity.crowdCount, max_value_uint8, "CrowdCount is expected to be between 1 and 254.")
+                    asserts.assert_less_equal(min_value_uint8, predictedActivity.crowdCount,
+                                              "CrowdCount is expected to be between 1 and 254.")
+                    asserts.assert_less_equal(predictedActivity.crowdCount, max_value_uint8,
+                                              "CrowdCount is expected to be between 1 and 254.")
             else:
                 log.info("Test step 13b skipped")
                 self.skip_step("13b")
@@ -367,3 +377,4 @@ class TC_ACS_2_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
