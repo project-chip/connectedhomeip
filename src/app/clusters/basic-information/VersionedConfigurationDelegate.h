@@ -24,7 +24,7 @@ namespace chip::app::Clusters {
 /// to such a version.
 ///
 /// For example BasicInformationCluster may increase a global configuration version and
-/// will notifyg when suche a configuration change occurs.
+/// will notify when such a configuration change occurs.
 class VersionedConfigurationDelegate
 {
 public:
