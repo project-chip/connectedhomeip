@@ -59,6 +59,50 @@ Delegate * GetDelegate(EndpointId endpoint)
         emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kWindowCoveringDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
+
+/*
+ * ConvertValue: Converts values from one range to another
+ * Range In  -> from  inputLowValue to   inputHighValue
+ * Range Out -> from outputLowValue to outputtHighValue
+ */
+uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
+                      uint16_t value)
+{
+    uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
+    uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
+
+    if (inputLowValue > inputHighValue)
+    {
+        inputMin = inputHighValue;
+        inputMax = inputLowValue;
+    }
+
+    if (outputLowValue > outputHighValue)
+    {
+        outputMin = outputHighValue;
+        outputMax = outputLowValue;
+    }
+
+    inputRange  = static_cast<uint16_t>(inputMax - inputMin);
+    outputRange = static_cast<uint16_t>(outputMax - outputMin);
+
+    if (value < inputMin)
+    {
+        return outputMin;
+    }
+
+    if (value > inputMax)
+    {
+        return outputMax;
+    }
+
+    if (inputRange > 0)
+    {
+        return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
+    }
+
+    return outputMax;
+}
 } // namespace
 
 namespace chip {
@@ -316,6 +360,11 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
     }
 
     return true;
+}
+
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
+{
+    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
