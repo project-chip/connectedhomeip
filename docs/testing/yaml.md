@@ -450,7 +450,8 @@ full list):
 -   `bridge`
 -   `closure`
 -   `energy-gateway`
--   `energy-management`
+-   `evse`
+-   `water-heater`
 -   `fabric-sync`
 -   `lit-icd`
 -   `lock`

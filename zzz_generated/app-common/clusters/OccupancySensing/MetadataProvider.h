@@ -33,6 +33,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OccupancySen
             return HoldTime::kMetadataEntry;
         case HoldTimeLimits::Id:
             return HoldTimeLimits::kMetadataEntry;
+        case PredictedOccupancy::Id:
+            return PredictedOccupancy::kMetadataEntry;
         case PIROccupiedToUnoccupiedDelay::Id:
             return PIROccupiedToUnoccupiedDelay::kMetadataEntry;
         case PIRUnoccupiedToOccupiedDelay::Id:

@@ -92,9 +92,8 @@ private:
     void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * scanInfo);
     CHIP_ERROR StartScanImpl();
 
-    int CreateLEScanFilter(ScanFilterType filterType);
-    int RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
-    int SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    CHIP_ERROR RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    CHIP_ERROR SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
     void UnRegisterScanFilter();
 
     ChipDeviceScannerDelegate * mDelegate;

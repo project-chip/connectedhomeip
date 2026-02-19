@@ -165,6 +165,7 @@ public:
 class MockGroupDataProvider : public GroupDataProvider
 {
 public:
+    MockGroupDataProvider() : GroupDataProvider(0, 0) {}
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
     void Finish() override {}
     CHIP_ERROR SetGroupInfo(FabricIndex, const GroupInfo &) override { return CHIP_NO_ERROR; }
@@ -177,9 +178,15 @@ public:
     CHIP_ERROR AddEndpoint(FabricIndex, GroupId, EndpointId) override { return CHIP_NO_ERROR; }
     CHIP_ERROR RemoveEndpoint(FabricIndex, GroupId, EndpointId) override { return CHIP_NO_ERROR; }
     CHIP_ERROR RemoveEndpoint(FabricIndex, EndpointId) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id) override { return CHIP_NO_ERROR; }
     GroupInfoIterator * IterateGroupInfo(FabricIndex) override { return nullptr; }
     EndpointIterator * IterateEndpoints(FabricIndex, std::optional<GroupId>) override { return nullptr; }
+    CHIP_ERROR SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id) override { return CHIP_NO_ERROR; }
     CHIP_ERROR SetGroupKeyAt(FabricIndex, size_t, const GroupKey &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id) override
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
     CHIP_ERROR GetGroupKeyAt(FabricIndex, size_t, GroupKey &) override { return CHIP_ERROR_NOT_FOUND; }
     CHIP_ERROR RemoveGroupKeyAt(FabricIndex, size_t) override { return CHIP_NO_ERROR; }
     CHIP_ERROR RemoveGroupKeys(FabricIndex) override { return CHIP_NO_ERROR; }
@@ -192,6 +199,8 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex) override { return CHIP_NO_ERROR; }
     GroupSessionIterator * IterateGroupSessions(uint16_t) override { return nullptr; }
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex, GroupId) override { return nullptr; }
+    uint16_t getMaxMembershipCount() override { return 0; }
+    uint16_t getMaxMcastAddrCount() override { return 0; }
 
     bool mHasEndpoint = true;
 };

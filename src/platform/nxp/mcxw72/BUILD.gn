@@ -109,6 +109,10 @@ static_library("nxp_platform") {
     ]
 
     include_dirs = [ "${nxp_sdk_build_root}/mbedtls/config" ]
+  } else if (chip_crypto == "psa") {
+    if (chip_crypto_spake2p == "custom") {
+      sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
+    }
   }
 
   if (chip_enable_ble) {
@@ -136,7 +140,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "../common/ThreadStackManagerImpl.cpp",

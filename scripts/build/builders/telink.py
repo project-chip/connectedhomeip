@@ -20,6 +20,14 @@ from enum import Enum, auto
 from .builder import Builder, BuilderOutput
 
 
+class TelinkLogLevel(Enum):
+    DEFAULT = auto()  # default everything
+    ALL = auto()  # enable all logging
+    PROGRESS = auto()  # progress and above
+    ERROR = auto()  # error and above
+    NONE = auto()  # no chip_logging at all
+
+
 class TelinkApp(Enum):
     AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
@@ -170,6 +178,7 @@ class TelinkBuilder(Builder):
                  precompiled_ot_config: bool = False,
                  tflm_config: bool = False,
                  chip_enable_nfc_onboarding_payload: bool = False,
+                 log_level: TelinkLogLevel = TelinkLogLevel.DEFAULT,
                  ):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
@@ -187,6 +196,7 @@ class TelinkBuilder(Builder):
         self.precompiled_ot_config = precompiled_ot_config
         self.tflm_config = tflm_config
         self.chip_enable_nfc_onboarding_payload = chip_enable_nfc_onboarding_payload
+        self.log_level = log_level
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -248,6 +258,19 @@ class TelinkBuilder(Builder):
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        if self.log_level == TelinkLogLevel.DEFAULT:
+            pass
+        elif self.log_level == TelinkLogLevel.ALL:
+            flags.append("-DTLNK_LOG_LEVEL=all")
+        elif self.log_level == TelinkLogLevel.PROGRESS:
+            flags.append("-DTLNK_LOG_LEVEL=progress")
+        elif self.log_level == TelinkLogLevel.ERROR:
+            flags.append("-DTLNK_LOG_LEVEL=error")
+        elif self.log_level == TelinkLogLevel.NONE:
+            flags.append("-DTLNK_LOG_LEVEL=none")
+        else:
+            raise Exception("Unknown log level: %r" % self.log_level)
 
         build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 

@@ -92,6 +92,29 @@ public:
 using DecodableType = Type;
 
 } // namespace HoldTimeLimitsStruct
+namespace ObjectCountConfigStruct {
+enum class Fields : uint8_t
+{
+    kCountingObject       = 0,
+    kObjectCountThreshold = 1,
+};
+
+struct Type
+{
+public:
+    Globals::Structs::SemanticTagStruct::Type countingObject;
+    uint16_t objectCountThreshold = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ObjectCountConfigStruct
 namespace PredictedActivityStruct {
 enum class Fields : uint8_t
 {

@@ -16,6 +16,7 @@
  */
 
 #include "CodegenIntegration.h"
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/chime-server/ChimeCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
@@ -24,35 +25,47 @@ using namespace chip;
 using namespace chip::app;
 using chip::app::Clusters::ChimeServer;
 
-ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mCluster(endpointId, delegate) {}
+ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) : mEndpointId(endpointId), mDelegate(&delegate) {}
 
 ChimeServer::~ChimeServer()
 {
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    if (mCluster.IsConstructed())
+    {
+        RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    }
 }
 
 CHIP_ERROR ChimeServer::Init()
 {
+    SafeAttributePersistenceProvider * provider = GetSafeAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ChimeCluster::Context context{ .delegate = *mDelegate, .safeAttributePersistenceProvider = *provider };
+    mCluster.Create(mEndpointId, context);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 
 Protocols::InteractionModel::Status ChimeServer::SetSelectedChime(uint8_t chimeSoundID)
 {
+    VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().SetSelectedChime(chimeSoundID);
 }
 
 Protocols::InteractionModel::Status ChimeServer::SetEnabled(bool Enabled)
 {
+    VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().SetEnabled(Enabled);
 }
 
 uint8_t ChimeServer::GetSelectedChime() const
 {
+    VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().GetSelectedChime();
 }
 
 bool ChimeServer::GetEnabled() const
 {
+    VerifyOrDie(mCluster.IsConstructed());
     return mCluster.Cluster().GetEnabled();
 }
 
