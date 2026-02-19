@@ -504,11 +504,12 @@ class TC_ACS_3_3(MatterBaseTest):
         # Clear accumulated reports and restart accumulating
         attrib_listener.reset()
         event_listener.reset()
-        log.info("Cleared accumulated reports. Restarting accumulation.")   
+        log.info("Cleared accumulated reports. Restarting accumulation.")
 
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
 
