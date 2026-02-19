@@ -24,7 +24,6 @@ import shlex
 import subprocess
 import sys
 import time
-from enum import Enum
 
 from chiptest.runner import SubprocessKind
 
