@@ -153,7 +153,7 @@ class TC_ACS_3_1(MatterBaseTest):
             subscription_expected = simultaneouslimit_input
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
-                    endpoint_id=endpoint_id, attribute=attr.SimultaneousDetectionLimit, value=subscription_expected)],
+                    endpoint_id=endpoint, attribute=attr.SimultaneousDetectionLimit, value=subscription_expected)],
                 timeout_sec=30.0)
             log.info("Received attribute report for SimultaneousDetectionLimit.")
             attrib_listener.reset()
@@ -173,7 +173,7 @@ class TC_ACS_3_1(MatterBaseTest):
                 holdTimeMin=1, holdTimeMax=holdtimemax_input, holdTimeDefault=10)
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
-                    endpoint_id=endpoint_id, attribute=attr.HoldTimeLimit, value=subscription_expected)],
+                    endpoint_id=endpoint, attribute=attr.HoldTimeLimit, value=subscription_expected)],
                 timeout_sec=30.0)
             log.info("Received attribute report for HoldTimeLimit.")
             attrib_listener.reset()
@@ -191,7 +191,7 @@ class TC_ACS_3_1(MatterBaseTest):
             subscription_expected = holdtime_input
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
-                    endpoint_id=endpoint_id, attribute=attr.HoldTime, value=subscription_expected)],
+                    endpoint_id=endpoint, attribute=attr.HoldTime, value=subscription_expected)],
                 timeout_sec=30.0)
             log.info("Received attribute report for HoldTime.")
             attrib_listener.reset()
@@ -327,5 +327,6 @@ class TC_ACS_3_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
