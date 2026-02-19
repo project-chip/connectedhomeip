@@ -84,13 +84,11 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
             [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
                 ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() Connection to CastingPlayer successful");
                 CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
-                if (targetCastingPlayer == nullptr)
-                {
+                VerifyOrReturn(
+                    targetCastingPlayer != nullptr,
                     ChipLogError(AppServer,
                                  "ChipDeviceEventHandler::Handle() Target CastingPlayer no longer exists, skipping connection "
-                                 "handling");
-                    return;
-                }
+                                 "handling"));
 
                 targetCastingPlayer->mConnectionState = CASTING_PLAYER_CONNECTED;
 
@@ -98,20 +96,18 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
                 // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                 EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
                 ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() calling EndpointListLoader::GetInstance()->Load()");
-                TEMPORARY_RETURN_IGNORED EndpointListLoader::GetInstance()->Load();
+                TEMPORARY_RETURN_IGNORED EndpointListLoader::GetInstance() -> Load();
             },
             [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                 ChipLogError(AppServer, "ChipDeviceEventHandler::Handle(): Connection to CastingPlayer failed");
                 CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
-                if (targetCastingPlayer == nullptr)
-                {
+                VerifyOrReturn(
+                    targetCastingPlayer != nullptr,
                     ChipLogError(AppServer,
-                                 "ChipDeviceEventHandler::Handle() Target CastingPlayer no longer exists, skipping cleanup");
-                    return;
-                }
+                                 "ChipDeviceEventHandler::Handle() Target CastingPlayer no longer exists, skipping cleanup"));
 
                 targetCastingPlayer->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                CHIP_ERROR err = support::CastingStore::GetInstance()->Delete(*targetCastingPlayer);
+                CHIP_ERROR err                        = support::CastingStore::GetInstance()->Delete(*targetCastingPlayer);
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());

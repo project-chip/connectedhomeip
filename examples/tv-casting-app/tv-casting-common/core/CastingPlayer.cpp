@@ -213,13 +213,11 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                                             "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                             "CastingPlayer successful");
                             CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
-                            if (targetCastingPlayer == nullptr)
-                            {
+                            VerifyOrReturn(
+                                targetCastingPlayer != nullptr,
                                 ChipLogError(AppServer,
                                              "CastingPlayer::VerifyOrEstablishConnection() Target CastingPlayer no longer exists, "
-                                             "skipping connection handling");
-                                return;
-                            }
+                                             "skipping connection handling"));
 
                             targetCastingPlayer->mConnectionState = CASTING_PLAYER_CONNECTED;
 
@@ -228,20 +226,18 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             //
                             // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                             support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
-                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance()->Load();
+                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance() -> Load();
                         },
                         [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                             ChipLogError(AppServer,
                                          "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                          "CastingPlayer failed");
                             CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
-                            if (targetCastingPlayer == nullptr)
-                            {
+                            VerifyOrReturn(
+                                targetCastingPlayer != nullptr,
                                 ChipLogError(AppServer,
                                              "CastingPlayer::VerifyOrEstablishConnection() Target CastingPlayer no longer exists, "
-                                             "skipping cleanup");
-                                return;
-                            }
+                                             "skipping cleanup"));
 
                             targetCastingPlayer->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
                             targetCastingPlayer->RemoveFabric();
