@@ -116,6 +116,7 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
 
         # Step 3: TH sends a Timed Request Message (Timed Invoke Transaction) with timeout,
         # waits for status response, waits 5 seconds (timer expired), then sends Invoke Request
+        SPEC_VERSION_1_4 = 0x00010400
         self.step(3)
         spec_version = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.SpecificationVersion)
         try:
@@ -132,7 +133,7 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
             )
             asserts.fail("Step 3: Command should timeout but succeeded unexpectedly")
         except InteractionModelError as e:
-            if spec_version >= 0x00010400:  # Matter release 1.4 or later
+            if spec_version >= SPEC_VERSION_1_4:  # Matter release 1.4 or later
                 asserts.assert_equal(e.status, Status.Timeout,
                                      f"SendCommand should return TIMEOUT, got {e.status}")
             else:  # Matter release 1.3 or earlier
@@ -151,7 +152,7 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
             )
             asserts.fail("Step 4: Write should timeout but succeeded unexpectedly")
         except InteractionModelError as e:
-            if spec_version >= 0x00010400:  # Matter release 1.4 or later
+            if spec_version >= SPEC_VERSION_1_4:  # Matter release 1.4 or later
                 asserts.assert_equal(e.status, Status.Timeout,
                                      f"WriteAttribute should return TIMEOUT, got {e.status}")
             else:  # Matter release 1.3 or earlier
