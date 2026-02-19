@@ -533,8 +533,7 @@ void SetupPretendDevices()
     auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
     if (temperatureMeasurement != nullptr)
     {
-        // write the temp attribute
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100));
+        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100)));
     }
 
     AddDevice("Door Lock");
@@ -587,14 +586,6 @@ void SetupPretendDevices()
     AddDevice("Thermostat");
     AddEndpoint("1");
     AddCluster("Thermostat");
-
-    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-    if (temperatureMeasurement != nullptr)
-    {
-        // write the temp attribute
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100));
-    }
-
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, app::Clusters::Thermostat::SystemModeEnum::kHeat);
