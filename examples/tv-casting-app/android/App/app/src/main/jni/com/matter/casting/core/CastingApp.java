@@ -43,7 +43,8 @@ public final class CastingApp {
 
   private static CastingApp sInstance;
 
-  private CastingAppState mState = CastingAppState.UNINITIALIZED;
+  private volatile CastingAppState mState = CastingAppState.UNINITIALIZED;
+  private final Object mStateLock = new Object();
   private AppParameters appParameters;
   private NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
   private ChipAppServer chipAppServer;
@@ -65,42 +66,44 @@ public final class CastingApp {
    */
   public MatterError initialize(AppParameters appParameters) {
     Log.i(TAG, "CastingApp.initialize() called");
-    if (mState != CastingAppState.UNINITIALIZED) {
-      return MatterError.CHIP_ERROR_INCORRECT_STATE;
-    }
+    synchronized (mStateLock) {
+      if (mState != CastingAppState.UNINITIALIZED) {
+        return MatterError.CHIP_ERROR_INCORRECT_STATE;
+      }
 
-    this.appParameters = appParameters;
-    this.nsdManagerResolverAvailState =
-        new NsdManagerServiceResolver.NsdManagerResolverAvailState();
+      this.appParameters = appParameters;
+      this.nsdManagerResolverAvailState =
+          new NsdManagerServiceResolver.NsdManagerResolverAvailState();
 
-    Context applicationContext = appParameters.getApplicationContext();
-    chipPlatform =
-        new AndroidChipPlatform(
-            new AndroidBleManager(),
-            new AndroidNfcCommissioningManager(),
-            new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
-            appParameters.getConfigurationManagerProvider().get(),
-            new NsdManagerServiceResolver(
-                applicationContext, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT),
-            new NsdManagerServiceBrowser(applicationContext, BROWSE_SERVICE_TIMEOUT),
-            new ChipMdnsCallbackImpl(),
-            new DiagnosticDataProviderImpl(applicationContext));
+      Context applicationContext = appParameters.getApplicationContext();
+      chipPlatform =
+          new AndroidChipPlatform(
+              new AndroidBleManager(),
+              new AndroidNfcCommissioningManager(),
+              new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
+              appParameters.getConfigurationManagerProvider().get(),
+              new NsdManagerServiceResolver(
+                  applicationContext, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT),
+              new NsdManagerServiceBrowser(applicationContext, BROWSE_SERVICE_TIMEOUT),
+              new ChipMdnsCallbackImpl(),
+              new DiagnosticDataProviderImpl(applicationContext));
 
-    MatterError err = updateAndroidChipPlatformWithCommissionableData();
-    if (err.hasError()) {
-      Log.e(
-          TAG,
-          "CastingApp.initialize() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+      MatterError err = updateAndroidChipPlatformWithCommissionableData();
+      if (err.hasError()) {
+        Log.e(
+            TAG,
+            "CastingApp.initialize() failed to updateCommissionableDataProviderData() on AndroidChipPlatform");
+        return err;
+      }
+
+      err = finishInitialization(appParameters);
+
+      if (err.hasNoError()) {
+        chipAppServer = new ChipAppServer(); // get a reference to the Matter server now
+        mState = CastingAppState.NOT_RUNNING; // initialization done, set state to NOT_RUNNING
+      }
       return err;
     }
-
-    err = finishInitialization(appParameters);
-
-    if (err.hasNoError()) {
-      chipAppServer = new ChipAppServer(); // get a reference to the Matter server now
-      mState = CastingAppState.NOT_RUNNING; // initialization done, set state to NOT_RUNNING
-    }
-    return err;
   }
 
   /**
@@ -136,21 +139,23 @@ public final class CastingApp {
    */
   public MatterError start() {
     Log.i(TAG, "CastingApp.start called");
-    if (mState != CastingAppState.NOT_RUNNING) {
-      return MatterError.CHIP_ERROR_INCORRECT_STATE;
-    }
+    synchronized (mStateLock) {
+      if (mState != CastingAppState.NOT_RUNNING) {
+        return MatterError.CHIP_ERROR_INCORRECT_STATE;
+      }
 
-    boolean serverStarted = chipAppServer.startApp();
-    if (!serverStarted) {
-      Log.e(TAG, "CastingApp.start failed to start Matter server");
-      return MatterError.CHIP_ERROR_INCORRECT_STATE;
-    }
+      boolean serverStarted = chipAppServer.startApp();
+      if (!serverStarted) {
+        Log.e(TAG, "CastingApp.start failed to start Matter server");
+        return MatterError.CHIP_ERROR_INCORRECT_STATE;
+      }
 
-    MatterError err = finishStartup();
-    if (err.hasNoError()) {
-      mState = CastingAppState.RUNNING; // CastingApp started successfully, set state to RUNNING
+      MatterError err = finishStartup();
+      if (err.hasNoError()) {
+        mState = CastingAppState.RUNNING; // CastingApp started successfully, set state to RUNNING
+      }
+      return err;
     }
-    return err;
   }
 
   /**
@@ -160,24 +165,49 @@ public final class CastingApp {
    */
   public MatterError stop() {
     Log.i(TAG, "CastingApp.stop called");
-    if (mState != CastingAppState.RUNNING) {
-      return MatterError.CHIP_ERROR_INCORRECT_STATE;
-    }
+    synchronized (mStateLock) {
+      if (mState != CastingAppState.RUNNING) {
+        return MatterError.CHIP_ERROR_INCORRECT_STATE;
+      }
 
-    boolean serverStopped = chipAppServer.stopApp();
-    if (!serverStopped) {
-      Log.e(TAG, "CastingApp.stop failed to stop Matter server");
-      return MatterError.CHIP_ERROR_INCORRECT_STATE;
-    }
-    finishStopping();
-    mState =
-        CastingAppState.NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
+      boolean serverStopped = chipAppServer.stopApp();
+      if (!serverStopped) {
+        Log.e(TAG, "CastingApp.stop failed to stop Matter server");
+        return MatterError.CHIP_ERROR_INCORRECT_STATE;
+      }
+      finishStopping();
+      mState =
+          CastingAppState.NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
 
-    return MatterError.NO_ERROR;
+      return MatterError.NO_ERROR;
+    }
   }
 
   /** @brief Tears down all active subscriptions. */
   public native MatterError shutdownAllSubscriptions();
+
+  /**
+   * Checks if the CastingApp is initialized and ready to accept connection requests.
+   *
+   * @return true if the CastingApp has been initialized (state is NOT_RUNNING or RUNNING), false
+   *     otherwise
+   */
+  public boolean isInitialized() {
+    synchronized (mStateLock) {
+      return mState != CastingAppState.UNINITIALIZED;
+    }
+  }
+
+  /**
+   * Checks if the CastingApp is running and ready to accept connection requests.
+   *
+   * @return true if the CastingApp is in RUNNING state, false otherwise
+   */
+  public boolean isRunning() {
+    synchronized (mStateLock) {
+      return mState == CastingAppState.RUNNING;
+    }
+  }
 
   /**
    * Clears app cache that contains the information about CastingPlayers previously connected to

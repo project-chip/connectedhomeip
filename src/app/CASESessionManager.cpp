@@ -101,6 +101,24 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
 
+    // Check if CASESessionManager is properly initialized
+    if (mConfig.sessionSetupPool == nullptr)
+    {
+        ChipLogError(CASESessionManager, "FindOrEstablishSession called before CASESessionManager is initialized");
+        if (onFailure != nullptr)
+        {
+            onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_INCORRECT_STATE);
+        }
+
+        if (onSetupFailure != nullptr)
+        {
+            OperationalSessionSetup::ConnectionFailureInfo failureInfo(peerId, CHIP_ERROR_INCORRECT_STATE,
+                                                                       SessionEstablishmentStage::kUnknown);
+            onSetupFailure->mCall(onSetupFailure->mContext, failureInfo);
+        }
+        return;
+    }
+
     bool forAddressUpdate             = false;
     OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
     if (session == nullptr)
@@ -154,17 +172,28 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
+    if (mConfig.sessionSetupPool == nullptr)
+    {
+        ChipLogError(CASESessionManager, "ReleaseSessionsForFabric called before CASESessionManager is initialized");
+        return;
+    }
     mConfig.sessionSetupPool->ReleaseAllSessionSetupsForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
 {
+    if (mConfig.sessionSetupPool == nullptr)
+    {
+        ChipLogError(CASESessionManager, "ReleaseAllSessions called before CASESessionManager is initialized");
+        return;
+    }
     mConfig.sessionSetupPool->ReleaseAllSessionSetup();
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr,
                                               TransportPayloadCapability transportPayloadCapability)
 {
+    VerifyOrReturnError(mConfig.sessionInitParams.sessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mConfig.sessionInitParams.Validate());
     auto optionalSessionHandle = FindExistingSession(peerId, transportPayloadCapability);
     VerifyOrReturnError(optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
@@ -174,6 +203,12 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
 
 void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
 {
+    if (mConfig.sessionSetupPool == nullptr)
+    {
+        ChipLogError(CASESessionManager, "UpdatePeerAddress called before CASESessionManager is initialized");
+        return;
+    }
+
     bool forAddressUpdate             = true;
     OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
     if (session == nullptr)
@@ -199,18 +234,33 @@ void CASESessionManager::UpdatePeerAddress(ScopedNodeId peerId)
 
 OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId, bool forAddressUpdate) const
 {
+    if (mConfig.sessionSetupPool == nullptr)
+    {
+        ChipLogError(CASESessionManager, "FindExistingSessionSetup called before CASESessionManager is initialized");
+        return nullptr;
+    }
     return mConfig.sessionSetupPool->FindSessionSetup(peerId, forAddressUpdate);
 }
 
 Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId,
                                                                 const TransportPayloadCapability transportPayloadCapability) const
 {
+    if (mConfig.sessionInitParams.sessionManager == nullptr)
+    {
+        ChipLogError(CASESessionManager, "FindExistingSession called before CASESessionManager is initialized");
+        return Optional<SessionHandle>::Missing();
+    }
     return mConfig.sessionInitParams.sessionManager->FindSecureSessionForNode(
         peerId, MakeOptional(Transport::SecureSession::Type::kCASE), transportPayloadCapability);
 }
 
 void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 {
+    if (mConfig.sessionSetupPool == nullptr)
+    {
+        ChipLogError(CASESessionManager, "ReleaseSession called before CASESessionManager is initialized");
+        return;
+    }
     auto * session = mConfig.sessionSetupPool->FindSessionSetup(peerId, false);
     ReleaseSession(session);
 }
@@ -219,6 +269,11 @@ void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)
 {
     if (session != nullptr)
     {
+        if (mConfig.sessionSetupPool == nullptr)
+        {
+            ChipLogError(CASESessionManager, "ReleaseSession called before CASESessionManager is initialized");
+            return;
+        }
         mConfig.sessionSetupPool->Release(session);
     }
 }

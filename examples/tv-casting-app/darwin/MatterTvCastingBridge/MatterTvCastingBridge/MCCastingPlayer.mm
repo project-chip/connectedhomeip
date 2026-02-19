@@ -54,7 +54,7 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     ChipLogProgress(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() called");
     VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning],
         [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE],
-        ChipLogError(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() MCCastingApp NOT running"));
+        ChipLogError(AppServer, "MCCastingPlayer.sendUDCWithCallbacks() called before MCCastingApp is running. Please call MCCastingApp.initializeWithDataSource() and MCCastingApp.startWithCompletionBlock() first."));
 
     dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
     dispatch_sync(workQueue, ^{
@@ -133,7 +133,7 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() called, MCConnectionCallbacks, timeout and MCIdentificationDeclarationOptions parameters");
     VerifyOrReturnValue([[MCCastingApp getSharedInstance] isRunning],
         [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE],
-        ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() MCCastingApp NOT running"));
+        ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCallbacks() called before MCCastingApp is running. Please call MCCastingApp.initializeWithDataSource() and MCCastingApp.startWithCompletionBlock() first."));
 
     dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
     dispatch_sync(workQueue, ^{
@@ -316,8 +316,8 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 - (NSString * _Nonnull)description
 {
     return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@. Supports Commissioner-Generated Passcode?: %@.",
-                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO",
-                     self.supportsCommissionerGeneratedPasscode ? @"YES" : @"NO"];
+        self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO",
+        self.supportsCommissionerGeneratedPasscode ? @"YES" : @"NO"];
 }
 
 - (NSString * _Nonnull)identifier
