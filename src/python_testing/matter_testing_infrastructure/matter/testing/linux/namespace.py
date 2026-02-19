@@ -97,46 +97,38 @@ class NetworkResource:
             self.deps.append(self.ns)
 
     def setup(self):
-        if self.exists:
-            return
+        if not self.exists:
+            for dep in self.deps:
+                dep.setup()
 
-        for dep in self.deps:
-            dep.setup()
+            for cmd in self.setup_cmds:
+                cmd.run(self.ns)
 
-        for cmd in self.setup_cmds:
-            cmd.run(self.ns)
-
-        self.exists = True
+            self.exists = True
 
     def teardown(self, check: bool = True):
-        if not self.exists:
-            return
+        if self.exists:
+            for cmd in self.teardown_cmds:
+                cmd.run(self.ns, check=check)
 
-        for cmd in self.teardown_cmds:
-            cmd.run(self.ns, check=check)
+            for dep in self.deps:
+                dep.teardown(check)
 
-        self.exists = False
-
-        for dep in self.deps:
-            dep.teardown(check)
+            self.exists = False
 
     def up(self):
-        if self.up_flag:
-            return
+        if not self.up_flag:
+            for cmd in self.up_cmds:
+                cmd.run(self.ns)
 
-        for cmd in self.up_cmds:
-            cmd.run(self.ns)
-
-        self.up_flag = True
+            self.up_flag = True
 
     def down(self):
-        if not self.up_flag:
-            return
+        if self.up_flag:
+            for cmd in self.down_cmds:
+                cmd.run(self.ns)
 
-        for cmd in self.down_cmds:
-            cmd.run(self.ns)
-
-        self.up_flag = False
+            self.up_flag = False
 
 
 class NetworkLink(NetworkResource):
@@ -219,8 +211,6 @@ class NetworkBridge(NetworkResource):
 
     def attach_link(self, link: NetworkLink):
         self.setup_cmds.append(WrappableCmd(f"ip link set {link.switch_name} master {self.name}"))
-        self.teardown_cmds.insert(0, WrappableCmd(f"ip link set {link.switch_name} nomaster"))
-
         self.deps.append(link)
 
 
