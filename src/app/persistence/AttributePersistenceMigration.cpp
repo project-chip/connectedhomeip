@@ -20,10 +20,9 @@
 namespace chip::app {
 
 CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
-                                                       AttributePersistenceProvider & dstProvider,
-                                                       const ConcreteClusterPath & cluster,
-                                                       Span<const AttrMigrationData> attributes,
-                                                       MutableByteSpan & buffer)
+                                                         AttributePersistenceProvider & dstProvider,
+                                                         const ConcreteClusterPath & cluster,
+                                                         Span<const AttrMigrationData> attributes, MutableByteSpan & buffer)
 {
     CHIP_ERROR migrationError = CHIP_NO_ERROR;
     ConcreteAttributePath attrPath;
@@ -75,11 +74,10 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
         if (attributeMigrationError != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement,
-                         "AttributeMigration: Error deleting SafeAttribute '" ChipLogFormatMEI
-                         "' from cluster '" ChipLogFormatMEI "' (err=%" CHIP_ERROR_FORMAT ")",
+                         "AttributeMigration: Error deleting SafeAttribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI
+                         "' (err=%" CHIP_ERROR_FORMAT ")",
                          ChipLogValueMEI(entry.attributeId), ChipLogValueMEI(cluster.mClusterId), attributeMigrationError.Format());
         }
-
     }
     return migrationError;
 };

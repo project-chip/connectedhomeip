@@ -55,9 +55,9 @@ struct AttrMigrationData
  *
  */
 CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
-                                                       AttributePersistenceProvider & dstProvider,
-                                                       const ConcreteClusterPath & cluster,
-                                                       Span<const AttrMigrationData> attributes, MutableByteSpan & buffer);
+                                                         AttributePersistenceProvider & dstProvider,
+                                                         const ConcreteClusterPath & cluster,
+                                                         Span<const AttrMigrationData> attributes, MutableByteSpan & buffer);
 
 /**
  * @brief
@@ -76,8 +76,8 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
  */
 template <int attributeBufferSize>
 CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(const ConcreteClusterPath & cluster,
-                                                       Span<const AttrMigrationData> attributes,
-                                                       PersistentStorageDelegate & storageDelegate)
+                                                         Span<const AttrMigrationData> attributes,
+                                                         PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
 
@@ -94,7 +94,8 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(const ConcreteClusterPa
 
 namespace DefaultMigrators {
 template <class T>
-CHIP_ERROR ScalarValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer)
+CHIP_ERROR ScalarValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
+                       MutableByteSpan & buffer)
 {
     VerifyOrReturnError(sizeof(T) <= buffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
