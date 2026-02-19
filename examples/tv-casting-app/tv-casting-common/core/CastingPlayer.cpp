@@ -342,10 +342,23 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
 {
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
                     support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
-    VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
+    //VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
+    //                    ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mIdOptions.resetState();
+
+    // hack to re-populate mUdcClients cache on TV in order to allow cancel to pass through
+    // mIdOptions.resetState();
+    mIdOptions.mCommissionerPasscode     = true;
+    mIdOptions.mNoPasscode = true;
+    mIdOptions.mCancelPasscode     = false;
+    mIdOptions.mCommissionerPasscodeReady = false;
+    err = SendUserDirectedCommissioningRequest();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::StopConnecting() hack failed with %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    // mIdOptions.resetState();
     mIdOptions.mCancelPasscode     = true;
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
