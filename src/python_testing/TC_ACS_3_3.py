@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CAMERA_APP}
+#     app: ${ALL_CLUSTER_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -56,6 +56,10 @@ min_value_uint16 = np.iinfo(np.uint16).min
 max_value_uint16 = np.iinfo(np.uint16).max
 min_value_uint32 = np.iinfo(np.uint32).min
 max_value_uint32 = np.iinfo(np.uint32).max
+
+HUMANACTIVITYNAMESPACEID = 0x4B
+OBJECTIDENTIFICATIONNAMESPACEID = 0x49
+SOUNDIDENTIFICATIONNAMESPACEID = 0x4A
 
 
 class TC_ACS_3_3(MatterBaseTest):
@@ -154,18 +158,18 @@ class TC_ACS_3_3(MatterBaseTest):
         dev_ctrl = self.default_controller
 
         # PIXIT.ACS.AmbientContextSensed_1 = Human activity walking
-        PIXITNamespaceID1 = 0x4B
-        PIXITTag1 = 0x03
+        namespaceID1 = HUMANACTIVITYNAMESPACEID
+        tag1 = 0x03
         # PIXIT.ACS.AmbientContextSensed_2 = Object identification person
-        PIXITNamespaceID2 = 0x49
-        PIXITTag2 = 0x03
+        namespaceID2 = OBJECTIDENTIFICATIONNAMESPACEID
+        tag2 = 0x03
         # PIXIT.ACS.AmbientContextSensed_3 = Sound identification barking
-        PIXITNamespaceID3 = 0x4A
-        PIXITTag3 = 0x04
-        PIXITHoldTimeTest = 30
-        PIXITObjectCountThreshold = 2
-        PIXITHoldTimeTest = 2
-        PIXITSimultaneousDetectionLimit = 3
+        namespaceID3 = SOUNDIDENTIFICATIONNAMESPACEID
+        tag3 = 0x04
+        holdtime_input = 30
+        objectcountthreshold_input = 2
+        simultaneouslimit_input = 3
+        post_prompt_settle_delay_seconds = 10  # seconds
         # ---------------------------------------------------------------
 
         self.step("1")
@@ -175,10 +179,15 @@ class TC_ACS_3_3(MatterBaseTest):
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
         log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         self.HumanActivitySupported = aFeatureMap & cluster.Bitmaps.Feature.kHumanActivity
+        log.info(f"Rx'd HumanActivitySupported: {self.HumanActivitySupported}")
         self.ObjectCountingSupported = aFeatureMap & cluster.Bitmaps.Feature.kObjectCounting
+        log.info(f"Rx'd ObjectCountingSupported: {self.ObjectCountingSupported}")
         self.ObjectIdentificationSupported = aFeatureMap & cluster.Bitmaps.Feature.kObjectIdentification
+        log.info(f"Rx'd ObjectIdentificationSupported: {self.ObjectIdentificationSupported}")
         self.SoundIdentificationSupported = aFeatureMap & cluster.Bitmaps.Feature.kSoundIdentification
+        log.info(f"Rx'd SoundIdentificationSupported: {self.SoundIdentificationSupported}")
         self.PredictedActivitySupported = aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity
+        log.info(f"Rx'd PredictedActivitySupported: {self.PredictedActivitySupported}")
 
         self.step("2")
         attribute_list = await self.read_single_attribute_check_success(
@@ -215,8 +224,6 @@ class TC_ACS_3_3(MatterBaseTest):
                     prompt_msg="Type any letter and press ENTER after a desired ambient sensing is triggered.")
 
             self.step("3c")
-            post_prompt_settle_delay_seconds = 10  # seconds
-
             # Wait for attribute data reporting
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
@@ -226,22 +233,22 @@ class TC_ACS_3_3(MatterBaseTest):
 
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.AmbientContextType.ambientContextSensed.namespaceID, value=PIXITNamespaceID1)],
+                                                      attribute=attr.AmbientContextType.ambientContextSensed.namespaceID, value=namespaceID1)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for AmbientContext Namespace ID.")
 
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.AmbientContextType.ambientContextSensed.tag,
-                                                      value=PIXITTag1)],
+                                                      value=tag1)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for AmbientContext Tag.")
 
             self.step("3d")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
-            asserts.assert_true(event.ambientContextType.ambientContextSensed.namespaceID == PIXITNamespaceID1, "Wrong NamespaceID")
-            asserts.assert_true(event.ambientContextType.ambientContextSensed.tag == PIXITTag1, "Wrong Tag")
+            asserts.assert_equal(event.ambientContextType.ambientContextSensed.namespaceID, namespaceID1, "Wrong NamespaceID")
+            asserts.assert_equal(event.ambientContextType.ambientContextSensed.tag, tag1, "Wrong Tag")
             # Ignore object count
 
             # store the event number
@@ -249,19 +256,13 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("3e")
             # Let HoldTime pass by
-            # time.sleep(PIXITHoldTimeTest)
-            await asyncio.sleep(PIXITHoldTimeTest)
+            # time.sleep(holdtime_input)
+            await asyncio.sleep(holdtime_input)
 
             self.step("3f")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=post_prompt_settle_delay_seconds)
             asserts.assert_true(event.startEventNumber == event_number, "Not matching Start event number")
-
-            # Clear accumulated reports and restart accumulating
-            attrib_listener.reset()
-            event_listener.reset()
-            log.info("Cleared accumulated reports. Restarting accumulation.")
-
         else:
             log.info("HumanActivity Feature not supported. Test steps skipped")
             self.skip_step("3a")
@@ -271,6 +272,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.skip_step("3e")
             self.skip_step("3f")
 
+        # Clear accumulated reports and restart accumulating
+        attrib_listener.reset()
+        event_listener.reset()
+        log.info("Cleared accumulated reports. Restarting accumulation.")
+
         if self.ObjectIdentificationSupported:
             self.step("4a")
             objectIdentified = await self.read_single_attribute_check_success(
@@ -279,8 +285,6 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(objectIdentified is True, "Expected False Boolean value.")
 
             self.step("4b")
-            attrib_listener.reset()
-
             # CI call to trigger on
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -293,8 +297,6 @@ class TC_ACS_3_3(MatterBaseTest):
                     prompt_msg="Type any letter and press ENTER after a desired ambient sensing is triggered.")
 
             self.step("4c")
-            post_prompt_settle_delay_seconds = 10  # seconds
-
             # Wait for attribute data reporting
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
@@ -305,23 +307,23 @@ class TC_ACS_3_3(MatterBaseTest):
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.AmbientContextType.ambientContextSensed.namespaceID,
-                                                      value=PIXITNamespaceID2)],
+                                                      value=namespaceID2)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for AmbientContext Namespace ID.")
 
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.AmbientContextType.ambientContextSensed.tag,
-                                                      value=PIXITTag2)],
+                                                      value=tag2)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for AmbientContext Tag.")
 
             self.step("4d")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
-            asserts.assert_true(event.ambientContextType.ambientContextSensed.namespaceID == PIXITNamespaceID2,
+            asserts.assert_equal(event.ambientContextType.ambientContextSensed.namespaceID, namespaceID2,
                                 "Wrong NamespaceID")
-            asserts.assert_true(event.ambientContextType.ambientContextSensed.tag == PIXITTag2, "Wrong Tag")
+            asserts.assert_equal(event.ambientContextType.ambientContextSensed.tag, tag2, "Wrong Tag")
             # Ignore object count
 
             # store the event number
@@ -329,18 +331,12 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("4e")
             # Let HoldTime pass by
-            # time.sleep(PIXITHoldTimeTest)
-            await asyncio.sleep(PIXITHoldTimeTest)
+            await asyncio.sleep(holdtime_input)
 
             self.step("4f")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=post_prompt_settle_delay_seconds)
             asserts.assert_true(event.startEventNumber == event_number, "Not matching Start event number")
-
-            # Clear accumulated reports and restart accumulating
-            attrib_listener.reset()
-            event_listener.reset()
-            log.info("Cleared accumulated reports. Restarting accumulation.")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
             self.skip_step("4a")
@@ -350,6 +346,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.skip_step("4e")
             self.skip_step("4f")
 
+        # Clear accumulated reports and restart accumulating
+        attrib_listener.reset()
+        event_listener.reset()
+        log.info("Cleared accumulated reports. Restarting accumulation.")
+        
         if self.SoundIdentificationSupported:
             self.step("5a")
             audioContextDetected = await self.read_single_attribute_check_success(
@@ -358,8 +359,6 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(audioContextDetected is True, "Expected False Boolean value.")
 
             self.step("5b")
-            attrib_listener.reset()
-
             # CI call to trigger on
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -372,8 +371,6 @@ class TC_ACS_3_3(MatterBaseTest):
                     prompt_msg="Type any letter and press ENTER after a desired ambient sensing is triggered.")
 
             self.step("5c")
-            post_prompt_settle_delay_seconds = 10  # seconds
-
             # Wait for attribute data reporting
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
@@ -384,23 +381,23 @@ class TC_ACS_3_3(MatterBaseTest):
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.AmbientContextType.ambientContextSensed.namespaceID,
-                                                      value=PIXITNamespaceID3)],
+                                                      value=namespaceID3)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for AmbientContext Namespace ID.")
 
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.AmbientContextType.ambientContextSensed.tag,
-                                                      value=PIXITTag3)],
+                                                      value=tag3)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for AmbientContext Tag.")
 
             self.step("5d")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
-            asserts.assert_true(event.ambientContextType.ambientContextSensed.namespaceID == PIXITNamespaceID3,
+            asserts.assert_equal(event.ambientContextType.ambientContextSensed.namespaceID, namespaceID3,
                                 "Wrong NamespaceID")
-            asserts.assert_true(event.ambientContextType.ambientContextSensed.tag == PIXITTag3, "Wrong Tag")
+            asserts.assert_equal(event.ambientContextType.ambientContextSensed.tag, tag3, "Wrong Tag")
             # Ignore object count
 
             # store the event number
@@ -408,18 +405,12 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("5e")
             # Let HoldTime pass by
-            # time.sleep(PIXITHoldTimeTest)
-            await asyncio(PIXITHoldTimeTest)
+            await asyncio(holdtime_input)
 
             self.step("5f")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=post_prompt_settle_delay_seconds)
             asserts.assert_true(event.startEventNumber == event_number, "Not matching Start event number")
-
-            # Clear accumulated reports and restart accumulating
-            attrib_listener.reset()
-            event_listener.reset()
-            log.info("Cleared accumulated reports. Restarting accumulation.")
         else:
             log.info("SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5a")
@@ -429,9 +420,14 @@ class TC_ACS_3_3(MatterBaseTest):
             self.skip_step("5e")
             self.skip_step("5f")
 
+        # Clear accumulated reports and restart accumulating
+        attrib_listener.reset()
+        event_listener.reset()
+        log.info("Cleared accumulated reports. Restarting accumulation.")
+
         if self.ObjectCountingSupported & self.ObjectIdentificationSupported:
             # set object counting threshold
-            await self.write_single_attribute(attr.ObjectCountConfig.objectCountThreshold(PIXITObjectCountThreshold))
+            await self.write_single_attribute(attr.ObjectCountConfig.objectCountThreshold(objectcountthreshold_input))
 
             self.step("6a")
             objectCountReached = await self.read_single_attribute_check_success(
@@ -440,8 +436,6 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(objectCountReached is True, "Expected False Boolean value.")
 
             self.step("6b")
-            attrib_listener.reset()
-
             # CI call to trigger on
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -451,7 +445,7 @@ class TC_ACS_3_3(MatterBaseTest):
                     self.write_to_app_pipe(
                         '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":73, "TagId":3}}'
                     )  # 0x49
-                    # self.write_to_app_pipe('{"Name":"ObjectCountTrigger", "EndpointId": 1, "ObjectCount": PIXITObjectCountThreshold + 1}')
+                    # self.write_to_app_pipe('{"Name":"ObjectCountTrigger", "EndpointId": 1, "ObjectCount": objectcountthreshold_input + 1}')
             else:
                 # Trigger the ambient sensor to change AmbientContextType.AmbientContextSensed.NamespaceID
                 # and AmbientContextType.AmbientContextSensed.Tag => TESTER ACTION on DUT
@@ -459,8 +453,6 @@ class TC_ACS_3_3(MatterBaseTest):
                     prompt_msg="Type any letter and press ENTER after a desired ambient sensing is triggered.")
 
             self.step("6c")
-            post_prompt_settle_delay_seconds = 10  # seconds
-
             # Wait for attribute data reporting
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
@@ -471,21 +463,21 @@ class TC_ACS_3_3(MatterBaseTest):
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.ObjectCountConfig.countingObject.namespaceID,
-                                                      value=PIXITNamespaceID2)],
+                                                      value=namespaceID2)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for ObjectCountConfig Namespace ID.")
 
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.ObjectCountConfig.countingObject.tag,
-                                                      value=PIXITTag2)],
+                                                      value=tag2)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for ObjectCountConfig Tag.")
 
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.ObjectCountConfig.objectCountThreshold,
-                                                      value=PIXITObjectCountThreshold)],
+                                                      value=objectcountthreshold_input)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for ObjectCountConfig ObjectCountThreshold.")
 
@@ -493,7 +485,7 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
             if attr.ObjectCount in attribute_list:
-                asserts.assert_true(event.objectCount >= PIXITObjectCountThreshold,
+                asserts.assert_greater_equal(event.objectCount, objectcountthreshold_input,
                                     "Object Count number is greater than or equal to ObjectCountThreshold.")
 
             # store the event number
@@ -501,18 +493,12 @@ class TC_ACS_3_3(MatterBaseTest):
 
             self.step("6e")
             # Let HoldTime pass by
-            # time.sleep(PIXITHoldTimeTest)
-            await asyncio(PIXITHoldTimeTest)
+            await asyncio(holdtime_input)
 
             self.step("6f")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectEnded, timeout_sec=post_prompt_settle_delay_seconds)
-            asserts.assert_true(event.startEventNumber == event_number, "Not matching Start event number")
-
-            # Clear accumulated reports and restart accumulating
-            attrib_listener.reset()
-            event_listener.reset()
-            log.info("Cleared accumulated reports. Restarting accumulation.")
+            asserts.assert_equal(event.startEventNumber, event_number, "Not matching Start event number")
         else:
             log.info("Object Counting & Object Identification Feature not supported. Test steps skipped")
             self.skip_step("6a")
@@ -522,6 +508,11 @@ class TC_ACS_3_3(MatterBaseTest):
             self.skip_step("6e")
             self.skip_step("6f")
 
+        # Clear accumulated reports and restart accumulating
+        attrib_listener.reset()
+        event_listener.reset()
+        log.info("Cleared accumulated reports. Restarting accumulation.")
+        
         # SimultaneousDetectionLimit attribute subscription test
         self.step("7a")
         simultaneousDetectionLimit = await self.read_single_attribute_check_success(
@@ -529,15 +520,14 @@ class TC_ACS_3_3(MatterBaseTest):
         )
 
         self.step("7b")
-        asserts.assert_true(simultaneousDetectionLimit == PIXITSimultaneousDetectionLimit, "Expected a different value from 7a.")
-        await self.write_single_attribute(attr.SimultaneousDetectionLimit(PIXITSimultaneousDetectionLimit))
+        asserts.assert_equal(simultaneousDetectionLimit, simultaneouslimit_input, "Expected a different value from 7a.")
+        await self.write_single_attribute(attr.SimultaneousDetectionLimit(simultaneouslimit_input))
 
         self.step("7c")
         # Wait for attribute data reporting
-        post_prompt_settle_delay_seconds = 10  # seconds
         attrib_listener.await_all_final_values_reported(
             expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                  attribute=attr.SimultaneousDetectionLimit, value=PIXITSimultaneousDetectionLimit)],
+                                                  attribute=attr.SimultaneousDetectionLimit, value=simultaneouslimit_input)],
             timeout_sec=post_prompt_settle_delay_seconds)
         log.info("Received attribute report for SimultaneousDetectionLimit.")
         attrib_listener.reset()
@@ -549,14 +539,13 @@ class TC_ACS_3_3(MatterBaseTest):
 
         self.step("8b")
         asserts.assert_true(holdTime == PIXITHoldTimeTest, "Expected a different value from 8a.")
-        await self.write_single_attribute(attr.HoldTime(PIXITHoldTimeTest))
+        await self.write_single_attribute(attr.HoldTime(holdtime_input))
 
         self.step("8c")
         # Wait for attribute data reporting
-        post_prompt_settle_delay_seconds = 10  # seconds
         attrib_listener.await_all_final_values_reported(
             expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                  attribute=attr.HoldTime, value=PIXITHoldTimeTest)],
+                                                  attribute=attr.HoldTime, value=holdtime_input)],
             timeout_sec=post_prompt_settle_delay_seconds)
         log.info("Received attribute report for HoldTime.")
         attrib_listener.reset()
@@ -564,4 +553,3 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
