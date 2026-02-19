@@ -94,9 +94,13 @@ public:
                     ReturnErrorOnFailure(entry.SetAuthMode(AuthMode::kGroup));
                     ReturnErrorOnFailure(entry.SetAuxiliaryType(AuxiliaryType::kGroupcast));
                     ReturnErrorOnFailure(entry.AddSubject(nullptr, NodeIdFromGroupId(mGroupId)));
+
+                    // TODO: Cluster and device type are mandatory fields for a Target, should they be specified here?
                     AccessControl::Entry::Target target;
                     target.flags    = AccessControl::Entry::Target::kEndpoint;
                     target.endpoint = endpoint.endpoint_id;
+                    target.cluster = 0;
+                    target.deviceType = 0;
                     ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
                     return CHIP_NO_ERROR;
                 }

@@ -149,13 +149,13 @@ private:
 
 TEST_F(TestAccessControlCluster, CompileTest)
 {
-    AccessControlCluster cluster(defaultContext);
+    AccessControlCluster cluster(BitFlags<AccessControl::Feature>(), defaultContext);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, AccessControl::Id }), BitFlags<ClusterQualityFlags>());
 }
 
 TEST_F(TestAccessControlCluster, CommandsTest)
 {
-    AccessControlCluster cluster(defaultContext);
+    AccessControlCluster cluster(BitFlags<AccessControl::Feature>(), defaultContext);
     ConcreteClusterPath accessControlPath = ConcreteClusterPath(kRootEndpointId, AccessControl::Id);
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
@@ -186,7 +186,7 @@ TEST_F(TestAccessControlCluster, CommandsTest)
 
 TEST_F(TestAccessControlCluster, AttributesTest)
 {
-    AccessControlCluster cluster(defaultContext);
+    AccessControlCluster cluster(BitFlags<AccessControl::Feature>(), defaultContext);
 
     std::vector<DataModel::AttributeEntry> expectedAttributes(AccessControl::Attributes::kMandatoryMetadata.begin(),
                                                               AccessControl::Attributes::kMandatoryMetadata.end());
@@ -221,7 +221,7 @@ CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
 // Test that all available attributes (mandatory and optional) can be read
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
 {
-    AccessControlCluster cluster(defaultContext);
+    AccessControlCluster cluster(BitFlags<AccessControl::Feature>(), defaultContext);
     Testing::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

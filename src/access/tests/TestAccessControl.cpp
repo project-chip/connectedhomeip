@@ -18,6 +18,8 @@
 
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
+#include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
+#include <credentials/GroupDataProvider.h>
 
 #include <pw_unit_test/framework.h>
 
@@ -1088,6 +1090,9 @@ public: // protected
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
         SuccessOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver));
+
+        AccessControl::Delegate * groupAuxiliaryAccessDelegate = Examples::GetGroupAuxiliaryAccessControlDelegate();
+        SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(groupAuxiliaryAccessDelegate));
     }
     static void TearDownTestSuite()
     {
@@ -1877,6 +1882,129 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
             }
         }
     }
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
+{
+    // The delegate is already registered in SetUpTestSuite.
+    AccessControl::Delegate * delegate = Examples::GetGroupAuxiliaryAccessControlDelegate();
+
+    // Verify registering again fails.
+    EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_ERROR_INCORRECT_STATE);
+
+    // Verify unregistration.
+    accessControl.UnregisterGroupAuxiliaryDelegate();
+
+    // Verify AuxiliaryEntries returns CHIP_ERROR_INCORRECT_STATE when no delegate is registered.
+    EntryIterator iterator;
+    EXPECT_EQ(accessControl.AuxiliaryEntries(1, iterator), CHIP_ERROR_INCORRECT_STATE);
+
+    // Verify registration again after unregistration.
+    EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_NO_ERROR);
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
+{
+    // Ensure GroupDataProvider is available
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    FabricIndex fabric1 = 1;
+    FabricIndex fabric2 = 2;
+
+    // Set up group 1 data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x1111;
+        info.SetName("Group 1");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric1, info.group_id, 10), CHIP_NO_ERROR);
+    }
+
+    // Set up group 2 data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x2222;
+        info.SetName("Group 2");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric1, info.group_id, 20), CHIP_NO_ERROR);
+    }
+
+    // Set up group data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x3333;
+        info.SetName("Group 3");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 30), CHIP_NO_ERROR);
+    }
+
+    // Set up group data for fabric 2, WITHOUT kHasAuxiliaryACL
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x4444;
+        info.SetName("Group 4");
+        EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 40), CHIP_NO_ERROR);
+    }
+
+    EntryIterator iterator;
+    Entry entry;
+    NodeId actualSubject;
+    Entry::Target actualTarget;
+    FabricIndex actualFabric;
+
+    // Test Fabric 1
+    EXPECT_EQ(accessControl.AuxiliaryEntries(fabric1, iterator), CHIP_NO_ERROR);
+    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
+    
+    // Group 1 check
+    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
+    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x1111));
+
+    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(actualTarget.endpoint, 10u);
+    
+    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
+    EXPECT_EQ(actualFabric, fabric1);
+
+    EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
+
+    // Group 2 check
+    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
+    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x2222));
+
+    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(actualTarget.endpoint, 20u);
+    
+    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
+    EXPECT_EQ(actualFabric, fabric1);
+
+    EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
+
+    // Test Fabric 2
+    EXPECT_EQ(accessControl.AuxiliaryEntries(fabric2, iterator), CHIP_NO_ERROR);
+    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
+    
+    // Group 3 check
+    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
+    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x3333));
+
+    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(actualTarget.endpoint, 30u);
+    
+    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
+    EXPECT_EQ(actualFabric, fabric2);
+
+    // This should be the end of the entries, and confirms the group without kHasAuxiliaryACL has no entry
+    EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
+
+    // Cleanup provider for next tests
+    EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->RemoveFabric(fabric2), CHIP_NO_ERROR);
 }
 
 TEST_F(TestAccessControl, TestIterator)
