@@ -214,7 +214,8 @@ void CameraApp::CreateAndInitializeCameraAVStreamMgmt()
     std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
-    mAVStreamMgmtServer.Create(mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs,
+    mAVStreamMgmtServer.Create(CameraAVStreamManagementCluster::Context{ *app::GetSafeAttributePersistenceProvider() },
+                               mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, avsmFeatures, avsmOptionalAttrs,
                                maxConcurrentVideoEncoders, maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport,
                                rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities, spkrCapabilities,
                                twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,

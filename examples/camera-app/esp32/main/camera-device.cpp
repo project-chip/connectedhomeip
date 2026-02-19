@@ -24,7 +24,7 @@
 #include "freertos/task.h"
 #include "webrtc_bridge.h"
 
-static uint8_t s_last_quality = 8;
+static uint8_t s_last_quality = 15;
 
 // Structure to hold snapshot data for queue
 struct SnapshotData
