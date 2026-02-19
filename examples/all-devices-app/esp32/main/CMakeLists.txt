@@ -17,9 +17,6 @@
 
 get_filename_component(CHIP_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../.." REALPATH)
 get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
-include("${CHIP_ROOT}/src/app/chip_data_model.cmake")
-
-set(CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION OFF)
 
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
@@ -60,34 +57,6 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST})
 
 target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS})
-
-set(ALL_DEVICES_CLUSTERS
-    # keep-sorted: start
-    "access-control-server"
-    "administrator-commissioning-server"
-    "basic-information"
-    "boolean-state-server"
-    "chime-server"
-    "descriptor"
-    "general-commissioning-server"
-    "general-diagnostics-server"
-    "group-key-mgmt-server"
-    "groups-server"
-    "identify-server"
-    "level-control"
-    "network-commissioning"
-    "occupancy-sensor-server"
-    "on-off-server"
-    "operational-credentials-server"
-    "scenes-server"
-    "software-diagnostics-server"
-    "wifi-network-diagnostics-server"
-    # keep-sorted: end
-)
-
-foreach(CLUSTER ${ALL_DEVICES_CLUSTERS})
-    chip_configure_cluster(${COMPONENT_LIB} ${CLUSTER})
-endforeach()
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC

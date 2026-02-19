@@ -16,9 +16,36 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("lib.gni")
 
+source_set("app-server-clusters") {
+  public_deps = [
+    "${chip_root}/src/app/clusters/access-control-server:access-control-server",
+    "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
+    "${chip_root}/src/app/clusters/basic-information:basic-information",
+    "${chip_root}/src/app/clusters/boolean-state-server:boolean-state-server",
+    "${chip_root}/src/app/clusters/chime-server:chime-server",
+    "${chip_root}/src/app/clusters/descriptor:descriptor",
+    "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-diagnostics-server",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server:group-key-mgmt-server",
+    "${chip_root}/src/app/clusters/groupcast:groupcast",
+    "${chip_root}/src/app/clusters/groups-server:groups-server",
+    "${chip_root}/src/app/clusters/identify-server:identify-server",
+    "${chip_root}/src/app/clusters/level-control:level-control",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/clusters/occupancy-sensor-server:occupancy-sensor-server",
+    "${chip_root}/src/app/clusters/on-off-server:on-off-server",
+    "${chip_root}/src/app/clusters/operational-credentials-server:operational-credentials-server",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
+    "${chip_root}/src/app/clusters/scenes-server:scenes-server",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-diagnostics-server",
+    "${chip_root}/src/app/clusters/wifi-network-diagnostics-server:wifi-network-diagnostics-server",
+  ]
+}
+
 source_set("without-logging") {
   public_deps = [
     "${chip_root}/src/app",
+    ":app-server-clusters",
     "${chip_root}/src/ble",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",

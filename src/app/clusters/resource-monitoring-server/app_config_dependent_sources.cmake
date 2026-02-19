@@ -14,7 +14,6 @@
 
 # app_config_dependent_sources.cmake
 # This block adds the codegen integration sources, similar to app_config_dependent_sources.gni
-if(CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION)
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
@@ -22,7 +21,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/resource-monitoring-server.h"
 )
-endif()
 
 # These are the things that BUILD.gn dependencies would pull
 TARGET_SOURCES(

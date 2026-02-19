@@ -23,15 +23,6 @@ endif()
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
 include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 
-# Controls whether cluster codegen integration sources (e.g. CodegenIntegration.cpp)
-# from app_config_dependent_sources.cmake are included.
-option(CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION
-       "Include cluster codegen integration sources from app_config_dependent_sources.cmake"
-       ON)
-if(DEFINED CONFIG_CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION)
-    set(CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION ${CONFIG_CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION})
-endif()
-
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster
 #
 function(chip_configure_cluster APP_TARGET CLUSTER)

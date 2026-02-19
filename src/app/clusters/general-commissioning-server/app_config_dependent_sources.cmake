@@ -14,14 +14,12 @@
 
 # This is the equivalent to app_config_dependent_sources.gni
 
-if(CHIP_APP_ENABLE_CLUSTER_CODEGEN_INTEGRATION)
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
 )
-endif()
 
 # These are the things that BUILD.gn dependencies would pull
 TARGET_SOURCES(
