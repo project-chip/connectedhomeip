@@ -271,7 +271,7 @@ class TC_ACS_3_1(MatterBaseTest):
             semantic_tag1 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID1, tag=tag1, label=NullValue)
             semantic_tag2 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=NullValue)
             subscription_expected1 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag1, detectionTime=None)
-            subscription_expected2 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag1, detectionTime=None)
+            subscription_expected2 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag2, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
                     endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected2, subscription_expected1])],
@@ -366,4 +366,5 @@ class TC_ACS_3_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
