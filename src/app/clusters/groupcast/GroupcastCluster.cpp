@@ -70,7 +70,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
     FabricIndex fabric_index = handler->GetAccessingFabricIndex();
 
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
+    [[maybe_unused]] Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
 
     switch (request.path.mCommandId)
     {
@@ -111,7 +111,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::GroupcastTesting::Id: {
         Groupcast::Commands::GroupcastTesting::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = GroupcastTesting(fabric_index, data);
+        return GroupcastTesting(fabric_index, data);
     }
     break;
     default:
@@ -139,10 +139,16 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
         constexpr uint16_t kMinDuration = 10, kMaxDuration = 1200;
         VerifyOrReturnError(data.durationSeconds.Value() >= kMinDuration && data.durationSeconds.Value() <= kMaxDuration,
                             Status::ConstraintError);
+        DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
         VerifyOrReturnError(CHIP_NO_ERROR ==
                                 DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(data.durationSeconds.Value()),
                                                                       OnGroupcastTestingDone, this),
                             Status::Failure);
+    }
+    else
+    {
+        // cancel any existing GroupcastTesting timer
+        DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
     }
 
     mTestingState = data.testOperation;
