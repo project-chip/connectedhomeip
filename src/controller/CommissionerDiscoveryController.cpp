@@ -87,6 +87,7 @@ void CommissionerDiscoveryController::OnCancel(UDCClientState state)
     {
         mUserPrompter->HidePromptsOnCancel(state.GetVendorId(), state.GetProductId(), state.GetDeviceName());
     }
+    ResetState();
     return;
 }
 
@@ -384,6 +385,7 @@ void CommissionerDiscoveryController::HandleTargetContentAppCheck(TargetAppInfo 
         CommissionerDeclaration cd;
         cd.SetNoAppsFound(true);
         mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        ResetState();
     }
     ChipLogDetail(AppServer, "UX Ok - HandleContentAppCheck: advancing");
     // otherwise, advance to the next step for trying to obtain a passcode.
@@ -512,6 +514,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         CommissionerDeclaration cd;
         cd.SetNeedsPasscode(true);
         mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        ResetState();
         return;
     }
 

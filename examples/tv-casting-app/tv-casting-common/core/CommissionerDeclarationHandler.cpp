@@ -57,6 +57,17 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
         support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
+    // During the workflow for Detecting App Presence on Casting Player, we send UDC with NoPasscode=True.
+    // The CD we get back will indicate NeedsPasscode=true and PasscodeDialogDisplayed=false.
+    // In this scenario, we want to clear the UDC status to allow other UDC messages to be sent.
+    if (cd.GetNeedsPasscode() && !cd.GetPasscodeDialogDisplayed())
+    {
+        ChipLogProgress(AppServer,
+                        "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() "
+                        "needs passcode - This is likely an App Check response");
+        support::ChipDeviceEventHandler::SetUdcStatus(false);
+    }
+
     // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
     if (cd.GetCancelPasscode())
     {
