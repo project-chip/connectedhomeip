@@ -672,7 +672,7 @@ void WindowManager::UpdateLCD()
 
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         // TODO: CurrentPositionLift and CurrentPositionTilt attributes are deprecated now, setting the value
-        // here to the default one defined in the ZAP file fot this example before the removal.
+        // here to the default one defined in the ZAP file for this example before the removal.
         LcdPainter::Paint(AppTask::GetAppTask().GetLCD(), type, LIFT_OPEN_DEFAULT, TILT_OPEN_DEFAULT, mIcon);
     }
 }
