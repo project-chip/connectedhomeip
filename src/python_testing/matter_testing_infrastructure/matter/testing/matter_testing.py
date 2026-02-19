@@ -1525,14 +1525,22 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.error(f"Failed to reboot app: {e}")
                 asserts.fail(f"App reboot failed: {e}")
 
-    async def request_device_factory_reset(self):
+    async def request_device_factory_reset(self, reset_ctrl: bool = False) -> None:
         """Request a factory reset of the Device Under Test (DUT).
 
-        This method handles factory resets in both CI and development environments (via run_python_test.py test runner script)
-        and also manual testing scenarios (via user input).
-        It will expire existing sessions to allow for controllers to reconnect to the DUT after the factory reset.
+        This method handles factory resets in both CI and development environments and also manual
+        testing scenarios (via user input). It expires existing sessions to allow for controllers
+        to reconnect to the DUT after the factory reset.
+
+        Args:
+            reset_ctrl (bool): If True, removes app, REPL configs, and controller config.
+                               If False, removes app and REPL configs but keeps controller config.
+                               Defaults to False.
+
+        Returns:
+            None
         """
-        # Check if restart flag file is available (indicates test runner supports app reboot)
+        # Check if restart flag file is available (indicates test runner supports app factory reset)
         restart_flag_file = self.get_restart_flag_file()
 
         if not restart_flag_file:
@@ -1544,21 +1552,23 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("Manual device factory reset completed")
 
         else:
+            restart_flag_text = "factory reset" if reset_ctrl else "factory reset app only"
             try:
                 # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, "w") as f:
-                    f.write("reset")
-                    LOGGER.info("Created restart flag file to signal app factory reset")
+                    f.write(restart_flag_text)
+                    LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
 
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
-                LOGGER.info("App factory reset completed successfully")
+                LOGGER.info("%s request sent successfully", restart_flag_text.capitalize())
 
             except Exception as e:
-                LOGGER.error(f"Failed to factory reset app: {e}")
-                asserts.fail(f"App factory reset failed: {e}")
+                err = f"Failed to {restart_flag_text}: {e}"
+                LOGGER.error(err)
+                asserts.fail(err)
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
