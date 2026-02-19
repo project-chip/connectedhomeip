@@ -197,10 +197,11 @@ public:
             if (name == "Temperature")
             {
                 auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-                VerifyOrReturn(temperatureMeasurement != nullptr);
+                VerifyOrReturn(temperatureMeasurement != nullptr,
+                               ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", 1));
 
                 // update the temp attribute here for hardcoded endpoint 1
-                TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(n * 100)));
             }
             else if (name == "Color Current Level")
             {
@@ -675,8 +676,11 @@ void SetupPretendDevices()
     auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
     if (temperatureMeasurement != nullptr)
     {
-        // write the temp attribute
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100));
+        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100)));
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", 1));
     }
 
     AddDevice("Garage 1");
@@ -721,14 +725,6 @@ void SetupPretendDevices()
     AddDevice("Thermostat");
     AddEndpoint("1");
     AddCluster("Thermostat");
-
-    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-    if (temperatureMeasurement != nullptr)
-    {
-        // write the temp attribute
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100));
-    }
-
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, chip::app::Clusters::Thermostat::SystemModeEnum::kHeat);

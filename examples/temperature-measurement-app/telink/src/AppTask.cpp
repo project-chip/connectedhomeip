@@ -50,7 +50,9 @@ CHIP_ERROR AppTask::Init(void)
     PlatformMgr().LockChipStack();
 
     auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(kExampleEndpointId);
-    VerifyOrReturn(temperatureMeasurement != nullptr);
+    VerifyOrReturn(
+        temperatureMeasurement != nullptr,
+        ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", kExampleEndpointId));
 
     CHIP_ERROR err = temperatureMeasurement->SetMinMeasuredValue(SensorMgr().GetMinMeasuredTempValue());
     VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -101,7 +103,7 @@ void AppTask::TemperatureMeasurementUpdateTimerEventHandler(AppEvent * aEvent)
     auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(kExampleEndpointId);
     if (temperatureMeasurement != nullptr)
     {
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(temperature);
+        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(temperature));
     }
     PlatformMgr().UnlockChipStack();
 

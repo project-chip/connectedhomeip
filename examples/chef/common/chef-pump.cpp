@@ -82,9 +82,10 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     {
         auto updatedTemperature     = onOff ? TemperatureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
         auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
-        VerifyOrReturn(temperatureMeasurement != nullptr);
+        VerifyOrReturn(temperatureMeasurement != nullptr,
+                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", endpointId));
 
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(updatedTemperature);
+        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(updatedTemperature));
 
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
@@ -156,7 +157,7 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
         auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
         VerifyOrReturn(temperatureMeasurement != nullptr);
 
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(updatedTemperature);
+        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(updatedTemperature));
 
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);

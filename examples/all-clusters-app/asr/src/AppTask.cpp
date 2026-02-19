@@ -184,9 +184,10 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     case AppEvent::kEventType_Timer: {
 
         auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-        VerifyOrReturn(temperatureMeasurement != nullptr);
+        VerifyOrReturn(temperatureMeasurement != nullptr,
+                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", 1));
 
-        TEMPORARY_RETURN_IGNORED temperatureMeasurement->SetMeasuredValue(/* temperature in 0.01*C */ temperature);
+        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(/* temperature in 0.01*C */ temperature));
 
         chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
             /* endpoint ID */ 1, /* humidity in 0.01% */ humidity);

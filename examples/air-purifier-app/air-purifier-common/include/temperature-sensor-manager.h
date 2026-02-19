@@ -29,12 +29,13 @@ namespace Clusters {
 class TemperatureSensorManager
 {
 public:
-    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
+    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
 
     void Init()
     {
         auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(mEndpointId);
-        VerifyOrReturn(temperatureMeasurement != nullptr);
+        VerifyOrReturn(temperatureMeasurement != nullptr,
+                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", mEndpointId));
 
         CHIP_ERROR err = temperatureMeasurement->SetMinMeasuredValue(-500);
         VerifyOrReturn(err == CHIP_NO_ERROR,
@@ -48,7 +49,8 @@ public:
     void OnTemperatureChangeHandler(int16_t newValue)
     {
         auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(mEndpointId);
-        VerifyOrReturn(temperatureMeasurement != nullptr);
+        VerifyOrReturn(temperatureMeasurement != nullptr,
+                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", mEndpointId));
 
         CHIP_ERROR err = temperatureMeasurement->SetMeasuredValue(newValue);
         VerifyOrReturn(err == CHIP_NO_ERROR,
