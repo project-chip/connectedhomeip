@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CAMERA_APP}
+#     app: ${ALL_CLUSTER_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -43,10 +43,15 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
+
+HUMANACTIVITYNAMESPACEID = 0x4B
+OBJECTIDENTIFICATIONNAMESPACEID = 0x49
+SOUNDIDENTIFICATIONNAMESPACEID = 0x4A
 
 
 class TC_ACS_3_2(MatterBaseTest):
@@ -92,9 +97,11 @@ class TC_ACS_3_2(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_3_2(self):
+        node_id = self.dut_node_id
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
         attr = Clusters.AmbientContextSensing.Attributes
+        dev_ctrl = self.default_controller
 
         self.step("1")
         # Commission DUT - already done
@@ -103,35 +110,62 @@ class TC_ACS_3_2(MatterBaseTest):
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
         log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         self.HumanActivitySupported = aFeatureMap & cluster.Bitmaps.Feature.kHumanActivity
+        log.info(f"Rx'd HumanActivitySupported: {self.HumanActivitySupported}")
         self.ObjectCountingSupported = aFeatureMap & cluster.Bitmaps.Feature.kObjectCounting
+        log.info(f"Rx'd ObjectCountingSupported: {self.ObjectCountingSupported}")
         self.ObjectIdentificationSupported = aFeatureMap & cluster.Bitmaps.Feature.kObjectIdentification
+        log.info(f"Rx'd ObjectIdentificationSupported: {self.ObjectIdentificationSupported}")
         self.SoundIdentificationSupported = aFeatureMap & cluster.Bitmaps.Feature.kSoundIdentification
+        log.info(f"Rx'd SoundIdentificationSupported: {self.SoundIdentificationSupported}")
         self.PredictedActivitySupported = aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity
+        log.info(f"Rx'd PredictedActivitySupported: {self.PredictedActivitySupported}")
+
+        # subscription setup for the following trigger testing
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         self.step("2")
-        PIXITHoldTimeMax = 40  # 40 sec hold time max
-        await self.write_single_attribute(attr.HoldTimeLimits.holTimeMax(PIXITHoldTimeMax))
+        holdtimemax_input = 40  # define HoldTimeMax to be 50 sec
+        await self.write_single_attribute(attr.HoldTimeLimits.holTimeMax(holdtimemax_input))
 
         holdTimeMax = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits.holdTimeMax
         )
-        asserts.assert_true(holdTimeMax == PIXITHoldTimeMax,
-                            "Different HoldTimeMax value is read.")
+        asserts.assert_equal(holdTimeMax, holdtimemax_input,
+                             "Different HoldTimeMax value is read.")
+
+        # subscription check
+        subscription_expected = cluster.Structs.HoldTimeLimitStruct(
+            holdTimeMin=1, holdTimeMax=holdtimemax_input, holdTimeDefault=10)
+        attrib_listener.await_all_final_values_reported(
+            expected_final_values=[AttributeValue(
+                endpoint_id=endpoint_id, attribute=attr.HoldTimeLimit, value=subscription_expected)],
+            timeout_sec=30.0)
+        log.info("Received attribute report for HoldTimeLimit.")
+        attrib_listener.reset()
 
         self.step("3")
-        PIXITHoldTime = 30  # 30 sec hold time
-        await self.write_single_attribute(attr.HoldTime(PIXITHoldTime))
+        holdtime_input = 30  # 30 sec for HoldTime
+        await self.write_single_attribute(attr.HoldTime(holdtime_input))
 
         holdTime = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime
         )
-        asserts.assert_true(holdTime == PIXITHoldTime,
-                            "Different HoldTime value is read.")
+        asserts.assert_eqaul(holdTime, holdtime_input, "Different HoldTime value is read.")
+
+        # subscription check
+        subscription_expected = holdtime_input
+        attrib_listener.await_all_final_values_reported(
+            expected_final_values=[AttributeValue(
+                endpoint_id=endpoint_id, attribute=attr.HoldTime, value=subscription_expected)],
+            timeout_sec=30.0)
+        log.info("Received attribute report for HoldTime.")
+        attrib_listener.reset()
 
         self.step("4")  # Trigger sensor
         # PIXIT.ACS.AmbientContextSensed_1 = Human activity walking
-        PIXITNamespaceID1 = 0x4B
-        PIXITTag1 = 0x03
+        namespaceID1 = HUMANACTIVITYNAMESPACEID
+        tag1 = 0x03  # walking
         # CI call to trigger on
         if self.is_ci:
             self.write_to_app_pipe(
@@ -150,8 +184,8 @@ class TC_ACS_3_2(MatterBaseTest):
         nsID_1 = ambientContextType.ambientContextSensed.namespaceID
         tagID_1 = ambientContextType.ambientContextSensed.tag
         # check the response is the same as what is expected
-        asserts.assert_true(nsID_1 == PIXITNamespaceID1 & tagID_1 == PIXITTag1,
-                            "Namespace ID and Tag ID must reflect step 4 sensing context.")
+        asserts.assert_equal(nsID_1, namespaceID1, "Namespace ID and Tag ID must reflect step 4 sensing context.")
+        asserts.assert_equal(tagID_1, tag1, "Namespace ID and Tag ID must reflect step 4 sensing context.")
 
         self.step("6")  # Trigger the sensor with same ambient context after 20 seconds from the step 4
         # PIXIT.ACS.AmbientContextSensed_1 = Human activity walking
@@ -171,18 +205,17 @@ class TC_ACS_3_2(MatterBaseTest):
         log.info(f"Rx'd AmbientContextType: {ambientContextType}")
 
         # Same trigger shouldn't add to the list
-        asserts.assert_true(len(ambientContextType) == 1,
-                            "AmbientContextType needs to be the size of 1.")
+        asserts.assert_equal(len(ambientContextType), 1,
+                             "AmbientContextType needs to be the size of 1.")
 
         nsID_2 = ambientContextType.ambientContextSensed.namespaceID
         tagID_2 = ambientContextType.ambientContextSensed.tag
         # check the response is the same as what is expected
-        asserts.assert_true(nsID_2 == PIXITNamespaceID1 & tagID_2 == PIXITTag1,
-                            "Namespace ID and Tag ID must reflect step 6 sensing context.")
+        asserts.assert_equal(nsID_2, namespaceID1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
+        asserts.assert_equal(tagID_2, tag1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
         self.step("8")  # wait until 40 seconds from the step 4
-        # time.sleep(40)
-        await asyncio.sleep(40)
+        await asyncio.sleep(holdtimemax_input)
 
         self.step("9")
         if self.HumanActivitySupported:
@@ -208,4 +241,3 @@ class TC_ACS_3_2(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
