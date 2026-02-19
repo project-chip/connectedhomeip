@@ -43,7 +43,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -139,7 +139,7 @@ class TC_ACS_3_1(MatterBaseTest):
             # subscription setup for the following trigger testing
             attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
             await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
-            
+
             simultaneouslimit_input = 2  # define simultaneous detection limit to 2
             await self.write_single_attribute(attr.SimultaneousDetectionLimit(simultaneouslimit_input))
 
@@ -147,12 +147,13 @@ class TC_ACS_3_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit
             )
             asserts.assert_equal(simultaneousDetectionLimit, simultaneouslimit_input,
-                                "Different SimultaneousDetectionLimit value is read.")
+                                 "Different SimultaneousDetectionLimit value is read.")
 
             # subscription check
             subscription_expected = simultaneouslimit_input
             attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=attr.SimultaneousDetectionLimit, value=subscription_expected)],
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint_id, attribute=attr.SimultaneousDetectionLimit, value=subscription_expected)],
                 timeout_sec=30.0)
             log.info("Received attribute report for SimultaneousDetectionLimit.")
             attrib_listener.reset()
@@ -165,12 +166,14 @@ class TC_ACS_3_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits.holdTimeMax
             )
             asserts.assert_equal(holdTimeMax, holdtimemax_input,
-                                "Different HoldTimeMax value is read.")
+                                 "Different HoldTimeMax value is read.")
 
             # subscription check
-            subscription_expected = cluster.Structs.HoldTimeLimitStruct(holdTimeMin=1, holdTimeMax=holdtimemax_input, holdTimeDefault=10)
+            subscription_expected = cluster.Structs.HoldTimeLimitStruct(
+                holdTimeMin=1, holdTimeMax=holdtimemax_input, holdTimeDefault=10)
             attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=attr.HoldTimeLimit, value=subscription_expected)],
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint_id, attribute=attr.HoldTimeLimit, value=subscription_expected)],
                 timeout_sec=30.0)
             log.info("Received attribute report for HoldTimeLimit.")
             attrib_listener.reset()
@@ -183,11 +186,12 @@ class TC_ACS_3_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime
             )
             asserts.assert_eqaul(holdTime, holdtime_input, "Different HoldTime value is read.")
-            
+
             # subscription check
             subscription_expected = holdtime_input
             attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=attr.HoldTime, value=subscription_expected)],
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint_id, attribute=attr.HoldTime, value=subscription_expected)],
                 timeout_sec=30.0)
             log.info("Received attribute report for HoldTime.")
             attrib_listener.reset()
@@ -220,7 +224,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # subscription check ON HOLD
             # semantic_tag = {NULL,namespaceID1,tag1,NULL}
-            # subscription_expected = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag, detectionTime=0)    
+            # subscription_expected = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag, detectionTime=0)
             # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=attr.AmbientContextType, value=1)], timeout_sec=30.0)
             # log.info("Received attribute report for AmbientContextType.")
             # attrib_listener.reset()
@@ -255,7 +259,7 @@ class TC_ACS_3_1(MatterBaseTest):
             nsID_2_1 = ambientContextType[1].ambientContextSensed.namespaceID
             tagID_2_1 = ambientContextType[1].ambientContextSensed.tag
             asserts.assert_equal(nsID_2_1, namespaceID1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
-            asserts.assert_equal(tagID_2_1, tag1, "Namespace ID and Tag ID must reflect step 6 sensing context.")  
+            asserts.assert_equal(tagID_2_1, tag1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
             self.step("10")  # Trigger another ambient sensing
             # PIXIT.ACS.AmbientContextSensed_2 = Sound Identification barking
@@ -278,7 +282,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
             # PIXITSimultaneousDetectionLimit = 2
             asserts.assert_equal(len(ambientContextType), simultaneousDetectionLimit,
-                                "AmbientContextType needs to be the size of 2.")
+                                 "AmbientContextType needs to be the size of 2.")
 
             nsID_3 = ambientContextType[0].ambientContextSensed.namespaceID
             tagID_3 = ambientContextType[0].ambientContextSensed.tag
@@ -323,4 +327,5 @@ class TC_ACS_3_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
