@@ -1177,7 +1177,7 @@ subsequent connections to that TV.
    will attempt to establish a secure connection with the TV by calling
    `FindOrEstablishSession`.
 
-3) **DNS-SD Information Changes**: If the credential matching fails for a TV
+3. **DNS-SD Information Changes**: If the credential matching fails for a TV
    with a cached credential (for example, if fields in the DNS-SD information
    change, such as the IP address or device name), the pin code flow and
    commissioning will be triggered. During this commissioning process, the TV
@@ -1193,7 +1193,7 @@ subsequent connections to that TV.
     In this scenario, the phone app will receive a failure callback for the
     first attempt, but the subsequent commissioning attempt should succeed.
 
-4) **TV Factory Reset Recovery**: If the phone app believes it has a cached
+4. **TV Factory Reset Recovery**: If the phone app believes it has a cached
    credential for a given TV (the DNS-SD information match succeeds), but the TV
    does not recognize the phone app (this could happen if the TV has been
    factory reset but then setup again with the same customer account - and
@@ -1205,7 +1205,7 @@ subsequent connections to that TV.
    call `removeFabric()` to recover. Then it will need to perform the pin code
    flow for this TV again.
 
-5) **Shared Credentials Across TVs**: When there are 2 TVs that use the same
+5. **Shared Credentials Across TVs**: When there are 2 TVs that use the same
    middleware (e.g., FireTV) and are associated with the same customer account,
    they will often use the same cached credential (they use the same Matter
    fabric), however, the DNS-SD information is different. The resulting behavior
