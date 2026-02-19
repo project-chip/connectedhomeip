@@ -71,12 +71,11 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
     return Status::Success;
 }
 
-void BridgedDeviceBasicInformationCluster::SetConfigurationVersion(uint32_t configurationVersion)
+void BridgedDeviceBasicInformationCluster::IncreaseConfigurationVersion()
 {
-    VerifyOrReturn(mRequiredData.configurationVersion != configurationVersion);
-
-    mRequiredData.configurationVersion = configurationVersion;
+    mRequiredData.configurationVersion++;
     NotifyAttributeChanged(Attributes::ConfigurationVersion::Id);
+    LogErrorOnFailure(mClusterContext.parentVersionConfiguration.IncreaseConfigurationVersion());
 }
 
 DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,

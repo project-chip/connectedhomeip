@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/basic-information/VersionedConfigurationDelegate.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceIcdDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -41,6 +42,7 @@ class BridgedDeviceBasicInformationCluster : public DefaultServerCluster
 public:
     struct Context
     {
+        VersionedConfigurationDelegate & parentVersionConfiguration;
         BridgedDeviceBasicInformationDelegate & delegate;
         BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if NULL, ICD support feature is disabled
     };
@@ -93,7 +95,16 @@ public:
     DataModel::ActionReturnStatus SetNodeLabel(CharSpan nodeLabel);
 
     uint32_t GetConfigurationVersion() const { return mRequiredData.configurationVersion; }
-    void SetConfigurationVersion(uint32_t configurationVersion);
+
+    /// Increases the configuration version and ALSO increases the device
+    /// configuration version. Specifically handles the spec requirement of:
+    ///
+    /// 9.13.5.4 ConfigurationVersion Attribute:
+    ///   ...
+    ///   If the bridge detects a change on a bridged device, which it deems as a
+    ///   change in the configuration of the bridged device, it SHALL increase this
+    ///   attribute (and the corresponding attribute on the bridge itself)
+    void IncreaseConfigurationVersion();
 
     void GenerateLeaveEvent();
     void GenerateActiveChangedEvent(uint32_t promisedActiveMs);

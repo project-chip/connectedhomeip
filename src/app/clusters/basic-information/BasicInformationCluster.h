@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/clusters/basic-information/VersionedConfigurationDelegate.h>
 #include <app/persistence/String.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
@@ -35,7 +36,9 @@ namespace Clusters {
 
 /// As a PlatformManagerDelegate, it automatically hooks into the node's lifecycle to
 /// emit the mandatory StartUp and optional ShutDown events, ensuring spec compliance.
-class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
+class BasicInformationCluster : public DefaultServerCluster,
+                                public DeviceLayer::PlatformManagerDelegate,
+                                public VersionedConfigurationDelegate
 {
 public:
     // Define the Context struct with References
@@ -95,6 +98,9 @@ public:
     void OnStartUp(uint32_t softwareVersion) override;
 
     void OnShutDown() override;
+
+    // VersionedConfigurationDelegate
+    CHIP_ERROR IncreaseConfigurationVersion() override;
 
 private:
     // write without notification

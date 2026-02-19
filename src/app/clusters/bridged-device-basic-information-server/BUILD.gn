@@ -23,6 +23,7 @@ source_set("bridged-device-basic-information-server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/clusters/basic-information",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/BridgedDeviceBasicInformation",
   ]

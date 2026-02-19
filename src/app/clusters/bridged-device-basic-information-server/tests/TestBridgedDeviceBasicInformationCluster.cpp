@@ -60,6 +60,18 @@ public:
     std::string mLastNodeLabel;
 };
 
+class MockVersionConfigurationDelegate : public VersionedConfigurationDelegate
+{
+public:
+    CHIP_ERROR IncreaseConfigurationVersion() override
+    {
+        mVersion++;
+        return CHIP_NO_ERROR;
+    }
+
+    uint32_t mVersion = 0;
+};
+
 class TestBridgedDeviceIcdDelegate : public BridgedDeviceIcdDelegate
 {
 public:
@@ -81,12 +93,14 @@ struct TestBridgedDeviceBasicInformationCluster : public ::testing::Test
 
     TestServerClusterContext mContext;
     MockDelegate mDelegate;
+    MockVersionConfigurationDelegate mMockVersionConfiguration;
 };
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestEmptyAttributes)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true }, {},
-                                                 { .delegate = mDelegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::UniqueID::kMetadataEntry,
@@ -103,7 +117,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestPartialAttributes)
         {
             .partNumber = "010203",
         },
-        { .delegate = mDelegate });
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::UniqueID::kMetadataEntry,
@@ -138,7 +152,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAllAttributes)
                     .primaryColor = ColorEnum::kFuchsia,
                 },
         },
-        { .delegate = mDelegate });
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::VendorName::kMetadataEntry,
@@ -186,7 +200,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
                     .primaryColor = ColorEnum::kRed,
                 },
         },
-        { .delegate = mDelegate });
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     ClusterTester tester(cluster);
 
     CharSpan charSpanVal;
@@ -239,8 +253,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
 {
     TestBridgedDeviceIcdDelegate delegate;
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {},
-                                                 { .delegate = mDelegate, .icdDelegate = &delegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "icd-dev" }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate, .icdDelegate = &delegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -258,8 +273,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandTimeoutDomain)
 {
     TestBridgedDeviceIcdDelegate delegate;
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {},
-                                                 { .delegate = mDelegate, .icdDelegate = &delegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "icd-dev" }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate, .icdDelegate = &delegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -280,8 +296,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandTimeoutDom
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestReachableChangedEvent)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "event-dev", .reachable = false }, {},
-                                                 { .delegate = mDelegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "event-dev", .reachable = false }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     cluster.SetReachable(true);
@@ -300,7 +317,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestReachableChangedEvent)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestLeaveEvent)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "event-dev" }, {}, { .delegate = mDelegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "event-dev" }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     cluster.GenerateLeaveEvent();
@@ -317,8 +336,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestLeaveEvent)
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestActiveChangedEvent)
 {
     TestBridgedDeviceIcdDelegate delegate;
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd-dev" }, {},
-                                                 { .delegate = mDelegate, .icdDelegate = &delegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "icd-dev" }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate, .icdDelegate = &delegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
     constexpr uint32_t promisedDuration = 5000;
@@ -340,7 +360,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestFeatureMap)
 {
     // Test without ICD delegate
     {
-        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "no-icd" }, {}, { .delegate = mDelegate });
+        BridgedDeviceBasicInformationCluster cluster(
+            kTestEndpointId, { .uniqueId = "no-icd" }, {},
+            { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
         EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
         BitFlags<Feature> featureMap;
@@ -351,8 +373,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestFeatureMap)
     // Test with ICD delegate
     {
         TestBridgedDeviceIcdDelegate delegate;
-        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "icd" }, {},
-                                                     { .delegate = mDelegate, .icdDelegate = &delegate });
+        BridgedDeviceBasicInformationCluster cluster(
+            kTestEndpointId, { .uniqueId = "icd" }, {},
+            { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate, .icdDelegate = &delegate });
         EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
         BitFlags<Feature> featureMap;
@@ -363,8 +386,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestFeatureMap)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabel)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
-                                                 { .delegate = mDelegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -396,27 +420,27 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabel)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetConfigurationVersion)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
-                                                 { .delegate = mDelegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "test-cfg-ver", .configurationVersion = 1u }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
-    cluster.SetConfigurationVersion(2u);
-    EXPECT_EQ(cluster.GetConfigurationVersion(), 2u);
+    mMockVersionConfiguration.mVersion = 0;
+    cluster.IncreaseConfigurationVersion();
+    EXPECT_EQ(cluster.GetConfigurationVersion(), 2u);  // we started with 1
+    EXPECT_EQ(mMockVersionConfiguration.mVersion, 1u); // parent is also increased
 
     uint32_t configVersion;
     EXPECT_EQ(tester.ReadAttribute(Attributes::ConfigurationVersion::Id, configVersion), CHIP_NO_ERROR);
     EXPECT_EQ(configVersion, 2u);
-
-    // Test no change
-    cluster.SetConfigurationVersion(2u);
-    EXPECT_EQ(cluster.GetConfigurationVersion(), 2u);
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteNodeLabel)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
-                                                 { .delegate = mDelegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
@@ -439,8 +463,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteNodeLabel)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteConfigurationVersion)
 {
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
-                                                 { .delegate = mDelegate });
+    BridgedDeviceBasicInformationCluster cluster(
+        kTestEndpointId, { .uniqueId = "test-unique-id", .configurationVersion = 1u }, {},
+        { .parentVersionConfiguration = mMockVersionConfiguration, .delegate = mDelegate });
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
