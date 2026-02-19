@@ -110,7 +110,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
                                              mContext.diagnosticDataProvider);
     ReturnErrorOnFailure(provider.AddCluster(mSoftwareDiagnosticsServerCluster.Registration()));
 
-    mAccessControlCluster.Create(AccessControlCluster::Context{
+    mAccessControlCluster.Create(BitFlags<AccessControl::Feature>{}, AccessControlCluster::Context{
         .persistentStorage = mContext.persistentStorage,
         .fabricTable       = mContext.fabricTable,
         .accessControl     = mContext.accessControl,

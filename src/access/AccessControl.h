@@ -37,10 +37,6 @@
 #define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
 
 namespace chip {
-namespace Credentials {
-class GroupDataProvider;
-}
-
 namespace Access {
 
 class AccessControl
@@ -409,6 +405,11 @@ public:
         // Iteration
         virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const { return CHIP_NO_ERROR; }
 
+        virtual CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex) const
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
         // Check
         // Return CHIP_NO_ERROR if allowed, CHIP_ERROR_ACCESS_DENIED if denied,
         // CHIP_ERROR_NOT_IMPLEMENTED to use the default check algorithm (against entries),
@@ -431,6 +432,11 @@ public:
         if (IsInitialized())
         {
             mDelegate->Release();
+        }
+
+        if (IsGroupAuxiliaryDelegateRegistered())
+        {
+            mGroupAuxDelegate->Release();
         }
     }
 
@@ -649,13 +655,53 @@ public:
      * @param [in]  fabric   Fabric for which to iterate auxiliary entries.
      * @param [out] iterator Iterator controlling the iteration.
      */
-    CHIP_ERROR AuxiliaryEntries(FabricIndex fabric, EntryIterator & iterator) const;
+    CHIP_ERROR AuxiliaryEntries(FabricIndex fabric, EntryIterator & iterator) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
+        return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabric);
+    }
+
+    /**
+     * Iterates over auxiliary entries for the given fabric.
+     *
+     * @param [out] iterator    Iterator controlling the iteration.
+     * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
+     */
+    CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
+        return mGroupAuxDelegate->AuxiliaryEntries(iterator, fabricIndex);
+    }
 
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
 
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
+
+    /**
+     * @brief Registers a delegate to handle auxiliary access control entries.
+     *
+     * @param[in] delegate The delegate to register.
+     *
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the delegate is null.
+     * @retval #CHIP_ERROR_INCORRECT_STATE if a delegate is already registered.
+     * @retval #CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR RegisterGroupAuxiliaryDelegate(Delegate * delegate)
+    {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mGroupAuxDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mGroupAuxDelegate = delegate;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * @brief Unregisters the delegate handling auxiliary access control entries.
+     */
+    void UnregisterGroupAuxiliaryDelegate() { mGroupAuxDelegate = nullptr; }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Set an optional AcceessRestriction object for MNGD feature.
@@ -666,13 +712,6 @@ public:
 
     AccessRestrictionProvider * GetAccessRestrictionProvider() { return mAccessRestrictionProvider; }
 #endif
-
-    void SetGroupDataProvider(Credentials::GroupDataProvider * groupDataProvider)
-    {
-        mGroupDataProvider = groupDataProvider;
-    }
-
-    Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
 
     /**
      * Check whether or not Access Restriction List is supported.
@@ -700,6 +739,8 @@ public:
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
 
+    bool IsGroupAuxiliaryDelegateRegistered() const { return (mGroupAuxDelegate != nullptr); }
+
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);
 
@@ -719,11 +760,11 @@ private:
 private:
     Delegate * mDelegate = nullptr;
 
+    Delegate * mGroupAuxDelegate = nullptr;
+
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 
     EntryListener * mEntryListener = nullptr;
-
-    Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     AccessRestrictionProvider * mAccessRestrictionProvider;

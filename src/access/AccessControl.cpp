@@ -23,7 +23,6 @@
 
 #include "AccessControl.h"
 
-#include <credentials/GroupDataProvider.h>
 #include <lib/core/Global.h>
 #include <lib/support/TypeTraits.h>
 
@@ -236,6 +235,12 @@ void AccessControl::Finish()
     ChipLogProgress(DataManagement, "AccessControl: finishing");
     mDelegate->Finish();
     mDelegate = nullptr;
+
+    if (IsGroupAuxiliaryDelegateRegistered())
+    {
+        mGroupAuxDelegate->Finish();
+        UnregisterGroupAuxiliaryDelegate();
+    }
 }
 
 CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index,
@@ -341,102 +346,6 @@ void AccessControl::RemoveEntryListener(EntryListener & listener)
     }
 }
 
-class AuxiliaryEntryIteratorDelegate : public AccessControl::EntryIterator::Delegate
-{
-public:
-    AuxiliaryEntryIteratorDelegate(Credentials::GroupDataProvider & groupDataProvider, FabricIndex fabric) :
-        mGroupDataProvider(groupDataProvider), mFabric(fabric)
-    {
-        mGroupInfoIterator = mGroupDataProvider.IterateGroupInfo(mFabric);
-    }
-
-    ~AuxiliaryEntryIteratorDelegate() override
-    {
-        if (mGroupInfoIterator)
-        {
-            mGroupInfoIterator->Release();
-        }
-        if (mEndpointIterator)
-        {
-            mEndpointIterator->Release();
-        }
-    }
-
-    CHIP_ERROR Next(AccessControl::Entry & entry) override
-    {
-        while (mGroupInfoIterator != nullptr || mEndpointIterator != nullptr)
-        {
-            if (mEndpointIterator != nullptr)
-            {
-                Credentials::GroupDataProvider::GroupEndpoint endpoint;
-                if (mEndpointIterator->Next(endpoint))
-                {
-                    ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
-                    ReturnErrorOnFailure(entry.SetFabricIndex(mFabric));
-                    ReturnErrorOnFailure(entry.SetPrivilege(Privilege::kOperate));
-                    ReturnErrorOnFailure(entry.SetAuthMode(AuthMode::kGroup));
-                    ReturnErrorOnFailure(entry.SetAuxiliaryType(AuxiliaryType::kGroupcast));
-                    ReturnErrorOnFailure(entry.AddSubject(nullptr, NodeIdFromGroupId(mGroupId)));
-                    AccessControl::Entry::Target target;
-                    target.flags    = AccessControl::Entry::Target::kEndpoint;
-                    target.endpoint = endpoint.endpoint_id;
-                    ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
-                    return CHIP_NO_ERROR;
-                }
-                mEndpointIterator->Release();
-                mEndpointIterator = nullptr;
-            }
-
-            if (mGroupInfoIterator != nullptr)
-            {
-                Credentials::GroupDataProvider::GroupInfo info;
-                if (mGroupInfoIterator->Next(info))
-                {
-                    if (info.flags & to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL))
-                    {
-                        mGroupId          = info.group_id;
-                        mEndpointIterator = mGroupDataProvider.IterateEndpoints(mFabric, mGroupId);
-                    }
-                }
-                else
-                {
-                    mGroupInfoIterator->Release();
-                    mGroupInfoIterator = nullptr;
-                }
-            }
-        }
-
-        return CHIP_ERROR_SENTINEL;
-    }
-
-private:
-    Credentials::GroupDataProvider & mGroupDataProvider;
-    FabricIndex mFabric;
-    Credentials::GroupDataProvider::GroupInfoIterator * mGroupInfoIterator = nullptr;
-    Credentials::GroupDataProvider::EndpointIterator * mEndpointIterator   = nullptr;
-    GroupId mGroupId                                                       = kUndefinedGroupId;
-};
-
-CHIP_ERROR AccessControl::AuxiliaryEntries(FabricIndex fabric, EntryIterator & iterator) const
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    if (mGroupDataProvider)
-    {
-        auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>(*mGroupDataProvider, fabric);
-        if (delegate)
-        {
-            iterator.SetDelegate(*delegate);
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_NO_MEMORY;
-    } else {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool AccessControl::IsAccessRestrictionListSupported() const
 {
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -453,7 +362,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     VerifyOrReturnError(IsValidPrivilege(requestPrivilege), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
-
+    // if result != chip no error, then try result = check on auxiliary one
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (result == CHIP_NO_ERROR)
     {
@@ -514,6 +423,8 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
 
             return result;
         }
+
+        //fallthrough to attempting auxiliary acl delegation. mGroupAuxDelegate->Check()
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.

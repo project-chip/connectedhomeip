@@ -188,6 +188,9 @@ struct ServerInitParams
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    // Access control auxiliary delegate: Optional. Used to look up auxiliary access control rules.
+    // If provided, must be initialized before being provided.
+    Access::AccessControl::Delegate * groupAuxiliaryAccessControlDelegate = nullptr;
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;

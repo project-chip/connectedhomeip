@@ -63,28 +63,10 @@ using ArlReviewEvent = Events::FabricRestrictionReviewUpdate::Type;
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 namespace {
-CHIP_ERROR ReadAcl(FabricTable & fabricTable, Access::AccessControl & accessControl, AttributeValueEncoder & aEncoder)
-{
-    AccessControl::EntryIterator iterator;
-    AccessControl::Entry entry;
-    AclStorage::EncodableEntry encodableEntry(entry);
-    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        for (auto & info : fabricTable)
-        {
-            auto fabric = info.GetFabricIndex();
-            ReturnErrorOnFailure(accessControl.Entries(fabric, iterator));
-            CHIP_ERROR err = CHIP_NO_ERROR;
-            while ((err = iterator.Next(entry)) == CHIP_NO_ERROR)
-            {
-                ReturnErrorOnFailure(encoder.Encode(encodableEntry));
-            }
-            VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_SENTINEL, err);
-        }
-        return CHIP_NO_ERROR;
-    });
-}
+using EntryProvider = CHIP_ERROR (Access::AccessControl::*)(FabricIndex, AccessControl::EntryIterator &) const;
 
-CHIP_ERROR ReadAuxiliaryAcl(FabricTable & fabricTable, Access::AccessControl & accessControl, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadAclEntries(FabricTable & fabricTable, Access::AccessControl & accessControl, AttributeValueEncoder & aEncoder,
+                          EntryProvider provider)
 {
     AccessControl::EntryIterator iterator;
     AccessControl::Entry entry;
@@ -93,7 +75,7 @@ CHIP_ERROR ReadAuxiliaryAcl(FabricTable & fabricTable, Access::AccessControl & a
         for (auto & info : fabricTable)
         {
             auto fabric = info.GetFabricIndex();
-            ReturnErrorOnFailure(accessControl.AuxiliaryEntries(fabric, iterator));
+            ReturnErrorOnFailure((accessControl.*provider)(fabric, iterator));
             CHIP_ERROR err = CHIP_NO_ERROR;
             while ((err = iterator.Next(entry)) == CHIP_NO_ERROR)
             {
@@ -489,9 +471,10 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     switch (request.path.mAttributeId)
     {
     case AccessControl::Attributes::Acl::Id:
-        return ReadAcl(mClusterContext.fabricTable, mClusterContext.accessControl, encoder);
+        return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder, &Access::AccessControl::Entries);
     case AccessControl::Attributes::AuxiliaryACL::Id:
-        return ReadAuxiliaryAcl(mClusterContext.fabricTable, mClusterContext.accessControl, encoder);
+        return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder,
+                             &Access::AccessControl::AuxiliaryEntries);
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case AccessControl::Attributes::Extension::Id:
         return ReadExtension(mClusterContext.persistentStorage, mClusterContext.fabricTable, encoder);

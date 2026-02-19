@@ -93,8 +93,8 @@ private:
                                          Optional<CharSpan> arlRequestFlowUrl) override;
 #endif
 
-    Context mClusterContext;
     BitFlags<AccessControl::Feature> mFeatureFlags;
+    Context mClusterContext;
 };
 
 } // namespace Clusters

@@ -57,6 +57,8 @@ static_library("access") {
     "AccessControl.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
+    "examples/GroupAuxiliaryAccessControlDelegate.cpp",
+    "examples/GroupAuxiliaryAccessControlDelegate.h",
     "examples/PermissiveAccessControlDelegate.cpp",
     "examples/PermissiveAccessControlDelegate.h",
   ]
@@ -71,6 +73,7 @@ static_library("access") {
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/credentials",
   ]
 
   if (chip_enable_access_restrictions) {
