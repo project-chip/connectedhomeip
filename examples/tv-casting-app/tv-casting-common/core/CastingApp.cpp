@@ -23,6 +23,7 @@
 #include "support/CastingStore.h"
 #include "support/ChipDeviceEventHandler.h"
 
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
@@ -181,6 +182,9 @@ CHIP_ERROR CastingApp::Stop()
 
     // Shutdown the Matter server
     chip::Server::GetInstance().Shutdown();
+
+    // Destroy EventManagement to reset its state for next Start()
+    chip::app::EventManagement::DestroyEventManagement();
 
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
 

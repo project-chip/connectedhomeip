@@ -43,30 +43,73 @@ ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
 
 CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & entry)
 {
-    // we have no strong way to check if entry is already registered somewhere else, so we use "next" as some
-    // form of double-check
-    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     Span<const ConcreteClusterPath> paths = entry.serverClusterInterface->GetPaths();
     VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
+    // Validate all paths have valid IDs and belong to the same endpoint FIRST
+    // This must happen before idempotent checks to ensure invalid registrations are rejected
+    EndpointId firstEndpoint = paths[0].mEndpointId;
     for (const ConcreteClusterPath & path : paths)
     {
         VerifyOrReturnError(path.HasValidIds(), CHIP_ERROR_INVALID_ARGUMENT);
+        // Multi-path clusters must have all paths on the same endpoint
+        VerifyOrReturnError(path.mEndpointId == firstEndpoint, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
-        // Double-checking for duplicates makes the checks O(n^2) on the total number of registered
-        // items. We preserve this however we may want to make this optional at some point in time.
-        VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
+    // Check early if this cluster is already registered (idempotent case)
+    // This prevents unnecessary validation work and ensures we don't modify the linked list structure
+    bool isAlreadyRegistered = false;
+    for (const ConcreteClusterPath & path : paths)
+    {
+        ServerClusterInterface * existing = Get(path);
+        if (existing == entry.serverClusterInterface)
+        {
+            isAlreadyRegistered = true;
+            break;
+        }
+    }
 
-        // Codegen registry requirements (so that we can support endpoint unregistration): every
-        // path must belong to the same endpoint id.
-        VerifyOrReturnError(path.mEndpointId == paths[0].mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    // Validate entry.next is nullptr (unless already registered)
+    // A non-null entry.next when not registered indicates the entry is
+    // already part of another list or improperly initialized
+    if (entry.next != nullptr && !isAlreadyRegistered)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // If already registered (idempotent case), return early
+    if (isAlreadyRegistered)
+    {
+#if CHIP_DETAIL_LOGGING
+        const ConcreteClusterPath path = entry.serverClusterInterface->GetPaths().front();
+        ChipLogDetail(DataManagement, "Cluster already registered for %u/" ChipLogFormatMEI ", skipping re-registration",
+                      path.mEndpointId, ChipLogValueMEI(path.mClusterId));
+#endif
+        return CHIP_NO_ERROR;
+    }
+
+    // Check for duplicate registrations
+    // Note: Same cluster re-registering is OK (handled above), but a DIFFERENT
+    // cluster with the same endpoint/cluster ID is an error
+    // Duplicate checking makes this O(n^2) on total registered items. We preserve this to ensure
+    // cluster integrity during Stop/Start cycles, but this may be optimized in the future if needed.
+    for (const ConcreteClusterPath & path : paths)
+    {
+        // A different cluster is already registered for this path
+        ServerClusterInterface * existing = Get(path);
+        if (existing != nullptr)
+        {
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
     }
 
     if (mContext.has_value())
     {
-        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(*mContext));
+        // To preserve similarity with SetContext, do not fail the register even if Startup fails.
+        // This will cause Shutdown to be called for both successful and failed startups.
+        LogErrorOnFailure(entry.serverClusterInterface->Startup(*mContext));
     }
 
     entry.next     = mRegistrations;
@@ -115,54 +158,6 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * w
     }
 
     return CHIP_ERROR_NOT_FOUND;
-}
-
-ServerClusterInterfaceRegistry::ClustersList ServerClusterInterfaceRegistry::ClustersOnEndpoint(EndpointId endpointId)
-{
-    return { mRegistrations, endpointId };
-}
-
-void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpointId)
-{
-    ServerClusterRegistration * prev    = nullptr;
-    ServerClusterRegistration * current = mRegistrations;
-    while (current != nullptr)
-    {
-        // Requirements for Paths:
-        //   - GetPaths() MUST be non-empty
-        //   - GetPaths() MUST belong to the same endpoint
-        // Loop below relies on that: if the endpoint matches, it can be removed
-        auto paths = current->serverClusterInterface->GetPaths();
-        if (paths.empty() || paths.front().mEndpointId == endpointId)
-        {
-            if (mCachedInterface == current->serverClusterInterface)
-            {
-                mCachedInterface = nullptr;
-            }
-            if (prev == nullptr)
-            {
-                mRegistrations = current->next;
-            }
-            else
-            {
-                prev->next = current->next;
-            }
-            ServerClusterRegistration * actual_next = current->next;
-
-            current->next = nullptr; // Make sure current does not look like part of a list.
-            if (mContext.has_value())
-            {
-                current->serverClusterInterface->Shutdown();
-            }
-
-            current = actual_next;
-        }
-        else
-        {
-            prev    = current;
-            current = current->next;
-        }
-    }
 }
 
 ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClusterPath & clusterPath)
@@ -242,6 +237,11 @@ void ServerClusterInterfaceRegistry::ClearContext()
     }
 
     mContext.reset();
+}
+
+ServerClusterInterfaceRegistry::ClustersList ServerClusterInterfaceRegistry::ClustersOnEndpoint(EndpointId endpointId)
+{
+    return { mRegistrations, endpointId };
 }
 
 } // namespace app

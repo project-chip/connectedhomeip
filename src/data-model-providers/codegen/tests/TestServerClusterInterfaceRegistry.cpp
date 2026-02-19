@@ -182,11 +182,46 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
 
     // clean of an entire endpoint works
     EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), &cluster3);
-    registry.UnregisterAllFromEndpoint(kEp2);
+
+    // Unregister all clusters on endpoint 2
+    // Collect clusters first to avoid iterator invalidation during unregister
+    {
+        std::vector<ServerClusterInterface *> clustersToUnregister;
+        for (const auto & clusterId : registry.ClustersOnEndpoint(kEp2))
+        {
+            auto * cluster = registry.Get({ kEp2, clusterId });
+            if (cluster != nullptr)
+            {
+                clustersToUnregister.push_back(cluster);
+            }
+        }
+        for (auto * cluster : clustersToUnregister)
+        {
+            EXPECT_EQ(registry.Unregister(cluster), CHIP_NO_ERROR);
+        }
+    }
+
     EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), &cluster1);
     EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
 
-    registry.UnregisterAllFromEndpoint(kEp1);
+    // Unregister all clusters on endpoint 1
+    // Collect clusters first to avoid iterator invalidation during unregister
+    {
+        std::vector<ServerClusterInterface *> clustersToUnregister;
+        for (const auto & clusterId : registry.ClustersOnEndpoint(kEp1))
+        {
+            auto * cluster = registry.Get({ kEp1, clusterId });
+            if (cluster != nullptr)
+            {
+                clustersToUnregister.push_back(cluster);
+            }
+        }
+        for (auto * cluster : clustersToUnregister)
+        {
+            EXPECT_EQ(registry.Unregister(cluster), CHIP_NO_ERROR);
+        }
+    }
+
     EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), nullptr);
     EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
 }
@@ -280,10 +315,23 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
         }
         else
         {
-            // bulk unregister
+            // bulk unregister using ClustersOnEndpoint
+            // Collect clusters first to avoid iterator invalidation during unregister
             for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
             {
-                registry.UnregisterAllFromEndpoint(ep);
+                std::vector<ServerClusterInterface *> clustersToUnregister;
+                for (const auto & clusterId : registry.ClustersOnEndpoint(ep))
+                {
+                    auto * cluster = registry.Get({ ep, clusterId });
+                    if (cluster != nullptr)
+                    {
+                        clustersToUnregister.push_back(cluster);
+                    }
+                }
+                for (auto * cluster : clustersToUnregister)
+                {
+                    ASSERT_EQ(registry.Unregister(cluster), CHIP_NO_ERROR);
+                }
             }
         }
     }
@@ -415,7 +463,22 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // Removing an entire endpoint clears the context for clusters (shuts them down)
-        registry.UnregisterAllFromEndpoint(kEp1);
+        // Collect clusters first to avoid iterator invalidation during unregister
+        {
+            std::vector<ServerClusterInterface *> clustersToUnregister;
+            for (const auto & clusterId : registry.ClustersOnEndpoint(kEp1))
+            {
+                auto * cluster = registry.Get({ kEp1, clusterId });
+                if (cluster != nullptr)
+                {
+                    clustersToUnregister.push_back(cluster);
+                }
+            }
+            for (auto * cluster : clustersToUnregister)
+            {
+                EXPECT_EQ(registry.Unregister(cluster), CHIP_NO_ERROR);
+            }
+        }
         EXPECT_FALSE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
