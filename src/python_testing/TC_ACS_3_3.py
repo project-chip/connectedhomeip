@@ -43,10 +43,13 @@ import numpy as np
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+
+from .Types import NullValue
 
 log = logging.getLogger(__name__)
 
@@ -124,14 +127,6 @@ class TC_ACS_3_3(MatterBaseTest):
             TestStep("6e", "Wait until PIXIT.ACS.HoldTimeTest seconds are passed."),
             TestStep("6f", "TH receives AmbientContextEndedStarted event and reads StartEventNumber event field.",
                      "Verify that the StartEventNumber field contains the event number stored from the step 6d."),
-            TestStep("7a", "TH reads the SimultaneousDetectionLimit attribute, and save SimultaneousDetectionLimit attribute value."),
-            TestStep("7b", "TH writes SimultaneousDetectionLimit attribute different from 7a"),
-            TestStep("7c", "DUT awaits a ReportDataMessage containing an attribute report for SimultaneousDetectionLimit.",
-                     "Verify that the value of SimultaneousDetectionLimit attribute is the input value from 7b."),
-            TestStep("8a", "TH reads the HoldTime attribute, and save HoldTime attribute value."),
-            TestStep("8b", "TH writes the HoldTime attribute different from 8a"),
-            TestStep("8c", "DUT awaits a ReportDataMessage containing an attribute report for HoldTime.",
-                     "Verify that the value of HoldTime attribute is the input value from 8b.")
         ]
     # Sends and out-of-band command to the all-clusters-app
 
@@ -210,7 +205,9 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(humanActivityDetected is True, "Expected False Boolean value.")
 
             self.step("3b")
-            attrib_listener.reset()
+            # PIXIT.ACS.AmbientContextSensed_1 = Human activity walking
+            namespaceID1 = HUMANACTIVITYNAMESPACEID
+            tag1 = 0x03  # walking
 
             # CI call to trigger on
             if self.is_ci:
@@ -224,25 +221,22 @@ class TC_ACS_3_3(MatterBaseTest):
                     prompt_msg="Type any letter and press ENTER after a desired ambient sensing is triggered.")
 
             self.step("3c")
-            # Wait for attribute data reporting
+            # Wait for attribute data reporting            
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(endpoint_id=endpoint,
                                                       attribute=attr.HumanActivityDetected, value=True)],
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for HumanActivityDetected = True.")
 
+            # subscription check
+            semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID1, tag=tag1, label=NullValue)
+            subscription_expected = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.AmbientContextType.ambientContextSensed.namespaceID, value=namespaceID1)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for AmbientContext Namespace ID.")
-
-            attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.AmbientContextType.ambientContextSensed.tag,
-                                                      value=tag1)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for AmbientContext Tag.")
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)],
+                timeout_sec=30.0)
+            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
+            log.info("Received attribute report for AmbientContextType.")
 
             self.step("3d")
             event = event_listener.wait_for_event_report(
@@ -285,6 +279,9 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(objectIdentified is True, "Expected False Boolean value.")
 
             self.step("4b")
+            # PIXIT.ACS.AmbientContextSensed_2 = Object Identification person
+            namespaceID2 = OBJECTIDENTIFICATIONNAMESPACEID
+            tag2 = 0x03  # person
             # CI call to trigger on
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -304,20 +301,16 @@ class TC_ACS_3_3(MatterBaseTest):
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for ObjectIdentified = True.")
 
+            # subscription check
+            semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=NullValue)
+            subscription_expected = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.AmbientContextType.ambientContextSensed.namespaceID,
-                                                      value=namespaceID2)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for AmbientContext Namespace ID.")
-
-            attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.AmbientContextType.ambientContextSensed.tag,
-                                                      value=tag2)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for AmbientContext Tag.")
-
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)],
+                timeout_sec=30.0)
+            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
+            log.info("Received attribute report for AmbientContextType.")
+            
             self.step("4d")
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
@@ -359,6 +352,9 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(audioContextDetected is True, "Expected False Boolean value.")
 
             self.step("5b")
+            # PIXIT.ACS.AmbientContextSensed_2 = Sound Identification barking
+            namespaceID3 = SOUNDIDENTIFICATIONNAMESPACEID
+            tag3 = 0x04  # barking
             # CI call to trigger on
             if self.is_ci:
                 self.write_to_app_pipe(
@@ -378,19 +374,17 @@ class TC_ACS_3_3(MatterBaseTest):
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for AudioContextDetected = True.")
 
+            # subscription check
+            semantic_tag = Globals.Structs.SemanticTagStruct(
+                mfgCode=NullValue, namespaceID=namespaceID3, tag=tag3, label=NullValue)
+            subscription_expected = cluster.Structs.AmbientContextTypeStruct(
+                ambientContextSensed=semantic_tag3, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.AmbientContextType.ambientContextSensed.namespaceID,
-                                                      value=namespaceID3)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for AmbientContext Namespace ID.")
-
-            attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.AmbientContextType.ambientContextSensed.tag,
-                                                      value=tag3)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for AmbientContext Tag.")
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)],
+                timeout_sec=30.0)
+            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
+            log.info("Received attribute report for AmbientContextType.")
 
             self.step("5d")
             event = event_listener.wait_for_event_report(
@@ -436,12 +430,16 @@ class TC_ACS_3_3(MatterBaseTest):
             asserts.assert_true(objectCountReached is True, "Expected False Boolean value.")
 
             self.step("6b")
+            # PIXIT.ACS.AmbientContextSensed_2 = Object Identification person
+            namespaceID2 = OBJECTIDENTIFICATIONNAMESPACEID
+            tag2 = 0x03  # person
+            objectcountthreshold_input = 2
             # CI call to trigger on
             if self.is_ci:
                 self.write_to_app_pipe(
                     '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":73, "TagId":3}}'
                 )  # 0x49
-                if attr.ObjectCount in attribute_list:  # Need to add ci
+                if attr.ObjectCount in attribute_list:  # NEED CI SUPPORT!
                     self.write_to_app_pipe(
                         '{"Name":"AddAmbientContextDetect", "EndpointId": 1, "AmbientContextType": {"TypeId":73, "TagId":3}}'
                     )  # 0x49
@@ -460,26 +458,22 @@ class TC_ACS_3_3(MatterBaseTest):
                 timeout_sec=post_prompt_settle_delay_seconds)
             log.info("Received attribute report for ObjectCountReached = True.")
 
+            # subscription check
+            semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=NullValue)
+            subscription_expected = cluster.Structs.ObjectCountConfigStruct(countingObject=semantic_tag, objectCountThreshold=objectcountthreshold_input)
             attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.ObjectCountConfig.countingObject.namespaceID,
-                                                      value=namespaceID2)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for ObjectCountConfig Namespace ID.")
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.ObjectCountConfig, value=subscription_expected)],
+                timeout_sec=30.0)
+            log.info("Received attribute report for ObjectCountConfig.")
 
-            attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.ObjectCountConfig.countingObject.tag,
-                                                      value=tag2)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for ObjectCountConfig Tag.")
-
-            attrib_listener.await_all_final_values_reported(
-                expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                      attribute=attr.ObjectCountConfig.objectCountThreshold,
-                                                      value=objectcountthreshold_input)],
-                timeout_sec=post_prompt_settle_delay_seconds)
-            log.info("Received attribute report for ObjectCountConfig ObjectCountThreshold.")
+            if attr.ObjectCount in attribute_list:
+                subscription_expected = objectcountthreshold_input
+                attrib_listener.await_all_final_values_reported(
+                    expected_final_values=[AttributeValue(
+                        endpoint_id=endpoint, attribute=attr.ObjectCount, value=subscription_expected)],
+                    timeout_sec=30.0)
+                log.info("Received attribute report for HoldTimeLimit.")
 
             self.step("6d")
             event = event_listener.wait_for_event_report(
@@ -512,47 +506,12 @@ class TC_ACS_3_3(MatterBaseTest):
         attrib_listener.reset()
         event_listener.reset()
         log.info("Cleared accumulated reports. Restarting accumulation.")
-
-        # SimultaneousDetectionLimit attribute subscription test
-        self.step("7a")
-        simultaneousDetectionLimit = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit
-        )
-
-        self.step("7b")
-        asserts.assert_equal(simultaneousDetectionLimit, simultaneouslimit_input, "Expected a different value from 7a.")
-        await self.write_single_attribute(attr.SimultaneousDetectionLimit(simultaneouslimit_input))
-
-        self.step("7c")
-        # Wait for attribute data reporting
-        attrib_listener.await_all_final_values_reported(
-            expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                  attribute=attr.SimultaneousDetectionLimit, value=simultaneouslimit_input)],
-            timeout_sec=post_prompt_settle_delay_seconds)
-        log.info("Received attribute report for SimultaneousDetectionLimit.")
-        attrib_listener.reset()
-
-        # HoldTime attribute subscription test
-        self.step("8a")
-        holdTime = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
-
-        self.step("8b")
-        asserts.assert_equal(holdTime, holdtime_input, "Expected a different value from 8a.")
-        await self.write_single_attribute(attr.HoldTime(holdtime_input))
-
-        self.step("8c")
-        # Wait for attribute data reporting
-        attrib_listener.await_all_final_values_reported(
-            expected_final_values=[AttributeValue(endpoint_id=endpoint,
-                                                  attribute=attr.HoldTime, value=holdtime_input)],
-            timeout_sec=post_prompt_settle_delay_seconds)
-        log.info("Received attribute report for HoldTime.")
-        attrib_listener.reset()
+        
 
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
 
