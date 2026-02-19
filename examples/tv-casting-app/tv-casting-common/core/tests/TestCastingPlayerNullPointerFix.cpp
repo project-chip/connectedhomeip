@@ -32,8 +32,8 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include "../CastingPlayer.h"
 #include "../../support/CastingStore.h"
+#include "../CastingPlayer.h"
 
 using namespace chip;
 using namespace matter::casting::core;
@@ -49,17 +49,11 @@ class CastingPlayerTestHelper : public CastingPlayer
 {
 public:
     CastingPlayerTestHelper() : CastingPlayer(CastingPlayerAttributes()) {}
-    
+
     // Static helper methods to access protected members for testing
-    static void ResetTargetCastingPlayer()
-    {
-        CastingPlayer::mTargetCastingPlayer.reset();
-    }
-    
-    static void SetTargetCastingPlayer(std::shared_ptr<CastingPlayer> player)
-    {
-        CastingPlayer::mTargetCastingPlayer = player;
-    }
+    static void ResetTargetCastingPlayer() { CastingPlayer::mTargetCastingPlayer.reset(); }
+
+    static void SetTargetCastingPlayer(std::shared_ptr<CastingPlayer> player) { CastingPlayer::mTargetCastingPlayer = player; }
 };
 
 class TestCastingPlayerNullPointer : public ::testing::Test
@@ -80,7 +74,7 @@ public:
     void SetUp() override
     {
         mCallbackExecuted = false;
-        mCallbackError = CHIP_NO_ERROR;
+        mCallbackError    = CHIP_NO_ERROR;
     }
 
     void TearDown() override
@@ -94,7 +88,7 @@ protected:
     static CHIP_ERROR mCallbackError;
 };
 
-bool TestCastingPlayerNullPointer::mCallbackExecuted = false;
+bool TestCastingPlayerNullPointer::mCallbackExecuted    = false;
 CHIP_ERROR TestCastingPlayerNullPointer::mCallbackError = CHIP_NO_ERROR;
 
 // =================================
@@ -127,13 +121,13 @@ TEST_F(TestCastingPlayerNullPointer, TestGetTargetCastingPlayerReturnsNull)
  */
 TEST_F(TestCastingPlayerNullPointer, TestConnectionFailureCallbackWithNullTarget)
 {
-    bool callbackInvoked = false;
+    bool callbackInvoked     = false;
     CHIP_ERROR capturedError = CHIP_NO_ERROR;
 
     // Create a lambda that simulates the fixed failure callback
     auto failureCallback = [&callbackInvoked, &capturedError](const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
         callbackInvoked = true;
-        capturedError = error;
+        capturedError   = error;
 
         // This is the critical fix: check for null before dereferencing
         CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
@@ -235,7 +229,7 @@ TEST_F(TestCastingPlayerNullPointer, TestMultipleCallbacksWithNullTarget)
 TEST_F(TestCastingPlayerNullPointer, TestCallbackWithValidTarget)
 {
     bool callbackInvoked = false;
-    bool targetWasValid = false;
+    bool targetWasValid  = false;
 
     auto failureCallback = [&callbackInvoked, &targetWasValid]() {
         callbackInvoked = true;

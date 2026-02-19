@@ -96,7 +96,7 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
                 // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                 EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
                 ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() calling EndpointListLoader::GetInstance()->Load()");
-                TEMPORARY_RETURN_IGNORED EndpointListLoader::GetInstance() -> Load();
+                TEMPORARY_RETURN_IGNORED EndpointListLoader::GetInstance()->Load();
             },
             [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                 ChipLogError(AppServer, "ChipDeviceEventHandler::Handle(): Connection to CastingPlayer failed");
