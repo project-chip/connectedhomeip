@@ -62,10 +62,10 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    TEMPORARY_RETURN_IGNORED InitWiFi();
+    ReturnErrorOnFailure(InitWiFi());
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    TEMPORARY_RETURN_IGNORED InitEthernet();
+    ReturnErrorOnFailure(InitEthernet());
 #endif
     return CHIP_NO_ERROR;
 }

@@ -117,9 +117,7 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     // If the network configuration backup exists, it means that the device has been rebooted with
     // the fail-safe armed. Since ESP-WiFi persists all wifi credentials changes, the backup must
     // be restored on the boot. If there's no backup, the below function is a no-op.
-    TEMPORARY_RETURN_IGNORED RevertConfiguration();
-
-    return CHIP_NO_ERROR;
+    return RevertConfiguration();
 }
 
 void ESPWiFiDriver::Shutdown()
