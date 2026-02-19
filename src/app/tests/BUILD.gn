@@ -243,7 +243,6 @@ chip_test_suite("tests") {
     "TestAclAttribute.cpp",
     "TestAclCommand.cpp",
     "TestAclEvent.cpp",
-    "TestActionsCluster.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePathParams.cpp",
@@ -325,6 +324,7 @@ chip_test_suite("tests") {
     test_sources += [
       "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
+      "TestActionsCluster.cpp",
       "TestSceneTable.cpp",
     ]
     public_deps += [
