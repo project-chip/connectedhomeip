@@ -47,7 +47,8 @@ from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from .Types import Nullable, NullValue
+
+from .Types import NullValue
 
 log = logging.getLogger(__name__)
 
@@ -268,10 +269,14 @@ class TC_ACS_3_1(MatterBaseTest):
             asserts.assert_equal(tagID_2_1, tag1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
             # subscription check
-            semantic_tag1 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID1, tag=tag1, label=NullValue)
-            semantic_tag2 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=NullValue)
-            subscription_expected1 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag1, detectionTime=None)
-            subscription_expected2 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag2, detectionTime=None)
+            semantic_tag1 = Globals.Structs.SemanticTagStruct(
+                mfgCode=NullValue, namespaceID=namespaceID1, tag=tag1, label=NullValue)
+            semantic_tag2 = Globals.Structs.SemanticTagStruct(
+                mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=NullValue)
+            subscription_expected1 = cluster.Structs.AmbientContextTypeStruct(
+                ambientContextSensed=semantic_tag1, detectionTime=None)
+            subscription_expected2 = cluster.Structs.AmbientContextTypeStruct(
+                ambientContextSensed=semantic_tag2, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
                     endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected2, subscription_expected1])],
@@ -315,8 +320,10 @@ class TC_ACS_3_1(MatterBaseTest):
             asserts.assert_equal(tagID_3_1, tag2, "Namespace ID and Tag ID must reflect step 8 sensing context.")
 
             # subscription check
-            semantic_tag3 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID3, tag=tag3, label=NullValue)
-            subscription_expected3 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag3, detectionTime=None)
+            semantic_tag3 = Globals.Structs.SemanticTagStruct(
+                mfgCode=NullValue, namespaceID=namespaceID3, tag=tag3, label=NullValue)
+            subscription_expected3 = cluster.Structs.AmbientContextTypeStruct(
+                ambientContextSensed=semantic_tag3, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
                     endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected3, subscription_expected2])],
@@ -366,5 +373,6 @@ class TC_ACS_3_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
