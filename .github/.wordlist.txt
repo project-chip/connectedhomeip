@@ -391,6 +391,8 @@ deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
 detokenization
