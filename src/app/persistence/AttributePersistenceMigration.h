@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,9 +23,14 @@
 
 namespace chip::app {
 
-using SafeAttributeMigrator = CHIP_ERROR (*)(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider,
+using SafeAttributeMigrator = CHIP_ERROR (*)(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
                                              MutableByteSpan & buffer);
-using AttrMigrationData     = std::pair<const AttributeId, SafeAttributeMigrator>;
+
+struct AttrMigrationData
+{
+    AttributeId attributeId;
+    SafeAttributeMigrator migrator;
+};
 /**
  * @brief
  * This function migrates attribute values from the SafeAttributeProvider to the standard provider mechanism.
@@ -40,7 +45,7 @@ using AttrMigrationData     = std::pair<const AttributeId, SafeAttributeMigrator
  * The user should ensure that the provided buffer has enough capacity for the attributes to be migrated.
  *
  * @param safeProvider A SafeAttributePersistenceProvider implementation to migrate from.
- * @param normProvider A standard AttributePersistenceProvider implementation to migrate to.
+ * @param dstProvider A standard AttributePersistenceProvider implementation to migrate to.
  * @param cluster      The concrete cluster path
  * @param attributes   The attributes that need to be migrated
  * @param buffer       An internal buffer used for temporary storage between the providers
@@ -49,8 +54,8 @@ using AttrMigrationData     = std::pair<const AttributeId, SafeAttributeMigrator
  *         CHIP_ERROR_HAD_FAILURES              There were errors during migration, some attributes might not be migrated.
  *
  */
-CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
-                                                       AttributePersistenceProvider & normProvider,
+CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
+                                                       AttributePersistenceProvider & dstProvider,
                                                        const ConcreteClusterPath & cluster,
                                                        Span<const AttrMigrationData> attributes, MutableByteSpan & buffer);
 
@@ -69,8 +74,8 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(SafeAttributePersistenceP
  *         CHIP_ERROR_HAD_FAILURES              There were errors during migration, some attributes might not be migrated.
  *
  */
-template <int attributeBufferSize = 255>
-CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath & cluster,
+template <int attributeBufferSize>
+CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(const ConcreteClusterPath & cluster,
                                                        Span<const AttrMigrationData> attributes,
                                                        PersistentStorageDelegate & storageDelegate)
 {
@@ -78,18 +83,18 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath
 
     ReturnErrorOnFailure(safeProvider.Init(&storageDelegate));
 
-    DefaultAttributePersistenceProvider normProvider;
-    ReturnErrorOnFailure(normProvider.Init(&storageDelegate));
+    DefaultAttributePersistenceProvider dstProvider;
+    ReturnErrorOnFailure(dstProvider.Init(&storageDelegate));
 
     uint8_t attributeBuffer[attributeBufferSize] = {};
     MutableByteSpan buffer(attributeBuffer);
 
-    return MigrateFromSafeAttributePersistenceProvider(safeProvider, normProvider, cluster, attributes, buffer);
+    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, cluster, attributes, buffer);
 };
 
 namespace DefaultMigrators {
 template <class T>
-static CHIP_ERROR ScalarValue(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer)
+CHIP_ERROR ScalarValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer)
 {
     VerifyOrReturnError(sizeof(T) <= buffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -100,7 +105,7 @@ static CHIP_ERROR ScalarValue(ConcreteAttributePath attrPath, SafeAttributePersi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SafeValue(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer);
+CHIP_ERROR SafeValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer);
 }; // namespace DefaultMigrators
 
 } // namespace chip::app

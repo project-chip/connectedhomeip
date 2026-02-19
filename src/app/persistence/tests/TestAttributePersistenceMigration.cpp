@@ -28,20 +28,6 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 
-// Used by TestMigrationDeletesFromSafeOnWriteFailure to poison the normal-provider
-// key after the initial ReadValue check has already passed.
-TestPersistentStorageDelegate * sStorageDelegateForPoisoning = nullptr;
-
-CHIP_ERROR PoisonAfterReadMigrator(ConcreteAttributePath attrPath, SafeAttributePersistenceProvider & provider,
-                                   MutableByteSpan & buffer)
-{
-    CHIP_ERROR err = DefaultMigrators::ScalarValue<uint32_t>(attrPath, provider, buffer);
-    // Poison the normal provider key now, after ReadValue already returned CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
-    sStorageDelegateForPoisoning->AddPoisonKey(
-        DefaultStorageKeyAllocator::AttributeValue(attrPath.mEndpointId, attrPath.mClusterId, attrPath.mAttributeId).KeyName());
-    return err;
-}
-
 // Single attribute migrated successfully: value appears in AttributePersistence, deleted from SafeAttribute.
 TEST(TestAttributePersistenceMigration, TestMigrationSuccess)
 {
@@ -64,7 +50,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSuccess)
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
               CHIP_NO_ERROR);
 
     // Value should now exist in the normal provider
@@ -86,7 +72,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSuccess)
     }
 }
 
-// Attribute not present in SafeAttribute: AttributePersistence untouched, no error.
+// Attribute not present in SafeAttribute: AttributePersistence untouched.
 TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
 {
     TestPersistentStorageDelegate storageDelegate;
@@ -105,8 +91,8 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+              CHIP_ERROR_HAD_FAILURES);
 
     // Normal provider should have nothing
     {
@@ -116,14 +102,10 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
     }
 }
 
-// When WriteValue to AttributePersistence fails, the value is still deleted from SafeAttribute ("one time" migration guarantee).
-// Uses a custom migrator (PoisonAfterReadMigrator) that poisons the normal provider key after the migrator runs, so that the
-// initial ReadValue check passes (returns CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) but the subsequent WriteValue
-// hits the poisoned key and fails.
+// Tests that the attribute was removed from SafeAttributePersistence even if Write fails.
 TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailure)
 {
     TestPersistentStorageDelegate storageDelegate;
-    sStorageDelegateForPoisoning = &storageDelegate;
 
     DefaultAttributePersistenceProvider ramProvider;
     DefaultSafeAttributePersistenceProvider safeRamProvider;
@@ -137,15 +119,13 @@ TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailu
     // Store a value in the safe provider
     ASSERT_EQ(safeRamProvider.WriteScalarValue(path, kValueToStore), CHIP_NO_ERROR);
 
-    // PoisonAfterReadMigrator will poison the normal-provider key after reading
-    // from the safe provider, so WriteValue will fail while ReadValue passed.
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &PoisonAfterReadMigrator },
+        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    EXPECT_NE(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
-              CHIP_NO_ERROR);
+    EXPECT_NE(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+              CHIP_ERROR_HAD_FAILURES);
 
     // Value should still be deleted from the safe provider
     {
@@ -153,8 +133,6 @@ TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailu
         MutableByteSpan readBuffer(readBuf);
         EXPECT_EQ(safeRamProvider.SafeReadValue(path, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
-
-    sStorageDelegateForPoisoning = nullptr;
 }
 
 // After a successful migration, calling it again is a no-op (value already deleted from SafeAttribute).
@@ -179,16 +157,16 @@ TEST(TestAttributePersistenceMigration, TestMigrationTwice)
     MutableByteSpan buffer(buf);
 
     // First migration
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
               CHIP_NO_ERROR);
 
-    // Overwrite the value in normProvider to detect if a second migration would overwrite it
+    // Overwrite the value in dstProvider to detect if a second migration would overwrite it
     constexpr uint32_t kNewValue = 99;
     ASSERT_EQ(ramProvider.WriteValue(path, ByteSpan(reinterpret_cast<const uint8_t *>(&kNewValue), sizeof(kNewValue))),
               CHIP_NO_ERROR);
 
     // Second migration, shouldn't affect the new value and return no error.
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
               CHIP_NO_ERROR);
 
     // The new value should still be intact
@@ -227,8 +205,8 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesMixedPresence)
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+              CHIP_ERROR_HAD_FAILURES);
 
     // Attribute A should not exist in the normal provider
     {
@@ -281,7 +259,7 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesAllPresent)
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
               CHIP_NO_ERROR);
 
     // Both should be in the normal provider
@@ -333,7 +311,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithEmptyAttributeList)
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
     EXPECT_EQ(
-        MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span<const AttrMigrationData>(), buffer),
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span<const AttrMigrationData>(), buffer),
         CHIP_NO_ERROR);
 }
 
@@ -353,7 +331,7 @@ TEST(TestAttributePersistenceMigration, TestTemplateOverload)
     const AttrMigrationData attributesToMigrate[] = {
         { 3, &DefaultMigrators::ScalarValue<uint32_t> },
     };
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(cluster, Span(attributesToMigrate), storageDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint32_t)>(cluster, Span(attributesToMigrate), storageDelegate), CHIP_NO_ERROR);
 
     // Verify by creating a new normal provider and reading back
     {
@@ -400,7 +378,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithSafeValueMigrator)
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
-    EXPECT_EQ(MigrateFromSafeAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
               CHIP_NO_ERROR);
 
     // Value should now exist in the normal provider with the same raw bytes
