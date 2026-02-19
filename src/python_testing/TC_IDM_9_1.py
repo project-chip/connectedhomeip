@@ -81,10 +81,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
         if await MatterBaseTest.command_guard(self, endpoint=self.endpoint, command=Clusters.ColorControl.Commands.MoveToColorTemperature):
             try:
                 cmd = Clusters.ColorControl.Commands.MoveToColorTemperature(
-                    colorTemperatureMireds=65280,  # Max value is 65279 for this uint16 attribute according to XML spec
-                    transitionTime=0,
-                    optionsMask=0,
-                    optionsOverride=0
+                    colorTemperatureMireds=65280  # Max value is 65279 for this uint16 attribute according to XML spec
                 )
                 await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
                 asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
@@ -143,8 +140,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
             # CountryCode field is string with constraint length=2
             cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
                 newRegulatoryConfig=Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor,
-                countryCode="U",  # Out of range (must be 2 chars)
-                breadcrumb=0
+                countryCode="U"  # Out of range (must be 2 chars)
             )
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
