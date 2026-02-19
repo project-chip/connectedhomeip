@@ -74,8 +74,10 @@ class WrappableCmd:
             cmd = self.cmd
 
         log.debug("Executing: '%s' check=%s", cmd, check)
-        if subprocess.run(shlex.split(cmd), check=check).returncode != 0:
-            raise RuntimeError(f"Failed to execute '{cmd}'. Are you using --privileged if running in docker?")
+        try:
+            subprocess.run(shlex.split(cmd), check=check)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError("Failed to execute '{cmd}'. Are you using --privileged if running in docker?") from e
 
 
 @dataclasses.dataclass
