@@ -144,7 +144,7 @@ class TC_SMOKECO_2_7(MatterBaseTest):
             sub_handler.wait_for_attribute_report(timeout_sec=60)
             asserts.assert_equal(sub_handler.attribute_reports[cluster.Attributes.Unmounted]
                                  [0].value, 1, msg="Received unexpected value for Unmounted")
-            sub_handler.reset
+            sub_handler.reset()
 
         # Step 8, "TH reads ExpressedState attribute from DUT."
         self.step(8)
