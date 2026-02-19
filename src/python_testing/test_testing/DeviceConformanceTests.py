@@ -138,10 +138,8 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         ignore_feature_masks: dict[int, list[int]] = {}
         if ignore_in_progress:
-            # The General Diagnostics cluster on the SDK has the DeviceLoad feature enabled, but the feature is not present
-            # in the spec.
             # This is a manually curated list of features that are in-progress in the SDK, but have landed in the spec
-            in_progress_features = {Clusters.GeneralDiagnostics.id: [0x02]}
+            in_progress_features = {}
             ignore_feature_masks.update(in_progress_features)
 
         if is_ci:

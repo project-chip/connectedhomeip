@@ -62,6 +62,11 @@ struct GenericOverallCurrentState : public Structs::OverallCurrentStateStruct::T
     {
         return position == rhs.position && latch == rhs.latch && speed == rhs.speed && secureState == rhs.secureState;
     }
+
+    bool operator==(const GenericOverallCurrentState & rhs) const
+    {
+        return operator==(static_cast<const Structs::OverallCurrentStateStruct::Type &>(rhs));
+    }
 };
 
 /**
@@ -96,6 +101,11 @@ struct GenericOverallTargetState : public Structs::OverallTargetStateStruct::Typ
     bool operator==(const Structs::OverallTargetStateStruct::Type & rhs) const
     {
         return position == rhs.position && latch == rhs.latch && speed == rhs.speed;
+    }
+
+    bool operator==(const GenericOverallTargetState & rhs) const
+    {
+        return operator==(static_cast<const Structs::OverallTargetStateStruct::Type &>(rhs));
     }
 };
 

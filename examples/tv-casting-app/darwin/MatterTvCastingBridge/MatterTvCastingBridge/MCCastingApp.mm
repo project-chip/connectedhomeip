@@ -46,6 +46,9 @@
 // Client defiend data source used to initialize the MCCommissionableDataProvider and, if needed, update the MCCommissionableDataProvider post initialization. This is necessary for the Commissioner-Generated passcode commissioning feature.
 @property (nonatomic, strong) id<MCDataSource> dataSource;
 
+// Track whether this is the first start (cold boot) or subsequent start (warm boot)
+@property (atomic) BOOL hasStartedBefore;
+
 @end
 
 @implementation MCCastingApp
@@ -129,32 +132,61 @@
 
 - (void)startWithCompletionBlock:(void (^)(NSError *))completion
 {
-    ChipLogProgress(AppServer, "MCCastingApp.startWithCompletionBlock called");
+    ChipLogProgress(AppServer, "MCCastingApp.startWithCompletionBlock called (%s start)", self.hasStartedBefore ? "warm" : "cold");
+    self.hasStartedBefore = YES;
+
     VerifyOrReturn(_workQueue != nil && _clientQueue != nil, dispatch_async(self->_clientQueue, ^{
+        ChipLogError(AppServer, "MCCastingApp.startWithCompletionBlock failed: work queue or client queue is nil");
         completion([MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
     }));
 
-    dispatch_async(_workQueue, ^{
-        __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Start();
+    // Start event loop task FIRST (synchronously) to ensure proper state
+    __block CHIP_ERROR err = chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "MCCastingApp.startWithCompletionBlock StartEventLoopTask failed: %s", err.AsString());
         dispatch_async(self->_clientQueue, ^{
             completion([MCErrorUtils NSErrorFromChipError:err]);
         });
+        // Early return to prevent double completion call
+        return;
+    }
+
+    // Only then start the casting app (on work queue)
+    dispatch_async(_workQueue, ^{
+        CHIP_ERROR startErr = matter::casting::core::CastingApp::GetInstance()->Start();
+        if (startErr != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "MCCastingApp.startWithCompletionBlock CastingApp::Start failed: %s", startErr.AsString());
+        }
+
+        dispatch_async(self->_clientQueue, ^{
+            completion([MCErrorUtils NSErrorFromChipError:startErr]);
+        });
     });
-    __block CHIP_ERROR err = chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
-    VerifyOrReturn(err == CHIP_NO_ERROR, dispatch_async(self->_clientQueue, ^{
-        completion([MCErrorUtils NSErrorFromChipError:err]);
-    }));
 }
 
 - (void)stopWithCompletionBlock:(void (^)(NSError *))completion
 {
     ChipLogProgress(AppServer, "MCCastingApp.stopWithCompletionBlock called");
     VerifyOrReturn(_workQueue != nil && _clientQueue != nil, dispatch_async(self->_clientQueue, ^{
+        ChipLogError(AppServer, "MCCastingApp.stopWithCompletionBlock failed: work queue or client queue is nil");
         completion([MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
     }));
 
     dispatch_async(_workQueue, ^{
-        __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Stop();
+        // Stop the casting app first
+        CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Stop();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "MCCastingApp.stopWithCompletionBlock CastingApp::Stop failed: %s", err.AsString());
+        }
+
+        // Then stop the event loop task to transition WorkQueue to suspended state
+        CHIP_ERROR stopEventLoopErr = chip::DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
+        if (stopEventLoopErr != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "MCCastingApp.stopWithCompletionBlock StopEventLoopTask failed: %s", stopEventLoopErr.AsString());
+            if (err == CHIP_NO_ERROR) {
+                err = stopEventLoopErr;
+            }
+        }
 
         dispatch_async(self->_clientQueue, ^{
             completion([MCErrorUtils NSErrorFromChipError:err]);
