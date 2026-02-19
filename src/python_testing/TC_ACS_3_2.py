@@ -47,7 +47,8 @@ from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from .Types import Nullable, NullValue
+
+from .Types import NullValue
 
 log = logging.getLogger(__name__)
 
@@ -288,4 +289,5 @@ class TC_ACS_3_2(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
