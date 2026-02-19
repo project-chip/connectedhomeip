@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -216,25 +216,19 @@ void UDPEndPointImplLwIP::CloseImpl()
 
     // If there is a UDPEndPointImplLwIP::LwIPReceiveUDPMessage
     // event pending in the event queue (SystemLayer::ScheduleLambda), we
-    // schedule a release call to the end of the queue, to ensure that the
+    // schedule a unref call to the end of the queue, to ensure that the
     // queued pointer to UDPEndPointImplLwIP is not dangling.
     if (mDelayReleaseCount != 0)
     {
-        Retain();
-        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
+        Ref();
+        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Unref(); });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Inet, "Unable to schedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
             // There is nothing we can do here, accept the chance of racing
-            Release();
+            Unref();
         }
     }
-}
-
-void UDPEndPointImplLwIP::Free()
-{
-    Close();
-    Release();
 }
 
 void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo)

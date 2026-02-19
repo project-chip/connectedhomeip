@@ -49,12 +49,23 @@ using namespace chip::ota;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
+#include <ota-provider-common/OTAProviderExample.h>
+
+namespace {
+OTAProviderExample gOtaProvider;
+}
+
+OTAProviderExample & GetOtaProviderExample()
+{
+    return gOtaProvider;
+}
+
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kOtaHeaderMaxSize   = 1024;
 
 // Arbitrary BDX Transfer Params
-constexpr uint32_t kMaxBdxBlockSize                = 1024;
+constexpr uint16_t kMaxBdxBlockSize                = 1024;
 constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
 constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                                     // poll every 50ms by default
 
@@ -89,6 +100,7 @@ OTAProviderExample::OTAProviderExample()
     mUserConsentDelegate       = nullptr;
     mUserConsentNeeded         = false;
     mPollInterval              = kBdxServerPollIntervalMillis;
+    mMaxBDXBlockSize           = kMaxBdxBlockSize;
     mCandidates.clear();
 }
 
@@ -275,7 +287,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         {
             CHIP_ERROR error =
                 mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                                 kMaxBdxBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
+                                                 mMaxBDXBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Cannot prepare for transfer: %" CHIP_ERROR_FORMAT, error.Format());
@@ -321,10 +333,44 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     commandObj->AddResponse(commandPath, response);
 }
 
+void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & commandData)
+{
+    mVendorId                 = commandData.vendorID;
+    mProductId                = commandData.productID;
+    mHardwareVersion          = commandData.hardwareVersion.ValueOr(0);
+    mRequestorSoftwareVersion = commandData.softwareVersion;
+    mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
+
+    chip::CharSpan loc = commandData.location.Value();
+    if (loc.size() >= sizeof(mLocation))
+    {
+        ChipLogError(AppServer, "Location too long (%u)", static_cast<unsigned>(loc.size()));
+        return;
+    }
+
+    Platform::CopyString(mLocation, sizeof(mLocation), commandData.location.Value());
+
+    size_t i  = 0;
+    auto iter = commandData.protocolsSupported.begin();
+    while (iter.Next())
+    {
+        if (i >= MATTER_ARRAY_SIZE(mProtocolsSupported))
+        {
+            ChipLogError(AppServer, "protocolsSupported overflow: received more than %u entries, truncating",
+                         static_cast<unsigned>(MATTER_ARRAY_SIZE(mProtocolsSupported)));
+            break;
+        }
+        mProtocolsSupported[i++] = iter.GetValue();
+    }
+    kProtocolsSupportedCount = i;
+}
+
 void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const QueryImage::DecodableType & commandData)
 {
     bool requestorCanConsent = commandData.requestorCanConsent.ValueOr(false);
+
+    SaveCommandSnapshot(commandData);
 
     if (mIgnoreQueryImageCount > 0)
     {

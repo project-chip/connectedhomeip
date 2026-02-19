@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -82,13 +82,16 @@ private:
     uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
                              // to hang-on to backing packet buffers until they are no longer needed.
     tcp_pcb * mTCP;          // LwIP Transmission control protocol (TCP) control block.
+    // For TCP Listen endpoint, we will pre-allocate a connection endpoint to assign the incoming connection to it.
+    // when there is a new TCP connection established.
+    TCPEndPointHandle mPreAllocatedConnectEP;
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();
     CHIP_ERROR GetPCB(IPAddressType addrType);
     void HandleDataSent(uint16_t len);
     void HandleDataReceived(chip::System::PacketBufferHandle && buf);
-    void HandleIncomingConnection(TCPEndPoint * pcb);
+    void HandleIncomingConnection(const TCPEndPointHandle & pcb);
     void HandleError(CHIP_ERROR err);
 
     static err_t LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr);

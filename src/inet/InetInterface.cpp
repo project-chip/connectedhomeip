@@ -32,7 +32,7 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/SafeInt.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <lwip/netif.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
@@ -56,7 +56,7 @@
 #include <zephyr/net/net_if.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <inet/UDPEndPointImplOpenThread.h>
 #endif
 
@@ -66,7 +66,7 @@
 namespace chip {
 namespace Inet {
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
     if (mPlatformInterface && nameBufSize >= kMaxIfNameLength)
@@ -95,7 +95,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
         return INET_ERROR_UNKNOWN_INTERFACE;
     }
 
-    interface = InterfaceId(intfNum);
+    interface = InterfaceId(static_cast<PlatformType>(intfNum));
     if (intfNum == 0)
     {
         return INET_ERROR_UNKNOWN_INTERFACE;
@@ -106,6 +106,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
 bool InterfaceIterator::Next()
 {
     // TODO : Cleanup #17346
+    mHasCurrent = false;
     return false;
 }
 
@@ -186,9 +187,28 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && (otIp6GetMulticastAddresses(Inet::globalOtInstance) != nullptr);
 }
 
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    type = InterfaceType::Thread;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    VerifyOrReturnError(addressBuffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(addressBufferSize >= sizeof(otExtAddress), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    const otExtAddress * extendedAddr = otLinkGetExtendedAddress(Inet::globalOtInstance);
+    memcpy(addressBuffer, extendedAddr, sizeof(otExtAddress));
+    addressSize = sizeof(otExtAddress);
+
+    return CHIP_NO_ERROR;
+}
+
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
@@ -939,9 +959,12 @@ bool InterfaceAddressIterator::Next()
             mIpv6 = config->ip.ipv6;
         }
 
-        while (++mCurAddrIndex < NET_IF_MAX_IPV6_ADDR)
-            if (mIpv6->unicast[mCurAddrIndex].is_used)
-                return true;
+        if (mIpv6)
+        {
+            while (++mCurAddrIndex < NET_IF_MAX_IPV6_ADDR)
+                if (mIpv6->unicast[mCurAddrIndex].is_used)
+                    return true;
+        }
 
         mCurAddrIndex = -1;
         mIntfIter.Next();

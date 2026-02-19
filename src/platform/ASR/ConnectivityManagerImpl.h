@@ -100,7 +100,6 @@ private:
 
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
@@ -173,11 +172,6 @@ inline bool ConnectivityManagerImpl::_IsWiFiAPActive(void)
 inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout(void)
 {
     return mWiFiAPIdleTimeout;
-}
-
-inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return mWiFiStationState != kWiFiStationState_Connecting;
 }
 
 /**

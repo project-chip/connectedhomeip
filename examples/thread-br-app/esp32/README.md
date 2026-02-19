@@ -11,11 +11,13 @@ guides to get started.
 
 ---
 
--   [OpenThread Border Router Board](#openthread-border-router-board)
--   [OpenThread RCP](#openthread-rcp)
--   [OpenThread CLI](#openthread-cli)
--   [Setup Thread Network](#setup-thread-network)
--   [Commissioning Thread End Devices](#commissioning-thread-end-devices)
+-   [Matter ESP32 Thread Border Router Example](#matter-esp32-thread-border-router-example)
+    -   [OpenThread Border Router Board](#openthread-border-router-board)
+    -   [OpenThread RCP](#openthread-rcp)
+    -   [OpenThread CLI](#openthread-cli)
+    -   [Setup Thread Network](#setup-thread-network)
+    -   [Commissioning Thread End Devices](#commissioning-thread-end-devices)
+    -   [Generate OTA Firmware For BR](#generate-ota-firmware-for-br)
 
 ---
 
@@ -92,3 +94,9 @@ the Thread network.
 ```
 ./chip-tool pairing ble-wifi 2 hex:<dataset_tlvs> <pincode> <discriminator>
 ```
+
+### Generate OTA Firmware For BR
+
+After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` and
+`CONFIG_CHIP_OTA_IMAGE_BUILD` in menuconfig, will generate OTA image with rcp
+firmware, named `ota_with_rcp_image_ota.bin` in build folder.

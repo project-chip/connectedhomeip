@@ -53,7 +53,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
         {
             ChipLogError(DataManagement, "Failed to parse Timed Request action: handler %p exchange " ChipLogFormatExchange, this,
                          ChipLogValueExchange(aExchangeContext));
-            StatusResponse::Send(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
         }
         return err;
     }
@@ -112,7 +112,7 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     ReturnErrorOnFailure(parser.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    parser.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED parser.PrettyPrint();
 #endif
 
     uint16_t timeoutMs;
@@ -127,8 +127,9 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     // will send nothing and the other side will have to time out to realize
     // it's missed its window).
     auto delay = System::Clock::Milliseconds32(timeoutMs);
-    aExchangeContext->SetResponseTimeout(
-        std::max(delay, aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+    aExchangeContext->SetResponseTimeout(std::max(delay,
+                                                  aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(
+                                                      app::kExpectedIMProcessingTime, false /*isFirstMessageOnExchange*/)));
     ReturnErrorOnFailure(StatusResponse::Send(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
 
     // Now just wait for the client.

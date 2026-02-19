@@ -91,7 +91,7 @@ specific codegen.
 `*.matter` files are both human and machine readable. Code that can process
 these files is available at `scripts/py_matter_idl` and `scripts/codegen.py`.
 You can read the
-[scripts/py_matter_idl/matter_idl/README.md](../scripts/py_matter_idl/matter_idl/README.md)
+[scripts/py_matter_idl/matter/idl/README.md](../../scripts/py_matter_idl/matter/idl/README.md)
 for details of how things work.
 
 `scripts/codegen.py` can generate various outputs based on an input `*.matter`
@@ -186,7 +186,7 @@ generate other things by passing in the `-t/--templates` argument to
 generate.py. In those cases, you may also need to specify an output directory
 via `-o/--output-dir`.
 
-#### Flow for updating an application zap file:
+#### Flow for updating an application zap file
 
 ```
 # use zap UI to edit the file (or edit zap file in any other way)
@@ -222,7 +222,7 @@ Code pre-generation can be used:
     generation at build time or to save the code generation time at the expense
     of running code generation for every possible zap/generation type
 -   To check changes in generated code across versions, beyond the comparisons
-    of golden image tests in `scripts/py_matter_idl/matter_idl/tests`
+    of golden image tests in `scripts/py_matter_idl/matter/idl/tests`
 
 The script to trigger code pre-generation is `scripts/codepregen.py` and
 requires the pre-generation output directory as an argument
@@ -255,7 +255,7 @@ it. If anything seems wrong, the `.zap` file should be fixed (`.matter`
 represents the content of `.zap`). To lint use:
 
 ```bash
-scripts/idl_lint.py ${MATTER_FILE_PATH}
+matter-idl-lint ${MATTER_FILE_PATH}
 ```
 
 #### Running pre-generation
@@ -308,14 +308,6 @@ creates. To invoke use:
         -B /workspace/out/esp32-m5stack-all-clusters \
         -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir \
         reconfigure
-
-    cmake -S /workspace/examples/lighting-app/mbed \
-          -B /workspace/out/mbed-cy8cproto_062_4343w-light \
-          -GNinja \
-          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
-          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
-          -DMBED_OS_POSIX_SOCKET_PATH=/workspace/third_party/mbed-os-posix-socket/repo \
-          -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
     ```
 
 ### Code generation unit testing

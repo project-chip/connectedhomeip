@@ -48,7 +48,7 @@ void DeviceCallbacks::NewManager(jobject manager)
 {
     ChipLogProgress(AppServer, "TV Android App: set ChipDeviceEvent delegate");
     DeviceCallbacks * mgr = new DeviceCallbacks();
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(mgr));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(mgr));
     mgr->InitializeWithObjects(manager);
 }
 

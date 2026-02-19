@@ -16,17 +16,17 @@
  *    limitations under the License.
  */
 
-#ifdef MATTER_DM_PLUGIN_SWITCH_SERVER
 #include "SwitchEventHandler.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
 #include "chef-descriptor-namespace.h"
-#include "chef-rpc-actions-worker.h"
+#include <app/util/config.h>
+
+#if MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using namespace chip;
 using namespace chip::app;
@@ -34,8 +34,10 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Switch;
 using namespace chip::DeviceLayer;
 
+#if CONFIG_ENABLE_PW_RPC
+
+#include "chef-rpc-actions-worker.h"
 using namespace chip::rpc;
-using namespace chip::app;
 
 class SwitchActionsDelegate : public chip::app::ActionsDelegate
 {
@@ -64,18 +66,22 @@ void SwitchActionsDelegate::AttributeWriteHandler(chip::EndpointId endpointId, c
     switch (attributeId)
     {
     case Switch::Attributes::NumberOfPositions::Id: {
-        uint8_t data = static_cast<uint8_t>(args[0]);
-        app::Clusters::Switch::Attributes::NumberOfPositions::Set(endpointId, data);
+        // NumberOfPositions is a mandatory attribute that needs to have an appropriate default value in ember (minimum value is 2).
+        // The cluster will take the value as a configuration value that can not be changed.
     }
     break;
     case Switch::Attributes::CurrentPosition::Id: {
         uint8_t data = static_cast<uint8_t>(args[0]);
-        app::Clusters::Switch::Attributes::CurrentPosition::Set(endpointId, data);
+
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        RETURN_SAFELY_IGNORED switchCluster->SetCurrentPosition(data);
     }
     break;
     case Switch::Attributes::MultiPressMax::Id: {
-        uint8_t data = static_cast<uint8_t>(args[0]);
-        app::Clusters::Switch::Attributes::MultiPressMax::Set(endpointId, data);
+        // MultiPressMax is an optional attribute, it has to be enabled in ember with an appropriate default value (minimum value is
+        // 2). If this attribute is enabled, the cluster will take the value as a configuration value that can not be changed.
     }
     break;
     default:
@@ -144,6 +150,11 @@ void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::Even
     }
 };
 
+static SwitchEventHandler * gSwitchEventHandler       = new SwitchEventHandler();
+static SwitchActionsDelegate * gSwitchActionsDelegate = new SwitchActionsDelegate(Clusters::Switch::Id, gSwitchEventHandler);
+
+#endif // CONFIG_ENABLE_PW_RPC
+
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gLatchingSwitch[] = {
     { .namespaceID = kNamespaceCommonLevel,
       .tag         = kTagCommonLow,
@@ -159,14 +170,14 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gLatchingSwitch[] =
           { chip::app::DataModel::MakeNullable(chip::CharSpan("High", 4)) }) }
 };
 
-static SwitchEventHandler * gSwitchEventHandler       = new SwitchEventHandler();
-static SwitchActionsDelegate * gSwitchActionsDelegate = new SwitchActionsDelegate(Clusters::Switch::Id, gSwitchEventHandler);
-
 void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 {
     ChipLogProgress(Zcl, "Chef: emberAfSwitchClusterInitCallback");
 
+#if CONFIG_ENABLE_PW_RPC
     ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, gSwitchActionsDelegate);
-    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
+#endif // CONFIG_ENABLE_PW_RPC
+    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 1,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
 }
-#endif // MATTER_DM_PLUGIN_SWITCH_SERVER
+#endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0

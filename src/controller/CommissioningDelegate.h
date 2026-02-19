@@ -18,11 +18,15 @@
 
 #pragma once
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributePathParams.h>
+#include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <credentials/jcm/TrustVerification.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/Span.h>
 #include <lib/support/Variant.h>
 #include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
@@ -48,6 +52,7 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
     kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
     kAttestationRevocationCheck, ///< Verify Revocation Status of device's DAC chain
+    kJCMTrustVerification,       ///< Perform JCM trust verification steps
     kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
     kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
@@ -56,19 +61,27 @@ enum CommissioningStage : uint8_t
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
     kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registration informations.
     kICDRegistration,            ///< Register for ICD management
-    kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
-    kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
-    kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
-    kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
-    kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
-    kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+
+    // NOTE: If any new steps are added between kWiFiNetworkSetup and kICDSendStayActive, double-check
+    // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
+    // failure" conditions still makes sense.
+    kWiFiNetworkSetup,             ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,           ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kFailsafeBeforeWiFiEnable,     ///< Extend the fail-safe before doing kWiFiNetworkEnable
+    kFailsafeBeforeThreadEnable,   ///< Extend the fail-safe before doing kThreadNetworkEnable
+    kWiFiNetworkEnable,            ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kEvictPreviousCaseSessions,    ///< Evict previous stale case sessions from a commissioned device with this node ID before
     kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
                                    ///< StayActive command
     kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
                                               ///< Commissioning Complete command
     kSendComplete,                            ///< Send CommissioningComplete (0x30:4) command to the device
     kICDSendStayActive,                       ///< Send Keep Alive to ICD
+    // NOTE: If any new steps are added between kWiFiNetworkSetup and kICDSendStayActive, double-check
+    // whether the logic in AutoCommissioner::CommissioningStepFinished that checks for "network
+    // failure" conditions still makes sense.
+
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     kScanNetworks,
@@ -81,7 +94,12 @@ enum CommissioningStage : uint8_t
     kRemoveWiFiNetworkConfig,         ///< Remove Wi-Fi network config.
     kRemoveThreadNetworkConfig,       ///< Remove Thread network config.
     kConfigureTCAcknowledgments,      ///< Send SetTCAcknowledgements (0x30:6) command to the device
-    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state
+    kRequestWiFiCredentials,          ///< Wi-Fi credentials are needed; ask for those.
+    kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
+    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
+#endif
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -173,8 +191,6 @@ public:
 
     // The country code to be used for the node, if set.
     Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
-
-    bool GetRequireTermsAndConditionsAcknowledgement() const { return mRequireTermsAndConditionsAcknowledgement; }
 
     Optional<TermsAndConditionsAcknowledgement> GetTermsAndConditionsAcknowledgement() const
     {
@@ -350,12 +366,6 @@ public:
     CommissioningParameters & SetCountryCode(CharSpan countryCode)
     {
         mCountryCode.SetValue(countryCode);
-        return *this;
-    }
-
-    CommissioningParameters & SetRequireTermsAndConditionsAcknowledgement(bool requireTermsAndConditionsAcknowledgement)
-    {
-        mRequireTermsAndConditionsAcknowledgement = requireTermsAndConditionsAcknowledgement;
         return *this;
     }
 
@@ -556,6 +566,18 @@ public:
         return *this;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Check for Joint Commissioning Method
+    Optional<bool> GetUseJCM() const { return mUseJCM; }
+
+    // Set the Joint Commissioning Method
+    CommissioningParameters & SetUseJCM(bool useJCM)
+    {
+        mUseJCM = MakeOptional(useJCM);
+        return *this;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
     CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
     {
@@ -599,6 +621,18 @@ public:
     }
     void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
 
+    Span<const app::AttributePathParams> GetExtraReadPaths() const { return mExtraReadPaths; }
+
+    // Additional attribute paths to read as part of the kReadCommissioningInfo stage.
+    // These values read from the device will be available in ReadCommissioningInfo.attributes.
+    // Clients should avoid requesting paths that are already read internally by the commissioner
+    // as no consolidation of internally read and extra paths provided here will be performed.
+    CommissioningParameters & SetExtraReadPaths(Span<const app::AttributePathParams> paths)
+    {
+        mExtraReadPaths = paths;
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -621,6 +655,7 @@ public:
         mDSTOffsets.ClearValue();
         mDefaultNTP.ClearValue();
         mICDSymmetricKey.ClearValue();
+        mExtraReadPaths = decltype(mExtraReadPaths)();
     }
 
 private:
@@ -670,7 +705,9 @@ private:
     Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
-    bool mRequireTermsAndConditionsAcknowledgement   = false;
+    Span<const app::AttributePathParams> mExtraReadPaths;
+
+    Optional<bool> mUseJCM;
 };
 
 struct RequestedCertificate
@@ -719,6 +756,9 @@ struct NetworkClusterInfo
 {
     EndpointId endpoint = kInvalidEndpointId;
     app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType minConnectionTime = 0;
+    // maxScanTime == 0 means we don't know; normal commissioning step timeouts
+    // will apply in that case.
+    app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType maxScanTime = 0;
 };
 struct NetworkClusters
 {
@@ -739,7 +779,7 @@ struct GeneralCommissioningInfo
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
     app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum locationCapability =
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
-    ;
+    bool isCommissioningWithoutPower = false;
 };
 
 // ICDManagementClusterInfo is populated when the controller reads information from
@@ -771,6 +811,9 @@ struct ICDManagementClusterInfo
 
 struct ReadCommissioningInfo
 {
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    app::ClusterStateCache const * attributes = nullptr;
+#endif
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
@@ -827,6 +870,7 @@ public:
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
      * kAttestationRevocationCheck: AttestationErrorInfo if there is an error
+     * kJCMTrustVerification: JCMTrustVerificationError if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
@@ -845,7 +889,8 @@ public:
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo,
+                  Credentials::JCM::TrustVerificationError>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

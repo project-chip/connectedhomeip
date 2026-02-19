@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
 #include <app/util/endpoint-config-api.h>
+#include <bridged-actions-stub.h>
 #include <lib/support/ZclString.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -30,7 +31,24 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 namespace {
 bool sTurnedOn;
 uint8_t sLevel;
+
+std::unique_ptr<chip::app::Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<chip::app::Clusters::Actions::ActionsServer> sActionsServer;
 } // namespace
+
+void emberAfActionsClusterInitCallback(chip::EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, chip::app::Clusters::Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<chip::app::Clusters::Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<chip::app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    TEMPORARY_RETURN_IGNORED sActionsServer->Init();
+}
 
 AppTask AppTask::sAppTask;
 #include <app/InteractionModelEngine.h>
@@ -163,16 +181,16 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::TemperatureMeasurement::Id, tempSensorAttrs, Z
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
-DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 
-DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
-// DataVersion gThermostatDataVersions[ArraySize(thermostatAttrs)];
+DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+// DataVersion gThermostatDataVersions[MATTER_ARRAY_SIZE(thermostatAttrs)];
 
 const EmberAfDeviceType gRootDeviceTypes[]          = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT } };
 const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
@@ -252,7 +270,7 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device
     else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
     {
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
-        MakeZclCharString(zclNameSpan, dev->GetName());
+        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclNameSpan, dev->GetName());
     }
     else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
     {
@@ -364,7 +382,7 @@ void CallReportingCallback(intptr_t closure)
 void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attribute)
 {
     auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
-    DeviceLayer::PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
 }
 } // anonymous namespace
 
@@ -387,18 +405,10 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Clusters::Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    // No actions are implemented, just return status NotFound.
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
-}
-
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LightingActionEventHandler);
-    InitCommonParts();
+    TEMPORARY_RETURN_IGNORED InitCommonParts();
 
     Protocols::InteractionModel::Status status;
 
@@ -437,7 +447,7 @@ CHIP_ERROR AppTask::Init(void)
     gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
     TempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
 
-    PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     return CHIP_NO_ERROR;
 }
@@ -455,8 +465,8 @@ void AppTask::InitServer(intptr_t context)
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // A bridge has root node device type on EP0 and aggregate node device type (bridge) at EP1
-    emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gRootDeviceTypes));
-    emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
+    TEMPORARY_RETURN_IGNORED emberAfSetDeviceTypeList(0, Span<const EmberAfDeviceType>(gRootDeviceTypes));
+    TEMPORARY_RETURN_IGNORED emberAfSetDeviceTypeList(1, Span<const EmberAfDeviceType>(gAggregateNodeDeviceTypes));
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 3, 4, 5
     AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
@@ -467,7 +477,7 @@ void AppTask::InitServer(intptr_t context)
                       Span<DataVersion>(gLight3DataVersions), 1);
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 3 & 5
-    RemoveDeviceEndpoint(&gLight2);
+    TEMPORARY_RETURN_IGNORED RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 6
     AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),

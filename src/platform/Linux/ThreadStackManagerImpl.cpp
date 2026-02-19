@@ -51,7 +51,7 @@ namespace {
 
 struct SetActiveDatasetContext
 {
-    OpenthreadIoOpenthreadBorderRouter * proxy;
+    OpenthreadBorderRouter * proxy;
     ByteSpan netInfo;
 };
 
@@ -67,7 +67,7 @@ CHIP_ERROR GLibMatterContextSetActiveDataset(SetActiveDatasetContext * context)
     GAutoPtr<GVariant> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
     if (!value)
         return CHIP_ERROR_NO_MEMORY;
-    openthread_io_openthread_border_router_set_active_dataset_tlvs(context->proxy, value.release());
+    openthread_border_router_set_active_dataset_tlvs(context->proxy, value.release());
     return CHIP_NO_ERROR;
 }
 
@@ -82,9 +82,9 @@ CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackM
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
     GAutoPtr<GError> err;
-    self->mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
-        &err.GetReceiver()));
+    self->mProxy.reset(openthread_border_router_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
+                                                                       kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
+                                                                       &err.GetReceiver()));
     VerifyOrReturnError(
         self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
@@ -103,7 +103,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
-    GAutoPtr<char> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
+    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
     if (role)
     {
         ThreadDeviceRoleChangedHandler(role.get());
@@ -112,7 +112,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     return CHIP_NO_ERROR;
 }
 
-void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                                      const gchar * const * invalidated_properties, gpointer user_data)
 {
     ThreadStackManagerImpl * me = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
@@ -130,7 +130,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
             if (key == nullptr || value == nullptr)
                 continue;
             // ownership of key and value is still holding by the iter
-            DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
 
             if (strcmp(key, kPropertyDeviceRole) == 0)
             {
@@ -182,7 +182,7 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
         return true;
     }
 
-    GAutoPtr<GVariant> routes(openthread_io_openthread_border_router_dup_external_routes(mProxy.get()));
+    GAutoPtr<GVariant> routes(openthread_border_router_dup_external_routes(mProxy.get()));
     if (!routes)
         return false;
 
@@ -301,9 +301,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
-    dataset.Init(mDataset.AsByteSpan());
-
-    return CHIP_NO_ERROR;
+    return dataset.Init(mDataset.AsByteSpan());
 }
 
 bool ThreadStackManagerImpl::_IsThreadProvisioned()
@@ -368,7 +366,7 @@ bool ThreadStackManagerImpl::_IsThreadAttached() const
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallAttach(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-    openthread_io_openthread_border_router_call_attach(self->mProxy.get(), nullptr, _OnThreadBrAttachFinished, self);
+    openthread_border_router_call_attach(self->mProxy.get(), nullptr, _OnThreadBrAttachFinished, self);
     return CHIP_NO_ERROR;
 }
 
@@ -383,7 +381,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     else
     {
         GAutoPtr<GError> err;
-        gboolean result = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &err.GetReceiver());
+        gboolean result = openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &err.GetReceiver());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", err->message);
@@ -405,12 +403,12 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
     GAutoPtr<GVariant> attachRes;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res, &err.GetReceiver());
+        gboolean result = openthread_border_router_call_attach_finish(this_->mProxy.get(), res, &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -421,7 +419,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
         }
         else
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -442,7 +440,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     }
 
-    GAutoPtr<char> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
+    GAutoPtr<char> role(openthread_border_router_dup_device_role(mProxy.get()));
     if (!role)
         return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
     if (strcmp(role.get(), kOpenthreadDeviceRoleDetached) == 0 || strcmp(role.get(), kOpenthreadDeviceRoleDisabled) == 0)
@@ -451,7 +449,7 @@ ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceTy
     }
     if (strcmp(role.get(), kOpenthreadDeviceRoleChild) == 0)
     {
-        GAutoPtr<GVariant> linkMode(openthread_io_openthread_border_router_dup_link_mode(mProxy.get()));
+        GAutoPtr<GVariant> linkMode(openthread_border_router_dup_link_mode(mProxy.get()));
         if (!linkMode)
             return ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported;
         gboolean rx_on_when_idle;
@@ -499,7 +497,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
         GAutoPtr<GVariant> linkMode(g_variant_new("(bbb)", rx_on_when_idle, device_type, network_data));
         if (!linkMode)
             return CHIP_ERROR_NO_MEMORY;
-        openthread_io_openthread_border_router_set_link_mode(mProxy.get(), linkMode.release());
+        openthread_border_router_set_link_mode(mProxy.get(), linkMode.release());
     }
 
     return CHIP_NO_ERROR;
@@ -514,53 +512,51 @@ CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Millisecon
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
-bool ThreadStackManagerImpl::_HaveMeshConnectivity()
-{
-    // TODO: Remove Weave legacy APIs
-    // For a leader with a child, the child is considered to have mesh connectivity
-    // and the leader is not, which is a very confusing definition.
-    // This API is Weave legacy and should be removed.
-
-    ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
-    return false;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyMinimal()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
-    guint64 extAddr = openthread_io_openthread_border_router_get_extended_address(mProxy.get());
 
-    for (size_t i = 0; i < sizeof(extAddr); i++)
+    // The ExtendedAddress d-bus property from otbr-agent is defined to not emit changed signals.
+    // This means the generated api, which uses a caching proxy underneath, will not obtain a value
+    // and will always return NULL. In order to retrieve the value in this case, we must directly
+    // call the Get function to get it, then we manually cache locally since it does not change.
+    if (std::all_of(mExtendedAddress, mExtendedAddress + sizeof(mExtendedAddress), [](uint8_t v) { return v == 0; }))
     {
-        buf[sizeof(uint64_t) - i - 1] = (extAddr & UINT8_MAX);
-        extAddr >>= CHAR_BIT;
+        GAutoPtr<GError> err;
+        GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                                           g_variant_new("(ss)", "io.openthread.BorderRouter", "ExtendedAddress"),
+                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
+
+        VerifyOrReturnError(err == nullptr, CHIP_ERROR_INTERNAL,
+                            ChipLogError(DeviceLayer, "openthread: failed to read ExtendedAddress property: %s", err->message));
+
+        VerifyOrReturnError(response, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to get a response for ExtendedAddress property"));
+
+        GAutoPtr<GVariant> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+        VerifyOrReturnError(tupleContent, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to find tuple in ExtendedAddress response"));
+
+        GAutoPtr<GVariant> value(g_variant_get_variant(tupleContent.get()));
+
+        VerifyOrReturnError(value, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to find tuple value in ExtendedAddress response"));
+
+        VerifyOrReturnError(g_variant_is_of_type(value.get(), G_VARIANT_TYPE_UINT64), CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: ExtendedAddress property returned unexpected type: %s",
+                                         g_variant_get_type_string(value.get())));
+
+        guint64 address_value = g_variant_get_uint64(value.get());
+        for (size_t i = 0; i < sizeof(address_value); i++)
+        {
+            mExtendedAddress[sizeof(mExtendedAddress) - i - 1] = (address_value & UINT8_MAX);
+            address_value >>= CHAR_BIT;
+        }
     }
 
+    memcpy(buf, mExtendedAddress, sizeof(mExtendedAddress));
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
@@ -570,16 +566,10 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-    openthread_io_openthread_border_router_call_scan(self->mProxy.get(), nullptr, _OnNetworkScanFinished, self);
+    openthread_border_router_call_scan(self->mProxy.get(), nullptr, _OnNetworkScanFinished, self);
     return CHIP_NO_ERROR;
 }
 
@@ -604,13 +594,13 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
     GAutoPtr<GVariant> scan_result;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_scan_finish(mProxy.get(), &scan_result.GetReceiver(), res,
-                                                                                  &err.GetReceiver());
+        gboolean result =
+            openthread_border_router_call_scan_finish(mProxy.get(), &scan_result.GetReceiver(), res, &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 if (mpScanCallback != nullptr)
                 {
                     LinuxScanResponseIterator<ThreadScanResponse> iter(nullptr);
@@ -686,7 +676,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         }
     }
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
         // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
         // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
         // lambda.

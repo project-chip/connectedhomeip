@@ -17,13 +17,17 @@
 
 #pragma once
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include "ThreadStackManagerImpl_OpenThread.h"
+#else
+
 #include <memory>
 #include <vector>
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/openthread/introspect.h>
+#include <platform/Linux/dbus/openthread/DBusOpenthread.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -31,7 +35,7 @@
 namespace chip {
 
 template <>
-struct GAutoPtrDeleter<OpenthreadIoOpenthreadBorderRouter>
+struct GAutoPtrDeleter<OpenthreadBorderRouter>
 {
     using deleter = GObjectDeleter;
 };
@@ -102,19 +106,18 @@ public:
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
-    bool _HaveMeshConnectivity();
-
-    CHIP_ERROR _GetAndLogThreadStatsCounters();
-
-    CHIP_ERROR _GetAndLogThreadTopologyMinimal();
-
-    CHIP_ERROR _GetAndLogThreadTopologyFull();
-
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    CHIP_ERROR _RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    void _CancelRendezvousAnnouncement() {}
+    void _RendezvousStop() {}
+#endif
 
     void _ResetThreadNetworkDiagnosticsCounts();
 
@@ -149,12 +152,12 @@ private:
         uint8_t lqi;
     };
 
-    GAutoPtr<OpenthreadIoOpenthreadBorderRouter> mProxy;
+    GAutoPtr<OpenthreadBorderRouter> mProxy;
 
     static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);
     static CHIP_ERROR GLibMatterContextCallScan(ThreadStackManagerImpl * self);
-    static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
+    static void OnDbusPropertiesChanged(OpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
     void ThreadDeviceRoleChangedHandler(const gchar * role);
 
@@ -165,6 +168,7 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
     bool mAttached;
+    uint8_t mExtendedAddress[8];
 };
 
 inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
@@ -174,3 +178,4 @@ inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
 
 } // namespace DeviceLayer
 } // namespace chip
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT

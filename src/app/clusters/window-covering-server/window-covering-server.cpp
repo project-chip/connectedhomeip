@@ -25,6 +25,7 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <clusters/WindowCovering/Metadata.h>
 #include <lib/support/TypeTraits.h>
 #include <string.h>
 
@@ -47,6 +48,8 @@ namespace {
 constexpr size_t kWindowCoveringDelegateTableSize =
     MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
+
+WindowCoverAttrAccess gAttrAccess;
 
 Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
 
@@ -111,6 +114,18 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
+
+CHIP_ERROR WindowCoverAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(WindowCovering::kRevision);
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
 
 bool HasFeature(chip::EndpointId endpoint, Feature feature)
 {
@@ -974,4 +989,12 @@ MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAtt
 /**
  * @brief Cluster Plugin Init Callback
  */
-void MatterWindowCoveringPluginServerInitCallback() {}
+void MatterWindowCoveringPluginServerInitCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterWindowCoveringPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

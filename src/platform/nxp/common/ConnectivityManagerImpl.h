@@ -88,6 +88,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+    static int _WlanEventCallback(enum wlan_event_reason event, void * data);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -119,6 +120,7 @@ private:
 
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
+    bool _IsWiFiStationProvisioned();
     bool _IsWiFiStationApplicationControlled();
     CHIP_ERROR _DisconnectNetwork(void);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
@@ -131,14 +133,29 @@ private:
     static ConnectivityManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
-    ConnectivityManager::WiFiStationMode mWiFiStationMode;
-    ConnectivityManager::WiFiStationState mWiFiStationState;
-    ConnectivityManager::WiFiAPMode mWiFiAPMode;
-    uint32_t mWiFiStationReconnectIntervalMS;
     bool mBorderRouterInit = false;
 
+#if CONFIG_CHIP_ETHERNET && !CHIP_DEVICE_CONFIG_ENABLE_WPA
+    enum class ConnectivityFlags : uint16_t{
+        kHaveIPv4InternetConnectivity = 0x0001,
+        kHaveIPv6InternetConnectivity = 0x0002,
+        kAwaitingConnectivity         = 0x0010,
+    };
+    BitFlags<ConnectivityFlags> mFlags;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
+    void UpdateInternetConnectivityState(void);
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    bool mWifiManagerInit = false;
+    ConnectivityManager::WiFiStationMode mWiFiStationMode;
+    ConnectivityManager::WiFiStationState mWiFiStationState = kWiFiStationState_NotConnected;
+    ConnectivityManager::WiFiAPMode mWiFiAPMode;
+    uint32_t mWiFiStationReconnectIntervalMS;
+    bool mWifiManagerInit   = false;
+    bool mWifiIsProvisioned = false;
+    bool mIsWifiRecovering  = false;
 
     enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
@@ -149,26 +166,20 @@ private:
     static constexpr uint32_t kWlanInitWaitMs = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
 
 #if CHIP_ENABLE_OPENTHREAD
-    static constexpr uint8_t kMaxIp6Addr = 3;
-
     Inet::InterfaceId mThreadNetIf;
     Inet::InterfaceId mExternalNetIf;
 
     char mHostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
-    otIp6Address mIp6AddrList[kMaxIp6Addr];
-    uint32_t mIp6AddrNum = 0;
 #endif
 
-    static int _WlanEventCallback(enum wlan_event_reason event, void * data);
     static void _NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args);
 
     void OnStationConnected(void);
     void OnStationDisconnected(void);
-    void UpdateInternetConnectivityState(void);
 #if CHIP_ENABLE_OPENTHREAD
-    void BrHandleStateChange(bool bLinkState);
-    void UpdateMdnsHost(void);
-    bool UpdateIp6AddrList(void);
+    void BrHandleStateChange();
+    static void LockThreadStack();
+    static void UnlockThreadStack();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #endif
     /* CHIP_DEVICE_CONFIG_ENABLE_WPA */

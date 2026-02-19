@@ -105,8 +105,7 @@ def run(args) -> int:
 
 
 def list_images(flash_directory: str) -> list[str]:
-    filenames: list[str] = glob.glob(os.path.join(flash_directory, "*.s37"))
-    return list(map(lambda x: os.path.join(flash_directory, x), filenames))
+    return glob.glob(os.path.join(flash_directory, "*.s37"))
 
 
 def main() -> int:

@@ -49,6 +49,8 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+#include <optional>
+
 // TODO : may be we can make it configurable
 #define BLE_ADVERTISEMENT_VERSION 0
 
@@ -56,7 +58,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static Optional<System::Clock::Seconds32> sFirmwareBuildChipEpochTime;
+namespace {
+std::optional<System::Clock::Seconds32> gFirmwareBuildChipEpochTime;
+}
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 
@@ -241,7 +245,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
+    err = mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
 #if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
@@ -285,12 +289,25 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVer
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetConfigurationVersion(uint32_t & configurationVer)
+{
+    configurationVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreConfigurationVersion(uint32_t configurationVer)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
 {
     // If the setter was called and we have a value in memory, return this.
-    if (sFirmwareBuildChipEpochTime.HasValue())
+    if (gFirmwareBuildChipEpochTime.has_value())
     {
-        chipEpochTime = sFirmwareBuildChipEpochTime.Value();
+        chipEpochTime = gFirmwareBuildChipEpochTime.value();
         return CHIP_NO_ERROR;
     }
 #ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S
@@ -323,7 +340,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFirmwareBuildChipEpo
     //
     // Implementations that can't use the hard-coded time for whatever reason
     // should set this at each init.
-    sFirmwareBuildChipEpochTime.SetValue(chipEpochTime);
+    gFirmwareBuildChipEpochTime = chipEpochTime;
     return CHIP_NO_ERROR;
 }
 
@@ -369,7 +386,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryWiFiMACAddres
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan buf)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan & buf)
 {
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -426,7 +443,7 @@ void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Increment life time counter to protect against long-term tracking of rotating device ID.
-    IncrementLifetimeCounter();
+    TEMPORARY_RETURN_IGNORED IncrementLifetimeCounter();
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
 #endif
 }
@@ -515,9 +532,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf,
     err                = ReadConfigValueStr(ConfigClass::kConfigKey_UniqueId, buf, bufSize, uniqueIdLen);
 
     ReturnErrorOnFailure(err);
-
     VerifyOrReturnError(uniqueIdLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(buf[uniqueIdLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    // ensure null termination if the string read is not null terminting (e.g. posix config on darwin
+    // returns data without null terminators as it reads data as binary.)
+    buf[uniqueIdLen] = 0;
 
     return err;
 }
@@ -654,7 +673,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCommissionableDevice
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
     return CHIP_NO_ERROR;
 }
@@ -662,7 +689,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstru
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
     return CHIP_NO_ERROR;
 }

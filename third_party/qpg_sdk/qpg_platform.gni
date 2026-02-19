@@ -18,14 +18,12 @@ import("${chip_root}/src/crypto/crypto.gni")
 declare_args() {
   # QPG chip
   qpg_target_ic = "unset"
-  qpg_flavour = ""
   mbedtls_alt_enabled = true
 }
 
-if (qpg_target_ic == "qpg6105") {
+if (qpg_target_ic == "qpg6200") {
   mbedtls_alt_enabled = true
-  arm_float_abi = "soft"
-  arm_arch = "armv7e-m"
+  arm_float_abi = "hard"
 } else {
   assert(qpg_target_ic != "", "qpg_target_ic must be specified")
 }

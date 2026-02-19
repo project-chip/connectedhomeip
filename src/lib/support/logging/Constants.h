@@ -5,6 +5,57 @@
 namespace chip {
 namespace Logging {
 
+// X-Macro style enumeration of log modules and associated short names
+// Note: For any module added here, a CHIP_CONFIG_LOG_MODULE_* macro needs to be defined below.
+// This list is used to generate the array of strings backing GetModuleName(), and can also
+// be used by platform-specific code, e.g. Darwin generates an array of non-abbreviated names.
+#define CHIP_LOGMODULES_ENUMERATE(X)                                                                                               \
+    X(NotSpecified, "-")                                                                                                           \
+    X(Inet, "IN")                                                                                                                  \
+    X(Ble, "BLE")                                                                                                                  \
+    X(MessageLayer, "ML")                                                                                                          \
+    X(SecurityManager, "SM")                                                                                                       \
+    X(ExchangeManager, "EM")                                                                                                       \
+    X(TLV, "TLV")                                                                                                                  \
+    X(ASN1, "ASN")                                                                                                                 \
+    X(Crypto, "CR")                                                                                                                \
+    X(Controller, "CTL")                                                                                                           \
+    X(Alarm, "AL")                                                                                                                 \
+    X(SecureChannel, "SC")                                                                                                         \
+    X(BDX, "BDX")                                                                                                                  \
+    X(DataManagement, "DMG")                                                                                                       \
+    X(DeviceControl, "DC")                                                                                                         \
+    X(DeviceDescription, "DD")                                                                                                     \
+    X(Echo, "ECH")                                                                                                                 \
+    X(FabricProvisioning, "FP")                                                                                                    \
+    X(NetworkProvisioning, "NP")                                                                                                   \
+    X(ServiceDirectory, "SD")                                                                                                      \
+    X(ServiceProvisioning, "SP")                                                                                                   \
+    X(SoftwareUpdate, "SWU")                                                                                                       \
+    X(FailSafe, "FS")                                                                                                              \
+    X(TimeService, "TS")                                                                                                           \
+    X(Heartbeat, "HB")                                                                                                             \
+    X(chipSystemLayer, "CSL")                                                                                                      \
+    X(EventLogging, "EVL")                                                                                                         \
+    X(Support, "SPT")                                                                                                              \
+    X(chipTool, "TOO")                                                                                                             \
+    X(Zcl, "ZCL")                                                                                                                  \
+    X(Shell, "SH")                                                                                                                 \
+    X(DeviceLayer, "DL")                                                                                                           \
+    X(SetupPayload, "SPL")                                                                                                         \
+    X(AppServer, "SVR")                                                                                                            \
+    X(Discovery, "DIS")                                                                                                            \
+    X(InteractionModel, "IM")                                                                                                      \
+    X(Test, "TST")                                                                                                                 \
+    X(OperationalSessionSetup, "OSS")                                                                                              \
+    X(Automation, "ATM")                                                                                                           \
+    X(CASESessionManager, "CSM")                                                                                                   \
+    X(ICD, "ICD")                                                                                                                  \
+    X(FabricSync, "FS")                                                                                                            \
+    X(WiFiPAF, "PAF")                                                                                                              \
+    X(Camera, "CAM")                                                                                                               \
+    X(JointFabric, "JF")
+
 /**
  *  @enum LogModule
  *
@@ -18,51 +69,9 @@ namespace Logging {
  */
 enum LogModule
 {
-    kLogModule_NotSpecified = 0,
-
-    kLogModule_Inet,
-    kLogModule_Ble,
-    kLogModule_MessageLayer,
-    kLogModule_SecurityManager,
-    kLogModule_ExchangeManager,
-    kLogModule_TLV,
-    kLogModule_ASN1,
-    kLogModule_Crypto,
-    kLogModule_Controller,
-    kLogModule_Alarm,
-    kLogModule_SecureChannel,
-    kLogModule_BDX,
-    kLogModule_DataManagement,
-    kLogModule_DeviceControl,
-    kLogModule_DeviceDescription,
-    kLogModule_Echo,
-    kLogModule_FabricProvisioning,
-    kLogModule_NetworkProvisioning,
-    kLogModule_ServiceDirectory,
-    kLogModule_ServiceProvisioning,
-    kLogModule_SoftwareUpdate,
-    kLogModule_FailSafe,
-    kLogModule_TimeService,
-    kLogModule_Heartbeat,
-    kLogModule_chipSystemLayer,
-    kLogModule_EventLogging,
-    kLogModule_Support,
-    kLogModule_chipTool,
-    kLogModule_Zcl,
-    kLogModule_Shell,
-    kLogModule_DeviceLayer,
-    kLogModule_SetupPayload,
-    kLogModule_AppServer,
-    kLogModule_Discovery,
-    kLogModule_InteractionModel,
-    kLogModule_Test,
-    kLogModule_OperationalSessionSetup,
-    kLogModule_Automation,
-    kLogModule_CASESessionManager,
-    kLogModule_ICD,
-    kLogModule_FabricSync,
-
-    kLogModule_Max
+#define _CHIP_LOGMODULE_ENUM_DECL(MOD, ...) kLogModule_##MOD,
+    CHIP_LOGMODULES_ENUMERATE(_CHIP_LOGMODULE_ENUM_DECL) //
+    kLogModule_Max                                       // marker value
 };
 
 /* Log modules enablers. Those definitions can be overwritten with 0 to disable
@@ -234,6 +243,18 @@ enum LogModule
 
 #ifndef CHIP_CONFIG_LOG_MODULE_FabricSync
 #define CHIP_CONFIG_LOG_MODULE_FabricSync 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_WiFiPAF
+#define CHIP_CONFIG_LOG_MODULE_WiFiPAF 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_Camera
+#define CHIP_CONFIG_LOG_MODULE_Camera 1
+#endif
+
+#ifndef CHIP_CONFIG_LOG_MODULE_JointFabric
+#define CHIP_CONFIG_LOG_MODULE_JointFabric 1
 #endif
 
 /**

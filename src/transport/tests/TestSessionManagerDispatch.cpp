@@ -48,7 +48,7 @@ namespace {
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::Credentials;
 
 using GroupInfo      = GroupDataProvider::GroupInfo;
@@ -56,7 +56,7 @@ using GroupKey       = GroupDataProvider::GroupKey;
 using KeySet         = GroupDataProvider::KeySet;
 using SecurityPolicy = GroupDataProvider::SecurityPolicy;
 
-using TestContext = chip::Test::LoopbackTransportManager;
+using TestContext = LoopbackTransportManager;
 
 struct MessageTestEntry
 {

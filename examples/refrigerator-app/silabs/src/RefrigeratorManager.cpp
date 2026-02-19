@@ -64,13 +64,15 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 
 CHIP_ERROR RefrigeratorManager::Init()
 {
-    SetTreeCompositionForEndpoint(kRefEndpointId);
-    SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
-    SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
 
     // set TagList
-    SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
-    SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(kColdCabinetEndpointId,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return CHIP_NO_ERROR;
@@ -112,14 +114,14 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
     }
 }
 
-void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
-                                                          uint16_t size)
+void RefrigeratorManager::RefAlarmAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
+                                                         uint16_t size)
 {
     switch (attributeId)
     {
     case RefAlarmAttr::Mask::Id: {
         auto mask = static_cast<uint32_t>(*value);
-        mState    = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(mask);
+        mMask     = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(mask);
         RefAlarmAttr::Mask::Set(endpointId, mMask);
     }
     break;

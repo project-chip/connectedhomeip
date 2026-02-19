@@ -141,7 +141,7 @@ public:
             // Since AdvanceBy allows the counter to be increased by an arbitrary value, it is possible that the new counter value
             // is greater than mNextEpoch + mEpoch. As such, we want the next Epoch value to be calculated from the new current
             // value.
-            PersistAndVerifyNextEpochStart(MonotonicallyIncreasingCounter<T>::GetValue());
+            return PersistAndVerifyNextEpochStart(MonotonicallyIncreasingCounter<T>::GetValue());
         }
 
         return CHIP_NO_ERROR;
@@ -228,6 +228,11 @@ private:
     {
         T valueLE     = GetInitialCounterValue();
         uint16_t size = sizeof(valueLE);
+
+        // clang-tidy claims that we're returning without writing to 'aStartValue',
+        // assign 0 to supppress the warning. In case of error, the value wont't be
+        // used anyway.
+        aStartValue = 0;
 
         VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 

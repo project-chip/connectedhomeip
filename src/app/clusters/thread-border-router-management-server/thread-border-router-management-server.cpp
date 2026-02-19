@@ -17,27 +17,28 @@
 
 #include "thread-border-router-management-server.h"
 
-#include "app-common/zap-generated/cluster-objects.h"
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app-common/zap-generated/ids/Commands.h"
-#include "app/AttributeAccessInterfaceRegistry.h"
-#include "app/AttributeValueEncoder.h"
-#include "app/CommandHandler.h"
-#include "app/CommandHandlerInterface.h"
-#include "app/CommandHandlerInterfaceRegistry.h"
-#include "app/InteractionModelEngine.h"
-#include "app/MessageDef/StatusIB.h"
-#include "app/clusters/general-commissioning-server/general-commissioning-server.h"
-#include "app/data-model/Nullable.h"
-#include "lib/core/CHIPError.h"
-#include "lib/core/Optional.h"
-#include "lib/support/CodeUtils.h"
-#include "lib/support/Span.h"
-#include "lib/support/ThreadOperationalDataset.h"
-#include "platform/CHIPDeviceEvent.h"
-#include "platform/PlatformManager.h"
-#include "protocols/interaction_model/StatusCode.h"
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributeValueEncoder.h>
+#include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/InteractionModelEngine.h>
+#include <app/MessageDef/StatusIB.h>
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+#include <app/data-model/Nullable.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 #include <optional>
 
 namespace chip {
@@ -67,11 +68,13 @@ Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterface::HandlerC
     VerifyOrReturnValue(IsCommandOverCASESession(ctx), Status::UnsupportedAccess);
 
     CHIP_ERROR err = mDelegate->GetDataset(dataset, type);
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_ERROR_NOT_FOUND)
     {
-        return err == CHIP_IM_GLOBAL_STATUS(NotFound) ? StatusIB(err).mStatus : Status::Failure;
+        // The spec mandates that we return an empty dataset, NOT a NotFound status.
+        TEMPORARY_RETURN_IGNORED dataset.Init(ByteSpan());
+        return Status::Success;
     }
-    return Status::Success;
+    return StatusIB(err).mStatus;
 }
 
 Status ServerInstance::HandleSetActiveDatasetRequest(CommandHandlerInterface::HandlerContext & ctx,
@@ -298,7 +301,11 @@ void ServerInstance::CommitSavedBreadcrumb()
 {
     if (mBreadcrumb.HasValue())
     {
-        GeneralCommissioning::SetBreadcrumb(mBreadcrumb.Value());
+        GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
+        if (cluster != nullptr)
+        {
+            cluster->SetBreadCrumb(mBreadcrumb.Value());
+        }
     }
     mBreadcrumb.ClearValue();
 }
@@ -337,7 +344,7 @@ void ServerInstance::OnFailSafeTimerExpired()
 {
     if (mDelegate)
     {
-        mDelegate->RevertActiveDataset();
+        TEMPORARY_RETURN_IGNORED mDelegate->RevertActiveDataset();
     }
     auto commandHandleRef = std::move(mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
@@ -357,7 +364,7 @@ void ServerInstance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent *
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        _this->mDelegate->CommitActiveDataset();
+        TEMPORARY_RETURN_IGNORED _this->mDelegate->CommitActiveDataset();
     }
 }
 
@@ -379,3 +386,4 @@ void MatterThreadBorderRouterManagementPluginServerInitCallback()
 {
     // Nothing to do, the server init routine will be done in Instance::Init()
 }
+void MatterThreadBorderRouterManagementPluginServerShutdownCallback() {}

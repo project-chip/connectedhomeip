@@ -15,48 +15,55 @@
  *    limitations under the License.
  */
 
+#include <chip_porting.h>
 #include <platform_stdlib.h>
-
-#include "AmebaObserver.h"
-#include "BindingHandler.h"
-#include "CHIPDeviceManager.h"
-#include "DeviceCallbacks.h"
-#include "Globals.h"
-#include "LEDWidget.h"
-#include "chip_porting.h"
-#if CHIP_AMEBA_APP_TASK
-#include "ameba_main_task.h"
+#if CONFIG_ENABLE_AMEBA_APP_TASK
+#include <ameba_main_task.h>
 #endif
-#include <DeviceInfoProviderImpl.h>
+
+#include <AmebaObserver.h>
+#include <BindingHandler.h>
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
+#include <Globals.h>
+#include <LEDWidget.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
+#include <app/server/TermsAndConditionsManager.h>
+#endif
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
-
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/DeviceInfoProviderImpl.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #if CONFIG_ENABLE_AMEBA_CRYPTO
 #include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
 #endif
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
-
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
 #include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
 #endif
-
+#if CONFIG_ENABLE_CHIP_SHELL
+#include <shell/launch_shell.h>
+#endif
 #if CONFIG_ENABLE_PW_RPC
 #include <Rpc.h>
 #endif
 
-#if CONFIG_ENABLE_CHIP_SHELL
-#include <shell/launch_shell.h>
+#ifdef CONFIG_PLATFORM_8721D
+#define STATUS_LED_GPIO_NUM PB_5
+#elif defined(CONFIG_PLATFORM_8710C)
+#define STATUS_LED_GPIO_NUM PA_20
+#else
+#define STATUS_LED_GPIO_NUM NC
 #endif
 
 using namespace ::chip;
@@ -64,6 +71,14 @@ using namespace ::chip::app;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
+
+static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+#endif
 
 namespace { // Network Commissioning
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
@@ -105,14 +120,6 @@ void OnIdentifyTriggerEffect(Identify * identify)
     return;
 }
 
-Identify gIdentify0 = {
-    chip::EndpointId{ 0 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnIdentifyTriggerEffect,
-};
-
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
@@ -121,36 +128,17 @@ Identify gIdentify1 = {
     OnIdentifyTriggerEffect,
 };
 
-#ifdef CONFIG_PLATFORM_8721D
-#define STATUS_LED_GPIO_NUM PB_5
-#elif defined(CONFIG_PLATFORM_8710C)
-#define STATUS_LED_GPIO_NUM PA_20
-#else
-#define STATUS_LED_GPIO_NUM NC
-#endif
-
-static DeviceCallbacks EchoCallbacks;
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
-#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-#endif
-
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
+    initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
     static AmebaTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
-    static AmebaObserver sAmebaObserver;
-    initParams.appDelegate = &sAmebaObserver;
-
-    initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
@@ -159,10 +147,18 @@ static void InitServer(intptr_t context)
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
 
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    // TODO: Use our own DeviceInfoProvider
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+#if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
+    const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
+        app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+    PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
+    chip::app::TermsAndConditionsManager::GetInstance().Init(&persistentStorageDelegate, termsAndConditions);
+#endif
 
     NetWorkCommissioningInstInit();
 
@@ -175,9 +171,11 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
-#if CHIP_AMEBA_APP_TASK
+
+#if CONFIG_ENABLE_AMEBA_APP_TASK
     AppTaskInit();
 #endif
+
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 
@@ -216,7 +214,7 @@ extern "C" void ChipTestShutdown(void)
     deviceMgr.Shutdown();
 }
 
-bool lowPowerClusterSleep()
+bool lowPowerClusterSleep(void)
 {
     return true;
 }

@@ -230,7 +230,7 @@ class CHIPVirtualHome:
         self.logger.info("Waiting for Thread network to be formed...")
         threadNetworkFormed = False
         for i in range(30):
-            roles = list()
+            roles = []
             for device in self.thread_devices:
                 # We can only check the status of ot-agent by query its state.
                 reply = self.execute_device_cmd(device['id'], 'ot-ctl state')
@@ -285,7 +285,7 @@ class CHIPVirtualHome:
     def wait_for_device_output(self, device_id, pattern, timeout=1):
         due = time.time() + timeout
         while True:
-            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern, ]):
+            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern]):
                 return True
             if time.time() < due:
                 time.sleep(1)
@@ -311,7 +311,7 @@ class CHIPVirtualHome:
             raise AssertionError
 
     def assertEqual(self, val1, val2, note=None):
-        if not (val1 == val2):
+        if val1 != val2:
             if note:
                 self.logger.error(note)
             raise AssertionError
@@ -361,7 +361,7 @@ class CHIPVirtualHome:
 
         self.device_config = created_devices
 
-        self.device_ids = [device_id for device_id in self.device_config]
+        self.device_ids = list(self.device_config)
         self.non_ap_devices = [device for device in self.device_config.values()
                                if device['type'] != 'wifi_ap']
         self.thread_devices = [device for device in self.device_config.values()
@@ -371,7 +371,7 @@ class CHIPVirtualHome:
 
     def save_device_logs(self):
         timestamp = int(time.time())
-        log_dir = os.environ.get("DEVICE_LOG_DIR", None)
+        log_dir = os.environ.get("DEVICE_LOG_DIR")
         if log_dir is not None and not os.path.exists(log_dir):
             os.makedirs("logs")
 

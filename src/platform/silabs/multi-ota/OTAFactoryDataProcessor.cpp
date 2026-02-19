@@ -17,53 +17,36 @@
  */
 
 #include <lib/core/TLV.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
 
 namespace chip {
-
-using namespace ::chip::DeviceLayer::Silabs;
-
-CHIP_ERROR OTAFactoryDataProcessor::Init()
-{
-    mAccumulator.Init(mLength);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAFactoryDataProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mPayload.Clear();
-
-    return CHIP_NO_ERROR;
-}
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-#if OTA_ENCRYPTION_ENABLE
-    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+    MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    ReturnErrorOnFailure(OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock));
 #endif
     error = DecodeTlv();
 
-    if (error != CHIP_NO_ERROR)
+    // The factory data payload can contain a variable number of fields
+    // to be updated. CHIP_END_OF_TLV is returned if no more fields are
+    // found.
+    if (error == CHIP_END_OF_TLV)
     {
-        // The factory data payload can contain a variable number of fields
-        // to be updated. CHIP_END_OF_TLV is returned if no more fields are
-        // found.
-        if (error == CHIP_END_OF_TLV)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        Clear();
+        return CHIP_NO_ERROR;
     }
 
+    if (error != CHIP_NO_ERROR)
+    {
+        TEMPORARY_RETURN_IGNORED Clear();
+    }
     return error;
 }
 
@@ -79,13 +62,15 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 exit:
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %s", ErrorStr(error));
+        ChipLogError(SoftwareUpdate, "Failed to update factory data. Error: %" CHIP_ERROR_FORMAT, error.Format());
     }
     else
     {
-        ChipLogProgress(SoftwareUpdate, "Factory data update finished.");
+        error = Provision::Manager::GetInstance().GetStorage().Commit();
+        VerifyOrReturnError(error == CHIP_NO_ERROR, error,
+                            ChipLogError(SoftwareUpdate, "Failed to commit factory data. Error: %s", ErrorStr(error)));
     }
-
+    ChipLogProgress(SoftwareUpdate, "Factory data update finished.");
     return error;
 }
 
@@ -166,4 +151,7 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
     return CHIP_ERROR_NOT_FOUND;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

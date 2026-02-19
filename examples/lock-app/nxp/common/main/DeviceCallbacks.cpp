@@ -60,14 +60,6 @@ void OnTriggerEffect(::Identify * identify)
     }
 }
 
-Identify gIdentify0 = {
-    chip::EndpointId{ 0 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
-    OnTriggerEffect,
-};
-
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
@@ -101,7 +93,9 @@ LockApp::DeviceCallbacks & LockApp::DeviceCallbacks::GetDefaultInstance()
     return sDeviceCallbacks;
 }
 
+#ifndef CONFIG_APP_DEVICE_CALLBACKS_CUSTOM_SINGLETON_IMPL
 chip::DeviceManager::CHIPDeviceManagerCallbacks & chip::NXP::App::GetDeviceCallbacks()
 {
     return LockApp::DeviceCallbacks::GetDefaultInstance();
 }
+#endif

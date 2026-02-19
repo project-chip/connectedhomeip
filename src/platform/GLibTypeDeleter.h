@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <gio/gio.h>
+#include <gio/gunixfdlist.h>
 #include <glib.h>
 
 namespace chip {
@@ -60,6 +61,11 @@ struct GErrorDeleter
     void operator()(GError * object) { g_error_free(object); }
 };
 
+struct GHashTableDeleter
+{
+    void operator()(GHashTable * hash) { g_hash_table_destroy(hash); }
+};
+
 struct GIOChannelDeleter
 {
     void operator()(GIOChannel * object) { g_io_channel_unref(object); }
@@ -83,6 +89,11 @@ struct GVariantIterDeleter
 struct GBytesDeleter
 {
     void operator()(GBytes * object) { g_bytes_unref(object); }
+};
+
+struct GStrvDeleter
+{
+    void operator()(gchar ** object) { g_strfreev(object); }
 };
 
 template <typename T>
@@ -139,15 +150,39 @@ struct GAutoPtrDeleter<GError>
 };
 
 template <>
+struct GAutoPtrDeleter<gchar *>
+{
+    using deleter = GStrvDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GHashTable>
+{
+    using deleter = GHashTableDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<GIOChannel>
 {
     using deleter = GIOChannelDeleter;
 };
 
 template <>
+struct GAutoPtrDeleter<GObject>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<GSource>
 {
     using deleter = GSourceDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GUnixFDList>
+{
+    using deleter = GObjectDeleter;
 };
 
 template <>

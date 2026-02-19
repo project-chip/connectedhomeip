@@ -25,7 +25,7 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/NetworkCommissioning.h>
-#include <platform/NuttX/dbus/openthread/introspect.h>
+#include <platform/NuttX/dbus/openthread/DBusOpenthread.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -103,21 +103,9 @@ public:
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
-    bool _HaveMeshConnectivity();
-
-    CHIP_ERROR _GetAndLogThreadStatsCounters();
-
-    CHIP_ERROR _GetAndLogThreadTopologyMinimal();
-
-    CHIP_ERROR _GetAndLogThreadTopologyFull();
-
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
-
-    CHIP_ERROR _JoinerStart();
 
     void _ResetThreadNetworkDiagnosticsCounts();
 

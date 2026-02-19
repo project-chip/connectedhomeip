@@ -22,9 +22,13 @@ kotlin_binary("java-matter-controller") {
   output_name = "java-matter-controller"
   deps = [
     "${chip_root}/src/controller/java",
+    "${chip_root}/src/controller/java:jsontlv",
     "${chip_root}/src/controller/java:onboarding_payload",
     "${chip_root}/third_party/java_deps:annotation",
+    "${chip_root}/third_party/java_deps:gson",
+    "${chip_root}/third_party/java_deps:json",
     "${chip_root}/third_party/java_deps:kotlin-stdlib",
+    "${chip_root}/third_party/java_deps:protobuf-java",
   ]
 
   sources = [
@@ -44,6 +48,7 @@ kotlin_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.kt",
     "java/src/com/matter/controller/commands/icd/ICDListCommand.kt",
+    "java/src/com/matter/controller/commands/ota/PairOnNetworkLongOtaOverBdxCommand.kt",
     "java/src/com/matter/controller/commands/pairing/CloseSessionCommand.kt",
     "java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.kt",
     "java/src/com/matter/controller/commands/pairing/PairAddressPaseCommand.kt",

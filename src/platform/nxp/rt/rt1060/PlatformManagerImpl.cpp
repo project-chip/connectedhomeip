@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023-2024 NXP
+ *    Copyright 2023-2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
-#include "fsl_adapter_rng.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
 #include "ksdk_mbedtls.h"
@@ -54,6 +53,17 @@
 #include "lib/spinel/spinel.h"
 #define OT_NXP_SPINEL_PROP_VENDOR_BLE_STATE SPINEL_PROP_VENDOR__BEGIN
 #endif /* CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED */
+#endif
+
+extern "C" {
+#include "osa.h"
+}
+
+// Helper macro to identify boards that use PLATFORM_InitControllers for firmware initialization
+#if defined(WIFI_IW612_BOARD_MURATA_2EL_M2) || defined(WIFI_IW610_BOARD_MURATA_2LL_M2)
+#define NXP_USE_PLATFORM_INIT_CONTROLLERS 1
+#else
+#define NXP_USE_PLATFORM_INIT_CONTROLLERS 0
 #endif
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -115,7 +125,7 @@ extern "C" void initiateResetInIdle(void);
 Currently only IW612 and K32W0 support controller initialization in the connectivity framework
 * Include should be removed otherwise it will introduce double firmware definition
 */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if !NXP_USE_PLATFORM_INIT_CONTROLLERS
 #include "wlan_bt_fw.h"
 #endif
 
@@ -180,13 +190,6 @@ static CHIP_ERROR EnableWiFiCoexistence(void)
 }
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_WPA
-extern "C" void vApplicationIdleHook(void)
-{
-    chip::DeviceLayer::PlatformManagerImpl::IdleHook();
-}
-#endif
-
 extern "C" void __wrap_exit(int __status)
 {
     ChipLogError(DeviceLayer, "======> error exit function !!!");
@@ -221,8 +224,7 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 }
 
 /* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !NXP_USE_PLATFORM_INIT_CONTROLLERS
 CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 {
     CHIP_ERROR result = CHIP_NO_ERROR;
@@ -273,7 +275,6 @@ CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 
     return result;
 }
-#endif
 #endif
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -350,7 +351,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif
 
 /* Currently only IW612 and K32W0 support controller initialization in the connectivity framework */
-#ifdef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if NXP_USE_PLATFORM_INIT_CONTROLLERS
     /* Init the controller by giving as an arg the connectivity supported */
     PLATFORM_InitControllers(connBle_c
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -375,7 +376,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otPlatRandomInit();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
@@ -383,9 +383,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         err = CHIP_ERROR_NO_MEMORY;
         goto exit;
     }
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 /* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if !NXP_USE_PLATFORM_INIT_CONTROLLERS
     err = WiFiInterfaceInit();
 #endif
 
@@ -521,7 +521,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -544,5 +545,5 @@ void PlatformManagerImpl::_Shutdown()
 
 extern "C" void mt_wipe(void)
 {
-    chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
 }

@@ -16,14 +16,13 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAFirmwareProcessor.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #if SL_WIFI
-#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI
 
 extern "C" {
@@ -35,6 +34,9 @@ extern "C" {
 #define SL_BOOTLOADER_OK 0L
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 // Define static memebers
 uint8_t OTAFirmwareProcessor::mSlotId                                                  = 0;
@@ -42,61 +44,44 @@ uint32_t OTAFirmwareProcessor::mWriteOffset                                     
 uint16_t OTAFirmwareProcessor::writeBufOffset                                          = 0;
 uint8_t OTAFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
 
-CHIP_ERROR OTAFirmwareProcessor::Init()
-{
-    VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(sizeof(Descriptor));
-#if OTA_ENCRYPTION_ENABLE
-    mUnalignmentNum = 0;
-#endif
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAFirmwareProcessor::Clear()
-{
-    OTATlvProcessor::ClearInternal();
-    mAccumulator.Clear();
-    mDescriptorProcessed = false;
-#if OTA_ENCRYPTION_ENABLE
-    mUnalignmentNum = 0;
-#endif
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     uint32_t err = SL_BOOTLOADER_OK;
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
         /* 16 bytes to used to store undecrypted data because of unalignment */
         mAccumulator.Init(requestedOtaMaxBlockSize + 16);
 #endif
     }
-#if OTA_ENCRYPTION_ENABLE
-    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
-    memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+    MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&byteBlock[0], &byteBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&byteBlock[mUnalignmentNum], block.data(), block.size());
 
     if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
     {
         uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
         mAlignmentNum          = mAlignmentNum * 16;
         mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
-        memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
-        mBlock.reduce_size(mAlignmentNum);
+        memcpy(&byteBlock[requestedOtaMaxBlockSize], &byteBlock[mAlignmentNum], mUnalignmentNum);
+        byteBlock.reduce_size(mAlignmentNum);
     }
     else
     {
         mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
-        mBlock.reduce_size(requestedOtaMaxBlockSize);
+        byteBlock.reduce_size(requestedOtaMaxBlockSize);
     }
 
-    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
-    block = mBlock;
+    ReturnErrorOnFailure(OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock));
+    if (IsLastBlock())
+    {
+        // Remove padding from the last block since if the file was padded, last block will contain padding bytes.
+        VerifyOrReturnError(OTATlvProcessor::RemovePadding(byteBlock) == CHIP_NO_ERROR, CHIP_ERROR_WRONG_ENCRYPTION_TYPE,
+                            ChipLogError(SoftwareUpdate, "Failed to remove padding"));
+    }
+    block = byteBlock;
 #endif
 
     uint32_t blockReadOffset = 0;
@@ -140,7 +125,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.data())));
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(reinterpret_cast<void *>(mAccumulator.data())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();
@@ -243,4 +228,7 @@ CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
     return err ? CHIP_ERROR_WRITE_FAILED : CHIP_NO_ERROR;
 }
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

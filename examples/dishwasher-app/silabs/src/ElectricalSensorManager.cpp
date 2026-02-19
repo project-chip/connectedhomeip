@@ -29,7 +29,6 @@
 #include "DishwasherManager.h"
 #include "ElectricalEnergyMeasurementInstance.h"
 #include "ElectricalSensorManager.h"
-#include "EnergyTimeUtils.h"
 #include "PowerTopologyDelegate.h"
 #include <ElectricalPowerMeasurementDelegate.h>
 
@@ -137,8 +136,7 @@ CHIP_ERROR ElectricalSensorManager::Init()
     VerifyOrReturnError(gPTDelegate, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Failed to allocate memory for PT Delegate"));
 
     gPTInstance = std::make_unique<PowerTopologyInstance>(
-        PTEndpointId, *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
-        BitMask<PowerTopology::OptionalAttributes, uint32_t>());
+        PTEndpointId, *gPTDelegate, BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology));
 
     VerifyOrReturnError(gPTInstance, CHIP_ERROR_NO_MEMORY, ChipLogError(AppServer, "Failed to allocate memory for PT Instance");
                         gPTDelegate.reset());
@@ -199,17 +197,17 @@ void ElectricalSensorManager::UpdateEPMAttributes(OperationalStateEnum state)
         uint8_t updateState = to_underlying(state);
 
         // Check state range
-        if (updateState >= ArraySize(kAttributes))
+        if (updateState >= MATTER_ARRAY_SIZE(kAttributes))
         {
-            updateState = ArraySize(kAttributes) - 1;
+            updateState = MATTER_ARRAY_SIZE(kAttributes) - 1;
         }
 
         ChipLogDetail(AppServer, "UpdateAllAttributes to Operational State : %d", updateState);
 
         // Added to support testing using a static array for now
-        gEPMDelegate->SetPowerMode(kAttributes[updateState].PowerMode);
-        gEPMDelegate->SetVoltage(MakeNullable(kAttributes[updateState].Voltage));
-        gEPMDelegate->SetActiveCurrent(MakeNullable(kAttributes[updateState].ActiveCurrent));
-        gEPMDelegate->SetActivePower(MakeNullable(kAttributes[updateState].ActivePower));
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetPowerMode(kAttributes[updateState].PowerMode);
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetVoltage(MakeNullable(kAttributes[updateState].Voltage));
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetActiveCurrent(MakeNullable(kAttributes[updateState].ActiveCurrent));
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetActivePower(MakeNullable(kAttributes[updateState].ActivePower));
     }
 }

@@ -85,6 +85,10 @@ TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvoked)
     EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
 
+    EXPECT_FALSE(failSafeContext.AddNocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.NocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.UpdateNocCommandHasBeenInvoked());
+
     failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
     EXPECT_TRUE(failSafeContext.NocCommandHasBeenInvoked());
     EXPECT_TRUE(failSafeContext.AddNocCommandHasBeenInvoked());
@@ -95,6 +99,89 @@ TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvoked)
     EXPECT_TRUE(failSafeContext.UpdateNocCommandHasBeenInvoked());
 
     failSafeContext.DisarmFailSafe();
+
+    EXPECT_FALSE(failSafeContext.AddNocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.NocCommandHasBeenInvoked());
+    EXPECT_FALSE(failSafeContext.UpdateNocCommandHasBeenInvoked());
 }
 
+TEST_F(TestFailSafeContext, TestFailSafeContext_MiscellaneousElementFlagsWork)
+{
+    chip::app::FailSafeContext failSafeContext;
+
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
+
+    {
+        EXPECT_FALSE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.AddTrustedRootCertHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.IsCsrRequestForUpdateNoc());
+    }
+
+    failSafeContext.SetUpdateTermsAndConditionsHasBeenInvoked();
+
+    {
+        EXPECT_TRUE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.AddTrustedRootCertHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.IsCsrRequestForUpdateNoc());
+    }
+
+    failSafeContext.RecordSetVidVerificationStatementHasBeenInvoked();
+
+    {
+        EXPECT_TRUE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.AddTrustedRootCertHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.IsCsrRequestForUpdateNoc());
+    }
+
+    failSafeContext.SetAddTrustedRootCertInvoked();
+
+    {
+        EXPECT_TRUE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.AddTrustedRootCertHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.IsCsrRequestForUpdateNoc());
+    }
+
+    failSafeContext.SetCsrRequestForUpdateNoc(true);
+
+    {
+        EXPECT_TRUE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.AddTrustedRootCertHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.IsCsrRequestForUpdateNoc());
+    }
+
+    failSafeContext.SetCsrRequestForUpdateNoc(false);
+
+    {
+        EXPECT_TRUE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+        EXPECT_TRUE(failSafeContext.AddTrustedRootCertHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.IsCsrRequestForUpdateNoc());
+        failSafeContext.SetCsrRequestForUpdateNoc(true);
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    EXPECT_FALSE(failSafeContext.AddICACCommandHasBeenInvoked());
+
+    failSafeContext.SetAddICACHasBeenInvoked();
+    EXPECT_TRUE(failSafeContext.AddICACCommandHasBeenInvoked());
+
+#endif
+
+    failSafeContext.DisarmFailSafe();
+
+    {
+        EXPECT_FALSE(failSafeContext.UpdateTermsAndConditionsHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.HasSetVidVerificationStatementHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.AddTrustedRootCertHasBeenInvoked());
+        EXPECT_FALSE(failSafeContext.IsCsrRequestForUpdateNoc());
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        EXPECT_FALSE(failSafeContext.AddICACCommandHasBeenInvoked());
+#endif
+    }
+}
 } // namespace

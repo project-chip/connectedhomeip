@@ -31,6 +31,10 @@ buildconfig_header("icd-server-buildconfig") {
     assert(chip_enable_icd_checkin && chip_enable_icd_user_active_mode_trigger)
   }
 
+  if (chip_enable_icd_dsls) {
+    assert(chip_enable_icd_lit)
+  }
+
   defines = [
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
     "CHIP_CONFIG_ENABLE_ICD_LIT=${chip_enable_icd_lit}",
@@ -39,6 +43,7 @@ buildconfig_header("icd-server-buildconfig") {
     "CHIP_CONFIG_ENABLE_ICD_DSLS=${chip_enable_icd_dsls}",
     "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_icd_report_on_active_mode}",
     "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
+    "CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT=${chip_enable_icd_checkin_on_report_timeout}",
   ]
 
   visibility = [ ":icd-server-config" ]
@@ -62,6 +67,7 @@ source_set("notifier") {
 
   deps = [
     ":icd-server-config",
+    "${chip_root}/src/access:types",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -98,6 +104,7 @@ source_set("manager") {
     ":observer",
     "${chip_root}/src/app:subscription-info-provider",
     "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/lib/address_resolve:address_resolve",
     "${chip_root}/src/messaging",
@@ -148,6 +155,8 @@ source_set("configuration-data") {
     "ICDConfigurationData.cpp",
     "ICDConfigurationData.h",
   ]
+
+  public_deps = [ "${chip_root}/src/app/common:enums" ]
 
   deps = [
     ":icd-server-config",

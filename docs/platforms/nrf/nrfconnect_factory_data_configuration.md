@@ -358,7 +358,7 @@ To use this script, complete the following steps:
     > `factory_data.hex` and `factory_data.bin` files are created in the
     > `output` directory. The first file contains the required memory offset.
     > For this reason, it can be programmed directly to the device using a
-    > programmer (for example, `nrfjprog`).
+    > programmer (for example, `nrfutil device`).
 
     l. (optional) The maximum partition size in device's NVM memory, where
     factory data will be stored.
@@ -372,7 +372,7 @@ To use this script, complete the following steps:
     > `factory_data.hex` and `factory_data.bin` files are created in the
     > `output` directory. The first file contains the required memory offset.
     > For this reason, it can be programmed directly to the device using a
-    > programmer (for example, `nrfjprog`).
+    > programmer (for example, `nrfutil device`).
 
 4. Run the script using the prepared list of arguments:
 
@@ -446,7 +446,7 @@ To add user data as an argument to the
 script, add the following line to the argument list:
 
 ```
---user-data {user data JSON}
+--user '{user data JSON}'
 ```
 
 As `user data JSON`, provide a flat JSON map with a value file that consists of
@@ -464,7 +464,7 @@ follows:
 When added to the argument line, the final result would look like follows:
 
 ```
---user-data '{"name": "product_name", "version": 123, "revision": "0x123"}'
+--user '{"name": "product_name", "version": 123, "revision": "0x123"}'
 ```
 
 #### How to handle user data
@@ -766,7 +766,7 @@ $ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i build/ligh
 As a result, `factory_data.hex` and `factory_data.bin` files are created in the
 `/build/light_bulb/zephyr/` directory. The first file contains the memory
 offset. For this reason, it can be programmed directly to the device using a
-programmer (for example, `nrfjprog`).
+programmer (for example, `nrfutil device`).
 
 <hr>
 
@@ -901,22 +901,16 @@ achieve the desired behavior of your application.
 ## Programming factory data
 
 The HEX file containing factory data can be programmed into the device's flash
-memory using `nrfjprog` and the J-Link programmer. To do this, use the following
-command:
+memory using `nrfutil device` and the J-Link programmer. To do this, use the
+following command:
 
 ```
-$ nrfjprog --program factory_data.hex
+$ nrfutil device program --firmware factory_data.hex
 ```
 
-In this command, you can add the `--family` argument and provide the name of the
-DK: `NRF52` for the nRF52840 DK or `NRF53` for the nRF5340 DK. For example:
-
-```
-$ nrfjprog --family NRF52 --program factory_data.hex
-```
-
-> Note: For more information about how to use the `nrfjprog` utility, visit
-> [Programming SoCs with nrfjprog](https://docs.nordicsemi.com/bundle/ug_nrf_cltools/page/UG/cltools/nrf_nrfjprogexe.html)
+> Note: For more information about how to use the `nrfutil device` utility,
+> visit
+> [Programming SoCs with nrfutil's device module](https://docs.nordicsemi.com/bundle/nrfutil/page/README.html)
 
 Another way to program the factory data to a device is to use the nRF Connect
 platform build system described in

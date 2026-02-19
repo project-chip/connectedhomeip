@@ -124,13 +124,57 @@ Status AmebaWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
     return Status::kSuccess;
 }
 
+void AmebaWiFiDriver::OnConnectWiFiNetwork()
+{
+    if (mpConnectCallback)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailedTimer, nullptr);
+        mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
+        mpConnectCallback = nullptr;
+    }
+}
+
+void AmebaWiFiDriver::OnConnectWiFiNetworkFailed(uint16_t reason)
+{
+    if (mpConnectCallback)
+    {
+        Status status;
+        switch (reason)
+        {
+        case RTW_NONE_NETWORK:
+            status = Status::kNetworkNotFound;
+            break;
+        case RTW_CONNECT_FAIL:
+#if defined(CONFIG_PLATFORM_8710C)
+        case RTW_4WAY_HANDSHAKE_TIMEOUT:
+#endif
+        case RTW_WRONG_PASSWORD:
+            status = Status::kAuthFailure;
+            break;
+        case RTW_DHCP_FAIL:
+        case RTW_UNKNOWN:
+        default:
+            status = Status::kUnknownError;
+            break;
+        }
+        mpConnectCallback->OnResult(status, CharSpan(), 0);
+        mpConnectCallback = nullptr;
+    }
+}
+
+void AmebaWiFiDriver::OnConnectWiFiNetworkFailedTimer(chip::System::Layer * aLayer, void * aAppState)
+{
+    matter_wifi_set_autoreconnect(0);
+    AmebaWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed(RTW_CONNECT_FAIL);
+}
+
 CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool connected;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // If device is already connected to WiFi, then disconnect the WiFi,
-    chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(connected);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(connected);
     if (connected)
     {
         ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Disconnecting);
@@ -155,21 +199,15 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
     }
 
     DeviceLayer::ConnectivityManager::WiFiStationState state = DeviceLayer::ConnectivityManager::kWiFiStationState_Connecting;
-    DeviceLayer::SystemLayer().ScheduleLambda([state, ssid, key]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([state, ssid, key]() {
         ConnectivityMgrImpl().ChangeWiFiStationState(state);
-        chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
     });
+
+    err = DeviceLayer::SystemLayer().StartTimer(static_cast<System::Clock::Timeout>(kWiFiConnectNetworkTimeoutSeconds * 1000),
+                                                OnConnectWiFiNetworkFailedTimer, nullptr);
 #endif
     return err;
-}
-
-void AmebaWiFiDriver::OnConnectWiFiNetwork()
-{
-    if (mpConnectCallback)
-    {
-        mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
-        mpConnectCallback = nullptr;
-    }
 }
 
 void AmebaWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
@@ -189,9 +227,10 @@ exit:
     {
         networkingStatus = Status::kUnknownError;
     }
+
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -201,11 +240,11 @@ CHIP_ERROR AmebaWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     if (!ssid.empty()) // ssid is given, only scan this network
     {
-        matter_scan_networks_with_ssid(ssid.data(), ssid.size());
+        matter_wifi_scan_networks_with_ssid(ssid.data(), ssid.size());
     }
     else // scan all networks
     {
-        matter_scan_networks();
+        matter_wifi_scan_networks();
     }
     return CHIP_NO_ERROR;
 }

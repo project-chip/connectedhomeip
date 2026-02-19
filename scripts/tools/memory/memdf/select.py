@@ -117,9 +117,7 @@ def is_selected(config: Config, column, name) -> bool:
     """Test `name` against the configured selection criteria for `column`."""
     if config.getl([column, 'select-all']):
         return True
-    if name in config.getl([column, 'select'], []):
-        return True
-    return False
+    return name in config.getl([column, 'select'], [])
 
 
 def synthesize_region(config: Config, df: DF, column: str) -> DF:

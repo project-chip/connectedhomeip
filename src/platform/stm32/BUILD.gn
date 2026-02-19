@@ -27,7 +27,7 @@ assert(chip_device_platform == "stm32")
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -68,7 +68,10 @@ static_library("stm32") {
       "SystemPlatformConfig.h",
     ]
 
-    deps += [ "${chip_root}/src/platform/logging:stdio" ]
+    deps += [
+      "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/platform/logging:stdio",
+    ]
   }
 
   public = [
@@ -80,7 +83,7 @@ static_library("stm32") {
     "${chip_root}/src/platform:platform_base",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/DnssdImpl.cpp",
       "../OpenThread/OpenThreadDnssdImpl.cpp",
@@ -95,7 +98,10 @@ static_library("stm32") {
     import("${stm32_sdk_build_root}/stm32_sdk.gni")
     public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
 
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/lib/dnssd:platform_header",
+    ]
   }
 
   # Set the compiler flags

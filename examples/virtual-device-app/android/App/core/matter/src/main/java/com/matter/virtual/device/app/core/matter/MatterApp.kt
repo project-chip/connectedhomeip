@@ -82,6 +82,7 @@ constructor(
     androidChipPlatform =
       AndroidChipPlatform(
         AndroidBleManager(),
+        AndroidNfcCommissioningManager(),
         PreferencesKeyValueStoreManager(context),
         MatterPreferencesConfigurationManager(
           context,

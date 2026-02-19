@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 
+#include <app/util/attribute-metadata.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
@@ -32,11 +33,34 @@ namespace Clusters {
 
 namespace RvcOperationalState {
 
+// Enum for OperationalStateEnum that has custom values for us.
+enum class ChefRvcOperationalStateEnum : uint8_t
+{
+    kStopped          = 0x00,
+    kRunning          = 0x01,
+    kPaused           = 0x02,
+    kError            = 0x03,
+    kSeekingCharger   = 0x40,
+    kCharging         = 0x41,
+    kDocked           = 0x42,
+    kEmptyingDustBin  = 0x43,
+    kCleaningMop      = 0x44,
+    kFillingWaterTank = 0x45,
+    kUpdatingMaps     = 0x46,
+
+    // Custom manufacturer-range operational state. Pretend we are running in a state that
+    // beeps really loud to annoy everyone.
+    kRunningWhileBeeping = 0x81,
+};
+
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 public:
-    RvcOperationalStateDelegate() { mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList); }
+    RvcOperationalStateDelegate()
+    {
+        mOperationalStateList = Span<const OperationalState::GenericOperationalState>(mRvcOpStateList, std::size(mRvcOpStateList));
+    }
 
     /**
      * Get the countdown time. This attribute is not used in this application.
@@ -93,6 +117,16 @@ public:
      */
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
+    /**
+     * Handle Command Callback in application: GoHome
+     */
+    void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) override;
+
+    void SetCurrentRunningState(RvcOperationalState::ChefRvcOperationalStateEnum RunningState)
+    {
+        mCurrentRunningState = RunningState;
+    };
+
     uint32_t mRunningTime = 0;
     uint32_t mPausedTime  = 0;
     app::DataModel::Nullable<uint32_t> mCountdownTime;
@@ -102,16 +136,21 @@ private:
     Span<const OperationalState::GenericOperationalState> mOperationalStateList;
     Span<const CharSpan> mOperationalPhaseList;
 
-    const OperationalState::GenericOperationalState rvcOpStateList[7] = {
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
+    const OperationalState::GenericOperationalState mRvcOpStateList[8] = {
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kStopped)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunning)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kPaused)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kError)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kSeekingCharger)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kCharging)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kDocked)),
         OperationalState::GenericOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
+            to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunningWhileBeeping),
+            Optional<CharSpan>("RunningWhileBeeping"_span)),
     };
+
+    RvcOperationalState::ChefRvcOperationalStateEnum mCurrentRunningState =
+        RvcOperationalState::ChefRvcOperationalStateEnum::kRunning;
 };
 
 void Shutdown();
@@ -120,6 +159,8 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+chip::app::Clusters::RvcOperationalState::RvcOperationalStateDelegate * getRvcOperationalStateDelegate();
 
 chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                                const EmberAfAttributeMetadata * attributeMetadata,

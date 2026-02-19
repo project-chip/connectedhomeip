@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,14 +34,18 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #if CONFIG_BOOTLOADER_MCUBOOT
 #include <OTAUtil.h>
+#endif
+
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+#include <DFUOverSMP.h>
 #endif
 
 #if CONFIG_CHIP_OTA_REQUESTOR
@@ -50,6 +54,7 @@
 
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
+#include <zephyr/sys/reboot.h>
 
 using namespace chip::app;
 
@@ -127,40 +132,48 @@ public:
 AppCallbacks sCallbacks;
 } // namespace
 
+static void DoDelayedFactoryReset(struct k_work * work)
+{
+    ChipLogProgress(DeviceLayer, "Erasing settings partition");
+
+    // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
+    void * storage = nullptr;
+    int status     = settings_storage_get(&storage);
+
+    if (!status)
+    {
+        status = nvs_clear(static_cast<nvs_fs *>(storage));
+    }
+
+    if (!status)
+    {
+        status = nvs_mount(static_cast<nvs_fs *>(storage));
+    }
+
+    if (status)
+    {
+        ChipLogError(DeviceLayer, "Storage clear failed: %d", status);
+    }
+#ifdef CONFIG_TFLM_FEATURE
+    AppTask::MicroSpeechProcessStop();
+#endif
+    // Reboot in case of failed commissioning to allow new pairing via BLE
+    if (sIsCommissioningFailed)
+    {
+        ChipLogProgress(DeviceLayer, "Rebooting board");
+        sys_reboot(SYS_REBOOT_WARM);
+    }
+}
+
+static k_work_delayable sDelayedFactoryResetWork = Z_WORK_DELAYABLE_INITIALIZER(DoDelayedFactoryReset);
+
 class AppFabricTableDelegate : public FabricTable::Delegate
 {
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
-
-            // Do FactoryReset in case of failed commissioning to allow new pairing via BLE
-            if (sIsCommissioningFailed)
-            {
-                chip::Server::GetInstance().ScheduleFactoryReset();
-            }
-            // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
-            else
-            {
-                void * storage = nullptr;
-                int status     = settings_storage_get(&storage);
-
-                if (!status)
-                {
-                    status = nvs_clear(static_cast<nvs_fs *>(storage));
-                }
-
-                if (!status)
-                {
-                    status = nvs_mount(static_cast<nvs_fs *>(storage));
-                }
-
-                if (status)
-                {
-                    ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
-                }
-            }
+            k_work_schedule(&sDelayedFactoryResetWork, K_SECONDS(2));
         }
     }
 };
@@ -188,8 +201,8 @@ static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** ar
     ARG_UNUSED(argc);
     ARG_UNUSED(argv);
 
-    shell_print(shell, "Performing board reboot...");
-    sys_reboot(0);
+    shell_print(shell, "Rebooting board");
+    sys_reboot(SYS_REBOOT_WARM);
 
     return 0;
 }
@@ -230,7 +243,7 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
     if (!sIsNetworkProvisioned)
     {
-        LOG_INF("Confirm image.");
+        LOG_INF("Confirm image");
         OtaConfirmNewImage();
     }
 #endif /* CONFIG_BOOTLOADER_MCUBOOT */
@@ -241,6 +254,13 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
         DispatchEvent(&event);
     }
 }
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+/* Demonstration of the fail handling */
+void HandleDFUFail(VerificationFailReason reason)
+{
+    LOG_INF("DFU image verification failed with reason: %d", reason);
+}
+#endif
 void AppTaskCommon::PrintFirmwareInfo(void)
 {
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -271,6 +291,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     InitButtons();
 
+#ifdef CONFIG_TFLM_FEATURE
+    mThreadStateChangedEventCaptured = false;
+#endif
+
     // Initialize function button timer
     k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFactoryResetTimer, this);
@@ -286,7 +310,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     err = mFactoryDataProvider.GetEnableKey(enableKey);
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("mFactoryDataProvider.GetEnableKey() failed. Could not delegate a test event trigger");
+        LOG_ERR("GetEnableKey failed. Could not delegate test event trigger");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
 #else
@@ -302,15 +326,14 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+#if APP_SET_DEVICE_INFO_PROVIDER
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+#endif
     initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-
-#if APP_SET_DEVICE_INFO_PROVIDER
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-#endif
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -320,6 +343,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+    GetDFUOverSMP().Init();
+    GetDFUOverSMP().SetFailCallback(HandleDFUFail);
 #endif
 
     // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
@@ -334,7 +361,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
     if (err != CHIP_NO_ERROR)
@@ -424,7 +451,7 @@ void AppTaskCommon::InitPwms()
 
     LinkPwms(pwmManager);
 
-#if CONFIG_WS2812_STRIP
+#if CONFIG_WS2812_STRIP_GPIO_TELINK
     pwmManager.linkBackend(Ws2812Strip::getInstance());
 #elif CONFIG_PWM
     pwmManager.linkBackend(PwmPool::getInstance());
@@ -437,7 +464,7 @@ void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
 {
 #if CONFIG_BOARD_TLSR9118BDK40D_V1 && CONFIG_PWM // TLSR9118BDK40D_V1 EVK supports single LED PWM channel
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
-#elif CONFIG_WS2812_STRIP
+#elif CONFIG_WS2812_STRIP_GPIO_TELINK
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);
@@ -446,7 +473,7 @@ void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 2);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 3);
-#endif // CONFIG_WS2812_STRIP
+#endif
 }
 
 void AppTaskCommon::InitButtons(void)
@@ -583,7 +610,7 @@ void AppTaskCommon::FactoryResetHandler(AppEvent * aEvent)
     }
 
     sFactoryResetCntr++;
-    LOG_INF("Factory Reset Trigger Counter: %d/%d", sFactoryResetCntr, kFactoryResetTriggerCntr);
+    LOG_INF("Factory Reset TC: %d/%d", sFactoryResetCntr, kFactoryResetTriggerCntr);
 
     if (sFactoryResetCntr == kFactoryResetTriggerCntr)
     {
@@ -615,7 +642,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     }
 
     sFactoryResetCntr = 0;
-    LOG_INF("Factory Reset Trigger Counter is cleared");
+    LOG_INF("Factory Reset TC is cleared");
 }
 
 #if CONFIG_TELINK_OTA_BUTTON_TEST
@@ -722,6 +749,22 @@ void AppTaskCommon::SetExampleButtonCallbacks(EventHandler aAction_CB)
     ExampleActionEventHandler = aAction_CB;
 }
 
+#ifdef CONFIG_TFLM_FEATURE
+void AppTaskCommon::TriggerMicroSpeechCallback()
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = TriggerMicroSpeechEventHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::TriggerMicroSpeechEventHandler(AppEvent * aEvent)
+{
+    LOG_INF("**************TriggerMicroSpeechEventHandler**************");
+    AppTask::MicroSpeechProcessStart();
+}
+#endif
+
 void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
     switch (event->Type)
@@ -729,10 +772,10 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCMgr().IsTagEmulationStarted())
+            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
             {
                 LOG_INF("NFC Tag emulation is already started");
             }
@@ -743,9 +786,17 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
+        break;
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
+        {
+            LOG_INF("BLE disconnected during commissioning");
+            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
+            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
@@ -765,6 +816,22 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
+#ifdef CONFIG_TFLM_FEATURE
+        if (sIsNetworkProvisioned && sIsNetworkAttached)
+        {
+            if (GetAppTask().GetThreadStateChangedEventCapturedFlag() == false)
+            {
+                LOG_INF("**************TriggerMicroSpeechCallback invoked**************");
+                GetAppTask().SetThreadStateChangedEventCapturedFlag();
+                AppTaskCommon::TriggerMicroSpeechCallback();
+            }
+            else
+            {
+                LOG_INF("**************TriggerMicroSpeechCallback skipped**************");
+            }
+        }
+#endif
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();

@@ -24,6 +24,8 @@ cluster_to_pics_dict = {
     "OTA Software Update Requestor": "OTA Software Update",
     "On/Off": "On-Off",
     "GroupKeyManagement": "Group Communication",
+    "Group Key Management": "Group Communication",
+    "Wake On LAN": "Media Cluster",
     "Wake on LAN": "Media Cluster",
     "Low Power": "Media Cluster",
     "Keypad Input": "Media Cluster",
@@ -44,6 +46,7 @@ cluster_to_pics_dict = {
     "Thermostat": "Thermostat Cluster",
     "Boolean State": "Boolean State Cluster",
     "AccessControl": "Access Control Cluster",
+    "Energy EVSE": "Energy EVSE Cluster",
 }
 
 

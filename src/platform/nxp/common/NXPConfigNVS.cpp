@@ -21,7 +21,10 @@
 #include <platform/CHIPDeviceError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 #include <platform/nxp/common/CHIPDeviceNXPPlatformDefaultConfig.h>
+
+extern "C" {
 #include <settings.h>
+}
 
 /* Only for flash init, to be move to sdk framework */
 #include "nvs_port.h"
@@ -330,7 +333,9 @@ CHIP_ERROR NXPConfig::ClearConfigValue(Key key)
 {
     char key_name[SETTINGS_MAX_NAME_LEN + 1];
     sprintf(key_name, CHIP_DEVICE_INTEGER_SETTINGS_KEY "/%04x", key);
-    return ClearConfigValue(key_name);
+    if (settings_delete(key_name) != 0)
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR NXPConfig::ClearConfigValue(const char * keyString)
@@ -392,7 +397,7 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 bool NXPConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
-    return (key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVS);
+    return (key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_App);
 }
 
 void NXPConfig::RunConfigUnitTest(void) {}

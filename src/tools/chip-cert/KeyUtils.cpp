@@ -24,6 +24,9 @@
  *
  */
 
+#include <memory>
+#include <utility>
+
 #include "chip-cert.h"
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
@@ -178,7 +181,7 @@ bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
                             kP256_PrivateKey_Length,
                         false);
 
-    serializedKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
+    TEMPORARY_RETURN_IGNORED serializedKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
 
     return true;
 }
@@ -196,7 +199,7 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
         res = ReadFileIntoMem(fileNameOrStr, nullptr, keyDataLen);
         VerifyTrueOrExit(res);
 
-        keyData = std::unique_ptr<uint8_t[]>(new uint8_t[keyDataLen]);
+        keyData = std::make_unique<uint8_t[]>(keyDataLen);
 
         res = ReadFileIntoMem(fileNameOrStr, keyData.get(), keyDataLen);
         VerifyTrueOrExit(res);
@@ -220,7 +223,7 @@ bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_
             return false;
         }
 
-        keyData = std::unique_ptr<uint8_t[]>(new uint8_t[keyDataLen]);
+        keyData = std::make_unique<uint8_t[]>(keyDataLen);
         memcpy(keyData.get(), fileNameOrStr, keyDataLen);
     }
 

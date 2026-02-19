@@ -68,13 +68,11 @@ details.
     Enables Thread management feature, requires ot-br-posix dbus daemon running.
     Required for Thread commissioning.
 
--   `--ble-device <interface id>`
+-   `--ble-controller <selector>`
 
-    Use specific bluetooth interface for BLE advertisement and connections.
-
-    `interface id`: the number after `hci` when listing BLE interfaces by
-    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
-    interface. Default: `0`.
+    Use the specific Bluetooth controller for BLE advertisement and connections.
+    For details on controller selection refer to
+    [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
 ## Running the Complete Example on Raspberry Pi 4
 
@@ -99,32 +97,19 @@ details.
 
     -   [Optional] Plug USB Bluetooth dongle
 
-        -   Plug USB Bluetooth dongle and find its bluetooth device number. The
-            number after `hci` is the bluetooth device number, `1` in this
-            example.
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-                  $ hciconfig
-                  hci1:	Type: Primary  Bus: USB
-                      BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                      TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+    -   Run Linux Lighting Example App
 
-                  hci0:	Type: Primary  Bus: UART
-                      BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                      TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+              $ cd ~/connectedhomeip/examples/lighting-app/linux
+              $ sudo out/debug/chip-lighting-app-data-mode-no-unique-id --ble-controller [bluetooth device number]
+              # In this example, the device we want to use is hci1
+              $ sudo out/debug/chip-lighting-app-data-mode-no-unique-id --ble-controller 1
 
-        -   Run Linux Lighting Example App
-
-                  $ cd ~/connectedhomeip/examples/lighting-app/linux
-                  $ sudo out/debug/chip-lighting-app-data-mode-no-unique-id --ble-device [bluetooth device number]
-                  # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-lighting-app-data-mode-no-unique-id --ble-device 1
-
-        -   Test the device using ChipDeviceController on your laptop /
-            workstation etc.
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.
 
 ## Running RPC Console
 
@@ -156,15 +141,21 @@ Obtain tracing json file.
 
 ## Trigger event using lighting-app event named pipe
 
-You can send a command to lighting-app to trigger specific event via
-lighting-app event named pipe /tmp/chip_lighting_fifo-<PID>.
+You can send a command to lighting-app to trigger specific event by adding the
+--app-pipe argument and providing the path of the file to use `<file_path>`.
+
+### Example to enable named pipes
+
+```
+./out/debug/chip-lighting-app-data-mode-no-unique-id --app-pipe /tmp/chip_lighting_fifo
+```
 
 ### Trigger `SoftwareFault` events
 
 1. Generate event `SoftwareFault` when a software fault takes place on the Node.
 
 ```
-$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo
 ```
 
 ### Trigger `HardwareFault` events
@@ -173,21 +164,21 @@ $ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo-<PID>
    hardware faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_lighting_fifo
 ```
 
 2. Generate event `RadioFaultChange` to indicate a change in the set of radio
    faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_lighting_fifo
 ```
 
 3. Generate event `NetworkFaultChange` to indicate a change in the set of
    network faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo
 ```
 
 4. Generate event `BootReason` to indicate the reason that caused the device to
@@ -212,7 +203,7 @@ $ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo-<PID>
     reboot.
 
 ```
-$ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo
 ```
 
 ### Trigger Switch events
@@ -221,41 +212,41 @@ $ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo-<PID>
    position.
 
 ```
-$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 2. Generate event `InitialPress`, when the momentary switch starts to be
    pressed.
 
 ```
-$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 3. Generate event `LongPress`, when the momentary switch has been pressed for a
    "long" time.
 
 ```
-$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 4. Generate event `ShortRelease`, when the momentary switch has been released.
 
 ```
-$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 5. Generate event `LongRelease` when the momentary switch has been released and
    after having been pressed for a long time.
 
 ```
-$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo
 ```
 
 6. Generate event `MultiPressOngoing` to indicate how many times the momentary
    switch has been pressed in a multi-press sequence, during that sequence.
 
 ```
-$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_lighting_fifo
 ```
 
 7. Generate event `MultiPressComplete` to indicate how many times the momentary
@@ -263,5 +254,5 @@ $ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCount
    that the sequence has ended.
 
 ```
-$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_lighting_fifo-<PID>
+$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_lighting_fifo
 ```

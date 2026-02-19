@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -39,9 +39,9 @@
 #include <sys/ioctl.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
-#include <zephyr/net/socket.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
+#include "ZephyrSocket.h" // nogncheck
+#endif
 
 #include <cerrno>
 #include <unistd.h>
@@ -56,10 +56,6 @@
 #ifndef INADDR_ANY
 #define INADDR_ANY 0
 #endif
-
-#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
-#include "ZephyrSocket.h"
-#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
 
 /*
  * Some systems define both IPV6_{ADD,DROP}_MEMBERSHIP and
@@ -434,16 +430,10 @@ void UDPEndPointImplSockets::CloseImpl()
 {
     if (mSocket != kInvalidSocketFd)
     {
-        static_cast<System::LayerSockets *>(&GetSystemLayer())->StopWatchingSocket(&mWatch);
+        TEMPORARY_RETURN_IGNORED static_cast<System::LayerSockets *>(&GetSystemLayer())->StopWatchingSocket(&mWatch);
         close(mSocket);
         mSocket = kInvalidSocketFd;
     }
-}
-
-void UDPEndPointImplSockets::Free()
-{
-    Close();
-    Release();
 }
 
 CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
@@ -582,6 +572,8 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         return;
     }
 
+    // Prevent the endpoint from being freed while in the middle of a callback.
+    UDPEndPointHandle ref(this);
     CHIP_ERROR lStatus = CHIP_NO_ERROR;
     IPPacketInfo lPacketInfo;
     System::PacketBufferHandle lBuffer;
@@ -856,7 +848,7 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
             interfaceFound = true;
 
             char ifName[InterfaceId::kMaxIfNameLength];
-            interfaceIt.GetInterfaceName(ifName, sizeof(ifName));
+            TEMPORARY_RETURN_IGNORED interfaceIt.GetInterfaceName(ifName, sizeof(ifName));
 
             // Ignore errors here, except for logging, because we expect some of
             // these interfaces to not work, and some (e.g. loopback) to always

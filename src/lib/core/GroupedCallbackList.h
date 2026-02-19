@@ -222,7 +222,7 @@ inline Cancelable * ClearCancelable(Cancelable * cancelable)
     return next;
 }
 
-// Dequeues `cancelable` and all otehr nodes in the same group.
+// Dequeues `cancelable` and all other nodes in the same group.
 inline void DequeueGroup(Cancelable * cancelable)
 {
     Cancelable * prev = cancelable->mPrev;

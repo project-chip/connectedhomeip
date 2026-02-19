@@ -33,10 +33,7 @@ namespace DataModel {
 class WrappedStructEncoder
 {
 public:
-    WrappedStructEncoder(TLV::TLVWriter & writer, TLV::Tag outerTag) : mWriter(writer)
-    {
-        mLastError = mWriter.StartContainer(outerTag, TLV::kTLVType_Structure, mOuter);
-    }
+    WrappedStructEncoder(TLV::TLVWriter & writer, TLV::Tag outerTag);
 
     template <typename... Args>
     void Encode(uint8_t contextTag, Args &&... args)
@@ -45,14 +42,21 @@ public:
         mLastError = DataModel::Encode(mWriter, TLV::ContextTag(contextTag), std::forward<Args>(args)...);
     }
 
-    CHIP_ERROR Finalize()
+    template <typename T>
+    void EncodeRequestCommandFabricScopedStructField(uint8_t contextTag, const T & field)
     {
-        if (mLastError == CHIP_NO_ERROR)
-        {
-            mLastError = mWriter.EndContainer(mOuter);
-        }
-        return mLastError;
+        VerifyOrReturn(mLastError == CHIP_NO_ERROR);
+        mLastError = DataModel::EncodeForWrite(mWriter, TLV::ContextTag(contextTag), field);
     }
+
+    template <typename T>
+    void EncodeResponseCommandFabricScopedStructField(uint8_t contextTag, const uint8_t accessingFabricIndex, const T & field)
+    {
+        VerifyOrReturn(mLastError == CHIP_NO_ERROR);
+        mLastError = DataModel::EncodeForRead(mWriter, TLV::ContextTag(contextTag), accessingFabricIndex, field);
+    }
+
+    CHIP_ERROR Finalize();
 
 private:
     TLV::TLVWriter & mWriter;

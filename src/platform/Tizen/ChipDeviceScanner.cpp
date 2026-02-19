@@ -36,9 +36,8 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
-
-#include "ErrorUtils.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -85,7 +84,7 @@ static bool __IsChipThingDevice(const bt_adapter_le_device_scan_result_info_s & 
 
 void ChipDeviceScanner::LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * scanInfo)
 {
-    VerifyOrReturn(result == BT_ERROR_NONE, mDelegate->OnScanError(TizenToChipError(result)));
+    VerifyOrReturn(result == BT_ERROR_NONE, mDelegate->OnScanError(MATTER_PLATFORM_ERROR(result)));
     VerifyOrReturn(scanInfo != nullptr, mDelegate->OnScanError(CHIP_ERROR_INTERNAL));
 
     ChipLogProgress(DeviceLayer, "LE device reported: %s", scanInfo->remote_address);
@@ -156,7 +155,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(ScanFilterType filterType, const ScanFil
 
 exit:
     ChipLogError(DeviceLayer, "Start CHIP Scan could not succeed fully! Stop Scan...");
-    StopScan();
+    TEMPORARY_RETURN_IGNORED StopScan();
     UnRegisterScanFilter();
     return err;
 }

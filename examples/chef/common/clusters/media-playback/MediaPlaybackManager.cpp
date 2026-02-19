@@ -16,6 +16,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <map>
 #include <string>
@@ -25,6 +26,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MediaPlayback;
 
 using chip::CharSpan;
@@ -139,36 +141,37 @@ CHIP_ERROR MediaPlaybackManager::HandleSetPlaybackSpeed(float playbackSpeed)
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    HandleSetCurrentState(PlaybackStateEnum::kPlaying);
-    HandleSetPlaybackSpeed(1);
+    TEMPORARY_RETURN_IGNORED HandleSetCurrentState(PlaybackStateEnum::kPlaying);
+    TEMPORARY_RETURN_IGNORED HandleSetPlaybackSpeed(1);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    HandleSetCurrentState(PlaybackStateEnum::kPaused);
-    HandleSetPlaybackSpeed(0);
+    TEMPORARY_RETURN_IGNORED HandleSetCurrentState(PlaybackStateEnum::kPaused);
+    TEMPORARY_RETURN_IGNORED HandleSetPlaybackSpeed(0);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    HandleSetCurrentState(PlaybackStateEnum::kNotPlaying);
-    HandleSetPlaybackSpeed(0);
+    TEMPORARY_RETURN_IGNORED HandleSetCurrentState(PlaybackStateEnum::kNotPlaying);
+    TEMPORARY_RETURN_IGNORED HandleSetPlaybackSpeed(0);
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
@@ -182,35 +185,36 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
         response.status = StatusEnum::kSpeedOutOfRange;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
         return;
     }
 
-    HandleSetCurrentState(PlaybackStateEnum::kPlaying);
+    TEMPORARY_RETURN_IGNORED HandleSetCurrentState(PlaybackStateEnum::kPlaying);
     // Normalize to correct range
     playbackSpeed = (playbackSpeed <= 0 ? 1 : playbackSpeed * 2);
     if (playbackSpeed > kPlaybackMaxForwardSpeed)
     {
         playbackSpeed = kPlaybackMaxForwardSpeed;
     }
-    HandleSetPlaybackSpeed(playbackSpeed);
+    TEMPORARY_RETURN_IGNORED HandleSetPlaybackSpeed(playbackSpeed);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    HandleSetCurrentState(PlaybackStateEnum::kPlaying);
-    HandleSetPlaybackSpeed(1);
+    TEMPORARY_RETURN_IGNORED HandleSetCurrentState(PlaybackStateEnum::kPlaying);
+    TEMPORARY_RETURN_IGNORED HandleSetPlaybackSpeed(1);
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
@@ -224,23 +228,23 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
         response.status = StatusEnum::kSpeedOutOfRange;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
         return;
     }
 
-    HandleSetCurrentState(PlaybackStateEnum::kPlaying);
+    TEMPORARY_RETURN_IGNORED HandleSetCurrentState(PlaybackStateEnum::kPlaying);
     // Normalize to correct range
     playbackSpeed = (playbackSpeed >= 0 ? -1 : playbackSpeed * 2);
     if (playbackSpeed < kPlaybackMaxRewindSpeed)
     {
         playbackSpeed = kPlaybackMaxRewindSpeed;
     }
-    HandleSetPlaybackSpeed(playbackSpeed);
+    TEMPORARY_RETURN_IGNORED HandleSetPlaybackSpeed(playbackSpeed);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
@@ -250,11 +254,12 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
                                 ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
                                 : 0);
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
@@ -263,11 +268,12 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
     uint64_t newPosition = mPlaybackPosition.position.Value() + deltaPositionMilliseconds;
     newPosition          = newPosition > mDuration ? mDuration : newPosition;
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
@@ -278,39 +284,42 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
         response.status = StatusEnum::kSeekOutOfRange;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
     }
     else
     {
         mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(positionMilliseconds) };
+        MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
         Commands::PlaybackResponse::Type response;
         response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
         response.status = StatusEnum::kSuccess;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
     }
 }
 
 void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    HandleSetCurrentState(PlaybackStateEnum::kPlaying);
-    HandleSetPlaybackSpeed(1);
+    TEMPORARY_RETURN_IGNORED HandleSetCurrentState(PlaybackStateEnum::kPlaying);
+    TEMPORARY_RETURN_IGNORED HandleSetPlaybackSpeed(1);
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+    MatterReportingAttributeChangeCallback(mEndpoint, MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id);
 
     Commands::PlaybackResponse::Type response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)

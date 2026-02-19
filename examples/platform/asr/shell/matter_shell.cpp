@@ -28,10 +28,10 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lega_rtos_api.h>
 #include <lib/core/CHIPError.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <string>
 #include <vector>
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -57,7 +57,7 @@ void asr_matter_reset(Reset_t type)
     {
         ConnectivityMgr().ClearWiFiStationProvision();
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else if (type == FACTORY_RESET)
     {
@@ -67,15 +67,15 @@ void asr_matter_reset(Reset_t type)
     {
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
         auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
-        commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                   CommissioningWindowAdvertisement::kDnssdOnly);
+        TEMPORARY_RETURN_IGNORED commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                                            CommissioningWindowAdvertisement::kDnssdOnly);
     }
 }
 
 void ShutdownChip()
 {
     Server::GetInstance().Shutdown();
-    PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask();
     PlatformMgr().Shutdown();
 }
 

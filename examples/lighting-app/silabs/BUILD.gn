@@ -73,7 +73,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -86,6 +86,9 @@ if (wifi_soc) {
         "HAL_VCOM_ENABLE=1",
         "PW_RPC_ENABLED",
       ]
+    }
+    if (sl_enable_rgb_led) {
+      include_dirs += [ "${examples_common_plat_dir}/rgb_led" ]
     }
   }
 } else {
@@ -101,19 +104,12 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/rgb_led",
     ]
 
     if (use_wf200) {
       # TODO efr32_sdk should not need a header from this location
       include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
-
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
     }
 
     defines = []
@@ -122,6 +118,9 @@ if (wifi_soc) {
         "HAL_VCOM_ENABLE=1",
         "PW_RPC_ENABLED",
       ]
+    }
+    if (sl_enable_rgb_led) {
+      include_dirs += [ "${examples_common_plat_dir}/rgb_led" ]
     }
   }
 }
@@ -137,8 +136,8 @@ silabs_executable("lighting_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/LightingManager.cpp",
-    "src/ZclCallbacks.cpp",
   ]
 
   deps = [

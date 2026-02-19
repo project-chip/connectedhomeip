@@ -40,26 +40,40 @@ RUN set -x \
     clang-tidy \
     cmake \
     curl \
+    dbus-daemon \
+    ffmpeg \
     flex \
     g++ \
     generate-ninja \
     git \
     git-lfs \
     gperf \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-tools \
     iproute2 \
     iwyu \
     jq \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
     libcairo2-dev \
     libcairo-dev \
+    libcurl4-openssl-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
+    libevent-dev \
     libgif-dev \
     libgirepository-1.0-1 \
     libglib2.0-dev \
+    libgstreamer1.0-0 \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
     libical-dev \
     libjpeg-dev \
     libmbedtls-dev \
@@ -69,7 +83,9 @@ RUN set -x \
     libnl-route-3-dev \
     libnspr4-dev \
     libpango1.0-dev \
+    libpcsclite-dev \
     libpixman-1-dev \
+    libprotobuf-dev \
     libreadline-dev \
     libsdl2-dev \
     libsdl-pango-dev \
@@ -86,6 +102,7 @@ RUN set -x \
     nodejs \
     patch \
     pkg-config \
+    protobuf-compiler \
     python3 \
     python3-click \
     python3-coloredlogs \
@@ -100,10 +117,12 @@ RUN set -x \
     shellcheck \
     strace \
     systemd \
+    tcpdump \
     udev \
     unzip \
     wget \
     zlib1g-dev \
+    zstd \
     && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
     && : # last line
@@ -121,6 +140,7 @@ RUN set -x \
     pygit \
     PyGithub \
     ruff \
+    gcovr==8.3 \
     && : # last line
 
 # Install bloat comparison tools
@@ -136,6 +156,20 @@ RUN set -x \
     && rm -rf bloaty \
     && : # last line
 
+# Code built with thread sanitizer can sometimes fail to run with an error message
+# similar to the following:
+# FATAL: ThreadSanitizer: unexpected memory mapping 0x7763c5472000-0x7763c5900000
+#
+# This happens for example when the build is executed on a Ubuntu 24.04 host. It
+# is reported to be linked with kernel versions 6.6.6 and higher. In order for the
+# build to succeed ASLR entropy needs to be reduced. This can be done with the
+# sysctl command:
+# sudo sysctl vm.mmap_rnd_bits=28
+#
+# This command is not persistent across reboots. This is desired as reducing
+# ASLR entropy has negative impact on exploit mitigation.
+# Reference: https://github.com/google/sanitizers/issues/1716
+
 # Build glib-2.0 from source with enabled thread sanitizer. This is needed for
 # running CHIP tests with TSAN enabled. When running applications with TSAN
 # all shared libraries should be built with TSAN enabled, otherwise TSAN might
@@ -149,7 +183,8 @@ RUN case ${TARGETPLATFORM} in \
     && export CCACHE_DISABLE=1 PYTHONDONTWRITEBYTECODE=1 \
     && GLIB_VERSION=$(pkg-config --modversion glib-2.0) \
     && git clone --depth=1 --branch=$GLIB_VERSION https://github.com/GNOME/glib.git \
-    && CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib -Dtests=false \
+    && (CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib -Dtests=false || \
+    { cat glib/build/meson-logs/meson-log.txt; exit 1; }) \
     && DESTDIR=../build-image ninja -C glib/build install \
     && mv glib/build-image/usr/local/lib64/lib* $LD_LIBRARY_PATH_TSAN \
     && rm -rf glib \
@@ -171,8 +206,3 @@ RUN set -x \
     libgirepository1.0-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
-
-
-# Some things that save space
-# Protoc goes from 108M to 4.6M
-RUN strip /usr/local/bin/protoc*

@@ -77,7 +77,7 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 
 void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
 {
-    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout));
+    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout, !HasReceivedAtLeastOneMessage()));
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
@@ -234,7 +234,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // it is done with the exchange context and the message layer sets all callbacks to NULL and does not send anything
     // received on the exchange context up to higher layers.  At this point, the message layer needs to handle the
     // remaining work to be done on that exchange, (e.g. send all pending acks) before truly cleaning it up.
-    FlushAcks();
+    TEMPORARY_RETURN_IGNORED FlushAcks();
 
     // In case the protocol wants a harder release of the EC right away, such as calling Abort(), exchange
     // needs to clear the MRP retransmission table immediately.
@@ -542,7 +542,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
             if (payloadHeader.NeedsAck())
             {
                 // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-                HandleNeedsAck(messageCounter, msgFlags);
+                TEMPORARY_RETURN_IGNORED HandleNeedsAck(messageCounter, msgFlags);
             }
         }
 
@@ -671,9 +671,20 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void ExchangeContext::OnSessionConnectionClosed(CHIP_ERROR conErr)
+void ExchangeContext::OnSessionConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR connErr)
 {
-    // TODO: Handle connection closure at the ExchangeContext level.
+    if (mDelegate != nullptr)
+    {
+        return mDelegate->HandleConnectionClosed(conn, connErr);
+    }
+}
+
+void ExchangeContext::OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR connErr)
+{
+    if (mDelegate != nullptr)
+    {
+        return mDelegate->HandleConnectionAttemptComplete(conn, connErr);
+    }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

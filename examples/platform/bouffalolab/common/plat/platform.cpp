@@ -18,12 +18,12 @@
 #include <DeviceInfoProviderImpl.h>
 #include <OTAConfig.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <platform/bouffalolab/common/PlatformManagerImpl.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
 
 #if HEAP_MONITORING
@@ -49,10 +49,10 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <NetworkCommissioningDriver.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
@@ -73,6 +73,8 @@
 #endif
 #endif
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+
 #include <AppTask.h>
 #include <plat.h>
 
@@ -87,6 +89,10 @@ chip::app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
 }
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 namespace {
@@ -108,8 +114,8 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
         if (ConnectivityMgr().IsThreadAttached())
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), OTAConfig::InitOTARequestorHandler, nullptr);
         }
         break;
 #endif
@@ -128,8 +134,8 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
             bl_route_hook_init();
 
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), OTAConfig::InitOTARequestorHandler, nullptr);
         }
         break;
 #endif
@@ -178,6 +184,37 @@ void UnlockOpenThreadTask(void)
 }
 #endif
 
+#if CONFIG_APP_ADVERTISE_COMMISSIONABLE_ON_LAST_FABRIC_REMOVAL
+class AppFabricTableDelegate : public FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+    {
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
+            PlatformMgr().ScheduleWork([](intptr_t) {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+                ConfigurationManagerImpl::GetDefaultInstance().ClearThreadStack();
+                ThreadStackMgrImpl().FactoryResetThreadStack();
+                ThreadStackMgr().InitThreadStack();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+                ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
+                chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+
+                CHIP_ERROR err = Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to open the Basic Commissioning Window");
+                }
+            });
+        }
+    }
+};
+#endif
+
 CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
     chip::RendezvousInformationFlags rendezvousMode(chip::RendezvousInformationFlag::kOnNetwork);
@@ -198,7 +235,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ChipLogProgress(NotSpecified, "Initializing CHIP stack");
     ReturnLogErrorOnFailure(PlatformMgr().InitChipStack());
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
@@ -212,8 +249,13 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
 #else
-    ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice));
+#else
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
+#endif
+    ReturnErrorAndLogOnFailure(sThreadNetworkDriver.Init(), NotSpecified, "Thread network init failed");
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -230,7 +272,8 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     }
     else
     {
-        ChipLogError(NotSpecified, "sFactoryDataProvider.Init() failed");
+        ChipLogError(NotSpecified, "factory data provider is failed to initialize, use example DAC provider.");
+        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     }
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -260,6 +303,11 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
 
+#if CONFIG_APP_ADVERTISE_COMMISSIONABLE_ON_LAST_FABRIC_REMOVAL
+    static AppFabricTableDelegate sAppFabricDelegate;
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppFabricDelegate);
+#endif
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -275,7 +323,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #endif
     PrintOnboardingCodes(rendezvousMode);
 
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();

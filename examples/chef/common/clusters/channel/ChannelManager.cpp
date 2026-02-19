@@ -19,6 +19,7 @@
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "ChannelManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 
 #include <iostream>
@@ -28,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Channel;
 using namespace chip::Uint8;
 
@@ -162,7 +164,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
             {
                 // Error: Found multiple matches
                 response.status = StatusEnum::kMultipleMatches;
-                helper.Success(response);
+                TEMPORARY_RETURN_IGNORED helper.Success(response);
                 return;
             }
             iMatchedChannel = i;
@@ -173,7 +175,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     {
         // Error: Found no match
         response.status = StatusEnum::kNoMatches;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
     }
     else
     {
@@ -181,7 +183,8 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel      = mChannels[iMatchedChannel];
         mCurrentChannelIndex = iMatchedChannel;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
+        MatterReportingAttributeChangeCallback(mEndpoint, Channel::Id, Channel::Attributes::CurrentChannel::Id);
     }
 }
 
@@ -198,6 +201,7 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
             {
                 mCurrentChannelIndex = index;
                 mCurrentChannel      = channel;
+                MatterReportingAttributeChangeCallback(mEndpoint, Channel::Id, Channel::Attributes::CurrentChannel::Id);
                 return true;
             }
         }
@@ -221,6 +225,7 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
 
     mCurrentChannelIndex = static_cast<uint16_t>(newChannelIndex);
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
+    MatterReportingAttributeChangeCallback(mEndpoint, Channel::Id, Channel::Attributes::CurrentChannel::Id);
     return true;
 }
 
@@ -283,7 +288,7 @@ void ChannelManager::HandleGetProgramGuide(CommandResponseHelper<ProgramGuideRes
 
     ProgramGuideResponseType response;
     response.programList = DataModel::List<const ProgramType>(matches.data(), matches.size());
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,

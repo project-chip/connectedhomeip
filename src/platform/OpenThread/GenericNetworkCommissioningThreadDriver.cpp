@@ -45,14 +45,20 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
 {
+    ThreadStackMgrImpl().InjectNetworkCommissioningDriver(this);
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
-    ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork);
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork);
     ReturnErrorOnFailure(PlatformMgr().AddEventHandler(OnThreadStateChangeHandler, reinterpret_cast<intptr_t>(this)));
 
     // If the network configuration backup exists, it means that the device has been rebooted with
     // the fail-safe armed. Since OpenThread persists all operational dataset changes, the backup
-    // must be restored on the boot. If there's no backup, the below function is a no-op.
-    RevertConfiguration();
+    // must be restored.
+    if (BackupExists())
+    {
+        // Set flag and postpone revert until OpenThread is initialized,
+        // as we need to clear SRP host and services before restoring the backup.
+        mRevertOnServerReady = true;
+    }
 
     CheckInterfaceEnabled();
 
@@ -61,11 +67,28 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
 
 void GenericThreadDriver::OnThreadStateChangeHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    if ((event->Type == DeviceEventType::kThreadStateChange) &&
-        (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_PANID))
+    auto & driver = *reinterpret_cast<GenericThreadDriver *>(arg);
+
+    switch (event->Type)
     {
-        // Update the mStagingNetwork when thread panid changed
-        ThreadStackMgrImpl().GetThreadProvision(reinterpret_cast<GenericThreadDriver *>(arg)->mStagingNetwork);
+    case DeviceEventType::kThreadStateChange:
+        if (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_PANID)
+        {
+            // Update the mStagingNetwork when thread panid changed
+            TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadProvision(driver.mStagingNetwork);
+        }
+        break;
+
+    case DeviceEventType::kServerReady:
+        if (driver.mRevertOnServerReady)
+        {
+            driver.mRevertOnServerReady = false;
+            TEMPORARY_RETURN_IGNORED driver.RevertConfiguration();
+        }
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -97,6 +120,10 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // since the fail-safe was armed, so return with no error.
     VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().ClearAllSrpHostAndServices();
+#endif
+
     if (!GetEnabled())
     {
         // When reverting configuration, set InterfaceEnabled to default value (true).
@@ -120,7 +147,7 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     }
 
     // Always remove the backup, regardless if it can be successfully restored.
-    KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName());
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName());
 
     return error;
 }
@@ -135,7 +162,7 @@ Status GenericThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Muta
     outNetworkIndex = 0;
 
     VerifyOrReturnError(newDataset.Init(operationalDataset) == CHIP_NO_ERROR && newDataset.IsCommissioned(), Status::kOutOfRange);
-    newDataset.GetExtendedPanIdAsByteSpan(newExtpanid);
+    TEMPORARY_RETURN_IGNORED newDataset.GetExtendedPanIdAsByteSpan(newExtpanid);
 
     // We only support one active operational dataset. Add/Update based on either:
     // Staging network not commissioned yet (active) or we are updating the dataset with same Extended Pan ID.
@@ -272,10 +299,11 @@ Status GenericThreadDriver::MatchesNetworkId(const Thread::OperationalDataset & 
 
 CHIP_ERROR GenericThreadDriver::BackupConfiguration()
 {
-    // If configuration is already backed up, return with no error
-    CHIP_ERROR err = KeyValueStoreMgr().Get(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), nullptr, 0);
+    // Abort pending revert
+    mRevertOnServerReady = false;
 
-    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    // If configuration is already backed up, return with no error
+    if (BackupExists())
     {
         return CHIP_NO_ERROR;
     }
@@ -283,6 +311,18 @@ CHIP_ERROR GenericThreadDriver::BackupConfiguration()
     ByteSpan dataset = mStagingNetwork.AsByteSpan();
 
     return KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), dataset.data(), dataset.size());
+}
+
+bool GenericThreadDriver::BackupExists()
+{
+    CHIP_ERROR err = KeyValueStoreMgr().Get(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName(), nullptr, 0);
+
+    if (err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void GenericThreadDriver::CheckInterfaceEnabled()
@@ -359,7 +399,7 @@ ThreadCapabilities GenericThreadDriver::GetSupportedThreadFeatures()
 uint16_t GenericThreadDriver::GetThreadVersion()
 {
     uint16_t version = 0;
-    ThreadStackMgrImpl().GetThreadVersion(version);
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadVersion(version);
     return version;
 }
 

@@ -89,11 +89,11 @@ void AttributeValueEncoder::EnsureListEnded()
     // fails, because that would mean that we've corrupted our data, and since
     // mEncodeState.mAllowPartialData is true nothing will clean up for us here.
     auto * attributeDataWriter = mAttributeReportIBsBuilder.GetAttributeReport().GetAttributeData().GetWriter();
-    VerifyOrDie(attributeDataWriter->UnreserveBuffer(kEndOfListByteCount + kEndOfAttributeReportIBByteCount) == CHIP_NO_ERROR);
-    VerifyOrDie(attributeDataWriter->EndContainer(kAttributeDataIBType) == CHIP_NO_ERROR);
+    SuccessOrDie(attributeDataWriter->UnreserveBuffer(kEndOfListByteCount + kEndOfAttributeReportIBByteCount));
+    SuccessOrDie(attributeDataWriter->EndContainer(kAttributeDataIBType));
 
     AttributeReportBuilder builder;
-    VerifyOrDie(builder.FinishAttribute(mAttributeReportIBsBuilder) == CHIP_NO_ERROR);
+    SuccessOrDie(builder.FinishAttribute(mAttributeReportIBsBuilder));
 
     if (!mEncodedAtLeastOneListItem)
     {
@@ -107,6 +107,35 @@ void AttributeValueEncoder::EnsureListEnded()
         // so it's safe to set it to false even if encoding succeeded.
         mEncodeState.SetAllowPartialData(false);
     }
+}
+
+bool AttributeValueEncoder::ShouldEncodeListItem(TLV::TLVWriter & aCheckpoint)
+{
+    // EncodeListItem (our caller) must be called after EnsureListStarted(),
+    // thus mCurrentEncodingListIndex and mEncodeState.mCurrentEncodingListIndex
+    // are not invalid values.
+    if (mCurrentEncodingListIndex < mEncodeState.CurrentEncodingListIndex())
+    {
+        // We have encoded this element in previous chunks, skip it.
+        mCurrentEncodingListIndex++;
+        return false;
+    }
+
+    mAttributeReportIBsBuilder.Checkpoint(aCheckpoint);
+    return true;
+}
+
+void AttributeValueEncoder::PostEncodeListItem(CHIP_ERROR aEncodeStatus, const TLV::TLVWriter & aCheckpoint)
+{
+    if (aEncodeStatus != CHIP_NO_ERROR)
+    {
+        mAttributeReportIBsBuilder.Rollback(aCheckpoint);
+        return;
+    }
+
+    mCurrentEncodingListIndex++;
+    mEncodeState.SetCurrentEncodingListIndex(mCurrentEncodingListIndex);
+    mEncodedAtLeastOneListItem = true;
 }
 
 } // namespace app

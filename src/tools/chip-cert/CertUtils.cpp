@@ -28,7 +28,9 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
 
+#include <memory>
 #include <string>
+#include <utility>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -102,6 +104,9 @@ bool ToolChipDN::SetCertName(X509_NAME * name) const
             break;
         case kOID_AttributeType_MatterICACId:
             attrNID = gNIDChipICAId;
+            break;
+        case kOID_AttributeType_MatterVidVerificationSignerId:
+            attrNID = gNIDChipVidVerificationSignerId;
             break;
         case kOID_AttributeType_MatterRCACId:
             attrNID = gNIDChipRootId;
@@ -186,12 +191,13 @@ void ToolChipDN::PrintDN(FILE * file, const char * name) const
     {
         if (IsChip64bitDNAttr(rdn[i].mAttrOID))
         {
-            Encoding::Uint64ToHex(rdn[i].mChipVal, valueStr, sizeof(valueStr), Encoding::HexFlags::kUppercaseAndNullTerminate);
+            TEMPORARY_RETURN_IGNORED Encoding::Uint64ToHex(rdn[i].mChipVal, valueStr, sizeof(valueStr),
+                                                           Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else if (IsChip32bitDNAttr(rdn[i].mAttrOID))
         {
-            Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), valueStr, sizeof(valueStr),
-                                  Encoding::HexFlags::kUppercaseAndNullTerminate);
+            TEMPORARY_RETURN_IGNORED Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), valueStr, sizeof(valueStr),
+                                                           Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else
         {
@@ -601,7 +607,7 @@ bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)
         res = ReadFileIntoMem(fileNameOrStr, nullptr, certLen);
         VerifyTrueOrExit(res);
 
-        certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
+        certBuf = std::make_unique<uint8_t[]>(certLen);
 
         res = ReadFileIntoMem(fileNameOrStr, certBuf.get(), certLen);
         VerifyTrueOrExit(res);
@@ -625,7 +631,7 @@ bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)
             return false;
         }
 
-        certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
+        certBuf = std::make_unique<uint8_t[]>(certLen);
         memcpy(certBuf.get(), fileNameOrStr, certLen);
     }
 
@@ -671,7 +677,7 @@ bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)
             VerifyTrueOrExit(res);
         }
 
-        std::unique_ptr<uint8_t[]> x509CertBuf(new uint8_t[kMaxDERCertLength]);
+        auto x509CertBuf = std::make_unique<uint8_t[]>(kMaxDERCertLength);
         MutableByteSpan x509Cert(x509CertBuf.get(), kMaxDERCertLength);
 
         CHIP_ERROR err = ConvertChipCertToX509Cert(ByteSpan(certBuf.get(), certLen), x509Cert);

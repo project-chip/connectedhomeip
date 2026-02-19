@@ -18,10 +18,11 @@
 import argparse
 import base64
 import binascii
-import logging as log
+import logging
 import os
 import random
 import secrets
+import shlex
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -34,6 +35,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 from cryptography.x509.oid import ObjectIdentifier
+
+log = logging.getLogger(__name__)
 
 MATTER_ROOT = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools/bouffalolab")]
 
@@ -74,9 +77,7 @@ def gen_test_discriminator(discriminator):
         if discriminator > 0xfff:
             raise Exception("discriminator is invalid value.")
 
-    discriminator = random.randint(0, 0xfff)
-
-    return discriminator
+    return random.randint(0, 0xfff)
 
 
 def gen_test_unique_id(unique_id):
@@ -86,9 +87,7 @@ def gen_test_unique_id(unique_id):
             raise Exception("rotating unique id has invalid length.")
         return unique_id
 
-    unique_id = secrets.token_bytes(16)
-
-    return unique_id
+    return secrets.token_bytes(16)
 
 
 def gen_test_spake2(passcode, spake2p_it, spake2p_salt, spake2p_verifier=None):
@@ -132,7 +131,9 @@ def gen_test_certs(chip_cert: str,
                    pai_cert: str = None,
                    pai_key: str = None,
                    dac_cert: str = None,
-                   dac_key: str = None):
+                   dac_key: str = None,
+                   dac_product_id: int = None,
+                   discriminator: int = None):
 
     def parse_cert_file(cert):
 
@@ -185,10 +186,10 @@ def gen_test_certs(chip_cert: str,
                        "--pai", pai_cert,
                        "--paa", paa_cert,
                        ]
-                log.info("Verify Certificate Chain: {}".format(" ".join(cmd)))
+                log.info("Verify Certificate Chain: %s", shlex.join(cmd))
                 subprocess.run(cmd)
 
-    def gen_dac_certificate(chip_cert, device_name, vendor_id, product_id, pai_cert, pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date):
+    def gen_dac_certificate(chip_cert, device_name, dac_vid, dac_pid, pai_cert, pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date, discriminator):
         def gen_valid_times(issue_date, expire_date):
             now = datetime.now() - timedelta(days=1)
 
@@ -205,8 +206,8 @@ def gen_test_certs(chip_cert: str,
             cmd = [chip_cert, "gen-att-cert",
                    "--type", "d",  # device attestation certificate
                    "--subject-cn", device_name + " Test DAC 0",
-                   "--subject-vid", hex(vendor_id),
-                   "--subject-pid", hex(product_id),
+                   "--subject-vid", hex(dac_vid),
+                   "--subject-pid", hex(dac_pid),
                    "--ca-cert", pai_cert,
                    "--ca-key", pai_key,
                    "--out", dac_cert,
@@ -214,7 +215,7 @@ def gen_test_certs(chip_cert: str,
                    "--valid-from", valid_from,
                    "--lifetime", str(lifetime),
                    ]
-            log.info("Generate DAC: {}".format(" ".join(cmd)))
+            log.info("Generate DAC: %s", shlex.join(cmd))
             subprocess.run(cmd)
 
     def convert_pem_to_der(chip_cert, action, pem):
@@ -224,12 +225,12 @@ def gen_test_certs(chip_cert: str,
 
         der = Path(pem).with_suffix(".der")
         if not os.path.isfile(der):
-            cmd = [chip_cert, action, pem, der, "--x509-der", ]
+            cmd = [chip_cert, action, pem, der, "--x509-der"]
             subprocess.run(cmd)
 
         return der
 
-    def gen_cd(chip_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd):
+    def gen_cd(chip_cert, paa_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd):
 
         if os.path.isfile(cd):
             return
@@ -254,15 +255,29 @@ def gen_test_certs(chip_cert: str,
                     "--dac-origin-product-id", hex(dac_product_id),
                     ]
 
-        log.info("Generate CD: {}".format(" ".join(cmd)))
+        if paa_cert:
+            cmd += ["--authorized-paa-cert", paa_cert]
+
+        log.info("Generate CD: %s", shlex.join(cmd))
         subprocess.run(cmd)
 
     pai_vendor_id, pai_product_id, pai_issue_date, pai_expire_date = parse_cert_file(pai_cert)
 
-    dac_vendor_id = pai_vendor_id if pai_vendor_id else vendor_id
-    dac_product_id = pai_product_id if pai_product_id else product_id
+    dac_vendor_id = pai_vendor_id
+
+    if dac_product_id is not None and pai_product_id is not None and dac_product_id != pai_product_id:
+        raise Exception("Specified product id for DAC certificate is not same as product id in PAI certificate.")
+
+    if pai_product_id is not None:
+        dac_product_id = pai_product_id
+
+    if dac_cert is None:
+        dac_disc_vp = "{}_{}_{}".format(hex(dac_vendor_id).split("x")[-1], hex(dac_product_id).split("x")[-1], discriminator)
+        dac_cert = os.path.join(output, "out_{}_dac_cert.pem".format(dac_disc_vp))
+        dac_key = os.path.join(output, "out_{}_dac_key.pem".format(dac_disc_vp))
+
     gen_dac_certificate(chip_cert, device_name, dac_vendor_id, dac_product_id, pai_cert,
-                        pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date)
+                        pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date, discriminator)
 
     dac_cert_der = convert_pem_to_der(chip_cert, "convert-cert", dac_cert)
     dac_key_der = convert_pem_to_der(chip_cert, "convert-key", dac_key)
@@ -273,7 +288,7 @@ def gen_test_certs(chip_cert: str,
 
     verify_certificates(chip_cert, paa_cert, pai_cert, dac_cert)
 
-    gen_cd(chip_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd)
+    gen_cd(chip_cert, paa_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd)
 
     return cd, pai_cert_der, dac_cert_der, dac_key_der
 
@@ -304,29 +319,24 @@ def gen_mfd_partition(args, mfd_output):
     def get_private_key(der):
         with open(der, 'rb') as file:
             keys = load_der_private_key(file.read(), password=None, backend=default_backend())
-            private_key = keys.private_numbers().private_value.to_bytes(32, byteorder='big')
-
-            return private_key
+            return keys.private_numbers().private_value.to_bytes(32, byteorder='big')
 
     def encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
         data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16)))
         cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-        ciphertext = cryptor.encrypt(data_bytearray)
-        return ciphertext
+        return cryptor.encrypt(data_bytearray)
 
     def convert_to_bytes(data):
-        if isinstance(data, bytes) or isinstance(data, str):
+        if isinstance(data, (bytes, str)):
             if isinstance(data, str):
                 return data.encode()
-            else:
-                return data
-        elif isinstance(data, int):
+            return data
+        if isinstance(data, int):
             byte_len = int((data.bit_length() + 7) / 8)
             return data.to_bytes(byte_len, byteorder='little')
-        elif data is None:
+        if data is None:
             return bytes([])
-        else:
-            raise Exception("Data is invalid type: {}".format(type(data)))
+        raise Exception("Data is invalid type: {}".format(type(data)))
 
     def gen_tlvs(mfdDict, need_sec):
         MFD_ID_RAW_MASK = 0x8000
@@ -334,7 +344,7 @@ def gen_mfd_partition(args, mfd_output):
         sec_tlvs = bytes([])
         raw_tlvs = bytes([])
 
-        for name in mfdDict.keys():
+        for name in mfdDict:
             d = mfdDict[name]
             if d["sec"] and need_sec:
                 if d["len"] and d["len"] < len(d["data"]):
@@ -343,7 +353,7 @@ def gen_mfd_partition(args, mfd_output):
                 sec_tlvs += int_to_2bytearray_l(len(d["data"]))
                 sec_tlvs += d["data"]
 
-        for name in mfdDict.keys():
+        for name in mfdDict:
             d = mfdDict[name]
             if not d["sec"] or not need_sec:
                 if d["len"] and d["len"] < len(d["data"]):
@@ -432,24 +442,27 @@ def main():
 
         if not isinstance(args.output, str) or not os.path.exists(args.output):
             raise Exception("output path is not specified or not existed.")
-        log.info("output path: {}".format(args.output))
+        log.info("output path: '%s'", args.output)
 
         if not isinstance(args.chip_cert, str) or not os.path.exists(args.chip_cert):
             raise Exception("chip-cert should be built before and is specified.")
-        log.info("chip-cert path: {}".format(args.chip_cert))
+        log.info("chip-cert path: '%s'", args.chip_cert)
 
     def to_bytes(input):
         if isinstance(input, str):
             return bytearray.fromhex(input)
-        elif isinstance(input, bytes):
+        if isinstance(input, bytes):
             return input
-        else:
-            return None
+        return None
+
+    def hex_to_int(hex_string):
+        return int(hex_string, 16)
 
     parser = argparse.ArgumentParser(description="Bouffalo Lab Factory Data generator tool")
 
     parser.add_argument("--dac_cert", type=str, help="DAC certificate file.")
     parser.add_argument("--dac_key", type=str, help="DAC certificate privat key.")
+    parser.add_argument("--dac_pid", type=hex_to_int, help="Product Identification, hex string, used in DAC certificate. ")
     parser.add_argument("--passcode", type=int, help="Setup pincode, optional.")
     parser.add_argument("--pai_cert", type=str, default=TEST_PAI_CERT, help="PAI certificate file.")
     parser.add_argument("--cd", type=str, help="Certificate Declaration file.")
@@ -459,9 +472,9 @@ def main():
     parser.add_argument("--spake2p_it", type=int, default=None, help="Spake2+ iteration count, optional.")
     parser.add_argument("--spake2p_salt", type=base64.b64decode, help="Spake2+ salt in hex string, optional.")
 
-    parser.add_argument("--vendor_id", type=int, default=0x130D, help="Vendor Identification, mandatory.")
+    parser.add_argument("--vendor_id", type=hex_to_int, default=0x130D, help="Vendor Identification, hex string, mandatory.")
     parser.add_argument("--vendor_name", type=str, default="Bouffalo Lab", help="Vendor Name string, optional.")
-    parser.add_argument("--product_id", type=int, default=0x1001, help="Product Identification, mandatory.")
+    parser.add_argument("--product_id", type=hex_to_int, default=0x1001, help="Product Identification, hex string, mandatory.")
     parser.add_argument("--product_name", type=str, default="Test Product", help="Product Name string, optional.")
 
     parser.add_argument("--product_part_no", type=str, help="Product Part number, optional.")
@@ -484,7 +497,7 @@ def main():
 
     args = parser.parse_args()
 
-    log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
+    logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
     check_arg(args)
 
@@ -493,11 +506,8 @@ def main():
     unique_id = gen_test_unique_id(args.unique_id)
     spake2p_it, spake2p_salt, spake2p_verifier = gen_test_spake2(passcode, args.spake2p_it, args.spake2p_salt)
 
-    vp_info = "{}_{}".format(hex(args.vendor_id), hex(args.product_id))
-    vp_disc_info = "{}_{}_{}".format(hex(args.vendor_id), hex(args.product_id), discriminator)
-    if args.dac_cert is None:
-        args.dac_cert = os.path.join(args.output, "out_{}_dac_cert.pem".format(vp_disc_info))
-        args.dac_key = os.path.join(args.output, "out_{}_dac_key.pem".format(vp_disc_info))
+    vp_info = "{}_{}".format(hex(args.vendor_id).split('x')[-1], hex(args.product_id).split('x')[-1])
+    vp_disc_info = "{}_{}".format(vp_info, discriminator)
 
     if args.cd is None:
         args.cd = os.path.join(args.output, "out_{}_cd.der".format(vp_info))
@@ -515,7 +525,9 @@ def main():
                                                                  args.pai_cert,
                                                                  args.pai_key,
                                                                  args.dac_cert,
-                                                                 args.dac_key)
+                                                                 args.dac_key,
+                                                                 args.dac_pid,
+                                                                 discriminator)
 
     mfd_output = os.path.join(args.output, "out_{}_mfd.bin".format(vp_disc_info))
     args.dac_cert = dac_cert_der
@@ -537,19 +549,19 @@ def main():
 
     log.info("")
     log.info("Output as below: ")
-    log.info("Passcode: {}".format(passcode))
-    log.info("Discriminator ID: {}".format(discriminator))
-    log.info("Rotating Unique ID: {}".format(unique_id.hex()))
-    log.info("Rotating Unique ID base64 code: {}".format(base64.b64encode(unique_id).decode()))
-    log.info("SPAKE2+ iteration: {}".format(spake2p_it))
-    log.info("SPAKE2+ slat: {}".format(spake2p_salt.hex()))
-    log.info("SPAKE2+ slat base code: {}".format(base64.b64encode(spake2p_salt).decode()))
-    log.info("Manual code: {}".format(manualcode))
-    log.info("QR code: {}".format(qrcode))
+    log.info("Passcode: '%s'", passcode)
+    log.info("Discriminator ID: '%s'", discriminator)
+    log.info("Rotating Unique ID: '%s'", unique_id.hex())
+    log.info("Rotating Unique ID base64 code: '%s'", base64.b64encode(unique_id).decode())
+    log.info("SPAKE2+ iteration: '%s'", spake2p_it)
+    log.info("SPAKE2+ slat: '%s'", spake2p_salt.hex())
+    log.info("SPAKE2+ slat base code: '%s'", base64.b64encode(spake2p_salt).decode())
+    log.info("Manual code: '%s'", manualcode)
+    log.info("QR code: '%s'", qrcode)
 
     log.info("")
-    log.info("MFD partition file: {}".format(mfd_output))
-    log.info("QR code PNG file: {}".format(onboard_png))
+    log.info("MFD partition file: '%s'", mfd_output)
+    log.info("QR code PNG file: '%s'", onboard_png)
 
 
 if __name__ == "__main__":

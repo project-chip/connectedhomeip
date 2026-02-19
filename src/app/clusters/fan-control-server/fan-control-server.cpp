@@ -383,10 +383,6 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
         DataModel::Nullable<Percent> percentSetting;
         Status status = PercentSetting::Get(attributePath.mEndpointId, percentSetting);
         VerifyOrReturn(Status::Success == status && !percentSetting.IsNull());
-        uint8_t speedMax;
-        status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
-        VerifyOrReturn(Status::Success == status,
-                       ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", to_underlying(status)));
 
         // Avoid circular callback calls
         ScopedChange PercentWriteInProgress(gPercentWriteInProgress, true);
@@ -400,6 +396,11 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
 
         if (SupportsMultiSpeed(attributePath.mEndpointId))
         {
+            uint8_t speedMax;
+            status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
+            VerifyOrReturn(Status::Success == status,
+                           ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", to_underlying(status)));
+
             // Adjust SpeedSetting from a percent value change for PercentSetting
             // speed = ceil( SpeedMax * (percent * 0.01) )
             uint16_t percent = percentSetting.Value();

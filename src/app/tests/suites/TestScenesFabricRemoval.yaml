@@ -132,6 +132,7 @@ tests:
                         EpochStartTime1: 1110001,
                         EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
                         EpochStartTime2: 1110002,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label: "TH1 Map KeySets to GroupId."
@@ -176,6 +177,7 @@ tests:
                         EpochStartTime1: 1120001,
                         EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
                         EpochStartTime2: 1120002,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label: "Preparation step TH2 Map KeySets to GroupId."
@@ -249,7 +251,7 @@ tests:
                 value: 0x0001
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value: []
       response:
           values:
@@ -272,7 +274,7 @@ tests:
                 value: 0x0000
               - name: "SceneName"
                 value: "Scene2"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value: []
       response:
           values:
@@ -296,7 +298,7 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value: []
       response:
           values:
@@ -320,7 +322,7 @@ tests:
                 value: 0x0000
               - name: "SceneName"
                 value: "Scene2"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value: []
       response:
           values:

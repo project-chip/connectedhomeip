@@ -21,7 +21,7 @@ import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 
 assert(chip_device_platform == "bl702")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -44,13 +44,6 @@ static_library("BL702") {
     "../common/SystemTimeSupport.cpp",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "../common/OTAImageProcessorImpl.cpp",
-      "../common/OTAImageProcessorImpl.h",
-    ]
-  }
-
   if (chip_enable_ble) {
     sources += [
       "../common/BLEManagerImpl.cpp",
@@ -72,9 +65,18 @@ static_library("BL702") {
   }
 
   deps = [
+    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+  }
 
   if (chip_enable_wifi) {
     sources += [
@@ -87,12 +89,15 @@ static_library("BL702") {
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     # needed for MTD/FTD
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
     import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
-    deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
+    deps += [
+      "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk",
+      "${chip_root}/src/app:app_config",
+    ]
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
@@ -116,7 +121,10 @@ static_library("BL702") {
       "EthernetInterface.c",
     ]
 
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/lib/dnssd:platform_header",
+    ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]

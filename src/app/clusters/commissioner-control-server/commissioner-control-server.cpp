@@ -69,15 +69,15 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
-CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId, ClusterId clusterId) :
-    CommandHandlerInterface(MakeOptional(endpointId), clusterId)
+CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
+    CommandHandlerInterface(MakeOptional(endpointId), Id)
 {
     mDelegate = delegate;
 }
 
 CommissionerControlServer::~CommissionerControlServer()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR CommissionerControlServer::Init()
@@ -240,7 +240,7 @@ void CommissionerControlServer::HandleCommissionNode(HandlerContext & ctx, const
     AddReverseOpenCommissioningWindowResponse(ctx.mCommandHandler, ctx.mRequestPath, *commissioningWindowParams);
 
     // Schedule the deferred reverse commission node task
-    DeviceLayer::SystemLayer().ScheduleLambda([delegate, params = commissioningWindowParams.release()]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate, params = commissioningWindowParams.release()]() {
         if (delegate != nullptr)
         {
             CHIP_ERROR error = delegate->HandleCommissionNode(*params);
@@ -273,4 +273,9 @@ exit:
 void MatterCommissionerControlPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initializing Commissioner Control cluster.");
+}
+
+void MatterCommissionerControlPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Shutdown Commissioner Control cluster.");
 }

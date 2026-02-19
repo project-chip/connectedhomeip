@@ -25,7 +25,7 @@ namespace bdx {
 
 namespace {
 // Max block size for the BDX transfer.
-constexpr uint32_t kMaxBdxBlockSize = 1024;
+constexpr uint16_t kMaxBdxBlockSize = CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE;
 
 // How often we poll our transfer session.  Sadly, we get allocated on
 // unsolicited message, which makes it hard for our clients to configure this.
@@ -41,6 +41,16 @@ constexpr TransferRole kBdxRole              = TransferRole::kReceiver;
 void BdxTransferDiagnosticLog::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
+
+    if (event.EventType == TransferSession::OutputEventType::kNone)
+    {
+        // Because we are polling for output every 50ms on our transfer session,
+        // we will get a lot of kNone events coming through here: one for every
+        // time we poll but the other side has not sent anything new yet.  Just
+        // ignore those here, for now, and make sure not to log them, because
+        // that bloats the logs pretty quickly.
+        return;
+    }
 
     ChipLogDetail(BDX, "Got an event %s", event.ToString(event.EventType));
 
@@ -71,7 +81,7 @@ void BdxTransferDiagnosticLog::HandleTransferSessionOutput(TransferSession::Outp
         }
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
-    case TransferSession::OutputEventType::kNone:
+    // case TransferSession::OutputEventType::kNone: handled above.
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
     case TransferSession::OutputEventType::kQueryReceived:
     case TransferSession::OutputEventType::kAckReceived:
@@ -126,7 +136,7 @@ CHIP_ERROR BdxTransferDiagnosticLog::OnMessageToSend(TransferSession::OutputEven
 
     // If there's an error sending the message, close the exchange by calling Reset.
     auto err = mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
-    VerifyOrDo(CHIP_NO_ERROR == err, OnTransferSessionEnd(err));
+    VerifyOrDo(CHIP_NO_ERROR == err, TEMPORARY_RETURN_IGNORED OnTransferSessionEnd(err));
 
     return err;
 }
@@ -187,7 +197,7 @@ void BdxTransferDiagnosticLog::OnExchangeClosing(Messaging::ExchangeContext * ec
 {
     // The exchange can be closing while TransferFacilitator is still accessing us, so
     // the BdxTransferDiagnosticLog can not be released "right now".
-    mSystemLayer->ScheduleWork(
+    TEMPORARY_RETURN_IGNORED mSystemLayer->ScheduleWork(
         [](auto * systemLayer, auto * appState) -> void {
             auto * _this = static_cast<BdxTransferDiagnosticLog *>(appState);
             _this->mPoolDelegate->Release(_this);

@@ -1,0 +1,129 @@
+/*
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/static-cluster-config/BasicInformation.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::BasicInformation::Attributes;
+using namespace chip::app::Clusters::BasicInformation::StaticApplicationConfig;
+using chip::Protocols::InteractionModel::Status;
+
+namespace {
+
+// BasicInformationCluster implementation is specifically implemented
+// only for the root endpoint (endpoint 0)
+// So either:
+//   - we have a fixed config and it is endpoint 0 OR
+//   - we have a fully dynamic config
+
+static constexpr size_t kBasicInformationFixedClusterCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size();
+
+static_assert((kBasicInformationFixedClusterCount == 0) ||
+                  ((kBasicInformationFixedClusterCount == 1) &&
+                   BasicInformation::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
+              "Basic Information cluster MUST be on endpoint 0");
+
+LazyRegisteredServerCluster<BasicInformationCluster> gServer;
+
+void LegacyOnlyDisableUniqueIdAttr(BasicInformationCluster::OptionalAttributesSet & attributeSet)
+{
+    attributeSet.Set<BasicInformation::Attributes::UniqueID::Id>(false);
+}
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+
+        BasicInformationCluster::OptionalAttributesSet optionalAttributeSet(optionalAttributeBits);
+
+        DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+        VerifyOrDie(provider != nullptr);
+
+        BasicInformationCluster::Context context = { .deviceInstanceInfoProvider = *provider,
+                                                     .configurationManager       = DeviceLayer::ConfigurationMgr(),
+                                                     .platformManager            = DeviceLayer::PlatformMgr() };
+        gServer.Create(optionalAttributeSet, context);
+
+        // This disabling of the unique id attribute is here only for test purposes. The uniqe id attribute
+        // is mandatory, but was optional in previous versions. It is forced to be enabled in the basic information
+        // constructor, but for apps following an old spec version, it is possible for it to be disabled. This is needed
+        // for the lighting-app-data-mode-no-unique-id example app with the MCORE_FS_1_3 test.
+        if (!optionalAttributeSet.IsSet(BasicInformation::Attributes::UniqueID::Id))
+        {
+            LegacyOnlyDisableUniqueIdAttr(gServer.Cluster().OptionalAttributes());
+        }
+
+        return gServer.Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+};
+
+} // namespace
+
+void MatterBasicInformationClusterInitCallback(EndpointId endpointId)
+{
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
+}
+
+void MatterBasicInformationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    VerifyOrReturn(endpointId == kRootEndpointId);
+
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = BasicInformation::Id,
+            .fixedClusterInstanceCount = BasicInformation::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+        },
+        integrationDelegate, shutdownType);
+}
+
+void MatterBasicInformationPluginServerInitCallback() {}
+void MatterBasicInformationPluginServerShutdownCallback() {}

@@ -140,6 +140,15 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const Commissionin
     return mController->GetConnectedDevice(mNodeId, &mDeviceConnected, &mDeviceConnectionFailure);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+CHIP_ERROR CommissioningWindowOpener::OpenJointCommissioningWindow(const CommissioningWindowPasscodeParams & params,
+                                                                   SetupPayload & payload)
+{
+    mJointCommissioning = true;
+    return OpenCommissioningWindow(params, payload);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(const CommissioningWindowVerifierParams & params)
 {
     VerifyOrReturnError(mNextStep == Step::kAcceptCommissioningStart, CHIP_ERROR_INCORRECT_STATE);
@@ -183,15 +192,36 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
         MutableByteSpan serializedVerifierSpan(serializedVerifier);
         ReturnErrorOnFailure(mVerifier.Serialize(serializedVerifierSpan));
 
-        AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
-        request.commissioningTimeout = mCommissioningWindowTimeout.count();
-        request.PAKEPasscodeVerifier = serializedVerifierSpan;
-        request.discriminator        = mDiscriminator.GetLongValue();
-        request.iterations           = mPBKDFIterations;
-        request.salt                 = mPBKDFSalt;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        if (mJointCommissioning == false)
+        {
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+            AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
+            request.commissioningTimeout = mCommissioningWindowTimeout.count();
+            request.PAKEPasscodeVerifier = serializedVerifierSpan;
+            request.discriminator        = mDiscriminator.GetLongValue();
+            request.iterations           = mPBKDFIterations;
+            request.salt                 = mPBKDFSalt;
 
-        ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
-                                                   OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+            ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
+                                                       OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        }
+        else
+        {
+            mJointCommissioning = false; // Reset the flag for next use
+
+            JointFabricAdministrator::Commands::OpenJointCommissioningWindow::Type request;
+            request.commissioningTimeout = mCommissioningWindowTimeout.count();
+            request.PAKEPasscodeVerifier = serializedVerifierSpan;
+            request.discriminator        = mDiscriminator.GetLongValue();
+            request.iterations           = mPBKDFIterations;
+            request.salt                 = mPBKDFSalt;
+
+            ReturnErrorOnFailure(cluster.InvokeCommand(request, this, OnOpenCommissioningWindowSuccess,
+                                                       OnOpenCommissioningWindowFailure, MakeOptional(kTimedInvokeTimeoutMs)));
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     }
     else
     {

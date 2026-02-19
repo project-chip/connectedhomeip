@@ -281,6 +281,30 @@ static_assert(std::numeric_limits<Seconds64::rep>::digits >= 64, "Seconds64 must
 static_assert(std::numeric_limits<Seconds32::rep>::digits >= 32, "Seconds32 must be at least 32 bits");
 static_assert(std::numeric_limits<Seconds16::rep>::digits >= 16, "Seconds16 must be at least 16 bits");
 
+CHIP_ERROR GetClock_MatterEpochS(uint32_t & aMatterEpoch)
+{
+    aMatterEpoch = 0;
+
+    Milliseconds64 cTMs;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    auto unixEpoch = std::chrono::duration_cast<Seconds32>(cTMs).count();
+    if (!UnixEpochToChipEpochTime(unixEpoch, aMatterEpoch))
+    {
+        ChipLogError(DeviceLayer, "Unable to convert Unix Epoch time to Matter Epoch Time: unixEpoch (%u)",
+                     static_cast<unsigned int>(unixEpoch));
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Clock
 } // namespace System
 } // namespace chip

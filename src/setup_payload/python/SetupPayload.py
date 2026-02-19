@@ -52,8 +52,8 @@ qrcode_format = BitStruct(
 
 
 class CommissioningFlow(enum.IntEnum):
-    Standard = 0,
-    UserIntent = 1,
+    Standard = 0
+    UserIntent = 1
     Custom = 2
 
 
@@ -187,8 +187,7 @@ class SetupPayload:
     def parse(payload):
         if payload.startswith('MT:'):
             return SetupPayload.parse_qrcode(payload)
-        else:
-            return SetupPayload.parse_manualcode(payload)
+        return SetupPayload.parse_manualcode(payload)
 
 
 @click.group()

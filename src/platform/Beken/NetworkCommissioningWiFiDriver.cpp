@@ -194,7 +194,7 @@ exit:
     }
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         // chip::DeviceLayer::PlatformMgr().LockChipStack();
         callback->OnResult(networkingStatus, CharSpan(), 0);

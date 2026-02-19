@@ -18,7 +18,8 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
-#include <app/util/af-types.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/util/MarkAttributeDirty.h>
 #include <app/util/attribute-metadata.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -49,7 +50,7 @@ struct EmberAfWriteDataInput
     // Listener called when when the written data is consided changed/dirty.
     // This being called depends on settings of `markDirty` combined with the actual contents of dataPtr
     // vs the contents of the current attribute storage.
-    chip::app::AttributesChangedListener * changeListener = nullptr;
+    chip::app::DataModel::ProviderChangeListener * changeListener = nullptr;
 
     EmberAfWriteDataInput(uint8_t * data, EmberAfAttributeType type) : dataPtr(data), dataType(type) {}
 
@@ -59,7 +60,7 @@ struct EmberAfWriteDataInput
         return *this;
     }
 
-    EmberAfWriteDataInput & SetChangeListener(chip::app::AttributesChangedListener * listener)
+    EmberAfWriteDataInput & SetChangeListener(chip::app::DataModel::ProviderChangeListener * listener)
     {
         changeListener = listener;
         return *this;

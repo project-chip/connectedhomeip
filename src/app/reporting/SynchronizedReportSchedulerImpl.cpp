@@ -211,12 +211,12 @@ void SynchronizedReportSchedulerImpl::TimerFired()
         // from the monotonic timer), and we don't know which handler was the one that should be reportable.
         Timeout timeout = Milliseconds32(0);
         ReturnOnFailure(CalculateNextReportTimeout(timeout, nullptr, now));
-        ScheduleReport(timeout, nullptr, now);
+        TEMPORARY_RETURN_IGNORED ScheduleReport(timeout, nullptr, now);
     }
     else
     {
         // If we have a reportable handler, we can schedule an engine run
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 }
 

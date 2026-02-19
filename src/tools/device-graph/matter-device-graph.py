@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -19,13 +21,16 @@ import os
 import pprint
 import sys
 
-import chip.clusters as Clusters
 import graphviz
 from rich.console import Console
 
-# Add the path to python_testing folder, in order to be able to import from chip.testing.matter_testing
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.runner import default_matter_test_main
+
+# Add the path to python_testing folder, in order to be able to import from matter.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
+from matter.testing.matter_testing import MatterBaseTest  # noqa: E402
 
 console = None
 maxClusterNameLength = 30
@@ -116,7 +121,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
     # console.print(f"DeviceTypeList: {listOfDeviceTypes}")
     # console.print(f"PartsList: {partsListFromWildcardRead}")
 
-    endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l"  # noqa: W605
+    endpointLabel = f"Endpoint: {endpoint}\\lDeviceTypeList: {listOfDeviceTypes}\\lPartsList: {partsListFromWildcardRead}\\l"
 
     nextNodeRef = ""
     nodeRef = f"ep{endpoint}"
@@ -131,7 +136,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom server\l0x{clusterId:08X}"  # noqa: W605
+            clusterName = f"Custom server\\l0x{clusterId:08X}"
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "olivedrab", nodeRef)
 
@@ -148,7 +153,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom client\l0x{clusterId:08X}"  # noqa: W605
+            clusterName = f"Custom client\\l0x{clusterId:08X}"
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "orange", nodeRef)
 
@@ -193,15 +198,14 @@ class TC_MatterDeviceGraph(MatterBaseTest):
                 with deviceGraph.subgraph(name='cluster_rootnode') as rootNodeSection:
                     CreateEndpointGraph(deviceGraph, rootNodeSection, endpoint, wildcardResponse)
             else:
-                with deviceGraph.subgraph(name='cluster_endpoints') as endpointsSection:
-                    with endpointsSection.subgraph(name=f'cluster_{endpoint}') as endpointSection:
-                        CreateEndpointGraph(deviceGraph, endpointSection, endpoint, wildcardResponse)
+                with (deviceGraph.subgraph(name='cluster_endpoints') as endpointsSection,
+                      endpointsSection.subgraph(name=f'cluster_{endpoint}') as endpointSection):
+                    CreateEndpointGraph(deviceGraph, endpointSection, endpoint, wildcardResponse)
 
         deviceGraph.save(f'{sys.path[0]}/matter-device-graph.dot')
 
-        deviceDataFile = open(f'{sys.path[0]}/matter-device-data.txt', 'w')
-        deviceDataFile.write(pprint.pformat((wildcardResponse)))
-        deviceDataFile.close()
+        with open(f'{sys.path[0]}/matter-device-data.txt', 'w') as f:
+            f.write(pprint.pformat((wildcardResponse)))
 
 
 if __name__ == "__main__":

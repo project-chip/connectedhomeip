@@ -21,7 +21,6 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
 #include <platform/PlatformManager.h>
@@ -72,11 +71,6 @@ void OnTriggerEffect(::Identify * identify)
         return;
     }
 }
-
-static Identify gIdentify0 = {
-    chip::EndpointId{ 0 }, OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnTriggerEffect,
-};
 
 static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,

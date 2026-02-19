@@ -36,6 +36,10 @@
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/support/CHIPMem.h>
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <dns_sd.h>
+#endif
+
 using chip::Dnssd::DnssdService;
 using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
@@ -61,7 +65,10 @@ public:
     // Implementation of mdns::Minimal::ParserDelegate
 
     void OnHeader(mdns::Minimal::ConstHeaderRef & header) override { mMsgId = header.GetMessageId(); }
-    void OnQuery(const mdns::Minimal::QueryData & data) override { mResponder->Respond(mMsgId, data, mCurSrc, mRespConfig); }
+    void OnQuery(const mdns::Minimal::QueryData & data) override
+    {
+        TEMPORARY_RETURN_IGNORED mResponder->Respond(mMsgId, data, mCurSrc, mRespConfig);
+    }
     void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override {}
 
 private:
@@ -78,8 +85,8 @@ class TestDnssd : public ::testing::Test
 public: // protected
     static void SetUpTestSuite()
     {
-        EXPECT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
@@ -101,7 +108,7 @@ static void Timeout(chip::System::Layer * systemLayer, void * context)
     auto * ctx = static_cast<TestDnssd *>(context);
     ChipLogError(DeviceLayer, "mDNS test timeout, is avahi daemon running?");
     ctx->mTimeoutExpired = true;
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & addresses,
@@ -110,7 +117,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     auto * ctx = static_cast<TestDnssd *>(context);
     char addrBuf[100];
 
-    EXPECT_NE(result, nullptr);
+    ASSERT_NE(result, nullptr);
     EXPECT_EQ(error, CHIP_NO_ERROR);
 
     if (!addresses.empty())
@@ -120,6 +127,8 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     }
 
     EXPECT_EQ(result->mTextEntrySize, 1u);
+    // must have at least 1 entry to check next key/val expectations.
+    ASSERT_GE(result->mTextEntrySize, 1u);
     EXPECT_STREQ(result->mTextEntries[0].mKey, "key");
     EXPECT_STREQ(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val");
 
@@ -131,10 +140,10 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
         // are required when the resolve callback (this one) is called. In order
         // to avoid deadlocks, we need to call the StopEventLoopTask from inside
         // the Matter event loop by scheduling a lambda.
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([]() {
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().ScheduleLambda([]() {
             // After last service is resolved, stop the event loop,
             // so the test case can gracefully exit.
-            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         });
     }
 }
@@ -179,6 +188,7 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
               CHIP_NO_ERROR);
 }
 
+#if !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 // Verify that platform DNS-SD implementation can browse and resolve services.
 //
 // This test case uses platform-independent mDNS server implementation based on
@@ -186,6 +196,10 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
 // A and AAAA queries without additional records. In order to pass this test,
 // the platform DNS-SD client implementation must be able to browse and resolve
 // services by querying for all of these records separately.
+//
+// However, when using Network.framework (on Darwin), we can't bind to port 5353
+// because SO_REUSEPORT is not supported. As a result, the minimal server cannot run,
+// even if it is compiled.
 TEST_F(TestDnssd, TestDnssdBrowse)
 {
     mdns::Minimal::SetDefaultAddressPolicy();
@@ -196,7 +210,7 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     mdns::Minimal::ResponseSender responseSender(&server);
 
     mdns::Minimal::QueryResponder<16> queryResponder;
-    responseSender.AddQueryResponder(&queryResponder);
+    TEMPORARY_RETURN_IGNORED responseSender.AddQueryResponder(&queryResponder);
 
     // Respond to PTR queries for _mock._udp.local
     mdns::Minimal::QNamePart serviceName[]       = { "_mock", chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
@@ -239,10 +253,11 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
-    chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
+    TEMPORARY_RETURN_IGNORED chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
 
     chip::Dnssd::ChipDnssdShutdown();
 }
+#endif // !CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 static void HandlePublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error)
 {
@@ -257,7 +272,13 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
     DnssdService service{};
     TextEntry entry{ "key", reinterpret_cast<const uint8_t *>("val"), 3 };
 
-    service.mInterface = chip::Inet::InterfaceId::Null();
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    constexpr chip::Inet::InterfaceId kInterfaceId = chip::Inet::InterfaceId(kDNSServiceInterfaceIndexLocalOnly);
+#else
+    constexpr chip::Inet::InterfaceId kInterfaceId = chip::Inet::InterfaceId::Null();
+#endif
+
+    service.mInterface = kInterfaceId;
     service.mPort      = 80;
     strcpy(service.mHostName, "MatterTest");
     strcpy(service.mName, "test");
@@ -271,8 +292,8 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
 
     EXPECT_EQ(ChipDnssdPublishService(&service, HandlePublish, nullptr), CHIP_NO_ERROR);
 
-    EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
-                              chip::Inet::InterfaceId::Null(), HandleBrowse, context, &ctx->mBrowseIdentifier),
+    EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny, kInterfaceId,
+                              HandleBrowse, context, &ctx->mBrowseIdentifier),
               CHIP_NO_ERROR);
 }
 
@@ -294,7 +315,7 @@ TEST_F(TestDnssd, TestDnssdPublishService)
     EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
-    chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
+    TEMPORARY_RETURN_IGNORED chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
 
     chip::Dnssd::ChipDnssdShutdown();
 }

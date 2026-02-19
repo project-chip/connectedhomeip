@@ -20,21 +20,27 @@
 #include <optional>
 
 #include <access/Privilege.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributePathParams.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteClusterPath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
+#include <lib/support/TypeTraits.h>
+
+// Pragma macro to disable the "conversion" and "narrowing" warnings.
+// This is done in some sections of the code in order to allow
+// the use of narrowing masks when assigning values to bitfields variables.
+// Without the use of these macros, the compiler would not allow
+// the narrowing and conversion of input values during the settings
+// of the variables inside of both 'AttributeEntry.mask' and 'AcceptedCommandEntry.mask'.
+#define _StartBitFieldInit                                                                                                         \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")                                              \
+        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+#define _EndBitFieldInit _Pragma("GCC diagnostic pop")
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
-/// Represents various endpoint composition patters as defined in the spec
+/// Represents various endpoint composition patterns as defined in the spec
 /// as `9.2.1. Endpoint Composition patterns`
 enum class EndpointCompositionPattern : uint8_t
 {
@@ -42,7 +48,7 @@ enum class EndpointCompositionPattern : uint8_t
     // device types that support physical device composition (e.g. Refrigerator)
     kTree = 0x1,
 
-    // A full-family pattern is a list fo all descendant endpoints, with no
+    // A full-family pattern is a list of all descendant endpoints, with no
     // imposed hierarchy.
     //
     // For example the Root Node and Aggregator device types use the full-familiy
@@ -50,29 +56,30 @@ enum class EndpointCompositionPattern : uint8_t
     kFullFamily = 0x2,
 };
 
-struct EndpointInfo
+struct EndpointEntry
 {
+    EndpointId id;
+
     // kInvalidEndpointId if there is no explicit parent endpoint (which means the parent is endpoint 0,
     // for endpoints other than endpoint 0).
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
-
-    explicit EndpointInfo(EndpointId parent) : parentId(parent), compositionPattern(EndpointCompositionPattern::kFullFamily) {}
-    EndpointInfo(EndpointId parent, EndpointCompositionPattern pattern) : parentId(parent), compositionPattern(pattern) {}
-};
-
-struct EndpointEntry
-{
-    EndpointId id;
-    EndpointInfo info;
-
-    bool IsValid() const { return id != kInvalidEndpointId; }
-    static const EndpointEntry kInvalid;
+    bool operator==(const EndpointEntry & rhs) const
+    {
+        return id == rhs.id && parentId == rhs.parentId && compositionPattern == rhs.compositionPattern;
+    }
 };
 
 enum class ClusterQualityFlags : uint32_t
 {
     kDiagnosticsData = 0x0001, // `K` quality, may be filtered out in subscriptions
+};
+
+struct ServerClusterEntry
+{
+    ClusterId clusterId;
+    DataVersion dataVersion; // current cluster data version,
+    BitFlags<ClusterQualityFlags> flags;
 };
 
 struct ClusterInfo
@@ -85,15 +92,16 @@ struct ClusterInfo
     ClusterInfo(DataVersion version) : dataVersion(version) {}
 };
 
-struct ClusterEntry
-{
-    ConcreteClusterPath path;
-    ClusterInfo info;
+// Constant used to narrow binary expressions
+constexpr uint8_t kPrivilegeBits = 5;
 
-    bool IsValid() const { return path.HasValidIds(); }
+// Mask used in the narrowing of binary expressions
+constexpr uint8_t kPrivilegeMask = ((1 << kPrivilegeBits) - 1);
 
-    static const ClusterEntry kInvalid;
-};
+// Validating contents of 'kPrivilegeMask'.
+static_assert(Access::kAllPrivilegeBits == kPrivilegeMask,
+              "\"kPrivilegeMask\" does not match all the values defined "
+              "inside the enum class Access::Privilege.");
 
 enum class AttributeQualityFlags : uint32_t
 {
@@ -102,26 +110,109 @@ enum class AttributeQualityFlags : uint32_t
     kFabricSensitive = 0x0010, // 'S' quality on attributes
     kChangesOmitted  = 0x0020, // `C` quality on attributes
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
+
+    // If you add new items here, remember to change kAttrQualityBits
 };
 
-struct AttributeInfo
+struct EventEntry
 {
-    BitFlags<AttributeQualityFlags> flags;
-
-    // read/write access will be missing if read/write is NOT allowed
-    std::optional<Access::Privilege> readPrivilege;  // generally defaults to View if readable
-    std::optional<Access::Privilege> writePrivilege; // generally defaults to Operate if writable
+    Access::Privilege readPrivilege; // Required access level to read this event
 };
 
 struct AttributeEntry
 {
-    ConcreteAttributePath path;
-    AttributeInfo info;
+    const AttributeId attributeId;
 
-    bool IsValid() const { return path.HasValidIds(); }
+    // Constructor
 
-    static const AttributeEntry kInvalid;
+    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wnarrowing'
+    constexpr AttributeEntry(AttributeId id, BitMask<AttributeQualityFlags> attrQualityFlags,
+                             std::optional<Access::Privilege> readPriv, std::optional<Access::Privilege> writePriv) :
+        attributeId{ id },
+        mask{
+            .flags          = attrQualityFlags.Raw() & kAttrQualityMask,
+            .readPrivilege  = readPriv.has_value() ? (to_underlying(*readPriv) & kPrivilegeMask) : 0,
+            .writePrivilege = writePriv.has_value() ? (to_underlying(*writePriv) & kPrivilegeMask) : 0,
+        }
+    {}
+
+    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wnarrowing'
+
+    // Getter for the read privilege for this attribute. std::nullopt means the attribute is not readable.
+    [[nodiscard]] constexpr std::optional<Access::Privilege> GetReadPrivilege() const
+    {
+        if (mask.readPrivilege != 0)
+        {
+            return static_cast<Access::Privilege>(mask.readPrivilege);
+        }
+        return std::nullopt;
+    }
+
+    // Getter for the write privilege for this attribute. std::nullopt means the attribute is not writable.
+    [[nodiscard]] constexpr std::optional<Access::Privilege> GetWritePrivilege() const
+    {
+        if (mask.writePrivilege != 0)
+        {
+            return static_cast<Access::Privilege>(mask.writePrivilege);
+        }
+        return std::nullopt;
+    }
+
+    [[nodiscard]] constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
+
+    bool operator==(const AttributeEntry & other) const
+    {
+        return (attributeId == other.attributeId) && (mask.flags == other.mask.flags) &&
+            (mask.readPrivilege == other.mask.readPrivilege) && (mask.writePrivilege == other.mask.writePrivilege);
+    }
+
+    bool operator!=(const AttributeEntry & other) const { return !(*this == other); }
+
+private:
+    // Constant used to narrow binary expressions
+    static constexpr uint8_t kAttrQualityBits = 7;
+
+    // Mask used in the narrowing of binary expressions
+    static constexpr uint8_t kAttrQualityMask = ((1 << kAttrQualityBits) - 1);
+
+    struct attribute_entry_mask_t
+    {
+
+        // attribute quality flags
+        //
+        // flags is a uint32_t bitfield of size kAttrQualityBits (aka 7),
+        // in order to accomodate all the different values of
+        // "enum class AttributeQualityFlags".
+        //
+        // Consider that any modification on the declaration of
+        // "enum class AttributeQualityFlags" will affect flags.
+        std::underlying_type_t<AttributeQualityFlags> flags : kAttrQualityBits;
+
+        // read/write access privilege variables
+        //
+        // readPrivilege is a uint8_t bitfield of size kPrivilegeBits (aka 5),
+        // in order to accomodate all the different values of "enum class Privilege".
+        // Same case for writePrivilege.
+        //
+        // Consider that any modification on the declaration of "enum class Privilege"
+        // will affect both readPrivilege and writePrivilege.
+        //
+        // The use of bitfields means that each variable holds an individual
+        // Access::Privilege value, as a bitwise value. This allows us to
+        // handle Access::Privilege information without any bit fiddling.
+        std::underlying_type_t<Access::Privilege> readPrivilege : kPrivilegeBits;
+        std::underlying_type_t<Access::Privilege> writePrivilege : kPrivilegeBits;
+    };
+
+    // Make sure that our various flags storage is never larger than 32 bits,
+    // because we expect these fields to pack together.
+    static_assert(sizeof(attribute_entry_mask_t) <= 4, "Size of attribute_entry_mask_t is not as expected.");
+
+    attribute_entry_mask_t mask;
 };
+
+// Static ASSERT to check size of AttributeEntry
+static_assert(sizeof(AttributeEntry) <= 8, "Size of AttributeEntry is not as expected.");
 
 // Bitmask values for different Command qualities.
 enum class CommandQualityFlags : uint32_t
@@ -129,23 +220,70 @@ enum class CommandQualityFlags : uint32_t
     kFabricScoped = 0x0001,
     kTimed        = 0x0002, // `T` quality on commands
     kLargeMessage = 0x0004, // `L` quality on commands
+
+    // If you add new items here, remember to change kCmdQualityBits
 };
 
-struct CommandInfo
+struct AcceptedCommandEntry
 {
-    BitFlags<CommandQualityFlags> flags;
-    Access::Privilege invokePrivilege = Access::Privilege::kOperate;
+    CommandId commandId;
+
+    // Constructor
+
+    _StartBitFieldInit; // Disabling '-Wconversion' & '-Wnarrowing'
+
+    constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
+                                   Access::Privilege invokePriv = Access::Privilege::kOperate) :
+        commandId(id),
+        mask{
+            .flags           = cmdQualityFlags.Raw() & kCmdQualityMask,
+            .invokePrivilege = to_underlying(invokePriv) & kPrivilegeMask,
+        }
+    {}
+
+    _EndBitFieldInit; // Enabling '-Wconversion' & '-Wnarrowing'
+
+    // Getter for the invoke privilege for this command.
+    [[nodiscard]] constexpr Access::Privilege GetInvokePrivilege() const
+    {
+        return static_cast<Access::Privilege>(mask.invokePrivilege);
+    }
+
+    [[nodiscard]] constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
+
+    bool operator==(const AcceptedCommandEntry & other) const
+    {
+        return (commandId == other.commandId) && (mask.flags == other.mask.flags) &&
+            (mask.invokePrivilege == other.mask.invokePrivilege);
+    }
+
+    bool operator!=(const AcceptedCommandEntry & other) const { return !(*this == other); }
+
+private:
+    // Constant used to narrow binary expressions
+    static constexpr uint8_t kCmdQualityBits = 3;
+
+    // Mask used in the narrowing of binary expressions
+    static constexpr uint8_t kCmdQualityMask = ((1 << kCmdQualityBits) - 1);
+
+    struct accepted_command_entry_mask_t
+    {
+        // command quality flags
+        //
+        std::underlying_type_t<CommandQualityFlags> flags : 3;
+
+        std::underlying_type_t<Access::Privilege> invokePrivilege : 5;
+    };
+
+    // Make sure that our various flags storage is never larger than 32 bits,
+    // because we expect these fields to pack together.
+    static_assert(sizeof(accepted_command_entry_mask_t) <= 4, "Size of accepted_command_entry_mask_t is not as expected.");
+
+    accepted_command_entry_mask_t mask;
 };
 
-struct CommandEntry
-{
-    ConcreteCommandPath path;
-    CommandInfo info;
-
-    bool IsValid() const { return path.HasValidIds(); }
-
-    static const CommandEntry kInvalid;
-};
+// Static ASSERT to check size of AcceptedCommandEntry
+static_assert(sizeof(AcceptedCommandEntry) <= 8, "Size of AcceptedCommandEntry is not as expected.");
 
 /// Represents a device type that resides on an endpoint
 struct DeviceTypeEntry
@@ -159,88 +297,9 @@ struct DeviceTypeEntry
     }
 };
 
-/// Provides metadata information for a data model
-///
-/// The data model can be viewed as a tree of endpoint/cluster/(attribute+commands+events)
-/// where each element can be iterated through independently.
-///
-/// Iteration rules:
-///   - Invalid paths will be returned when iteration ends (IDs will be kInvalid* and in particular
-///     mEndpointId will be kInvalidEndpointId). See `::kInvalid` constants for entries and
-///     can use ::IsValid() to determine if the entry is valid or not.
-///   - Global Attributes are NOT returned since they are implied
-///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
-///   - Iteration order is NOT guaranteed globally. Only the following is guaranteed:
-///     - Complete tree iteration (e.g. when iterating an endpoint, ALL clusters of that endpoint
-///       are returned, when iterating over a cluster, all attributes/commands are iterated over)
-///     - uniqueness and completeness (iterate over all possible distinct values as long as no
-///       internal structural changes occur)
-class ProviderMetadataTree
-{
-public:
-    virtual ~ProviderMetadataTree() = default;
-
-    // This iteration will list all the endpoints in the data model
-    virtual EndpointEntry FirstEndpoint()                              = 0;
-    virtual EndpointEntry NextEndpoint(EndpointId before)              = 0;
-    virtual std::optional<EndpointInfo> GetEndpointInfo(EndpointId id) = 0;
-    virtual bool EndpointExists(EndpointId id);
-
-    // This iteration describes device types registered on an endpoint
-    virtual std::optional<DeviceTypeEntry> FirstDeviceType(EndpointId endpoint)                                  = 0;
-    virtual std::optional<DeviceTypeEntry> NextDeviceType(EndpointId endpoint, const DeviceTypeEntry & previous) = 0;
-
-    // This iteration describes semantic tags registered on an endpoint
-    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
-    virtual std::optional<SemanticTag> GetFirstSemanticTag(EndpointId endpoint)                              = 0;
-    virtual std::optional<SemanticTag> GetNextSemanticTag(EndpointId endpoint, const SemanticTag & previous) = 0;
-
-    // This iteration will list all server clusters on a given endpoint
-    virtual ClusterEntry FirstServerCluster(EndpointId endpoint)                              = 0;
-    virtual ClusterEntry NextServerCluster(const ConcreteClusterPath & before)                = 0;
-    virtual std::optional<ClusterInfo> GetServerClusterInfo(const ConcreteClusterPath & path) = 0;
-
-    // This iteration will list all client clusters on a given endpoint
-    // As the client cluster is only a client without any attributes/commands,
-    // these functions only return the cluster path.
-    virtual ConcreteClusterPath FirstClientCluster(EndpointId endpoint)               = 0;
-    virtual ConcreteClusterPath NextClientCluster(const ConcreteClusterPath & before) = 0;
-
-    // Attribute iteration and accessors provide cluster-level access over
-    // attributes
-    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
-    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
-    virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
-
-    // Command iteration and accessors provide cluster-level access over commands
-    virtual CommandEntry FirstAcceptedCommand(const ConcreteClusterPath & cluster)              = 0;
-    virtual CommandEntry NextAcceptedCommand(const ConcreteCommandPath & before)                = 0;
-    virtual std::optional<CommandInfo> GetAcceptedCommandInfo(const ConcreteCommandPath & path) = 0;
-
-    // "generated" commands are purely for reporting what types of command ids can be
-    // returned as responses.
-    virtual ConcreteCommandPath FirstGeneratedCommand(const ConcreteClusterPath & cluster) = 0;
-    virtual ConcreteCommandPath NextGeneratedCommand(const ConcreteCommandPath & before)   = 0;
-
-    /// Workaround function to report attribute change.
-    ///
-    /// When this is invoked, the caller is expected to increment the cluster data version, and the attribute path
-    /// should be marked as `dirty` by the data model provider listener so that the reporter can notify the subscriber
-    /// of attribute changes.
-    /// This function should be invoked when attribute managed by attribute access interface is modified but not
-    /// through an actual Write interaction.
-    /// For example, if the LastNetworkingStatus attribute changes because the NetworkCommissioning driver detects a
-    /// network connection status change and calls SetLastNetworkingStatusValue(). The data model provider can recognize
-    /// this change by invoking this function at the point of change.
-    ///
-    /// This is a workaround function as we cannot notify the attribute change to the data model provider. The provider
-    /// should own its data and versions.
-    ///
-    /// TODO: We should remove this function when the AttributeAccessInterface/CommandHandlerInterface is able to report
-    /// the attribute changes.
-    virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
-};
-
 } // namespace DataModel
 } // namespace app
 } // namespace chip
+
+#undef _StartBitFieldInit
+#undef _EndBitFieldInit

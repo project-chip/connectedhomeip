@@ -66,7 +66,7 @@ int main(int argc, char * argv[])
 {
     bool res = false;
 
-    chip::Platform::MemoryInit();
+    SuccessOrDie(chip::Platform::MemoryInit());
 
     if (argc == 1)
     {

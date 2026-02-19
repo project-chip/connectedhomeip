@@ -30,6 +30,7 @@ TestDriver = namedtuple('TestDriver', ['name', 'source'])
 class TizenBoard(Enum):
 
     ARM = Board('arm')
+    ARM64 = Board('arm64')
 
 
 class TizenApp(Enum):
@@ -122,7 +123,7 @@ class TizenBuilder(GnBuilder):
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
         if not enable_thread:
-            self.extra_gn_options.append('chip_enable_openthread=false')
+            self.extra_gn_options.append('chip_enable_thread=false')
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
         if use_asan:
@@ -186,16 +187,37 @@ class TizenBuilder(GnBuilder):
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined
-        for env in ('TIZEN_SDK_ROOT', 'TIZEN_SDK_SYSROOT'):
+        env = 'TIZEN_SDK_ROOT'
+        if env not in os.environ:
+            raise Exception(
+                "Environment %s missing, cannot build Tizen target" % env)
+
+        sysroot = None
+
+        if self.board.value.target_cpu == "arm64":
+            env = 'TIZEN_SDK_SYSROOT_ARM64'
             if env not in os.environ:
                 raise Exception(
                     "Environment %s missing, cannot build Tizen target" % env)
+
+            sysroot = os.environ[env]
+
+        elif self.board.value.target_cpu == "arm":
+            env = 'TIZEN_SDK_SYSROOT'
+            if env not in os.environ:
+                raise Exception(
+                    "Environment %s missing, cannot build Tizen target" % env)
+
+            sysroot = os.environ[env]
+
+        else:
+            raise Exception("CPU architecture is not supported")
 
         return self.extra_gn_options + [
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.value.target_cpu,
             'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
-            'tizen_sdk_sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
+            'tizen_sdk_sysroot="%s"' % sysroot,
         ]
 
     def _bundle(self):

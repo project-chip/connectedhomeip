@@ -36,13 +36,30 @@ CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::Init()
 void RefrigeratorAndTemperatureControlledCabinetModeDelegate::HandleChangeToMode(
     uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
+    if (gRefrigeratorAndTemperatureControlledCabinetModeDelegate == nullptr)
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Delegate not initialized"));
+        return;
+    }
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
+
+    // Disallow transitions between Normal (0) and Rapid Freeze (2)
+    if ((currentMode == ModeNormal && NewMode == ModeRapidFreeze) || (currentMode == ModeRapidFreeze && NewMode == ModeNormal))
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+        response.statusText.SetValue(
+            chip::CharSpan::fromCharString("Direct transition between Normal and Rapid Freeze not allowed"));
+        return;
+    }
+
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeLabelByIndex(uint8_t modeIndex,
                                                                                         chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -51,7 +68,7 @@ CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeLabel
 
 CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -62,7 +79,7 @@ CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeValue
 CHIP_ERROR RefrigeratorAndTemperatureControlledCabinetModeDelegate::GetModeTagsByIndex(uint8_t modeIndex,
                                                                                        List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -106,6 +123,6 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
         new RefrigeratorAndTemperatureControlledCabinetMode::RefrigeratorAndTemperatureControlledCabinetModeDelegate;
     gRefrigeratorAndTemperatureControlledCabinetModeInstance =
         new ModeBase::Instance(gRefrigeratorAndTemperatureControlledCabinetModeDelegate, 0x1,
-                               RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(Feature::kOnOff));
-    gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
+                               RefrigeratorAndTemperatureControlledCabinetMode::Id, chip::to_underlying(ModeBase::Feature::kOnOff));
+    TEMPORARY_RETURN_IGNORED gRefrigeratorAndTemperatureControlledCabinetModeInstance->Init();
 }

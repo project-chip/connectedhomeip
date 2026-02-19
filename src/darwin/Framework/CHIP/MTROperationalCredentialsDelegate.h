@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,8 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <memory>
 
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
@@ -31,6 +28,8 @@
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
+
+#include <memory>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,17 +54,14 @@ public:
 
     void SetFabricIdForNextNOCRequest(chip::FabricId fabricId) override { mNextFabricId = fabricId; }
 
+    CHIP_ERROR ObtainCsrNonce(chip::MutableByteSpan & csrNonce) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
     void SetDeviceCommissioner(chip::Controller::DeviceCommissioner * _Nullable cppCommissioner)
     {
         mCppCommissioner = cppCommissioner;
-    }
-
-    chip::Optional<chip::Controller::CommissioningParameters> GetCommissioningParameters()
-    {
-        return mCppCommissioner == nullptr ? chip::NullOptional : mCppCommissioner->GetCommissioningParameters();
     }
 
     void SetOperationalCertificateIssuer(

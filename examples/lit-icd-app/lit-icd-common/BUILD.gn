@@ -18,4 +18,18 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("lit-icd-common") {
   zap_file = "lit-icd-server-app.zap"
   is_server = true
+
+  public_deps = [ ":identify_delegate_impl" ]
+}
+
+source_set("identify_delegate_impl") {
+  sources = [
+    "Identify.cpp",
+    "Identify.h",
+  ]
+  deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/data-model-providers/codegen:headers",
+  ]
 }

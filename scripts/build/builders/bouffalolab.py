@@ -28,16 +28,16 @@ class BouffalolabApp(Enum):
     def ExampleName(self):
         if self == BouffalolabApp.LIGHT:
             return 'lighting-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        if self == BouffalolabApp.CONTACT:
+            return 'contact-sensor-app'
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
             return ('chip-%s-lighting-example' % chip_name)
-        elif self == BouffalolabApp.CONTACT:
-            return ('chip-%s-contact-example' % chip_name)
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        if self == BouffalolabApp.CONTACT:
+            return ('chip-%s-contact-sensor-example' % chip_name)
+        raise Exception('Unknown app type: %r' % self)
 
 
 class BouffalolabBoard(Enum):
@@ -54,22 +54,21 @@ class BouffalolabBoard(Enum):
 
         if self == BouffalolabBoard.BL602DK:
             return 'BL602DK'
-        elif self == BouffalolabBoard.BL616DK:
+        if self == BouffalolabBoard.BL616DK:
             return 'BL616DK'
-        elif self == BouffalolabBoard.BL704LDK:
+        if self == BouffalolabBoard.BL704LDK:
             return 'BL704LDK'
-        elif self == BouffalolabBoard.BL706DK:
+        if self == BouffalolabBoard.BL706DK:
             return 'BL706DK'
-        elif self == BouffalolabBoard.BL602_IoT_Matter_V1:
+        if self == BouffalolabBoard.BL602_IoT_Matter_V1:
             return 'BL602-IoT-Matter-V1'
-        elif self == BouffalolabBoard.BL602_NIGHT_LIGHT:
+        if self == BouffalolabBoard.BL602_NIGHT_LIGHT:
             return 'BL602-NIGHT-LIGHT'
-        elif self == BouffalolabBoard.XT_ZB6_DevKit:
+        if self == BouffalolabBoard.XT_ZB6_DevKit:
             return 'XT-ZB6-DevKit'
-        elif self == BouffalolabBoard.BL706_NIGHT_LIGHT:
+        if self == BouffalolabBoard.BL706_NIGHT_LIGHT:
             return 'BL706-NIGHT-LIGHT'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+        raise Exception('Unknown board #: %r' % self)
 
 
 class BouffalolabThreadType(Enum):
@@ -100,16 +99,17 @@ class BouffalolabBuilder(GnBuilder):
                  use_matter_openthread: bool = False,
                  enable_easyflash: bool = False,
                  enable_littlefs: bool = False,
+                 enable_pds: bool = False,
                  enable_debug_coredump: bool = False,
                  ):
 
-        if 'BL602' == module_type:
+        if module_type == 'BL602':
             bouffalo_chip = 'bl602'
-        elif 'BL704L' == module_type:
+        elif module_type == 'BL704L':
             bouffalo_chip = 'bl702l'
         elif "BL70" in module_type:
             bouffalo_chip = 'bl702'
-        elif "BL616" == module_type:
+        elif module_type == "BL616":
             bouffalo_chip = "bl616"
         else:
             raise Exception(f"module_type {module_type} is not supported")
@@ -172,7 +172,7 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt.append(f'chip_enable_ethernet={str(enable_ethernet).lower()}')
         self.argsOpt.append(f'chip_enable_wifi={str(enable_wifi).lower()}')
-        self.argsOpt.append(f'chip_enable_openthread={str(enable_thread).lower()}')
+        self.argsOpt.append(f'chip_enable_thread={str(enable_thread).lower()}')
 
         # for enable_ethernet, do not need ble for commissioning
         self.argsOpt.append(f'chip_config_network_layer_ble={str(enable_wifi or enable_thread).lower()}')
@@ -196,15 +196,15 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_thread:
 
-            self.argsOpt.append('chip_system_config_use_open_thread_inet_endpoints=true')
+            self.argsOpt.append('chip_system_config_use_openthread_inet_endpoints=true')
             self.argsOpt.append('chip_with_lwip=false')
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
-            self.argsOpt.append(f'openthread_package_version="7e32165be"')
+            self.argsOpt.append('openthread_package_version="7e32165be"')
 
             if enable_thread_type == BouffalolabThreadType.THREAD_FTD:
-                self.argsOpt.append(f'chip_openthread_ftd=true')
+                self.argsOpt.append('chip_openthread_ftd=true')
             else:
-                self.argsOpt.append(f'chip_openthread_ftd=false')
+                self.argsOpt.append('chip_openthread_ftd=false')
 
             if not use_matter_openthread:
                 if bouffalo_chip in {"bl702", "bl702l"}:
@@ -237,12 +237,15 @@ class BouffalolabBuilder(GnBuilder):
         if enable_mfd:
             self.argsOpt.append("chip_enable_factory_data=true")
 
+        if enable_pds:
+            self.argsOpt.append("enable_pds=true")
+
         self.argsOpt.append(f"enable_heap_monitoring={str(enable_heap_monitoring).lower()}")
         if enable_debug_coredump:
-            self.argsOpt.append(f"enable_debug_coredump=true")
+            self.argsOpt.append("enable_debug_coredump=true")
             self.argsOpt.append(f"coredump_binary_id={int(time.time())}")
 
-        self.argsOpt.append(f"chip_generate_link_map_file=true")
+        self.argsOpt.append("chip_generate_link_map_file=true")
 
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
@@ -279,16 +282,14 @@ class BouffalolabBuilder(GnBuilder):
 
     def PostBuildCommand(self):
 
-        bouffalo_sdk_chips = ["bl616"]
-        abs_path_fw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
-
-        if self.chip_name not in bouffalo_sdk_chips:
-            abs_path_fw_raw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".raw")
+        if self.chip_name in ["bl616"]:
+            abs_path_fw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".raw")
+        else:
+            abs_path_fw = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
 
         if os.path.isfile(abs_path_fw):
             target_dir = self.output_dir.replace(self.chip_dir, "").strip("/")
 
-            abs_path_fw_bin = os.path.join(self.output_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
             path_fw = os.path.join(target_dir, self.app.AppNamePrefix(self.chip_name) + ".bin")
             path_flash_script = os.path.join(target_dir, self.app.AppNamePrefix(self.chip_name) + ".flash.py")
 

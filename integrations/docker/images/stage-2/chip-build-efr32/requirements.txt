@@ -1,5 +1,5 @@
 # codegen.py build requirements
-Jinja2==3.1.5
+Jinja2==3.1.6
 lark==1.1.7
 # Sphinx dependencies (for slc-cli)
 linkify-it-py==2.0.2

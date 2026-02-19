@@ -113,7 +113,7 @@ CHIP_ERROR HeapTraceDispatch(int argc, char ** argv)
 {
     if (argc == 0)
     {
-        HeapTraceHelpHandler(argc, argv);
+        TEMPORARY_RETURN_IGNORED HeapTraceHelpHandler(argc, argv);
         return CHIP_NO_ERROR;
     }
 
@@ -137,7 +137,7 @@ void RegisterHeapTraceCommands()
         { &HeapTraceTaskHandler, "task", "Dump heap usage of each task" },
 #endif // CONFIG_HEAP_TASK_TRACKING
     };
-    sShellHeapSubCommands.RegisterCommands(sHeapSubCommands, ArraySize(sHeapSubCommands));
+    sShellHeapSubCommands.RegisterCommands(sHeapSubCommands, MATTER_ARRAY_SIZE(sHeapSubCommands));
 
 #if CONFIG_HEAP_TRACING_STANDALONE
     ESP_ERROR_CHECK(heap_trace_init_standalone(sTraceRecords, kNumHeapTraceRecords));

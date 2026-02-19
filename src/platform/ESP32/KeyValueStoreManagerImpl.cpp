@@ -55,7 +55,7 @@ bool HashIfLongKey(const char * key, char * keyHash)
     VerifyOrReturnError(Crypto::Hash_SHA1(Uint8::from_const_char(key), strlen(key), hashBuffer) == CHIP_NO_ERROR, false);
 
     BitFlags<Encoding::HexFlags> flags(Encoding::HexFlags::kNone);
-    Encoding::BytesToHex(hashBuffer, NVS_KEY_NAME_MAX_SIZE / 2, keyHash, NVS_KEY_NAME_MAX_SIZE, flags);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(hashBuffer, NVS_KEY_NAME_MAX_SIZE / 2, keyHash, NVS_KEY_NAME_MAX_SIZE, flags);
     keyHash[NVS_KEY_NAME_MAX_SIZE - 1] = 0;
 
     ChipLogDetail(DeviceLayer, "Using hash:%s for nvs key:%s", keyHash, StringOrNullMarker(key));

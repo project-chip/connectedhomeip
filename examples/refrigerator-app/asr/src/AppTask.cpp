@@ -21,11 +21,11 @@
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "qrcodegen.h"
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -76,7 +76,7 @@ const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList
 
 void NetWorkCommissioningInstInit()
 {
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -124,14 +124,15 @@ void AppTask::AppTaskMain(void * pvParameter)
     EndpointId kRefEndpointId           = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
-    app::SetTreeCompositionForEndpoint(kRefEndpointId);
-    app::SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
-    app::SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED app::SetTreeCompositionForEndpoint(kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED app::SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED app::SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
 
     // set TagList
-    SetTagList(kColdCabinetEndpointId,
-               Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
-    SetTagList(kFreezeCabinetEndpointId, Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(
+        kColdCabinetEndpointId, Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId,
+                                        Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 

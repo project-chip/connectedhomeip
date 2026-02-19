@@ -7,6 +7,10 @@ commissioning mode, advertises itself as a Commissionable Node and gets
 commissioned. Then it allows the user to send Matter ContentLauncher commands to
 the TV.
 
+Refer to the
+[Matter Casting APIs documentation](https://project-chip.github.io/connectedhomeip-doc/examples/tv-casting-app/APIs.html)
+to build the Matter “Casting Client” into your consumer-facing mobile app.
+
 <hr>
 
 -   [Matter TV Casting Android App Example](#matter-tv-casting-android-app-example)
@@ -15,6 +19,14 @@ the TV.
         -   [Gradle \& JDK Version](#gradle--jdk-version)
     -   [Preparing for build](#preparing-for-build)
     -   [Building \& Installing the app](#building--installing-the-app)
+    -   [Common build environment issues](#common-build-environment-issues)
+    -   [Running the app](#running-the-app)
+    -   [Running Unit Tests](#running-unit-tests)
+        -   [Running All Tests](#running-all-tests)
+        -   [Running Specific Test Suites](#running-specific-test-suites)
+        -   [Viewing Test Results](#viewing-test-results)
+        -   [Test Coverage](#test-coverage)
+        -   [Troubleshooting Tests](#troubleshooting-tests)
 
 <hr>
 
@@ -50,10 +62,24 @@ We are using Gradle 7.1.1 for all android project which does not support Java 17
 (https://docs.gradle.org/current/userguide/compatibility.html) while the default
 JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
 
-Using JDK bundled with Android Studio will help with that.
+If you attempt to build with an incompatible Java version, you may encounter the
+following error:
+
+```text
+Unsupported class file major version XX
+```
+
+This error occurs when the Java version being used is not compatible with the
+Gradle version in your project.
+
+See the
+[Building Android](../../../docs/platforms/android/android_building.md#gradle--jdk-version)
+guide for more info about the supported Gradle & JDK Version.
+
+You can verify your current Java version by running:
 
 ```shell
-export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+java -version
 ```
 
 <hr>
@@ -107,3 +133,86 @@ adb install out/android-$TARGET_CPU-tv-casting-app/outputs/apk/debug/app-debug.a
 You can use Android Studio to edit the Android app itself and run it after
 build_examples.py, but you will not be able to edit Matter Android code from
 `src/controller/java`, or other Matter C++ code within Android Studio.
+
+## Common build environment issues
+
+1. If you see an error like `kotlinc: command not found`, install the Kotlin in
+   your build environment. Eg. on MacOS, this can be done with the command:
+
+```shell
+brew install kotlin
+```
+
+## Running the app
+
+This example Matter TV Casting Android app can be tested with the
+[example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
+running on a Raspberry Pi.
+
+## Running Unit Tests
+
+The Android TV Casting app includes unit tests for the SendUDC functionality and
+other features.
+
+### Running All Tests
+
+From the `App` directory, run all unit tests:
+
+```bash
+cd examples/tv-casting-app/android/App
+./gradlew test
+```
+
+### Running Specific Test Suites
+
+To run only the SendUDC tests:
+
+```bash
+cd examples/tv-casting-app/android/App
+./gradlew app:testDebugUnitTest --tests "com.matter.casting.core.CastingPlayerSendUDCTest"
+```
+
+### Viewing Test Results
+
+After running tests, you can view detailed HTML reports:
+
+```bash
+open app/build/reports/tests/testDebugUnitTest/index.html
+```
+
+Or navigate to `app/build/reports/tests/testDebugUnitTest/` in your file
+browser.
+
+### Test Coverage
+
+The SendUDC test suite (`CastingPlayerSendUDCTest.java`) includes 10 test cases
+covering:
+
+1. Basic sendUDC invocation with minimal options
+2. NoPasscode flag handling for app detection
+3. CancelPasscode flag for ending UDC sessions
+4. InstanceName management for unique session identifiers
+5. TargetAppInfo handling with vendor/product IDs
+6. CommissionerDeclarationCallback registration
+7. Complete app detection workflow simulation
+8. Multiple target apps support
+9. Error handling and response validation
+10. Callback validation requirements
+
+### Troubleshooting Tests
+
+**Issue**: Tests don't run or show as "up-to-date"
+
+-   **Solution**: Clean and rebuild: `./gradlew clean test`
+
+**Issue**: Native method errors (UnsatisfiedLinkError)
+
+-   **Solution**: Ensure all native objects are properly mocked in tests
+
+**Issue**: Gradle version compatibility errors
+
+-   **Solution**: Verify you're using JDK 11 (not JDK 17) as per the build
+    requirements above
+
+For more details on the test implementation, see the
+[test documentation](tv-casting-common/core/tests/README.md).

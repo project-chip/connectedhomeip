@@ -18,15 +18,23 @@
  */
 
 #include "LockManager.h"
-
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
+using chip::app::DataModel::MakeNullable;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace EFR32DoorLock::LockInitParams;
+using namespace SilabsDoorLock;
+using namespace SilabsDoorLock::LockInitParams;
+
+static constexpr uint16_t LockUserInfoSize        = sizeof(LockUserInfo);
+static constexpr uint16_t LockCredentialInfoSize  = sizeof(LockCredentialInfo);
+static constexpr uint16_t CredentialStructSize    = sizeof(CredentialStruct);
+static constexpr uint16_t WeekDayScheduleInfoSize = sizeof(WeekDayScheduleInfo);
+static constexpr uint16_t YearDayScheduleInfoSize = sizeof(YearDayScheduleInfo);
+static constexpr uint16_t HolidayScheduleInfoSize = sizeof(HolidayScheduleInfo);
 
 namespace {
 LockManager sLock;
@@ -37,8 +45,11 @@ LockManager & LockMgr()
     return sLock;
 }
 
-CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam)
+CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam,
+                             PersistentStorageDelegate * storage)
 {
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mStorage = storage;
 
     LockParams = lockParam;
 
@@ -81,6 +92,9 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
+    // Migrate legacy configuration, if needed
+    MigrateConfig(lockParam);
+
     // Create cmsis os sw timer for lock timer.
     mLockTimer = osTimerNew(TimerEventHandler, // timer callback handler
                             osTimerOnce,       // no timer reload (one-shot timer)
@@ -113,7 +127,9 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, CredentialTyp
     {
         return (0 == credentialIndex); // 0 is required index for Programming PIN
     }
-    return (credentialIndex < kMaxCredentialsPerUser);
+
+    // Other credential types are valid at all uint16_t indices, credential limit is based on available storage
+    return (credentialIndex < UINT16_MAX);
 }
 
 bool LockManager::IsValidCredentialType(CredentialTypeEnum type)
@@ -134,41 +150,6 @@ bool LockManager::IsValidYeardayScheduleIndex(uint8_t scheduleIndex)
 bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 {
     return (scheduleIndex < kMaxHolidaySchedules);
-}
-
-bool LockManager::ReadConfigValues()
-{
-    size_t outLen;
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
-
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
-
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
-                                     sizeof(mUserNames), outLen);
-
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                     sizeof(mCredentialData), outLen);
-
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-                                     sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
-                                     outLen);
-
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
-                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                         LockParams.numberOfUsers,
-                                     outLen);
-
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
-                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                         LockParams.numberOfUsers,
-                                     outLen);
-
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
-                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
-
-    return true;
 }
 
 void LockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
@@ -353,42 +334,110 @@ bool LockManager::Unbolt(chip::EndpointId endpointId, const Nullable<chip::Fabri
 
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
+    CHIP_ERROR error;
+
     VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed
 
     userIndex--;
 
     VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
 
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
+
     ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
 
-    const auto & userInDb = mLockUsers[userIndex];
+    // Get User struct from nvm3
+    chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
 
-    user.userStatus = userInDb.userStatus;
-    if (UserStatusEnum::kAvailable == user.userStatus)
+    uint16_t size = LockUserInfoSize;
+
+    LockUserInfo userInStorage;
+
+    error = mStorage->SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == LockUserInfoSize, false);
+
+    // If no data is found at user key
+    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
+        user.userStatus = UserStatusEnum::kAvailable;
+
+        ChipLogDetail(Zcl, "No user data found");
         return true;
     }
+    // Else if KVS read was successful
+    else if (error == CHIP_NO_ERROR)
+    {
+        user.userStatus = userInStorage.userStatus;
 
-    user.userName       = chip::CharSpan(userInDb.userName.data(), userInDb.userName.size());
-    user.credentials    = chip::Span<const CredentialStruct>(mCredentials[userIndex], userInDb.credentials.size());
-    user.userUniqueId   = userInDb.userUniqueId;
-    user.userType       = userInDb.userType;
-    user.credentialRule = userInDb.credentialRule;
+        if (userInStorage.userStatus == UserStatusEnum::kAvailable)
+        {
+            ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
+            return true;
+        }
+    }
+    else
+    {
+        ChipLogError(Zcl, "Error reading from KVS key");
+        return false;
+    }
+
+    VerifyOrReturnValue(userInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
+
+    VerifyOrReturnValue(userInStorage.userNameSize <= user.userName.size(), false);
+
+    // Copy username data from storage to the output parameter
+    memmove(user.userName.data(), userInStorage.userName, userInStorage.userNameSize);
+
+    // Resize Span to match the actual username size retrieved from storage
+    user.userName.reduce_size(userInStorage.userNameSize);
+
+    user.userUniqueId   = userInStorage.userUniqueId;
+    user.userType       = userInStorage.userType;
+    user.credentialRule = userInStorage.credentialRule;
     // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     user.creationSource     = DlAssetSource::kMatterIM;
-    user.createdBy          = userInDb.createdBy;
+    user.createdBy          = userInStorage.createdBy;
     user.modificationSource = DlAssetSource::kMatterIM;
-    user.lastModifiedBy     = userInDb.lastModifiedBy;
+    user.lastModifiedBy     = userInStorage.lastModifiedBy;
+
+    // Get credential struct from nvm3
+    chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
+
+    uint16_t credentialSize = static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount);
+
+    CredentialStruct credentials[kMaxCredentialsPerUser];
+
+    error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), credentials, credentialSize);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount),
+                        false);
+
+    // If KVS read was successful
+    if (error == CHIP_NO_ERROR)
+    {
+
+        // Copy credentials attached to user from storage to the output parameter
+        memmove(user.credentials.data(), credentials, credentialSize);
+
+        // Resize Span to match the actual size of credentials attached to user
+        user.credentials.reduce_size(userInStorage.currentCredentialCount);
+    }
+    else if (error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogError(Zcl, "Error reading KVS key");
+        return false;
+    }
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
-                  user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
-                  user.lastModifiedBy);
+                  endpointId, NullTerminated(user.userName).c_str(), user.credentials.size(), user.userUniqueId,
+                  to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
     return true;
 }
@@ -397,20 +446,14 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                           const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                           CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
-    ChipLogProgress(Zcl,
-                    "Door Lock App: LockManager::SetUser "
-                    "[endpoint=%d,userIndex=%d,creator=%d,modifier=%d,userName=%s,uniqueId=%ld "
-                    "userStatus=%u,userType=%u,credentialRule=%u,credentials=%p,totalCredentials=%u]",
-                    endpointId, userIndex, creator, modifier, userName.data(), uniqueId, to_underlying(userStatus),
-                    to_underlying(usertype), to_underlying(credentialRule), credentials, totalCredentials);
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
     VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed
 
     userIndex--;
 
     VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
-
-    auto & userInStorage = mLockUsers[userIndex];
 
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
@@ -425,31 +468,29 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         return false;
     }
 
-    chip::Platform::CopyString(mUserNames[userIndex], userName);
-    userInStorage.userName       = chip::CharSpan(mUserNames[userIndex], userName.size());
-    userInStorage.userUniqueId   = uniqueId;
-    userInStorage.userStatus     = userStatus;
-    userInStorage.userType       = usertype;
-    userInStorage.credentialRule = credentialRule;
-    userInStorage.lastModifiedBy = modifier;
-    userInStorage.createdBy      = creator;
+    LockUserInfo userInStorage;
 
-    for (size_t i = 0; i < totalCredentials; ++i)
-    {
-        mCredentials[userIndex][i] = credentials[i];
-    }
+    memmove(userInStorage.userName, userName.data(), userName.size());
+    userInStorage.userNameSize           = userName.size();
+    userInStorage.userUniqueId           = uniqueId;
+    userInStorage.userStatus             = userStatus;
+    userInStorage.userType               = usertype;
+    userInStorage.credentialRule         = credentialRule;
+    userInStorage.lastModifiedBy         = modifier;
+    userInStorage.createdBy              = creator;
+    userInStorage.currentCredentialCount = totalCredentials;
 
-    userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
+    // Save credential struct in nvm3
+    chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-    // Save user information in NVM flash
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-                                      sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(credentialKey.KeyName(), credentials, CredentialStructSize * totalCredentials) ==
+                            CHIP_NO_ERROR,
+                        false);
 
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-                                      sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+    // Save user in nvm3
+    chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
 
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
-                                      sizeof(mUserNames));
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(userKey.KeyName(), &userInStorage, LockUserInfoSize) == CHIP_NO_ERROR, false);
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -459,34 +500,62 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
+    CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
     VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
-    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
-                            false); // programming pin index is only index allowed to contain 0
-    }
-    else
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // otherwise, indices are one-indexed
-    }
+    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
 
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), credentialIndex);
 
-    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
+    chip::StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
 
-    credential.status = credentialInStorage.status;
-    ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
+    LockCredentialInfo credentialInStorage;
 
-    if (DlCredentialStatus::kAvailable == credential.status)
+    uint16_t size = LockCredentialInfoSize;
+
+    error = mStorage->SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == LockCredentialInfoSize, false);
+
+    // If no data is found at credential key
+    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        ChipLogDetail(Zcl, "Found unoccupied credential ");
+        // No credentials found
+        credential.status = DlCredentialStatus::kAvailable;
+
         return true;
     }
+    // Else if KVS read was successful
+    else if (error == CHIP_NO_ERROR)
+    {
+        credential.status = credentialInStorage.status;
+        ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
+        if (DlCredentialStatus::kAvailable == credential.status)
+        {
+            ChipLogDetail(Zcl, "Found unoccupied credential ");
+            return true;
+        }
+    }
+    else
+    {
+        ChipLogError(Zcl, "Error reading KVS key");
+        return false;
+    }
+
+    VerifyOrReturnValue(credentialInStorage.credentialDataSize <= credential.credentialData.size(), false);
+
+    // Copy credential data from storage to the output parameter
+    memmove(credential.credentialData.data(), credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
+
+    // Resize Span to match the actual size of the credential data retrieved from storage
+    credential.credentialData.reduce_size(credentialInStorage.credentialDataSize);
+
     credential.credentialType = credentialInStorage.credentialType;
-    credential.credentialData = credentialInStorage.credentialData;
     credential.createdBy      = credentialInStorage.createdBy;
     credential.lastModifiedBy = credentialInStorage.lastModifiedBy;
     // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
@@ -494,8 +563,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     credential.creationSource     = DlAssetSource::kMatterIM;
     credential.modificationSource = DlAssetSource::kMatterIM;
 
-    ChipLogDetail(Zcl, "Found occupied credential [type=%u,dataSize=%u]", to_underlying(credential.credentialType),
-                  credential.credentialData.size());
+    ChipLogDetail(Zcl, "Found occupied credential");
 
     return true;
 }
@@ -504,41 +572,41 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 chip::FabricIndex modifier, DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                 const chip::ByteSpan & credentialData)
 {
+    CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
     VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
-    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
-                            false); // programming pin index is only index allowed to contain 0
-    }
-    else
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // otherwise, indices are one-indexed
-    }
+    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
+
+    VerifyOrReturnValue(credentialData.size() <= kMaxCredentialSize, false);
 
     ChipLogProgress(Zcl,
                     "Door Lock App: LockManager::SetCredential "
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
+    LockCredentialInfo credentialInStorage;
 
-    credentialInStorage.status         = credentialStatus;
-    credentialInStorage.credentialType = credentialType;
-    credentialInStorage.createdBy      = creator;
-    credentialInStorage.lastModifiedBy = modifier;
+    credentialInStorage.status             = credentialStatus;
+    credentialInStorage.credentialType     = credentialType;
+    credentialInStorage.createdBy          = creator;
+    credentialInStorage.lastModifiedBy     = modifier;
+    credentialInStorage.credentialDataSize = credentialData.size();
 
-    memcpy(mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.data(), credentialData.size());
-    credentialInStorage.credentialData =
-        chip::ByteSpan{ mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.size() };
+    // Copy credential data to the storage struct
+    memmove(credentialInStorage.credentialData, credentialData.data(), credentialInStorage.credentialDataSize);
 
-    // Save credential information in NVM flash
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
+    chip::StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
 
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-                                      sizeof(mCredentialData));
+    error = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, LockCredentialInfoSize);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Error reading from KVS key");
+        return false;
+    }
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -548,6 +616,11 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                          EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
+    CHIP_ERROR error;
+
+    WeekDayScheduleInfo weekDayScheduleInStorage;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
@@ -558,13 +631,37 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    const auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
-    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    // Get schedule data from nvm3
+    chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(endpointId, userIndex, weekdayIndex);
+
+    uint16_t size = WeekDayScheduleInfoSize; // Create a non-const variable
+
+    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == WeekDayScheduleInfoSize, DlStatus::kFailure);
+
+    // If no data is found at scheduleDataKey
+    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
+        ChipLogError(Zcl, "No schedule data found for user");
         return DlStatus::kNotFound;
     }
+    // Else if KVS read was successful
+    else if (error == CHIP_NO_ERROR)
+    {
+        if (weekDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
+        {
+            return DlStatus::kNotFound;
+        }
+    }
+    else
+    {
+        ChipLogError(Zcl, "Error reading from KVS key");
+        return DlStatus::kFailure;
+    }
 
-    schedule = scheduleInStorage.schedule;
+    schedule = weekDayScheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -574,6 +671,10 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
                                          uint8_t endHour, uint8_t endMinute)
 {
 
+    WeekDayScheduleInfo weekDayScheduleInStorage;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
+
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
@@ -583,19 +684,19 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     VerifyOrReturnValue(IsValidWeekdayScheduleIndex(weekdayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
+    weekDayScheduleInStorage.schedule.daysMask    = daysMask;
+    weekDayScheduleInStorage.schedule.startHour   = startHour;
+    weekDayScheduleInStorage.schedule.startMinute = startMinute;
+    weekDayScheduleInStorage.schedule.endHour     = endHour;
+    weekDayScheduleInStorage.schedule.endMinute   = endMinute;
+    weekDayScheduleInStorage.status               = status;
 
-    scheduleInStorage.schedule.daysMask    = daysMask;
-    scheduleInStorage.schedule.startHour   = startHour;
-    scheduleInStorage.schedule.startMinute = startMinute;
-    scheduleInStorage.schedule.endHour     = endHour;
-    scheduleInStorage.schedule.endMinute   = endMinute;
-    scheduleInStorage.status               = status;
+    // Save schedule data in nvm3
+    chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(endpointId, userIndex, weekdayIndex);
 
-    // Save schedule information in NVM flash
-    SilabsConfig::WriteConfigValueBin(
-        SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
-        sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, WeekDayScheduleInfoSize) ==
+                            CHIP_NO_ERROR,
+                        DlStatus::kFailure);
 
     return DlStatus::kSuccess;
 }
@@ -603,6 +704,12 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                          EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
+    CHIP_ERROR error;
+
+    YearDayScheduleInfo yearDayScheduleInStorage;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
+
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
@@ -612,13 +719,38 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    const auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
-    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    // Get schedule data from nvm3
+    chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
+
+    uint16_t size = YearDayScheduleInfoSize;
+
+    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == YearDayScheduleInfoSize, DlStatus::kFailure);
+
+    // If no data is found at scheduleDataKey
+    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
+        ChipLogError(Zcl, "No schedule data found for user");
         return DlStatus::kNotFound;
     }
+    // Else if KVS read was successful
+    else if (error == CHIP_NO_ERROR)
+    {
 
-    schedule = scheduleInStorage.schedule;
+        if (yearDayScheduleInStorage.status == DlScheduleStatus::kAvailable)
+        {
+            return DlStatus::kNotFound;
+        }
+    }
+    else
+    {
+        ChipLogError(Zcl, "Error reading from KVS key");
+        return DlStatus::kFailure;
+    }
+
+    schedule = yearDayScheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -626,6 +758,11 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
 {
+
+    YearDayScheduleInfo yearDayScheduleInStorage;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
+
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
@@ -635,16 +772,16 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     VerifyOrReturnValue(IsValidYeardayScheduleIndex(yearDayIndex), DlStatus::kFailure);
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
-    auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+    yearDayScheduleInStorage.schedule.localStartTime = localStartTime;
+    yearDayScheduleInStorage.schedule.localEndTime   = localEndTime;
+    yearDayScheduleInStorage.status                  = status;
 
-    scheduleInStorage.schedule.localStartTime = localStartTime;
-    scheduleInStorage.schedule.localEndTime   = localEndTime;
-    scheduleInStorage.status                  = status;
+    // Save schedule data in nvm3
+    chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
 
-    // Save schedule information in NVM flash
-    SilabsConfig::WriteConfigValueBin(
-        SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
-        sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, YearDayScheduleInfoSize) ==
+                            CHIP_NO_ERROR,
+                        DlStatus::kFailure);
 
     return DlStatus::kSuccess;
 }
@@ -652,19 +789,50 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
                                          EmberAfPluginDoorLockHolidaySchedule & schedule)
 {
+    CHIP_ERROR error;
+
+    HolidayScheduleInfo holidayScheduleInStorage;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
+
     VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
     holidayIndex--;
 
     VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
 
-    const auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
-    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    // Get schedule data from nvm3
+    chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(endpointId, holidayIndex);
+
+    uint16_t size = HolidayScheduleInfoSize;
+
+    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == HolidayScheduleInfoSize, DlStatus::kFailure);
+
+    // If no data is found at scheduleDataKey
+    if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
+        ChipLogError(Zcl, "No schedule data found for user");
         return DlStatus::kNotFound;
     }
+    // Else if KVS read was successful
+    else if (error == CHIP_NO_ERROR)
+    {
 
-    schedule = scheduleInStorage.schedule;
+        if (holidayScheduleInStorage.status == DlScheduleStatus::kAvailable)
+        {
+            return DlStatus::kNotFound;
+        }
+    }
+    else
+    {
+        ChipLogError(Zcl, "Error reading from KVS key");
+        return DlStatus::kFailure;
+    }
+
+    schedule = holidayScheduleInStorage.schedule;
 
     return DlStatus::kSuccess;
 }
@@ -672,23 +840,28 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
                                          uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
+
+    HolidayScheduleInfo holidayScheduleInStorage;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
+
     VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
     holidayIndex--;
 
     VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
 
-    auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
+    holidayScheduleInStorage.schedule.localStartTime = localStartTime;
+    holidayScheduleInStorage.schedule.localEndTime   = localEndTime;
+    holidayScheduleInStorage.schedule.operatingMode  = operatingMode;
+    holidayScheduleInStorage.status                  = status;
 
-    scheduleInStorage.schedule.localStartTime = localStartTime;
-    scheduleInStorage.schedule.localEndTime   = localEndTime;
-    scheduleInStorage.schedule.operatingMode  = operatingMode;
-    scheduleInStorage.status                  = status;
+    // Save schedule data in nvm3
+    chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(endpointId, holidayIndex);
 
-    // Save schedule information in NVM flash
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules,
-                                      reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
-                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, HolidayScheduleInfoSize) ==
+                            CHIP_NO_ERROR,
+                        DlStatus::kFailure);
 
     return DlStatus::kSuccess;
 }
@@ -717,6 +890,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                                OperationErrorEnum & err)
 {
 
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
+
     // Assume pin is required until told otherwise
     bool requirePin = true;
     chip::app::Clusters::DoorLock::Attributes::RequirePINforRemoteOperation::Get(endpointId, &requirePin);
@@ -743,25 +918,57 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
         return false;
     }
 
-    // Check the PIN code
-    for (const auto & currentCredential : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
+    // Check all pin codes associated to all users to see if this pin code exists
+    for (uint32_t userIndex = 1; userIndex <= kMaxUsers; userIndex++)
     {
+        EmberAfPluginDoorLockUserInfo user;
 
-        if (currentCredential.status == DlCredentialStatus::kAvailable)
+        if (!GetUser(endpointId, userIndex, user))
         {
-            continue;
+            ChipLogError(Zcl, "Unable to get the user - internal error [endpointId=%d,userIndex=%lu]", endpointId, userIndex);
+            return false;
         }
 
-        if (currentCredential.credentialData.data_equal(pin.Value()))
+        if (user.userStatus == UserStatusEnum::kOccupiedEnabled)
         {
-            ChipLogDetail(Zcl,
-                          "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
-                          lockStateToString(lockState), endpointId);
+            // Loop through each credential attached to the user
+            for (auto & userCredential : user.credentials)
+            {
+                // If the current credential is a pin type, then check it against pin input. Otherwise ignore
+                if (userCredential.credentialType == CredentialTypeEnum::kPin)
+                {
+                    EmberAfPluginDoorLockCredentialInfo credential;
 
-            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, NullNullable, NullNullable,
-                                                    fabricIdx, nodeId);
+                    if (!GetCredential(endpointId, userCredential.credentialIndex, userCredential.credentialType, credential))
+                    {
+                        ChipLogError(Zcl,
+                                     "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
+                                     endpointId, to_underlying(userCredential.credentialType), userCredential.credentialIndex);
+                        return false;
+                    }
 
-            return true;
+                    if (credential.status == DlCredentialStatus::kOccupied)
+                    {
+
+                        // See if credential retrieved from storage matches the provided PIN
+                        if (credential.credentialData.data_equal(pin.Value()))
+                        {
+                            ChipLogDetail(Zcl,
+                                          "Lock App: specified PIN code was found in the database, setting lock state to "
+                                          "\"%s\" [endpointId=%d]",
+                                          lockStateToString(lockState), endpointId);
+
+                            LockOpCredentials userCred[] = { { CredentialTypeEnum::kPin, userCredential.credentialIndex } };
+                            auto userCredentials         = MakeNullable<List<const LockOpCredentials>>(userCred);
+
+                            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, userIndex,
+                                                                    userCredentials, fabricIdx, nodeId);
+
+                            return true;
+                        }
+                    }
+                }
+            }
         }
     }
 

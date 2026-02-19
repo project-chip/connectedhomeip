@@ -25,12 +25,10 @@
 
 #pragma once
 
-// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
-#include <lib/core/CHIPCore.h>
-
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
+#include <app/CASESessionManager.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
@@ -38,6 +36,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
+#include <app/DeviceLoadStatusProvider.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
@@ -45,10 +44,12 @@
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
+#include <app/SubscriptionStats.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
@@ -68,8 +69,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <app/CASESessionManager.h>
+#include <transport/MessageStats.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -94,7 +94,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
                                public TimedHandlerDelegate,
-                               public WriteHandlerDelegate
+                               public WriteHandlerDelegate,
+                               public DeviceLoadStatusProvider
 {
 public:
     /**
@@ -171,7 +172,13 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
+
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+    /**
+     * Tears down all subscription handlers.
+     */
+    void ShutdownAllSubscriptionHandlers();
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -236,12 +243,12 @@ public:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
-     *  Activate the idle subscriptions.
      *
-     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
-     * resubscription can be triggered via OnActiveModeNotification().
+     *  Notification that aPeer has sent a check-in message because aMonitoredSubject does
+     *  not have a subscription to it.
+     *
      */
-    void OnActiveModeNotification(ScopedNodeId aPeer);
+    void OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject);
 
     /**
      *  Used to notify when a peer becomes LIT ICD or vice versa.
@@ -323,9 +330,17 @@ public:
     /**
      * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
      *        This should be called after we have completed a re-subscribe attempt on a persisted subscription wether the attempt
-     *        was succesful or not.
+     *        was successful or not.
      */
     void DecrementNumSubscriptionsToResume();
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    /**
+     * @brief Function resets the number of retries of subscriptions resumption - mNumSubscriptionResumptionRetries.
+     *        This should be called after we have completed a re-subscribe attempt successfully on a persisted subscription,
+     *        or when the subscription resumption gets terminated.
+     */
+    void ResetNumSubscriptionsRetries();
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -416,6 +431,11 @@ public:
     //
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
+
+    // DeviceLoadStatusProvider functions implementation
+    MessageStats GetMessageStats() override;
+
+    SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override;
 
 private:
     /* DataModel::ActionContext implementation */
@@ -614,14 +634,17 @@ private:
     void ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex = NullOptional,
                                        const Optional<NodeId> & aPeerNodeId       = NullOptional);
 
-    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath);
-    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest);
-    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest);
+    /**
+     * Validates that the command exists and on success returns the data for the command in `entry`.
+     */
+    Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const Access::Privilege aRequiredPrivilege);
+    Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
 
     /**
-     * Check if the given attribute path is a valid path in the data model provider.
+     * Find the AttributeEntry that corresponds to the given attribute, if there is one.
      */
-    bool IsExistentAttributePath(const ConcreteAttributePath & path);
+    std::optional<DataModel::AttributeEntry> FindAttributeEntry(const ConcreteAttributePath & path);
 
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
@@ -710,7 +733,7 @@ private:
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    FabricTable * mpFabricTable;
+    FabricTable * mpFabricTable = nullptr;
 
     CASESessionManager * mpCASESessionMgr = nullptr;
 

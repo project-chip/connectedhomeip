@@ -21,7 +21,7 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 #include "BluezObjectIterator.h"
 
@@ -36,7 +36,7 @@ class BluezObjectList
 {
 public:
     BluezObjectList() = default;
-    explicit BluezObjectList(GDBusObjectManager * manager) { Init(manager); }
+    explicit BluezObjectList(GDBusObjectManager * manager) { TEMPORARY_RETURN_IGNORED Init(manager); }
 
     // This class is not trivially copyable
     BluezObjectList(const BluezObjectList &)             = delete;

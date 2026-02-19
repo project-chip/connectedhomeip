@@ -36,12 +36,19 @@ CHIP_ERROR DishwasherModeDelegate::Init()
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
 void DishwasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
+    if (gDishwasherModeInstance->GetFailTransition())
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Mode change not allowed due to device state"));
+        return;
+    }
+
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR DishwasherModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -50,7 +57,7 @@ CHIP_ERROR DishwasherModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::
 
 CHIP_ERROR DishwasherModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -60,7 +67,7 @@ CHIP_ERROR DishwasherModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_
 
 CHIP_ERROR DishwasherModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -100,7 +107,16 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDishwasherModeDelegate == nullptr && gDishwasherModeInstance == nullptr);
     gDishwasherModeDelegate = new DishwasherMode::DishwasherModeDelegate;
-    gDishwasherModeInstance =
-        new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, chip::to_underlying(Feature::kOnOff));
-    gDishwasherModeInstance->Init();
+    gDishwasherModeInstance = new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, 0);
+    TEMPORARY_RETURN_IGNORED gDishwasherModeInstance->Init();
+}
+
+void emberAfDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    if (gDishwasherModeInstance)
+    {
+        gDishwasherModeInstance->Shutdown();
+    }
+    DishwasherMode::Shutdown();
 }

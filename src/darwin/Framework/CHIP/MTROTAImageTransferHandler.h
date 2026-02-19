@@ -74,6 +74,12 @@ private:
     MTROTAImageTransferHandlerWrapper * mOTAImageTransferHandlerWrapper;
 
     bool mNeedToCallTransferSessionEnd = false;
+
+    bool mIsPeerNodeAKnownThreadDevice = NO;
+
+    chip::System::Clock::Milliseconds32 mBDXThrottleIntervalForThreadDevices;
+
+    size_t mNumBytesProcessed = 0;
 };
 
 NS_ASSUME_NONNULL_END

@@ -23,8 +23,8 @@
 #include <app/util/config.h>
 #include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
-#include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/odd-sized-integers.h>
 
 #include <app/reporting/reporting.h>
 #include <protocols/interaction_model/Constants.h>
@@ -356,7 +356,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
             return Status::InvalidDataType;
         }
 
-        if (metadata->IsReadOnly())
+        if (!metadata->IsWritable())
         {
             ChipLogProgress(Zcl, "WRITE ERR: attr not writable");
             return Status::UnsupportedWrite;
@@ -365,7 +365,7 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
 
     // if the value the attribute is being set to is out of range
     // return Status::ConstraintError
-    if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
+    if ((metadata->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
         EmberAfDefaultAttributeValue maxv = metadata->defaultValue.ptrToMinMaxValue->maxValue;

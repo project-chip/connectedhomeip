@@ -31,13 +31,26 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h> //nogncheck
 #endif
+
+#include "sl_component_catalog.h"
+#ifdef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+#include "ZigbeeCallbacks.h"
+#endif // SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+
+#if !SLI_SI91X_MCU_INTERFACE
+extern "C" {
+#include "btl_interface.h"
+#include "btl_reset_info.h"
+}
+#endif // !SLI_SI91X_MCU_INTERFACE
 
 namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip ::DeviceLayer ::Silabs;
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
@@ -50,10 +63,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<SilabsConfig>::Init();
+    err = GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
-    IncreaseBootCount();
+    TEMPORARY_RETURN_IGNORED IncreaseBootCount();
     err = CHIP_NO_ERROR;
 
 exit:
@@ -68,7 +81,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -82,7 +95,7 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 
     if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_BootCount))
     {
-        GetRebootCount(bootCount);
+        TEMPORARY_RETURN_IGNORED GetRebootCount(bootCount);
     }
 
     return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_BootCount, bootCount + 1);
@@ -91,8 +104,16 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
-    BootReasonType matterBootCause;
     uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
+
+    // Before looking into the bootloader reboot cause, check if we performed a matter update
+    if (rebootCause == to_underlying(BootReasonType::kSoftwareUpdateCompleted))
+    {
+        bootReason = to_underlying(BootReasonType::kSoftwareUpdateCompleted);
+        return CHIP_NO_ERROR;
+    }
+
+    BootReasonType matterBootCause;
 
 #if defined(_RMU_RSTCAUSE_MASK)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
@@ -266,7 +287,7 @@ void ConfigurationManagerImpl::ClearThreadStack()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().ClearAllSrpHostAndServices();
+    TEMPORARY_RETURN_IGNORED ThreadStackMgr().ClearAllSrpHostAndServices();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ChipLogProgress(DeviceLayer, "Clearing Thread provision");
     ThreadStackMgr().ErasePersistentInfo();
@@ -275,28 +296,33 @@ void ConfigurationManagerImpl::ClearThreadStack()
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = SilabsConfig::FactoryResetConfig();
-    if (err != CHIP_NO_ERROR)
+    GetPlatform().WatchdogDisable();
+    error = SilabsConfig::FactoryResetConfig();
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     GetDefaultInstance().ClearThreadStack();
+#ifdef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+    Zigbee::TokenFactoryReset();
+#endif
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    sl_status_t status = sl_matter_wifi_disconnect();
-    if (status != SL_STATUS_OK)
+    error = WifiInterface::GetInstance().TriggerDisconnection();
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_disconnect() failed: %lx", status);
+        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
+
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
-    wfx_clear_wifi_provision();
+    WifiInterface::GetInstance().ClearWifiCredentials();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
     // Restart the system.
@@ -307,7 +333,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Block the task for 500 ms before the reset occurs to allow RPC response to be sent
     osDelay(pdMS_TO_TICKS(500));
 
-    NVIC_SystemReset();
+    Silabs::GetPlatform().SoftwareReset();
 }
 
 #ifdef SL_WIFI
@@ -316,7 +342,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     MutableByteSpan byteSpan(buf, kPrimaryMACAddressLength);
-    return GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
+    return WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 }
 #endif
 

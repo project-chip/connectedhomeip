@@ -37,6 +37,10 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
+  override fun onCommissioningStageStart(nodeId: Long, stage: String) {
+    // No op
+  }
+
   override fun onNotifyChipConnectionClosed() {
     // No op
   }

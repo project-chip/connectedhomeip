@@ -29,33 +29,19 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
-    /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
-    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
-    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x0000003E, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
+    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -72,33 +58,19 @@
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
-    /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
-    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
-    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     0x00000005, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     0x00000006, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000007, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x00000000, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
+    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -115,33 +87,19 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
-    /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
-    /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
-    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
-    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -176,6 +134,7 @@
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000041, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000005C, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000099, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -199,17 +158,6 @@
     0x00000201, /* Cluster: Thermostat, Attribute: Schedules, Privilege: manage */ \
     0x00000204, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
     0x00000204, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
-    0x00000300, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
     0x00000300, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     0x00000301, /* Cluster: Ballast Configuration, Attribute: MinLevel, Privilege: manage */ \
     0x00000301, /* Cluster: Ballast Configuration, Attribute: MaxLevel, Privilege: manage */ \
@@ -241,6 +189,7 @@
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000000, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000000B, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000009, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -264,17 +213,6 @@
     0x00000051, /* Cluster: Thermostat, Attribute: Schedules, Privilege: manage */ \
     0x00000001, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
     0x00000002, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
-    0x00000030, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
-    0x00000031, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
-    0x00000032, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
-    0x00000033, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
-    0x00000034, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
-    0x00000036, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
-    0x00000037, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
-    0x00000038, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
-    0x0000003A, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
-    0x0000003B, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
-    0x0000003C, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
     0x00004010, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     0x00000010, /* Cluster: Ballast Configuration, Attribute: MinLevel, Privilege: manage */ \
     0x00000011, /* Cluster: Ballast Configuration, Attribute: MaxLevel, Privilege: manage */ \
@@ -306,6 +244,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -329,17 +268,6 @@
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Attribute: Schedules, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: WhitePointX, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: WhitePointY, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointRY, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointRIntensity, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointGX, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointGY, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointGIntensity, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Ballast Configuration, Attribute: MinLevel, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Ballast Configuration, Attribute: MaxLevel, Privilege: manage */ \
@@ -363,6 +291,7 @@
     0x00000004, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
     0x00000004, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     0x00000004, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    0x0000002A, /* Cluster: OTA Software Update Requestor, Command: AnnounceOTAProvider, Privilege: administer */ \
     0x00000030, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     0x00000030, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     0x00000030, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -403,6 +332,13 @@
     0x00000062, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
     0x00000201, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
+    0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
+    0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
+    0x00000801, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
+    0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
+    0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
+    0x00000802, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
+    0x00000802, /* Cluster: TLS Client Management, Command: RemoveEndpoint, Privilege: administer */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -415,6 +351,7 @@
     0x00000003, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
     0x00000004, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     0x00000005, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    0x00000000, /* Cluster: OTA Software Update Requestor, Command: AnnounceOTAProvider, Privilege: administer */ \
     0x00000000, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     0x00000002, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     0x00000004, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -455,6 +392,13 @@
     0x00000004, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     0x00000040, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
     0x000000FE, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
+    0x00000000, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
+    0x00000006, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
+    0x00000007, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
+    0x00000009, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
+    0x0000000E, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
+    0x00000000, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
+    0x00000004, /* Cluster: TLS Client Management, Command: RemoveEndpoint, Privilege: administer */ \
     0x00000000, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0x00000001, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -467,6 +411,7 @@
     chip::Access::Privilege::kManage, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: OTA Software Update Requestor, Command: AnnounceOTAProvider, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -507,6 +452,13 @@
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Client Management, Command: RemoveEndpoint, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -518,6 +470,7 @@
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
@@ -525,6 +478,7 @@
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    0x00000003, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
@@ -532,6 +486,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

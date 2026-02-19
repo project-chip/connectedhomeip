@@ -16,16 +16,33 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include "sl_component_catalog.h"
+// Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
 #include "sl_system_init.h"
-#include "sl_system_kernel.h"
+#else
+#include "sl_main_init.h"
+#endif
 #include <MatterConfig.h>
 
-int main(void)
-{
-    sl_system_init();
+// This is a User definable function in sl_main context, called by sl_main_init before the kernel is started
+void app_init_early(void) {}
 
-    // Initialize the application. For example, create periodic timer(s) or
-    // task(s) if the kernel is present.
+// This is a User definable function, in sl_main context, called by start_task_handler once the silabs platform is fully
+// initialized.
+void app_init(void)
+{
+    // Initialize the matter application. For example, create periodic timer(s) or
+    // task(s).
     SilabsMatterConfig::AppInit();
 }
+
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+int main(void)
+{
+    app_init_early();
+    sl_system_init();
+    app_init();
+}
+#endif

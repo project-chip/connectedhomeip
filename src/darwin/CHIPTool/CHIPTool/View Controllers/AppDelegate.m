@@ -33,19 +33,4 @@
     [self.window makeKeyAndVisible];
     return YES;
 }
-
-- (BOOL)application:(UIApplication *)application
-            openURL:(NSURL *)url
-            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
-{
-    // custom commissioning flow
-    UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"Info"
-                                                                    message:@"Commissioning flow Completed."
-                                                             preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction * ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:nil];
-    [alert addAction:ok];
-    [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-    NSLog(@"Do custom commissioning inbound logic here.");
-    return YES;
-}
 @end

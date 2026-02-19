@@ -1,0 +1,32 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/recommended.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
+
+declare_args() {
+  # Build controller (set to false for a device)
+  chip_support_commissioning_in_controller = true
+
+  # Build controller with webrtc python bindings
+  chip_support_webrtc_python_bindings = false
+
+  # Disable Thread MeshCoP if cross-compiling by default.
+  chip_support_thread_meshcop =
+      matter_enable_recommended && chip_device_platform == "linux" &&
+      !chip_system_config_use_openthread_inet_endpoints &&
+      current_cpu == host_cpu && current_os == host_os
+}

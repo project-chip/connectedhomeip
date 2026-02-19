@@ -44,17 +44,13 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionState ** peerConnState);
+                          Transport::ActiveTCPConnectionHandle & peerConnState);
 
-    void TCPDisconnect(const Transport::PeerAddress & address);
+    void HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn) override;
 
-    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0);
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 
-    void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn) override;
-
-    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
-
-    void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
+    void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     void SetSessionManager(TransportMgrDelegate * sessionManager) { mSessionManager = sessionManager; }

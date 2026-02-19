@@ -27,7 +27,8 @@ namespace Crypto {
 
 PSAOperationalKeystore::PersistentP256Keypair::PersistentP256Keypair(FabricIndex fabricIndex)
 {
-    ToPsaContext(mKeypair).key_id = MakeOperationalKeyId(fabricIndex);
+    VerifyOrReturn(IsValidFabricIndex(fabricIndex));
+    ToPsaContext(mKeypair).key_id = GetPSAKeyAllocator().GetOpKeyId(fabricIndex);
     mInitialized                  = true;
 }
 
@@ -61,7 +62,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     psa_key_id_t keyId              = 0;
     size_t publicKeyLength;
 
-    Destroy();
+    TEMPORARY_RETURN_IGNORED Destroy();
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
@@ -70,6 +71,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
     psa_set_key_id(&attributes, GetKeyId());
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
 
     status = psa_generate_key(&attributes, &keyId);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
@@ -144,7 +146,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     psa_key_id_t keyId              = 0;
     VerifyOrReturnError(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    Destroy();
+    TEMPORARY_RETURN_IGNORED Destroy();
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
@@ -153,6 +155,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
     psa_set_key_id(&attributes, GetKeyId());
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
 
     status = psa_import_key(&attributes, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length, &keyId);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
@@ -211,9 +214,7 @@ CHIP_ERROR PSAOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIn
         return CHIP_ERROR_INTERNAL;
     }
 
-    outKeypair.SetLength(outSize);
-
-    return CHIP_NO_ERROR;
+    return outKeypair.SetLength(outSize);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
@@ -235,7 +236,7 @@ CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIn
 void PSAOperationalKeystore::RevertPendingKeypair()
 {
     VerifyOrReturn(HasPendingOpKeypair());
-    mPendingKeypair->Destroy();
+    TEMPORARY_RETURN_IGNORED mPendingKeypair->Destroy();
     ReleasePendingKeypair();
 }
 

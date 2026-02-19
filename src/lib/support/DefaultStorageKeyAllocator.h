@@ -99,11 +99,16 @@ public:
     static StorageKeyName FabricNOC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/n", fabric); }
     static StorageKeyName FabricICAC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/i", fabric); }
     static StorageKeyName FabricRCAC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/r", fabric); }
+    static StorageKeyName FabricVVSC(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/vvsc", fabric); }
+    static StorageKeyName FabricVidVerificationStatement(FabricIndex fabric)
+    {
+        return StorageKeyName::Formatted("f/%x/vvs", fabric);
+    }
     static StorageKeyName FabricMetadata(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/m", fabric); }
     static StorageKeyName FabricOpKey(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/o", fabric); }
 
     // Fail-safe handling
-    static StorageKeyName FailSafeCommitMarkerKey() { return StorageKeyName::FromConst("g/fs/c"); }
+    static StorageKeyName FabricTableCommitMarkerKey() { return StorageKeyName::FromConst("g/fs/c"); }
     static StorageKeyName FailSafeNetworkConfig() { return StorageKeyName::FromConst("g/fs/n"); }
 
     // LastKnownGoodTime
@@ -260,6 +265,75 @@ public:
     // Terms and Conditions Acceptance Key
     // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
+
+    // TLS Clusters Certs Keys, used by CertificateTableImpl to persist certificates for TLS clusters
+
+    // Number of root certs stored in table for a given endpoint, across all fabrics.
+    static StorageKeyName TlsRootCertEndpointCountKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlsr/e/%x", endpoint);
+    }
+
+    // Stores information about root certs for the given fabric & endpoint
+    static StorageKeyName TlsRootCertFabricDataKey(FabricIndex fabric, EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsr", fabric, endpoint);
+    }
+
+    // Stores the root cert payload for the given fabric & endpoint
+    static StorageKeyName TlsRootCertEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsr/%x", fabric, endpoint, idx);
+    }
+
+    // Number of client certs stored in table for a given endpoint, across all fabrics.
+    static StorageKeyName TlsClientCertEndpointCountKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlsc/e/%x", endpoint);
+    }
+
+    // Stores information about client certs for the given fabric & endpoint
+    static StorageKeyName TlsClientCertFabricDataKey(FabricIndex fabric, EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsc", fabric, endpoint);
+    }
+
+    // Stores the client cert payload for the given fabric & endpoint
+    static StorageKeyName TlsClientCertEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlsc/%x", fabric, endpoint, idx);
+    }
+
+    // Stores global data about certificates for the given endpoint, across all fabrics, used by CertificateTableImpl
+    // Applications can also create their own implementation extending CertificateTable
+    static StorageKeyName TlsEndpointGlobalDataKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlsr/g/%x", endpoint);
+    }
+
+    // Number of tls endpoints stored in table for a given endpoint, across all fabrics.
+    static StorageKeyName TlsClientEndpointCountKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlse/e/%x", endpoint);
+    }
+
+    // Stores information about TLS endpoints for the given fabric & endpoint
+    static StorageKeyName TlsClientEndpointFabricDataKey(FabricIndex fabric, EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlse", fabric, endpoint);
+    }
+
+    // Stores the root cert payload for the given fabric & endpoint
+    static StorageKeyName TlsClientEndpointEntityKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/tlse/%x", fabric, endpoint, idx);
+    }
+
+    // Stores global data about TLS endpoints, across all fabrics, used by TLS Client Management cluster
+    static StorageKeyName TlsClientEndpointGlobalDataKey(EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/tlse/g/%x", endpoint);
+    }
 };
 
 } // namespace chip

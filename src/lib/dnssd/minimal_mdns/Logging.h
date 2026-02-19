@@ -18,6 +18,7 @@
 
 #include <inet/IPAddress.h>
 #include <lib/core/PeerId.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
 

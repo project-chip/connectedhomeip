@@ -175,7 +175,10 @@ shared_library("jni") {
 
     defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
 
-    deps += [ "${chip_root}/src/controller:nodatamodel" ]
+    deps += [
+      "${chip_root}/src/app/clusters/ota-provider",
+      "${chip_root}/src/controller:nodatamodel",
+    ]
 
     # Temporary dependency: InteractionModelEngine NEEDS a codegen data model instance
     # defined and application is supposed to provide it. This adds the sources
@@ -225,6 +228,10 @@ shared_library("jni") {
   } else {
     ldflags = [ "-Wl,--gc-sections" ]
   }
+
+  # Compatibility with 16K pages for Andropid 15+ support on 64-bit devices.
+  # See https://developer.android.com/guide/practices/page-sizes
+  ldflags += [ "-Wl,-z,max-page-size=16384" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
@@ -679,7 +686,7 @@ android_library("java") {
   ]
 
   # TODO: add classpath support (we likely need to add something like
-  #  ..../platforms/android-26/android.jar to access BLE items)
+  #  ..../platforms/android-34/android.jar to access BLE items)
 }
 
 if (chip_link_tests) {
@@ -711,7 +718,7 @@ if (chip_link_tests) {
     javac_flags = [ "-Xlint:deprecation" ]
 
     # TODO: add classpath support (we likely need to add something like
-    #  ..../platforms/android-26/android.jar to access BLE items)
+    #  ..../platforms/android-34/android.jar to access BLE items)
   }
 
   android_library("tests") {
@@ -746,12 +753,12 @@ if (chip_link_tests) {
     javac_flags = [ "-Xlint:deprecation" ]
 
     # TODO: add classpath support (we likely need to add something like
-    #  ..../platforms/android-26/android.jar to access BLE items)
+    #  ..../platforms/android-34/android.jar to access BLE items)
   }
 }
 
 if (!matter_enable_java_compilation) {
   java_prebuilt("android") {
-    jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+    jar_path = "${android_sdk_root}/platforms/android-34/android.jar"
   }
 }

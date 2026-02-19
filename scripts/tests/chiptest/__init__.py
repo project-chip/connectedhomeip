@@ -17,13 +17,22 @@
 import json
 import logging
 import os
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Set
 
-from . import linux, runner
-from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
+import yaml
+
+from . import runner
+from .test_definition import TestDefinition, TestTag, TestTarget
+
+log = logging.getLogger(__name__)
+
+__all__ = [
+    "TestTarget",
+    "TestDefinition",
+    "runner",
+]
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -69,7 +78,7 @@ def _IsValidYamlTest(name: str) -> bool:
 
 
 def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
-    with open(json_file_path, 'rt') as f:
+    with open(json_file_path) as f:
         data = json.load(f)
         for c in data["collection"]:
             for name in data[c]:
@@ -77,7 +86,7 @@ def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
 
 
 def _GetManualTests() -> Set[str]:
-    manualtests = set()
+    manualtests: set[str] = set()
 
     # Flagged as manual from: src/app/tests/suites/manualTests.json
     for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
@@ -146,15 +155,15 @@ def _GetInDevelopmentTests() -> Set[str]:
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
-        "Test_TC_SMOKECO_2_2.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_2.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_3.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_3.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_4.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_4.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_5.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_6.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_BR_5.yaml",                 # [TODO] Fabric Sync example app has not been integrated into CI yet.
     }
@@ -207,7 +216,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_DGTHREAD_2_2",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_3",  # Thread Network Diagnostics is not implemented under darwin.
         "Test_TC_DGTHREAD_2_4",  # Thread Network Diagnostics is not implemented under darwin.
-        "Test_TC_FLABEL_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
@@ -219,29 +227,31 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_SC_4_1",  # darwin-framework-tool does not support dns-sd commands.
         "Test_TC_SC_5_2",  # darwin-framework-tool does not support group commands.
         "Test_TC_S_2_3",  # darwin-framework-tool does not support group commands.
-        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests
+        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_3",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
     }
 
 
-def _GetChipReplUnsupportedTests() -> Set[str]:
-    """Tests that fail in chip-repl for some reason"""
+def _GetReplUnsupportedTests() -> Set[str]:
+    """Tests that fail in matter-repl for some reason"""
     return {
-        "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
-        "Test_TC_OPCREDS_3_7.yaml",         # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
-        "TestExampleCluster.yaml",          # chip-repl does not load custom pseudo clusters
-        "TestAttributesById.yaml",           # chip-repl does not support AnyCommands (06/06/2023)
-        "TestCommandsById.yaml",             # chip-repl does not support AnyCommands (06/06/2023)
-        "TestEventsById.yaml",               # chip-repl does not support AnyCommands (06/06/2023)
-        "TestReadNoneSubscribeNone.yaml",    # chip-repl does not support AnyCommands (07/27/2023)
-        "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
-        "Test_TC_BRBINFO_2_1.yaml",          # chip-repl does not support AnyCommands (24/07/2024)
-        "TestThermostat.yaml",               # chip-repl does not support AnyCommands (14/10/2024)
-        "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
-        "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
-        # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
+        "Test_AddNewFabricFromExistingFabric.yaml",     # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
+        "Test_TC_OPCREDS_3_7.yaml",         # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
+        "TestExampleCluster.yaml",          # matter-repl does not load custom pseudo clusters
+        "TestAttributesById.yaml",           # matter-repl does not support AnyCommands (06/06/2023)
+        "TestCommandsById.yaml",             # matter-repl does not support AnyCommands (06/06/2023)
+        "TestEventsById.yaml",               # matter-repl does not support AnyCommands (06/06/2023)
+        "TestReadNoneSubscribeNone.yaml",    # matter-repl does not support AnyCommands (07/27/2023)
+        "Test_TC_IDM_1_2.yaml",              # matter-repl does not support AnyCommands (19/07/2023)
+        "Test_TC_BRBINFO_2_1.yaml",          # matter-repl does not support AnyCommands (24/07/2024)
+        "TestThermostat.yaml",               # matter-repl does not support AnyCommands (14/10/2024)
+        "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in matter-repl
+        "Test_TC_ICDM_3_4.yaml",           # matter-repl does not support ICD registration
+        # matter-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
         "TestClusterMultiFabric.yaml",
-        "TestDiagnosticLogs.yaml",          # chip-repl does not implement a BDXTransferServerDelegate
-        "TestDiagnosticLogsDownloadCommand.yaml",  # chip-repl does not implement the bdx download command
+        "TestDiagnosticLogs.yaml",          # matter-repl does not implement a BDXTransferServerDelegate
+        "TestDiagnosticLogsDownloadCommand.yaml",  # matter-repl does not implement the bdx download command
     }
 
 
@@ -268,68 +278,24 @@ def _AllYamlTests():
         yield path
 
 
-def target_for_name(name: str):
-    if (name.startswith("TV_") or name.startswith("Test_TC_MC_") or
-            name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or
-            name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or
-            name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or
-            name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or
-            name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or
-            name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
-        return TestTarget.TV
-    if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
-        return TestTarget.LOCK
-    if name.startswith("TestFabricSync"):
-        return TestTarget.FABRIC_SYNC
-    if name.startswith("OTA_"):
-        return TestTarget.OTA
-    if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
-        return TestTarget.BRIDGE
-    if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
-        return TestTarget.LIT_ICD
-    if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
-        return TestTarget.MWO
-    if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
-        return TestTarget.RVC
-    if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
-        return TestTarget.NETWORK_MANAGER
-    return TestTarget.ALL_CLUSTERS
+def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
+    targets = []
 
+    with open(yaml_path, 'rt') as f:
+        data = yaml.safe_load(f)
+        if 'CI' in data:
+            for item in data['CI']:
+                targets.append(TestTarget(
+                    name=item['name'],
+                    command=item['app'],
+                    arguments=item.get('args', [])
+                ))
 
-def tests_with_command(chip_tool: str, is_manual: bool):
-    """Executes `chip_tool` binary to see what tests are available, using cmd
-    to get the list.
-    """
-    cmd = "list"
-    if is_manual:
-        cmd += "-manual"
+    # default to a 'standard app name' if nothing set in the yaml file
+    if not targets:
+        targets.append(TestTarget(name='all-clusters', command='all-clusters'))
 
-    cmd = [chip_tool, "tests", cmd]
-    result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
-    if result.returncode != 0:
-        logging.error(f'Failed to run {cmd}:')
-        logging.error('STDOUT: ' + result.stdout)
-        logging.error('STDERR: ' + result.stderr)
-        result.check_returncode()
-
-    test_tags = set()
-    if is_manual:
-        test_tags.add(TestTag.MANUAL)
-
-    in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
-
-    for name in result.stdout.split("\n"):
-        if not name:
-            continue
-
-        target = target_for_name(name)
-        tags = test_tags.copy()
-        if name in in_development_tests:
-            tags.add(TestTag.IN_DEVELOPMENT)
-
-        yield TestDefinition(
-            run_name=name, name=name, target=target, tags=tags
-        )
+    return targets
 
 
 def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
@@ -341,7 +307,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
     slow_tests = _GetSlowTests()
     extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
-    chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
+    matter_repl_unsupported_tests = _GetReplUnsupportedTests()
     dft_unsupported_as_in_development_tests = _GetDarwinFrameworkToolUnsupportedTests()
     chip_tool_unsupported_as_in_development_tests = _GetChipToolUnsupportedTests()
     purposeful_failure_tests = _GetPurposefulFailureTests()
@@ -350,7 +316,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         if not _IsValidYamlTest(path.name):
             continue
 
-        tags = set()
+        tags: set[TestTag] = set()
         if path.name in manual_tests:
             tags.add(TestTag.MANUAL)
 
@@ -369,7 +335,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         if path.name in purposeful_failure_tests:
             tags.add(TestTag.PURPOSEFUL_FAILURE)
 
-        if treat_repl_unsupported_as_in_development and path.name in chip_repl_unsupported_tests:
+        if treat_repl_unsupported_as_in_development and path.name in matter_repl_unsupported_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
         if use_short_run_name:
@@ -386,7 +352,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         yield TestDefinition(
             run_name=run_name,
             name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
-            target=target_for_name(path.name),
+            targets=_TargetsForYaml(path),
             tags=tags,
         )
 
@@ -404,21 +370,3 @@ def AllChipToolYamlTests(use_short_run_name: bool = True):
 def AllDarwinFrameworkToolYamlTests():
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
-
-
-def AllChipToolTests(chip_tool: str):
-    for test in tests_with_command(chip_tool, is_manual=False):
-        yield test
-
-    for test in tests_with_command(chip_tool, is_manual=True):
-        yield test
-
-
-__all__ = [
-    "TestTarget",
-    "TestDefinition",
-    "AllTests",
-    "ApplicationPaths",
-    "linux",
-    "runner",
-]

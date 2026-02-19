@@ -38,25 +38,25 @@ from enum import IntEnum
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../controller/python'))
-from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402 isort:skip
+from matter.tlv import TLVReader, TLVWriter, uint  # noqa: E402 isort:skip
 
 HEADER_MAGIC = 0x1BEEF11E
 FIXED_HEADER_FORMAT = '<IQI'
 
-DIGEST_ALGORITHM_ID = dict(
-    sha256=1,
-    sha256_128=2,
-    sha256_120=3,
-    sha256_96=4,
-    sha256_64=5,
-    sha256_32=6,
-    sha384=7,
-    sha512=8,
-    sha3_224=9,
-    sha3_256=10,
-    sha3_384=11,
-    sha3_512=12,
-)
+DIGEST_ALGORITHM_ID = {
+    'sha256': 1,
+    'sha256_128': 2,
+    'sha256_120': 3,
+    'sha256_96': 4,
+    'sha256_64': 5,
+    'sha256_32': 6,
+    'sha384': 7,
+    'sha512': 8,
+    'sha3_224': 9,
+    'sha3_256': 10,
+    'sha3_384': 11,
+    'sha3_512': 12,
+}
 
 DIGEST_ALL_ALGORITHMS = hashlib.algorithms_available.intersection(
     DIGEST_ALGORITHM_ID.keys())
@@ -245,11 +245,10 @@ def remove_header(args: object) -> None:
     Removes the header from args.image_file and writes to args.output_file
     """
     image_start = full_header_size(args)
-    with open(args.image_file, 'rb') as file:
-        with open(args.output_file, 'wb') as outfile:
-            file.seek(image_start)
-            for chunk in read_chunk(file):
-                outfile.write(chunk)
+    with open(args.image_file, 'rb') as file, open(args.output_file, 'wb') as outfile:
+        file.seek(image_start)
+        for chunk in read_chunk(file):
+            outfile.write(chunk)
 
 
 def show_header(args: object):
@@ -309,12 +308,11 @@ def update_header_args(args: object) -> None:
     new_header_tlv = generate_header_tlv(args, payload_size, payload_digest)
     header = generate_header(new_header_tlv, payload_size)
 
-    with open(args.image_file, 'rb') as infile:
-        with open(args.output_file, 'wb') as outfile:
-            outfile.write(header)
-            infile.seek(full_header_size(args))
-            for chunk in read_chunk(infile):
-                outfile.write(chunk)
+    with open(args.image_file, 'rb') as infile, open(args.output_file, 'wb') as outfile:
+        outfile.write(header)
+        infile.seek(full_header_size(args))
+        for chunk in read_chunk(infile):
+            outfile.write(chunk)
 
 
 def main():

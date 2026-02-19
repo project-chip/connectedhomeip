@@ -3,9 +3,9 @@
 # Same for files in zap-generated folders
 **/zap-generated/** linguist-generated
 # And some specific generated files
-src/controller/python/chip/clusters/CHIPClusters.py linguist-generated
-src/controller/python/chip/clusters/Objects.py linguist-generated
+src/controller/python/matter/clusters/CHIPClusters.py linguist-generated
+src/controller/python/matter/clusters/Objects.py linguist-generated
 # Let bat file use CRLF linebreak
-**/*.bat eol=crlf
+**/*.bat eol=input
 # Mark Matter operational certificate/key files as binary
 **/*.chip binary

@@ -89,7 +89,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -190,6 +190,17 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
     BLConfig::RunConfigUnitTest();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+void ConfigurationManagerImpl::ClearThreadStack()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    TEMPORARY_RETURN_IGNORED ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    ChipLogProgress(DeviceLayer, "Clearing Thread provision");
+    ThreadStackMgr().ErasePersistentInfo();
+}
+#endif
+
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     CHIP_ERROR err;
@@ -203,7 +214,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = BLConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Restart the system.

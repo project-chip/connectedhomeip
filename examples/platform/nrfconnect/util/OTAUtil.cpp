@@ -24,6 +24,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/nrfconnect/ExternalFlashManager.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
 #include <zephyr/dfu/mcuboot.h>
 #endif
@@ -45,7 +46,7 @@ chip::DefaultOTARequestor sOTARequestor;
 OTAImageProcessorImpl & GetOTAImageProcessor()
 {
 #if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR
-    static OTAImageProcessorImpl sOTAImageProcessor(&GetFlashHandler());
+    static OTAImageProcessorImpl sOTAImageProcessor(ExternalFlashManager.GetInstance());
 #else
     static OTAImageProcessorImpl sOTAImageProcessor;
 #endif
@@ -60,7 +61,7 @@ void InitBasicOTARequestor()
     imageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&imageProcessor);
     sOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
+    TEMPORARY_RETURN_IGNORED sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &imageProcessor);
     imageProcessor.TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
@@ -93,9 +94,3 @@ void OtaConfirmNewImage()
 }
 
 #endif
-
-ExternalFlashManager & GetFlashHandler()
-{
-    static ExternalFlashManager sFlashHandler;
-    return sFlashHandler;
-}

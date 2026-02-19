@@ -23,6 +23,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
+#include "qvMultiProtocolOta.h"
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -63,6 +65,8 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
+    /* Instantiate QPG Matter image processor class to download and process OTA data */
+    std::unique_ptr<OTAMultiProtocolImpl> mProcessor = CreateProcessor(qvOta_ProtocolTypeMatter);
 };
 
 } // namespace chip

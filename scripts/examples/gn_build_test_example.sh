@@ -44,6 +44,7 @@ function runGN() {
     GN_ARGS="chip_tests_zap_config=\"$APP_DIR\""
     GN_ARGS+="chip_project_config_include_dirs=[\"$INPUT_DIR/apps/$APP_DIR/include\", \"$CHIP_ROOT/config/standalone\"]"
     GN_ARGS+="chip_config_network_layer_ble=false"
+    GN_ARGS+="chip_device_config_enable_wifipaf=false"
 
     gn gen --check --fail-on-unused-args --root=examples/placeholder/linux "$CHIP_ROOT/out/$APP_DIR" --args="$GN_ARGS"
 }

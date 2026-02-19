@@ -20,6 +20,7 @@
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
 #include <tracing/macros.h>
@@ -207,7 +208,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, mTargetHostName.Get());
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
     }
 
     inactiveReset.Disarm();
@@ -320,7 +321,7 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
 
 CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr)
 {
-    if (mCommonResolutionData.numIPs >= ArraySize(mCommonResolutionData.ipAddress))
+    if (mCommonResolutionData.numIPs >= MATTER_ARRAY_SIZE(mCommonResolutionData.ipAddress))
     {
         return CHIP_ERROR_NO_MEMORY;
     }

@@ -25,6 +25,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
+#include <lib/support/attribute-storage-null-handling.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {
@@ -98,7 +99,7 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
  * @brief
  *
  * This specific variant that decodes cluster objects (like structs, commands, events) from TLV
- * depends on the presence of a Decode method on the object to present. The signature of that method
+ * depends on the presence of a Decode method on X. The signature of that method
  * is as follows:
  *
  * CHIP_ERROR <Object>::Decode(TLVReader &reader);

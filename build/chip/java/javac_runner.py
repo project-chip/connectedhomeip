@@ -88,13 +88,12 @@ def ComputeClasspath(build_config_json):
     unique_jars = build_config_json['deps_info']['deps_jars']
     if sys.platform == 'win32':
         return ";".join(unique_jars)
-    else:
-        return ":".join(unique_jars)
+    return ":".join(unique_jars)
 
 
 def main():
-    java_path = FindCommand('javac')
-    if not java_path:
+    java_home = FindCommand('javac')
+    if not java_home:
         sys.stderr.write('javac: command not found\n')
         sys.exit(EXIT_FAILURE)
 
@@ -123,7 +122,7 @@ def main():
 
     build_config_json = ReadBuildConfig(args.build_config)
     classpath = ComputeClasspath(build_config_json)
-    java_args = [java_path]
+    java_args = [java_home]
     if classpath:
         java_args += ["-classpath", classpath]
 

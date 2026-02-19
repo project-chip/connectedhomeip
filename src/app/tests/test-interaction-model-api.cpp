@@ -30,8 +30,8 @@
 using namespace chip::app::DataModel;
 
 namespace chip {
-uint8_t Test::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-size_t Test::attributeDataTLVLen = 0;
+uint8_t Testing::attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+size_t Testing::attributeDataTLVLen = 0;
 
 namespace app {
 
@@ -70,12 +70,12 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
                                         const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                         AttributeEncodeState * apEncoderState)
 {
-    if (aPath.mClusterId >= Test::kMockEndpointMin)
+    if (aPath.mClusterId >= Testing::kMockEndpointMin)
     {
-        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+        return Testing::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
-    if (!(aPath.mClusterId == Test::kTestClusterId && aPath.mEndpointId == Test::kTestEndpointId))
+    if (!(aPath.mClusterId == Testing::kTestClusterId && aPath.mEndpointId == Testing::kTestEndpointId))
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -86,7 +86,10 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
         ReturnErrorOnFailure(attributeStatus.GetError());
 
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
         ReturnErrorOnFailure(attributeStatus.GetError());
@@ -96,7 +99,8 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         return attributeReport.EndOfAttributeReportIB();
     }
 
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(Test::kTestFieldValue1);
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */)
+        .Encode(Testing::kTestFieldValue1);
 }
 
 TestImCustomDataModel & TestImCustomDataModel::Instance()
@@ -126,129 +130,23 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
 
 ActionReturnStatus TestImCustomDataModel::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    if (request.path.mDataVersion.HasValue() && request.path.mDataVersion.Value() == Test::kRejectedDataVersion)
-    {
-        return CHIP_IM_GLOBAL_STATUS(DataVersionMismatch);
-    }
-
     TestOnlyAttributeValueDecoderAccessor decodeAccess(decoder);
 
     decodeAccess.SetTriedDecode(true);
 
     TLV::TLVWriter writer;
-    writer.Init(chip::Test::attributeDataTLV);
-    writer.CopyElement(TLV::AnonymousTag(), decodeAccess.GetTlvReader());
-    chip::Test::attributeDataTLVLen = writer.GetLengthWritten();
+    writer.Init(chip::Testing::attributeDataTLV);
+    TEMPORARY_RETURN_IGNORED writer.CopyElement(TLV::AnonymousTag(), decodeAccess.GetTlvReader());
+    chip::Testing::attributeDataTLVLen = writer.GetLengthWritten();
 
     return CHIP_NO_ERROR;
 }
 
-std::optional<ActionReturnStatus> TestImCustomDataModel::Invoke(const InvokeRequest & request,
-                                                                chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<ActionReturnStatus> TestImCustomDataModel::InvokeCommand(const InvokeRequest & request,
+                                                                       chip::TLV::TLVReader & input_arguments,
+                                                                       CommandHandler * handler)
 {
     return std::make_optional<ActionReturnStatus>(CHIP_ERROR_NOT_IMPLEMENTED);
-}
-
-DataModel::EndpointEntry TestImCustomDataModel::FirstEndpoint()
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
-}
-
-DataModel::EndpointEntry TestImCustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
-}
-
-std::optional<DataModel::EndpointInfo> TestImCustomDataModel::GetEndpointInfo(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
-}
-
-std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::FirstDeviceType(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::DeviceTypeEntry> TestImCustomDataModel::NextDeviceType(EndpointId endpoint,
-                                                                                const DataModel::DeviceTypeEntry & previous)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> TestImCustomDataModel::GetNextSemanticTag(EndpointId endpoint,
-                                                                                          const SemanticTag & previous)
-{
-    return std::nullopt;
-}
-
-ClusterEntry TestImCustomDataModel::FirstServerCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);
-}
-
-ClusterEntry TestImCustomDataModel::NextServerCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextServerCluster(before);
-}
-
-std::optional<ClusterInfo> TestImCustomDataModel::GetServerClusterInfo(const ConcreteClusterPath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusterInfo(path);
-}
-
-ConcreteClusterPath TestImCustomDataModel::FirstClientCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstClientCluster(endpoint);
-}
-
-ConcreteClusterPath TestImCustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextClientCluster(before);
-}
-
-AttributeEntry TestImCustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);
-}
-
-AttributeEntry TestImCustomDataModel::NextAttribute(const ConcreteAttributePath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAttribute(before);
-}
-
-std::optional<AttributeInfo> TestImCustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
-}
-
-CommandEntry TestImCustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAcceptedCommand(cluster);
-}
-
-CommandEntry TestImCustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAcceptedCommand(before);
-}
-
-std::optional<CommandInfo> TestImCustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommandInfo(path);
-}
-
-ConcreteCommandPath TestImCustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstGeneratedCommand(cluster);
-}
-
-ConcreteCommandPath TestImCustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextGeneratedCommand(before);
 }
 
 } // namespace app

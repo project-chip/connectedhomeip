@@ -46,18 +46,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
-    // TODO: This nulling out of mEventLoopTask should happen when we shut down
-    // the task, not here!
-    mEventLoopTask = NULL;
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
-    mBackgroundEventLoopTask = NULL;
-#endif
-    mChipTimerActive = false;
-
-    // We support calling Shutdown followed by InitChipStack, because some tests
-    // do that.  To keep things simple for existing consumers, we keep not
-    // destroying our lock and queue in shutdown, but rather check whether they
-    // already exist here before trying to create them.
+    mChipTimerActive        = false;
 
     if (mChipStackLock == NULL)
     {
@@ -255,7 +244,11 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_RunEventLoop(void)
         while (eventReceived == pdTRUE)
         {
             Impl()->DispatchEvent(&event);
-            eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
+            {
+                // Unlock the CHIP stack, to prevent the Matter task from remaining locked for too long
+                StackUnlock unlock;
+                eventReceived = xQueueReceive(mChipEventQueue, &event, 0);
+            }
         }
     }
 }
@@ -264,8 +257,8 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartEventLoopTask(void)
 {
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
-    mEventLoopTask = xTaskCreateStatic(EventLoopTaskMain, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME, ArraySize(mEventLoopStack), this,
-                                       CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, mEventLoopStack, &mEventLoopTaskStruct);
+    mEventLoopTask = xTaskCreateStatic(EventLoopTaskMain, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME, MATTER_ARRAY_SIZE(mEventLoopStack),
+                                       this, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, mEventLoopStack, &mEventLoopTaskStruct);
 #else
     xTaskCreate(EventLoopTaskMain, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t),
                 this, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, &mEventLoopTask);
@@ -277,10 +270,16 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP event task running");
-    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunEventLoop();
-    // TODO: At this point, should we not
-    // vTaskDelete(static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->mEventLoopTask)?
-    // Or somehow get our caller to do it once this thread is joined?
+    GenericPlatformManagerImpl_FreeRTOS<ImplClass> * platformManager =
+        static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg);
+    platformManager->Impl()->RunEventLoop();
+    ChipLogDetail(DeviceLayer, "CHIP event task stopped");
+
+    // Notify any waiting tasks that we're about to exit
+    TaskHandle_t currentTask = xTaskGetCurrentTaskHandle();
+    xTaskNotifyGive(currentTask);
+
+    vTaskDelete(NULL);
 }
 
 template <class ImplClass>
@@ -339,9 +338,9 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartBackgroundEvent
 {
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
-    mBackgroundEventLoopTask =
-        xTaskCreateStatic(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME, ArraySize(mBackgroundEventLoopStack), this,
-                          CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, mBackgroundEventLoopStack, &mBackgroundEventLoopTaskStruct);
+    mBackgroundEventLoopTask = xTaskCreateStatic(
+        BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME, MATTER_ARRAY_SIZE(mBackgroundEventLoopStack), this,
+        CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY, mBackgroundEventLoopStack, &mBackgroundEventLoopTaskStruct);
 #else
     xTaskCreate(BackgroundEventLoopTaskMain, CHIP_DEVICE_CONFIG_BG_TASK_NAME,
                 CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY,
@@ -376,7 +375,11 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::BackgroundEventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP background task running");
-    static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg)->Impl()->RunBackgroundEventLoop();
+    GenericPlatformManagerImpl_FreeRTOS<ImplClass> * platformManager =
+        static_cast<GenericPlatformManagerImpl_FreeRTOS<ImplClass> *>(arg);
+    platformManager->Impl()->RunBackgroundEventLoop();
+    vTaskDelete(NULL);
+    platformManager->mBackgroundEventLoopTask = NULL;
 }
 #endif
 
@@ -416,6 +419,36 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
+    // If event loop task exists, wait for it to exit
+    if (mEventLoopTask != NULL)
+    {
+        // Wait for notification from the event loop task with a timeout
+        const TickType_t xMaxBlockTime = pdMS_TO_TICKS(2000); // 2 second timeout
+        if (ulTaskNotifyTake(pdTRUE, xMaxBlockTime) == 0)
+        {
+            ChipLogError(DeviceLayer, "Event loop task failed to exit within timeout");
+        }
+
+        mEventLoopTask = NULL;
+    }
+
+    if (mChipEventQueue)
+    {
+        vQueueDelete(mChipEventQueue);
+        mChipEventQueue = NULL;
+    }
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+    if (mBackgroundEventQueue)
+    {
+        vQueueDelete(mBackgroundEventQueue);
+        mBackgroundEventQueue = NULL;
+    }
+#endif
+    if (mChipStackLock)
+    {
+        vSemaphoreDelete(mChipStackLock);
+        mChipStackLock = NULL;
+    }
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
@@ -423,6 +456,12 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopEventLoopTask(void)
 {
     mShouldRunEventLoop.store(false);
+    // Post a no-op event to wake up the event loop if it's blocked on queue receive
+    ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
+    if (mChipEventQueue != NULL)
+    {
+        xQueueSend(mChipEventQueue, &noop, 0);
+    }
     return CHIP_NO_ERROR;
 }
 

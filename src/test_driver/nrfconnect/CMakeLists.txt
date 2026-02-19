@@ -18,10 +18,10 @@
 #   @file
 #     CMake project for building and running selected CHIP unit tests using
 #     'nrfconnect' platform integration layer in CHIP and Zephyr
-#     'native_posix[_64]' platforms. Note that certain design decisions behind
-#     the native_posix platforms make them inapplicable for some unit tests,
+#     'native_sim[/native/64]' platforms. Note that certain design decisions behind
+#     the native_sim platforms make them inapplicable for some unit tests,
 #     hence only a subset of CHIP unit tests is listed in the project.
-#     See: https://docs.zephyrproject.org/1.12.0/boards/posix/native_posix/doc/board.html
+#     See: https://docs.zephyrproject.org/4.0.0/boards/native/native_sim/doc/index.html
 #     for more details.
 #
 
@@ -48,6 +48,11 @@ set(CHIP_CFLAGS
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+set(CONFIG_ZEPHYR_PIGWEED_MODULE 1)
+set(CONFIG_PIGWEED_ASSERT 1)
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+add_subdirectory(${PIGWEED_ROOT} "${CMAKE_BINARY_DIR}/pigweed")
+
 # ==================================================
 # Build 'all tests' runner
 # ==================================================
@@ -56,7 +61,11 @@ project(AllChipTests)
 enable_testing()
 
 target_sources(app PRIVATE main/runner.cpp)
-target_link_libraries(app PUBLIC chip $<TARGET_FILE:kernel>)
+target_link_libraries(app PUBLIC
+  chip
+  $<TARGET_FILE:kernel>
+  pw_unit_test
+)
 target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 
 add_test(AllChipTests zephyr/zephyr.exe)

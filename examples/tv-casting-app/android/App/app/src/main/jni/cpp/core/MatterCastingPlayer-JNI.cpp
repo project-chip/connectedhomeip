@@ -44,6 +44,83 @@ namespace core {
 
 MatterCastingPlayerJNI MatterCastingPlayerJNI::sInstance;
 
+JNI_METHOD(jobject, sendUDC)
+(JNIEnv * env, jobject thiz, jobject jconnectionCallbacks, jobject jIdentificationDeclarationOptions)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::sendUDC() called");
+
+    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
+
+    // Find the ConnectionCallbacks class, get the field IDs of the connection callbacks and extract the callback objects.
+    jclass connectionCallbacksClass = env->GetObjectClass(jconnectionCallbacks);
+    VerifyOrReturnValue(connectionCallbacksClass != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+                        ChipLogError(AppServer, "MatterCastingPlayer-JNI::sendUDC() connectionCallbacksClass == nullptr "));
+
+    jfieldID successCallbackFieldID =
+        env->GetFieldID(connectionCallbacksClass, "onSuccess", "Lcom/matter/casting/support/MatterCallback;");
+    jfieldID failureCallbackFieldID =
+        env->GetFieldID(connectionCallbacksClass, "onFailure", "Lcom/matter/casting/support/MatterCallback;");
+    jfieldID commissionerDeclarationCallbackFieldID =
+        env->GetFieldID(connectionCallbacksClass, "onCommissionerDeclaration", "Lcom/matter/casting/support/MatterCallback;");
+
+    jobject jSuccessCallback                 = env->GetObjectField(jconnectionCallbacks, successCallbackFieldID);
+    jobject jFailureCallback                 = env->GetObjectField(jconnectionCallbacks, failureCallbackFieldID);
+    jobject jCommissionerDeclarationCallback = env->GetObjectField(jconnectionCallbacks, commissionerDeclarationCallbackFieldID);
+
+    VerifyOrReturnValue(
+        jSuccessCallback != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+        ChipLogError(AppServer, "MatterCastingPlayer-JNI::sendUDC() jSuccessCallback == nullptr but is mandatory "));
+    VerifyOrReturnValue(
+        jFailureCallback != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+        ChipLogError(AppServer, "MatterCastingPlayer-JNI::sendUDC() jFailureCallback == nullptr but is mandatory "));
+
+    // jIdentificationDeclarationOptions is optional
+    matter::casting::core::IdentificationDeclarationOptions * idOptions = nullptr;
+    if (jIdentificationDeclarationOptions == nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::sendUDC() Optional jIdentificationDeclarationOptions not "
+                        "provided by the client");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::sendUDC() jIdentificationDeclarationOptions was provided by client");
+        idOptions = support::convertIdentificationDeclarationOptionsFromJavaToCpp(jIdentificationDeclarationOptions);
+        VerifyOrReturnValue(idOptions != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT),
+                            ChipLogError(AppServer,
+                                         "MatterCastingPlayer-JNI::sendUDC() "
+                                         "convertIdentificationDeclarationOptionsFromJavaToCpp() error"));
+        idOptions->LogDetail();
+    }
+
+    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
+    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
+
+    // jCommissionerDeclarationCallback is optional
+    if (jCommissionerDeclarationCallback == nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "MatterCastingPlayer-JNI::sendUDC() optional jCommissionerDeclarationCallback was not "
+                        "provided by the client");
+    }
+    else
+    {
+        TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(
+            env, jCommissionerDeclarationCallback);
+    }
+
+    matter::casting::core::ConnectionCallbacks connectionCallbacks;
+    connectionCallbacks.mOnConnectionComplete = MatterCastingPlayerJNI::getInstance().getConnectCallback();
+    connectionCallbacks.mCommissionerDeclarationCallback =
+        MatterCastingPlayerJNI::getInstance().getCommissionerDeclarationCallback();
+
+    castingPlayer->SendUDC(connectionCallbacks, *idOptions);
+
+    return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
+}
+
 JNI_METHOD(jobject, verifyOrEstablishConnection)
 (JNIEnv * env, jobject thiz, jobject jconnectionCallbacks, jlong commissioningWindowTimeoutSec,
  jobject jIdentificationDeclarationOptions)
@@ -102,8 +179,8 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
         idOptions->LogDetail();
     }
 
-    MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
-    MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
+    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
+    TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
 
     // jCommissionerDeclarationCallback is optional
     if (jCommissionerDeclarationCallback == nullptr)
@@ -114,7 +191,8 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     }
     else
     {
-        MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(env, jCommissionerDeclarationCallback);
+        TEMPORARY_RETURN_IGNORED MatterCastingPlayerJNIMgr().mCommissionerDeclarationHandler.SetUp(
+            env, jCommissionerDeclarationCallback);
     }
 
     matter::casting::core::ConnectionCallbacks connectionCallbacks;
@@ -165,6 +243,61 @@ JNI_METHOD(void, disconnect)
     castingPlayer->Disconnect();
 }
 
+JNI_METHOD(void, removeFabric)
+(JNIEnv * env, jobject thiz)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::removeFabric()");
+
+    core::CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturn(castingPlayer != nullptr,
+                   ChipLogError(AppServer, "MatterCastingPlayer-JNI::removeFabric() castingPlayer == nullptr"));
+
+    castingPlayer->RemoveFabric();
+}
+
+JNI_METHOD(jstring, getConnectionStateNative)
+(JNIEnv * env, jobject thiz)
+{
+    char error_str[50];
+    jobject jstr_obj = nullptr;
+
+    if (NULL == env)
+    {
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("JNIEnv interface is NULL"), jstr_obj));
+        return static_cast<jstring>(jstr_obj);
+    }
+
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::getConnectionState()");
+
+    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    jstring result                = nullptr;
+    LogErrorOnFailure(JniReferences::GetInstance().CharToStringUTF(
+        chip::CharSpan("Cast Player is nullptr", strlen("Cast Player is nullptr")), reinterpret_cast<jobject &>(result)));
+    VerifyOrReturnValue(castingPlayer != nullptr, result);
+
+    matter::casting::core::ConnectionState state = castingPlayer->GetConnectionState();
+    switch (state)
+    {
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_NOT_CONNECTED:
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("NOT_CONNECTED"), jstr_obj));
+        break;
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTING:
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("CONNECTING"), jstr_obj));
+        break;
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTED:
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("CONNECTED"), jstr_obj));
+        break;
+    default:
+        snprintf(error_str, sizeof(error_str), "Unsupported Connection State: %d", state);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(error_str), jstr_obj));
+        break;
+    }
+    return static_cast<jstring>(jstr_obj);
+}
+
 JNI_METHOD(jobject, getEndpoints)
 (JNIEnv * env, jobject thiz)
 {
@@ -177,13 +310,13 @@ JNI_METHOD(jobject, getEndpoints)
 
     const std::vector<memory::Strong<Endpoint>> endpoints = castingPlayer->GetEndpoints();
     jobject jEndpointList                                 = nullptr;
-    chip::JniReferences::GetInstance().CreateArrayList(jEndpointList);
+    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(jEndpointList);
     for (memory::Strong<Endpoint> endpoint : endpoints)
     {
         jobject matterEndpointJavaObject = support::convertEndpointFromCppToJava(endpoint);
         VerifyOrReturnValue(matterEndpointJavaObject != nullptr, jEndpointList,
                             ChipLogError(AppServer, "MatterCastingPlayer-JNI::getEndpoints(): Could not create Endpoint jobject"));
-        chip::JniReferences::GetInstance().AddToList(jEndpointList, matterEndpointJavaObject);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(jEndpointList, matterEndpointJavaObject);
     }
     return jEndpointList;
 }

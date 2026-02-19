@@ -19,11 +19,14 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -53,7 +56,11 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
 
 Instance::~Instance()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    if (mDelegate)
+    {
+        mDelegate->SetInstance(nullptr);
+    }
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -134,7 +141,7 @@ void Instance::SetCookTimeSec(uint32_t cookTimeSec)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "Microwave Oven Control: Reading");
+    ChipLogDetail(Zcl, "Microwave Oven Control: Reading");
     switch (aPath.mAttributeId)
     {
     case MicrowaveOvenControl::Attributes::CookTime::Id:
@@ -247,10 +254,18 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
-        ConcreteCommandPath commandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id);
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
+
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
+            ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);
+        auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 
         bool commandExists =
-            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetAcceptedCommandInfo(commandPath).has_value();
+            std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [](const DataModel::AcceptedCommandEntry & entry) {
+                return entry.commandId == OperationalState::Commands::Start::Id;
+            }) != acceptedCommands.end();
+
         VerifyOrExit(
             commandExists, status = Status::InvalidCommand; ChipLogError(
                 Zcl,
@@ -374,3 +389,4 @@ bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNu
  *
  */
 void MatterMicrowaveOvenControlPluginServerInitCallback() {}
+void MatterMicrowaveOvenControlPluginServerShutdownCallback() {}

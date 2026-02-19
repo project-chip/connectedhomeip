@@ -49,12 +49,13 @@ public:
         }
 
         item.security.SetRaw(mpScanResults[mIternum].auth);
-        item.ssidLen  = (uint32_t) (mpScanResults[mIternum].ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-             ? mpScanResults[mIternum].ssid_len
-             : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
-        item.channel  = mpScanResults[mIternum].channel;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults[mIternum].rssi;
+        item.ssidLen         = (uint32_t) (mpScanResults[mIternum].ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+                    ? mpScanResults[mIternum].ssid_len
+                    : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+        item.channel         = mpScanResults[mIternum].channel;
+        item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        item.signal.strength = mpScanResults[mIternum].rssi;
         memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
 
@@ -141,6 +142,9 @@ private:
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
+
+    char mScanSSID[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+    int mScanSSIDlength;
 };
 
 } // namespace NetworkCommissioning

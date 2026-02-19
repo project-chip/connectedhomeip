@@ -20,6 +20,7 @@
 
 #include <app/ConcreteEventPath.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
@@ -39,7 +40,15 @@ public:
      * @param[in] aPath           The path that identifies the kind of event that was generated.
      * @param[in] aBytesConsumed  The number of bytes needed to store the event in EventManagement.
      */
-    CHIP_ERROR virtual NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed) = 0;
+    virtual CHIP_ERROR NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed) = 0;
+
+    /**
+     * Schedule event delivery to happen immediately and run reporting to get
+     * those reports into messages and on the wire.  This can be done either for
+     * a specific fabric, identified by the provided FabricIndex, or across all
+     * fabrics if no FabricIndex is provided.
+     */
+    virtual void ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex = NullOptional) = 0;
 };
 
 } // namespace app

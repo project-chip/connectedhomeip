@@ -44,7 +44,7 @@ void ConnectivityManagerImpl::OnWiFiStationDisconnected()
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     PlatformMgr().PostEventOrDie(&event);
 
-    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
     uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
@@ -106,8 +106,15 @@ extern "C" void wifiInterface_eventGotIP(struct netif * interface)
 
 extern "C" void wifiInterface_eventScanDone(struct netif * interface, netbus_fs_scan_ind_cmd_msg_t * pmsg)
 {
+    ChipDeviceEvent event;
+
     ChipLogProgress(DeviceLayer, "wifiInterface_eventScanDone");
+
+    memset(&event, 0, sizeof(ChipDeviceEvent));
     NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone(pmsg);
+
+    event.Type = kWiFiOnScanDone;
+    PlatformMgr().PostEventOrDie(&event);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 

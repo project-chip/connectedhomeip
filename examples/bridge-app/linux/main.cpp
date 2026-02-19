@@ -17,6 +17,7 @@
  */
 
 #include <AppMain.h>
+#include <cstdint>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -44,6 +45,7 @@
 
 #include "CommissionableInit.h"
 #include "Device.h"
+#include "include/main.h"
 #include "main.h"
 #include <app/server/Server.h>
 
@@ -60,7 +62,14 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
+// These variables need to be in global scope for bridged-actions-stub.cpp to access them
+std::vector<Room *> gRooms;
+std::vector<Action *> gActions;
+
 namespace {
+
+NamedPipeCommands sChipNamedPipeCommands;
+BridgeCommandDelegate sBridgeCommandDelegate;
 
 const int kNodeLabelSize = 32;
 const int kUniqueIdSize  = 32;
@@ -71,8 +80,6 @@ EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
 // Power source is on the same endpoint as the composed device
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
-std::vector<Room *> gRooms;
-std::vector<Action *> gActions;
 
 const int16_t minMeasuredValue     = -27315;
 const int16_t maxMeasuredValue     = 32766;
@@ -121,13 +128,19 @@ DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDe
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::EndpointUniqueID::Id, ARRAY, 32, 0), /* endpoint unique id*/
+#endif
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Bridged Device Basic Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),              /* Reachable */
+DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize,
+                          ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)),         /* NodeLabel */
+    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0), /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::UniqueID::Id, CHAR_STRING, kUniqueIdSize, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id, INT32U, 4,
+                              0), /* Configuration Version */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* feature map */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
@@ -152,8 +165,8 @@ DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, ZAP_CLUSTER_MASK(SERVER), onOffIn
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
-DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 DeviceOnOff Light1("Light 1", "Office");
 DeviceOnOff Light2("Light 2", "Office");
@@ -162,10 +175,10 @@ DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeas
 DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
 // Declare Bridged endpoints used for Action clusters
-DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight4DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gActionLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 DeviceOnOff ActionLight1("Action Light 1", "Room 1");
 DeviceOnOff ActionLight2("Action Light 2", "Room 1");
@@ -209,8 +222,8 @@ DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, ZAP_CLUSTER
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
-DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
-DataVersion gTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
+DataVersion gTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 // ---------------------------------------------------------------------------
 //
@@ -237,9 +250,9 @@ DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
-DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
-DataVersion gComposedTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
-DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gComposedDeviceDataVersions[MATTER_ARRAY_SIZE(bridgedComposedDeviceClusters)];
+DataVersion gComposedTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
+DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 } // namespace
 
@@ -258,7 +271,11 @@ DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters
 // ---------------------------------------------------------------------------
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
+                      const Span<DataVersion> & dataVersionStorage,
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+                      chip::CharSpan epUniqueId,
+#endif
+                      chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -273,8 +290,13 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 DeviceLayer::StackLock lock;
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
                 err =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+#else
+                err = emberAfSetDynamicEndpointWithEpUniqueId(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList,
+                                                              epUniqueId, parentEndpointId);
+#endif
                 if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
@@ -371,6 +393,11 @@ std::vector<Action *> GetActionListInfo(chip::EndpointId parentId)
     return gActions;
 }
 
+std::vector<Room *> GetRoomListInfo(chip::EndpointId parentId)
+{
+    return gRooms;
+}
+
 namespace {
 void CallReportingCallback(intptr_t closure)
 {
@@ -382,7 +409,7 @@ void CallReportingCallback(intptr_t closure)
 void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attribute)
 {
     auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
-    PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
 }
 } // anonymous namespace
 
@@ -463,12 +490,17 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device
     else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
     {
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
-        MakeZclCharString(zclNameSpan, dev->GetName());
+        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclNameSpan, dev->GetName());
     }
     else if ((attributeId == UniqueID::Id) && (maxReadLength == 32))
     {
         MutableByteSpan zclUniqueIdSpan(buffer, maxReadLength);
-        MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
+        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
+    }
+    else if ((attributeId == ConfigurationVersion::Id) && (maxReadLength == 4))
+    {
+        uint32_t configVersion = dev->GetConfigurationVersion();
+        memcpy(buffer, &configVersion, sizeof(configVersion));
     }
     else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
     {
@@ -529,6 +561,30 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(DeviceOnOff * dev,
     {
         return Protocols::InteractionModel::Status::Failure;
     }
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Device * dev, AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=" ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+
+    if (attributeId != BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
+
+    CharSpan nameSpan = CharSpan::fromZclString(buffer);
+
+    if (nameSpan.size() > kNodeLabelSize)
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    std::string name(nameSpan.data(), nameSpan.size());
+    dev->SetName(name.c_str());
+
+    HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
     return Protocols::InteractionModel::Status::Success;
 }
@@ -622,35 +678,36 @@ public:
             switch (aPath.mAttributeId)
             {
             case PowerSource::Attributes::BatChargeLevel::Id:
-                aEncoder.Encode(dev->GetBatChargeLevel());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetBatChargeLevel());
                 break;
             case PowerSource::Attributes::Order::Id:
-                aEncoder.Encode(dev->GetOrder());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetOrder());
                 break;
             case PowerSource::Attributes::Status::Id:
-                aEncoder.Encode(dev->GetStatus());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetStatus());
                 break;
             case PowerSource::Attributes::Description::Id:
-                aEncoder.Encode(chip::CharSpan(dev->GetDescription().c_str(), dev->GetDescription().size()));
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(
+                    chip::CharSpan(dev->GetDescription().c_str(), dev->GetDescription().size()));
                 break;
             case PowerSource::Attributes::EndpointList::Id: {
                 std::vector<chip::EndpointId> & list = dev->GetEndpointList();
                 DataModel::List<EndpointId> dm_list(chip::Span<chip::EndpointId>(list.data(), list.size()));
-                aEncoder.Encode(dm_list);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dm_list);
                 break;
             }
             case PowerSource::Attributes::ClusterRevision::Id:
-                aEncoder.Encode(ZCL_POWER_SOURCE_CLUSTER_REVISION);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(ZCL_POWER_SOURCE_CLUSTER_REVISION);
                 break;
             case PowerSource::Attributes::FeatureMap::Id:
-                aEncoder.Encode(dev->GetFeatureMap());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetFeatureMap());
                 break;
 
             case PowerSource::Attributes::BatReplacementNeeded::Id:
-                aEncoder.Encode(false);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(false);
                 break;
             case PowerSource::Attributes::BatReplaceability::Id:
-                aEncoder.Encode(PowerSource::BatReplaceabilityEnum::kNotReplaceable);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(PowerSource::BatReplaceabilityEnum::kNotReplaceable);
                 break;
             default:
                 return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
@@ -680,6 +737,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
         {
             ret = HandleWriteOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer);
         }
+        else if ((dev->IsReachable()) && (clusterId == BridgedDeviceBasicInformation::Id))
+        {
+            ret = HandleWriteBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer);
+        }
     }
 
     return ret;
@@ -691,7 +752,7 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
     {
         Actions::Events::StateChanged::Type event{ actionID, invokeID, Actions::ActionStateEnum::kActive };
         EventNumber eventNumber;
-        chip::app::LogEvent(event, endpointId, eventNumber);
+        TEMPORARY_RETURN_IGNORED chip::app::LogEvent(event, endpointId, eventNumber);
     }
 
     // Check and run the action for ActionLight1 - ActionLight4
@@ -716,48 +777,8 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
     {
         Actions::Events::StateChanged::Type event{ actionID, invokeID, Actions::ActionStateEnum::kInactive };
         EventNumber eventNumber;
-        chip::app::LogEvent(event, endpointId, eventNumber);
+        TEMPORARY_RETURN_IGNORED chip::app::LogEvent(event, endpointId, eventNumber);
     }
-}
-
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    bool hasInvokeID      = false;
-    uint32_t invokeID     = 0;
-    EndpointId endpointID = commandPath.mEndpointId;
-    auto & actionID       = commandData.actionID;
-
-    if (commandData.invokeID.HasValue())
-    {
-        hasInvokeID = true;
-        invokeID    = commandData.invokeID.Value();
-    }
-
-    if (actionID == action1.getActionId() && action1.getIsVisible())
-    {
-        // Turn On Lights in Room 1
-        runOnOffRoomAction(&room1, true, endpointID, actionID, invokeID, hasInvokeID);
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-        return true;
-    }
-    if (actionID == action2.getActionId() && action2.getIsVisible())
-    {
-        // Turn On Lights in Room 2
-        runOnOffRoomAction(&room2, true, endpointID, actionID, invokeID, hasInvokeID);
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-        return true;
-    }
-    if (actionID == action3.getActionId() && action3.getIsVisible())
-    {
-        // Turn Off Lights in Room 1
-        runOnOffRoomAction(&room1, false, endpointID, actionID, invokeID, hasInvokeID);
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-        return true;
-    }
-
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
 }
 
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
@@ -797,8 +818,13 @@ void * bridge_polling_thread(void * context)
             if (ch == '2' && light2_added == false)
             {
                 // TC-BR-2 step 2, Add Light2
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                                   Span<DataVersion>(gLight2DataVersions), 1);
+#else
+                AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                                  Span<DataVersion>(gLight2DataVersions), ""_span, 1);
+#endif
                 light2_added = true;
             }
             else if (ch == '4' && light1_added == true)
@@ -810,8 +836,13 @@ void * bridge_polling_thread(void * context)
             if (ch == '5' && light1_added == false)
             {
                 // TC-BR-2 step 5, Add Light 1 back
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+                AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                                  Span<DataVersion>(gLight2DataVersions), 1);
+#else
                 AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight1DataVersions), 1);
+                                  Span<DataVersion>(gLight1DataVersions), ""_span, 1);
+#endif
                 light1_added = true;
             }
             if (ch == 'b')
@@ -898,6 +929,12 @@ void * bridge_polling_thread(void * context)
                 // TC-BRBINFO-2.2 step 2 "Set reachable to true"
                 TempSensor1.SetReachable(true);
             }
+            if (ch == 'w')
+            {
+                // TC-BRBINFO-3.2 step 3
+                uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
+                Light1.SetConfigurationVersion(configVersion);
+            }
             continue;
         }
 
@@ -954,6 +991,7 @@ void ApplicationInit()
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // Add light 1 -> will be mapped to ZCL endpoints 3
+#if !CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight1DataVersions), 1);
 
@@ -982,6 +1020,38 @@ void ApplicationInit()
                       Span<DataVersion>(gActionLight3DataVersions), 1);
     AddDeviceEndpoint(&ActionLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gActionLight4DataVersions), 1);
+#else
+    AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gLight1DataVersions), ""_span, 1);
+
+    // Add Temperature Sensor devices --> will be mapped to endpoints 4,5
+    AddDeviceEndpoint(&TempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
+                      Span<DataVersion>(gTempSensor1DataVersions), ""_span, 1);
+    AddDeviceEndpoint(&TempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
+                      Span<DataVersion>(gTempSensor2DataVersions), ""_span, 1);
+
+    // Add composed Device with two temperature sensors and a power source
+    AddDeviceEndpoint(&gComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
+                      Span<DataVersion>(gComposedDeviceDataVersions), ""_span, 1);
+    AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint,
+                      Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
+                      Span<DataVersion>(gComposedTempSensor1DataVersions), "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span,
+                      gComposedDevice.GetEndpointId());
+    AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint,
+                      Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
+                      Span<DataVersion>(gComposedTempSensor2DataVersions), "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02"_span,
+                      gComposedDevice.GetEndpointId());
+
+    // Add 4 lights for the Action Clusters tests
+    AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight1DataVersions), ""_span, 1);
+    AddDeviceEndpoint(&ActionLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight2DataVersions), ""_span, 1);
+    AddDeviceEndpoint(&ActionLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight3DataVersions), ""_span, 1);
+    AddDeviceEndpoint(&ActionLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                      Span<DataVersion>(gActionLight4DataVersions), ""_span, 1);
+#endif
 
     // Because the power source is on the same endpoint as the composed device, it needs to be explicitly added
     gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT] = &ComposedPowerSource;
@@ -1011,6 +1081,14 @@ void ApplicationInit()
         }
     }
 
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
+    }
+
     AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
 }
 
@@ -1018,10 +1096,76 @@ void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
+    }
+
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;
     }
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+BridgeAppCommandHandler * BridgeAppCommandHandler::FromJSON(const char * json)
+{
+    Json::Reader reader;
+    Json::Value value;
+
+    if (!reader.parse(json, value))
+    {
+        ChipLogError(NotSpecified, "Bridge App: Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
+        return nullptr;
+    }
+
+    if (value.empty() || !value.isObject())
+    {
+        ChipLogError(NotSpecified, "Bridge App: Invalid JSON command received");
+        return nullptr;
+    }
+
+    if (!value.isMember("Name") || !value["Name"].isString())
+    {
+        ChipLogError(NotSpecified, "Bridge App: Invalid JSON command received: command name is missing");
+        return nullptr;
+    }
+
+    return Platform::New<BridgeAppCommandHandler>(std::move(value));
+}
+
+void BridgeAppCommandHandler::HandleCommand(intptr_t context)
+{
+    auto * self      = reinterpret_cast<BridgeAppCommandHandler *>(context);
+    std::string name = self->mJsonValue["Name"].asString();
+
+    VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
+
+    if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
+        Light1.SetConfigurationVersion(configVersion);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
+        VerifyOrDie(false && "Named pipe command not supported, see log above.");
+    }
+
+exit:
+    Platform::Delete(self);
+}
+
+void BridgeCommandDelegate::OnEventCommandReceived(const char * json)
+{
+    auto handler = BridgeAppCommandHandler::FromJSON(json);
+    if (nullptr == handler)
+    {
+        ChipLogError(NotSpecified, "Bridge App: Unable to instantiate a command handler");
+        return;
+    }
+
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(BridgeAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

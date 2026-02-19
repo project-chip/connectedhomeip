@@ -51,7 +51,7 @@ using Milliseconds64      = System::Clock::Milliseconds64;
 
 static const size_t kNumMaxReadHandlers = 16;
 
-class TestReportScheduler : public chip::Test::AppContext
+class TestReportScheduler : public chip::Testing::AppContext
 {
 public:
     void TestReadHandlerList();
@@ -96,7 +96,7 @@ public:
     }
 };
 
-class TestTimerDelegate : public ReportScheduler::TimerDelegate
+class TestTimerDelegate : public TimerDelegate
 {
 public:
     struct NodeTimeoutPair
@@ -156,7 +156,7 @@ public:
         context->TimerFired();
         ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
-    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
         return insertPair(static_cast<ReadHandlerNode *>(context), aTimeout + mMockSystemTimestamp);
     }
@@ -193,7 +193,7 @@ public:
 /// on the system layer. This also simulates the system timer by verifying if the timeout expired when incrementing the mock
 /// timestamp. only one timer can be active at a time, which is the one has the earliest timeout.
 /// It is used to test the SynchronizedReportSchedulerImpl.
-class TestTimerSynchronizedDelegate : public ReportScheduler::TimerDelegate
+class TestTimerSynchronizedDelegate : public TimerDelegate
 {
 public:
     static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
@@ -201,7 +201,7 @@ public:
         TimerContext * context = static_cast<TimerContext *>(aAppState);
         context->TimerFired();
     }
-    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
         if (nullptr == context)
         {
@@ -276,8 +276,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReadHandlerList)
     for (size_t i = 0; i < kNumMaxReadHandlers; i++)
     {
         ReadHandler * readHandler =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler,
-                                         CodegenDataModelProviderInstance(nullptr /* delegate */));
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         sScheduler.OnSubscriptionEstablished(readHandler);
         ASSERT_NE(nullptr, readHandler);
         ASSERT_NE(nullptr, sScheduler.FindReadHandlerNode(readHandler));
@@ -341,22 +340,19 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestReportTiming)
     // Dirty read handler, will be triggered at min interval
     // Test OnReadHandler created
     ReadHandler * readHandler1 =
-        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler,
-                                     CodegenDataModelProviderInstance(nullptr /* delegate */));
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 2));
     readHandler1->ForceDirtyState();
 
     // Clean read handler, will be triggered at max interval
     ReadHandler * readHandler2 =
-        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler,
-                                     CodegenDataModelProviderInstance(nullptr /* delegate */));
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler2, &sScheduler, 0, 3));
 
     // Clean read handler, will be triggered at max interval, but will be cancelled before
     ReadHandler * readHandler3 =
-        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler,
-                                     CodegenDataModelProviderInstance(nullptr /* delegate */));
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler3, &sScheduler, 0, 3));
 
     // Confirms that none of the ReadHandlers are currently reportable
@@ -409,8 +405,8 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestObserverCallbacks)
     // Initialize mock timestamp
     sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
 
-    ReadHandler * readHandler = readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe,
-                                                             &sScheduler, CodegenDataModelProviderInstance(nullptr /* delegate */));
+    ReadHandler * readHandler =
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler, &sScheduler, 1, 2));
 
@@ -486,15 +482,13 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
     sTestTimerSynchronizedDelegate.SetMockSystemTimestamp(System::Clock::Milliseconds64(0));
 
     ReadHandler * readHandler1 =
-        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler,
-                                     CodegenDataModelProviderInstance(nullptr /* delegate */));
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler1, &syncScheduler, 0, 2));
     ReadHandlerNode * node1 = syncScheduler.FindReadHandlerNode(readHandler1);
 
     ReadHandler * readHandler2 =
-        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler,
-                                     CodegenDataModelProviderInstance(nullptr /* delegate */));
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler2, &syncScheduler, 1, 3));
 
     ReadHandlerNode * node2 = syncScheduler.FindReadHandlerNode(readHandler2);
@@ -622,8 +616,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
     sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
 
     ReadHandler * readHandler3 =
-        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler,
-                                     CodegenDataModelProviderInstance(nullptr /* delegate */));
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler3, &syncScheduler, 2, 3));
     ReadHandlerNode * node3 = syncScheduler.FindReadHandlerNode(readHandler3);
@@ -677,8 +670,7 @@ TEST_F_FROM_FIXTURE(TestReportScheduler, TestSynchronizedScheduler)
 
     // Now simulate a new readHandler being added with a max forcing a conflict
     ReadHandler * readHandler4 =
-        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler,
-                                     CodegenDataModelProviderInstance(nullptr /* delegate */));
+        readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
 
     EXPECT_EQ(CHIP_NO_ERROR, MockReadHandlerSubscriptionTransaction(readHandler4, &syncScheduler, 0, 1));
     ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);
