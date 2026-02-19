@@ -254,7 +254,7 @@ class TC_ACS_3_2(MatterBaseTest):
                 timeout_sec=30.0)
             log.info("Received attribute report for HumanActivityDetected.")
             attrib_listener.reset()
-            
+
         if self.ObjectIdentificationSupported:
             objectIdentified = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
@@ -269,7 +269,7 @@ class TC_ACS_3_2(MatterBaseTest):
                 timeout_sec=30.0)
             log.info("Received attribute report for ObjectIdentified.")
             attrib_listener.reset()
-            
+
         if self.SoundIdentificationSupported:
             audioContextDetected = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
@@ -288,3 +288,4 @@ class TC_ACS_3_2(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
