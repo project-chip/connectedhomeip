@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CAMERA_APP}
+#     app: ${ALL_CLUSTER_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -53,6 +53,13 @@ min_value_uint16 = np.iinfo(np.uint16).min
 max_value_uint16 = np.iinfo(np.uint16).max
 min_value_uint32 = np.iinfo(np.uint32).min
 max_value_uint32 = np.iinfo(np.uint32).max
+
+HUMANACTIVITYNAMESPACEID = 0x4B
+HUMANACTIVITYMAXTAGNUMBER = 0X09
+OBJECTIDENTIFICATIONNAMESPACEID = 0x49
+OBJECTIDENTIFICATIONMAXTAGNUMBER = 0X0C
+SOUNDIDENTIFICATIONNAMESPACEID = 0x4A
+SOUNDIDENTIFICATIONMAXTAGNUMBER = 0X15
 
 
 class TC_ACS_2_1(MatterBaseTest):
@@ -109,10 +116,15 @@ class TC_ACS_2_1(MatterBaseTest):
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
         log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         self.HumanActivitySupported = aFeatureMap & cluster.Bitmaps.Feature.kHumanActivity
+        log.info(f"Rx'd HumanActivitySupported: {self.HumanActivitySupported}")
         self.ObjectCountingSupported = aFeatureMap & cluster.Bitmaps.Feature.kObjectCounting
+        log.info(f"Rx'd ObjectCountingSupported: {self.ObjectCountingSupported}")
         self.ObjectIdentificationSupported = aFeatureMap & cluster.Bitmaps.Feature.kObjectIdentification
+        log.info(f"Rx'd ObjectIdentificationSupported: {self.ObjectIdentificationSupported}")
         self.SoundIdentificationSupported = aFeatureMap & cluster.Bitmaps.Feature.kSoundIdentification
+        log.info(f"Rx'd SoundIdentificationSupported: {self.SoundIdentificationSupported}")
         self.PredictedActivitySupported = aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity
+        log.info(f"Rx'd PredictedActivitySupported: {self.PredictedActivitySupported}")
 
         if self.HumanActivitySupported:
             self.step("2")
@@ -160,21 +172,21 @@ class TC_ACS_2_1(MatterBaseTest):
             tagID = ambientContextType.ambientContextSensed.tag
 
             if self.HumanActivitySupported:
-                asserts.assert_true((nsID == 0x4B) and (tagID <= 0x09),
-                                    "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
+                asserts.assert_equal(nsID, HUMANACTIVITYNAMESPACEID, "Not Identified Human Activity Namespace ID")
+                asserts.assert_less_equal(tagID, HUMANACTIVITYMAXTAGNUMBER, "Tag number doesn't exit.")
 
             if self.ObjectIdentificationSupported:
-                asserts.assert_true((nsID == 0x49) and (tagID <= 0x0C),
-                                    "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                asserts.assert_equal(nsID, OBJECTIDENTIFICATIONNAMESPACEID, "Not Identified Object Namespace ID")
+                asserts.assert_less_equal(tagID, OBJECTIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
 
             if self.SoundIdentificationSupported:
-                asserts.assert_true((nsID == 0x4A) and (tagID <= 0x16),
-                                    "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                asserts.assert_equal(nsID, SOUNDIDENTIFICATIONNAMESPACEID, "Not Identifid Sound Namespace ID")
+                asserts.assert_less_equal(tagID, SOUNDIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
 
             if "detectionStartTime" in ambientContextType:
                 self.step("5a")
-                asserts.assert_true(min_value_uint32 <= ambientContextType.detectionStartTime <= max_value_uint32,
-                                    "DetectionStartTime must be an unsigned 32-bit scalar.")
+                asserts.assert_less_equal(min_value_uint32, ambientContextType.detectionStartTime, "DetectionStartTime is not uint32.")
+                asserts.assert_less_equal(ambientContextType.detectionStartTime, max_value_uint32, "DetectionStartTime is not uint32.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
@@ -186,7 +198,7 @@ class TC_ACS_2_1(MatterBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported
             )
             log.info(f"Rx'd AmbientContextTypeSupported: {ambientContextTypeSupported}")
-            asserts.assert_true(len(ambientContextTypeSupported) <= 50,
+            asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
                                 "AmbientContextTypeSupported should be less than equalt to 50.")
 
             for acts in ambientContextTypeSupported:
@@ -194,16 +206,16 @@ class TC_ACS_2_1(MatterBaseTest):
                 tagID = acts.tag
 
                 if self.HumanActivitySupported:
-                    asserts.assert_true(nsID == 0x4B & tagID <= 0x09,
-                                        "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
+                    asserts.assert_equal(nsID, HUMANACTIVITYNAMESPACEID, "Not Identified Human Activity Namespace ID")
+                    asserts.assert_less_equal(tagID, HUMANACTIVITYMAXTAGNUMBER, "Tag number doesn't exit.")
 
                 if self.ObjectIdentificationSupported:
-                    asserts.assert_true(nsID == 0x49 & tagID <= 0x0C,
-                                        "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                    asserts.assert_equal(nsID, OBJECTIDENTIFICATIONNAMESPACEID, "Not Identified Object Namespace ID")
+                    asserts.assert_less_equal(tagID, OBJECTIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
 
                 if self.SoundIdentificationSupported:
-                    asserts.assert_true(nsID == 0x4A & tagID <= 0x16,
-                                        "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                    asserts.assert_equal(nsID, SOUNDIDENTIFICATIONNAMESPACEID, "Not Identifid Sound Namespace ID")
+                    asserts.assert_less_equal(tagID, SOUNDIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("6")
@@ -230,12 +242,13 @@ class TC_ACS_2_1(MatterBaseTest):
 
             # object should come from Identified Object namespace
             log.info(f"Rx'd ObjectCountConfig: {objectCountConfig}")
-            asserts.assert_true(nsID == 0x49 & tagID <= 0x0C,
-                                "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
-
+            asserts.assert_equal(nsID, OBJECTIDENTIFICATIONNAMESPACEID, "Not Identified Object Namespace ID")
+            asserts.assert_less_equal(tagID, OBJECTIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
+            
             # ObjectCountThreshold should be uint16
-            asserts.assert_true((type(objectCountConfig.objectCountThreshold) is int) and (min_value_uint16 <= objectCountConfig.objectCountThreshold <= max_value_uint16),
-                                "Threshold value should be uint16 data.")
+            asserts.assert_true((type(objectCountConfig.objectCountThreshold) is int), "Threshold value should be uint16 data.")
+            asserts.assert_less_equal(min_value_uint16, objectCountConfig.objectCountThreshold, "Threshold value should be uint16 data.")
+            asserts.assert_less_equal(objectCountConfig.objectCountThreshold, max_value_uint16, "Threshold value should be uint16 data.")
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
             self.skip_step("8")
@@ -245,9 +258,9 @@ class TC_ACS_2_1(MatterBaseTest):
 
             # ObjectCount should be uint16
             if "objectCount" in objectCountConfig:
-                asserts.assert_true((type(objectCountConfig.objectCount) is int) and (
-                    min_value_uint16 <= objectCountConfig.objectCount <= max_value_uint16),
-                    "ObjectCount must be an unsigned 16-bit integer.")
+                asserts.assert_true((type(objectCountConfig.objectCount) is int), "ObjectCount value should be uint16 data.")
+                asserts.assert_less_equal(min_value_uint16, objectCountConfig.objectCount, "ObjectCount value should be uint16 data.")
+                asserts.assert_less_equal(objectCountConfig.objectCount, max_value_uint16, "ObjectCount value should be uint16 data.")
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
             self.skip_step("9")
@@ -257,27 +270,27 @@ class TC_ACS_2_1(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit
         )
         log.info(f"Rx'd AudioContextDetected: {simultaneousDetectionLimit}")
-        asserts.assert_true(1 <= simultaneousDetectionLimit <= 10,
-                            "SimultaneousDetectionLimit is not within 1 and 10.")
+        asserts.assert_less_equal(1, simultaneousDetectionLimit, "SimultaneousDetectionLimit is not within 1 and 10.")
+        asserts.assert_less_equal(simultaneousDetectionLimit, 10, "SimultaneousDetectionLimit is not within 1 and 10.")
 
         self.step("11")
         holdTime = await self.read_single_attribute_expect_success(endpoint=endpoint, attribute=attr.HoldTime)
         holdTimeLimits = await self.read_single_attribute_expect_success(endpoint=endpoint, attribute=attr.HoldTimeLimits)
         log.info(f"Rx'd HoldTime: {holdTime}")
-        asserts.assert_true(holdTimeLimits.holdTimeMin <= holdTime <= holdTimeLimits.holdTimeMax,
-                            "Expected to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime, "Expected to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTime, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
 
         self.step("12")
         log.info(f"Rx'd HoldTimeLimits: {holdTimeLimits}")
-        asserts.assert_true(holdTimeLimits.holdTimeMin >= 1,
+        asserts.assert_less_equal(holdTimeLimits.holdTimeMin, 1,
                             "Expected HoldTimeMin to be greater than equal to 1.")
 
         minformax = max(holdTimeLimits.holdTimeMin, 10)
-        asserts.assert_true(holdTimeLimits.holdTimeMax >= minformax,
+        sserts.assert_less_equal(holdTimeLimits.holdTimeMax, minformax,
                             "Expected HoldTimeMax to be greater than equal to max(holdTimeLimits.holdTimeMin, 10).")
 
-        asserts.assert_true(holdTimeLimits.holdTimeMin <= holdTimeLimits.holdTimeDefault <= holdTimeLimits.holdTimeMax,
-                            "Expected HoldTimeMin to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTimeLimits.holdTimeDefault, "Expected to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTimeLimits.holdTimeDefault, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
 
         if self.PredictedActivitySupported:
             self.step("13")
@@ -287,45 +300,44 @@ class TC_ACS_2_1(MatterBaseTest):
             log.info(f"Rx'd PredictedActivity: {predictedActivity}")
 
             # less than 20
-            asserts.assert_true(len(predictedActivity) <= 20,
-                                "PredictedActivity should be less than 20.")
+            asserts.assert_less_equal(len(predictedActivity), 20, "PredictedActivity should be less than 20.")
 
             startTime = predictedActivity.startTimestamp
             endTime = predictedActivity.endTimestamp
 
             # StartTimestamp should be epoch-s (uint32)
-            asserts.assert_true(startTime <= endTime-1,
-                                "StartTimestamp must be less than EndTimestamp.")
+            asserts.assert_less_equal(startTime, endTime-1, "StartTimestamp must be less than EndTimestamp.")
 
             # EndTimestamp should be epoch-s (uint32)
-            asserts.assert_true(endTime >= startTime+1,
-                                "EndTimestamp must be greater than StartTimestamp.")
+            asserts.assert_less_equal(endTime, startTime+1, "EndTimestamp must be greater than StartTimestamp.")
 
             # Confidence
-            asserts.assert_true(0 <= predictedActivity.confidence <= 100,
+            asserts.assert_less_equal(0, predictedActivity.confidence,
+                                "Expected the percentage to be between 0 and 100.")
+            asserts.assert_less_equal(predictedActivity.confidence, 100,
                                 "Expected the percentage to be between 0 and 100.")
 
             if self.HumanActivitySupported | self.ObjectIdentificationSupported | self.SoundIdentificationSupported:
                 self.step("13a")
 
                 # AmbientContextType
-                asserts.assert_true(len(predictedActivity.ambientContextType) <= 100, "AmbientContextType should be less than 100.")
+                asserts.assert_less_equal(len(predictedActivity.ambientContextType), "AmbientContextType should be less than 100.")
 
                 for acts in predictedActivity.ambientContextType:
                     nsID = acts.namespaceID
                     tagID = acts.tag
 
                     if self.HumanActivitySupported:
-                        asserts.assert_true(nsID == 0x4B & tagID <= 0x09,
-                                            "Namespace ID and Tag ID must belong to IdentifiedHumanActivity Namespace.")
+                        asserts.assert_equal(nsID, HUMANACTIVITYNAMESPACEID, "Not Identified Human Activity Namespace ID")
+                        asserts.assert_less_equal(tagID, HUMANACTIVITYMAXTAGNUMBER, "Tag number doesn't exit.")
 
                     if self.ObjectIdentificationSupported:
-                        asserts.assert_true(nsID == 0x49 & tagID <= 0x0C,
-                                            "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
-
+                        asserts.assert_equal(nsID, OBJECTIDENTIFICATIONNAMESPACEID, "Not Identified Object Namespace ID")
+                        asserts.assert_less_equal(tagID, OBJECTIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
+    
                     if self.SoundIdentificationSupported:
-                        asserts.assert_true(nsID == 0x4A & tagID <= 0x16,
-                                            "Namespace ID and Tag ID must belong to IdentifiedObject Namespace.")
+                        asserts.assert_equal(nsID, SOUNDIDENTIFICATIONNAMESPACEID, "Not Identifid Sound Namespace ID")
+                        asserts.assert_less_equal(tagID, SOUNDIDENTIFICATIONMAXTAGNUMBER, "Tag number doesn't exit.")
             else:
                 log.info("Test step 13a skipped")
                 self.skip_step("13a")
@@ -340,8 +352,8 @@ class TC_ACS_2_1(MatterBaseTest):
                 # CrowdCount
                 if "crowdCount" in predictedActivity:
                     log.info(f"Rx'd CrowdCount: {predictedActivity.crowdCount}")
-                    asserts.assert_true(min_value_uint8 <= predictedActivity.crowdCount <=
-                                        max_value_uint8, "CrowdCount is expected to be between 1 and 254.")
+                    asserts.assert_less_equal(min_value_uint8, predictedActivity.crowdCount, "CrowdCount is expected to be between 1 and 254.")
+                    asserts.assert_less_equal(predictedActivity.crowdCount, max_value_uint8, "CrowdCount is expected to be between 1 and 254.")
             else:
                 log.info("Test step 13b skipped")
                 self.skip_step("13b")
@@ -355,4 +367,3 @@ class TC_ACS_2_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
