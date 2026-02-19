@@ -322,9 +322,9 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestActionsCluster.cpp",
       "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
-      "TestActionsCluster.cpp",
       "TestSceneTable.cpp",
     ]
     public_deps += [
