@@ -98,7 +98,7 @@ source_set("actions-cluster-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/actions-server/ActionsCluster.cpp",
     "${chip_root}/src/app/clusters/actions-server/actions-server.h",
-    ]
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
