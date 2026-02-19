@@ -19,9 +19,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
 
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/GroupsCluster.cpp"
-    "${CLUSTER_DIR}/GroupsCluster.h"
-)

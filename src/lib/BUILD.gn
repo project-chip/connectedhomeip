@@ -18,6 +18,7 @@ import("lib.gni")
 
 source_set("app-server-clusters") {
   public_deps = [
+    # keep-sorted: start
     "${chip_root}/src/app/clusters/access-control-server:access-control-server",
     "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
     "${chip_root}/src/app/clusters/basic-information:basic-information",
@@ -39,6 +40,8 @@ source_set("app-server-clusters") {
     "${chip_root}/src/app/clusters/scenes-server:scenes-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-diagnostics-server",
     "${chip_root}/src/app/clusters/wifi-network-diagnostics-server:wifi-network-diagnostics-server",
+
+    # keep-sorted: end
   ]
 }
 

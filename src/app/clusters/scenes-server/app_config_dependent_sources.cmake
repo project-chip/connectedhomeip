@@ -24,19 +24,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/scenes-server.h"
 )
 
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    # these below would be pulled by GN (.gni file) dependency. CMAKE needs these directly
-    "${CLUSTER_DIR}/AttributeValuePairValidator.h"
-    "${CLUSTER_DIR}/ExtensionFieldSets.h"
-    "${CLUSTER_DIR}/ExtensionFieldSetsImpl.cpp"
-    "${CLUSTER_DIR}/ExtensionFieldSetsImpl.h"
-    "${CLUSTER_DIR}/SceneHandlerImpl.cpp"
-    "${CLUSTER_DIR}/SceneHandlerImpl.h"
-    "${CLUSTER_DIR}/ScenesManagementCluster.cpp"
-    "${CLUSTER_DIR}/ScenesManagementCluster.h"
-    "${CLUSTER_DIR}/SceneTable.h"
-    "${CLUSTER_DIR}/SceneTableImpl.cpp"
-    "${CLUSTER_DIR}/SceneTableImpl.h"
-)
