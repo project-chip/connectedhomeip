@@ -350,7 +350,7 @@ class TC_ACS_3_3(MatterBaseTest):
         attrib_listener.reset()
         event_listener.reset()
         log.info("Cleared accumulated reports. Restarting accumulation.")
-        
+
         if self.SoundIdentificationSupported:
             self.step("5a")
             audioContextDetected = await self.read_single_attribute_check_success(
@@ -512,7 +512,7 @@ class TC_ACS_3_3(MatterBaseTest):
         attrib_listener.reset()
         event_listener.reset()
         log.info("Cleared accumulated reports. Restarting accumulation.")
-        
+
         # SimultaneousDetectionLimit attribute subscription test
         self.step("7a")
         simultaneousDetectionLimit = await self.read_single_attribute_check_success(
@@ -538,7 +538,7 @@ class TC_ACS_3_3(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
 
         self.step("8b")
-        asserts.assert_true(holdTime == PIXITHoldTimeTest, "Expected a different value from 8a.")
+        asserts.assert_equal(holdTime, holdtime_input, "Expected a different value from 8a.")
         await self.write_single_attribute(attr.HoldTime(holdtime_input))
 
         self.step("8c")
@@ -553,3 +553,4 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
