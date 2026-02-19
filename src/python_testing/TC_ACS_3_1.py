@@ -274,7 +274,7 @@ class TC_ACS_3_1(MatterBaseTest):
             subscription_expected2 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag1, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
-                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected2 subscription_expected1])],
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected2, subscription_expected1])],
                 timeout_sec=30.0)
             # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
             log.info("Received attribute report for AmbientContextType.")
@@ -319,7 +319,7 @@ class TC_ACS_3_1(MatterBaseTest):
             subscription_expected3 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag3, detectionTime=None)
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
-                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected3 subscription_expected2])],
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected3, subscription_expected2])],
                 timeout_sec=30.0)
             # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
             log.info("Received attribute report for AmbientContextType.")
@@ -366,3 +366,4 @@ class TC_ACS_3_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
