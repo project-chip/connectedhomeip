@@ -16,5 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/actions-server.cpp"
+    "${CLUSTER_DIR}/ActionsCluster.cpp"
 )
