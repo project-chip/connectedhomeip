@@ -25134,29 +25134,6 @@ Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::IlluminanceMea
 namespace TemperatureMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)
-{
-    using Traits = NumericAttributeTraits<int16_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-} // namespace MeasuredValue
-
 namespace MinMeasuredValue {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value)

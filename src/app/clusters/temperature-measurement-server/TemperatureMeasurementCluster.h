@@ -31,7 +31,6 @@ public:
 
     struct StartupConfiguration
     {
-        DataModel::Nullable<int16_t> measuredValue{};
         DataModel::Nullable<int16_t> minMeasuredValue{};
         DataModel::Nullable<int16_t> maxMeasuredValue{};
         uint16_t tolerance{};

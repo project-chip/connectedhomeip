@@ -3976,10 +3976,6 @@ Get(EndpointId endpoint,
 namespace TemperatureMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
-} // namespace MeasuredValue
-
 namespace MinMeasuredValue {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
 } // namespace MinMeasuredValue

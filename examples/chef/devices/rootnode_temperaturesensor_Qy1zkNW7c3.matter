@@ -1945,7 +1945,7 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue default = 2350;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = -27315;
     ram      attribute maxMeasuredValue default = 32767;
     callback attribute generatedCommandList;

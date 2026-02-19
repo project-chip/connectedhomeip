@@ -2830,7 +2830,7 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;

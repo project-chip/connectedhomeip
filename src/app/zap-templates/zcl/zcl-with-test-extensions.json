@@ -422,7 +422,11 @@
             "global_struct",
             "nullable_global_struct"
         ],
-        "Temperature Measurement": ["ClusterRevision", "FeatureMap"],
+        "Temperature Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",
