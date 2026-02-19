@@ -459,7 +459,8 @@ class TC_ACS_3_3(MatterBaseTest):
 
             # subscription check
             semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=NullValue)
-            subscription_expected = cluster.Structs.ObjectCountConfigStruct(countingObject=semantic_tag, objectCountThreshold=objectcountthreshold_input)
+            subscription_expected = cluster.Structs.ObjectCountConfigStruct(
+                countingObject=semantic_tag, objectCountThreshold=objectcountthreshold_input)
             attrib_listener.await_all_final_values_reported(
                 expected_final_values=[AttributeValue(
                     endpoint_id=endpoint, attribute=attr.ObjectCountConfig, value=subscription_expected)],
@@ -509,10 +510,4 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-
-
-
-
-
 
