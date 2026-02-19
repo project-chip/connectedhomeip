@@ -93,9 +93,10 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
         # Step 2: TH sends a Timed Request Message (Timed Write Transaction) with timeout,
         # waits for status response, then sends Write Request
         self.step(2)
+        expected_value = 21
         write_result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
-            attributes=[(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(21))],
+            attributes=[(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(expected_value))],
             timedRequestTimeoutMs=500
         )
 
@@ -110,8 +111,8 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
         )
 
         new_value = read_result[self.endpoint][Clusters.LevelControl][Clusters.LevelControl.Attributes.OnLevel]
-        asserts.assert_equal(new_value, 21,
-                             f"Step 2: Read back value after timed write should be 21, got {new_value}")
+        asserts.assert_equal(new_value, expected_value,
+                             f"Step 2: Read back value after timed write should be {expected_value}, got {new_value}")
 
         # Step 3: TH sends a Timed Request Message (Timed Invoke Transaction) with timeout,
         # waits for status response, waits 5 seconds (timer expired), then sends Invoke Request
