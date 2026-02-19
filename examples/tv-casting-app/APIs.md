@@ -1212,13 +1212,18 @@ subsequent connections to that TV.
    is similar to item (3) - the pin code flow will be attempted and fail, the
    cached credential will be deleted which allows the next attempt to succeed.
    Some middleware providers may handle this scenario differently.
+
 ### Handling Passcode Failures and Passcode Length
 
 #### Detecting Passcode Failure
 
-When commissioning fails due to an incorrect passcode, the Casting Client can detect this condition in the `onFailure` `ConnectionCallback`. The failure will be indicated by a `MatterError` with `errorCode = 0x38`, which corresponds to `CHIP_ERROR_INVALID_PASE_PARAMETER`.
+When commissioning fails due to an incorrect passcode, the Casting Client can
+detect this condition in the `onFailure` `ConnectionCallback`. The failure will
+be indicated by a `MatterError` with `errorCode = 0x38`, which corresponds to
+`CHIP_ERROR_INVALID_PASE_PARAMETER`.
 
 When this error occurs, the Casting Client should:
+
 1. Inform the user that the passcode was incorrect
 2. Prompt the user to re-enter the passcode
 3. Retry the connection with the new passcode
@@ -1241,7 +1246,8 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
 }
 ```
 
-On Android, you can detect passcode failures in the `MatterCallback<MatterError>`:
+On Android, you can detect passcode failures in the
+`MatterCallback<MatterError>`:
 
 ```java
 new MatterCallback<MatterError>() {
@@ -1287,11 +1293,16 @@ let connectionCompleteCallback: (Swift.Error?) -> Void = { err in
 
 #### Determining Passcode Length for Entry Dialog
 
-The `passcodeLength` field is provided in the `CommissionerDeclaration` sent by the TV during the commissioning process. This field indicates the expected length of the passcode that should be entered by the user.
+The `passcodeLength` field is provided in the `CommissionerDeclaration` sent by
+the TV during the commissioning process. This field indicates the expected
+length of the passcode that should be entered by the user.
 
 When implementing the passcode entry dialog:
-- If `passcodeLength` is `0` or not provided, the Casting Client should provide a variable-length input field for passcode entry
-- If `passcodeLength` has a specific value (e.g., 8), the Casting Client should configure the input field to accept exactly that many digits
+
+-   If `passcodeLength` is `0` or not provided, the Casting Client should
+    provide a variable-length input field for passcode entry
+-   If `passcodeLength` has a specific value (e.g., 8), the Casting Client
+    should configure the input field to accept exactly that many digits
 
 On Linux, you can access the passcode length from the `CommissionerDeclaration`:
 
@@ -1300,7 +1311,7 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
                                      chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
 {
     uint8_t passcodeLength = cd.GetPasscodeLength();
-    
+
     if (passcodeLength == 0) {
         ChipLogProgress(AppServer, "Variable-length passcode expected");
         // Display variable-length input field
@@ -1308,7 +1319,7 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
         ChipLogProgress(AppServer, "Fixed-length passcode expected: %d digits", passcodeLength);
         // Display fixed-length input field with passcodeLength digits
     }
-    
+
     if (cd.GetCommissionerPasscode()) {
         // Prompt user to enter the passcode displayed on the CastingPlayer
         ...
@@ -1316,14 +1327,15 @@ void CommissionerDeclarationCallback(const chip::Transport::PeerAddress & source
 }
 ```
 
-On Android, you can access the passcode length from the `CommissionerDeclaration`:
+On Android, you can access the passcode length from the
+`CommissionerDeclaration`:
 
 ```java
 new MatterCallback<CommissionerDeclaration>() {
     @Override
     public void handle(CommissionerDeclaration cd) {
         int passcodeLength = cd.getPasscodeLength();
-        
+
         if (cd.getCommissionerPasscode()) {
             getActivity().runOnUiThread(() -> {
                 if (passcodeLength == 0) {
@@ -1347,7 +1359,7 @@ On iOS, you can access the passcode length from the `MCCommissionerDeclaration`:
 let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { commissionerDeclarationMessage in
     DispatchQueue.main.async {
         let passcodeLength = commissionerDeclarationMessage.passcodeLength
-        
+
         if commissionerDeclarationMessage.commissionerPasscode {
             if let topViewController = self.getTopMostViewController() {
                 if passcodeLength == 0 {

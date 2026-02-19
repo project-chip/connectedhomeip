@@ -713,7 +713,7 @@ void CastingPlayer::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "CastingPlayer::OnCommissioningSessionEstablishmentError() err: %" CHIP_ERROR_FORMAT, err.Format());
     mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-    support::ChipDeviceEventHandler::SetUdcStatus(false);
+    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     if (mOnCompleted != nullptr)
     {
         // err = 0x38 = CHIP_ERROR_INVALID_PASE_PARAMETER upon bad passcode
