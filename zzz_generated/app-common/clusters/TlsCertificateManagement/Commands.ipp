@@ -41,7 +41,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCertificate)) | (1 << to_underlying(Fields::kCaid));
+    static_assert(to_underlying(Fields::kCertificate) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kCaid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -73,7 +76,9 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCaid));
+    static_assert(to_underlying(Fields::kCaid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -101,7 +106,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCaid));
+    static_assert(to_underlying(Fields::kCaid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -130,7 +137,9 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCertificateDetails));
+    static_assert(to_underlying(Fields::kCertificateDetails) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -158,7 +167,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kFingerprint));
+    static_assert(to_underlying(Fields::kFingerprint) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -186,7 +197,9 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCaid));
+    static_assert(to_underlying(Fields::kCaid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -214,7 +227,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCaid));
+    static_assert(to_underlying(Fields::kCaid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -243,7 +258,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kNonce)) | (1 << to_underlying(Fields::kCcdid));
+    static_assert(to_underlying(Fields::kNonce) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kCcdid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -277,7 +295,12 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCcdid)) | (1 << to_underlying(Fields::kCsr)) |
+        (1 << to_underlying(Fields::kNonceSignature));
+    static_assert(to_underlying(Fields::kCcdid) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kCsr) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kNonceSignature) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -315,7 +338,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCcdid)) |
+        (1 << to_underlying(Fields::kClientCertificate)) | (1 << to_underlying(Fields::kIntermediateCertificates));
+    static_assert(to_underlying(Fields::kCcdid) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kClientCertificate) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIntermediateCertificates) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -351,7 +379,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCcdid));
+    static_assert(to_underlying(Fields::kCcdid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -380,7 +410,9 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCertificateDetails));
+    static_assert(to_underlying(Fields::kCertificateDetails) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -408,7 +440,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kFingerprint));
+    static_assert(to_underlying(Fields::kFingerprint) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -436,7 +470,9 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCcdid));
+    static_assert(to_underlying(Fields::kCcdid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -464,7 +500,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCcdid));
+    static_assert(to_underlying(Fields::kCcdid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

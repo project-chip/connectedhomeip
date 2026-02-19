@@ -65,6 +65,7 @@ source_set("encode-decode") {
   deps = [
     ":data-model",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/protocols/interaction_model",
   ]
 
   public_deps = [ ":nullable" ]

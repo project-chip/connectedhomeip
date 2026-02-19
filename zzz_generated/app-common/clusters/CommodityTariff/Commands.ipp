@@ -40,7 +40,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kTariffComponentID));
+    static_assert(to_underlying(Fields::kTariffComponentID) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -70,7 +72,12 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kLabel)) |
+        (1 << to_underlying(Fields::kDayEntryIDs)) | (1 << to_underlying(Fields::kTariffComponent));
+    static_assert(to_underlying(Fields::kLabel) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kDayEntryIDs) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTariffComponent) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -106,7 +113,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kDayEntryID));
+    static_assert(to_underlying(Fields::kDayEntryID) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -134,7 +143,9 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kDayEntry));
+    static_assert(to_underlying(Fields::kDayEntry) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

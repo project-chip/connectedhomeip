@@ -52,7 +52,28 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kExtAddress)) | (1 << to_underlying(Fields::kAge)) |
+        (1 << to_underlying(Fields::kRloc16)) | (1 << to_underlying(Fields::kLinkFrameCounter)) |
+        (1 << to_underlying(Fields::kMleFrameCounter)) | (1 << to_underlying(Fields::kLqi)) |
+        (1 << to_underlying(Fields::kAverageRssi)) | (1 << to_underlying(Fields::kLastRssi)) |
+        (1 << to_underlying(Fields::kFrameErrorRate)) | (1 << to_underlying(Fields::kMessageErrorRate)) |
+        (1 << to_underlying(Fields::kRxOnWhenIdle)) | (1 << to_underlying(Fields::kFullThreadDevice)) |
+        (1 << to_underlying(Fields::kFullNetworkData)) | (1 << to_underlying(Fields::kIsChild));
+    static_assert(to_underlying(Fields::kExtAddress) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kAge) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kRloc16) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLinkFrameCounter) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kMleFrameCounter) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLqi) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kAverageRssi) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLastRssi) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kFrameErrorRate) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kMessageErrorRate) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kRxOnWhenIdle) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kFullThreadDevice) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kFullNetworkData) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIsChild) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -144,7 +165,26 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kActiveTimestampPresent)) |
+        (1 << to_underlying(Fields::kPendingTimestampPresent)) | (1 << to_underlying(Fields::kMasterKeyPresent)) |
+        (1 << to_underlying(Fields::kNetworkNamePresent)) | (1 << to_underlying(Fields::kExtendedPanIdPresent)) |
+        (1 << to_underlying(Fields::kMeshLocalPrefixPresent)) | (1 << to_underlying(Fields::kDelayPresent)) |
+        (1 << to_underlying(Fields::kPanIdPresent)) | (1 << to_underlying(Fields::kChannelPresent)) |
+        (1 << to_underlying(Fields::kPskcPresent)) | (1 << to_underlying(Fields::kSecurityPolicyPresent)) |
+        (1 << to_underlying(Fields::kChannelMaskPresent));
+    static_assert(to_underlying(Fields::kActiveTimestampPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kPendingTimestampPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kMasterKeyPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kNetworkNamePresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kExtendedPanIdPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kMeshLocalPrefixPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kDelayPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kPanIdPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kChannelPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kPskcPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kSecurityPolicyPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kChannelMaskPresent) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -226,7 +266,22 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kExtAddress)) |
+        (1 << to_underlying(Fields::kRloc16)) | (1 << to_underlying(Fields::kRouterId)) | (1 << to_underlying(Fields::kNextHop)) |
+        (1 << to_underlying(Fields::kPathCost)) | (1 << to_underlying(Fields::kLQIIn)) | (1 << to_underlying(Fields::kLQIOut)) |
+        (1 << to_underlying(Fields::kAge)) | (1 << to_underlying(Fields::kAllocated)) |
+        (1 << to_underlying(Fields::kLinkEstablished));
+    static_assert(to_underlying(Fields::kExtAddress) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kRloc16) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kRouterId) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kNextHop) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kPathCost) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLQIIn) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLQIOut) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kAge) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kAllocated) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kLinkEstablished) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -292,7 +347,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap =
+        0 | (1 << to_underlying(Fields::kRotationTime)) | (1 << to_underlying(Fields::kFlags));
+    static_assert(to_underlying(Fields::kRotationTime) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kFlags) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

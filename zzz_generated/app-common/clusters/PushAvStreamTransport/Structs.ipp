@@ -42,7 +42,14 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kInitialDuration)) |
+        (1 << to_underlying(Fields::kAugmentationDuration)) | (1 << to_underlying(Fields::kMaxDuration)) |
+        (1 << to_underlying(Fields::kBlindDuration));
+    static_assert(to_underlying(Fields::kInitialDuration) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kAugmentationDuration) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kMaxDuration) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kBlindDuration) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -84,7 +91,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kZone));
+    static_assert(to_underlying(Fields::kZone) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -118,7 +127,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap =
+        0 | (1 << to_underlying(Fields::kAudioStreamName)) | (1 << to_underlying(Fields::kAudioStreamID));
+    static_assert(to_underlying(Fields::kAudioStreamName) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kAudioStreamID) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -152,7 +165,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap =
+        0 | (1 << to_underlying(Fields::kVideoStreamName)) | (1 << to_underlying(Fields::kVideoStreamID));
+    static_assert(to_underlying(Fields::kVideoStreamName) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kVideoStreamID) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -189,7 +206,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kTriggerType));
+    static_assert(to_underlying(Fields::kTriggerType) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -241,7 +260,15 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCMAFInterface)) |
+        (1 << to_underlying(Fields::kSegmentDuration)) | (1 << to_underlying(Fields::kChunkDuration)) |
+        (1 << to_underlying(Fields::kSessionGroup)) | (1 << to_underlying(Fields::kTrackName));
+    static_assert(to_underlying(Fields::kCMAFInterface) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kSegmentDuration) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kChunkDuration) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kSessionGroup) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTrackName) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -299,7 +326,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kContainerType));
+    static_assert(to_underlying(Fields::kContainerType) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -342,7 +371,17 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kStreamUsage)) |
+        (1 << to_underlying(Fields::kTLSEndpointID)) | (1 << to_underlying(Fields::kUrl)) |
+        (1 << to_underlying(Fields::kTriggerOptions)) | (1 << to_underlying(Fields::kIngestMethod)) |
+        (1 << to_underlying(Fields::kContainerOptions));
+    static_assert(to_underlying(Fields::kStreamUsage) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTLSEndpointID) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kUrl) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTriggerOptions) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIngestMethod) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kContainerOptions) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -430,7 +469,11 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap =
+        0 | (1 << to_underlying(Fields::kConnectionID)) | (1 << to_underlying(Fields::kTransportStatus));
+    static_assert(to_underlying(Fields::kConnectionID) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTransportStatus) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -472,7 +515,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap =
+        0 | (1 << to_underlying(Fields::kContainerFormat)) | (1 << to_underlying(Fields::kIngestMethod));
+    static_assert(to_underlying(Fields::kContainerFormat) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIngestMethod) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

@@ -226,6 +226,11 @@ protected:
                                             Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricID)),
                                         static_cast<FabricId>(0x1122334455667788ULL)));
         ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kNodeID),
+                       static_cast<NodeId>(0x99aabbccddeeffULL)));
+        ReturnErrorOnFailure(writer.PutString(
+            TLV::ContextTag(Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kLabel), ""_span));
+        ReturnErrorOnFailure(
             writer.Put(TLV::ContextTag(static_cast<uint8_t>(
                            Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Fields::kFabricIndex)),
                        fabricIndex));
