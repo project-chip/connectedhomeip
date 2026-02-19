@@ -322,7 +322,7 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
             asserts.assert_equal(event.ambientContextType.ambientContextSensed.namespaceID, namespaceID2,
-                                "Wrong NamespaceID")
+                                 "Wrong NamespaceID")
             asserts.assert_equal(event.ambientContextType.ambientContextSensed.tag, tag2, "Wrong Tag")
             # Ignore object count
 
@@ -486,7 +486,7 @@ class TC_ACS_3_3(MatterBaseTest):
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
             if attr.ObjectCount in attribute_list:
                 asserts.assert_greater_equal(event.objectCount, objectcountthreshold_input,
-                                    "Object Count number is greater than or equal to ObjectCountThreshold.")
+                                             "Object Count number is greater than or equal to ObjectCountThreshold.")
 
             # store the event number
             event_number = event.event_id
@@ -553,4 +553,5 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
