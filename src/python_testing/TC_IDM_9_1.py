@@ -125,8 +125,7 @@ class TC_IDM_9_1(IDMBaseTest, BasicCompositionTests):
             # CountryCode field is string with constraint length=2
             cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
                 newRegulatoryConfig=Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor,
-                countryCode="USA",  # Out of range (must be 2 chars)
-                breadcrumb=0
+                countryCode="USA"  # Out of range (must be 2 chars)
             )
             await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Expected CONSTRAINT_ERROR but command succeeded")
