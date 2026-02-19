@@ -396,7 +396,7 @@ class TC_ACS_3_3(MatterBaseTest):
             event = event_listener.wait_for_event_report(
                 cluster.Events.AmbientContextDetectStarted, timeout_sec=post_prompt_settle_delay_seconds)
             asserts.assert_equal(event.ambientContextType.ambientContextSensed.namespaceID, namespaceID3,
-                                "Wrong NamespaceID")
+                                 "Wrong NamespaceID")
             asserts.assert_equal(event.ambientContextType.ambientContextSensed.tag, tag3, "Wrong Tag")
             # Ignore object count
 
@@ -553,5 +553,6 @@ class TC_ACS_3_3(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+
 
 
