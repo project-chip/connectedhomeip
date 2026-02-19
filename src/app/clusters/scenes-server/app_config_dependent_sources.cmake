@@ -27,7 +27,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-
     # these below would be pulled by GN (.gni file) dependency. CMAKE needs these directly
     "${CLUSTER_DIR}/AttributeValuePairValidator.h"
     "${CLUSTER_DIR}/ExtensionFieldSets.h"

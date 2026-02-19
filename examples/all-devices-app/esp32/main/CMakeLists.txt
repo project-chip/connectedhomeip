@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-get_filename_component(CHIP_ROOT "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip" REALPATH)
+get_filename_component(CHIP_ROOT "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip" REALPATH)
 get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST
