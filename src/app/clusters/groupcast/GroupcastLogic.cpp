@@ -114,12 +114,6 @@ CHIP_ERROR GroupcastLogic::ReadUsedMcastAddrCount(EndpointId endpoint, Attribute
     return aEncoder.Encode(count);
 }
 
-CHIP_ERROR GroupcastLogic::ReadFabricUnderTest(EndpointId endpoint, AttributeValueEncoder & aEncoder)
-{
-    FabricIndex fabric_index = kUndefinedFabricIndex;
-    return aEncoder.Encode(fabric_index);
-}
-
 Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data)
 {
     GroupDataProvider & groups = Provider();

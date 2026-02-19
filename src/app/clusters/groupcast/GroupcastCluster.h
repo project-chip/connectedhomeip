@@ -25,6 +25,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+using Status = chip::Protocols::InteractionModel::Status;
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
  */
@@ -50,9 +51,19 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
+    Status GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data);
+
+    inline FabricIndex GetFabricUnderTest() const { return mFabricUnderTest; }
+
 private:
+    void SetFabricUnderTest(FabricIndex fabricUnderTest);
+    static void OnGroupcastTestingDone(System::Layer * aLayer, void * appState);
+
     GroupcastContext mContext;
     GroupcastLogic mLogic;
+
+    Groupcast::GroupcastTestingEnum mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
+    FabricIndex mFabricUnderTest                  = kUndefinedFabricIndex;
 };
 
 } // namespace Clusters

@@ -25,6 +25,7 @@
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <clusters/Groupcast/Enums.h>
@@ -36,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
+#include <system/RAIIMockClock.h>
 
 #include <array>
 #include <credentials/GroupDataProviderImpl.h>
@@ -49,6 +51,8 @@ using namespace chip::app;
 using namespace chip::Testing;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters::Groupcast;
+using namespace chip::System;
+using namespace chip::System::Clock::Literals;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
@@ -96,20 +100,20 @@ public:
 };
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
-struct TestGroupcastCluster : public ::testing::Test
+class TestGroupcastCluster : public chip::Testing::AppContext
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+public:
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        AppContext::SetUpTestSuite();
+    }
 
-    TestServerClusterContext mTestContext;
-    Credentials::GroupDataProviderImpl mProvider;
-    Crypto::DefaultSessionKeystore mKeystore;
-    CustomDataModel customDataModel;
-    std::unique_ptr<ServerClusterContext> clusterContext;
-    FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
-    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider }, BitFlags<Feature>{ Feature::kSender } };
-    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider },
-                                               BitFlags<Feature>{ Feature::kListener } };
+    static void TearDownTestSuite()
+    {
+        AppContext::TearDownTestSuite();
+        Platform::MemoryShutdown();
+    }
 
     void SetUp() override
     {
@@ -133,6 +137,8 @@ struct TestGroupcastCluster : public ::testing::Test
         CHIP_ERROR err = mFabricHelper.SetUpTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mProvider);
+        DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
+        AppContext::SetUp();
     }
 
     void TearDown() override
@@ -144,6 +150,8 @@ struct TestGroupcastCluster : public ::testing::Test
         CHIP_ERROR err = mFabricHelper.TearDownTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         mProvider.Finish();
+        DeviceLayer::SetSystemLayerForTesting(nullptr);
+        AppContext::TearDown();
     }
 
     void AssertStatus(std::optional<app::DataModel::ActionReturnStatus> & status,
@@ -153,6 +161,16 @@ struct TestGroupcastCluster : public ::testing::Test
         EXPECT_EQ(status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   expected);
     }
+
+    TestServerClusterContext mTestContext;
+    Credentials::GroupDataProviderImpl mProvider;
+    Crypto::DefaultSessionKeystore mKeystore;
+    CustomDataModel customDataModel;
+    std::unique_ptr<ServerClusterContext> clusterContext;
+    FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
+    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider }, BitFlags<Feature>{ Feature::kSender } };
+    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider },
+                                               BitFlags<Feature>{ Feature::kListener } };
 };
 
 TEST_F(TestGroupcastCluster, TestAttributes)
@@ -191,6 +209,7 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
                                                   Commands::LeaveGroup::kMetadataEntry,
                                                   Commands::UpdateGroupKey::kMetadataEntry,
                                                   Commands::ConfigureAuxiliaryACL::kMetadataEntry,
+                                                  Commands::GroupcastTesting::kMetadataEntry,
                                               }));
 }
 
@@ -859,6 +878,105 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
             ASSERT_FALSE(item.hasAuxiliaryACL.Value());
         }
     }
+}
+
+TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
+{
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Default should be "no fabric under test"
+    FabricIndex fabricUnderTest = kUndefinedFabricIndex;
+    ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+    EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+
+    // Test invalid duration
+    {
+        Commands::GroupcastTesting::Type data;
+        data.testOperation = GroupcastTestingEnum::kEnableListenerTesting;
+        // Too small
+        data.durationSeconds = MakeOptional(static_cast<uint16_t>(9));
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ConstraintError);
+
+        // Command failed; should not have changed.
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+
+        // Too large
+        data.durationSeconds = MakeOptional(static_cast<uint16_t>(1201));
+        result               = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ConstraintError);
+
+        // Command failed; should not have changed from enabled state.
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+    }
+
+    // Enable testing (no duration)
+    {
+        Commands::GroupcastTesting::Type data;
+        data.testOperation = GroupcastTestingEnum::kEnableListenerTesting;
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
+    }
+
+    // Disable testing should clear the fabric under test
+    {
+        Commands::GroupcastTesting::Type data;
+        data.testOperation = GroupcastTestingEnum::kDisableTesting;
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+    }
+
+    // Enable Listener Testing with duration
+    {
+        chip::System::Clock::Internal::RAIIMockClock mockClock;
+        const uint16_t durationSeconds = 10;
+
+        Commands::GroupcastTesting::Type data;
+        data.testOperation   = GroupcastTestingEnum::kEnableListenerTesting;
+        data.durationSeconds = MakeOptional(durationSeconds);
+
+        auto result = tester.Invoke(Commands::GroupcastTesting::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
+
+        //  Testing should still be active
+        mockClock.AdvanceMonotonic(Clock::Seconds16(durationSeconds - 1));
+        GetIOContext().DriveIO();
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
+
+        //  Testing should end after the duration
+        mockClock.AdvanceMonotonic(Clock::Seconds16(durationSeconds + 1));
+        GetIOContext().DriveIO();
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
+    }
+
+    // Enable Sender Testing with duration
 }
 
 } // namespace
