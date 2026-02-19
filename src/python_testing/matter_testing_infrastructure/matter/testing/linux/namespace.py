@@ -15,12 +15,18 @@
 #
 #
 
+from __future__ import annotations
+
+import dataclasses
 import logging
 import os
 import shlex
 import subprocess
 import sys
 import time
+from enum import Enum
+
+from chiptest.runner import SubprocessKind
 
 log = logging.getLogger(__name__)
 
@@ -55,155 +61,258 @@ def ensure_private_state():
         sys.exit(1)
 
 
+@dataclasses.dataclass
+class WrappableCmd:
+    """Command used to set up some network resource with optional cleanup command."""
+
+    cmd: str
+    ns_wrapper: bool = False
+
+    def run(self, ns: NetworkNamespace | None = None, check: bool = True) -> None:
+        if self.ns_wrapper and ns:
+            cmd = ns.wrap_cmd(self.cmd)
+        else:
+            cmd = self.cmd
+
+        log.debug("Executing: '%s' check=%s", cmd, check)
+        if subprocess.run(shlex.split(cmd), check=check).returncode != 0:
+            raise RuntimeError(f"Failed to execute '{cmd}'. Are you using --privileged if running in docker?")
+
+
+@dataclasses.dataclass
+class NetworkResource:
+
+    setup_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    teardown_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    exists: bool = False
+
+    up_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    down_cmds: list[WrappableCmd] = dataclasses.field(default_factory=list)
+    up_flag: bool = False
+
+    deps: list[NetworkResource] = dataclasses.field(default_factory=list)
+    ns: NetworkNamespace | None = None
+
+    def __post_init__(self):
+        if self.ns:
+            self.deps.append(self.ns)
+
+    def setup(self):
+        if self.exists:
+            return
+
+        for dep in self.deps:
+            dep.setup()
+
+        for cmd in self.setup_cmds:
+            cmd.run(self.ns)
+
+        self.exists = True
+
+    def teardown(self, check: bool = True):
+        if not self.exists:
+            return
+
+        for cmd in self.teardown_cmds:
+            cmd.run(self.ns, check=check)
+
+        self.exists = False
+
+        for dep in self.deps:
+            dep.teardown(check)
+
+    def up(self):
+        if self.up_flag:
+            return
+
+        for cmd in self.up_cmds:
+            cmd.run(self.ns)
+
+        self.up_flag = True
+
+    def down(self):
+        if not self.up_flag:
+            return
+
+        for cmd in self.down_cmds:
+            cmd.run(self.ns)
+
+        self.up_flag = False
+
+
+class NetworkLink(NetworkResource):
+    def __init__(self, link_name: str, ipv4_addrs: list[str], ipv6_addrs: list[str], ns: NetworkNamespace | None = None) -> None:
+
+        self.link_name = link_name
+        self.switch_name = f"{link_name}-sw"
+        self.ipv4_addrs = ipv4_addrs
+        self.ipv6_addrs = ipv6_addrs
+
+        netns_opt = ""
+        if ns:
+            netns_opt = f"netns {ns.name}"
+
+        up_cmds = [
+            WrappableCmd(f"ip link set dev {self.switch_name} up"),
+            WrappableCmd(f"ip link set dev {self.link_name} up", ns_wrapper=True),
+            WrappableCmd("ip link set dev lo up", ns_wrapper=True),
+        ]
+
+        if len(self.ipv6_addrs) > 0:
+            up_cmds.append(WrappableCmd(f"ip -6 addr flush {self.link_name}", ns_wrapper=True))
+
+        up_cmds.extend([WrappableCmd(f"ip addr add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv4_addrs])
+        up_cmds.extend([WrappableCmd(f"ip -6 a add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv6_addrs])
+
+        if len(self.ipv6_addrs) > 0:
+            up_cmds.extend([WrappableCmd(cmd, ns_wrapper=True) for cmd in [
+                "sysctl -w net.ipv6.conf.all.forwarding=1",
+                "sysctl -w net.ipv6.conf.default.forwarding=1",
+                f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra=2",
+                f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra_rt_info_max_plen=64"
+            ]])
+
+        super().__init__(
+            setup_cmds=[WrappableCmd(f"ip link add {self.link_name} {netns_opt} type veth peer name {self.switch_name}")],
+            teardown_cmds=[WrappableCmd(f"ip link delete {self.switch_name}")],
+            up_cmds=up_cmds,
+            down_cmds=[
+                WrappableCmd(f"ip link set dev {self.link_name} down", ns_wrapper=True),
+                WrappableCmd(f"ip link set dev {self.switch_name} down")
+            ],
+            ns=ns)
+
+    def wait_for_duplicate_address_detection(self) -> bool:
+        # IPv6 does Duplicate Address Detection even though we know ULAs provided are isolated.
+        # Wait for 'tentative' address to be gone.
+        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
+
+        cmd = "ip addr"
+        if self.ns:
+            cmd = self.ns.wrap_cmd(cmd)
+        cmd_list = shlex.split(cmd)
+
+        # Wait at most 10 seconds.
+        start_time = time.time()
+        while time.time() - start_time < 10:
+            if 'tentative' not in subprocess.check_output(cmd_list, text=True):
+                log.info("No more tentative addresses")
+                return True
+            time.sleep(0.1)
+
+        log.warning("Some addresses look to still be tentative")
+        return False
+
+    def up(self, wait_for_dad: bool = True):
+        super().up()
+        if wait_for_dad:
+            self.wait_for_duplicate_address_detection()
+
+
+class NetworkBridge(NetworkResource):
+    def __init__(self, name: str):
+        self.name = name
+        super().__init__(setup_cmds=[WrappableCmd(f"ip link add {name} type bridge")],
+                         teardown_cmds=[WrappableCmd(f"ip link delete {name}")],
+                         up_cmds=[WrappableCmd(f"ip link set {name} up")],
+                         down_cmds=[WrappableCmd(f"ip link set {name} down")]
+                         )
+
+    def attach_link(self, link: NetworkLink):
+        self.setup_cmds.append(WrappableCmd(f"ip link set {link.switch_name} master {self.name}"))
+        self.teardown_cmds.insert(0, WrappableCmd(f"ip link set {link.switch_name} nomaster"))
+
+        self.deps.append(link)
+
+
+class NetworkNamespace(NetworkResource):
+    def __init__(self, name: str) -> None:
+        self.name = name
+        super().__init__(setup_cmds=[
+            WrappableCmd(f"ip netns add {name}")
+        ],
+            teardown_cmds=[
+            WrappableCmd(f"ip netns del {name}")
+        ])
+
+    @property
+    def netns_cmd_wrapper(self) -> str:
+        return f"ip netns exec {self.name}"
+
+    def wrap_cmd(self, cmd: str) -> str:
+        return f"{self.netns_cmd_wrapper} {cmd}"
+
+
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
 
-    # Commands for creating appropriate namespaces for a tool and app binaries
-    # in the simulated isolated network.
-    COMMANDS_SETUP = [
-        # Create 2 virtual hosts: for app and for the tool
-        "ip netns add app-{index}",
-        "ip netns add tool-{index}",
-        'sysctl -w net.ipv6.conf.all.forwarding=1',
-        'sysctl -w net.ipv6.conf.default.forwarding=1',
+    def __init__(self, index: int = 0, mgmt_name: str = 'eth-mgmt', ctrl_name: str = 'eth-ctrl', app_name: str = 'eth-app',
+                 mgmt_link_up: bool = True, ctrl_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True):
+        """Initialize isolated network namespaces.
 
-        # Create links for switch to net connections
-        "ip link add {app_link_name}-{index} type veth peer name {app_link_name}-sw-{index}",
-        "ip link add {tool_link_name}-{index} type veth peer name {tool_link_name}-sw-{index}",
-        "ip link add eth-ci-{index} type veth peer name eth-ci-sw-{index}",
-
-        # Link the connections together
-        "ip link set {app_link_name}-{index} netns app-{index}",
-        "ip link set {tool_link_name}-{index} netns tool-{index}",
-
-        # Bridge all the connections together.
-        "ip link add name br1-{index} type bridge",
-        "ip link set br1-{index} up",
-        "ip link set {app_link_name}-sw-{index} master br1-{index}",
-        "ip link set {tool_link_name}-sw-{index} master br1-{index}",
-        "ip link set eth-ci-sw-{index} master br1-{index}",
-
-        # Create link between virtual host 'tool' and the test runner
-        "ip addr add 10.10.10.5/24 dev eth-ci-{index}",
-        "ip link set dev eth-ci-{index} up",
-        "ip link set dev eth-ci-sw-{index} up",
-    ]
-
-    # Bring up application connection link.
-    COMMANDS_APP_LINK_UP = [
-        "ip netns exec app-{index} ip addr add 10.10.10.1/24 dev {app_link_name}-{index}",
-        "ip netns exec app-{index} ip link set dev {app_link_name}-{index} up",
-        "ip netns exec app-{index} ip link set dev lo up",
-        "ip link set dev {app_link_name}-sw-{index} up",
-        "ip netns exec app-{index} ip -6 addr flush {app_link_name}-{index}",
-        "ip netns exec app-{index} ip -6 a add fe80::1/64 dev {app_link_name}-{index}",
-        "ip netns exec app-{index} sysctl -w net.ipv6.conf.{app_link_name}-{index}.accept_ra=2",
-        "ip netns exec app-{index} sysctl -w net.ipv6.conf.{app_link_name}-{index}.accept_ra_rt_info_max_plen=64",
-        'ip netns exec app-{index} sysctl -w net.ipv6.conf.all.forwarding=1',
-        'ip netns exec app-{index} sysctl -w net.ipv6.conf.default.forwarding=1',
-    ]
-
-    COMMANDS_APP_LINK_ULA = [
-        # Force IPv6 to use ULAs that we control.
-        "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
-    ]
-
-    # Bring up tool (controller) connection link.
-    COMMANDS_TOOL_LINK_UP = [
-        "ip netns exec tool-{index} ip addr add 10.10.10.2/24 dev {tool_link_name}-{index}",
-        "ip netns exec tool-{index} ip link set dev {tool_link_name}-{index} up",
-        "ip netns exec tool-{index} ip link set dev lo up",
-        "ip link set dev {tool_link_name}-sw-{index} up",
-        "ip netns exec tool-{index} ip -6 addr flush {tool_link_name}-{index}",
-        "ip netns exec tool-{index} ip -6 a add fe80::2/64 dev {tool_link_name}-{index}",
-        "ip netns exec tool-{index} sysctl -w net.ipv6.conf.{tool_link_name}-{index}.accept_ra=2",
-        "ip netns exec tool-{index} sysctl -w net.ipv6.conf.{tool_link_name}-{index}.accept_ra_rt_info_max_plen=64",
-    ]
-
-    COMMANDS_TOOL_LINK_ULA = [
-        # Force IPv6 to use ULAs that we control.
-        "ip netns exec tool-{index} ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}-{index}",
-    ]
-
-    # Commands for removing namespaces previously created.
-    COMMANDS_TERMINATE = [
-        "ip link set dev eth-ci-{index} down",
-        "ip link set dev eth-ci-sw-{index} down",
-        "ip addr del 10.10.10.5/24 dev eth-ci-{index}",
-
-        "ip link set br1-{index} down",
-        "ip link delete br1-{index}",
-
-        "ip link delete eth-ci-sw-{index}",
-        "ip link delete {tool_link_name}-sw-{index}",
-        "ip link delete {app_link_name}-sw-{index}",
-
-        "ip netns del tool-{index}",
-        "ip netns del app-{index}",
-    ]
-
-    def __init__(self, index: int = 0, setup_app_link_up: bool = True, setup_tool_link_up: bool = True,
-                 app_link_name: str = 'eth-app', tool_link_name: str = 'eth-tool', add_ula: bool = True):
+        - mgmt -- management network for the RPC server.
+        - ctrl -- controller network for chip-tool.
+        - app -- network for tested application(s).
+        """
         self.index = index
-        self.app_link_name = app_link_name
-        self.tool_link_name = tool_link_name
+
+        self.app_ns = NetworkNamespace(f"ns-{app_name}-{index}")
+        self.ctrl_ns = NetworkNamespace(f"ns-{ctrl_name}-{index}")
+
+        app_ipv6 = ["fe80::1/64"]
+        if add_ula:
+            app_ipv6.append("fd00:0:1:1::1/64")
+        self.app_link = NetworkLink(f"{app_name}-{index}", ipv4_addrs=["10.10.10.1/24"], ipv6_addrs=app_ipv6, ns=self.app_ns)
+
+        ctrl_ipv6 = ["fe80::2/64"]
+        if add_ula:
+            ctrl_ipv6.append("fd00:0:1:1::2/64")
+        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=ctrl_ipv6, ns=self.ctrl_ns)
+
+        mgmt_ipv6 = ["fe80::5/64"]
+        if add_ula:
+            mgmt_ipv6.append("fd00:0:1:1::5/64")
+        self.mgmt_link = NetworkLink(f"{mgmt_name}-{index}", ipv4_addrs=["10.10.10.5/24"], ipv6_addrs=mgmt_ipv6)
+
+        self.bridge = NetworkBridge(f"br-{index}")
+        self.bridge.attach_link(self.app_link)
+        self.bridge.attach_link(self.ctrl_link)
+        self.bridge.attach_link(self.mgmt_link)
 
         try:
-            self._setup()
-            if setup_app_link_up:
-                self.setup_app_link_up(add_ula, wait_for_dad=False)
-            if setup_tool_link_up:
-                self._setup_tool_link_up(add_ula, wait_for_dad=False)
-            self._wait_for_duplicate_address_detection()
-        except BaseException:
+            # Bridge is the root of the dependency tree
+            self.bridge.setup()
+
+            # Bring up selected links.
+            if mgmt_link_up:
+                self.mgmt_link.up()
+            if ctrl_link_up:
+                self.ctrl_link.up()
+            if app_link_up:
+                self.app_link.up()
+
+            self.bridge.up()
+
+        except BaseException as e:
+            log.error("Encountered error while setting up network namespaces: %r", e)
             # Ensure that we leave a clean state on any exception.
             self.terminate()
             raise
 
-    def netns_for_subprocess_kind(self, name: str):
-        return "{}-{}".format(name, self.index)
-
-    def _wait_for_duplicate_address_detection(self):
-        # IPv6 does Duplicate Address Detection even though
-        # we know ULAs provided are isolated. Wait for 'tentative'
-        # address to be gone.
-        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
-        for _ in range(100):  # wait at most 10 seconds
-            if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                log.info("No more tentative addresses")
-                break
-            time.sleep(0.1)
-        else:
-            log.warning("Some addresses look to still be tentative")
-
-    def _setup(self):
-        self._run(*self.COMMANDS_SETUP)
-
-    def setup_app_link_up(self, add_ula: bool = True, wait_for_dad: bool = True):
-        self._run(*self.COMMANDS_APP_LINK_UP)
-        if add_ula:
-            self._run(*self.COMMANDS_APP_LINK_ULA)
-        if wait_for_dad:
-            self._wait_for_duplicate_address_detection()
-
-    def _setup_tool_link_up(self, add_ula: bool = True, wait_for_dad: bool = True):
-        self._run(*self.COMMANDS_TOOL_LINK_UP)
-        if add_ula:
-            self._run(*self.COMMANDS_TOOL_LINK_ULA)
-        if wait_for_dad:
-            self._wait_for_duplicate_address_detection()
-
-    def _run(self, *command: str):
-        for c in command:
-            c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
-            log.debug("Executing: '%s'", c)
-            if subprocess.run(shlex.split(c)).returncode != 0:
-                raise RuntimeError(f"Failed to execute '{c}'. Are you using --privileged if running in docker?")
+    def netns_for_subprocess_kind(self, kind: SubprocessKind) -> NetworkNamespace:
+        match kind:
+            case SubprocessKind.APP:
+                return self.app_ns
+            case SubprocessKind.CTRL:
+                return self.ctrl_ns
+            case SubprocessKind.MGMT:
+                return self.ctrl_ns
+            case _:
+                raise ValueError(f"Subprocess kind {kind} doesn't map to a network namespace.")
 
     def terminate(self):
-        """Execute all down commands gracefully omitting errors."""
-        for cmd in self.COMMANDS_TERMINATE:
-            try:
-                self._run(cmd)
-            except Exception as e:
-                log.warning("Encountered error during namespace termination: %s", e)
+        """Execute all down commands in reverse order, gracefully omitting errors."""
+        try:
+            self.bridge.teardown(check=False)
+        except Exception as e:
+            log.warning("Encountered an error during termination of network resources: %r", e)
