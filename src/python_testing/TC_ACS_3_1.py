@@ -42,10 +42,12 @@ import time
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from .Types import Nullable, NullValue
 
 log = logging.getLogger(__name__)
 
@@ -66,11 +68,11 @@ class TC_ACS_3_1(MatterBaseTest):
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads the SimultaneousDetectionLimit attribute.",
                      "If 1 is read, skip this test case. Otherwise proceed the following."),
-            TestStep("3", "TH writes PIXIT.ACS.SimultaneousDetectionLimitTest seconds to the SimultaneousDetectionLimit attribute.",
+            TestStep("3", "TH writes 2 to the SimultaneousDetectionLimit attribute.",
                      "Verify that TH reads the SimultaneousDetectionLimit attribute with 2."),
-            TestStep("4", "TH writes PIXIT.ACS.HoldTimeMaxTest to the HoldTimeMax of HoldTimeLimits attribute.",
+            TestStep("4", "TH writes 50 to the HoldTimeMax of HoldTimeLimits attribute.",
                      "Verify that TH reads the HoldTimeMax of HoldTime attribute with a value of 50."),
-            TestStep("5", "TH writes DUT HoldTime attribute with with PIXIT.ACS.HoldTimeTest,"
+            TestStep("5", "TH writes DUT HoldTime attribute with with 30,"
                      "Verify TH reads the HoldTime attribute with a value of 30."),
             TestStep("6", "Trigger DUT with its ambient sensing supporting feature via PIXIT.ACS.AmbientContextSensed_1."),
             TestStep("7", "TH reads the AmbientContextType attribute.",
@@ -222,12 +224,16 @@ class TC_ACS_3_1(MatterBaseTest):
             asserts.assert_equal(nsID_1, namespaceID1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
             asserts.assert_equal(tagID_1, tag1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
 
-            # subscription check ON HOLD
-            # semantic_tag = {NULL,namespaceID1,tag1,NULL}
-            # subscription_expected = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag, detectionTime=0)
-            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint_id, attribute=attr.AmbientContextType, value=1)], timeout_sec=30.0)
-            # log.info("Received attribute report for AmbientContextType.")
-            # attrib_listener.reset()
+            # subscription check
+            semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID1, tag=tag1, label=NullValue)
+            subscription_expected = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag, detectionTime=None)
+            attrib_listener.await_all_final_values_reported(
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)],
+                timeout_sec=30.0)
+            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
+            log.info("Received attribute report for AmbientContextType.")
+            attrib_listener.reset()
 
             self.step("8")  # Trigger another ambient sensing
             # PIXIT.ACS.AmbientContextSensed_2 = Object Identification person
@@ -260,6 +266,19 @@ class TC_ACS_3_1(MatterBaseTest):
             tagID_2_1 = ambientContextType[1].ambientContextSensed.tag
             asserts.assert_equal(nsID_2_1, namespaceID1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
             asserts.assert_equal(tagID_2_1, tag1, "Namespace ID and Tag ID must reflect step 6 sensing context.")
+
+            # subscription check
+            semantic_tag1 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID1, tag=tag1, label=NullValue)
+            semantic_tag2 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID2, tag=tag2, label=NullValue)
+            subscription_expected1 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag1, detectionTime=None)
+            subscription_expected2 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag1, detectionTime=None)
+            attrib_listener.await_all_final_values_reported(
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected2 subscription_expected1])],
+                timeout_sec=30.0)
+            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
+            log.info("Received attribute report for AmbientContextType.")
+            attrib_listener.reset()
 
             self.step("10")  # Trigger another ambient sensing
             # PIXIT.ACS.AmbientContextSensed_2 = Sound Identification barking
@@ -295,6 +314,17 @@ class TC_ACS_3_1(MatterBaseTest):
             asserts.assert_equal(nsID_3_1, namespaceID2, "Namespace ID and Tag ID must reflect step 8 sensing context.")
             asserts.assert_equal(tagID_3_1, tag2, "Namespace ID and Tag ID must reflect step 8 sensing context.")
 
+            # subscription check
+            semantic_tag3 = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=namespaceID3, tag=tag3, label=NullValue)
+            subscription_expected3 = cluster.Structs.AmbientContextTypeStruct(ambientContextSensed=semantic_tag3, detectionTime=None)
+            attrib_listener.await_all_final_values_reported(
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=[subscription_expected3 subscription_expected2])],
+                timeout_sec=30.0)
+            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
+            log.info("Received attribute report for AmbientContextType.")
+            attrib_listener.reset()
+
             self.step("12")
             await asyncio.sleep(holdtime_input)
 
@@ -308,6 +338,15 @@ class TC_ACS_3_1(MatterBaseTest):
             # check the response is the same as what is expected
             asserts.assert_equal(nsID_4, namespaceID3, "Namespace ID and Tag ID must reflect step 10 sensing context.")
             asserts.assert_equal(tagID_4, tag3, "Namespace ID and Tag ID must reflect step 10 sensing context.")
+
+            # subscription check
+            attrib_listener.await_all_final_values_reported(
+                expected_final_values=[AttributeValue(
+                    endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected3)],
+                timeout_sec=30.0)
+            # attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(endpoint_id=endpoint, attribute=attr.AmbientContextType, value=subscription_expected)], timeout_sec=30.0)
+            log.info("Received attribute report for AmbientContextType.")
+            attrib_listener.reset()
 
         else:
             log.info("Multiple Detection Feature not supported. This test case skipped")
@@ -327,7 +366,3 @@ class TC_ACS_3_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-
-
-
