@@ -28,6 +28,10 @@
 #include <vector>
 
 namespace chip {
+
+// Forward declaration for friend class
+class JFAManager;
+
 namespace app {
 
 namespace datastore {
@@ -237,6 +241,16 @@ public:
         }
     };
 
+    CHIP_ERROR SetAnchorRootCA(const ByteSpan & anchorRootCA)
+    {
+        if (anchorRootCA.size() >= sizeof(mAnchorRootCA))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mAnchorRootCALength = anchorRootCA.size();
+        memcpy(mAnchorRootCA, anchorRootCA.data(), mAnchorRootCALength);
+        return CHIP_NO_ERROR;
+    }
     ByteSpan GetAnchorRootCA() const { return ByteSpan(mAnchorRootCA, mAnchorRootCALength); }
 
     CHIP_ERROR SetAnchorNodeId(NodeId anchorNodeId)
@@ -271,6 +285,12 @@ public:
         return mGroupInformationEntries;
     }
 
+    void SetStatus(Clusters::JointFabricDatastore::DatastoreStateEnum state, uint32_t updateTimestamp, uint8_t failureCode)
+    {
+        mDatastoreStatusEntry.state           = state;
+        mDatastoreStatusEntry.updateTimestamp = updateTimestamp;
+        mDatastoreStatusEntry.failureCode     = failureCode;
+    }
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type & GetStatus() { return mDatastoreStatusEntry; }
 
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> & GetEndpointGroupIDList()
@@ -335,6 +355,8 @@ public:
 
     CHIP_ERROR TestAddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId, NodeId nodeId);
     CHIP_ERROR TestAddEndpointEntry(EndpointId endpointId, NodeId nodeId, CharSpan friendlyName);
+
+    CHIP_ERROR ForceAddNodeKeySetEntry(uint16_t groupKeySetId, NodeId nodeId);
 
     const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> & GetGroupKeySetList()
     {
@@ -416,6 +438,11 @@ private:
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mEndpointEntries;
 
     Listener * mListeners = nullptr;
+
+    friend class chip::JFAManager;
+
+    CHIP_ERROR
+    ForceAddGroup(const Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType & commandData);
 
     CHIP_ERROR IsNodeIDInDatastore(NodeId nodeId, size_t & index);
 

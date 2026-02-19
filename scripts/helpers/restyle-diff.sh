@@ -26,9 +26,6 @@
 # if unspecified, ref defaults to upstream/master (or master)
 # -d enables debug logging for Restyle CLI
 #
-# Note: This script requires sudo to restore file ownership after restyle
-#  (which uses Docker and changes ownership of restyled files to root). Run this script as a regular user;
-#  it will prompt for sudo only when needed to restore file ownership.
 
 here=${0%/*}
 
@@ -40,16 +37,24 @@ CHIP_ROOT=$(cd "$here/../.." && pwd)
 cd "$CHIP_ROOT"
 
 restyle-paths() {
-
-    local uid="${SUDO_UID:-$(id -u)}"
-    local gid="${SUDO_GID:-$(id -g)}"
+    [[ $# -eq 0 ]] && return 0
 
     echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
     restyle --config-file=.restyled.yaml "$@"
 
-    echo
-    echo "[restyle-diff.sh] Restoring file ownership to current user (sudo required)"
-    sudo chown -h "$uid:$gid" -- "$@"
+    # warn if restyle left any files owned by root (which means older restyle-CLI is being used)
+    root_owned=$(find "$@" -maxdepth 0 -user 0 2>/dev/null || true)
+    if [[ -n "$root_owned" ]]; then
+        echo
+        echo "[restyle-diff.sh] WARNING: The following restyled files are owned by root:"
+        echo "$root_owned"
+        echo
+        echo "[restyle-diff.sh] This typically means your restyle CLI is older than v0.80 which fixed this bug."
+        echo "[restyle-diff.sh] Please UPGRADE to a newer restyle CLI by running"
+        echo "[restyle-diff.sh] 1. rm -f \"\$(command -v restyle)\""
+        echo "[restyle-diff.sh] 2. re-run this script without using sudo (it will automatically download latest restyle-CLI version)."
+    fi
+
 }
 
 ensure_restyle_installed() {

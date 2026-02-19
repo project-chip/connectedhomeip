@@ -25,6 +25,7 @@
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <clusters/TlsCertificateManagement/Metadata.h>
 #include <clusters/TlsCertificateManagement/Structs.h>
+#include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -37,8 +38,16 @@ class TLSCertificateManagementDelegate;
 class TLSCertificateManagementCluster : public DefaultServerCluster, private FabricTable::Delegate
 {
 public:
+    struct Context
+    {
+        FabricTable & fabricTable;
+    };
+
     /**
      * Creates a TlsCertificateManagement server instance.
+     * @param context The context containing injected dependencies.
+     *                           Note: the caller must ensure that the provided dependencies
+     *                           outlive this instance.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param delegate A reference to the delegate to be used by this server.
      * @param dependencyChecker A reference to a CertificateDependencyChecker which checks for transitive dependencies
@@ -47,7 +56,7 @@ public:
      * @param maxClientCertificates The maximum number of client certificates which can be provisioned
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    TLSCertificateManagementCluster(EndpointId endpointId, TLSCertificateManagementDelegate & delegate,
+    TLSCertificateManagementCluster(const Context & context, EndpointId endpointId, TLSCertificateManagementDelegate & delegate,
                                     Tls::CertificateDependencyChecker & dependencyChecker, Tls::CertificateTable & certificateTable,
                                     uint8_t maxRootCertificates, uint8_t maxClientCertificates);
     ~TLSCertificateManagementCluster();
@@ -89,6 +98,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
+    Context mContext;
     TLSCertificateManagementDelegate & mDelegate;
     Tls::CertificateDependencyChecker & mDependencyChecker;
     Tls::CertificateTable & mCertificateTable;

@@ -3655,6 +3655,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   public @Nullable Long epochStartTime1;
   public @Nullable byte[] epochKey2;
   public @Nullable Long epochStartTime2;
+  public Integer groupKeyMulticastPolicy;
   private static final long GROUP_KEY_SET_ID_ID = 0L;
   private static final long GROUP_KEY_SECURITY_POLICY_ID = 1L;
   private static final long EPOCH_KEY0_ID = 2L;
@@ -3663,6 +3664,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
   private static final long EPOCH_START_TIME1_ID = 5L;
   private static final long EPOCH_KEY2_ID = 6L;
   private static final long EPOCH_START_TIME2_ID = 7L;
+  private static final long GROUP_KEY_MULTICAST_POLICY_ID = 8L;
 
   public GroupKeyManagementClusterGroupKeySetStruct(
     Integer groupKeySetID,
@@ -3672,7 +3674,8 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable byte[] epochKey1,
     @Nullable Long epochStartTime1,
     @Nullable byte[] epochKey2,
-    @Nullable Long epochStartTime2
+    @Nullable Long epochStartTime2,
+    Integer groupKeyMulticastPolicy
   ) {
     this.groupKeySetID = groupKeySetID;
     this.groupKeySecurityPolicy = groupKeySecurityPolicy;
@@ -3682,6 +3685,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     this.epochStartTime1 = epochStartTime1;
     this.epochKey2 = epochKey2;
     this.epochStartTime2 = epochStartTime2;
+    this.groupKeyMulticastPolicy = groupKeyMulticastPolicy;
   }
 
   public StructType encodeTlv() {
@@ -3694,6 +3698,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     values.add(new StructElement(EPOCH_START_TIME1_ID, epochStartTime1 != null ? new UIntType(epochStartTime1) : new NullType()));
     values.add(new StructElement(EPOCH_KEY2_ID, epochKey2 != null ? new ByteArrayType(epochKey2) : new NullType()));
     values.add(new StructElement(EPOCH_START_TIME2_ID, epochStartTime2 != null ? new UIntType(epochStartTime2) : new NullType()));
+    values.add(new StructElement(GROUP_KEY_MULTICAST_POLICY_ID, new UIntType(groupKeyMulticastPolicy)));
 
     return new StructType(values);
   }
@@ -3710,6 +3715,7 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     @Nullable Long epochStartTime1 = null;
     @Nullable byte[] epochKey2 = null;
     @Nullable Long epochStartTime2 = null;
+    Integer groupKeyMulticastPolicy = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3751,6 +3757,11 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
           UIntType castingValue = element.value(UIntType.class);
           epochStartTime2 = castingValue.value(Long.class);
         }
+      } else if (element.contextTagNum() == GROUP_KEY_MULTICAST_POLICY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          groupKeyMulticastPolicy = castingValue.value(Integer.class);
+        }
       }
     }
     return new GroupKeyManagementClusterGroupKeySetStruct(
@@ -3761,7 +3772,8 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
       epochKey1,
       epochStartTime1,
       epochKey2,
-      epochStartTime2
+      epochStartTime2,
+      groupKeyMulticastPolicy
     );
   }
 
@@ -3792,6 +3804,70 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     output.append("\n");
     output.append("\tepochStartTime2: ");
     output.append(epochStartTime2);
+    output.append("\n");
+    output.append("\tgroupKeyMulticastPolicy: ");
+    output.append(groupKeyMulticastPolicy);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class GroupKeyManagementClusterGroupcastAdoptionStruct {
+  public Boolean groupcastAdopted;
+  public Integer fabricIndex;
+  private static final long GROUPCAST_ADOPTED_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public GroupKeyManagementClusterGroupcastAdoptionStruct(
+    Boolean groupcastAdopted,
+    Integer fabricIndex
+  ) {
+    this.groupcastAdopted = groupcastAdopted;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(GROUPCAST_ADOPTED_ID, new BooleanType(groupcastAdopted)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static GroupKeyManagementClusterGroupcastAdoptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Boolean groupcastAdopted = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == GROUPCAST_ADOPTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          groupcastAdopted = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new GroupKeyManagementClusterGroupcastAdoptionStruct(
+      groupcastAdopted,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GroupKeyManagementClusterGroupcastAdoptionStruct {\n");
+    output.append("\tgroupcastAdopted: ");
+    output.append(groupcastAdopted);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5867,36 +5943,41 @@ public static class ScenesManagementClusterSceneInfoStruct {
 }
 public static class GroupcastClusterMembershipStruct {
   public Integer groupID;
-  public ArrayList<Integer> endpoints;
+  public Optional<ArrayList<Integer>> endpoints;
   public Integer keySetID;
-  public Boolean hasAuxiliaryACL;
+  public Optional<Boolean> hasAuxiliaryACL;
+  public Integer mcastAddrPolicy;
   public Integer fabricIndex;
   private static final long GROUP_ID_ID = 0L;
   private static final long ENDPOINTS_ID = 1L;
   private static final long KEY_SET_ID_ID = 2L;
   private static final long HAS_AUXILIARY_ACL_ID = 3L;
+  private static final long MCAST_ADDR_POLICY_ID = 4L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public GroupcastClusterMembershipStruct(
     Integer groupID,
-    ArrayList<Integer> endpoints,
+    Optional<ArrayList<Integer>> endpoints,
     Integer keySetID,
-    Boolean hasAuxiliaryACL,
+    Optional<Boolean> hasAuxiliaryACL,
+    Integer mcastAddrPolicy,
     Integer fabricIndex
   ) {
     this.groupID = groupID;
     this.endpoints = endpoints;
     this.keySetID = keySetID;
     this.hasAuxiliaryACL = hasAuxiliaryACL;
+    this.mcastAddrPolicy = mcastAddrPolicy;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(GROUP_ID_ID, new UIntType(groupID)));
-    values.add(new StructElement(ENDPOINTS_ID, ArrayType.generateArrayType(endpoints, (elementendpoints) -> new UIntType(elementendpoints))));
+    values.add(new StructElement(ENDPOINTS_ID, endpoints.<BaseTLVType>map((nonOptionalendpoints) -> ArrayType.generateArrayType(nonOptionalendpoints, (elementnonOptionalendpoints) -> new UIntType(elementnonOptionalendpoints))).orElse(new EmptyType())));
     values.add(new StructElement(KEY_SET_ID_ID, new UIntType(keySetID)));
-    values.add(new StructElement(HAS_AUXILIARY_ACL_ID, new BooleanType(hasAuxiliaryACL)));
+    values.add(new StructElement(HAS_AUXILIARY_ACL_ID, hasAuxiliaryACL.<BaseTLVType>map((nonOptionalhasAuxiliaryACL) -> new BooleanType(nonOptionalhasAuxiliaryACL)).orElse(new EmptyType())));
+    values.add(new StructElement(MCAST_ADDR_POLICY_ID, new UIntType(mcastAddrPolicy)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -5907,9 +5988,10 @@ public static class GroupcastClusterMembershipStruct {
       return null;
     }
     Integer groupID = null;
-    ArrayList<Integer> endpoints = null;
+    Optional<ArrayList<Integer>> endpoints = Optional.empty();
     Integer keySetID = null;
-    Boolean hasAuxiliaryACL = null;
+    Optional<Boolean> hasAuxiliaryACL = Optional.empty();
+    Integer mcastAddrPolicy = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == GROUP_ID_ID) {
@@ -5920,7 +6002,7 @@ public static class GroupcastClusterMembershipStruct {
       } else if (element.contextTagNum() == ENDPOINTS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          endpoints = castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class));
+          endpoints = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
         }
       } else if (element.contextTagNum() == KEY_SET_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5930,7 +6012,12 @@ public static class GroupcastClusterMembershipStruct {
       } else if (element.contextTagNum() == HAS_AUXILIARY_ACL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          hasAuxiliaryACL = castingValue.value(Boolean.class);
+          hasAuxiliaryACL = Optional.of(castingValue.value(Boolean.class));
+        }
+      } else if (element.contextTagNum() == MCAST_ADDR_POLICY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mcastAddrPolicy = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5944,6 +6031,7 @@ public static class GroupcastClusterMembershipStruct {
       endpoints,
       keySetID,
       hasAuxiliaryACL,
+      mcastAddrPolicy,
       fabricIndex
     );
   }
@@ -5963,6 +6051,9 @@ public static class GroupcastClusterMembershipStruct {
     output.append("\n");
     output.append("\thasAuxiliaryACL: ");
     output.append(hasAuxiliaryACL);
+    output.append("\n");
+    output.append("\tmcastAddrPolicy: ");
+    output.append(mcastAddrPolicy);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -11127,6 +11218,97 @@ public static class OccupancySensingClusterHoldTimeLimitsStruct {
     return output.toString();
   }
 }
+public static class OccupancySensingClusterPredictedOccupancyStruct {
+  public Long startTimestamp;
+  public Long endTimestamp;
+  public Integer occupancy;
+  public Integer confidence;
+  private static final long START_TIMESTAMP_ID = 0L;
+  private static final long END_TIMESTAMP_ID = 1L;
+  private static final long OCCUPANCY_ID = 2L;
+  private static final long CONFIDENCE_ID = 3L;
+
+  public OccupancySensingClusterPredictedOccupancyStruct(
+    Long startTimestamp,
+    Long endTimestamp,
+    Integer occupancy,
+    Integer confidence
+  ) {
+    this.startTimestamp = startTimestamp;
+    this.endTimestamp = endTimestamp;
+    this.occupancy = occupancy;
+    this.confidence = confidence;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(START_TIMESTAMP_ID, new UIntType(startTimestamp)));
+    values.add(new StructElement(END_TIMESTAMP_ID, new UIntType(endTimestamp)));
+    values.add(new StructElement(OCCUPANCY_ID, new UIntType(occupancy)));
+    values.add(new StructElement(CONFIDENCE_ID, new UIntType(confidence)));
+
+    return new StructType(values);
+  }
+
+  public static OccupancySensingClusterPredictedOccupancyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long startTimestamp = null;
+    Long endTimestamp = null;
+    Integer occupancy = null;
+    Integer confidence = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == START_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == END_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == OCCUPANCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          occupancy = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONFIDENCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          confidence = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OccupancySensingClusterPredictedOccupancyStruct(
+      startTimestamp,
+      endTimestamp,
+      occupancy,
+      confidence
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OccupancySensingClusterPredictedOccupancyStruct {\n");
+    output.append("\tstartTimestamp: ");
+    output.append(startTimestamp);
+    output.append("\n");
+    output.append("\tendTimestamp: ");
+    output.append(endTimestamp);
+    output.append("\n");
+    output.append("\toccupancy: ");
+    output.append(occupancy);
+    output.append("\n");
+    output.append("\tconfidence: ");
+    output.append(confidence);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class SoilMeasurementClusterMeasurementAccuracyRangeStruct {
   public Long rangeMin;
   public Long rangeMax;
@@ -11607,6 +11789,67 @@ public static class AmbientContextSensingClusterHoldTimeLimitsStruct {
     output.append("\n");
     output.append("\tholdTimeDefault: ");
     output.append(holdTimeDefault);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientContextSensingClusterObjectCountConfigStruct {
+  public ChipStructs.AmbientContextSensingClusterSemanticTagStruct countingObject;
+  public Integer objectCountThreshold;
+  private static final long COUNTING_OBJECT_ID = 0L;
+  private static final long OBJECT_COUNT_THRESHOLD_ID = 1L;
+
+  public AmbientContextSensingClusterObjectCountConfigStruct(
+    ChipStructs.AmbientContextSensingClusterSemanticTagStruct countingObject,
+    Integer objectCountThreshold
+  ) {
+    this.countingObject = countingObject;
+    this.objectCountThreshold = objectCountThreshold;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(COUNTING_OBJECT_ID, countingObject.encodeTlv()));
+    values.add(new StructElement(OBJECT_COUNT_THRESHOLD_ID, new UIntType(objectCountThreshold)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterObjectCountConfigStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ChipStructs.AmbientContextSensingClusterSemanticTagStruct countingObject = null;
+    Integer objectCountThreshold = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == COUNTING_OBJECT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          countingObject = ChipStructs.AmbientContextSensingClusterSemanticTagStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == OBJECT_COUNT_THRESHOLD_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          objectCountThreshold = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new AmbientContextSensingClusterObjectCountConfigStruct(
+      countingObject,
+      objectCountThreshold
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterObjectCountConfigStruct {\n");
+    output.append("\tcountingObject: ");
+    output.append(countingObject);
+    output.append("\n");
+    output.append("\tobjectCountThreshold: ");
+    output.append(objectCountThreshold);
     output.append("\n");
     output.append("}\n");
     return output.toString();

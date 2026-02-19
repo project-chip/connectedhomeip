@@ -2549,6 +2549,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxGroupKeysPerFabric";
             break;
 
+        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupcastAdoptionID:
+            result = @"GroupcastAdoption";
+            break;
+
         case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -3433,6 +3437,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ExpiryDate";
             break;
 
+        case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeUnmountedID:
+            result = @"Unmounted";
+            break;
+
         case MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -3779,6 +3787,18 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterGroupcastAttributeMaxMembershipCountID:
             result = @"MaxMembershipCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeMaxMcastAddrCountID:
+            result = @"MaxMcastAddrCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeUsedMcastAddrCountID:
+            result = @"UsedMcastAddrCount";
+            break;
+
+        case MTRAttributeIDTypeClusterGroupcastAttributeFabricUnderTestID:
+            result = @"FabricUnderTest";
             break;
 
         case MTRAttributeIDTypeClusterGroupcastAttributeGeneratedCommandListID:
@@ -6549,6 +6569,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"HoldTimeLimits";
             break;
 
+        case MTRAttributeIDTypeClusterOccupancySensingAttributePredictedOccupancyID:
+            result = @"PredictedOccupancy";
+            break;
+
         case MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID:
             result = @"PIROccupiedToUnoccupiedDelay";
             break;
@@ -7437,20 +7461,20 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"AmbientContextTypeSupported";
             break;
 
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID:
-            result = @"SimultaneousDetectionLimit";
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountReachedID:
+            result = @"ObjectCountReached";
             break;
 
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdReachedID:
-            result = @"CountThresholdReached";
-            break;
-
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeCountThresholdID:
-            result = @"CountThreshold";
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountConfigID:
+            result = @"ObjectCountConfig";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeObjectCountID:
             result = @"ObjectCount";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientContextSensingAttributeSimultaneousDetectionLimitID:
+            result = @"SimultaneousDetectionLimit";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeHoldTimeID:
@@ -7463,10 +7487,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributePredictedActivityID:
             result = @"PredictedActivity";
-            break;
-
-        case MTRAttributeIDTypeClusterAmbientContextSensingAttributePrivacyModeEnabledID:
-            result = @"PrivacyModeEnabled";
             break;
 
         case MTRAttributeIDTypeClusterAmbientContextSensingAttributeGeneratedCommandListID:
@@ -10778,6 +10798,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterGroupcastCommandConfigureAuxiliaryACLID:
             result = @"ConfigureAuxiliaryACL";
+            break;
+
+        case MTRCommandIDTypeClusterGroupcastCommandGroupcastTestingID:
+            result = @"GroupcastTesting";
             break;
 
         default:
@@ -15409,6 +15433,11 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         switch (eventID) {
 
+            // Cluster Groupcast events
+        case MTREventIDTypeClusterGroupcastEventGroupcastTestingID:
+            result = @"GroupcastTesting";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;
@@ -16129,6 +16158,15 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeAmbientContextSensingID:
 
         switch (eventID) {
+
+            // Cluster AmbientContextSensing events
+        case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectStartedID:
+            result = @"AmbientContextDetectStarted";
+            break;
+
+        case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectEndedID:
+            result = @"AmbientContextDetectEnded";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

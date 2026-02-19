@@ -2774,6 +2774,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("GroupKeySetStruct.epochKey2", "epochKey2", value.isMember("epochKey2")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("GroupKeySetStruct.epochStartTime2", "epochStartTime2",
                                                                   value.isMember("epochStartTime2")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "GroupKeySetStruct.groupKeyMulticastPolicy", "groupKeyMulticastPolicy", value.isMember("groupKeyMulticastPolicy")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupKeySetID");
@@ -2809,6 +2811,11 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.epochStartTime2, value["epochStartTime2"]));
     valueCopy.removeMember("epochStartTime2");
 
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupKeyMulticastPolicy");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.groupKeyMulticastPolicy, value["groupKeyMulticastPolicy"]));
+    valueCopy.removeMember("groupKeyMulticastPolicy");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -2822,6 +2829,40 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::GroupKeyManagement::St
     ComplexArgumentParser::Finalize(request.epochStartTime1);
     ComplexArgumentParser::Finalize(request.epochKey2);
     ComplexArgumentParser::Finalize(request.epochStartTime2);
+    ComplexArgumentParser::Finalize(request.groupKeyMulticastPolicy);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("GroupcastAdoptionStruct.groupcastAdopted", "groupcastAdopted",
+                                                                  value.isMember("groupcastAdopted")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupcastAdopted");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.groupcastAdopted, value["groupcastAdopted"]));
+    valueCopy.removeMember("groupcastAdopted");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.groupcastAdopted);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -3133,28 +3174,36 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("MembershipStruct.groupID", "groupID", value.isMember("groupID")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("MembershipStruct.endpoints", "endpoints", value.isMember("endpoints")));
-    ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("MembershipStruct.keySetID", "keySetID", value.isMember("keySetID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MembershipStruct.hasAuxiliaryACL", "hasAuxiliaryACL",
-                                                                  value.isMember("hasAuxiliaryACL")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MembershipStruct.mcastAddrPolicy", "mcastAddrPolicy",
+                                                                  value.isMember("mcastAddrPolicy")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "groupID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.groupID, value["groupID"]));
     valueCopy.removeMember("groupID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoints");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoints, value["endpoints"]));
+    if (value.isMember("endpoints"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoints");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoints, value["endpoints"]));
+    }
     valueCopy.removeMember("endpoints");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "keySetID");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.keySetID, value["keySetID"]));
     valueCopy.removeMember("keySetID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hasAuxiliaryACL");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hasAuxiliaryACL, value["hasAuxiliaryACL"]));
+    if (value.isMember("hasAuxiliaryACL"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hasAuxiliaryACL");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hasAuxiliaryACL, value["hasAuxiliaryACL"]));
+    }
     valueCopy.removeMember("hasAuxiliaryACL");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mcastAddrPolicy");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mcastAddrPolicy, value["mcastAddrPolicy"]));
+    valueCopy.removeMember("mcastAddrPolicy");
 
     if (value.isMember("fabricIndex"))
     {
@@ -3172,6 +3221,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Groupcast::Structs::Me
     ComplexArgumentParser::Finalize(request.endpoints);
     ComplexArgumentParser::Finalize(request.keySetID);
     ComplexArgumentParser::Finalize(request.hasAuxiliaryACL);
+    ComplexArgumentParser::Finalize(request.mcastAddrPolicy);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
@@ -5299,6 +5349,52 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::OccupancySensing::Stru
     ComplexArgumentParser::Finalize(request.holdTimeDefault);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PredictedOccupancyStruct.startTimestamp", "startTimestamp",
+                                                                  value.isMember("startTimestamp")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PredictedOccupancyStruct.endTimestamp", "endTimestamp",
+                                                                  value.isMember("endTimestamp")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("PredictedOccupancyStruct.occupancy", "occupancy", value.isMember("occupancy")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PredictedOccupancyStruct.confidence", "confidence",
+                                                                  value.isMember("confidence")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "startTimestamp");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.startTimestamp, value["startTimestamp"]));
+    valueCopy.removeMember("startTimestamp");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endTimestamp");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endTimestamp, value["endTimestamp"]));
+    valueCopy.removeMember("endTimestamp");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "occupancy");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.occupancy, value["occupancy"]));
+    valueCopy.removeMember("occupancy");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "confidence");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.confidence, value["confidence"]));
+    valueCopy.removeMember("confidence");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.startTimestamp);
+    ComplexArgumentParser::Finalize(request.endTimestamp);
+    ComplexArgumentParser::Finalize(request.occupancy);
+    ComplexArgumentParser::Finalize(request.confidence);
+}
+
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
                              chip::app::Clusters::AmbientContextSensing::Structs::AmbientContextTypeStruct::Type & request,
@@ -5372,6 +5468,40 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AmbientContextSensing:
     ComplexArgumentParser::Finalize(request.holdTimeMin);
     ComplexArgumentParser::Finalize(request.holdTimeMax);
     ComplexArgumentParser::Finalize(request.holdTimeDefault);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ObjectCountConfigStruct.countingObject", "countingObject",
+                                                                  value.isMember("countingObject")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ObjectCountConfigStruct.objectCountThreshold",
+                                                                  "objectCountThreshold", value.isMember("objectCountThreshold")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "countingObject");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.countingObject, value["countingObject"]));
+    valueCopy.removeMember("countingObject");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "objectCountThreshold");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.objectCountThreshold, value["objectCountThreshold"]));
+    valueCopy.removeMember("objectCountThreshold");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AmbientContextSensing::Structs::ObjectCountConfigStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.countingObject);
+    ComplexArgumentParser::Finalize(request.objectCountThreshold);
 }
 
 CHIP_ERROR

@@ -385,6 +385,9 @@ extern "C" void vApplicationIdleHook(void)
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
     SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
+#if SL_MATTER_DEBUG_WATCHDOG_ENABLE
+    GetPlatform().WatchdogFeed();
+#endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
