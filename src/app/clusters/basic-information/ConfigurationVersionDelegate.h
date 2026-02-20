@@ -25,10 +25,10 @@ namespace chip::app::Clusters {
 ///
 /// For example BasicInformationCluster may increase a global configuration version and
 /// will notify when such a configuration change occurs.
-class VersionedConfigurationDelegate
+class ConfigurationVersionDelegate
 {
 public:
-    virtual ~VersionedConfigurationDelegate() = default;
+    virtual ~ConfigurationVersionDelegate() = default;
 
     // Bump the configuration version by 1
     virtual CHIP_ERROR IncreaseConfigurationVersion() = 0;

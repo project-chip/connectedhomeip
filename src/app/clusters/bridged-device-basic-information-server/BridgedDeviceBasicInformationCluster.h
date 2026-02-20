@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/clusters/basic-information/VersionedConfigurationDelegate.h>
+#include <app/clusters/basic-information/ConfigurationVersionDelegate.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceIcdDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -42,7 +42,7 @@ class BridgedDeviceBasicInformationCluster : public DefaultServerCluster
 public:
     struct Context
     {
-        VersionedConfigurationDelegate & parentVersionConfiguration;
+        ConfigurationVersionDelegate & parentVersionConfiguration;
         BridgedDeviceBasicInformationDelegate & delegate;
         BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if NULL, ICD support feature is disabled
     };

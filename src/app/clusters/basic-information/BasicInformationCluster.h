@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/clusters/basic-information/VersionedConfigurationDelegate.h>
+#include <app/clusters/basic-information/ConfigurationVersionDelegate.h>
 #include <app/persistence/String.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
@@ -38,7 +38,7 @@ namespace Clusters {
 /// emit the mandatory StartUp and optional ShutDown events, ensuring spec compliance.
 class BasicInformationCluster : public DefaultServerCluster,
                                 public DeviceLayer::PlatformManagerDelegate,
-                                public VersionedConfigurationDelegate
+                                public ConfigurationVersionDelegate
 {
 public:
     // Define the Context struct with References
@@ -99,7 +99,7 @@ public:
 
     void OnShutDown() override;
 
-    // VersionedConfigurationDelegate
+    // ConfigurationVersionDelegate
     CHIP_ERROR IncreaseConfigurationVersion() override;
 
 private:

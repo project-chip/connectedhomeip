@@ -60,7 +60,7 @@ public:
     std::string mLastNodeLabel;
 };
 
-class MockVersionConfigurationDelegate : public VersionedConfigurationDelegate
+class MockVersionConfigurationDelegate : public ConfigurationVersionDelegate
 {
 public:
     CHIP_ERROR IncreaseConfigurationVersion() override
