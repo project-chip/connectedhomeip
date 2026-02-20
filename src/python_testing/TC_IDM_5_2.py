@@ -90,10 +90,9 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
             timedRequestTimeoutMs=200,
         )
 
-
         # Step 2: TH sends a Timed Request Message (Timed Write Transaction) with timeout,
         # waits for status response, then sends Write Request
-        TIMED_REQUEST_TIMEOUT_MS=500
+        TIMED_REQUEST_TIMEOUT_MS = 500
         self.step(2)
         expected_value = 21
         write_result = await self.default_controller.WriteAttribute(
