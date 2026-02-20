@@ -47,6 +47,13 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
                 break;
             }
 
+            Groupcast::Structs::MembershipStruct::Type group;
+            group.fabricIndex     = fabric_index;
+            group.groupID         = info.group_id;
+            group.keySetID        = keyset_id;
+            group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
+            group.mcastAddrPolicy = info.UsePerGroupAddress() ? Groupcast::MulticastAddrPolicyEnum::kPerGroup
+                                                              : Groupcast::MulticastAddrPolicyEnum::kIanaAddr;
             // Return endpoints in kMaxMembershipEndpoints chunks or less
             size_t group_total = end_iter->Count();
             size_t group_count = 0;
@@ -58,19 +65,16 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
                 endpoints.entries[split_count++] = mapping.endpoint_id;
                 if ((group_count == group_total) || (split_count == kMaxMembershipEndpoints))
                 {
-                    Groupcast::Structs::MembershipStruct::Type group;
-                    group.fabricIndex     = fabric_index;
-                    group.groupID         = info.group_id;
-                    group.keySetID        = keyset_id;
-                    group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
-                    group.mcastAddrPolicy = info.UsePerGroupAddress() ? Groupcast::MulticastAddrPolicyEnum::kPerGroup
-                                                                      : Groupcast::MulticastAddrPolicyEnum::kIanaAddr;
-                    group.endpoints       = MakeOptional(DataModel::List<const chip::EndpointId>(endpoints.entries, split_count));
-                    status                = encoder.Encode(group);
-                    split_count           = 0;
+                    group.endpoints = MakeOptional(DataModel::List<const chip::EndpointId>(endpoints.entries, split_count));
+                    status          = encoder.Encode(group);
+                    split_count     = 0;
                 }
             }
             end_iter->Release();
+            if (group_count == 0)
+            {
+                status = encoder.Encode(group);
+            }
         }
         group_iter->Release();
 

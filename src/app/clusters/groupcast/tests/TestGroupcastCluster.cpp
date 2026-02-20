@@ -692,6 +692,52 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
         ASSERT_EQ(memershipCount, 1u);
     }
+
+    // Create a Listener and Sender capable group with 1 endpoint.
+    // Remove the endpoint from the group. Verify that the group still exists for Sender.
+    app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider },
+                                                       BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
+    ASSERT_EQ(ListenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester listenerAndSendertester(ListenerAndSender);
+    listenerAndSendertester.SetFabricIndex(kTestFabricIndex);
+    {
+        // JoinGroup for GroupID 3
+        Commands::JoinGroup::Type data;
+        data.groupID         = 3;
+        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints[0], 1);
+        data.keySetID        = 0xabcd;
+        data.useAuxiliaryACL = MakeOptional(true);
+        auto result          = listenerAndSendertester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+
+        // Read Membership
+        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(listenerAndSendertester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+
+        size_t memershipCount = 0;
+        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
+        ASSERT_EQ(memershipCount, 2u);
+    }
+
+    {
+        // LeaveGroup for GroupID 3
+        Commands::LeaveGroup::Type data;
+        data.groupID   = 3;
+        data.endpoints = MakeOptional(chip::app::DataModel::List<const EndpointId>(kEndpoints[0], 1));
+        auto result    = listenerAndSendertester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+
+        size_t memershipCount = 0;
+        app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
+        ASSERT_EQ(listenerAndSendertester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
+        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
+        ASSERT_EQ(memershipCount, 2u);
+    }
+    ListenerAndSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
 }
 
 TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
