@@ -21,7 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterLogic.h>
 #include <lib/core/CHIPError.h>
 
 namespace chip {

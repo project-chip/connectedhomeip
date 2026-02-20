@@ -22,9 +22,9 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/cluster-building-blocks/QuieterReporting.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterMatterContext.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterObjects.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/logging/CHIPLogging.h>
