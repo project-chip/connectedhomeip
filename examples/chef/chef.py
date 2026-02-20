@@ -884,6 +884,7 @@ def main() -> int:
                 'chip_system_project_config_include = "<SystemProjectConfig.h>"',
                 'chip_project_config_include_dirs = [ "${chip_root}/examples/chef/linux/include" ]',
                 'chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]',
+                'target_cflags = ["-Wno-unused-result"]',
                 (f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '

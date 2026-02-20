@@ -139,11 +139,6 @@ silabs_executable("chef_app") {
 
     deps += pw_build_LINK_DEPS
 
-    # Avoid:
-    # ../third_party/connectedhomeip/third_party/pigweed/repo/pw_stream/socket_stream.cc:182:14: error: ignoring return value of ‘ssize_t write(int, const void*, size_t)’ declared with attribute ‘warn_unused_result’ [-Werror=unused-result]
-    #  182 |         write(connection_pipe_w_fd_, "T", 1);
-    cflags = [ "-Wno-unused-result" ]
-
     include_dirs += [
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/efr32",
