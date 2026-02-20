@@ -900,11 +900,13 @@ execution.
 Guards let you run test steps only when certain conditions are met (e.g., a
 cluster has a feature, attribute, or command).
 
+See below sections for usage examples please.
+
 ## Cluster Guards
 
 The following are inherited from the `matter_testing` module, so they do not
 need to be imported. For more examples on these guards, see
-`src/python_testing/TC_TestAttrAvail.py`.
+`src/python_testing/support_modules/binfo_attributes_verification.py`.
 
 Use these to skip a test step when the endpoint or cluster does not support the
 feature, attribute, or command under test.
@@ -916,7 +918,9 @@ Runs the test step only if the endpoint and cluster contain the given attribute:
 Example:
 
 ```python
-attr_should_be_there = await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState)
+self.step(#)
+if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
+    # If attribute exists then test step continues, else test step is skipped.
 ```
 
 ### Feature Guard
@@ -927,7 +931,9 @@ feature:
 Example:
 
 ```python
-feat_should_be_there = await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible)
+self.step(#)
+if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
+    # IF feature available then do test step, else test step is skipped.
 ```
 
 ### Command Guard
@@ -938,7 +944,9 @@ command:
 Example:
 
 ```python
-cmd_should_be_there = await self.command_guard(endpoint=self.endpoint, command=commands.Resume)
+self.step(#)
+if await self.command_guard(endpoint=self.endpoint, command=commands.Resume):
+    # If command available, then do test step here, else test step is skipped
 ```
 
 ## Additional Test Guards
@@ -955,6 +963,7 @@ Example:
 
 ```python
 if self.pics_guard(self.check_pics("CC.S.F04")):
+    # Do someething, otherwise test step is skipped
 ```
 
 ### run_if_endpoint_matches decorator
@@ -973,15 +982,25 @@ Examples:
 
 ```python
 #Feature:
-@run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning,
-                            feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
+@run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+    )
+async def test_TC_AVSM_2_2(self):
+    # Do test step logic if feature exists, else this test is skipped
 
 #Cluster
 @run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+async def test_TC_CADMIN_1_3(self):
+    # Do test step logic if cluster exists, else this test is skipped
 
 #Attribute:
-@run_if_endpoint_matches(has_attribute(Clusters.FixedLabel.Attributes.LabelList))
+@run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
+async def test_TC_ACL_2_3(self):
+    # Do test step logic if attribute exists, else this test is skipped
 
 #Command
 @run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
+async def test_TC_OPCREDS_3_8(self):
+    # Do test step logic if command is available, else this test is skipped
+        
 ```
