@@ -17,7 +17,6 @@
 
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
-#include <app/clusters/groupcast/GroupcastLogic.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -196,7 +195,7 @@ TEST_F(GroupcastClusterTest, TestAcceptedCommands)
 
 TEST_F(GroupcastClusterTest, TestReadMembership)
 {
-    static constexpr uint16_t kMaxEndpoints = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kMaxEndpoints = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     static constexpr uint16_t kIntervals    = 15;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const EndpointId kEndpoints[kIntervals][kMaxEndpoints] = {
@@ -593,7 +592,7 @@ TEST_F(GroupcastClusterTest, TestJoinGroupCommand)
 
 TEST_F(GroupcastClusterTest, TestLeaveGroup)
 {
-    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     static constexpr uint16_t kIntervals      = 5;
     static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
