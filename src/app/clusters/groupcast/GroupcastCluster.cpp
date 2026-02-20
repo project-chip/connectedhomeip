@@ -23,6 +23,7 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     mLogic.SetDataModelProvider(context.provider);
+    mLogic.SetListener(this);
 
     return CHIP_NO_ERROR;
 }
@@ -119,11 +120,6 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         break;
     }
 
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
-    }
-
     return status;
 }
 
@@ -175,6 +171,16 @@ void GroupcastCluster::OnGroupcastTestingDone(System::Layer * aLayer, void * app
     GroupcastCluster * cluster = reinterpret_cast<GroupcastCluster *>(appState);
     cluster->SetFabricUnderTest(kUndefinedFabricIndex);
     cluster->mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
+}
+
+void GroupcastCluster::OnMembershipChanged()
+{
+    NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
+}
+
+void GroupcastCluster::OnUsedMcastAddrCountChange()
+{
+    NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
 }
 
 } // namespace Clusters

@@ -13,6 +13,24 @@ using GroupEndpoint     = Credentials::GroupDataProvider::GroupEndpoint;
 using GroupInfoIterator = Credentials::GroupDataProvider::GroupInfoIterator;
 using EndpointIterator  = Credentials::GroupDataProvider::EndpointIterator;
 
+GroupcastLogic::GroupcastLogic(GroupcastContext & context) : mContext(context), mFeatures()
+{
+    mContext.groupDataProvider.SetListener(this);
+    mUsedMcastAddrCount = GetUsedMcastAddrCount();
+}
+
+GroupcastLogic::GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features) :
+    mContext(context), mFeatures(features)
+{
+    mContext.groupDataProvider.SetListener(this);
+    mUsedMcastAddrCount = GetUsedMcastAddrCount();
+}
+
+GroupcastLogic::~GroupcastLogic()
+{
+    mContext.groupDataProvider.RemoveListener(this);
+}
+
 CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
                                           AttributeValueEncoder & aEncoder)
 {
@@ -94,24 +112,7 @@ CHIP_ERROR GroupcastLogic::ReadMaxMcastAddrCount(EndpointId endpoint, AttributeV
 
 CHIP_ERROR GroupcastLogic::ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    uint16_t count = 0;
-    // Iterate all fabrics
-    for (const FabricInfo & fabric : Fabrics())
-    {
-        // Count all the groups with Per-group addresses
-        GroupInfoIterator * iter = Provider().IterateGroupInfo(fabric.GetFabricIndex());
-        VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
-        GroupInfo group;
-        while (iter->Next(group))
-        {
-            if (group.UsePerGroupAddress())
-            {
-                count++;
-            }
-        }
-        iter->Release();
-    }
-    return aEncoder.Encode(count);
+    return aEncoder.Encode(mUsedMcastAddrCount);
 }
 
 Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data)
@@ -383,6 +384,75 @@ Status GroupcastLogic::RemoveGroupEndpoint(FabricIndex fabric_index, GroupId gro
     }
 
     return Status::Success;
+}
+
+void GroupcastLogic::OnGroupAdded(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group)
+{
+    (void) fabric_index;
+    (void) new_group;
+    NotifyMembershipChanged();
+    uint16_t address_count = GetUsedMcastAddrCount();
+    if (address_count != mUsedMcastAddrCount)
+    {
+        mUsedMcastAddrCount = address_count;
+        NotifyUsedMcastAddrCountChange();
+    }
+}
+
+void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group)
+{
+    (void) fabric_index;
+    (void) old_group;
+    NotifyMembershipChanged();
+    uint16_t address_count = GetUsedMcastAddrCount();
+    if (address_count != mUsedMcastAddrCount)
+    {
+        mUsedMcastAddrCount = address_count;
+        NotifyUsedMcastAddrCountChange();
+    }
+}
+
+uint16_t GroupcastLogic::GetUsedMcastAddrCount()
+{
+    uint16_t per_group_count = 0;
+    uint16_t iana_address    = 0;
+    // Iterate all fabrics
+    for (const FabricInfo & fabric : Fabrics())
+    {
+        // Count distinct group addresses
+        GroupInfoIterator * iter = Provider().IterateGroupInfo(fabric.GetFabricIndex());
+        VerifyOrReturnValue(nullptr != iter, 0);
+        GroupInfo group;
+        while (iter->Next(group))
+        {
+            if (group.UsePerGroupAddress())
+            {
+                per_group_count++;
+            }
+            else
+            {
+                iana_address = 1;
+            }
+        }
+        iter->Release();
+    }
+    return per_group_count + iana_address;
+}
+
+void GroupcastLogic::NotifyMembershipChanged()
+{
+    if (mListener != nullptr)
+    {
+        mListener->OnMembershipChanged();
+    }
+}
+
+void GroupcastLogic::NotifyUsedMcastAddrCountChange()
+{
+    if (mListener != nullptr)
+    {
+        mListener->OnUsedMcastAddrCountChange();
+    }
 }
 
 } // namespace Clusters

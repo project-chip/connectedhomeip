@@ -349,6 +349,161 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
     }
 }
 
+TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    GroupId kGroup1               = 0xab01;
+    GroupId kGroup2               = 0xcd02;
+    GroupId kGroup3               = 0xef03;
+    GroupId kGroup4               = 0xff04;
+    KeysetId kKeyset              = 0xabcd;
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::TypeInfo::DecodableType multicastAddrCount;
+    app::ConcreteAttributePath membershipAttributePath(kRootEndpointId, app::Clusters::Groupcast::Id,
+                                                       app::Clusters::Groupcast::Attributes::Membership::Id);
+    app::ConcreteAttributePath usedMcastAddrCountAttributePath(kRootEndpointId, app::Clusters::Groupcast::Id,
+                                                               app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id);
+    ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+    ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+    // Read UsedMcastAddrCount
+    ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(multicastAddrCount, 0u);
+
+    // Join groups
+    {
+        // Group 1 (IanaAddr)
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroup1;
+        data.keySetID        = kKeyset;
+        data.key             = MakeOptional(ByteSpan(key));
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints);
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 1u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 2 (PerGroup)
+        data.groupID = kGroup2;
+        data.key.ClearValue();
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        result               = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 2u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 3 (PerGroup)
+        data.groupID = kGroup3;
+        result       = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 3u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 4 (IanaAddr)
+        data.groupID         = kGroup4;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        result               = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 3u);
+        mTestContext.ChangeListener().DirtyList().clear();
+    }
+
+    // Leave groups
+    {
+        // Group 2 (PerGroup)
+        Commands::LeaveGroup::Type data;
+        data.groupID = kGroup2;
+        auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 2u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 1 (IanaAddr)
+        data.groupID = kGroup1;
+        result       = tester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 2u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 3 (PerGroup)
+        data.groupID = kGroup3;
+        result       = tester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 1u);
+        mTestContext.ChangeListener().DirtyList().clear();
+
+        // Group 4 (IanaAddr)
+        data.groupID = kGroup4;
+        result       = tester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
+        ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
+        // Read UsedMcastAddrCount
+        ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::UsedMcastAddrCount::Id, multicastAddrCount),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(multicastAddrCount, 0u);
+        mTestContext.ChangeListener().DirtyList().clear();
+    }
+}
+
 TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 {
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
@@ -360,6 +515,18 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     data.key             = MakeOptional(ByteSpan(key));
     data.useAuxiliaryACL = MakeOptional(true);
     data.endpoints       = chip::app::DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+    // Neither Listener, nor Sender
+    {
+        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider });
+        chip::Testing::ClusterTester tester(cluster);
+        tester.SetFabricIndex(kTestFabricIndex);
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ConstraintError);
+    }
 
     // Listener
     {
