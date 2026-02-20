@@ -2467,45 +2467,96 @@ cluster AudioOutput = 1291 {
   command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
-/** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
-cluster AccountLogin = 1294 {
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
+cluster ApplicationLauncher = 1292 {
   revision 2;
 
-  fabric_sensitive critical event access(read: administer) LoggedOut = 0 {
-    optional node_id node = 0;
-    fabric_idx fabricIndex = 254;
+  enum StatusEnum : enum8 {
+    kSuccess = 0;
+    kAppNotAvailable = 1;
+    kSystemBusy = 2;
+    kPendingUserApproval = 3;
+    kDownloading = 4;
+    kInstalling = 5;
   }
 
+  bitmap Feature : bitmap32 {
+    kApplicationPlatform = 0x1;
+  }
+
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+  }
+
+  struct ApplicationEPStruct {
+    ApplicationStruct application = 0;
+    optional endpoint_no endpoint = 1;
+  }
+
+  readonly attribute optional int16u catalogList[] = 0;
+  readonly attribute optional nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct GetSetupPINRequest {
-    char_string<100> tempAccountIdentifier = 0;
+  request struct LaunchAppRequest {
+    optional ApplicationStruct application = 0;
+    optional octet_string data = 1;
   }
 
-  response struct GetSetupPINResponse = 1 {
-    char_string setupPIN = 0;
+  request struct StopAppRequest {
+    optional ApplicationStruct application = 0;
   }
 
-  request struct LoginRequest {
-    char_string<100> tempAccountIdentifier = 0;
-    char_string setupPIN = 1;
-    optional node_id node = 2;
+  request struct HideAppRequest {
+    optional ApplicationStruct application = 0;
   }
 
-  request struct LogoutRequest {
-    optional node_id node = 0;
+  response struct LauncherResponse = 3 {
+    StatusEnum status = 0;
+    optional octet_string data = 1;
   }
 
-  /** The purpose of this command is to determine if the active user account of the given Content App matches the active user account of a given Commissionee, and when it does, return a Setup PIN which can be used for password-authenticated session establishment (PASE) with the Commissionee. */
-  fabric timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
-  /** The purpose of this command is to allow the Content App to assume the user account of a given Commissionee by leveraging the Setup PIN input by the user during the commissioning process. */
-  fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
-  /** The purpose of this command is to instruct the Content App to clear the current user account. */
-  fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
+  /** Upon receipt of this command, the server SHALL launch the application with optional data. */
+  command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
+  /** Upon receipt of this command, the server SHALL stop the application if it is running. */
+  command StopApp(StopAppRequest): LauncherResponse = 1;
+  /** Upon receipt of this command, the server SHALL hide the application. */
+  command HideApp(HideAppRequest): LauncherResponse = 2;
+}
+
+/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
+cluster ApplicationBasic = 1293 {
+  revision 1;
+
+  enum ApplicationStatusEnum : enum8 {
+    kStopped = 0;
+    kActiveVisibleFocus = 1;
+    kActiveHidden = 2;
+    kActiveVisibleNotFocus = 3;
+  }
+
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+  }
+
+  readonly attribute optional char_string<32> vendorName = 0;
+  readonly attribute optional vendor_id vendorID = 1;
+  readonly attribute long_char_string<256> applicationName = 2;
+  readonly attribute optional int16u productID = 3;
+  readonly attribute ApplicationStruct application = 4;
+  readonly attribute ApplicationStatusEnum status = 5;
+  readonly attribute char_string<32> applicationVersion = 6;
+  readonly attribute access(read: administer) vendor_id allowedVendorList[] = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 endpoint 0 {
@@ -2859,16 +2910,151 @@ endpoint 1 {
     handle command RenameOutput;
   }
 
-  server cluster AccountLogin {
+  server cluster ApplicationLauncher {
+    callback attribute catalogList;
+    callback attribute currentApp;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 2;
+
+    handle command LaunchApp;
+    handle command StopApp;
+    handle command HideApp;
+  }
+}
+endpoint 2 {
+  device type ma_contentapp = 36, version 1;
+
+
+  server cluster Identify {
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Identify;
+    handle command TriggerEffect;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster Channel {
+    callback attribute channelList;
+    callback attribute lineup;
+    callback attribute currentChannel;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 2;
+
+    handle command ChangeChannel;
+    handle command ChangeChannelByNumber;
+    handle command SkipChannel;
+  }
+
+  server cluster TargetNavigator {
+    emits event TargetUpdated;
+    callback attribute targetList;
+    ram      attribute currentTarget default = 0xFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
 
-    handle command GetSetupPIN;
-    handle command Login;
-    handle command Logout;
+    handle command NavigateTarget;
+  }
+
+  server cluster MediaPlayback {
+    emits event StateChanged;
+    ram      attribute currentState;
+    ram      attribute startTime;
+    ram      attribute duration;
+    callback attribute sampledPosition;
+    ram      attribute playbackSpeed default = 0;
+    ram      attribute seekRangeEnd;
+    ram      attribute seekRangeStart;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 2;
+
+    handle command Play;
+    handle command Pause;
+    handle command Stop;
+    handle command StartOver;
+    handle command Previous;
+    handle command Next;
+    handle command Rewind;
+    handle command FastForward;
+    handle command SkipForward;
+    handle command SkipBackward;
+    handle command Seek;
+  }
+
+  server cluster KeypadInput {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 7;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SendKey;
+  }
+
+  server cluster ContentLauncher {
+    callback attribute acceptHeader;
+    ram      attribute supportedStreamingProtocols default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command LaunchContent;
+    handle command LaunchURL;
+  }
+
+  server cluster ApplicationLauncher {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 2;
+
+    handle command LaunchApp;
+    handle command StopApp;
+    handle command HideApp;
+  }
+
+  server cluster ApplicationBasic {
+    callback attribute applicationName;
+    callback attribute application;
+    callback attribute status default = 0x01;
+    callback attribute applicationVersion;
+    callback attribute allowedVendorList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
   }
 }
 
