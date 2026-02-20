@@ -655,6 +655,7 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
     const EndpointId kEndpoints[] = { 1 };
     const KeysetId kKeyset1       = 0xabcd;
     const KeysetId kKeyset2       = 0xcafe;
+    const KeysetId kKeyset3       = 0xface;
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
@@ -710,6 +711,15 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::AlreadyExists);
+
+        // Update to non-existing keyset (invalid)
+        data.groupID  = 2;
+        data.keySetID = kKeyset3;
+        data.key.ClearValue();
+        result = tester.Invoke(Commands::UpdateGroupKey::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::NotFound);
 
         // Update without key (always valid)
         data.groupID  = 2;

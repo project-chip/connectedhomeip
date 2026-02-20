@@ -185,22 +185,8 @@ Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Comm
     VerifyOrReturnError(new_count <= max_fabric_memberships, Status::ResourceExhausted);
 
     // Key handling
-    if (data.key.HasValue())
-    {
-        // Create a new keyset
-        Status stat = SetKeySet(fabric_index, data.keySetID, data.key.Value());
-        VerifyOrReturnError(Status::Success == stat, stat);
-    }
-    else
-    {
-        // The keyset must exist
-        GroupDataProvider::KeySet ks;
-        err = groups.GetKeySet(fabric_index, data.keySetID, ks);
-        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
-    }
-    // Assign keyset to group
-    err = groups.SetGroupKey(fabric_index, data.groupID, data.keySetID);
-    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+    Status stat = SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
+    VerifyOrReturnError(Status::Success == stat, stat);
 
     // Add/update entry in the group table
     info.group_id = data.groupID;
@@ -271,18 +257,7 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
 
 Status GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
 {
-    GroupDataProvider & groups = Provider();
-
-    // Key handling
-    if (data.key.HasValue())
-    {
-        // Create a new keyset
-        Status stat = SetKeySet(fabric_index, data.keySetID, data.key.Value());
-        VerifyOrReturnError(Status::Success == stat, stat);
-    }
-    // Assign keyset to group
-    CHIP_ERROR err = groups.SetGroupKey(fabric_index, data.groupID, data.keySetID);
-    return CHIP_NO_ERROR == err ? Status::Success : Status::Failure;
+    return SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
 }
 
 Status GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
@@ -314,17 +289,20 @@ Status GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     return Status::Success;
 }
 
-Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key)
+Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id,
+                                 const chip::Optional<chip::ByteSpan> & key)
 {
     GroupDataProvider & groups = Provider();
     GroupDataProvider::KeySet ks;
 
     CHIP_ERROR err = groups.GetKeySet(fabric_index, keyset_id, ks);
-    VerifyOrReturnError(CHIP_NO_ERROR != err, Status::AlreadyExists); // Cannot set an existing key
-
-    if (CHIP_ERROR_NOT_FOUND == err)
+    if (key.HasValue())
     {
-        // New key
+        // Key provided, the keyset must not exist
+        VerifyOrReturnError(CHIP_NO_ERROR != err, Status::AlreadyExists);
+        VerifyOrReturnError(CHIP_ERROR_NOT_FOUND == err, Status::Failure);
+
+        // Create new key
         const FabricInfo * fabric = Fabrics().FindFabricWithIndex(fabric_index);
         VerifyOrReturnValue(nullptr != fabric, Status::NotFound);
 
@@ -333,9 +311,8 @@ Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, c
         ks.num_keys_used = 1;
 
         GroupDataProvider::EpochKey & epoch = ks.epoch_keys[0];
-        VerifyOrReturnValue(key.size() == GroupDataProvider::EpochKey::kLengthBytes, Status::ConstraintError);
-        memcpy(epoch.key, key.data(), GroupDataProvider::EpochKey::kLengthBytes);
-
+        VerifyOrReturnValue(key.Value().size() == GroupDataProvider::EpochKey::kLengthBytes, Status::ConstraintError);
+        memcpy(epoch.key, key.Value().data(), GroupDataProvider::EpochKey::kLengthBytes);
         {
             // Get compressed fabric
             uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
@@ -347,10 +324,18 @@ Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, c
             VerifyOrReturnError(CHIP_ERROR_INVALID_LIST_LENGTH != err, Status::ResourceExhausted);
             VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
         }
-        return Status::Success;
+    }
+    else
+    {
+        // No key provided, the keyset must exist
+        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
     }
 
-    return Status::Failure;
+    // Assign keyset to group
+    err = groups.SetGroupKey(fabric_index, group_id, keyset_id);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
+    return Status::Success;
 }
 
 Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
