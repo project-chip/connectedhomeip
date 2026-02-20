@@ -34,7 +34,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
 
@@ -42,8 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
-from matter.testing.matter_testing import MatterBaseTest, TestStep, get_first_setup_code
-from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.matter_testing import MatterBaseTest, TestStep
 
 from matter.testing.commissioning import SetupParameters
 
@@ -120,12 +118,12 @@ class TC_DA_1_1(MatterBaseTest):
         logging.info(f"setupPayloadInfo: {setupPayloadInfo}")
         if not setupPayloadInfo:
             asserts.fail("Setup payload info is required for commissioning.")
-        
+
         # Build setup params for commissioning
         setup_params = SetupParameters(
             discriminator=setupPayloadInfo[0].filter_value,
             passcode=setupPayloadInfo[0].passcode
-        )            
+        )
 
         # Setup
         root_node_id = 0
