@@ -66,7 +66,7 @@ class TC_DA_1_1(MatterBaseTest):
 
     def steps_TC_DA_1_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("precondition", "DUT Commissioned to TH1's fabric", is_commissioning=True),
             TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1", """
                      - Verify that there is a single entry in the NOCs list"""),
@@ -84,13 +84,10 @@ class TC_DA_1_1(MatterBaseTest):
                      - Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key"""),
         ]
 
-        return steps
-
     def get_new_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
-        new_controller = new_fabric_admin.NewController(paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
-        return new_controller
+        return new_fabric_admin.NewController(paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
     async def read_nocs(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
         return await self.read_single_attribute_check_success(
@@ -112,7 +109,7 @@ class TC_DA_1_1(MatterBaseTest):
     async def test_TC_DA_1_1(self):
         # Get setup payload info from the original commissioning parameters
         setupPayloadInfo = self.get_setup_payload_info()
-        logging.info(f"setupPayloadInfo: {setupPayloadInfo}")
+        logger.info(f"setupPayloadInfo: {setupPayloadInfo}")
         if not setupPayloadInfo:
             asserts.fail("Setup payload info is required for commissioning.")
 
@@ -178,7 +175,7 @@ class TC_DA_1_1(MatterBaseTest):
             fabricFiltered=False
         )
         fabrics_pase = response[0][opcreds_cluster][fabrics_attr]
-        logging.info(f"Fabrics over PASE (after factory reset): {fabrics_pase}")
+        logger.info(f"Fabrics over PASE (after factory reset): {fabrics_pase}")
 
         # Verify that TH1's FabricID is not present after factory reset
         fabrics_pase_ids = [f.fabricID for f in fabrics_pase]
@@ -198,7 +195,7 @@ class TC_DA_1_1(MatterBaseTest):
             filter=setup_params.discriminator
         )
 
-        logging.info("DUT fully commissioned to TH2's fabric")
+        logger.info("DUT fully commissioned to TH2's fabric")
 
         # *** STEP 5 ***
         # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT (over CASE)
@@ -210,7 +207,7 @@ class TC_DA_1_1(MatterBaseTest):
             cluster=opcreds_cluster,
             attribute=fabrics_attr,
             fabric_filtered=False)
-        logging.info(f"fabrics_th2: {fabrics_th2}")
+        logger.info(f"fabrics_th2: {fabrics_th2}")
 
         # Verify that there is a single entry in the Fabrics list
         asserts.assert_equal(len(fabrics_th2), 1,
@@ -244,6 +241,16 @@ class TC_DA_1_1(MatterBaseTest):
         nocs_th2_decoded_pk = TLVReader(nocs_th2[0].noc).get()["Any"][9]
         asserts.assert_not_equal(nocs_th1_decoded_pk, nocs_th2_decoded_pk,
                                  f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1 ({nocs_th1_decoded_pk.hex()})")
+
+        # *** Cleanup ***
+        self.step("Cleanup")
+        await self.request_device_factory_reset()
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=setup_params.passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=setup_params.discriminator
+        )
 
 
 if __name__ == "__main__":
