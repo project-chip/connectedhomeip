@@ -30,7 +30,7 @@ from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuild
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.realtek import RealtekApp, RealtekBoard, RealtekBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
-from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
+from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder, TelinkLogLevel
 from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
@@ -821,6 +821,10 @@ def BuildTelinkTarget():
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
     target.AppendModifier('nfc-payload', chip_enable_nfc_onboarding_payload=True)
+    target.AppendModifier("log-progress", log_level=TelinkLogLevel.PROGRESS).ExceptIfRe("-log-(all|error|none)")
+    target.AppendModifier("log-error", log_level=TelinkLogLevel.ERROR).ExceptIfRe("-log-(progress|all|none)")
+    target.AppendModifier("log-none", log_level=TelinkLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
+    target.AppendModifier("log-all", log_level=TelinkLogLevel.ALL).ExceptIfRe("-log-(progress|error|none)")
 
     return target
 

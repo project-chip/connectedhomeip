@@ -1397,7 +1397,6 @@ cluster GeneralDiagnostics = 51 {
 
   bitmap Feature : bitmap32 {
     kDataModelTest = 0x1;
-    kDeviceLoad = 0x2;
   }
 
   struct DeviceLoadStruct {
@@ -2988,7 +2987,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x1A3;
+    ram      attribute featureMap default = 0x5A3;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;

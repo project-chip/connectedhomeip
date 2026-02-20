@@ -1274,7 +1274,7 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     CHIP_ERROR err = device->SetConnected(session);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogFailure(err, Controller, "Failed in setting up secure channel");
+        ChipLogError(Controller, "Failed in setting up secure channel: %" CHIP_ERROR_FORMAT, err.Format());
         OnSessionEstablishmentError(err);
         return;
     }

@@ -16,7 +16,7 @@
  */
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 
-#include <app/InteractionModelEngine.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/PascalString.h>
@@ -213,7 +213,8 @@ inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager
     return EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
 }
 
-inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceInstanceInfoProvider & deviceInfoProvider)
+inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceInstanceInfoProvider & deviceInfoProvider,
+                                       uint16_t & subscriptionsPerFabric)
 {
     BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
 
@@ -223,7 +224,7 @@ inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder, DeviceI
     auto capabilityMinimasFromDeviceInfo = deviceInfoProvider.GetSupportedCapabilityMinimaValues();
 
     capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
-    capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
+    capabilityMinima.subscriptionsPerFabric = subscriptionsPerFabric;
     capabilityMinima.simultaneousInvocationsSupported =
         chip::MakeOptional<uint16_t>(capabilityMinimasFromDeviceInfo.simultaneousInvocationsSupported);
     capabilityMinima.simultaneousWritesSupported =
@@ -355,7 +356,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case UniqueID::Id:
         return ReadUniqueID(configManager, encoder);
     case CapabilityMinima::Id:
-        return ReadCapabilityMinima(encoder, deviceInfoProvider);
+        return ReadCapabilityMinima(encoder, deviceInfoProvider, mClusterContext.subscriptionsPerFabric);
     case ProductAppearance::Id:
         return ReadProductAppearance(deviceInfoProvider, encoder);
     case SpecificationVersion::Id:

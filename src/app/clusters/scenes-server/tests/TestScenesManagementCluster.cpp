@@ -165,6 +165,7 @@ public:
 class MockGroupDataProvider : public GroupDataProvider
 {
 public:
+    MockGroupDataProvider() : GroupDataProvider(0, 0) {}
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
     void Finish() override {}
     CHIP_ERROR SetGroupInfo(FabricIndex, const GroupInfo &) override { return CHIP_NO_ERROR; }

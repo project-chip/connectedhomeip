@@ -2749,6 +2749,7 @@ SMOKECO.S.A0009=1
 SMOKECO.S.A000a=1
 SMOKECO.S.A000b=1
 SMOKECO.S.A000c=1
+SMOKECO.S.A000d=1
 SMOKECO.S.E00=1
 SMOKECO.S.E01=1
 SMOKECO.S.E02=1
@@ -2762,6 +2763,7 @@ SMOKECO.S.E09=1
 SMOKECO.S.E0a=1
 SMOKECO.M.ManuallyControlledTest=1
 SMOKECO.M.ManuallyControlledMute=1
+SMOKECO.M.InoperativeWhenUnmounted=1
 SMOKECO.S.C00.Rsp=1
 
 #Temperature Controlled Cabinet Mode Cluster
@@ -3181,3 +3183,13 @@ WEBRTCR.S.C00.Rsp=1  # Offer
 WEBRTCR.S.C01.Rsp=1  # Answer  
 WEBRTCR.S.C02.Rsp=1  # ICECandidates
 WEBRTCR.S.C03.Rsp=1  # End
+
+# Joint Fabric Administrator Cluster
+# Server
+JFPKI.S=1
+
+# Client
+JFPKI.C=1
+
+# Attributes
+JFPKI.S.A0000=1 #AdministratorFabricIndex
