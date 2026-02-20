@@ -75,8 +75,7 @@ private:
     bool mEntered = false;
     TLV::TLVType mOuter;
     TLV::TLVReader & mReader;
-    const uint32_t mRequiredFieldBitmap;
-    uint32_t mObservedFieldBitmap = 0;
+    uint32_t mRequiredFieldBitmap;
 };
 
 } // namespace detail
