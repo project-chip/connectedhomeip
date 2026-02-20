@@ -35,6 +35,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
     "${dir_pw_unit_test}",
+    "${chip_root}/src/lib/support:testing",
   ]
 
   if (chip_enable_access_restrictions) {

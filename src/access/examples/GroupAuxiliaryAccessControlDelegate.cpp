@@ -21,6 +21,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/NodeId.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 
@@ -35,32 +36,99 @@ using chip::Access::Privilege;
 using chip::Access::RequestPath;
 using chip::Access::SubjectDescriptor;
 
-class GroupAuxiliaryAccessControlDelegate : public AccessControl::Delegate
+using Entry         = chip::Access::AccessControl::Entry;
+using EntryIterator = chip::Access::AccessControl::EntryIterator;
+using Target        = Entry::Target;
+
+class EntryDelegate : public AccessControl::Entry::Delegate
 {
 public:
-    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider) : mGroupDataProvider(groupDataProvider) {}
-    ~GroupAuxiliaryAccessControlDelegate() override = default;
-
-    // Delegate implementation
-    CHIP_ERROR AuxiliaryEntries(AccessControl::EntryIterator & iterator, const FabricIndex * fabricIndex) const override;
-
-    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
-                     Privilege requestPrivilege) override
+    void Init(Entry & entry, FabricIndex fabricIndex, GroupId groupId, EndpointId endpointId)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        mFabricIndex = fabricIndex;
+        mGroupId     = groupId;
+        mEndpointId  = endpointId;
+        entry.SetDelegate(*this);
+    }
+
+    void Release() override { Platform::Delete(this); }
+
+    CHIP_ERROR GetAuthMode(AuthMode & authMode) const override
+    {
+        authMode = AuthMode::kGroup;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const override
+    {
+        fabricIndex = mFabricIndex;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetPrivilege(Privilege & privilege) const override
+    {
+        privilege = Privilege::kOperate;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const override
+    {
+        auxiliaryType = AuxiliaryType::kGroupcast;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetSubjectCount(size_t & count) const override
+    {
+        count = 1;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetSubject(size_t index, NodeId & subject) const override
+    {
+        if (index == 0)
+        {
+            subject = NodeIdFromGroupId(mGroupId);
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_SENTINEL;
+    }
+
+    CHIP_ERROR GetTargetCount(size_t & count) const override
+    {
+        count = 1;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetTarget(size_t index, Target & target) const override
+    {
+        if (index == 0)
+        {
+            target.flags    = Target::kEndpoint;
+            target.endpoint = mEndpointId;
+            // TODO: These are inaccurate and need to be updated
+            target.cluster  = 0;
+            target.deviceType = 0;
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_SENTINEL;
     }
 
 private:
-    Credentials::GroupDataProvider * mGroupDataProvider;
+    FabricIndex mFabricIndex;
+    GroupId mGroupId;
+    EndpointId mEndpointId;
 };
 
-class AuxiliaryEntryIteratorDelegate : public AccessControl::EntryIterator::Delegate
+class AuxiliaryEntryIteratorDelegate : public EntryIterator::Delegate
 {
 public:
     AuxiliaryEntryIteratorDelegate(Credentials::GroupDataProvider * groupDataProvider, FabricIndex fabric) :
         mGroupDataProvider(groupDataProvider), mFabric(fabric)
     {
-        mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabric);
+        if (mGroupDataProvider)
+        {
+            mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabric);
+        }
     }
 
     ~AuxiliaryEntryIteratorDelegate() override
@@ -77,8 +145,13 @@ public:
 
     void Release() override { Platform::Delete(this); }
 
-    CHIP_ERROR Next(AccessControl::Entry & entry) override
+    CHIP_ERROR Next(Entry & entry) override
     {
+        if (mGroupDataProvider == nullptr)
+        {
+            return CHIP_ERROR_SENTINEL;
+        }
+
         while (mGroupInfoIterator != nullptr || mEndpointIterator != nullptr)
         {
             if (mEndpointIterator != nullptr)
@@ -86,22 +159,12 @@ public:
                 Credentials::GroupDataProvider::GroupEndpoint endpoint;
                 if (mEndpointIterator->Next(endpoint))
                 {
-                    // TODO: This PrepareEntry() call goes through the access control delegate set in 
-                    // the access controol module, NOT the group auxiliary ACL delegate. Needs to be addressed.
-                    ReturnErrorOnFailure(Access::GetAccessControl().PrepareEntry(entry));
-                    ReturnErrorOnFailure(entry.SetFabricIndex(mFabric));
-                    ReturnErrorOnFailure(entry.SetPrivilege(Privilege::kOperate));
-                    ReturnErrorOnFailure(entry.SetAuthMode(AuthMode::kGroup));
-                    ReturnErrorOnFailure(entry.SetAuxiliaryType(AuxiliaryType::kGroupcast));
-                    ReturnErrorOnFailure(entry.AddSubject(nullptr, NodeIdFromGroupId(mGroupId)));
-
-                    // TODO: Cluster and device type are mandatory fields for a Target, should they be specified here?
-                    AccessControl::Entry::Target target;
-                    target.flags    = AccessControl::Entry::Target::kEndpoint;
-                    target.endpoint = endpoint.endpoint_id;
-                    target.cluster = 0;
-                    target.deviceType = 0;
-                    ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+                    auto * delegate = Platform::New<EntryDelegate>();
+                    if (delegate == nullptr)
+                    {
+                        return CHIP_ERROR_NO_MEMORY;
+                    }
+                    delegate->Init(entry, mFabric, mGroupId, endpoint.endpoint_id);
                     return CHIP_NO_ERROR;
                 }
                 mEndpointIterator->Release();
@@ -138,21 +201,37 @@ private:
     GroupId mGroupId                                                       = kUndefinedGroupId;
 };
 
-CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
-                                                                  const FabricIndex * fabricIndex) const
+class GroupAuxiliaryAccessControlDelegate : public AccessControl::Delegate
 {
-    VerifyOrReturnError(fabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+public:
+    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider) : mGroupDataProvider(groupDataProvider) {}
+    ~GroupAuxiliaryAccessControlDelegate() override = default;
 
-    auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>(mGroupDataProvider, *fabricIndex);
-    if (delegate)
+    // Delegate implementation
+    CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex) const override
     {
-        iterator.SetDelegate(*delegate);
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_NO_MEMORY;
-}
+        VerifyOrReturnError(fabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-} // namespace namespace
+        auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>(mGroupDataProvider, *fabricIndex);
+        if (delegate)
+        {
+            iterator.SetDelegate(*delegate);
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                     Privilege requestPrivilege) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+private:
+    Credentials::GroupDataProvider * mGroupDataProvider;
+};
+
+} // namespace
 
 namespace chip {
 namespace Access {
