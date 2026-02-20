@@ -257,8 +257,10 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kGenre, value="Sci-Fi"),
         ]
 
+        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(parameterList=params)
+
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=params, autoplay=True),
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=search, autoPlay=True),
             endpoint=endpoint,
         )
         asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
@@ -272,8 +274,10 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kSport, value="Football"),
         ]
 
+        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(parameterList=params)
+
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=params, autoplay=True),
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=search, autoPlay=True),
             endpoint=endpoint,
         )
         asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
@@ -284,8 +288,10 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kVideo, value="NonExistentMovie"),
         ]
 
+        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(parameterList=params)
+
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=params, autoplay=True),
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=search, autoPlay=True),
             endpoint=endpoint,
         )
         asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kURLNotAvailable)
