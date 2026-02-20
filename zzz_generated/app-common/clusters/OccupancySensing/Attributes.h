@@ -103,6 +103,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HoldTimeLimits
+namespace PredictedOccupancy {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PredictedOccupancy::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PredictedOccupancy
 namespace PIROccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
@@ -258,6 +272,7 @@ struct TypeInfo
             static_cast<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>(0);
         Attributes::HoldTime::TypeInfo::DecodableType holdTime = static_cast<uint16_t>(0);
         Attributes::HoldTimeLimits::TypeInfo::DecodableType holdTimeLimits;
+        Attributes::PredictedOccupancy::TypeInfo::DecodableType predictedOccupancy;
         Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::DecodableType PIROccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::DecodableType PIRUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType PIRUnoccupiedToOccupiedThreshold =

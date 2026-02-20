@@ -13,6 +13,7 @@
 # limitations under the License.
 import("//build_overrides/build.gni")
 import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/toolchain/custom/custom.gni")
 
 _compiler_subdir = "gcc"
 if (is_clang) {
@@ -27,10 +28,17 @@ action("build_libdatachannel") {
 
   if (is_clang) {
     args += [ "--clang" ]
+  }
 
-    # check for cross compilation
-    if (host_os == "linux" && host_cpu == "x64" && current_cpu == "arm64") {
-      args += [ "--cross-compile-cpu-type=arm64" ]
+  # check for cross compilation - use target_cc/target_cxx from args.gn if set
+  if (host_cpu != current_cpu) {
+    args += [ "--cross-compile-cpu-type=${current_cpu}" ]
+
+    if (target_cc != "" && target_cxx != "") {
+      args += [
+        "--target-cc=${target_cc}",
+        "--target-cxx=${target_cxx}",
+      ]
     }
   }
 }

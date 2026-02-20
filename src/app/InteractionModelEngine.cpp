@@ -58,6 +58,8 @@ namespace chip {
 namespace app {
 namespace {
 
+inline constexpr uint16_t kMaxNumSubscriptionsPerFabric = 10000;
+
 /**
  * Helper to handle wildcard events in the event path.
  *
@@ -237,6 +239,19 @@ void InteractionModelEngine::Shutdown()
     mTimedHandlers.ReleaseAll();
 
     mReadHandlers.ReleaseAll();
+
+    // Shut down the data model provider to clear cluster mContext pointers.
+    // Required for proper Stop() → Start() lifecycle - ensures clusters are reinitialized.
+    if (mDataModelProvider != nullptr)
+    {
+        CHIP_ERROR err = mDataModelProvider->Shutdown();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(InteractionModel,
+                         "InteractionModelEngine::Shutdown() Data model provider shutdown failed: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+        }
+    }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     // Shut down any subscription clients that are still around.  They won't be
@@ -1204,7 +1219,7 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
             candidateEventPathsUsed     = eventPathsUsed;
         }
         // This handler is older than the one we picked before.
-        else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().Before(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
                   (candidateAttributePathsUsed > perFabricPathCapacity || candidateEventPathsUsed > perFabricPathCapacity)))
@@ -1382,7 +1397,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
             candidate = handler;
         }
         // Read Handlers are "first come first served", so we give eariler read transactions a higher priority.
-        else if (handler->GetTransactionStartGeneration() > candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().After(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
                   (candidateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
@@ -1914,14 +1929,20 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     // Altering data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
+    // REMOVED: Early return when (model == mDataModelProvider) - breaks Stop() → Start()
+    // After Shutdown(), server clusters are uninitialized even though pointer is unchanged.
+    // Must call Startup() again to reinitialize cluster mContext pointers.
+
     if (model == mDataModelProvider)
     {
-        // no-op, just return
-        return model;
+        ChipLogDetail(DataManagement,
+                      "InteractionModelEngine::SetDataModelProvider() re-initializing same provider (Stop/Start cycle)");
     }
 
     DataModel::Provider * oldModel = mDataModelProvider;
-    if (oldModel != nullptr)
+
+    // Only shutdown if changing to a different provider
+    if (oldModel != nullptr && oldModel != model)
     {
         CHIP_ERROR err = oldModel->Shutdown();
         if (err != CHIP_NO_ERROR)
@@ -2021,10 +2042,10 @@ bool InteractionModelEngine::HasActiveRead()
 uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    return UINT16_MAX;
+    return kMaxNumSubscriptionsPerFabric;
 #else
-    return static_cast<uint16_t>(
-        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+    return static_cast<uint16_t>(std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(),
+                                          static_cast<size_t>(kMaxNumSubscriptionsPerFabric)));
 #endif
 }
 

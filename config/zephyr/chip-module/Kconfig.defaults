@@ -20,6 +20,8 @@
 
 if CHIP
 
+rsource "../../nxp/chip-module/Kconfig.defaults"
+
 # disable synchronous printk to avoid blocking IRQs which
 # may affect time sensitive components
 config PRINTK_SYNC

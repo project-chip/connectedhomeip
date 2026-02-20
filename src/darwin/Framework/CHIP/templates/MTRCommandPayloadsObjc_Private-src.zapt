@@ -1,0 +1,76 @@
+{{> header excludeZapComment=true}}
+
+{{> command_payload_impl_imports privateOrInternal="Private"}}
+
+NS_ASSUME_NONNULL_BEGIN
+{{> placeholder_comment}}
+
+static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error) __attribute__((unused));
+static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing * error) {
+  NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+  MTR_LOG_ERROR("%s", errorStr.UTF8String);
+  if (error != nil) {
+    NSDictionary * userInfo = @ { NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+    *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+  }
+}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+{{#zcl_commands}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
+
+@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params
+{{> command_params_init_impl}}
+
+{{> command_params_copy_impl cluster=(asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)}}
+
+{{> command_params_description_impl}}
+
+{{#if (isStrEqual source "server")}}
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+  if (!(self = [super init])) {
+    return nil;
+  }
+
+  using DecodableType = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType;
+  chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                         clusterID:DecodableType::GetClusterId()
+                                                                         commandID:DecodableType::GetCommandId()
+                                                                             error:error];
+  if (buffer.IsNull()) {
+    return nil;
+  }
+
+  chip::TLV::TLVReader reader;
+  reader.Init(buffer->Start(), buffer->DataLength());
+
+  CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+  if (err == CHIP_NO_ERROR) {
+    DecodableType decodedStruct;
+    err = chip::app::DataModel::Decode(reader, decodedStruct);
+    if (err == CHIP_NO_ERROR) {
+      err = [self _setFieldsFromDecodableStruct:decodedStruct];
+      if (err == CHIP_NO_ERROR) {
+        return self;
+      }
+    }
+  }
+
+  LogAndConvertDecodingError(err, error);
+  return nil;
+}
+{{/if}}
+
+@end
+
+{{/if}}
+{{> command_params_internal_methods cluster=(asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) categoryName="PrivateMethods"}}
+
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

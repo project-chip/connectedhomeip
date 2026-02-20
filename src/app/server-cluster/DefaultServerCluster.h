@@ -106,6 +106,8 @@ public:
 protected:
     const ConcreteClusterPath mPath;
     ServerClusterContext * mContext = nullptr;
+    // Tracks if shutdown has been called to make it idempotent
+    bool mIsShutdown = false;
 
     void IncreaseDataVersion() { mDataVersion++; }
 
@@ -114,6 +116,19 @@ protected:
     /// This increases cluster data version and if a cluster context is available it will
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
+
+    /// Apply the very common pattern of:
+    ///   - if a variable value needs changing, update and NotifyAttributeChanged
+    ///
+    /// Returns true if the value has been updated to a new value.
+    template <typename T>
+    bool SetAttributeValue(T & dest, const T & value, AttributeId attributeId)
+    {
+        VerifyOrReturnValue(dest != value, false);
+        dest = value;
+        NotifyAttributeChanged(attributeId);
+        return true;
+    }
 
     /// Marks that a specific attribute has changed value, if `status` is success.
     ///

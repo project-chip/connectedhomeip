@@ -20,7 +20,7 @@ import("${build_root}/config/linux/pkg_config.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -97,7 +97,7 @@ static_library("Tizen") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "NetworkCommissioningThreadDriver.cpp",
       "ThreadStackManagerImpl.cpp",
