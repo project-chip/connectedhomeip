@@ -30,5 +30,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }

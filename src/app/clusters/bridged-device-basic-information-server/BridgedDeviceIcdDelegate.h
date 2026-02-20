@@ -29,13 +29,15 @@ class BridgedDeviceIcdDelegate
 public:
     virtual ~BridgedDeviceIcdDelegate() = default;
 
-    /// Notification that a keep active was requested.
+    /// Called when the cluster enters the PendingActive state.
     ///
-    /// NOTE: Specification requires an `ActiveChanged` event to be generated once the device is active.
-    ///       Implementations should ensure that the bridged device `GenerateActiveChangedEvent` is triggered
-    ///       when applicable.
-    virtual Protocols::InteractionModel::Status
-    OnKeepActive(const BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & request) = 0;
+    /// When the bridged device checks in, the application MUST query the cluster for
+    /// the corresponding stay-active duration as it may change (multiple requests for KeepActive
+    /// will keep a max value of the stay active duration).
+    virtual Protocols::InteractionModel::Status OnEnterPendingActive() = 0;
+
+    /// Called when the PendingActive state timer expires.
+    virtual void OnPendingActiveExpired() = 0;
 };
 
 } // namespace chip::app::Clusters

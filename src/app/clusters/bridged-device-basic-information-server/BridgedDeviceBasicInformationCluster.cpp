@@ -201,6 +201,14 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::AcceptedCommands(const Concrete
     return CHIP_NO_ERROR;
 }
 
+void BridgedDeviceBasicInformationCluster::Shutdown(ClusterShutdownType s)
+{
+    DefaultServerCluster::Shutdown(s);
+
+    // if we are shut down, stop processing active timers
+    CancelPendingActiveTimer();
+}
+
 std::optional<DataModel::ActionReturnStatus>
 BridgedDeviceBasicInformationCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                     chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
@@ -213,9 +221,25 @@ BridgedDeviceBasicInformationCluster::InvokeCommand(const DataModel::InvokeReque
         ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
         VerifyOrReturnError(mClusterContext.icdDelegate != nullptr, Status::UnsupportedCommand);
+
         VerifyOrReturnError(commandData.timeoutMs >= kMinKeepActiveTimeoutMs, Status::ConstraintError);
         VerifyOrReturnError(commandData.timeoutMs <= kMaxKeepActiveTimeoutMs, Status::ConstraintError);
-        return mClusterContext.icdDelegate->OnKeepActive(commandData);
+
+        if (!mStayActiveDurationMs.has_value())
+        {
+            // brand new "pending active" state
+            mStayActiveDurationMs = commandData.stayActiveDuration;
+            StartPendingActiveTimer(System::Clock::Milliseconds32(commandData.timeoutMs));
+            return mClusterContext.icdDelegate->OnEnterPendingActive();
+        }
+
+        // already in active state, may need to sleep longer. The logic is:
+        //   - we need to keep the "max" stay active duration
+        //   - we need to potentially extend our timeout
+        mStayActiveDurationMs = std::max(*mStayActiveDurationMs, commandData.stayActiveDuration);
+        StartPendingActiveTimer(System::Clock::Milliseconds32(commandData.timeoutMs));
+
+        return Status::Success;
     }
     default:
         return Status::UnsupportedCommand;
@@ -250,6 +274,43 @@ void BridgedDeviceBasicInformationCluster::SetReachable(bool reachable)
     BridgedDeviceBasicInformation::Events::ReachableChanged::Type event;
     event.reachableNewValue = reachable;
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
+void BridgedDeviceBasicInformationCluster::TimerFired()
+{
+    VerifyOrReturn(mStayActiveDurationMs.has_value());
+
+    mStayActiveDurationMs.reset();
+
+    VerifyOrReturn(mClusterContext.icdDelegate != nullptr);
+    mClusterContext.icdDelegate->OnPendingActiveExpired();
+}
+
+void BridgedDeviceBasicInformationCluster::StartPendingActiveTimer(System::Clock::Milliseconds32 timeout)
+{
+    System::Clock::Timestamp nextTimeout = mTimerDelegate.GetCurrentMonotonicTimestamp() + timeout;
+
+    // extending the timeout (or no timeout at all...)
+    VerifyOrReturn(nextTimeout > mPendingActiveExpiryTime);
+
+    // start a new timer
+    CancelPendingActiveTimer();
+    LogErrorOnFailure(mTimerDelegate.StartTimer(this, timeout));
+    mPendingActiveExpiryTime = nextTimeout;
+}
+
+void BridgedDeviceBasicInformationCluster::CancelPendingActiveTimer()
+{
+    mTimerDelegate.CancelTimer(this);
+}
+
+void BridgedDeviceBasicInformationCluster::NotifyDeviceActive()
+{
+    VerifyOrReturn(mStayActiveDurationMs.has_value());
+
+    GenerateActiveChangedEvent(*mStayActiveDurationMs);
+    CancelPendingActiveTimer();
+    mStayActiveDurationMs.reset();
 }
 
 } // namespace chip::app::Clusters

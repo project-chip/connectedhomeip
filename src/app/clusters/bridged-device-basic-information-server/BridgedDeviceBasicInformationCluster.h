@@ -22,7 +22,9 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BridgedDeviceBasicInformation/ClusterId.h>
 #include <clusters/BridgedDeviceBasicInformation/Structs.h>
+#include <lib/support/TimerDelegate.h>
 
+#include <chrono>
 #include <optional>
 #include <string>
 #include <utility>
@@ -37,17 +39,19 @@ namespace chip::app::Clusters {
 /// Note: current implementation DOES NOT generate startup/shutdown events
 /// Note: DeviceLocation attribute (0x0017) is not supported as it is not in the standard Bridged Device Basic Information Cluster
 /// XML.
-class BridgedDeviceBasicInformationCluster : public DefaultServerCluster
+class BridgedDeviceBasicInformationCluster : public DefaultServerCluster, public TimerContext
 {
 public:
     struct Context
     {
         ConfigurationVersionDelegate & parentVersionConfiguration;
         BridgedDeviceBasicInformationDelegate & delegate;
+        TimerDelegate & timerDelegate;
         BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if NULL, ICD support feature is disabled
     };
 
     /// Most attributes in the bridged device basic information cluster are fixed and cannot be
+
     /// changed after construction. This class defines those attributes.
     ///
     /// Attribute will be exposed if the optional values have a value.
@@ -81,7 +85,8 @@ public:
     BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
                                          Context && context) :
         DefaultServerCluster({ endpointId, BridgedDeviceBasicInformation::Id }),
-        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
+        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mTimerDelegate(context.timerDelegate),
+        mClusterContext(std::move(context))
 
     {}
 
@@ -109,8 +114,18 @@ public:
     void GenerateLeaveEvent();
     void GenerateActiveChangedEvent(uint32_t promisedActiveMs);
 
+    // Application interface for ICD
+
+    /// Returns the reuqested "StayActiveDuration" when the cluster is in "pending-active" state.
+    ///
+    /// When the bridged device is checking in, the application should keep it active
+    /// for the time period here and should `NotifyDeviceActie`
+    std::optional<uint32_t> GetRequestedStayActiveDurationMs() const { return mStayActiveDurationMs; }
+    void NotifyDeviceActive();
+
     /// ServerClusterInterface (DefaultServerCluster overrides)
 
+    void Shutdown(ClusterShutdownType) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -125,9 +140,19 @@ public:
                                                                CommandHandler * handler) override;
 
 private:
+    // TimerContext
+    void TimerFired() override;
+
+    void StartPendingActiveTimer(System::Clock::Milliseconds32 timeoutMs);
+    void CancelPendingActiveTimer();
+
     RequiredData mRequiredData;
     const FixedData mFixedData;
+    TimerDelegate & mTimerDelegate;
     const Context mClusterContext;
+
+    std::optional<uint32_t> mStayActiveDurationMs; // Present only when pending active
+    System::Clock::Timestamp mPendingActiveExpiryTime{};
 };
 
 } // namespace chip::app::Clusters
