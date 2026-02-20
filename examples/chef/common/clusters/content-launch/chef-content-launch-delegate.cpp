@@ -163,12 +163,11 @@ void AddDefaultDelegateForEndpioint(EndpointId endpoint)
 
     for (auto it = gDelegateList.begin(); it != gDelegateList.end(); ++it)
     {
-        auto a = it;
-        // if ((*it)->GetEndpointId() == endpoint)
-        // {
-        //     ChipLogError(Zcl, "ContentLauncher::AddDelegateForEndpioint Delegate for endpoint %d already exists.", endpoint);
-        //     return;
-        // }
+        if (it->GetEndpointId() == endpoint)
+        {
+            ChipLogError(Zcl, "ContentLauncher::AddDelegateForEndpioint Delegate for endpoint %d already exists.", endpoint);
+            return;
+        }
     }
 
     ChefDelegate * delegate = Platform::New<ChefDelegate>(endpoint);
