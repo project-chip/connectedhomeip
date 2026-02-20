@@ -308,6 +308,10 @@ class TC_JFPKI_2_4(MatterBaseTest):
             "Precondition failed: AdministratorFabricIndex must be non-null after commissioning"
             f"(expected non-null value, got {admin_fabric_idx!r})",
         )
+        asserts.assert_true(
+            admin_fabric_idx in range(1, 255),
+            f"Precondition failed: AdministratorFabricIndex={admin_fabric_idx!r} not in valid range [1..254]",
+        )
 
         self.step("2")
         await self.assert_ojcw(commissioning_timeout=self._TIMEOUT_STEP_2)
