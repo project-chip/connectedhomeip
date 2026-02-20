@@ -59,6 +59,8 @@ public:
     CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
                               AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
     Status JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
     Status LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
@@ -66,17 +68,21 @@ public:
     Status UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
     Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
-private:
-    Credentials::GroupDataProvider & Provider() { return mContext.provider; }
-    chip::FabricTable & Fabrics() { return mContext.fabrics; }
+    void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
+    void ResetDataModelProvider() { mDataModelProvider = nullptr; }
 
-    Status SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key);
+private:
+    Credentials::GroupDataProvider & Provider() { return mContext.groupDataProvider; }
+    chip::FabricTable & Fabrics() { return mContext.fabricTable; }
+
+    Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
     Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
                        EndpointList & endpoints);
     Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList & endpoints);
 
     GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;
+    DataModel::Provider * mDataModelProvider = nullptr;
 };
 
 } // namespace Clusters

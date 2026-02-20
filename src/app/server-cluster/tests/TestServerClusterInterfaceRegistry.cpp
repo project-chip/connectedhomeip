@@ -335,7 +335,9 @@ TEST_F(TestServerClusterInterfaceRegistry, RegisterErrors)
 
     // Can't register a duplicate cluster
     EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Register(registration1), CHIP_ERROR_DUPLICATE_KEY_ID);
+    // Idempotent: re-registering the same cluster object returns success
+    EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
+    // Different cluster with same endpoint/cluster ID is still an error
     EXPECT_EQ(registry.Register(anotherRegistration1), CHIP_ERROR_DUPLICATE_KEY_ID);
 }
 
@@ -404,4 +406,47 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
     EXPECT_EQ(cluster1.Cluster().GetShutdownCallCount(), 1u);
     EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 1u);
     EXPECT_EQ(cluster3.Cluster().GetShutdownCallCount(), 1u);
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, WarmStartAfterShutdown)
+{
+    // This test validates app lifecycle management where apps need to:
+    // 1. Shutdown clusters when suspending/backgrounding (ClearContext)
+    // 2. Re-register and startup clusters when resuming/foregrounding
+    // The fix made Register() idempotent so re-registration succeeds without errors.
+    // This applies to any platform with app lifecycle (iOS, Android, tvOS, desktop, etc.)
+
+    RegisteredServerCluster<FakeServerClusterInterface> cluster1(kEp1, kCluster1);
+    RegisteredServerCluster<FakeServerClusterInterface> cluster2(kEp1, kCluster2);
+
+    ServerClusterInterfaceRegistry registry;
+    TestServerClusterContext context;
+
+    // COLD START: Initial registration and startup
+    EXPECT_EQ(registry.Register(cluster1.Registration()), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(cluster2.Registration()), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster1.Cluster().HasContext());
+    EXPECT_TRUE(cluster2.Cluster().HasContext());
+
+    // BACKGROUND: Simulate app backgrounding - clear context (triggers Shutdown)
+    registry.ClearContext();
+    EXPECT_FALSE(cluster1.Cluster().HasContext());
+    EXPECT_FALSE(cluster2.Cluster().HasContext());
+
+    // WARM START: Re-register same clusters (should be idempotent - no errors)
+    EXPECT_EQ(registry.Register(cluster1.Registration()), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(cluster2.Registration()), CHIP_NO_ERROR);
+
+    // Set context again (triggers Startup)
+    EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
+
+    // Verify clusters are operational again
+    EXPECT_TRUE(cluster1.Cluster().HasContext());
+    EXPECT_TRUE(cluster2.Cluster().HasContext());
+
+    // Verify clusters are still accessible
+    EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), &cluster1.Cluster());
+    EXPECT_EQ(registry.Get({ kEp1, kCluster2 }), &cluster2.Cluster());
 }
