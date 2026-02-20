@@ -20,8 +20,8 @@ declare_args() {
   #   - Os for non-debug builds
   #
   # For embedded platforms, we default to non-debug as we want size-optimized builds
-  is_debug =
-      current_os == "linux" || current_os == "mac" || current_os == "android"
+  is_debug = current_os == "linux" || current_os == "mac" ||
+             current_os == "ios" || current_os == "android"
 }
 
 if (target_os == "") {
