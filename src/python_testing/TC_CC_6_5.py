@@ -34,6 +34,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -166,6 +167,8 @@ class TC_CC_6_5(MatterBaseTest):
         self.step("3b")
         # Restart the device PowerOn and then Power Off
         await self.request_device_reboot()
+        log.info("Waiting for device")
+        await asyncio.sleep(5)
 
         self.step("4a")
         startup_color_temp_mireds = await self.read_single_attribute_check_success(
