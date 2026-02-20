@@ -16,7 +16,8 @@ declare_args() {
   # Debug build. Set this to false to remove development features.
   #
   # Defaults in CHIP are:
-  #   - Og for debug builds
+  #   - O0 for debug builds on desktop/mobile platforms (linux, mac, ios, android)
+  #   - Og for some embedded platforms when debug is enabled (see optimize_debug)
   #   - Os for non-debug builds
   #
   # For embedded platforms, we default to non-debug as we want size-optimized builds
