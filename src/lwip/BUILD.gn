@@ -45,7 +45,7 @@ if (lwip_platform != "external") {
 }
 
 config("supress-warnings") {
-  # Avoid 0-size references for ND6, e.g. cc3xx errors out with:
+  # Avoid 0-size references for ND6, e.g. cc32xx errors out with:
   #
   #    In function 'nd6_get_next_hop_entry',
   #        inlined from 'nd6_get_next_hop_addr_or_queue' at ../../examples/air-purifier-app/cc32xx/third_party/connectedhomeip/third_party/lwip/repo/src/core/ipv6/nd6.c:2290:7:
