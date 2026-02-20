@@ -382,6 +382,30 @@ choice CHIP_CRYPTO
 
 endchoice
 
+choice CHIP_CRYPTO_SPAKE2P
+	prompt "CHIP Crypto SPAKE2+ Selection"
+	default CHIP_CRYPTO_SPAKE2P_MBEDTLS
+
+	config CHIP_CRYPTO_SPAKE2P_MBEDTLS
+		bool "SPAKE2+ default mbedtls"
+		help
+			Enables the implementation of the SPAKE2+ protocol
+			based on the mbedTLS crypto API.
+
+	config CHIP_CRYPTO_SPAKE2P_PSA
+		bool "SPAKE2+ default PSA"
+		help
+			Enables the implementation of the SPAKE2+ protocol
+			based on the PSA API.
+
+	config CHIP_CRYPTO_SPAKE2P_CUSTOM
+		bool "SPAKE2+ custom"
+		help
+			Enables the implementation of the SPAKE2+ protocol
+			based on custom API.
+
+endchoice
+
 config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
     bool "Use PSA AEAD single-part API"
     depends on CHIP_CRYPTO_PSA

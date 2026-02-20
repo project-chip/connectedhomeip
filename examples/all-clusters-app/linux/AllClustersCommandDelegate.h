@@ -135,6 +135,11 @@ private:
      * Should be called when it is necessary to change the BooleanState cluster StateValue attribute.
      */
     void OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState);
+
+    /**
+     * Should be called when it is necessary to trigger or clear a sensor fault on the BooleanStateConfiguration cluster.
+     */
+    void OnBooleanStateSensorFaultHandler(chip::EndpointId endpointId, uint16_t sensorFault);
 };
 
 class AllClustersCommandDelegate : public NamedPipeCommandDelegate

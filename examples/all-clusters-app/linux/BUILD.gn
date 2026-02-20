@@ -77,6 +77,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/groupcast",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${chip_root}/src/app/clusters/valve-configuration-and-control-server:valve-configuration-and-control-server",

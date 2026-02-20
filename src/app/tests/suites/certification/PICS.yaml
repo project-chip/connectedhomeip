@@ -6103,6 +6103,9 @@ PICS:
     - label: "Does the device implement the ExpiryDate attribute?"
       id: SMOKECO.S.A000c
 
+    - label: "Does the device implement the Unmounted attribute?"
+      id: SMOKECO.S.A000d
+
     #
     # server / Events
     #
@@ -6151,6 +6154,9 @@ PICS:
           "Can the DeviceMuted attribute be changed by physical control at the
           device?"
       id: SMOKECO.M.ManuallyControlledMute
+
+    - label: "Is the device inoperative when it is unmounted?"
+      id: SMOKECO.M.InoperativeWhenUnmounted
 
     #
     # server / commandsReceived

@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/static-cluster-config/BasicInformation.h>
 #include <app/util/attribute-storage.h>
@@ -62,9 +63,12 @@ public:
         DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
         VerifyOrDie(provider != nullptr);
 
-        BasicInformationCluster::Context context = { .deviceInstanceInfoProvider = *provider,
-                                                     .configurationManager       = DeviceLayer::ConfigurationMgr(),
-                                                     .platformManager            = DeviceLayer::PlatformMgr() };
+        BasicInformationCluster::Context context = {
+            .deviceInstanceInfoProvider = *provider,
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),
+            .platformManager            = DeviceLayer::PlatformMgr(),
+            .subscriptionsPerFabric     = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric()
+        };
         gServer.Create(optionalAttributeSet, context);
 
         // This disabling of the unique id attribute is here only for test purposes. The uniqe id attribute

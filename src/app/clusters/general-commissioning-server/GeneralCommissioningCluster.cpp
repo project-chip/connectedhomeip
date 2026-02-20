@@ -526,6 +526,23 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
+    // Check if mContext is valid before accessing it (can be null during app shutdown/restart)
+    if (mContext == nullptr)
+    {
+        ChipLogError(FailSafe, "GeneralCommissioning: mContext is NULL, cluster not initialized");
+        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
+
+    if (!mContext->interactionContext.actionContext.CurrentExchange())
+    {
+        ChipLogError(FailSafe, "GeneralCommissioning: Invalid exchange during commissioning complete");
+        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
+
     SessionHandle handle = mContext->interactionContext.actionContext.CurrentExchange()->GetSessionHandle();
 
     // Ensure it's a valid CASE session
