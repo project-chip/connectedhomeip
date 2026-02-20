@@ -40,7 +40,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(2, "[TC_CASTINGVIDEOPLAYER] Test media playback."),
                 TestStep(3, "[TC_CASTINGVIDEOPLAYER] Test wake on lan."),
                 TestStep(4, "[TC_CASTINGVIDEOPLAYER] Test channel."),
-                TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off.")]
+                TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off."),
+                TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher.")]
 
     async def _read_on_off(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -245,6 +246,50 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             current_channel = await self._read_channel_current_channel(endpoint)
             asserts.assert_equal(current_channel.majorNumber, channels_list[0].majorNumber)
 
+    async def content_launcher_interstellar_test(self, endpoint):
+        # Launch Interstellar
+        params = [
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kType, value="Movie"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kVideo, value="Interstellar"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kDirector, value="Christopher Nolan"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kActor, value="Matthew McConaughey"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kActor, value="Anne Hathaway"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kGenre, value="Sci-Fi"),
+        ]
+
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=params, autoplay=True),
+            endpoint=endpoint,
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
+
+    async def content_launcher_man_united_match_test(self, endpoint):
+        # Launch Man United Match
+        params = [
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kType, value="SportsEvent"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kLeague, value="Premier League"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kSportsTeam, value="Manchester United"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kSport, value="Football"),
+        ]
+
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=params, autoplay=True),
+            endpoint=endpoint,
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
+
+    async def content_launcher_unavailable_test(self, endpoint):
+        # Try to launch non-existent content
+        params = [
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kVideo, value="NonExistentMovie"),
+        ]
+
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=params, autoplay=True),
+            endpoint=endpoint,
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kURLNotAvailable)
+
     @async_test_body
     async def test_TC_CASTINGVIDEOPLAYER(self):
         """Run all steps."""
@@ -263,6 +308,11 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(5)
         await self.on_off_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+
+        self.step(6)
+        await self.content_launcher_interstellar_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.content_launcher_man_united_match_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.content_launcher_unavailable_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
 
 if __name__ == "__main__":

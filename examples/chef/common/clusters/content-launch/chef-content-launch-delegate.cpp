@@ -170,6 +170,7 @@ void AddDefaultDelegateForEndpioint(EndpointId endpoint)
         }
     }
 
+    ChipLogProgress(Zcl, "ContentLauncher::AddDelegateForEndpioint Adding delegate for endpoint %d", endpoint);
     ChefDelegate * delegate = Platform::New<ChefDelegate>(endpoint);
     gDelegateList.PushBack(delegate);
     SetDefaultDelegate(endpoint, delegate);
