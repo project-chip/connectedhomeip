@@ -40,7 +40,6 @@ Usage example:
 from dataclasses import dataclass
 from typing import Any, Optional, Type
 
-
 # Sentinel object to distinguish "no default provided" from None
 _PIXIT_NO_DEFAULT = object()
 

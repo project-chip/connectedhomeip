@@ -19,14 +19,8 @@
 
 import unittest
 
-from matter.testing.pixit import (
-    PixitDefinition,
-    _type_to_arg_flag,
-    format_pixit_error,
-    get_pixit_definitions,
-    requires_pixit,
-    validate_pixits,
-)
+from matter.testing.pixit import (PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions, requires_pixit,
+                                  validate_pixits)
 
 
 class TestPixitDefinition(unittest.TestCase):

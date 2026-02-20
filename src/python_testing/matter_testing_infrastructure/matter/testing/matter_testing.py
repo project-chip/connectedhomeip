@@ -57,9 +57,9 @@ from matter.testing.commissioning import (CommissioningInfo, CustomCommissioning
                                           get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.pixit import format_pixit_error, get_pixit_definitions, validate_pixits
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.pixit import format_pixit_error, get_pixit_definitions, validate_pixits
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.tlv import uint
