@@ -265,7 +265,7 @@ if (current_os == "zephyr") {
     ]
 
     if (lwip_platform == "cc32xx") {
-      public_configs += [ ":supress-warnings" ]
+      public_configs += [ ":suppress-warnings" ]
     }
   }
 
