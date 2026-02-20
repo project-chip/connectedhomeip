@@ -186,7 +186,7 @@ not_automated:
           onboarding data security requirements)
     - name: TC_GCAST_common.py
       reason: Shared code for TC_GCAST, not a standalone test.
-    - name: TC_GCAST_2_1.py
+    - name: TC_GCAST_2_2.py
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.
@@ -202,11 +202,11 @@ not_automated:
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.
-    - name: TC_GCAST_2_6.py
+    - name: TC_GCAST_2_7.py
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.
-    - name: TC_GCAST_2_7.py
+    - name: TC_GCAST_2_8.py
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.

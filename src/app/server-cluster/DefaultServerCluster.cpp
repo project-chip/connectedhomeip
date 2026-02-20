@@ -81,7 +81,19 @@ CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, Re
 
 CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
 {
-    VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+    // Reset shutdown state to allow restart after shutdown
+    mIsShutdown = false;
+
+    // Make Startup() idempotent for Stop() → Start() lifecycle.
+    // Shutdown() does not fully clean up cluster objects - cluster objects persist across Stop() → Start().
+    // Only their state (mContext) is cleared.
+    // If already initialized, update context and return success (preserves mDataVersion).
+    if (mContext != nullptr)
+    {
+        ChipLogDetail(DataManagement, "DefaultServerCluster::Startup() already initialized, updating context (idempotent)");
+        mContext = &context;
+        return CHIP_NO_ERROR;
+    }
 
     mContext = &context;
 
@@ -94,7 +106,14 @@ CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
 
 void DefaultServerCluster::Shutdown(ClusterShutdownType)
 {
-    mContext = nullptr;
+    // Make shutdown idempotent - safe to call multiple times
+    if (mIsShutdown)
+    {
+        return;
+    }
+
+    mContext    = nullptr;
+    mIsShutdown = true;
 }
 
 void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
