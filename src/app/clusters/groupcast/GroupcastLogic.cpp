@@ -328,7 +328,8 @@ Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, GroupId group_id, Key
     else
     {
         // No key provided, the keyset must exist
-        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
+        VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     }
 
     // Assign keyset to group
