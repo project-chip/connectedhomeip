@@ -36,7 +36,7 @@ source_set("without-logging") {
     "${chip_root}/src/system",
     "${chip_root}/src/transport",
 
-    #keep-sorted: end
+    # keep-sorted: end
   ]
 
   if (chip_device_config_enable_wifipaf) {
