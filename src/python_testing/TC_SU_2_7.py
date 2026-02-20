@@ -97,7 +97,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_2_7.log')
-        self.step5_download_wait_time = self.user_params.get('step5_download_wait_time', 5)
+        self.step5_download_wait_time = self.user_params.get('step5_download_wait_time', 10)
         # On average the ota image build for the CI is 1.8 MB which takes 4-6 min to download. Adjust time if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*6)
         logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
