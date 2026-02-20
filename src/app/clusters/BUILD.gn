@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+source_set("clusters") {
+  public_deps = [
+    # keep-sorted: start
+    "access-control-server:access-control-server",
+    "administrator-commissioning-server:administrator-commissioning-server",
+    "basic-information:basic-information",
+    "boolean-state-server:boolean-state-server",
+    "chime-server:chime-server",
+    "descriptor:descriptor",
+    "general-commissioning-server:general-commissioning-server",
+    "general-diagnostics-server:general-diagnostics-server",
+    "group-key-mgmt-server:group-key-mgmt-server",
+    "groupcast:groupcast",
+    "groups-server:groups-server",
+    "identify-server:identify-server",
+    "level-control:level-control",
+    "network-commissioning:network-commissioning",
+    "occupancy-sensor-server:occupancy-sensor-server",
+    "on-off-server:on-off-server",
+    "operational-credentials-server:operational-credentials-server",
+    "scenes-server:scenes",
+    "scenes-server:scenes-server",
+    "software-diagnostics-server:software-diagnostics-server",
+    "wifi-network-diagnostics-server:wifi-network-diagnostics-server",
+    # keep-sorted: end
+  ]
+}
