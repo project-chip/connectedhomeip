@@ -12,37 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-    source_set("clusters") {
-      public_deps = [
-        # keep-sorted: start
-        "access-control-server:access-control-server",
-        "administrator-commissioning-server:administrator-commissioning-server",
-        "basic-information:basic-information",
-        "boolean-state-configuration-server:boolean-state-configuration-server",
-        "boolean-state-server:boolean-state-server",
-        "camera-av-settings-user-level-management-server:camera-av-settings-user-level-management-server",
-        "chime-server:chime-server",
-        "descriptor:descriptor",
-        "general-commissioning-server:general-commissioning-server",
-        "general-diagnostics-server:general-diagnostics-server",
-        "group-key-mgmt-server:group-key-mgmt-server",
-        "groupcast:groupcast",
-        "groups-server:groups-server",
-        "identify-server:identify-server",
-        "level-control:level-control",
-        "network-commissioning:network-commissioning",
-        "occupancy-sensor-server:occupancy-sensor-server",
-        "on-off-server:on-off-server",
-        "operational-credentials-server:operational-credentials-server",
-        "push-av-stream-transport-server:push-av-stream-transport-server",
-        "scenes-server:scenes",
-        "scenes-server:scenes-server",
-        "software-diagnostics-server:software-diagnostics-server",
-        "tls-certificate-management-server:tls-certificate-management-server",
-        "tls-client-management-server:tls-client-management-server",
-        "webrtc-transport-provider-server:webrtc-transport-provider-server",
-        "wifi-network-diagnostics-server:wifi-network-diagnostics-server",
+source_set("clusters") {
+  public_deps = [
+    # keep-sorted: start
+    "access-control-server:access-control-server",
+    "administrator-commissioning-server:administrator-commissioning-server",
+    "basic-information:basic-information",
+    "boolean-state-configuration-server:boolean-state-configuration-server",
+    "boolean-state-server:boolean-state-server",
+    "camera-av-settings-user-level-management-server:camera-av-settings-user-level-management-server",
+    "chime-server:chime-server",
+    "descriptor:descriptor",
+    "general-commissioning-server:general-commissioning-server",
+    "general-diagnostics-server:general-diagnostics-server",
+    "group-key-mgmt-server:group-key-mgmt-server",
+    "groupcast:groupcast",
+    "groups-server:groups-server",
+    "identify-server:identify-server",
+    "level-control:level-control",
+    "network-commissioning:network-commissioning",
+    "occupancy-sensor-server:occupancy-sensor-server",
+    "on-off-server:on-off-server",
+    "operational-credentials-server:operational-credentials-server",
+    "push-av-stream-transport-server:push-av-stream-transport-server",
+    "scenes-server:scenes",
+    "scenes-server:scenes-server",
+    "software-diagnostics-server:software-diagnostics-server",
+    "tls-certificate-management-server:tls-certificate-management-server",
+    "tls-client-management-server:tls-client-management-server",
+    "webrtc-transport-provider-server:webrtc-transport-provider-server",
+    "wifi-network-diagnostics-server:wifi-network-diagnostics-server",
 
-        # keep-sorted: end
-      ]
-    }
+    # keep-sorted: end
+  ]
+}
