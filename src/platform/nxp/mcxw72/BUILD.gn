@@ -109,6 +109,10 @@ static_library("nxp_platform") {
     ]
 
     include_dirs = [ "${nxp_sdk_build_root}/mbedtls/config" ]
+  } else if (chip_crypto == "psa") {
+    if (chip_crypto_spake2p == "custom") {
+      sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
+    }
   }
 
   if (chip_enable_ble) {

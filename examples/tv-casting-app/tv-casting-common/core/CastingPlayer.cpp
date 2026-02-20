@@ -35,10 +35,8 @@ void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, Identificat
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(
-        connectionCallbacks.mOnConnectionComplete != nullptr,
-        ChipLogError(AppServer,
-                     "CastingPlayer::VerifyOrEstablishConnection() ConnectionCallbacks.mOnConnectionComplete was not provided"));
+    VerifyOrExit(connectionCallbacks.mOnConnectionComplete != nullptr,
+                 ChipLogError(AppServer, "CastingPlayer::SendUDC() ConnectionCallbacks.mOnConnectionComplete was not provided"));
 
     mOnCompleted         = connectionCallbacks.mOnConnectionComplete;
     mTargetCastingPlayer = weak_from_this();
@@ -212,7 +210,14 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             ChipLogProgress(AppServer,
                                             "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                             "CastingPlayer successful");
-                            CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
+                            CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
+                            VerifyOrReturn(
+                                targetCastingPlayer != nullptr,
+                                ChipLogError(AppServer,
+                                             "CastingPlayer::VerifyOrEstablishConnection() Target CastingPlayer no longer exists, "
+                                             "skipping connection handling"));
+
+                            targetCastingPlayer->mConnectionState = CASTING_PLAYER_CONNECTED;
 
                             // this async call will Load all the endpoints with their respective attributes into the
                             // TargetCastingPlayer.
@@ -225,16 +230,25 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             ChipLogError(AppServer,
                                          "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                          "CastingPlayer failed");
-                            CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                            CastingPlayer::GetTargetCastingPlayer()->RemoveFabric();
-                            CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                            CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
+                            VerifyOrReturn(
+                                targetCastingPlayer != nullptr,
+                                ChipLogError(AppServer,
+                                             "CastingPlayer::VerifyOrEstablishConnection() Target CastingPlayer no longer exists, "
+                                             "skipping cleanup"));
+
+                            targetCastingPlayer->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+                            targetCastingPlayer->RemoveFabric();
+                            CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*targetCastingPlayer);
                             if (e != CHIP_NO_ERROR)
                             {
                                 ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, e.Format());
                             }
 
-                            VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
-                            CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
+                            if (targetCastingPlayer->mOnCompleted)
+                            {
+                                targetCastingPlayer->mOnCompleted(error, nullptr);
+                            }
                             mTargetCastingPlayer.reset();
                         });
                     return; // FindOrEstablishSession called. Return early.

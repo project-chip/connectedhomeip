@@ -50,9 +50,12 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     mBasicInformationCluster.Create(
         optionalAttributeSet,
-        BasicInformationCluster::Context{ .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider,
-                                          .configurationManager       = mContext.configurationManager,
-                                          .platformManager            = mContext.platformManager });
+        BasicInformationCluster::Context{
+            .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider,
+            .configurationManager       = mContext.configurationManager,
+            .platformManager            = mContext.platformManager,
+            .subscriptionsPerFabric     = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
+        });
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
