@@ -105,9 +105,9 @@ static const ParameterType kManUnitedMatch[] = {
 
 static const ContentEntry kLaunchableContent[] = {
 
-    Conent(kInterstellar),
+    ContentEntry(kInterstellar),
 
-    Conent(kManUnitedMatch),
+    ContentEntry(kManUnitedMatch),
 };
 
 class ChefDelegate : public Delegate
