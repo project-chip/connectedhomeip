@@ -29,6 +29,7 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
+    DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
     mLogic.ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -70,7 +71,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
     FabricIndex fabric_index = handler->GetAccessingFabricIndex();
 
-    [[maybe_unused]] Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
 
     switch (request.path.mCommandId)
     {
@@ -134,12 +135,12 @@ CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
-    if (data.durationSeconds.HasValue())
+    if (data.durationSeconds.HasValue() && data.testOperation != Groupcast::GroupcastTestingEnum::kDisableTesting)
     {
-        constexpr uint16_t kMinDuration = 10, kMaxDuration = 1200;
-        VerifyOrReturnError(data.durationSeconds.Value() >= kMinDuration && data.durationSeconds.Value() <= kMaxDuration,
+        constexpr uint16_t kMinDurationSeconds = 10, kMaxDurationSeconds = 1200;
+        VerifyOrReturnError(data.durationSeconds.Value() >= kMinDurationSeconds &&
+                                data.durationSeconds.Value() <= kMaxDurationSeconds,
                             Status::ConstraintError);
-        DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
         VerifyOrReturnError(CHIP_NO_ERROR ==
                                 DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(data.durationSeconds.Value()),
                                                                       OnGroupcastTestingDone, this),
@@ -158,11 +159,7 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 
 void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
 {
-    if (mFabricUnderTest != fabricUnderTest)
-    {
-        mFabricUnderTest = fabricUnderTest;
-        NotifyAttributeChanged(Groupcast::Attributes::FabricUnderTest::Id);
-    }
+    SetAttributeValue(mFabricUnderTest, fabricUnderTest, Groupcast::Attributes::FabricUnderTest::Id);
 }
 
 void GroupcastCluster::OnGroupcastTestingDone(System::Layer * aLayer, void * appState)
