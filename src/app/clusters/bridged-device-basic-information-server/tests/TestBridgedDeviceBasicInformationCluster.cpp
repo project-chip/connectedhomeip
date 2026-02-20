@@ -427,7 +427,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetConfigurationVersion)
     ClusterTester tester(cluster);
 
     mMockVersionConfiguration.mVersion = 0;
-    cluster.IncreaseConfigurationVersion();
+    EXPECT_EQ(cluster.IncreaseConfigurationVersion(), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.GetConfigurationVersion(), 2u);  // we started with 1
     EXPECT_EQ(mMockVersionConfiguration.mVersion, 1u); // parent is also increased
 

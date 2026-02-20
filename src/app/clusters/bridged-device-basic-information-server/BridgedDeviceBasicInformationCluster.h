@@ -104,7 +104,7 @@ public:
     ///   If the bridge detects a change on a bridged device, which it deems as a
     ///   change in the configuration of the bridged device, it SHALL increase this
     ///   attribute (and the corresponding attribute on the bridge itself)
-    void IncreaseConfigurationVersion();
+    CHIP_ERROR IncreaseConfigurationVersion();
 
     void GenerateLeaveEvent();
     void GenerateActiveChangedEvent(uint32_t promisedActiveMs);
