@@ -38,6 +38,16 @@ with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infras
     from testing.linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, ThreadBorderRouter, WpaSupplicantMock,
                                ensure_network_namespace_availability, ensure_private_state)
 
+__all__ = [
+    "ensure_network_namespace_availability",
+    "ensure_private_state",
+    "BluetoothMock",
+    "DBusTestSystemBus",
+    "IsolatedNetworkNamespace",
+    "LinuxNamespacedExecutor",
+    "ThreadBorderRouter",
+    "WpaSupplicantMock"
+]
 
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: IsolatedNetworkNamespace):
@@ -53,15 +63,3 @@ class LinuxNamespacedExecutor(Executor):
             log.warning("%s", e)
             wrapped = subproc
         return super().run(wrapped, stdin=stdin, stdout=stdout, stderr=stderr)
-
-
-__all__ = [
-    "ensure_network_namespace_availability",
-    "ensure_private_state",
-    "BluetoothMock",
-    "DBusTestSystemBus",
-    "IsolatedNetworkNamespace",
-    "LinuxNamespacedExecutor",
-    "ThreadBorderRouter",
-    "WpaSupplicantMock"
-]
