@@ -82,6 +82,11 @@ void InitIdentifyCluster()
 }
 } // namespace
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "content-launch/chef-content-launch-delegate.h"
+#endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -574,6 +579,20 @@ void GenericSwitchInit()
     if (DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId))
     {
         LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kEp2TagList)));
+    }
+}
+
+/**
+ * This initializer is for the casting video player application rootnode_castingvideoplayer_contentapp_34699714e7. To not have this
+ * initialiser affect new apps video player device types, use different endpoints.
+ */
+void CastingvideoplayerContentappInit()
+{
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kCastingVideoClientDeviceTypeId))
+    {
+#if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        Clusters::ContentLauncher::Chef::AddDefaultDelegateForEndpioint(1);
+#endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
     }
 }
 

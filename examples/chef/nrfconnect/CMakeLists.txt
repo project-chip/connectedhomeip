@@ -94,6 +94,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
     ${CHEF}/common/clusters/channel/ChannelManager.cpp
+    ${CHEF}/common/clusters/content-launch/chef-content-launch-delegate.cpp
     ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp

@@ -19,6 +19,9 @@
 #pragma once
 
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
+#include <app/util/config.h>
+
+#if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using chip::CharSpan;
 using chip::EndpointId;
@@ -29,6 +32,8 @@ using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::
 using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
 using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
 using PlaybackPreferencesType = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
+
+typedef Span<const ParameterType> ContentEntry;
 
 namespace chip {
 namespace app {
@@ -48,60 +53,60 @@ static constexpr CharSpan kAcceptHeaderList[]          = { "application/dash+xml
                                                            "video/webm"_span,
                                                            "audio/mp4"_span,
                                                            "audio/mpeg"_span };
-static const ParameterType kLaunchableContentData[]    = {
-    // LaunchContent will return success if the requested content matches any of the below parameters.
+
+// LaunchContent will succeed only when requested content matches with one of the below items.
+static const ParameterType kInterstellar[] = {
     {
-        .type  = ParameterEnum::kActor,
-        .value = "Gaby Hoffman"_span,
+        .type  = ParameterEnum::kType,
+        .value = "Movie"_span,
     },
     {
-        .type  = ParameterEnum::kChannel,
-        .value = "PBS"_span,
-    },
-    {
-        .type  = ParameterEnum::kCharacter,
-        .value = "Snow White"_span,
+        // Video represents the title of the content
+        .type  = ParameterEnum::kVideo,
+        .value = "Interstellar"_span,
     },
     {
         .type  = ParameterEnum::kDirector,
-        .value = "Spike Lee"_span,
+        .value = "Christopher Nolan"_span,
     },
     {
-        .type  = ParameterEnum::kFranchise,
-        .value = "Star Wars"_span,
+        .type  = ParameterEnum::kActor,
+        .value = "Matthew McConaughey"_span,
+    },
+    {
+        .type  = ParameterEnum::kActor,
+        .value = "Anne Hathaway"_span,
     },
     {
         .type  = ParameterEnum::kGenre,
-        .value = "Horror"_span,
+        .value = "Sci-Fi"_span,
     },
+};
+
+static const ParameterType kManUnitedMatch[] = {
     {
-        .type  = ParameterEnum::kPopularity,
-        .value = "Popularity"_span,
-    },
-    {
-        .type  = ParameterEnum::kProvider,
-        .value = "Netflix"_span,
-    },
-    {
-        .type  = ParameterEnum::kEvent,
-        .value = "Football games"_span,
+        .type  = ParameterEnum::kType,
+        .value = "SportsEvent"_span,
     },
     {
         .type  = ParameterEnum::kLeague,
-        .value = "NCAA"_span,
-    },
-    {
-        .type  = ParameterEnum::kSport,
-        .value = "football"_span,
+        .value = "Premier League"_span,
     },
     {
         .type  = ParameterEnum::kSportsTeam,
-        .value = "Arsenel"_span,
+        .value = "Manchester United"_span,
     },
     {
-        .type  = ParameterEnum::kType,
-        .value = "TVSeries"_span,
+        .type  = ParameterEnum::kSport,
+        .value = "Football"_span,
     },
+};
+
+static const ContentEntry kLaunchableContent[] = {
+
+    Conent(kInterstellar),
+
+    Conent(kManUnitedMatch),
 };
 
 class ChefDelegate : public Delegate
@@ -109,13 +114,13 @@ class ChefDelegate : public Delegate
 public:
     ChefDelegate(const EndpointId endpointId, const uint32_t featureMap, const uint16_t clusterRevision,
                  const uint32_t supportedStreamingProtocols, const Span<const CharSpan> acceptHeaderList,
-                 const Span<const ParameterType> launchableContentData) :
+                 const Span<const ContentEntry> launchableContent) :
         mEndpointId(endpointId), mFeaturemap(featureMap), mClusterRevision(clusterRevision),
         mSupportedStreamingProtocols(supportedStreamingProtocols), mAcceptHeaderList(acceptHeaderList),
-        mLaunchableContentData(launchableContentData) {};
+        mLaunchableContent(launchableContent) {};
     ChefDelegate(EndpointId endpointId) :
         ChefDelegate(endpointId, kEndpointFeatureMap, kClusterRevision, kSupportedStreamingProtocols,
-                     Span<const CharSpan>(kAcceptHeaderList), Span<const ParameterType>(kLaunchableContentData)) {};
+                     Span<const CharSpan>(kAcceptHeaderList), Span<const ContentEntry>(kLaunchableContent)) {};
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                              const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
@@ -129,17 +134,23 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
+    EndpointId GetEndpointId() { return mEndpointId; }
+
 private:
     EndpointId mEndpointId;
     uint32_t mFeaturemap;
     uint16_t mClusterRevision;
     uint32_t mSupportedStreamingProtocols;
     Span<const CharSpan> mAcceptHeaderList;
-    Span<const ParameterType> mLaunchableContentData;
+    Span<const ContentEntry> mLaunchableContent;
 };
+
+void AddDefaultDelegateForEndpioint(EndpointId endpoint);
 
 } // namespace Chef
 } // namespace ContentLauncher
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT

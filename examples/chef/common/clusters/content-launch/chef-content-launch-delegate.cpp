@@ -19,12 +19,53 @@
 #include "chef-content-launch-delegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/content-launch-server/content-launch-server.h>
 #include <app/util/config.h>
+#include <lib/support/CHIPMem.h> // For chip::Platform
+#include <lib/support/IntrusiveList.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+#if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ContentLauncher;
+
+typedef DataModel::DecodableList<ParameterType> SearchParameters;
+
+namespace {
+
+/**
+ * Checks if given content has **all** search parameters.
+ */
+bool checkContentMatch(const ContentEntry & content, const SearchParameters & params)
+{
+    auto iter = params.begin();
+    while (iter.Next())
+    {
+        bool found           = false;
+        auto & requiredParam = iter.GetValue();
+        for (auto it = content.begin(); it != content.end(); ++it)
+        {
+            auto & availableParam = *it;
+            if (requiredParam.type == availableParam.type && availableParam.value.data_equal(requiredParam.value))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+chip::IntrusiveList<Chef::ChefDelegate> gDelegateList;
+
+} // namespace
 
 namespace chip {
 namespace app {
@@ -37,46 +78,40 @@ void ChefDelegate::HandleLaunchContent(CommandResponseHelper<LaunchResponseType>
                                        const CharSpan & data, const chip::Optional<PlaybackPreferencesType> playbackPreferences,
                                        bool useCurrentContext)
 {
-    ChipLogProgress(Zcl, "ChefDelegate::HandleLaunchContent");
+    ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::HandleLaunchContent");
 
     bool foundMatch = false;
-    auto iter       = parameterList.begin();
-    while (iter.Next())
+    for (auto it = mLaunchableContent.begin(); it != mLaunchableContent.end(); ++it)
     {
-        auto & parameterType = iter.GetValue();
-        for (auto const & launchableContent : mLaunchableContentData)
+        auto & content = *it;
+        if (checkContentMatch(content, parameterList))
         {
-            if (launchableContent.type == parameterType.type && launchableContent.value.data_equal(parameterType.value))
-            {
-                foundMatch = true;
-                break;
-            }
-        }
-        if (foundMatch)
-        {
+            foundMatch = true;
             break;
         }
     }
 
+    LaunchResponseType response;
+
     if (foundMatch)
     {
-        ChipLogProgress(Zcl, "ChefDelegate::HandleLaunchContent match found");
-        LaunchResponseType response;
+        ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::HandleLaunchContent match found");
         response.status = ContentLauncher::StatusEnum::kSuccess;
-        response.data   = chip::MakeOptional(data);
-        helper.Success(response);
     }
     else
     {
-        ChipLogProgress(Zcl, "ChefDelegate::HandleLaunchContent match NOT found");
-        helper.Failure(chip::Protocols::InteractionModel::Status::NotFound);
+        ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::HandleLaunchContent match NOT found");
+        response.status = ContentLauncher::StatusEnum::kURLNotAvailable; // Only available enum closest to a "not found"
     }
+
+    response.data = chip::MakeOptional(data);
+    helper.Success(response);
 }
 
 void ChefDelegate::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                                    const CharSpan & displayString, const BrandingInformationType & brandingInformation)
 {
-    ChipLogProgress(Zcl, "ChefDelegate::HandleLaunchUrl");
+    ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::HandleLaunchUrl");
     LaunchResponseType response;
     response.status = ContentLauncher::StatusEnum::kSuccess;
     response.data   = chip::MakeOptional(contentUrl);
@@ -103,7 +138,10 @@ uint32_t ChefDelegate::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint != mEndpointId)
     {
-        return kEndpointFeatureMap;
+        ChipLogError(
+            Zcl,
+            "ContentLauncher::ChefDelegate::GetFeatureMap I am delegate for endpoint %d but got GetFeatureMap with endpoint %d",
+            mEndpointId, endpoint);
     }
     return mFeaturemap;
 }
@@ -112,9 +150,29 @@ uint16_t ChefDelegate::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint != mEndpointId)
     {
-        return kClusterRevision;
+        ChipLogError(Zcl,
+                     "ContentLauncher::ChefDelegate::GetClusterRevision I am delegate for endpoint %d but got GetClusterRevision "
+                     "with endpoint %d",
+                     mEndpointId, endpoint);
     }
     return mClusterRevision;
+}
+
+void AddDefaultDelegateForEndpioint(EndpointId endpoint)
+{
+
+    for (auto & delegate : gDelegateList)
+    {
+        if (delegate.GetEndpointId() == endpoint)
+        {
+            ChipLogError(Zcl, "ContentLauncher::AddDelegateForEndpioint Delegate for endpoint %d already exists.", endpoint);
+            return;
+        }
+    }
+
+    ChefDelegate * delegate = Platform::New<ChefDelegate>(endpoint);
+    gDelegateList.PushBack(delegate);
+    SetDefaultDelegate(endpoint, delegate);
 }
 
 } // namespace Chef
@@ -122,3 +180,5 @@ uint16_t ChefDelegate::GetClusterRevision(chip::EndpointId endpoint)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
