@@ -17,6 +17,7 @@
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/BridgedDeviceBasicInformation/Attributes.h>
 #include <clusters/BridgedDeviceBasicInformation/Commands.h>
 #include <clusters/BridgedDeviceBasicInformation/Events.h>
 #include <clusters/BridgedDeviceBasicInformation/Metadata.h>
@@ -32,9 +33,6 @@ namespace {
 
 static constexpr uint32_t kMinKeepActiveTimeoutMs = 30 * 1000;
 static constexpr uint32_t kMaxKeepActiveTimeoutMs = 3600 * 1000;
-
-// TODO: These should come from the metadata
-constexpr size_t kNodeLabelMaxLength = 32;
 
 CharSpan ToSpan(const std::string & s)
 {
@@ -55,7 +53,7 @@ CharSpan ToSpan(const std::optional<std::string> & s)
 
 DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel(CharSpan nodeLabel)
 {
-    VerifyOrReturnError(nodeLabel.size() <= kNodeLabelMaxLength, Status::ConstraintError);
+    VerifyOrReturnError(nodeLabel.size() <= Attributes::NodeLabel::TypeInfo::MaxLength(), Status::ConstraintError);
 
     // std::string may not like a nullptr .data() when the charspan is empty.
     const std::string newValue = nodeLabel.empty() ? std::string() : std::string{ nodeLabel.data(), nodeLabel.size() };
