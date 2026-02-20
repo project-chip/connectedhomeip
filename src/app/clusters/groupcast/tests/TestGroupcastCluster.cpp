@@ -100,7 +100,7 @@ public:
 };
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
-class TestGroupcastCluster : public chip::Testing::AppContext
+class TestGroupcastCluster : public AppContext
 {
 public:
     static void SetUpTestSuite()
@@ -882,7 +882,7 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
 
 TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
 {
-    chip::Testing::ClusterTester tester(mListener);
+    ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
 
     // Default should be "no fabric under test"
