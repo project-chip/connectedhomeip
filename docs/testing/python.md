@@ -918,7 +918,7 @@ Runs the test step only if the endpoint and cluster contain the given attribute:
 Example:
 
 ```python
-self.step(#)
+self.step(<STEP_NUMBER>)
 if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
     # If attribute exists then test step continues, else test step is skipped.
 ```
@@ -931,7 +931,7 @@ feature:
 Example:
 
 ```python
-self.step(#)
+self.step(<STEP_NUMBER>)
 if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
     # IF feature available then do test step, else test step is skipped.
 ```
@@ -944,7 +944,7 @@ command:
 Example:
 
 ```python
-self.step(#)
+self.step(<STEP_NUMBER>)
 if await self.command_guard(endpoint=self.endpoint, command=commands.Resume):
     # If command available, then do test step here, else test step is skipped
 ```
@@ -962,8 +962,12 @@ the given PICS key is enabled in the PICS file:
 Example:
 
 ```python
-if self.pics_guard(self.check_pics("CC.S.F04")):
-    # Do someething, otherwise test step is skipped
+if self.pics_guard(self.check_pics(<PICS here>)):
+    self.step(<STEP_NUMBER>)
+    # Do test step logic here
+else:
+    self.skip_step(<STEP_NUMBER>)
+    #skip test step
 ```
 
 ### run_if_endpoint_matches decorator
