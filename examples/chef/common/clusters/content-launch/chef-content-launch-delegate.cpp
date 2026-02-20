@@ -63,7 +63,7 @@ bool checkContentMatch(const ContentEntry & content, const SearchParameters & pa
     return true;
 }
 
-chip::IntrusiveList<Chef::ChefDelegate> gDelegateList;
+static chip::IntrusiveList<Chef::ChefDelegate> gDelegateList;
 
 } // namespace
 
