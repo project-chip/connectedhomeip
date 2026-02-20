@@ -53,7 +53,12 @@ public:
     };
 
     GroupcastLogic(GroupcastContext & context) : mContext(context) {}
-    GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features) : mContext(context), mFeatures(features) {}
+    GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features) : mContext(context), mFeatures(features)
+    {
+        mContext.groupDataProvider.SetKeepGroupWithNoEndpoints(mFeatures.Has(Groupcast::Feature::kSender));
+    }
+    ~GroupcastLogic() { mContext.groupDataProvider.SetKeepGroupWithNoEndpoints(false); }
+
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
     CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,

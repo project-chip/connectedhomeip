@@ -267,6 +267,7 @@ public:
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id)                   = 0;
     virtual CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id)                        = 0;
+    virtual void SetKeepGroupWithNoEndpoints(bool keep) { mKeepGroupWithNoEndpoints = keep; }
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
@@ -371,6 +372,7 @@ protected:
     const uint16_t mMaxGroupsPerFabric;
     const uint16_t mMaxGroupKeysPerFabric;
     GroupListener * mListener = nullptr;
+    bool mKeepGroupWithNoEndpoints;
 };
 
 /**

@@ -1135,7 +1135,15 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
         return group.Save(mStorage);
     }
 
-    // No more endpoints, remove the group
+    // We are removing the last endpoint of the group.
+    // Check if we should keep the group with no endpoints or not(Groupcast Listener usecase)
+    if (mKeepGroupWithNoEndpoints)
+    {
+        group.endpoint_count = 0;
+        return group.Save(mStorage);
+    }
+
+    // No more endpoints and empty groups are not allowed: remove the group.
     return RemoveGroupInfoAt(fabric_index, group.index);
 }
 
