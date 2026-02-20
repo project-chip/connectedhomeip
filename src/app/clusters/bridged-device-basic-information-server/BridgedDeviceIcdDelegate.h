@@ -23,7 +23,7 @@ namespace chip::app::Clusters {
 
 /// This handles application notifications for bridged devices that support ICD.
 ///
-/// Specifically it allows being notified when a `KeepActive` is requested
+/// Specifically, it allows the application to be notified when a `KeepActive` command is requested.
 class BridgedDeviceIcdDelegate
 {
 public:
