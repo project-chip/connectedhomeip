@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 source_set("clusters") {
   public_deps = [
     # keep-sorted: start
@@ -37,6 +36,7 @@ source_set("clusters") {
     "scenes-server:scenes-server",
     "software-diagnostics-server:software-diagnostics-server",
     "wifi-network-diagnostics-server:wifi-network-diagnostics-server",
+
     # keep-sorted: end
   ]
 }
