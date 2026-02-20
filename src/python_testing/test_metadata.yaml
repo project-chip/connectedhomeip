@@ -13,22 +13,6 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
-    - name: TC_AVSM_2_18.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
-    - name: TC_AVSM_2_19.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
-    - name: TC_AVSM_2_20.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
-    - name: TC_AVSM_2_21.py
-      reason:
-          AVSM flaky test in CI.
-          https://github.com/project-chip/connectedhomeip/issues/42871
     - name: TC_BRBINFO_3_1.py
       reason:
           Attribute is not implemented in the bridge app. Same code as
@@ -210,10 +194,6 @@ not_automated:
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.
-    - name: TC_ACL_2_10.py
-      reason:
-          Flaky, see
-          https://github.com/project-chip/connectedhomeip/issues/43056
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
