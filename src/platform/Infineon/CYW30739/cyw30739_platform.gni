@@ -37,7 +37,7 @@ template("cyw30739_platform") {
       "${cyw30739_platform_dir}/cycfg_gatt_db.c",
     ]
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       sources += [ "${cyw30739_platform_dir}/ThreadStackManagerImpl.cpp" ]
     }
 
@@ -55,7 +55,7 @@ template("cyw30739_platform") {
       "${chip_root}/src/platform/logging:headers",
     ]
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       deps += [
         "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
       ]

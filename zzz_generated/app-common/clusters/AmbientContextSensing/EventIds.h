@@ -11,9 +11,13 @@ namespace app {
 namespace Clusters {
 namespace AmbientContextSensing {
 namespace Events {
-namespace AmbientContextDetected {
+namespace AmbientContextDetectStarted {
 inline constexpr EventId Id = 0x00000000;
-} // namespace AmbientContextDetected
+} // namespace AmbientContextDetectStarted
+
+namespace AmbientContextDetectEnded {
+inline constexpr EventId Id = 0x00000001;
+} // namespace AmbientContextDetectEnded
 
 } // namespace Events
 } // namespace AmbientContextSensing

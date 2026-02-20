@@ -92,7 +92,7 @@ declare_args() {
   }
 }
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -247,7 +247,7 @@ static_library("Linux") {
       public_configs += [ ":avahi_client_config" ]
     }
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       sources += [
         "NetworkCommissioningThreadDriver.cpp",
         "ThreadStackManagerImpl.cpp",
