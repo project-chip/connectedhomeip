@@ -345,6 +345,8 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     //VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
     //                    ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
     CHIP_ERROR err = CHIP_NO_ERROR;
+    mTargetCastingPlayer = weak_from_this();
+    mIdOptions.LogDetail();
 
     // hack to re-populate mUdcClients cache on TV in order to allow cancel to pass through
     // mIdOptions.resetState();
@@ -362,8 +364,8 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     mIdOptions.mCancelPasscode     = true;
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    mTargetCastingPlayer.reset();
-    CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
+    // mTargetCastingPlayer.reset();
+    // CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
 
     if (!shouldSendIdentificationDeclarationMessage)
     {
