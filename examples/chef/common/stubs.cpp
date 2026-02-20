@@ -588,7 +588,7 @@ void GenericSwitchInit()
  */
 void CastingvideoplayerContentappInit()
 {
-    if (DeviceTypes::EndpointHasDeviceType(1, Device::kCastingVideoClientDeviceTypeId))
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kCastingVideoPlayerDeviceTypeId))
     {
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         Clusters::ContentLauncher::Chef::AddDefaultDelegateForEndpioint(1);
