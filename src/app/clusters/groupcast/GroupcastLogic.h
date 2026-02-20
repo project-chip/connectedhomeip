@@ -78,8 +78,8 @@ private:
 
     Status SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key);
     Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                       EndpointList & endpoints);
-    Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList & endpoints);
+                       EndpointList * endpoints);
+    Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList * endpoints);
 
     GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;

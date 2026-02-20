@@ -256,14 +256,15 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
         GroupInfo info;
         while (iter->Next(info) && (Status::Success == err))
         {
-            err = RemoveGroup(fabric_index, info.group_id, data, endpoints);
+            // For leave group, the leaveGroupResponse SHALL NOT contain the endpoints that were removed.
+            err = RemoveGroup(fabric_index, info.group_id, data, nullptr /* endpoints */);
         }
         iter->Release();
     }
     else
     {
         // Modify specific group
-        err = RemoveGroup(fabric_index, data.groupID, data, endpoints);
+        err = RemoveGroup(fabric_index, data.groupID, data, &endpoints);
     }
 
     return err;
@@ -354,7 +355,7 @@ Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, c
 }
 
 Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
-                                   const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints)
+                                   const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints)
 {
     GroupDataProvider & groups = Provider();
     Status stat                = Status::Success;
@@ -363,7 +364,7 @@ Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
     {
         // Remove endpoints
         auto iter = data.endpoints.Value().begin();
-        while (iter.Next() && (endpoints.count < kMaxCommandEndpoints))
+        while (iter.Next())
         {
             auto endpoint_id = iter.GetValue();
             if (groups.HasEndpoint(fabric_index, group_id, endpoint_id))
@@ -375,6 +376,22 @@ Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
     }
     else
     {
+        if (endpoints != nullptr)
+        {
+            // Get the endpoints list for the LeaveGroupResponse
+            EndpointIterator * epIter = groups.IterateEndpoints(fabric_index, group_id);
+            VerifyOrReturnError(nullptr != epIter, Status::ResourceExhausted);
+
+            if (epIter->Count() <= kMaxCommandEndpoints)
+            {
+                GroupEndpoint ep;
+                while (epIter->Next(ep))
+                {
+                    endpoints->entries[endpoints->count++] = ep.endpoint_id;
+                }
+            }
+            epIter->Release();
+        }
         // Remove whole group (with all endpoints)
         CHIP_ERROR err = groups.RemoveGroupInfo(fabric_index, group_id);
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
@@ -385,21 +402,22 @@ Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
 }
 
 Status GroupcastLogic::RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
-                                           EndpointList & endpoints)
+                                           EndpointList * endpoints)
 {
     GroupDataProvider & groups = Provider();
 
     CHIP_ERROR err = groups.RemoveEndpoint(fabric_index, group_id, endpoint_id);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+    VerifyOrReturnError(endpoints != nullptr, Status::Success);
 
     bool found = false;
-    for (size_t i = 0; !found && i < endpoints.count; ++i)
+    for (size_t i = 0; !found && i < endpoints->count; ++i)
     {
-        found = (endpoints.entries[i] == endpoint_id);
+        found = (endpoints->entries[i] == endpoint_id);
     }
     if (!found)
     {
-        endpoints.entries[endpoints.count++] = endpoint_id;
+        endpoints->entries[endpoints->count++] = endpoint_id;
     }
 
     return Status::Success;
