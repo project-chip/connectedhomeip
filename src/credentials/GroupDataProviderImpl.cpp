@@ -1150,11 +1150,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id,
                                                  chip::EndpointId endpoint_id)
 {
-    return RemoveEndpoint(fabric_index, group_id, endpoint_id, false /* keepGroupWithNoEndpoints */);
+    bool keepGroupWithNoEndpoints = false;
+    return RemoveEndpoint(fabric_index, group_id, endpoint_id, keepGroupWithNoEndpoints);
 }
 
-CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id,
-                                                 bool keepGroupWithNoEndpoints)
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpointAllGroups(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id,
+                                                          bool keepGroupWithNoEndpoints)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -1188,7 +1189,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)
 {
-    return RemoveEndpoint(fabric_index, endpoint_id, false /* keepGroupWithNoEndpoints */);
+    bool keepGroupWithNoEndpoints = false;
+    return RemoveEndpointAllGroups(fabric_index, endpoint_id, keepGroupWithNoEndpoints);
 }
 
 GroupDataProvider::GroupInfoIterator * GroupDataProviderImpl::IterateGroupInfo(chip::FabricIndex fabric_index)
