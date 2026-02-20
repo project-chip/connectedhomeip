@@ -71,6 +71,18 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Objects.Channel, attribute=Clusters.Objects.Channel.Attributes.ChannelList)
 
+    async def _read_content_launcher_accept_header(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ContentLauncher, attribute=Clusters.Objects.ContentLauncher.Attributes.AcceptHeader)
+
+    async def _read_content_launcher_supported_streaming_protocols(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ContentLauncher, attribute=Clusters.Objects.ContentLauncher.Attributes.SupportedStreamingProtocols)
+
+    async def _read_content_launcher_feature_map(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ContentLauncher, attribute=Clusters.Objects.ContentLauncher.Attributes.FeatureMap)
+
     async def on_off_test(self, endpoint):
         # Set initial state to On
         await self.send_single_cmd(
@@ -296,6 +308,40 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         )
         asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kURLNotAvailable)
 
+    async def content_launcher_launch_url_test(self, endpoint):
+        # Launch URL
+        url = "https://www.google.com"
+        display_string = "Google"
+
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchURL(contentURL=url, displayString=display_string),
+            endpoint=endpoint,
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(response.data, url)
+
+    async def content_launcher_attribute_test(self, endpoint):
+        # Test AcceptHeader
+        expected_accept_headers = [
+            "application/dash+xml",
+            "application/vnd.apple.mpegurl",
+            "application/x-mpegurl",
+            "video/mp4",
+            "video/webm",
+            "audio/mp4",
+            "audio/mpeg"
+        ]
+        accept_headers = await self._read_content_launcher_accept_header(endpoint)
+        asserts.assert_equal(accept_headers, expected_accept_headers)
+
+        # Test SupportedStreamingProtocols
+        supported_protocols = await self._read_content_launcher_supported_streaming_protocols(endpoint)
+        asserts.assert_equal(supported_protocols, 0)
+
+        # Test FeatureMap
+        feature_map = await self._read_content_launcher_feature_map(endpoint)
+        asserts.assert_equal(feature_map, 3)
+
     @async_test_body
     async def test_TC_CASTINGVIDEOPLAYER(self):
         """Run all steps."""
@@ -319,6 +365,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         await self.content_launcher_interstellar_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_man_united_match_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_unavailable_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.content_launcher_launch_url_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.content_launcher_attribute_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
 
 if __name__ == "__main__":

@@ -120,6 +120,7 @@ void ChefDelegate::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & h
 
 CHIP_ERROR ChefDelegate::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
+    ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::HandleGetAcceptHeaderList");
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (const auto & header : mAcceptHeaderList)
         {
@@ -131,11 +132,13 @@ CHIP_ERROR ChefDelegate::HandleGetAcceptHeaderList(AttributeValueEncoder & aEnco
 
 uint32_t ChefDelegate::HandleGetSupportedStreamingProtocols()
 {
+    ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::HandleGetSupportedStreamingProtocols");
     return mSupportedStreamingProtocols;
 }
 
 uint32_t ChefDelegate::GetFeatureMap(chip::EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::GetFeatureMap");
     if (endpoint != mEndpointId)
     {
         ChipLogError(
@@ -148,6 +151,7 @@ uint32_t ChefDelegate::GetFeatureMap(chip::EndpointId endpoint)
 
 uint16_t ChefDelegate::GetClusterRevision(chip::EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::GetClusterRevision");
     if (endpoint != mEndpointId)
     {
         ChipLogError(Zcl,
