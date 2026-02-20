@@ -135,25 +135,33 @@ CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
-    if (data.durationSeconds.HasValue() && data.testOperation != Groupcast::GroupcastTestingEnum::kDisableTesting)
+    VerifyOrReturnError(mFabricUnderTest == kUndefinedFabricIndex || mFabricUnderTest == fabricIndex, Status::ConstraintError);
+
+    if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
+    {
+        // cancel any existing GroupcastTesting timer
+        DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
+        mTestingState = data.testOperation;
+        SetFabricUnderTest(kUndefinedFabricIndex);
+        return Status::Success;
+    }
+
+    constexpr uint16_t kDefaultDurationSeconds = 60;
+    System::Clock::Seconds32 duration          = System::Clock::Seconds32(kDefaultDurationSeconds);
+    if (data.durationSeconds.HasValue())
     {
         constexpr uint16_t kMinDurationSeconds = 10, kMaxDurationSeconds = 1200;
         VerifyOrReturnError(data.durationSeconds.Value() >= kMinDurationSeconds &&
                                 data.durationSeconds.Value() <= kMaxDurationSeconds,
                             Status::ConstraintError);
-        VerifyOrReturnError(CHIP_NO_ERROR ==
-                                DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(data.durationSeconds.Value()),
-                                                                      OnGroupcastTestingDone, this),
-                            Status::Failure);
-    }
-    else
-    {
-        // cancel any existing GroupcastTesting timer
-        DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
+        duration = System::Clock::Seconds32(data.durationSeconds.Value());
     }
 
+    VerifyOrReturnError(CHIP_NO_ERROR == DeviceLayer::SystemLayer().StartTimer(duration, OnGroupcastTestingDone, this),
+                        Status::Failure);
+
     mTestingState = data.testOperation;
-    SetFabricUnderTest((mTestingState == Groupcast::GroupcastTestingEnum::kDisableTesting) ? kUndefinedFabricIndex : fabricIndex);
+    SetFabricUnderTest(fabricIndex);
     return Status::Success;
 }
 
