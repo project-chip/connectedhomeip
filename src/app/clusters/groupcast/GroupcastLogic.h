@@ -53,11 +53,7 @@ public:
     };
 
     GroupcastLogic(GroupcastContext & context) : mContext(context) {}
-    GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features) : mContext(context), mFeatures(features)
-    {
-        mContext.groupDataProvider.SetKeepGroupWithNoEndpoints(mFeatures.Has(Groupcast::Feature::kSender));
-    }
-    ~GroupcastLogic() { mContext.groupDataProvider.SetKeepGroupWithNoEndpoints(false); }
+    GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features) : mContext(context), mFeatures(features) {}
 
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 

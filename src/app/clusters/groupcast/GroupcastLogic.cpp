@@ -410,7 +410,7 @@ Status GroupcastLogic::RemoveGroupEndpoint(FabricIndex fabric_index, GroupId gro
 {
     GroupDataProvider & groups = Provider();
 
-    CHIP_ERROR err = groups.RemoveEndpoint(fabric_index, group_id, endpoint_id);
+    CHIP_ERROR err = groups.RemoveEndpoint(fabric_index, group_id, endpoint_id, mFeatures.Has(Groupcast::Feature::kSender));
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     VerifyOrReturnError(endpoints != nullptr, Status::Success);
 

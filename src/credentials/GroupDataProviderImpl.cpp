@@ -1100,7 +1100,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
 }
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id,
-                                                 chip::EndpointId endpoint_id)
+                                                 chip::EndpointId endpoint_id, bool keepGroupWithNoEndpoints)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -1137,7 +1137,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 
     // We are removing the last endpoint of the group.
     // Check if we should keep the group with no endpoints or not(Groupcast Listener usecase)
-    if (mKeepGroupWithNoEndpoints)
+    if (keepGroupWithNoEndpoints)
     {
         group.endpoint_count = 0;
         return group.Save(mStorage);
@@ -1147,7 +1147,14 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
     return RemoveGroupInfoAt(fabric_index, group.index);
 }
 
-CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id,
+                                                 chip::EndpointId endpoint_id)
+{
+    return RemoveEndpoint(fabric_index, group_id, endpoint_id, false /* keepGroupWithNoEndpoints */);
+}
+
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id,
+                                                 bool keepGroupWithNoEndpoints)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -1169,7 +1176,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
         if (endpoint.Find(mStorage, fabric, group, endpoint_id))
         {
             // Endpoint found in group
-            ReturnErrorOnFailure(RemoveEndpoint(fabric_index, group.group_id, endpoint_id));
+            ReturnErrorOnFailure(RemoveEndpoint(fabric_index, group.group_id, endpoint_id, keepGroupWithNoEndpoints));
         }
 
         group.group_id = group.next;
@@ -1177,6 +1184,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)
+{
+    return RemoveEndpoint(fabric_index, endpoint_id, false /* keepGroupWithNoEndpoints */);
 }
 
 GroupDataProvider::GroupInfoIterator * GroupDataProviderImpl::IterateGroupInfo(chip::FabricIndex fabric_index)
