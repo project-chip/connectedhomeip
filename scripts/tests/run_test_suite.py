@@ -172,8 +172,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
-
-    '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--ctrl-path chip-tool:<path>',
+    '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
@@ -357,17 +356,17 @@ class Terminable(Protocol):
     '--closure-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path closure:<path>',
     help='what closure app to use')
 @click.option(
-    '--matter-repl-yaml-tester', type=ExistingFilePath, cls=DeprecatedOption, replacement='--ctrl-path matter-repl-yaml-tester:<path>',
+    '--matter-repl-yaml-tester', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path matter-repl-yaml-tester:<path>',
     help='what python script to use for running yaml tests using matter-repl as controller')
 @click.option(
-    '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--ctrl-path chip-tool-with-python:<path>',
+    '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
 @click.option(
     '--app-path', multiple=True, metavar="<key>:<path>",
     help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys'
 )
 @click.option(
-    '--ctrl-path', multiple=True, metavar="<key>:<path>",
+    '--tool-path', multiple=True, metavar="<key>:<path>",
     help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys'
 )
 @click.option(
@@ -412,7 +411,7 @@ class Terminable(Protocol):
     help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
-            app_path: list[str], ctrl_path: list[str], discover_paths: bool, help_paths: bool,
+            app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -456,9 +455,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
-    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.CTRL)
-    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.CTRL)
-    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.CTRL)
+    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.TOOL)
 
     # New-style options override the deprecated ones
     for p in app_path:
@@ -466,11 +465,11 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
         except ValueError as e:
             raise click.BadOptionUsage("app-path", f"Invalid app path specifier '{p}': {e}")
-    for p in ctrl_path:
+    for p in tool_path:
         try:
-            subproc_info_repo.addSpec(p, kind=SubprocessKind.CTRL)
+            subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
         except ValueError as e:
-            raise click.BadOptionUsage("ctrl-path", f"Invalid tool path specifier '{p}': {e}")
+            raise click.BadOptionUsage("tool-path", f"Invalid tool path specifier '{p}': {e}")
 
     if discover_paths:
         subproc_info_repo.discover()

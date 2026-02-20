@@ -237,28 +237,28 @@ class NetworkNamespace(NetworkResource):
 class IsolatedNetworkNamespace:
     """Helper class to create and remove network namespaces for tests."""
 
-    def __init__(self, index: int = 0, mgmt_name: str = 'eth-mgmt', ctrl_name: str = 'eth-ctrl', app_name: str = 'eth-app',
-                 mgmt_link_up: bool = True, ctrl_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True):
+    def __init__(self, index: int = 0, mgmt_name: str = 'eth-mgmt', tool_name: str = 'eth-tool', app_name: str = 'eth-app',
+                 mgmt_link_up: bool = True, tool_link_up: bool = True, app_link_up: bool = True, add_ula: bool = True):
         """Initialize isolated network namespaces.
 
         - mgmt -- management network for the RPC server.
-        - ctrl -- controller network for chip-tool.
+        - tool -- tool network for chip-tool.
         - app -- network for tested application(s).
         """
         self.index = index
 
         self.app_ns = NetworkNamespace(f"ns-{app_name}-{index}")
-        self.ctrl_ns = NetworkNamespace(f"ns-{ctrl_name}-{index}")
+        self.tool_ns = NetworkNamespace(f"ns-{tool_name}-{index}")
 
         app_ipv6 = ["fe80::1/64"]
         if add_ula:
             app_ipv6.append("fd00:0:1:1::1/64")
         self.app_link = NetworkLink(f"{app_name}-{index}", ipv4_addrs=["10.10.10.1/24"], ipv6_addrs=app_ipv6, ns=self.app_ns)
 
-        ctrl_ipv6 = ["fe80::2/64"]
+        tool_ipv6 = ["fe80::2/64"]
         if add_ula:
-            ctrl_ipv6.append("fd00:0:1:1::2/64")
-        self.ctrl_link = NetworkLink(f"{ctrl_name}-{index}", ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=ctrl_ipv6, ns=self.ctrl_ns)
+            tool_ipv6.append("fd00:0:1:1::2/64")
+        self.tool_link = NetworkLink(f"{tool_name}-{index}", ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=tool_ipv6, ns=self.tool_ns)
 
         mgmt_ipv6 = ["fe80::5/64"]
         if add_ula:
@@ -267,7 +267,7 @@ class IsolatedNetworkNamespace:
 
         self.bridge = NetworkBridge(f"br-{index}")
         self.bridge.attach_link(self.app_link)
-        self.bridge.attach_link(self.ctrl_link)
+        self.bridge.attach_link(self.tool_link)
         self.bridge.attach_link(self.mgmt_link)
 
         try:
@@ -277,8 +277,8 @@ class IsolatedNetworkNamespace:
             # Bring up selected links.
             if mgmt_link_up:
                 self.mgmt_link.up()
-            if ctrl_link_up:
-                self.ctrl_link.up()
+            if tool_link_up:
+                self.tool_link.up()
             if app_link_up:
                 self.app_link.up()
 
@@ -294,10 +294,10 @@ class IsolatedNetworkNamespace:
         match kind:
             case SubprocessKind.APP:
                 return self.app_ns
-            case SubprocessKind.CTRL:
-                return self.ctrl_ns
+            case SubprocessKind.TOOL:
+                return self.tool_ns
             case SubprocessKind.MGMT:
-                return self.ctrl_ns
+                return self.tool_ns
             case _:
                 raise ValueError(f"Subprocess kind {kind} doesn't map to a network namespace.")
 

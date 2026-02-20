@@ -138,7 +138,7 @@ class RunnerWaitQueue:
 
 class SubprocessKind(StrEnum):
     APP = 'app'
-    CTRL = 'ctrl'
+    TOOL = 'tool'
     MGMT = 'mgmt'
 
 
