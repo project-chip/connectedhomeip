@@ -244,7 +244,6 @@ class TC_DA_1_1(MatterBaseTest):
                                  f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1 ({nocs_th1_decoded_pk.hex()})")
 
         # *** Cleanup ***
-        self.step("Cleanup")
         await self.request_device_factory_reset()
         await self.default_controller.CommissionOnNetwork(
             nodeId=self.dut_node_id,
