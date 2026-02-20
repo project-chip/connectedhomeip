@@ -20,6 +20,7 @@
 
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/util/config.h>
+#include <lib/support/IntrusiveList.h>
 
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
@@ -110,7 +111,7 @@ static const ContentEntry kLaunchableContent[] = {
     ContentEntry(kManUnitedMatch),
 };
 
-class ChefDelegate : public Delegate
+class ChefDelegate : public Delegate, public chip::IntrusiveListNodeBase<>
 {
 public:
     ChefDelegate(const EndpointId endpointId, const uint32_t featureMap, const uint16_t clusterRevision,
