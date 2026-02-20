@@ -44,6 +44,20 @@ if (lwip_platform != "external") {
   }
 }
 
+config("supress-warnings") {
+  # Avoid 0-size references for ND6, e.g. cc3266 errors out with:
+  #
+  #    In function 'nd6_get_next_hop_entry',
+  #        inlined from 'nd6_get_next_hop_addr_or_queue' at ../../examples/air-purifier-app/cc32xx/third_party/connectedhomeip/third_party/lwip/repo/src/core/ipv6/nd6.c:2290:7:
+  #    ../../examples/air-purifier-app/cc32xx/third_party/connectedhomeip/third_party/lwip/repo/src/core/ipv6/nd6.c|1975 col 28| error: array subscript 0 is outside array bounds of 'struct nd6_destination_cache_entry[0]' [-Werror=array-bounds]
+  #     1975 |   dest = &destination_cache[nd6_cached_destination_index];
+  #          |           ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  #    ../../examples/air-purifier-app/cc32xx/third_party/connectedhomeip/third_party/lwip/repo/src/core/ipv6/nd6.c: In function 'nd6_get_next_hop_addr_or_queue':
+  #    ../../examples/air-purifier-app/cc32xx/third_party/connectedhomeip/third_party/lwip/repo/src/core/ipv6/nd6.c|90 col 36| note: while referencing 'destination_cache'
+  #       90 | struct nd6_destination_cache_entry destination_cache[LWIP_ND6_NUM_DESTINATIONS];
+  cflags = [ "-Wno-array-bounds" ]
+}
+
 if (lwip_platform == "cc13xx_26xx") {
   import("//build_overrides/ti_simplelink_sdk.gni")
 } else if (lwip_platform == "cc32xx") {
@@ -249,6 +263,10 @@ if (current_os == "zephyr") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+
+    if (lwip_platform == "cc32xx") {
+      public_configs += [ ":supress-warnings" ]
+    }
   }
 
   group("lwip") {
