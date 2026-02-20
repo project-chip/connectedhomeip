@@ -28,7 +28,7 @@ namespace Clusters {
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
  */
-class GroupcastCluster : public DefaultServerCluster
+class GroupcastCluster : public DefaultServerCluster, public GroupcastLogic::Listener
 {
 public:
     GroupcastCluster(GroupcastContext && context) :
@@ -51,6 +51,10 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
 private:
+    // GroupcastLogic::Listener implementation
+    void OnMembershipChanged() override;
+    void OnUsedMcastAddrCountChange() override;
+
     GroupcastContext mContext;
     GroupcastLogic mLogic;
 };

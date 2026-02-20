@@ -24,12 +24,14 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     mLogic.SetDataModelProvider(context.provider);
+    mLogic.SetListener(this);
 
     return CHIP_NO_ERROR;
 }
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
+    mLogic.RemoveListener();
     mLogic.ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -89,7 +91,6 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         status = mLogic.LeaveGroup(fabric_index, data, endpoints);
         if (Protocols::InteractionModel::Status::Success == status)
         {
-            NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
             response.groupID   = data.groupID;
             response.endpoints = DataModel::List<const chip::EndpointId>(endpoints.entries, endpoints.count);
             handler->AddResponse(request.path, response);
@@ -113,11 +114,6 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         break;
     }
 
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
-    }
-
     return status;
 }
 
@@ -125,6 +121,16 @@ CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+void GroupcastCluster::OnMembershipChanged()
+{
+    NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
+}
+
+void GroupcastCluster::OnUsedMcastAddrCountChange()
+{
+    NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
 }
 
 } // namespace Clusters
