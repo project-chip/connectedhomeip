@@ -145,20 +145,24 @@ public:
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-        mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-        VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
+        for (const auto & config : AppOptions::GetDeviceConfigs())
+        {
+            auto device = DeviceFactory::GetInstance().Create(config.type);
+            VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
+            ReturnErrorOnFailure(device->Register(config.endpoint, mDataModelProvider, kInvalidEndpointId));
+            mConstructedDevices.push_back(std::move(device));
+        }
 
         return CHIP_NO_ERROR;
     }
 
     void Shutdown()
     {
-        if (mConstructedDevice)
+        for (auto & device : mConstructedDevices)
         {
-            mConstructedDevice->UnRegister(mDataModelProvider);
-            mConstructedDevice.reset();
+            device->UnRegister(mDataModelProvider);
         }
+        mConstructedDevices.clear();
         mRootNode.RootDevice().UnRegister(mDataModelProvider);
     }
 
@@ -171,7 +175,7 @@ private:
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
-    std::unique_ptr<DeviceInterface> mConstructedDevice;
+    std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
 };
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)

@@ -1255,7 +1255,6 @@ cluster GeneralDiagnostics = 51 {
 
   bitmap Feature : bitmap32 {
     kDataModelTest = 0x1;
-    kDeviceLoad = 0x2;
   }
 
   struct DeviceLoadStruct {

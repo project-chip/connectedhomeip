@@ -52,6 +52,7 @@ void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
         EndOfServiceEnum endOfServiceState = EndOfServiceEnum::kNormal;
         bool active                        = false;
         bool success                       = false;
+        bool unmounted                     = false;
 
         switch (priority)
         {
@@ -79,11 +80,15 @@ void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
         case ExpressedStateEnum::kInterconnectCO:
             success = GetInterconnectCOAlarm(endpointId, alarmState);
             break;
+        case ExpressedStateEnum::kInoperative:
+            success = GetUnmountedState(endpointId, unmounted);
+            break;
         default:
             break;
         }
 
-        if (success && ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active))
+        if (success &&
+            ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active || unmounted))
         {
             SetExpressedState(endpointId, priority);
             return;
@@ -334,6 +339,29 @@ bool SmokeCoAlarmServer::SetSmokeSensitivityLevel(EndpointId endpointId, Sensiti
     return true;
 }
 
+bool SmokeCoAlarmServer::SetUnmountedState(EndpointId endpointId, bool isUnmounted)
+{
+    VerifyOrReturnValue(SetAttribute(endpointId, Unmounted::Id, Unmounted::Set, isUnmounted), false);
+    if (mInoperativeWhenUnmounted)
+    {
+        if (isUnmounted)
+        {
+            SetExpressedState(endpointId, ExpressedStateEnum::kInoperative);
+        }
+        else
+        {
+            ExpressedStateEnum expressedState;
+            VerifyOrReturnValue(GetAttribute(endpointId, ExpressedState::Id, ExpressedState::Get, expressedState), false);
+            if (expressedState == ExpressedStateEnum::kInoperative)
+            {
+                SetExpressedState(endpointId, ExpressedStateEnum::kNormal);
+            }
+        }
+    }
+
+    return true;
+}
+
 bool SmokeCoAlarmServer::GetExpressedState(chip ::EndpointId endpointId, ExpressedStateEnum & expressedState)
 {
     return GetAttribute(endpointId, ExpressedState::Id, ExpressedState::Get, expressedState);
@@ -397,6 +425,11 @@ bool SmokeCoAlarmServer::GetSmokeSensitivityLevel(EndpointId endpointId, Sensiti
 bool SmokeCoAlarmServer::GetExpiryDate(EndpointId endpointId, uint32_t & expiryDate)
 {
     return GetAttribute(endpointId, ExpiryDate::Id, ExpiryDate::Get, expiryDate);
+}
+
+bool SmokeCoAlarmServer::GetUnmountedState(EndpointId endpointId, bool & unmountedState)
+{
+    return GetAttribute(endpointId, Unmounted::Id, Unmounted::Get, unmountedState);
 }
 
 chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpointId)

@@ -44,6 +44,7 @@ public:
         DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::PlatformManager & platformManager;
+        uint16_t subscriptionsPerFabric;
     };
 
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //

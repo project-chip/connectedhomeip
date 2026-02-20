@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "WindowCoveringCluster.cpp",
   "window-covering-delegate.h",
-  "window-covering-server.cpp",
   "window-covering-server.h",
 ]
