@@ -149,17 +149,17 @@ class TC_JFPKI_2_2(MatterBaseTest):
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
             filter=self.admin_discriminator,
         )
-        response = await self.default_controller.ReadAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[(self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                         Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
-            returnClusterObject=True,
+        admin_fabric_idx = await self.read_single_attribute_check_success(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+            cluster=Clusters.JointFabricAdministrator,
+            attribute=Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex,
         )
-        admin_fabric_idx = response[self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT][Clusters.JointFabricAdministrator].administratorFabricIndex
         asserts.assert_true(
             admin_fabric_idx in (None, NullValue, 0),
             "Precondition failed: AdministratorFabricIndex must be null after commissioning"
-            f"(expected None/NullValue/0, got {admin_fabric_idx!r})",
+            f" (expected None/NullValue/0, got {admin_fabric_idx!r})",
         )
 
         self.step("2")

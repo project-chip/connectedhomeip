@@ -296,17 +296,17 @@ class TC_JFPKI_2_4(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[self.eco_a_cats])
 
-        response = await self.dev_ctrl_eco_a.ReadAttribute(
-            nodeId=self.dut_node_id,
-            attributes=[(self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
-                         Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
-            returnClusterObject=True,
+        admin_fabric_idx = await self.read_single_attribute_check_success(
+            dev_ctrl=self.dev_ctrl_eco_a,
+            node_id=self.dut_node_id,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+            cluster=Clusters.JointFabricAdministrator,
+            attribute=Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex,
         )
-        admin_fabric_idx = response[self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT][Clusters.JointFabricAdministrator].administratorFabricIndex
         asserts.assert_true(
             admin_fabric_idx not in (None, NullValue, 0),
             "Precondition failed: AdministratorFabricIndex must be non-null after commissioning"
-            f"(expected non-null value, got {admin_fabric_idx!r})",
+            f" (expected non-null value, got {admin_fabric_idx!r})",
         )
         asserts.assert_true(
             admin_fabric_idx in range(1, 255),
