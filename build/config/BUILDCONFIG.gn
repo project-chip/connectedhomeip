@@ -14,7 +14,14 @@
 
 declare_args() {
   # Debug build. Set this to false to remove development features.
-  is_debug = true
+  #
+  # Defaults in CHIP are:
+  #   - Og for debug builds
+  #   - Os for non-debug builds
+  #
+  # For embedded platforms, we default to non-debug as we want size-optimized builds
+  is_debug =
+      current_os == "linux" || current_os == "mac" || current_os == "android"
 }
 
 if (target_os == "") {
