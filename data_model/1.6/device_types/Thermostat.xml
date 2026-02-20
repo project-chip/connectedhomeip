@@ -64,7 +64,7 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Addition of Energy Preference cluster and updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
     <revision revision="4" summary="Remove Time Synchronization cluster, Scenes Management and Zigbee only clusters, remove provisional marking from Energy Preference cluster"/>
     <revision revision="5" summary="Moved disallowed element conformance to Thermostat cluster."/>
-    <revision revision="6" summary=""/>
+    <revision revision="6" summary="Added Groupcast condition requirement."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditionRequirements>
