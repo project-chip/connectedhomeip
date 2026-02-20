@@ -43,6 +43,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
@@ -177,6 +178,8 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
                           .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
                           .WithDelegate(&sIdentifyDelegate));
 
+LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -213,6 +216,16 @@ void ApplicationInit()
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster2.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) == CHIP_NO_ERROR);
+
+    gGroupcastCluster.Create(
+        Clusters::GroupcastContext{
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .groupDataProvider = *Credentials::GetGroupDataProvider(),
+        },
+        BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender,
+                                               Clusters::Groupcast::Feature::kPerGroup));
+
+    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gGroupcastCluster.Registration()) == CHIP_NO_ERROR);
 
     TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 0,
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
