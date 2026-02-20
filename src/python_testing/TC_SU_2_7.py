@@ -123,7 +123,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
         if not self.step5_download_wait_time or self.step5_download_wait_time < 5:
             asserts.fail(
-                "Step5 download time out parameter must be defined and greater than 5 seconds. A good timeout can be over 10 seconds up to 20 seconds [ --int-arg step5_download_wait_time:10 ]")
+                "Step5 download wait time parameter must be defined and at least than 5 seconds. A good value can be over 10 seconds up to 20 seconds [ --int-arg step5_download_wait_time:10 ]")
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -393,7 +393,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
         await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
         # Force an DownloadError by Killing the app during the image download.
-        logger.info("Wait 3 seconds to allow download some data before killing the Provider Process")
+        logger.info(f"Wait {self.step5_download_wait_time} seconds to allow download some data before killing the Provider Process")
         await asyncio.sleep(self.step5_download_wait_time)
         self.current_provider_app_proc.kill()
         start_time = time()
