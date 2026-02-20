@@ -128,6 +128,7 @@ class TestGetPixitDefinitions(unittest.TestCase):
 
     def test_returns_empty_list_for_undecorated_method(self):
         """Returns empty list for method without @requires_pixit."""
+
         def test_method(self):
             pass
 

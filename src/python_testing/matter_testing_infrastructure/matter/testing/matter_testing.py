@@ -558,7 +558,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             error_msg = format_pixit_error(test_name, missing_required, available_optional)
             asserts.fail(error_msg)
 
-
     def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
         endpoint = self.matter_test_config.endpoint
