@@ -11,38 +11,58 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
 
 source_set("clusters") {
   public_deps = [
     # keep-sorted: start
-    "access-control-server:access-control-server",
-    "administrator-commissioning-server:administrator-commissioning-server",
-    "basic-information:basic-information",
-    "boolean-state-configuration-server:boolean-state-configuration-server",
-    "boolean-state-server:boolean-state-server",
-    "camera-av-settings-user-level-management-server:camera-av-settings-user-level-management-server",
-    "chime-server:chime-server",
-    "descriptor:descriptor",
-    "general-commissioning-server:general-commissioning-server",
-    "general-diagnostics-server:general-diagnostics-server",
-    "group-key-mgmt-server:group-key-mgmt-server",
-    "groupcast:groupcast",
-    "groups-server:groups-server",
-    "identify-server:identify-server",
-    "level-control:level-control",
-    "network-commissioning:network-commissioning",
-    "occupancy-sensor-server:occupancy-sensor-server",
-    "on-off-server:on-off-server",
-    "operational-credentials-server:operational-credentials-server",
-    "push-av-stream-transport-server:push-av-stream-transport-server",
-    "scenes-server:scenes",
-    "scenes-server:scenes-server",
-    "software-diagnostics-server:software-diagnostics-server",
-    "tls-certificate-management-server:tls-certificate-management-server",
-    "tls-client-management-server:tls-client-management-server",
-    "webrtc-transport-provider-server:webrtc-transport-provider-server",
-    "wifi-network-diagnostics-server:wifi-network-diagnostics-server",
+    "access-control-server",
+    "administrator-commissioning-server",
+    "basic-information",
+    "boolean-state-configuration-server",
+    "boolean-state-server",
+    "camera-av-settings-user-level-management-server",
+    "chime-server",
+    "descriptor",
+    "general-commissioning-server",
+    "general-diagnostics-server",
+    "group-key-mgmt-server",
+    "groupcast",
+    "groups-server",
+    "identify-server",
+    "level-control",
+    "network-commissioning",
+    "occupancy-sensor-server",
+    "on-off-server",
+    "operational-credentials-server",
+    "scenes-server",
+    "software-diagnostics-server",
+    "tls-certificate-management-server",
+    "tls-client-management-server",
+    "webrtc-transport-provider-server",
+    "wifi-network-diagnostics-server",
 
     # keep-sorted: end
   ]
+
+  if (chip_device_platform != "ameba") {
+    # Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
+    # these get pulled via LWIP and end up overriding things like true/false/isapha by macros.
+    #
+    # This results in errors in libraries used by these clusters, like:
+    #
+    # INFO    In file included from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib_rtl8721d.h:25,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib.h:39,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/network/include/lwipopts.h:17,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/opt.h:51,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/errno.h:40,
+    # INFO                     from ../../../config/ameba/third_party/connectedhomeip/third_party/uriparser/repo/src/UriMemory.c:56:
+    # INFO    /__w/connectedhomeip/connectedhomeip/.environment/cipd/packages/arm/arm-none-eabi/include/ctype.h:14:5: error: expected identifier or '(' before 'int'
+    # INFO       14 | int isalpha (int __c);
+    # INFO          |     ^~~~~~~
+    # INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
+    # INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
+    public_deps += [ "push-av-stream-transport-server" ]
+  }
 }
