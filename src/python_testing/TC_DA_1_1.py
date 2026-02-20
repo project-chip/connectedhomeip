@@ -173,30 +173,31 @@ class TC_DA_1_1(MatterBaseTest):
         # th2 = self.get_new_controller()
 
         # # Phase 1: TH2 opens a PASE session to verify old fabric was wiped
-        # pase_node_id = self.dut_node_id + 1
-        # await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
+        pase_node_id = self.dut_node_id + 1
+        await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
 
-        # # Read Fabrics over PASE to confirm TH1's fabric was removed by factory reset
-        # response = await th2.ReadAttribute(
-        #     nodeId=pase_node_id,
-        #     attributes=(root_node_id, fabrics_attr),
-        #     fabricFiltered=False
-        # )
-        # fabrics_pase = response[0][opcreds_cluster][fabrics_attr]
-        # logging.info(f"Fabrics over PASE (after factory reset): {fabrics_pase}")
+        # Read Fabrics over PASE to confirm TH1's fabric was removed by factory reset
+        response = await th2.ReadAttribute(
+            nodeId=pase_node_id,
+            attributes=[(root_node_id, fabrics_attr)],
+            fabricFiltered=False
+        )
+        fabrics_pase = response[0][opcreds_cluster][fabrics_attr]
+        logging.info(f"Fabrics over PASE (after factory reset): {fabrics_pase}")
 
-        # # Verify that TH1's FabricID is not present after factory reset
-        # fabrics_pase_ids = [f.fabricID for f in fabrics_pase]
-        # asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_pase_ids,
-        #                       f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present after factory reset, found: {fabrics_pase_ids}")
+        # Verify that TH1's FabricID is not present after factory reset
+        fabrics_pase_ids = [f.fabricID for f in fabrics_pase]
+        asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_pase_ids,
+                              f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present after factory reset, found: {fabrics_pase_ids}")
+
+        # Close PASE session by aborting commissioning to allow CommissionOnNetwork to work
+        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+        await th2.SendCommand(nodeId=pase_node_id, endpoint=0, payload=cmd)
 
         # Phase 2: Fully commission DUT to TH2's fabric
         th2_node_id = self.dut_node_id + 2
-
-        # await th2.Commission(nodeId=self.dut_node_id)
-
         await th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
+            nodeId=th2_node_id,
             setupPinCode=setup_params.passcode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=setup_params.discriminator
@@ -207,47 +208,47 @@ class TC_DA_1_1(MatterBaseTest):
         # *** STEP 5 ***
         # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT (over CASE)
         self.step(5)
-        # fabrics_th2 = await self.read_single_attribute_check_success(
-        #     dev_ctrl=th2,
-        #     node_id=th2_node_id,
-        #     endpoint=0,
-        #     cluster=opcreds_cluster,
-        #     attribute=fabrics_attr,
-        #     fabric_filtered=False)
-        # logging.info(f"fabrics_th2: {fabrics_th2}")
+        fabrics_th2 = await self.read_single_attribute_check_success(
+            dev_ctrl=th2,
+            node_id=th2_node_id,
+            endpoint=0,
+            cluster=opcreds_cluster,
+            attribute=fabrics_attr,
+            fabric_filtered=False)
+        logging.info(f"fabrics_th2: {fabrics_th2}")
 
-        # # Verify that there is a single entry in the Fabrics list
-        # asserts.assert_equal(len(fabrics_th2), 1,
-        #                      f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th2)}")
+        # Verify that there is a single entry in the Fabrics list
+        asserts.assert_equal(len(fabrics_th2), 1,
+                             f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th2)}")
 
-        # # Verify that the FabricID is the same as TH2's FabricID
-        # asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId,
-        #                      f"TH2 FabricID ({fabrics_th2[0].fabricID}) and Fabrics attribute FabricID ({th2.fabricId}) must match")
+        # Verify that the FabricID is the same as TH2's FabricID
+        asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId,
+                             f"TH2 FabricID ({fabrics_th2[0].fabricID}) and Fabrics attribute FabricID ({th2.fabricId}) must match")
 
-        # # Verify that TH2's Fabrics attribute's FabricID is different than from TH1's Fabrics attribute's FabricID
-        # asserts.assert_not_equal(fabrics_th2[0].fabricID, fabrics_th1[0].fabricID,
-        #                          f"TH2's FabricID ({fabrics_th2[0].fabricID}) must be different from TH1's FabricID ({fabrics_th1[0].fabricID})")
+        # Verify that TH2's Fabrics attribute's FabricID is different than from TH1's Fabrics attribute's FabricID
+        asserts.assert_not_equal(fabrics_th2[0].fabricID, fabrics_th1[0].fabricID,
+                                 f"TH2's FabricID ({fabrics_th2[0].fabricID}) must be different from TH1's FabricID ({fabrics_th1[0].fabricID})")
 
         # *** STEP 6 ***
         # TH2 does a non-fabric-filtered read of NOCs attribute list from DUT (over CASE)
         self.step(6)
-        # nocs_th2 = await self.read_single_attribute_check_success(
-        #     dev_ctrl=th2,
-        #     node_id=th2_node_id,
-        #     endpoint=0,
-        #     cluster=opcreds_cluster,
-        #     attribute=nocs_attr,
-        #     fabric_filtered=False)
+        nocs_th2 = await self.read_single_attribute_check_success(
+            dev_ctrl=th2,
+            node_id=th2_node_id,
+            endpoint=0,
+            cluster=opcreds_cluster,
+            attribute=nocs_attr,
+            fabric_filtered=False)
 
-        # # Verify that there is a single entry in the NOCs list
-        # asserts.assert_equal(len(nocs_th2), 1,
-        #                      f"NOCs attribute must contain a single entry in the list, got {len(nocs_th2)}")
+        # Verify that there is a single entry in the NOCs list
+        asserts.assert_equal(len(nocs_th2), 1,
+                             f"NOCs attribute must contain a single entry in the list, got {len(nocs_th2)}")
 
-        # # Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key
-        # nocs_th1_decoded_pk = TLVReader(nocs_th1[0].noc).get()["Any"][9]
-        # nocs_th2_decoded_pk = TLVReader(nocs_th2[0].noc).get()["Any"][9]
-        # asserts.assert_not_equal(nocs_th1_decoded_pk, nocs_th2_decoded_pk,
-        #                          f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1 ({nocs_th1_decoded_pk.hex()})")
+        # Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key
+        nocs_th1_decoded_pk = TLVReader(nocs_th1[0].noc).get()["Any"][9]
+        nocs_th2_decoded_pk = TLVReader(nocs_th2[0].noc).get()["Any"][9]
+        asserts.assert_not_equal(nocs_th1_decoded_pk, nocs_th2_decoded_pk,
+                                 f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1 ({nocs_th1_decoded_pk.hex()})")
 
 
 if __name__ == "__main__":
