@@ -49,6 +49,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 import matter.discovery as Discovery
 from matter import CertificateAuthority
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.storage import VolatileTemporaryPersistentStorage
 from matter.testing.apps import JFAdministratorSubprocess, JFControllerSubprocess
@@ -294,6 +295,19 @@ class TC_JFPKI_2_4(MatterBaseTest):
             nodeId=101,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[self.eco_a_cats])
+
+        response = await self.dev_ctrl_eco_a.ReadAttribute(
+            nodeId=self.dut_node_id,
+            attributes=[(self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+                         Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
+            returnClusterObject=True,
+        )
+        admin_fabric_idx = response[self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT][Clusters.JointFabricAdministrator].administratorFabricIndex
+        asserts.assert_true(
+            admin_fabric_idx not in (None, NullValue, 0),
+            "Precondition failed: AdministratorFabricIndex must be non-null after commissioning"
+            f"(expected non-null value, got {admin_fabric_idx!r})",
+        )
 
         self.step("2")
         await self.assert_ojcw(commissioning_timeout=self._TIMEOUT_STEP_2)
