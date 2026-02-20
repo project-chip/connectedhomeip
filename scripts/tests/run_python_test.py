@@ -372,7 +372,7 @@ def monitor_app_restart_requests(
             flag_file_content = f.read().strip()
 
         # Determine reset type and remove app/ctrl config and storage
-        reset_type = False
+        reset_type = None
         if flag_file_content == "factory reset":
             reset_type = FactoryResetType.AppAndController
 
