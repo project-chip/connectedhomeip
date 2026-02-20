@@ -161,9 +161,9 @@ uint16_t ChefDelegate::GetClusterRevision(chip::EndpointId endpoint)
 void AddDefaultDelegateForEndpioint(EndpointId endpoint)
 {
 
-    for (auto & delegate : gDelegateList)
+    for (auto it = gDelegateList.begin(); it != gDelegateList.end(); ++it)
     {
-        if (delegate.GetEndpointId() == endpoint)
+        if (it->GetEndpointId() == endpoint)
         {
             ChipLogError(Zcl, "ContentLauncher::AddDelegateForEndpioint Delegate for endpoint %d already exists.", endpoint);
             return;
