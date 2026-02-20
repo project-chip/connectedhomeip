@@ -45,17 +45,6 @@ TEST_F(TestThreadRendezvousAnnouncement, TxtStringsBuilder)
 
     TxtStringsBuilder builder;
     EXPECT_EQ(builder.Fill(params), CHIP_NO_ERROR);
-
-    // Expected entries:
-    // VP=123+456
-    // D=789
-    // CM=1
-    // DT=1
-    // DN=TestDevice
-    // RI=1234567890
-    // PH=2
-    // PI=Press button
-
     EXPECT_EQ(builder.GetCount(), 8u);
     const char * const * entries = builder.GetEntries();
 

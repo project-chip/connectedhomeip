@@ -96,6 +96,8 @@ public:
         DeviceLoadStatusProvider & deviceLoadStatusProvider;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         TestEventTriggerDelegate * testEventTriggerDelegate;
+        Credentials::DeviceAttestationCredentialsProvider & dacProvider;
+        EventManagement & eventManagement;
         SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -122,8 +124,9 @@ public:
                     .deviceLoadStatusProvider         = mContext.deviceLoadStatusProvider,         //
                     .diagnosticDataProvider           = mContext.diagnosticDataProvider,           //
                     .testEventTriggerDelegate         = mContext.testEventTriggerDelegate,         //
+                    .dacProvider                      = mContext.dacProvider,                      //
+                    .eventManagement                  = mContext.eventManagement,                  //
                     .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
-
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -142,20 +145,24 @@ public:
         ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
         ReturnErrorOnFailure(mRootNode.RootDevice().Register(kRootEndpointId, mDataModelProvider, kInvalidEndpointId));
 
-        mConstructedDevice = DeviceFactory::GetInstance().Create(AppOptions::GetDeviceType());
-        VerifyOrReturnError(mConstructedDevice, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(mConstructedDevice->Register(AppOptions::GetDeviceEndpoint(), mDataModelProvider, kInvalidEndpointId));
+        for (const auto & config : AppOptions::GetDeviceConfigs())
+        {
+            auto device = DeviceFactory::GetInstance().Create(config.type);
+            VerifyOrReturnError(device, CHIP_ERROR_NO_MEMORY);
+            ReturnErrorOnFailure(device->Register(config.endpoint, mDataModelProvider, kInvalidEndpointId));
+            mConstructedDevices.push_back(std::move(device));
+        }
 
         return CHIP_NO_ERROR;
     }
 
     void Shutdown()
     {
-        if (mConstructedDevice)
+        for (auto & device : mConstructedDevices)
         {
-            mConstructedDevice->UnRegister(mDataModelProvider);
-            mConstructedDevice.reset();
+            device->UnRegister(mDataModelProvider);
         }
+        mConstructedDevices.clear();
         mRootNode.RootDevice().UnRegister(mDataModelProvider);
     }
 
@@ -168,7 +175,7 @@ private:
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
-    std::unique_ptr<DeviceInterface> mConstructedDevice;
+    std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
 };
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
@@ -193,7 +200,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)
     {
-        ChipLogError(AppServer, "Failed to get the DeviceInstanceInfoProvifer.");
+        ChipLogError(AppServer, "Failed to get the DeviceInstanceInfoProvider.");
         chipDie();
     }
 
@@ -201,24 +208,30 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(gSafeAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
     SetSafeAttributePersistenceProvider(&gSafeAttributePersistenceProvider);
 
+    // Set the global DAC provider before server/cluster init so any integration path that
+    // snapshots the provider during construction sees a valid implementation.
+    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+
     static CodeDrivenDataModelDevices devices({
-        .storageDelegate                      = *initParams.persistentStorageDelegate,                 //
-            .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager             = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable                      = Server::GetInstance().GetFabricTable(),                //
-            .accessControl                    = Server::GetInstance().GetAccessControl(),              //
-            .persistentStorage                = Server::GetInstance().GetPersistentStorage(),          //
-            .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),            //
-            .deviceInstanceInfoProvider       = *provider,                                             //
-            .platformManager                  = DeviceLayer::PlatformMgr(),                            //
-            .groupDataProvider                = gGroupDataProvider,                                    //
-            .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),       //
-            .dnssdServer                      = DnssdServer::Instance(),                               //
-            .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                //
-            .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),              //
-            .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                   //
-            .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                     //
+        .storageDelegate                      = *initParams.persistentStorageDelegate,                   //
+            .commissioningWindowManager       = Server::GetInstance().GetCommissioningWindowManager(),   //
+            .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
+            .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
+            .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
+            .accessControl                    = Server::GetInstance().GetAccessControl(),                //
+            .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
+            .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
+            .deviceInstanceInfoProvider       = *provider,                                               //
+            .platformManager                  = DeviceLayer::PlatformMgr(),                              //
+            .groupDataProvider                = gGroupDataProvider,                                      //
+            .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
+            .dnssdServer                      = DnssdServer::Instance(),                                 //
+            .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
+            .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
+            .testEventTriggerDelegate         = initParams.testEventTriggerDelegate,                     //
+            .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+            .eventManagement                  = EventManagement::GetInstance(),                          //
+            .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -266,8 +279,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(payload.vendorID));
     SuccessOrDie(chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(payload.productID));
     PrintOnboardingCodes(payload);
-
-    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     chip::app::SetTerminateHandler(StopSignalHandler);
 
