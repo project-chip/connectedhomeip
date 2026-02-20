@@ -1002,5 +1002,5 @@ async def test_TC_ACL_2_3(self):
 @run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
 async def test_TC_OPCREDS_3_8(self):
     # Do test step logic if command is available, else this test is skipped
-        
+
 ```
