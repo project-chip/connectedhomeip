@@ -25,6 +25,7 @@
 
 using chip::CharSpan;
 using chip::EndpointId;
+using chip::Span;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
