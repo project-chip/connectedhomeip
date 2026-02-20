@@ -57,6 +57,7 @@ from matter.testing.commissioning import (CommissioningInfo, CustomCommissioning
                                           get_setup_payload_info_config)
 from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.pixit import PixitDefinition, format_pixit_error, get_pixit_definitions, validate_pixits
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
@@ -290,6 +291,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
         self.failed = False
+        self._validate_pixits()
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
@@ -505,6 +507,57 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
     # Matter Test API - Parameter Getters
     #
+
+    def get_pixit(self, name: str, default: Any = None) -> Any:
+        """Get a declared PIXIT value by name.
+
+        Retrieves the value from user_params. If not found, falls back to the
+        default specified in the @requires_pixit decorator, or the default
+        argument provided to this method.
+
+        Args:
+            name: The PIXIT parameter name (as declared in @requires_pixit).
+            default: Fallback default if no value is found and no decorator default exists.
+
+        Returns:
+            The PIXIT value, or the default.
+        """
+        value = self.user_params.get(name)
+        if value is not None:
+            return value
+
+        # Look up decorator default from the current test method
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method:
+            for pixit_def in get_pixit_definitions(test_method):
+                if pixit_def.name == name:
+                    if pixit_def.default is not None:
+                        return pixit_def.default
+                    return default
+        return default
+
+    def _validate_pixits(self):
+        """Validate that all required PIXITs declared via @requires_pixit are present.
+
+        Called automatically by setup_test() before each test method.
+        If required PIXITs are missing, the test fails immediately with a clear
+        error message listing all missing parameters and available optional ones.
+        """
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method is None:
+            return
+
+        pixit_defs = get_pixit_definitions(test_method)
+        if not pixit_defs:
+            return
+
+        missing_required, available_optional = validate_pixits(pixit_defs, self.user_params)
+        if missing_required:
+            error_msg = format_pixit_error(test_name, missing_required, available_optional)
+            asserts.fail(error_msg)
+
 
     def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
