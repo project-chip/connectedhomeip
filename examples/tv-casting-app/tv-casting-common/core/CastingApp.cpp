@@ -24,11 +24,13 @@
 #include "support/ChipDeviceEventHandler.h"
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace {
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -123,7 +125,13 @@ CHIP_ERROR CastingApp::Start()
     // Start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();
     VerifyOrReturnError(serverInitParams != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init(*serverInitParams));
+
+    CHIP_ERROR initError = chip::Server::GetInstance().Init(*serverInitParams);
+    if (initError != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "CastingApp::Start() Server::Init failed: %s", initError.AsString());
+        return initError;
+    }
 
     // Perform post server startup registrations
     ReturnErrorOnFailure(PostStartRegistrations());
@@ -142,6 +150,7 @@ CHIP_ERROR CastingApp::Start()
         CastingPlayer::GetTargetCastingPlayer()->VerifyOrEstablishConnection(connectionCallbacks);
     }
 
+    ChipLogProgress(Discovery, "CastingApp::Start() completed");
     return CHIP_NO_ERROR;
 }
 
@@ -188,10 +197,21 @@ CHIP_ERROR CastingApp::Stop()
     chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    // Shutdown the Matter server
+    // Shutdown the Matter server to clean up active sessions
     chip::Server::GetInstance().Shutdown();
 
+    // Shutdown the CodegenDataModelProvider to reset mContext
+    CHIP_ERROR providerShutdownErr = chip::app::CodegenDataModelProvider::Instance().Shutdown();
+    if (providerShutdownErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "CastingApp::Stop() CodegenDataModelProvider::Shutdown failed: %s", providerShutdownErr.AsString());
+    }
+
+    // Destroy EventManagement to reset its state
+    chip::app::EventManagement::DestroyEventManagement();
+
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
+    ChipLogProgress(Discovery, "CastingApp::Stop() completed");
 
     return CHIP_NO_ERROR;
 }

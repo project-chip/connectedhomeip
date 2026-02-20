@@ -106,13 +106,6 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Unpair(remoteId);
         break;
     case PairingMode::Code:
-#if CHIP_ENABLE_OT_COMMISSIONER
-        if (mThreadBaHost.HasValue() && mThreadBaPort.HasValue())
-        {
-            err = PairWithMeshCoP();
-            break;
-        }
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         chip::DeviceLayer::ConnectivityMgr().WiFiPafSetApFreq(
             mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
@@ -148,6 +141,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
             mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
+#endif
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    case PairingMode::ThreadMeshcop: {
+        Inet::IPAddress ipAddr;
+
+        VerifyOrReturnError(mThreadBaHost.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mThreadBaPort.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
+        err = Pair(remoteId, PeerAddress::ThreadMeshcop(ipAddr, mThreadBaPort.Value()));
+        break;
+    }
 #endif
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
@@ -303,12 +307,37 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
-    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode.value()).SetPeerAddress(address);
-    if (mDiscriminator.has_value())
+    auto params = RendezvousParameters().SetPeerAddress(address);
+    if (mOnboardingPayload != nullptr)
     {
-        params.SetDiscriminator(mDiscriminator.value());
+        SetupPayload payload;
+
+        ReturnErrorOnFailure(ParseSetupPayload(payload, mOnboardingPayload));
+        params.SetSetupPINCode(payload.setUpPINCode);
+        params.SetSetupDiscriminator(payload.discriminator);
     }
+    else
+    {
+        VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+        params.SetSetupPINCode(mSetupPINCode.value());
+        if (mDiscriminator.has_value())
+        {
+            params.SetDiscriminator(mDiscriminator.value());
+        }
+    }
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (address.GetTransportType() == Transport::Type::kThreadMeshcop)
+    {
+        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+        CommissioningParameters commissioningParams = GetCommissioningParameters();
+
+        commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
+        auto error = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
+        return error;
+    }
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
@@ -418,57 +447,6 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
     return CurrentCommissioner().DiscoverCommissionableNodes(filter);
 }
-
-#if CHIP_ENABLE_OT_COMMISSIONER
-CHIP_ERROR PairingCommand::PairWithMeshCoP()
-{
-    SetupPayload payload;
-
-    ReturnErrorOnFailure(ParseSetupPayload(payload, mOnboardingPayload));
-
-    if (payload.rendezvousInformation.HasValue() && !payload.rendezvousInformation.Value().Has(RendezvousInformationFlag::kThread))
-    {
-        // Proceed even if the device doesn't claim rendezvous over Thread MeshCoP because in-market devices may not
-        // be able to update their QR Code.
-        ChipLogProgress(chipTool, "WARNING: device may not support commissioning over Thread meshcop");
-    }
-
-    mSetupPINCode.emplace(payload.setUpPINCode);
-
-    Thread::DiscoveryCode code;
-    if (payload.discriminator.IsShortDiscriminator())
-    {
-        code = Thread::DiscoveryCode(payload.discriminator.GetShortValue());
-        ChipLogProgress(chipTool, "Discovery code from short discriminator: 0x%" PRIx64, code.AsUInt64());
-    }
-    else
-    {
-        code = Thread::DiscoveryCode(payload.discriminator.GetLongValue());
-        ChipLogProgress(chipTool, "Discovery code from long discriminator: 0x%" PRIx64, code.AsUInt64());
-    }
-
-    uint8_t pskc[Thread::kSizePSKc];
-
-    {
-        Thread::OperationalDatasetView dataset;
-        ReturnErrorAndLogOnFailure(dataset.Init(mOperationalDataset), chipTool, "Failed to parse Thread dataset");
-
-        ReturnErrorAndLogOnFailure(dataset.GetPSKc(pskc), chipTool, "Failed to retrieve PSKc");
-    }
-
-    {
-        Dnssd::DiscoveredNodeData discoveredNodeData;
-        ReturnErrorOnFailure(mCommissionProxy.Discover(pskc, mThreadBaHost.Value(), mThreadBaPort.Value(), code,
-                                                       payload.discriminator, discoveredNodeData, mTimeout.ValueOr(30)));
-
-        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
-        CurrentCommissioner().OnNodeDiscovered(discoveredNodeData);
-    }
-
-    ChipLogProgress(chipTool, "Joiner discovered");
-    return CHIP_NO_ERROR;
-}
-#endif // CHIP_ENABLE_OT_COMMISSIONER
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {

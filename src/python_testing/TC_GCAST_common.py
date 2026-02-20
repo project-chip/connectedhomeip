@@ -87,7 +87,7 @@ async def valid_endpoints_list(test, ln_enabled: bool) -> list:
 def generate_membership_entry_matcher(
     group_id: int,
     key_set_id: Optional[int] = None,
-    has_auxiliary_acl: Optional[str] = None,
+    has_auxiliary_acl: Optional[bool] = None,
     endpoints: Optional[list] = None,
     mcastAddrPolicy: Optional[Clusters.Groupcast.Enums.MulticastAddrPolicyEnum] = None,
     test_for_exists: bool = True,

@@ -284,6 +284,14 @@ public:
     void AddRetryHandler(Callback::Callback<OnDeviceConnectionRetry> * onRetry);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    /**
+     * Set a fallback resolve result to use if address resolution times out.
+     * This should be called before Connect() to enable the fallback mechanism.
+     */
+    void SetFallbackResolveResult(const AddressResolve::ResolveResult & result);
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+
 private:
     enum class State : uint8_t
     {
@@ -344,6 +352,12 @@ private:
 
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // Fallback address resolve result to use if normal address resolution times out
+    Optional<AddressResolve::ResolveResult> mFallbackResolveResult;
+    System::Clock::Timeout mFallbackTimeout = System::Clock::Seconds16(CHIP_CONFIG_ADDRESS_RESOLVE_FALLBACK_TIMEOUT_SECONDS);
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
     void MoveToState(State aTargetState);
 
@@ -453,6 +467,34 @@ private:
      */
     void NotifyRetryHandlers(CHIP_ERROR error, System::Clock::Seconds16 timeoutEstimate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    /**
+     * Timer callback invoked when DNS-SD resolution doesn't complete within the configured timeout.
+     *
+     * When this fires:
+     * - Cancels the ongoing DNS-SD lookup to prevent race conditions
+     * - Uses the cached IP/port from the successful PASE session seconds ago
+     * - Assumes the cached address is still valid (IP hasn't changed)
+     */
+    static void OnFallbackTimeout(System::Layer * systemLayer, void * appState);
+
+    /**
+     * Cancel the fallback timeout timer if it's running.
+     */
+    void CancelFallbackTimer();
+
+    /**
+     * Start the fallback timeout timer.
+     */
+    CHIP_ERROR StartFallbackTimer();
+
+    /**
+     * Helper to get the System::Layer from the session manager.
+     * Returns nullptr if not available.
+     */
+    System::Layer * GetSystemLayer();
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 };
 
 } // namespace chip

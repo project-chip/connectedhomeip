@@ -59,6 +59,9 @@ public:
     CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
                               AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadFabricUnderTest(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
     Status JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
     Status LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
@@ -66,9 +69,12 @@ public:
     Status UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
     Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
+    void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
+    void ResetDataModelProvider() { mDataModelProvider = nullptr; }
+
 private:
-    Credentials::GroupDataProvider & Provider() { return mContext.provider; }
-    chip::FabricTable & Fabrics() { return mContext.fabrics; }
+    Credentials::GroupDataProvider & Provider() { return mContext.groupDataProvider; }
+    chip::FabricTable & Fabrics() { return mContext.fabricTable; }
 
     Status SetKeySet(FabricIndex fabric_index, KeysetId keyset_id, const chip::ByteSpan & key);
     Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
@@ -77,6 +83,7 @@ private:
 
     GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;
+    DataModel::Provider * mDataModelProvider = nullptr;
 };
 
 } // namespace Clusters
