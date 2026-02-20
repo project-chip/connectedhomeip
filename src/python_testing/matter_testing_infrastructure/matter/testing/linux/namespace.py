@@ -247,7 +247,8 @@ class IsolatedNetworkNamespace:
         tool_ipv6 = ["fe80::2/64"]
         if add_ula:
             tool_ipv6.append("fd00:0:1:1::2/64")
-        self.tool_link = NetworkLink(f"{tool_link_name}-{index}", ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=tool_ipv6, ns=self.tool_ns)
+        self.tool_link = NetworkLink(f"{tool_link_name}-{index}",
+                                     ipv4_addrs=["10.10.10.2/24"], ipv6_addrs=tool_ipv6, ns=self.tool_ns)
 
         mgmt_ipv6 = ["fe80::5/64"]
         if add_ula:

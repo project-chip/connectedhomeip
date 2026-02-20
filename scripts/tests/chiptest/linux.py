@@ -49,6 +49,7 @@ __all__ = [
     "WpaSupplicantMock"
 ]
 
+
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns: IsolatedNetworkNamespace):
         super().__init__()
