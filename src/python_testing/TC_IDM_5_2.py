@@ -67,10 +67,10 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
                      "On the TH verify DUT sends back a Write Response after performing the write action. Verify by sending a ReadRequest that the Write action was performed correctly."),
             TestStep(3, "TH sends a Timed Request Message(Timed Invoke Transaction) with the timeout value set. (Example - 200 milliseconds)" +
                      "Wait for the status response message to be received. Wait for 5 seconds(Timer has expired) and then send the Invoke Request Message to the DUT.",
-                     "If the device being certified is Matter release 1.4 or later, {resDutTimeout}. If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either {stTimeout} or {stUnsupportedAccess}."),
+                     "If the device being certified is Matter release 1.4 or later, timeout error should be returned. If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either timeout or unsupported access error."),
             TestStep(4, "TH sends a Timed Request Message(Timed Write Transaction) with the timeout value set. (Example - 200 milliseconds)." +
                      "Wait for the status response message to be received.  Wait for 5 seconds(Timer has expired) and then send the Write Request Message to the DUT.",
-                     "If the device being certified is Matter release 1.4 or later, {resDutTimeout}. If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either {stTimeout} or {stUnsupportedAccess}."),
+                     "If the device being certified is Matter release 1.4 or later, timeout error should be returned. If the device being certified is Matter release 1.3 or earlier, verify the DUT sends back a Status response with either timeout or unsupported access error."),
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.LevelControl))
@@ -90,14 +90,16 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
             timedRequestTimeoutMs=200,
         )
 
+
         # Step 2: TH sends a Timed Request Message (Timed Write Transaction) with timeout,
         # waits for status response, then sends Write Request
+        TIMED_REQUEST_TIMEOUT_MS=500
         self.step(2)
         expected_value = 21
         write_result = await self.default_controller.WriteAttribute(
             self.dut_node_id,
             attributes=[(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(expected_value))],
-            timedRequestTimeoutMs=500
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
 
         # Verify write was successful
@@ -128,8 +130,8 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
                 nodeId=self.dut_node_id,
                 endpoint=self.endpoint,
                 payload=Clusters.LevelControl.Commands.MoveToLevel(23),
-                timedRequestTimeoutMs=500,
-                busyWaitMs=1000  # Wait longer than timeout to trigger TIMEOUT error
+                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS,
+                busyWaitMs=TIMED_REQUEST_TIMEOUT_MS * 2  # Wait longer than timeout to trigger TIMEOUT error
             )
             asserts.fail("Step 3: Command should timeout but succeeded unexpectedly")
         except InteractionModelError as e:
@@ -147,8 +149,8 @@ class TC_IDM_5_2(IDMBaseTest, BasicCompositionTests):
             write_result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
                 attributes=[(self.endpoint, Clusters.LevelControl.Attributes.OnLevel(25))],
-                timedRequestTimeoutMs=500,
-                busyWaitMs=1000  # Wait longer than timeout to trigger TIMEOUT error
+                timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS,
+                busyWaitMs=TIMED_REQUEST_TIMEOUT_MS * 2  # Wait longer than timeout to trigger TIMEOUT error
             )
             asserts.fail("Step 4: Write should timeout but succeeded unexpectedly")
         except InteractionModelError as e:
