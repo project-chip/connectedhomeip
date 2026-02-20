@@ -84,9 +84,9 @@ class TC_DA_1_1(MatterBaseTest):
                      - Verify that there is a single entry in the Fabrics list
                      - Verify that the FabricID is the same as TH2's FabricID
                      - Verify that TH2's Fabrics attribute's FabricID is different than from TH1's Fabrics attribute's FabricID"""),
-            # TestStep(6, "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT", """
-            #          - Verify that there is a single entry in the NOCs list
-            #          - Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key"""),
+            TestStep(6, "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT", """
+                     - Verify that there is a single entry in the NOCs list
+                     - Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key"""),
         ]
 
         return steps
@@ -113,19 +113,6 @@ class TC_DA_1_1(MatterBaseTest):
             attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
             fabric_filtered=False)
 
-    async def factory_reset_dut(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
-        # Trigger app restart for factory reset
-        restart_flag_file = self.get_restart_flag_file()
-        if restart_flag_file:
-            with open(restart_flag_file, "w") as f:
-                f.write("reset")
-            logging.info("Created restart flag file to signal app restart for factory reset")
-
-            # Expire sessions and re-establish connections
-            dev_ctrl.ExpireSessions(self.dut_node_id)
-
-            logging.info("App restart completed successfully")
-
     @async_test_body
     async def test_TC_DA_1_1(self):
         # Get setup payload info from the original commissioning parameters
@@ -134,16 +121,11 @@ class TC_DA_1_1(MatterBaseTest):
         if not setupPayloadInfo:
             asserts.fail("Setup payload info is required for commissioning.")
         
+        # Build setup params for commissioning
         setup_params = SetupParameters(
             discriminator=setupPayloadInfo[0].filter_value,
             passcode=setupPayloadInfo[0].passcode
-        )
-            
-        # codelenz = get_first_setup_code(self.default_controller, MatterTestConfig)
-        # logging.info(f"codelenz: {codelenz}")
-            
-            
-            
+        )            
 
         # Setup
         root_node_id = 0
@@ -183,72 +165,89 @@ class TC_DA_1_1(MatterBaseTest):
         # *** STEP 3 ***
         # Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state
         self.step(3)
-        # await self.request_device_factory_reset()
-        await self.factory_reset_dut(th1)
-        
-        # logging.info(f"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        # logging.info(f"SLPEEEEEEEEEEEEEEEEEEEEEEEEEPIN!")
-        # await asyncio.sleep(45)
-        # logging.info(f"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        await self.request_device_factory_reset()
 
         # *** STEP 4 ***
         # Commission DUT to TH2's Fabric
         self.step(4)
+        # th2 = self.get_new_controller()
 
-        # logging.info(
-        #     f"Commissioning TH2 with {setupPayloadInfo[0].filter_type.value} discriminator: {setupPayloadInfo[0].filter_value}, passcode: {setupPayloadInfo[0].passcode}")
-        # await th2.CommissionOnNetwork(
-        #     nodeId=self.dut_node_id,
-        #     setupPinCode=setupPayloadInfo[0].passcode,
-        #     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-        #     filter=setupPayloadInfo[0].filter_value
-        # )
+        # # Phase 1: TH2 opens a PASE session to verify old fabric was wiped
+        # pase_node_id = self.dut_node_id + 1
+        # await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
 
-        # Open a PASE session
-        pase_node_id = self.dut_node_id + 1
-        # params = await self.open_commissioning_window()
-        logging.info(f"setup_params.qr_code: {setup_params.qr_code}")
-        await th2.FindOrEstablishPASESession(setupCode=setup_params.qr_code, nodeId=pase_node_id)
-
-        # # *** STEP 5 ***
-        # # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT
-        # self.step(5)
+        # # Read Fabrics over PASE to confirm TH1's fabric was removed by factory reset
         # response = await th2.ReadAttribute(
         #     nodeId=pase_node_id,
         #     attributes=(root_node_id, fabrics_attr),
         #     fabricFiltered=False
-        # )       
-        # fabrics_th2 = response[0][opcreds_cluster][fabrics_attr]
+        # )
+        # fabrics_pase = response[0][opcreds_cluster][fabrics_attr]
+        # logging.info(f"Fabrics over PASE (after factory reset): {fabrics_pase}")
+
+        # # Verify that TH1's FabricID is not present after factory reset
+        # fabrics_pase_ids = [f.fabricID for f in fabrics_pase]
+        # asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_pase_ids,
+        #                       f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present after factory reset, found: {fabrics_pase_ids}")
+
+        # Phase 2: Fully commission DUT to TH2's fabric
+        th2_node_id = self.dut_node_id + 2
+
+        # await th2.Commission(nodeId=self.dut_node_id)
+
+        await th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=setup_params.passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=setup_params.discriminator
+        )
+
+        logging.info("DUT fully commissioned to TH2's fabric")
+
+        # *** STEP 5 ***
+        # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT (over CASE)
+        self.step(5)
+        # fabrics_th2 = await self.read_single_attribute_check_success(
+        #     dev_ctrl=th2,
+        #     node_id=th2_node_id,
+        #     endpoint=0,
+        #     cluster=opcreds_cluster,
+        #     attribute=fabrics_attr,
+        #     fabric_filtered=False)
         # logging.info(f"fabrics_th2: {fabrics_th2}")
 
-        # # Verify that TH1's FabricID is not present in the fabrics list after factory reset
-        # fabrics_th2_ids = [f.fabricID for f in fabrics_th2]
-        # asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_th2_ids,
-        #                       f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's fabrics after factory reset, found: {fabrics_th2_ids}")
-
-
-
-     
-
+        # # Verify that there is a single entry in the Fabrics list
+        # asserts.assert_equal(len(fabrics_th2), 1,
+        #                      f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th2)}")
 
         # # Verify that the FabricID is the same as TH2's FabricID
         # asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId,
-        #                      f"TH2 FabricID ({fabrics_th2[0].fabricID})and Fabrics attribute FabricID ({th2.fabricId}) must match")
+        #                      f"TH2 FabricID ({fabrics_th2[0].fabricID}) and Fabrics attribute FabricID ({th2.fabricId}) must match")
 
+        # # Verify that TH2's Fabrics attribute's FabricID is different than from TH1's Fabrics attribute's FabricID
+        # asserts.assert_not_equal(fabrics_th2[0].fabricID, fabrics_th1[0].fabricID,
+        #                          f"TH2's FabricID ({fabrics_th2[0].fabricID}) must be different from TH1's FabricID ({fabrics_th1[0].fabricID})")
 
-        # # *** STEP 6 ***
-        # # TH2 does a non-fabric-filtered read of NOCs attribute list from DUT
-        # self.step(6)
-        # nocs_th2 = await self.read_nocs(th2)
+        # *** STEP 6 ***
+        # TH2 does a non-fabric-filtered read of NOCs attribute list from DUT (over CASE)
+        self.step(6)
+        # nocs_th2 = await self.read_single_attribute_check_success(
+        #     dev_ctrl=th2,
+        #     node_id=th2_node_id,
+        #     endpoint=0,
+        #     cluster=opcreds_cluster,
+        #     attribute=nocs_attr,
+        #     fabric_filtered=False)
 
         # # Verify that there is a single entry in the NOCs list
-        # asserts.assert_true(len(nocs_th2) == 1, f"NOCs attribute must contain a single entry in the list, got {len(nocs_th2)}")
+        # asserts.assert_equal(len(nocs_th2), 1,
+        #                      f"NOCs attribute must contain a single entry in the list, got {len(nocs_th2)}")
 
         # # Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key
         # nocs_th1_decoded_pk = TLVReader(nocs_th1[0].noc).get()["Any"][9]
         # nocs_th2_decoded_pk = TLVReader(nocs_th2[0].noc).get()["Any"][9]
         # asserts.assert_not_equal(nocs_th1_decoded_pk, nocs_th2_decoded_pk,
-        #                          f"The public key of the TH2 NOCs entry ({nocs_th1_decoded_pk.hex()}) must be different than from TH1 ({nocs_th2_decoded_pk.hex()})")
+        #                          f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1 ({nocs_th1_decoded_pk.hex()})")
 
 
 if __name__ == "__main__":
