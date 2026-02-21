@@ -123,6 +123,7 @@ public:
     ChefDelegate(EndpointId endpointId) :
         ChefDelegate(endpointId, kEndpointFeatureMap, kClusterRevision, kSupportedStreamingProtocols,
                      Span<const CharSpan>(kAcceptHeaderList), Span<const ContentEntry>(kLaunchableContent)) {};
+    ~ChefDelegate() = default;
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                              const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
