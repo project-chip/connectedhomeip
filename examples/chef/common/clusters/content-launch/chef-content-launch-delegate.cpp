@@ -22,7 +22,6 @@
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <app/util/config.h>
 #include <lib/support/CHIPMem.h> // For chip::Platform
-#include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
@@ -62,8 +61,6 @@ bool checkContentMatch(const ContentEntry & content, const SearchParameters & pa
     }
     return true;
 }
-
-static chip::IntrusiveList<Chef::ChefDelegate> gDelegateList;
 
 } // namespace
 
@@ -162,22 +159,9 @@ uint16_t ChefDelegate::GetClusterRevision(chip::EndpointId endpoint)
     return mClusterRevision;
 }
 
-void AddDefaultDelegateForEndpioint(EndpointId endpoint)
+void ChefDelegate::Register()
 {
-
-    for (auto it = gDelegateList.begin(); it != gDelegateList.end(); ++it)
-    {
-        if (it->GetEndpointId() == endpoint)
-        {
-            ChipLogError(Zcl, "ContentLauncher::AddDelegateForEndpioint Delegate for endpoint %d already exists.", endpoint);
-            return;
-        }
-    }
-
-    ChipLogProgress(Zcl, "ContentLauncher::AddDelegateForEndpioint Adding delegate for endpoint %d", endpoint);
-    ChefDelegate * delegate = Platform::New<ChefDelegate>(endpoint);
-    gDelegateList.PushBack(delegate);
-    SetDefaultDelegate(endpoint, delegate);
+    SetDefaultDelegate(mEndpointId, this);
 }
 
 } // namespace Chef

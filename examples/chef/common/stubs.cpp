@@ -7,6 +7,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPMem.h> // For chip::Platform
 
 using chip::app::DataModel::Nullable;
 
@@ -591,7 +592,9 @@ void CastingvideoplayerContentappInit()
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kCastingVideoPlayerDeviceTypeId))
     {
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
-        Clusters::ContentLauncher::Chef::AddDefaultDelegateForEndpioint(1);
+        ContentLauncher::Chef::ChefDelegate * contentLauncherPlatformDelegate =
+            Platform::New<ContentLauncher::Chef::ChefDelegate>(1);
+        contentLauncherPlatformDelegate->Register();
 #endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
     }
 }
