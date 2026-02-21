@@ -1337,6 +1337,7 @@ showDocumentation
 showsdks
 shubhamdp
 SIGINT
+SIGSEGV
 SiLabs
 Silabs's
 SiliconLabs
