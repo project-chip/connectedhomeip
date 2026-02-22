@@ -50,7 +50,7 @@ void PlatformDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseTyp
     LauncherResponseType response;
     response.status = StatusEnum::kSuccess;
     response.data   = chip::MakeOptional(data);
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
@@ -58,7 +58,7 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleStopApp");
     LauncherResponseType response;
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
@@ -66,7 +66,7 @@ void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType>
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp");
     LauncherResponseType response;
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 CHIP_ERROR PlatformDelegate::HandleGetCatalogList(app::AttributeValueEncoder & aEncoder)
@@ -126,7 +126,7 @@ void AppDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & 
     LauncherResponseType response;
     response.status = StatusEnum::kSuccess;
     response.data   = chip::MakeOptional(data);
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void AppDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
@@ -134,7 +134,7 @@ void AppDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & he
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleStopApp");
     LauncherResponseType response;
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void AppDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
@@ -142,7 +142,7 @@ void AppDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & he
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleHideApp");
     LauncherResponseType response;
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 CHIP_ERROR AppDelegate::HandleGetCatalogList(app::AttributeValueEncoder & aEncoder)
