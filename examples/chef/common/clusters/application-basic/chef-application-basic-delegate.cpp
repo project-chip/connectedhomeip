@@ -39,23 +39,25 @@ namespace Chef {
 ChefDelegate::ChefDelegate(EndpointId endpointId, const char * vendorName, uint16_t catalogVendorId, const char * applicationId,
                            const char * applicationName, const char * applicationVersion,
                            const Span<const uint16_t> allowedVendorList, const uint16_t productId) :
-    Delegate(catalogVendorId, applicationId),
-    mEndpointId(endpointId), mApplicationName(applicationName), mVendorName(vendorName), mProductId(productId),
-    mApplicationVersion(applicationVersion), mAllowedVendorList(allowedVendorList)
+    Delegate(catalogVendorId, applicationId), mEndpointId(endpointId), mApplicationName(applicationName), mVendorName(vendorName),
+    mProductId(productId), mApplicationVersion(applicationVersion), mAllowedVendorList(allowedVendorList)
 {}
 
 CHIP_ERROR ChefDelegate::HandleGetApplicationName(app::AttributeValueEncoder & aEncoder)
 {
+    ChipLogProgress(Zcl, "ChefDelegate::HandleGetApplicationName %s", mApplicationName);
     return aEncoder.Encode(chip::CharSpan(mApplicationName, strlen(mApplicationName)));
 }
 
 CHIP_ERROR ChefDelegate::HandleGetApplicationVersion(app::AttributeValueEncoder & aEncoder)
 {
+    ChipLogProgress(Zcl, "ChefDelegate::HandleGetApplicationVersion %s", mApplicationVersion);
     return aEncoder.Encode(chip::CharSpan(mApplicationVersion, strlen(mApplicationVersion)));
 }
 
 CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder)
 {
+    ChipLogProgress(Zcl, "ChefDelegate::HandleGetAllowedVendorList");
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (const auto & vendorId : mAllowedVendorList)
         {
@@ -67,26 +69,31 @@ CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder &
 
 CHIP_ERROR ChefDelegate::HandleGetVendorName(app::AttributeValueEncoder & aEncoder)
 {
+    ChipLogProgress(Zcl, "ChefDelegate::HandleGetVendorName %d", mVendorName);
     return aEncoder.Encode(chip::CharSpan(mVendorName, strlen(mVendorName)));
 }
 
 uint16_t ChefDelegate::HandleGetVendorId()
 {
+    ChipLogProgress(Zcl, "ChefDelegate::HandleGetVendorId %d", mCatalogVendorApp.catalogVendorId);
     return mCatalogVendorApp.catalogVendorId;
 }
 
 uint16_t ChefDelegate::HandleGetProductId()
 {
+    ChipLogProgress(Zcl, "ChefDelegate::HandleGetProductId %d", mProductId);
     return mProductId;
 }
 
 std::list<uint16_t> ChefDelegate::GetAllowedVendorList()
 {
+    ChipLogProgress(Zcl, "ChefDelegate::GetAllowedVendorList");
     return std::list<uint16_t>(mAllowedVendorList.begin(), mAllowedVendorList.end());
 }
 
 void ChefDelegate::Register()
 {
+    ChipLogProgress(Zcl, "ChefDelegate::Register");
     SetDefaultDelegate(mEndpointId, this);
 }
 
