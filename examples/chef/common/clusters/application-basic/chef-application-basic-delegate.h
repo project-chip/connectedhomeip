@@ -54,7 +54,7 @@ private:
     const char * mVendorName;
     const uint16_t mProductId;
     const char * mApplicationVersion;
-    Span<const uint16_t> mAllowedVendorList;
+    const Span<const uint16_t> mAllowedVendorList;
 };
 
 } // namespace Chef
