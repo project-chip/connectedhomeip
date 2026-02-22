@@ -391,6 +391,8 @@ deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
 detokenization
@@ -1335,6 +1337,7 @@ showDocumentation
 showsdks
 shubhamdp
 SIGINT
+SIGSEGV
 SiLabs
 Silabs's
 SiliconLabs
