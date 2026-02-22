@@ -43,13 +43,18 @@ public:
 
     void Register();
 
+    CHIP_ERROR HandleGetVendorName(app::AttributeValueEncoder & aEncoder) = delete;
+    uint16_t HandleGetVendorId()                                          = delete;
+    uint16_t HandleGetProductId()                                         = delete;
+    std::list<uint16_t> GetAllowedVendorList()                            = delete;
+
 private:
     EndpointId mEndpointId;
     const char * mApplicationName;
     uint16_t mVendorId;
     const char * mVendorName;
     uint16_t mProductId;
-    std::string mApplicationVersion;
+    const char * mApplicationVersion;
     Span<const uint16_t> mAllowedVendorList;
 };
 

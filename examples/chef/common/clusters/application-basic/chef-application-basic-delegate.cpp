@@ -50,7 +50,7 @@ CHIP_ERROR ChefDelegate::HandleGetApplicationName(app::AttributeValueEncoder & a
 
 CHIP_ERROR ChefDelegate::HandleGetApplicationVersion(app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(chip::CharSpan(mApplicationVersion.c_str(), mApplicationVersion.length()));
+    return aEncoder.Encode(chip::CharSpan(mApplicationVersion, strlen(mApplicationVersion)));
 }
 
 CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder)
