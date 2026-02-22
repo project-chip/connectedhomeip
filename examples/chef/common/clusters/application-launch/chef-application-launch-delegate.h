@@ -40,6 +40,8 @@ namespace Clusters {
 namespace ApplicationLauncher {
 namespace Chef {
 
+class AppDelegate;
+
 class PlatformDelegate : public Delegate // This is for the "Casting Video Player" endpoint.
 {
 public:
