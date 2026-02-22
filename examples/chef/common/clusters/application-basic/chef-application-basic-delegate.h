@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
+#include <app/util/config.h>
 
 #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
