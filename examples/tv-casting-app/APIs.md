@@ -1249,7 +1249,7 @@ std::string instanceName = GenerateRandomInstanceName(); // Implement your rando
 // Step 2: Set up IdentificationDeclarationOptions with NoPasscode and targetAppInfo
 matter::casting::core::IdentificationDeclarationOptions idOptions;
 idOptions.mNoPasscode = true;
-idOptions.mInstanceName = instanceName.c_str();
+chip::Platform::CopyString(idOptions.mCommissioneeInstanceName, instanceName.c_str());
 
 chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
 targetAppInfo.vendorId = kDesiredAppVendorId;  // Your target app's vendor ID
@@ -1275,7 +1275,7 @@ connectionCallbacks.mCommissionerDeclarationCallback = [&instanceName, &targetCa
     // Step 4: Cancel the UDC session by sending CancelPasscode
     matter::casting::core::IdentificationDeclarationOptions cancelOptions;
     cancelOptions.mCancelPasscode = true;
-    cancelOptions.mInstanceName = instanceName.c_str();
+chip::Platform::CopyString(cancelOptions.mCommissioneeInstanceName, instanceName.c_str());
 
     matter::casting::core::ConnectionCallbacks cancelCallbacks;
     // Send the cancel message using SendUDC
