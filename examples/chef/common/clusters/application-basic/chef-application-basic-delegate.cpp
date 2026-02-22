@@ -23,7 +23,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+// #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using namespace chip;
 using namespace chip::app;
@@ -36,11 +36,11 @@ namespace Clusters {
 namespace ApplicationBasic {
 namespace Chef {
 
-ChefDelegate::ChefDelegate(EndpointId endpointId, uint16_t catalogVendorId, const char * applicationId,
+ChefDelegate::ChefDelegate(EndpointId endpointId, const char * vendorName, uint16_t catalogVendorId, const char * applicationId,
                            const char * applicationName, const char * applicationVersion,
-                           const Span<const uint16_t> allowedVendorList) :
-    Delegate(catalogVendorId, applicationId), mEndpointId(endpointId), mApplicationName(applicationName),
-    mApplicationVersion(applicationVersion), mAllowedVendorList(allowedVendorList)
+                           const Span<const uint16_t> allowedVendorList, const uint16_t productId) :
+    Delegate(catalogVendorId, applicationId), mVendorName(vendorName), mEndpointId(endpointId), mApplicationName(applicationName),
+    mApplicationVersion(applicationVersion), mAllowedVendorList(allowedVendorList), mProductId(productId)
 {}
 
 CHIP_ERROR ChefDelegate::HandleGetApplicationName(app::AttributeValueEncoder & aEncoder)
@@ -64,6 +64,26 @@ CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder &
     });
 }
 
+CHIP_ERROR ChefDelegate::HandleGetVendorName(app::AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(chip::CharSpan(mVendorName, strlen(mVendorName)));
+}
+
+uint16_t ChefDelegate::HandleGetVendorId()
+{
+    return mCatalogVendorApp.catalogVendorId;
+}
+
+uint16_t ChefDelegate::HandleGetProductId()
+{
+    return mProductId;
+}
+
+std::list<uint16_t> ChefDelegate::GetAllowedVendorList()
+{
+    return std::list<uint16_t>(mAllowedVendorList.begin(), mAllowedVendorList.end());
+}
+
 void ChefDelegate::Register()
 {
     SetDefaultDelegate(mEndpointId, this);
@@ -75,4 +95,4 @@ void ChefDelegate::Register()
 } // namespace app
 } // namespace chip
 
-#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
+// #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT

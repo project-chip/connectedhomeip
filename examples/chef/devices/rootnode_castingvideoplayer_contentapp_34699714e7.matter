@@ -3045,7 +3045,10 @@ endpoint 2 {
   }
 
   server cluster ApplicationBasic {
+    callback attribute vendorName default = "TEST_VENDOR";
+    callback attribute vendorID default = 65521;
     callback attribute applicationName;
+    callback attribute productID default = 32768;
     callback attribute application;
     callback attribute status default = 0x01;
     callback attribute applicationVersion;

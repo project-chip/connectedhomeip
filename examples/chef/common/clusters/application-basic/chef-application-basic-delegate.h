@@ -21,7 +21,7 @@
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/util/config.h>
 
-#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+// #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace chip {
 namespace app {
@@ -32,28 +32,27 @@ namespace Chef {
 class ChefDelegate : public Delegate
 {
 public:
-    ChefDelegate(EndpointId endpointId, uint16_t catalogVendorId, const char * applicationId, const char * applicationName,
-                 const char * applicationVersion, const Span<const uint16_t> allowedVendorList);
+    ChefDelegate(EndpointId endpointId, const char * vendorName, uint16_t catalogVendorId, const char * applicationId,
+                 const char * applicationName, const char * applicationVersion, const Span<const uint16_t> allowedVendorList,
+                 const uint16_t productId);
 
     CHIP_ERROR HandleGetApplicationName(app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetApplicationVersion(app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetVendorName(app::AttributeValueEncoder & aEncoder) override;
+    uint16_t HandleGetVendorId() override;
+    uint16_t HandleGetProductId() override;
+    std::list<uint16_t> GetAllowedVendorList() override;
 
     EndpointId GetEndpointId() { return mEndpointId; }
 
     void Register();
 
-    CHIP_ERROR HandleGetVendorName(app::AttributeValueEncoder & aEncoder) = delete;
-    uint16_t HandleGetVendorId()                                          = delete;
-    uint16_t HandleGetProductId()                                         = delete;
-    std::list<uint16_t> GetAllowedVendorList()                            = delete;
-
 private:
     EndpointId mEndpointId;
     const char * mApplicationName;
-    uint16_t mVendorId;
     const char * mVendorName;
-    uint16_t mProductId;
+    const uint16_t mProductId;
     const char * mApplicationVersion;
     Span<const uint16_t> mAllowedVendorList;
 };
@@ -64,4 +63,4 @@ private:
 } // namespace app
 } // namespace chip
 
-#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
+// #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
