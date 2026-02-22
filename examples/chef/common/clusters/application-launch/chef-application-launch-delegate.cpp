@@ -30,11 +30,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
-namespace {
-static chip::app::Clusters::ApplicationLauncher::Chef::PlatformDelegate * gPlatformDelegate = nullptr;
-static chip::IntrusiveList<chip::app::Clusters::ApplicationLauncher::Chef::AppDelegate> gAppDelegateList;
-} // namespace
-
 namespace chip {
 namespace app {
 namespace Clusters {
