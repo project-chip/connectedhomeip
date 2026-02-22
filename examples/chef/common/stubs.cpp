@@ -605,12 +605,12 @@ void CastingvideoplayerContentappInit()
 #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         static constexpr uint16_t kAllowedVendorList[] = { 0xFFF1 };
         ApplicationBasic::Chef::ChefDelegate * appABasic =
-            Platform::New<ApplicationBasic::Chef::ChefDelegate>(kAppAEndpoint,                            // Endpoint ID
-                                                                0xFFF1,                                   // catalogVendorId
-                                                                "Application_A_ID",                       // applicationId
-                                                                "Application_A_Name",                     // applicationName
-                                                                "Version_1",                              // applicationVersion
-                                                                Span<const uint16_t>(kAllowedVendorList), // allowedVendorList
+            Platform::New<ApplicationBasic::Chef::ChefDelegate>(kAppAEndpoint,                           // Endpoint ID
+                                                                0xFFF1,                                  // catalogVendorId
+                                                                "Application_A_ID",                      // applicationId
+                                                                "Application_A_Name",                    // applicationName
+                                                                "Version_1",                             // applicationVersion
+                                                                Span<const uint16_t>(kAllowedVendorList) // allowedVendorList
             );
         appABasic->Register();
 #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
