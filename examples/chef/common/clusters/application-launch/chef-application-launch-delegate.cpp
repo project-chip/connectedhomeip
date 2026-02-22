@@ -19,6 +19,7 @@
 #include "chef-application-launch-delegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/util/config.h>
 #include <lib/support/CHIPMem.h>
@@ -86,17 +87,34 @@ CHIP_ERROR PlatformDelegate::HandleGetCurrentApp(app::AttributeValueEncoder & aE
     return aEncoder.EncodeNull();
 }
 
-void AddApplicationLauncherPlatformDelegateForEndpoint(EndpointId endpoint, const Span<const uint16_t> catalogList)
+CHIP_ERROR PlatformDelegate::AddAppDelegate(AppDelegate * delegate)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AddApplicationLauncherPlatformDelegateForEndpoint endpoint=%d", endpoint);
-    if (gPlatformDelegate != nullptr)
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::AddAppDelegate");
+    for (auto it = mAppDelegateList.begin(); it != mAppDelegateList.end(); ++it)
     {
-        ChipLogError(Zcl, "ApplicationLauncher::Chef::PlatformDelegate already exists");
-        return;
+        if (delegate->GetEndpointId() == it->GetEndpointId())
+        {
+            ChipLogError(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::AddAppDelegate endpoint %d already registered",
+                         delegate->GetEndpointId());
+            return CHIP_ERROR_ALREADY_INITIALIZED;
+        }
+        ApplicationBasic::CatalogVendorApp CatalogApp(*it->GetCatalogVendorApp());
+        if (delegate->GetCatalogVendorApp()->Matches(CatalogApp))
+        {
+            ChipLogError(Zcl,
+                         "ApplicationLauncher::Chef::PlatformDelegate::AddAppDelegate application (%d , %s) already registered",
+                         CatalogApp.catalogVendorId, CatalogApp.applicationId);
+            return CHIP_ERROR_ALREADY_INITIALIZED;
+        }
     }
+    mAppDelegateList.PushBack(delegate);
+    return CHIP_NO_ERROR;
+}
 
-    gPlatformDelegate = Platform::New<PlatformDelegate>(endpoint, catalogList);
-    SetDefaultDelegate(endpoint, gPlatformDelegate);
+void PlatformDelegate::Register()
+{
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::Register");
+    SetDefaultDelegate(mEndpointId, this);
 }
 
 // AppDelegate Implementation
@@ -127,21 +145,24 @@ void AppDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & he
     helper.Success(response);
 }
 
-void AddApplicationLauncherAppDelegateForEndpoint(EndpointId endpoint)
+CHIP_ERROR AppDelegate::HandleGetCatalogList(app::AttributeValueEncoder & aEncoder)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AddApplicationLauncherAppDelegateForEndpoint endpoint=%d", endpoint);
-    for (auto & delegate : gAppDelegateList)
-    {
-        if (delegate.GetEndpointId() == endpoint)
-        {
-            ChipLogError(Zcl, "ApplicationLauncher::Chef::AppDelegate already exists for endpoint %d", endpoint);
-            return;
-        }
-    }
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleGetCatalogList returning unsupported");
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
-    AppDelegate * delegate = Platform::New<AppDelegate>(endpoint);
-    gAppDelegateList.PushBack(delegate);
-    SetDefaultDelegate(endpoint, delegate);
+void AppDelegate::Register()
+{
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::Register");
+    SetDefaultDelegate(mEndpointId, this);
+}
+
+bool AppDelegate::Match(const Application & application)
+{
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::Match (%d , %s)", application.catalogVendorID,
+                    application.applicationID.data());
+    ApplicationBasic::CatalogVendorApp toCatalogApp(application.catalogVendorID, application.applicationID.data());
+    return mAppBasicDelegate->GetCatalogVendorApp()->Matches(toCatalogApp);
 }
 
 } // namespace Chef

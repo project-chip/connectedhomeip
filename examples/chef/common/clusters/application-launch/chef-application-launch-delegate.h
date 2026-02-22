@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "application-basic/chef-application-basic-delegate.h"
+#include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/util/config.h>
 #include <lib/support/IntrusiveList.h>
@@ -64,19 +66,23 @@ public:
 
     EndpointId GetEndpointId() { return mEndpointId; }
 
-private:
-    EndpointId mEndpointId;
-    // In a real app, you would track which app is currently in focus
-    EndpointId mCurrentAppEndpoint = chip::kInvalidEndpointId;
-    Span<const uint16_t> mCatalogList;
-};
+    CHIP_ERROR AddAppDelegate(AppDelegate * delegate); // Adds a new app to the list of managed apps
 
-void AddApplicationLauncherPlatformDelegateForEndpoint(EndpointId endpoint);
+    void Register();
+
+private:
+    const EndpointId mEndpointId;
+    AppDelegate * mCurrentApp = nullptr; // track which app is currently in focus
+    Span<const uint16_t> mCatalogList;
+    chip::IntrusiveList<AppDelegate> mAppDelegateList; // List of managed content apps
+};
 
 class AppDelegate : public Delegate, public chip::IntrusiveListNodeBase<> // This is for the "Content App" endpoint.
 {
 public:
-    AppDelegate(EndpointId endpointId) : mEndpointId(endpointId) {}
+    AppDelegate(EndpointId endpointId, ApplicationBasic::Chef::ChefDelegate * appBasicDelegate) :
+        mEndpointId(endpointId), mAppBasicDelegate(appBasicDelegate)
+    {}
     ~AppDelegate() = default;
 
     // Commands
@@ -85,14 +91,20 @@ public:
     void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
     void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
 
+    // Return error as this is not the platform instance
+    CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) override;
+
     EndpointId GetEndpointId() { return mEndpointId; }
+
+    void Register();
+
+    bool Match(const Application & application); // Checks if the specified application matches with the current one
+    ApplicationBasic::CatalogVendorApp * GetCatalogVendorApp() { return mAppBasicDelegate->GetCatalogVendorApp(); }
 
 private:
     EndpointId mEndpointId;
-    // TODO: Add an attribute for the app basic delegate.
+    ApplicationBasic::Chef::ChefDelegate * mAppBasicDelegate;
 };
-
-void AddApplicationLauncherAppDelegateForEndpoint(EndpointId endpoint);
 
 } // namespace Chef
 } // namespace ApplicationLauncher

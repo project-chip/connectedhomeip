@@ -93,6 +93,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
     ${CHEF}/common/clusters/application-basic/chef-application-basic-delegate.cpp
+    ${CHEF}/common/clusters/application-launch/chef-application-launch-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
     ${CHEF}/common/clusters/channel/ChannelManager.cpp
     ${CHEF}/common/clusters/content-launch/chef-content-launch-delegate.cpp
