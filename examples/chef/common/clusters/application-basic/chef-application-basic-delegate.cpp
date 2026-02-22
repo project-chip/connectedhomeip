@@ -23,14 +23,12 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationBasic;
-
-namespace {
-static chip::IntrusiveList<Chef::ChefDelegate> gDelegateList;
-} // namespace
 
 namespace chip {
 namespace app {
@@ -47,7 +45,7 @@ ChefDelegate::ChefDelegate(EndpointId endpointId, uint16_t catalogVendorId, cons
 
 CHIP_ERROR ChefDelegate::HandleGetApplicationName(app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode(chip::CharSpan(mApplicationName.c_str(), mApplicationName.length()));
+    return aEncoder.Encode(chip::CharSpan(mApplicationName, strlen(mApplicationName)));
 }
 
 CHIP_ERROR ChefDelegate::HandleGetApplicationVersion(app::AttributeValueEncoder & aEncoder)
@@ -66,31 +64,9 @@ CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder &
     });
 }
 
-void AddApplicationBasicDelegateForEndpoint(EndpointId endpoint, uint16_t catalogVendorId, const char * applicationId,
-                                            const char * applicationName, const char * applicationVersion,
-                                            const Span<const uint16_t> allowedVendorList)
+void ChefDelegate::Register()
 {
-    for (auto it = gDelegateList.begin(); it != gDelegateList.end(); ++it)
-    {
-        if (it->GetEndpointId() == endpoint)
-        {
-            ChipLogError(Zcl, "ApplicationBasic::ChefDelegate already exists for endpoint %d", endpoint);
-            return;
-        }
-        if (CatalogVendorApp(catalogVendorId, applicationId).Matches(*it->GetCatalogVendorApp()))
-        {
-            ChipLogError(Zcl, "ApplicationBasic::ChefDelegate already exists for [VendorId, AppId] [%d, %s]", catalogVendorId,
-                         applicationId);
-            return;
-        }
-    }
-
-    // Default values for Chef
-    // Using values that match common Chef test cases or defaults
-    ChefDelegate * delegate = Platform::New<ChefDelegate>(endpoint, catalogVendorId, applicationId, applicationName,
-                                                          applicationVersion, ); // applicationVersion
-    gDelegateList.PushBack(delegate);
-    SetDefaultDelegate(endpoint, delegate);
+    SetDefaultDelegate(mEndpointId, this);
 }
 
 } // namespace Chef
@@ -98,3 +74,5 @@ void AddApplicationBasicDelegateForEndpoint(EndpointId endpoint, uint16_t catalo
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT

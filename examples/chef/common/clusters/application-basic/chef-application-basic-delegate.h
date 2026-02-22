@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
-#include <lib/support/IntrusiveList.h>
-#include <string>
+
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace chip {
 namespace app {
@@ -28,7 +28,7 @@ namespace Clusters {
 namespace ApplicationBasic {
 namespace Chef {
 
-class ChefDelegate : public Delegate, public chip::IntrusiveListNodeBase<>
+class ChefDelegate : public Delegate
 {
 public:
     ChefDelegate(EndpointId endpointId, uint16_t catalogVendorId, const char * applicationId, const char * applicationName,
@@ -39,26 +39,23 @@ public:
     CHIP_ERROR HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder) override;
 
     EndpointId GetEndpointId() { return mEndpointId; }
-    const char * GetApplicationId() { return mApplicationName.c_str(); }
+
+    void Register();
 
 private:
     EndpointId mEndpointId;
-    std::string mApplicationName;
+    const char * mApplicationName;
     uint16_t mVendorId;
-    std::string mVendorName;
+    const char * mVendorName;
     uint16_t mProductId;
     std::string mApplicationVersion;
+    Span<const uint16_t> mAllowedVendorList;
 };
-
-/**
- * @brief Adds an Application Basic delegate for the given endpoint.
- *
- * @param endpoint The endpoint to add the delegate for.
- */
-void AddApplicationBasicDelegateForEndpoint(EndpointId endpoint);
 
 } // namespace Chef
 } // namespace ApplicationBasic
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT

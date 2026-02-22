@@ -88,6 +88,10 @@ void InitIdentifyCluster()
 #include "content-launch/chef-content-launch-delegate.h"
 #endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
 
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "application-basic/chef-application-basic-delegate.h"
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -589,13 +593,27 @@ void GenericSwitchInit()
  */
 void CastingvideoplayerContentappInit()
 {
-    if (DeviceTypes::EndpointHasDeviceType(1, Device::kCastingVideoPlayerDeviceTypeId))
+    chip::EndpointId kPlatformEndpoint = 1;
+    chip::EndpointId kAppAEndpoint     = 2;
+    if (DeviceTypes::EndpointHasDeviceType(kPlatformEndpoint, Device::kCastingVideoPlayerDeviceTypeId) &&
+        DeviceTypes::EndpointHasDeviceType(kAppAEndpoint, Device::kContentAppDeviceTypeId))
     {
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
-        ContentLauncher::Chef::ChefDelegate * contentLauncherPlatformDelegate =
-            Platform::New<ContentLauncher::Chef::ChefDelegate>(1);
-        contentLauncherPlatformDelegate->Register();
+        Platform::New<ContentLauncher::Chef::ChefDelegate>(kPlatformEndpoint)->Register();
+        Platform::New<ContentLauncher::Chef::ChefDelegate>(kAppAEndpoint)->Register();
 #endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        static constexpr uint16_t kAllowedVendorList[] = { 0xFFF1 };
+        ApplicationBasic::Chef::ChefDelegate * appABasic =
+            Platform::New<ApplicationBasic::Chef::ChefDelegate>(kAppAEndpoint,                            // Endpoint ID
+                                                                0xFFF1,                                   // catalogVendorId
+                                                                "Application_A_ID",                       // applicationId
+                                                                "Application_A_Name",                     // applicationName
+                                                                "Version_1",                              // applicationVersion
+                                                                Span<const uint16_t>(kAllowedVendorList), // allowedVendorList
+            );
+        appABasic->Register();
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
     }
 }
 
