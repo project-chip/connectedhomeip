@@ -69,7 +69,7 @@ CHIP_ERROR ChefDelegate::HandleGetAllowedVendorList(app::AttributeValueEncoder &
 
 CHIP_ERROR ChefDelegate::HandleGetVendorName(app::AttributeValueEncoder & aEncoder)
 {
-    ChipLogProgress(Zcl, "ChefDelegate::HandleGetVendorName %d", mVendorName);
+    ChipLogProgress(Zcl, "ChefDelegate::HandleGetVendorName %s", mVendorName);
     return aEncoder.Encode(chip::CharSpan(mVendorName, strlen(mVendorName)));
 }
 
