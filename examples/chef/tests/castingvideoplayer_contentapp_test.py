@@ -41,11 +41,40 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(3, "[TC_CASTINGVIDEOPLAYER] Test wake on lan."),
                 TestStep(4, "[TC_CASTINGVIDEOPLAYER] Test channel."),
                 TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off."),
-                TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher.")]
+                TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher."),
+                TestStep(7, "[TC_CONTENTAPP_A] Test application basic.")]
 
     async def _read_on_off(self, endpoint):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
+
+    async def _read_application_basic_vendor_name(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.VendorName)
+
+    async def _read_application_basic_vendor_id(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.VendorID)
+
+    async def _read_application_basic_application_name(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.ApplicationName)
+
+    async def _read_application_basic_product_id(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.ProductID)
+
+    async def _read_application_basic_application(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.Application)
+
+    async def _read_application_basic_application_version(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.ApplicationVersion)
+
+    async def _read_application_basic_allowed_vendor_list(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.AllowedVendorList)
 
     async def _read_media_playback_current_state(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -342,6 +371,36 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         feature_map = await self._read_content_launcher_feature_map(endpoint)
         asserts.assert_equal(feature_map, 3)
 
+    async def application_basic_test(self, endpoint):
+        # Test VendorName
+        vendor_name = await self._read_application_basic_vendor_name(endpoint)
+        asserts.assert_equal(vendor_name, "TEST_VENDOR")
+
+        # Test VendorID
+        vendor_id = await self._read_application_basic_vendor_id(endpoint)
+        asserts.assert_equal(vendor_id, 0xFFF1)
+
+        # Test ApplicationName
+        app_name = await self._read_application_basic_application_name(endpoint)
+        asserts.assert_equal(app_name, "Application_A_Name")
+
+        # Test ProductID
+        product_id = await self._read_application_basic_product_id(endpoint)
+        asserts.assert_equal(product_id, 32768)
+
+        # Test Application
+        application = await self._read_application_basic_application(endpoint)
+        asserts.assert_equal(application.catalogVendorID, 0xFFF1)
+        asserts.assert_equal(application.applicationID, "Application_A_ID")
+
+        # Test ApplicationVersion
+        app_version = await self._read_application_basic_application_version(endpoint)
+        asserts.assert_equal(app_version, "Version_1")
+
+        # Test AllowedVendorList
+        allowed_vendors = await self._read_application_basic_allowed_vendor_list(endpoint)
+        asserts.assert_equal(allowed_vendors, [0xFFF1])
+
     @async_test_body
     async def test_TC_CASTINGVIDEOPLAYER(self):
         """Run all steps."""
@@ -367,6 +426,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         await self.content_launcher_unavailable_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_launch_url_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_attribute_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+
+        self.step(7)
+        await self.application_basic_test(2)
 
 
 if __name__ == "__main__":
