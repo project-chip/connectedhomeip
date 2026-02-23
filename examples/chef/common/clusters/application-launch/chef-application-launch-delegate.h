@@ -70,7 +70,7 @@ public:
 
     CHIP_ERROR AddAppDelegate(AppDelegate * delegate); // Adds a new app to the list of managed apps
 
-    AppDelegate * FindAppDelegate(const Application & application) {}
+    AppDelegate * FindAppDelegate(const Application & application);
 
     void Register();
 

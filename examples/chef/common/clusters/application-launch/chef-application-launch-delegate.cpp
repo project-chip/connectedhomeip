@@ -55,7 +55,7 @@ void PlatformDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseTyp
     }
     else if (app != mCurrentApp) // Launching a new app
     {
-        ChipLogProgress("ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp : Launching new app");
+        ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp : Launching new app");
         if (mCurrentApp != nullptr)
         {
             mCurrentApp->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus);
@@ -99,7 +99,7 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
             status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden ||
             status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
         {
-            app->SetApplicationStatus(ApplicationStatusEnum::kStopped);
+            app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kStopped);
             MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
                                                    ApplicationBasic::Attributes::Status::Id);
         }
@@ -116,7 +116,7 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
 
 void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp (%s , %s)", application.catalogVendorID,
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp (%d , %s)", application.catalogVendorID,
                     application.applicationID.data());
     LauncherResponseType response;
 
@@ -132,7 +132,7 @@ void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType>
         if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
             status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
         {
-            app->SetApplicationStatus(ApplicationStatusEnum::kActiveHidden);
+            app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
             MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
                                                    ApplicationBasic::Attributes::Status::Id);
         }
