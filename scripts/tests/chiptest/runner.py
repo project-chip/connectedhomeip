@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import logging
 import os
-from pathlib import Path
 import pty
 import queue
 import re
@@ -25,8 +24,8 @@ import subprocess
 import sys
 import threading
 from contextlib import suppress
+from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Protocol
-
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture
