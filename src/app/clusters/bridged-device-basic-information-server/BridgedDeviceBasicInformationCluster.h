@@ -89,7 +89,7 @@ public:
     BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
                                          Context && context) :
         DefaultServerCluster({ endpointId, BridgedDeviceBasicInformation::Id }),
-        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mTimerDelegate(context.timerDelegate),
+        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)),
         mClusterContext(std::move(context))
 
     {}
@@ -152,7 +152,6 @@ private:
 
     RequiredData mRequiredData;
     const FixedData mFixedData;
-    TimerDelegate & mTimerDelegate;
     const Context mClusterContext;
 
     std::optional<uint32_t> mStayActiveDurationMs; // Present only when pending active

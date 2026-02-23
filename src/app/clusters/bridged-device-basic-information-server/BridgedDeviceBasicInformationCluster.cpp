@@ -24,6 +24,8 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/Span.h>
 
+#include <algorithm>
+
 using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 using chip::Protocols::InteractionModel::Status;
 
@@ -291,23 +293,23 @@ void BridgedDeviceBasicInformationCluster::TimerFired()
 
 void BridgedDeviceBasicInformationCluster::StartPendingActiveTimer(System::Clock::Milliseconds32 timeout)
 {
-    System::Clock::Timestamp nextTimeout = mTimerDelegate.GetCurrentMonotonicTimestamp() + timeout;
+    System::Clock::Timestamp nextTimeout = mClusterContext.timerDelegate.GetCurrentMonotonicTimestamp() + timeout;
 
     // extending the timeout (or no timeout at all...)
     VerifyOrReturn(nextTimeout > mPendingActiveExpiryTime);
 
     // start a new timer
     CancelPendingActiveTimer();
-    LogErrorOnFailure(mTimerDelegate.StartTimer(this, timeout));
+    LogErrorOnFailure(mClusterContext.timerDelegate.StartTimer(this, timeout));
     mPendingActiveExpiryTime = nextTimeout;
 }
 
 void BridgedDeviceBasicInformationCluster::CancelPendingActiveTimer()
 {
-    mTimerDelegate.CancelTimer(this);
+    mClusterContext.timerDelegate.CancelTimer(this);
 
     // mark as "expired now" to not assume there is a pending timer in `Start`
-    mPendingActiveExpiryTime = mTimerDelegate.GetCurrentMonotonicTimestamp();
+    mPendingActiveExpiryTime = mClusterContext.timerDelegate.GetCurrentMonotonicTimestamp();
 }
 
 void BridgedDeviceBasicInformationCluster::NotifyDeviceActive()
