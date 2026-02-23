@@ -1,0 +1,68 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
+
+source_set("clusters") {
+  public_deps = [
+    # keep-sorted: start
+    "access-control-server",
+    "administrator-commissioning-server",
+    "basic-information",
+    "boolean-state-configuration-server",
+    "boolean-state-server",
+    "camera-av-settings-user-level-management-server",
+    "chime-server",
+    "descriptor",
+    "general-commissioning-server",
+    "general-diagnostics-server",
+    "group-key-mgmt-server",
+    "groupcast",
+    "groups-server",
+    "identify-server",
+    "level-control",
+    "network-commissioning",
+    "occupancy-sensor-server",
+    "on-off-server",
+    "operational-credentials-server",
+    "scenes-server",
+    "software-diagnostics-server",
+    "tls-certificate-management-server",
+    "tls-client-management-server",
+    "webrtc-transport-provider-server",
+    "wifi-network-diagnostics-server",
+
+    # keep-sorted: end
+  ]
+
+  if (chip_device_platform != "ameba") {
+    # Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
+    # these get pulled via LWIP and end up overriding things like true/false/isalpha by macros.
+    #
+    # This results in errors in libraries used by these clusters, like:
+    #
+    # INFO    In file included from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib_rtl8721d.h:25,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/platform/platform_stdlib.h:39,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/api/network/include/lwipopts.h:17,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/opt.h:51,
+    # INFO                     from /opt/ameba/ambd_sdk_with_chip_non_NDA/component/common/network/lwip/lwip_v2.1.2/src/include/lwip/errno.h:40,
+    # INFO                     from ../../../config/ameba/third_party/connectedhomeip/third_party/uriparser/repo/src/UriMemory.c:56:
+    # INFO    /__w/connectedhomeip/connectedhomeip/.environment/cipd/packages/arm/arm-none-eabi/include/ctype.h:14:5: error: expected identifier or '(' before 'int'
+    # INFO       14 | int isalpha (int __c);
+    # INFO          |     ^~~~~~~
+    # INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
+    # INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
+    public_deps += [ "push-av-stream-transport-server" ]
+  }
+}
