@@ -389,7 +389,7 @@ Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
             if (epIter->Count() <= kMaxCommandEndpoints)
             {
                 GroupEndpoint ep;
-                while (epIter->Next(ep))
+                while (epIter->Next(ep) && (endpoints->count < kMaxCommandEndpoints))
                 {
                     endpoints->entries[endpoints->count++] = ep.endpoint_id;
                 }
