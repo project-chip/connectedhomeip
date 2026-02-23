@@ -48,7 +48,7 @@ source_set("clusters") {
 
   if (chip_device_platform != "ameba") {
     # Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
-    # these get pulled via LWIP and end up overriding things like true/false/isapha by macros.
+    # these get pulled via LWIP and end up overriding things like true/false/isalpha by macros.
     #
     # This results in errors in libraries used by these clusters, like:
     #
