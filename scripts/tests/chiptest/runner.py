@@ -34,12 +34,12 @@ log = logging.getLogger(__name__)
 
 try:
     # Import all symbols used downstream not only those we use ourselves
-    from matter.testing.subprocess import SubprocessInfo, SubprocessKind  # noqa: F401
+    from matter.testing.tasks import SubprocessInfo, SubprocessKind  # noqa: F401
 except ImportError:
     fallback_import_path = (Path(__file__).parent / "../../../src/python_testing/matter_testing_infrastructure").resolve()
     if fallback_import_path not in sys.path:
         sys.path.insert(0, str(fallback_import_path))
-    from matter.testing.subprocess import SubprocessInfo, SubprocessKind  # noqa: F401
+    from matter.testing.tasks import SubprocessInfo, SubprocessKind  # noqa: F401
 
 
 class LogPipe(threading.Thread):
