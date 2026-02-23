@@ -16,16 +16,17 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 import pty
 import queue
 import re
 import shlex
 import subprocess
+import sys
 import threading
 from contextlib import suppress
 from typing import IO, TYPE_CHECKING, Any, Protocol
 
-import python_path
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture
@@ -36,8 +37,10 @@ try:
     # Import all symbols used downstream not only those we use ourselves
     from matter.testing.subprocess import SubprocessInfo, SubprocessKind  # noqa: F401
 except ImportError:
-    with python_path.PythonPath("../../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-        from matter.testing.subprocess import SubprocessInfo
+    fallback_import_path = (Path(__file__).parent / "../../../src/python_testing/matter_testing_infrastructure").resolve()
+    if fallback_import_path not in sys.path:
+        sys.path.insert(0, str(fallback_import_path))
+    from matter.testing.subprocess import SubprocessInfo, SubprocessKind  # noqa: F401
 
 
 class LogPipe(threading.Thread):
