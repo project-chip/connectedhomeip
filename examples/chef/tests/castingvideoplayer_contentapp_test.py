@@ -47,7 +47,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher."),
                 TestStep(7, "[TC_CONTENTAPP_A] Test application basic."),
                 TestStep(8, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using platform endpoint."),
-                TestStep(9, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint.")]
+                TestStep(9, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
+                TestStep(10, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
+                TestStep(11, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -57,14 +59,14 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.Status)
 
-    async def cuj_launch_stop_app_a_using_platform_endpoint(self):
+    async def cuj_launch_and_stop_app_a(self, command_on_endpoint):
         app_a = Clusters.Objects.ApplicationLauncher.Structs.ApplicationStruct(
             catalogVendorID=self.APP_A_VENDOR_ID, applicationID=self.APP_A_ID)
 
         # 1. Launch App A via Platform
         response = await self.send_single_cmd(
             cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(application=app_a),
-            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+            endpoint=command_on_endpoint
         )
         asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
@@ -80,7 +82,7 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         # 4. Stop App A via Platform
         response = await self.send_single_cmd(
             cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(application=app_a),
-            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+            endpoint=command_on_endpoint
         )
         asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
@@ -92,14 +94,14 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
         asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
 
-    async def cuj_launch_hide_stop_app_a_using_platform_endpoint(self):
+    async def cuj_launch_hide_and_stop_app_a(self, command_on_endpoint):
         app_a = Clusters.Objects.ApplicationLauncher.Structs.ApplicationStruct(
             catalogVendorID=self.APP_A_VENDOR_ID, applicationID=self.APP_A_ID)
 
         # 1. Launch App A via Platform
         response = await self.send_single_cmd(
             cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(application=app_a),
-            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+            endpoint=command_on_endpoint
         )
         asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
@@ -115,7 +117,7 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         # 4. Hide App A via Platform
         response = await self.send_single_cmd(
             cmd=Clusters.Objects.ApplicationLauncher.Commands.HideApp(application=app_a),
-            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+            endpoint=command_on_endpoint
         )
         asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
@@ -130,7 +132,7 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         # 7. Stop App A via Platform
         response = await self.send_single_cmd(
             cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(application=app_a),
-            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+            endpoint=command_on_endpoint
         )
         asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
@@ -529,11 +531,16 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         await self.application_basic_test(2)
 
         self.step(8)
-        await self.cuj_launch_stop_app_a_using_platform_endpoint()
+        await self.cuj_launch_and_stop_app_a(command_on_endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT)
 
         self.step(9)
-        await self.cuj_launch_hide_stop_app_a_using_platform_endpoint()
+        await self.cuj_launch_hide_and_stop_app_a(command_on_endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT)
 
+        self.step(10)
+        await self.cuj_launch_and_stop_app_a(command_on_endpoint=self.APP_A_ENDPOINT)
+
+        self.step(11)
+        await self.cuj_launch_hide_and_stop_app_a(command_on_endpoint=self.APP_A_ENDPOINT)
 
 if __name__ == "__main__":
     default_matter_test_main()
