@@ -116,12 +116,12 @@ public:
     ChefDelegate(const EndpointId endpointId, const uint32_t featureMap, const uint16_t clusterRevision,
                  const uint32_t supportedStreamingProtocols, const Span<const CharSpan> acceptHeaderList,
                  const Span<const ContentEntry> launchableContent) :
-        mEndpointId(endpointId), mFeaturemap(featureMap), mClusterRevision(clusterRevision),
-        mSupportedStreamingProtocols(supportedStreamingProtocols), mAcceptHeaderList(acceptHeaderList),
-        mLaunchableContent(launchableContent) {};
+        mEndpointId(endpointId),
+        mFeaturemap(featureMap), mClusterRevision(clusterRevision), mSupportedStreamingProtocols(supportedStreamingProtocols),
+        mAcceptHeaderList(acceptHeaderList), mLaunchableContent(launchableContent){};
     ChefDelegate(EndpointId endpointId) :
         ChefDelegate(endpointId, kEndpointFeatureMap, kClusterRevision, kSupportedStreamingProtocols,
-                     Span<const CharSpan>(kAcceptHeaderList), Span<const ContentEntry>(kLaunchableContent)) {};
+                     Span<const CharSpan>(kAcceptHeaderList), Span<const ContentEntry>(kLaunchableContent)){};
     ~ChefDelegate() = default;
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
