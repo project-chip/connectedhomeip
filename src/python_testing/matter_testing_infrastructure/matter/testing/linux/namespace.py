@@ -92,7 +92,7 @@ class NetworkResource:
         try:
             subprocess.run(shlex.split(cmd), check=check)
         except subprocess.CalledProcessError as e:
-            raise RuntimeError("Failed to execute '{cmd}'. Are you using --privileged if running in docker?") from e
+            raise RuntimeError(f"Failed to execute '{cmd}'. Are you using --privileged if running in docker?") from e
 
     def setup(self):
         if not self.exists:

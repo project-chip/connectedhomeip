@@ -22,7 +22,7 @@ import subprocess
 import threading
 from typing import Optional, Pattern
 
-from chiptest.linux import SubprocessKind
+from chiptest.runner import SubprocessKind
 
 from .namespace import IsolatedNetworkNamespace
 
