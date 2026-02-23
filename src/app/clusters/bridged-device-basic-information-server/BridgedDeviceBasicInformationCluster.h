@@ -36,7 +36,11 @@ namespace chip::app::Clusters {
 /// Since it is intended for bridge uses (assumed higher resources devices)
 /// it uses std::string and similar data types for ease of use.
 ///
-/// Note: current implementation DOES NOT generate startup/shutdown events
+/// Note: StartUp/ShutDown events are intentionally NOT supported.
+///   - Node-wide startup/shutdown events are provided by the Node's Basic Information cluster.
+///   - Per-endpoint (bridged device) lifecycle is detectable via the Descriptor cluster.
+///   - They are marked as Optional (O) in the Bridged Device Basic Information specification.
+///
 /// Note: DeviceLocation attribute (0x0017) is not supported as it is not in the standard Bridged Device Basic Information Cluster
 /// XML.
 class BridgedDeviceBasicInformationCluster : public DefaultServerCluster, public TimerContext

@@ -315,6 +315,27 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     EXPECT_FALSE(mMockTimer.IsTimerActive(&cluster));
 }
 
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestNotifyDeviceActiveWithoutRequestedDuration)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "no-icd",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    // Call NotifyDeviceActive when not in pending state
+    // Should NOT generate an event and NOT crash
+    cluster.NotifyDeviceActive();
+
+    EXPECT_EQ(mContext.EventsGenerator().GetNextEvent(), std::nullopt);
+}
+
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestShutdownCancelsTimer)
 {
     TestBridgedDeviceIcdDelegate icdDelegate;
@@ -657,6 +678,25 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabel)
     std::string tooLongLabel(33, 'b');
     EXPECT_EQ(cluster.SetNodeLabel(CharSpan::fromCharString(tooLongLabel.c_str())), Status::ConstraintError);
     EXPECT_TRUE(cluster.GetNodeLabel().empty()); // Should not have changed
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabelEmpty)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId  = "label-test",
+                                                     .nodeLabel = "Initial",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+
+    // Test setting to empty
+    EXPECT_EQ(cluster.SetNodeLabel(""_span), Status::Success);
+    EXPECT_EQ(cluster.GetNodeLabel(), "");
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetConfigurationVersion)
