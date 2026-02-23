@@ -25,7 +25,7 @@ import subprocess
 import sys
 import time
 
-from chiptest.runner import SubprocessKind
+from matter.testing.subprocess import SubprocessKind
 
 log = logging.getLogger(__name__)
 

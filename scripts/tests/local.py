@@ -37,20 +37,28 @@ import colorama
 import coloredlogs
 import tabulate
 import yaml
-from chiptest.runner import SubprocessKind
+import python_path
 
+
+fallback_import_path = "../../src/python_testing/matter_testing_infrastructure"
+
+# These may fail if python environment is not built yet
 try:
-    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
+    from matter.testing.metadata import extract_runs_args
 except ImportError:
     # Fallback to manual import from source tree
-    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
-        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
-    if _MATTER_TESTING_PATH not in sys.path:
-        sys.path.insert(0, _MATTER_TESTING_PATH)
-    try:
-        from matter.testing.metadata import extract_runs_args
-    except ImportError:
-        extract_runs_args = None  # filtering by app (--app-filter) will not work.
+    with python_path.PythonPath(fallback_import_path, relative_to=__file__):
+        try:
+            from matter.testing.metadata import extract_runs_args
+        except ImportError:
+            extract_runs_args = None  # filtering by app (--app-filter) will not work.
+
+try:
+    from matter.testing.subprocess import SubprocessKind
+except ImportError:
+    with python_path.PythonPath(fallback_import_path, relative_to=__file__):
+        from matter.testing.subprocess import SubprocessKind
+
 
 log = logging.getLogger(__name__)
 
