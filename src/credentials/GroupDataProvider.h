@@ -230,6 +230,12 @@ public:
         mMaxGroupsPerFabric(maxGroupsPerFabric), mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
     {}
 
+    enum class GroupCleanupPolicy
+    {
+        kDeleteGroupIfEmpty, // Default behavior for legacy Groups
+        kKeepGroupIfEmpty    // Required for Groupcast Sender feature
+    };
+
     virtual ~GroupDataProvider() = default;
 
     // Not copyable
@@ -265,6 +271,10 @@ public:
     // Endpoints
     virtual bool HasEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)          = 0;
     virtual CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)    = 0;
+    virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                                      GroupCleanupPolicy cleanupPolicy)                                   = 0;
+    virtual CHIP_ERROR RemoveEndpointAllGroups(FabricIndex fabric_index, EndpointId endpoint_id,
+                                               GroupCleanupPolicy cleanupPolicy)                          = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id)                   = 0;
     virtual CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id)                        = 0;

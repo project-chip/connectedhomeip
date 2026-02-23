@@ -1100,7 +1100,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
 }
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id,
-                                                 chip::EndpointId endpoint_id)
+                                                 chip::EndpointId endpoint_id, GroupCleanupPolicy cleanupPolicy)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -1135,11 +1135,26 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
         return group.Save(mStorage);
     }
 
-    // No more endpoints, remove the group
+    // We are removing the last endpoint of the group.
+    // Check if we should keep the group with no endpoints or not(Groupcast Sender usecase)
+    if (cleanupPolicy == GroupCleanupPolicy::kKeepGroupIfEmpty)
+    {
+        group.endpoint_count = 0;
+        return group.Save(mStorage);
+    }
+
+    // No more endpoints and empty groups are not allowed: remove the group.
     return RemoveGroupInfoAt(fabric_index, group.index);
 }
 
-CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id,
+                                                 chip::EndpointId endpoint_id)
+{
+    return RemoveEndpoint(fabric_index, group_id, endpoint_id, GroupCleanupPolicy::kDeleteGroupIfEmpty);
+}
+
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpointAllGroups(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id,
+                                                          GroupCleanupPolicy cleanupPolicy)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
@@ -1161,7 +1176,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
         if (endpoint.Find(mStorage, fabric, group, endpoint_id))
         {
             // Endpoint found in group
-            ReturnErrorOnFailure(RemoveEndpoint(fabric_index, group.group_id, endpoint_id));
+            ReturnErrorOnFailure(RemoveEndpoint(fabric_index, group.group_id, endpoint_id, cleanupPolicy));
         }
 
         group.group_id = group.next;
@@ -1169,6 +1184,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)
+{
+    return RemoveEndpointAllGroups(fabric_index, endpoint_id, GroupCleanupPolicy::kDeleteGroupIfEmpty);
 }
 
 GroupDataProvider::GroupInfoIterator * GroupDataProviderImpl::IterateGroupInfo(chip::FabricIndex fabric_index)
