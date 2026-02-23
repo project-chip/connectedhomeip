@@ -24,7 +24,6 @@
 #include <clusters/BridgedDeviceBasicInformation/Structs.h>
 #include <lib/support/TimerDelegate.h>
 
-#include <chrono>
 #include <optional>
 #include <string>
 #include <utility>
