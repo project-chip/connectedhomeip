@@ -302,6 +302,9 @@ void BridgedDeviceBasicInformationCluster::StartPendingActiveTimer(System::Clock
 void BridgedDeviceBasicInformationCluster::CancelPendingActiveTimer()
 {
     mTimerDelegate.CancelTimer(this);
+
+    // mark as "expired now" to not assume there is a pending timer in `Start`
+    mPendingActiveExpiryTime = mTimerDelegate.GetCurrentMonotonicTimestamp();
 }
 
 void BridgedDeviceBasicInformationCluster::NotifyDeviceActive()
