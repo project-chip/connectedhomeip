@@ -245,7 +245,8 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("a{sv}")
         async def Scan(self, args: DictVariantT) -> None:
-            pass
+            await self.State.set_async("scanning")
+
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
@@ -253,11 +254,16 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("o")
         async def SelectNetwork(self, path: str) -> None:
+            log.debug("SelectNetwork called with path=%s", path)
+
             async def associate():
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
                 self.mock.networking.app_link.up()
                 await self.State.set_async("completed")
+
+                self.ScanDone.emit(True)
+
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
 
@@ -473,6 +479,10 @@ class WpaSupplicantMock(threading.Thread):
         def PropertiesChanged(self) -> dict:
             raise NotImplementedError
 
+        @sdbus.dbus_signal_async("b")
+        def ScanDone(self) -> bool:
+            raise NotImplementedError
+
         # =====================================================================
         # Properties
         # =====================================================================
@@ -496,6 +506,10 @@ class WpaSupplicantMock(threading.Thread):
         @sdbus.dbus_property_async("s")
         def CurrentAuthMode(self) -> str:
             return "WPA2-PSK"
+
+        @sdbus.dbus_property_async("ao")
+        def BSSs(self) -> list:
+            return []
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
                      interface_name="fi.w1.wpa_supplicant1.Network"):
