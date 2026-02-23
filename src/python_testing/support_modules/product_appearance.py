@@ -23,7 +23,7 @@ from matter.testing.runner import TestStep
 
 
 class ProductAppearanceBase(MatterBaseTest):
-    def steps(self) -> list[TestStep]:
+    def steps(self, test=None) -> list[TestStep]:
         return [
             TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
             TestStep(1, "TH reads ProductAppearance attribute from the DUT.",
