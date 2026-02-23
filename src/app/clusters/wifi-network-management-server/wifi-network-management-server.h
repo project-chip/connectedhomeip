@@ -17,36 +17,5 @@
 
 #pragma once
 
-#include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-
-namespace chip::app::Clusters {
-
-/// Compatibility wrapper for WiFiNetworkManagementCluster for ZAP-based applications.
-///
-/// Note that this cluster does not support automatic instantiation of the cluster
-/// server even in ZAP-based applications; the application code is responsible for
-/// instantiating and registering the cluster manually.
-///
-/// @code
-/// std::optional<WiFiNetworkManagementServer> gServer;
-/// void emberAfWiFiNetworkManagementClusterInitCallback(EndpointId endpoint)
-/// {
-///     gServer.emplace(endpoint).Init();
-/// }
-/// @endcode
-class WiFiNetworkManagementServer : public WiFiNetworkManagementCluster
-{
-public:
-    using WiFiNetworkManagementCluster::WiFiNetworkManagementCluster;
-
-    ~WiFiNetworkManagementServer();
-
-    /// Registers this cluster with the CodegenDataModelProvider.
-    CHIP_ERROR Init();
-
-private:
-    ServerClusterRegistration mRegistration{ *this };
-};
-
-} // namespace chip::app::Clusters
+// Compatibility header - new code should include CodegenIntegration.h directly.
+#include <app/clusters/wifi-network-management-server/CodegenIntegration.h>
