@@ -34,8 +34,11 @@ public:
 
     WiFiNetworkManagementCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, Id }) {}
 
-    CHIP_ERROR ClearNetworkCredentials();
+    /// Sets the Wi-Fi credentials to expose via this cluster.
+    /// The application is responsible for calling this method during startup,
+    /// and whenever the Wi-Fi credentials are modified externally.
     CHIP_ERROR SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase);
+    CHIP_ERROR ClearNetworkCredentials();
 
     WiFiNetworkManagementCluster(WiFiNetworkManagementCluster const &)             = delete;
     WiFiNetworkManagementCluster & operator=(WiFiNetworkManagementCluster const &) = delete;

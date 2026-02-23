@@ -42,7 +42,7 @@ public:
 
     ~WiFiNetworkManagementServer();
 
-    /// Register this cluster with the code-driven data model provider.
+    /// Registers this cluster with the CodegenDataModelProvider.
     CHIP_ERROR Init();
 
 private:
