@@ -233,7 +233,7 @@ BridgedDeviceBasicInformationCluster::InvokeCommand(const DataModel::InvokeReque
             return mClusterContext.icdDelegate->OnEnterPendingActive();
         }
 
-        // already in active state, may need to sleep longer. The logic is:
+        // already in pending active state, may need to sleep longer. The logic is:
         //   - we need to keep the "max" stay active duration
         //   - we need to potentially extend our timeout
         mStayActiveDurationMs = std::max(*mStayActiveDurationMs, commandData.stayActiveDuration);
