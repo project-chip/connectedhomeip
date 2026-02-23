@@ -286,7 +286,7 @@ void AppDelegate::Register()
 
 bool AppDelegate::Match(const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::Match (%d , %.*s)", application.catalogVendorID,
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::Match Checking (%d , %.*s)", application.catalogVendorID,
                     static_cast<int>(application.applicationID.size()), application.applicationID.data());
     ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
     if (vendorApp->catalogVendorId != application.catalogVendorID)
@@ -296,6 +296,7 @@ bool AppDelegate::Match(const Application & application)
     {
         return false;
     }
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::Match returning true");
     return true;
 }
 
