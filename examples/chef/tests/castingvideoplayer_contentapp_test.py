@@ -46,7 +46,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off."),
                 TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher."),
                 TestStep(7, "[TC_CONTENTAPP_A] Test application basic."),
-                TestStep(8, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using platform endpoint.")]
+                TestStep(8, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using platform endpoint."),
+                TestStep(9, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -88,6 +89,56 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         asserts.assert_equal(current_app, Clusters.Types.NullValue)
 
         # 6. Verify Status on App A Endpoint is Stopped
+        status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
+        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
+
+    async def cuj_launch_hide_stop_app_a_using_platform_endpoint(self):
+        app_a = Clusters.Objects.ApplicationLauncher.Structs.ApplicationStruct(
+            catalogVendorID=self.APP_A_VENDOR_ID, applicationID=self.APP_A_ID)
+
+        # 1. Launch App A via Platform
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(application=app_a),
+            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+
+        # 2. Verify Status on App A Endpoint is ActiveVisibleFocus
+        status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
+        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveVisibleFocus)
+
+        # 3. Verify CurrentApp on Platform Endpoint
+        current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        asserts.assert_equal(current_app.application.catalogVendorID, self.APP_A_VENDOR_ID)
+        asserts.assert_equal(current_app.application.applicationID, self.APP_A_ID)
+
+        # 4. Hide App A via Platform
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.HideApp(application=app_a),
+            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+
+        # 5. Verify CurrentApp on Platform Endpoint is Null
+        current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        asserts.assert_equal(current_app, Clusters.Types.NullValue)
+
+        # 6. Verify Status on App A Endpoint is Stopped
+        status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
+        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveHidden)
+
+        # 7. Stop App A via Platform
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(application=app_a),
+            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+
+        # 8. Verify CurrentApp on Platform Endpoint is Null
+        current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        asserts.assert_equal(current_app, Clusters.Types.NullValue)
+
+        # 9. Verify Status on App A Endpoint is Stopped
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
         asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
 
@@ -479,6 +530,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(8)
         await self.cuj_launch_stop_app_a_using_platform_endpoint()
+
+        self.step(9)
+        await self.cuj_launch_hide_stop_app_a_using_platform_endpoint()
 
 
 if __name__ == "__main__":
