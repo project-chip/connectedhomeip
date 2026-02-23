@@ -7,11 +7,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-using GroupDataProvider = Credentials::GroupDataProvider;
-using GroupInfo         = Credentials::GroupDataProvider::GroupInfo;
-using GroupEndpoint     = Credentials::GroupDataProvider::GroupEndpoint;
-using GroupInfoIterator = Credentials::GroupDataProvider::GroupInfoIterator;
-using EndpointIterator  = Credentials::GroupDataProvider::EndpointIterator;
+using namespace chip::Credentials;
+using GroupDataProvider = GroupDataProvider;
+using GroupInfo         = GroupDataProvider::GroupInfo;
+using GroupEndpoint     = GroupDataProvider::GroupEndpoint;
+using GroupInfoIterator = GroupDataProvider::GroupInfoIterator;
+using EndpointIterator  = GroupDataProvider::EndpointIterator;
 
 GroupcastLogic::GroupcastLogic(GroupcastContext & context) : mContext(context), mFeatures()
 {
@@ -391,7 +392,10 @@ Status GroupcastLogic::RemoveGroupEndpoint(FabricIndex fabric_index, GroupId gro
 {
     GroupDataProvider & groups = Provider();
 
-    CHIP_ERROR err = groups.RemoveEndpoint(fabric_index, group_id, endpoint_id, mFeatures.Has(Groupcast::Feature::kSender));
+    CHIP_ERROR err = groups.RemoveEndpoint(fabric_index, group_id, endpoint_id,
+                                           mFeatures.Has(Groupcast::Feature::kSender)
+                                               ? GroupDataProvider::GroupCleanupPolicy::kKeepGroupIfEmpty
+                                               : GroupDataProvider::GroupCleanupPolicy::kDeleteGroupIfEmpty);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     VerifyOrReturnError(endpoints != nullptr, Status::Success);
 
@@ -408,7 +412,7 @@ Status GroupcastLogic::RemoveGroupEndpoint(FabricIndex fabric_index, GroupId gro
     return Status::Success;
 }
 
-void GroupcastLogic::OnGroupAdded(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group)
+void GroupcastLogic::OnGroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
 {
     (void) fabric_index;
     (void) new_group;
@@ -421,7 +425,7 @@ void GroupcastLogic::OnGroupAdded(FabricIndex fabric_index, const Credentials::G
     }
 }
 
-void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group)
+void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group)
 {
     (void) fabric_index;
     (void) old_group;
