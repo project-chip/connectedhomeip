@@ -26,6 +26,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -309,3 +311,5 @@ bool AppDelegate::Match(const Application & application)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT

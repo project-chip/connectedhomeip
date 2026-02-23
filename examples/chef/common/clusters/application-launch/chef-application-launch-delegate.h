@@ -24,7 +24,7 @@
 #include <app/util/config.h>
 #include <lib/support/IntrusiveList.h>
 
-// #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using chip::EndpointId;
 using chip::Span;
@@ -110,7 +110,7 @@ public:
 
     void SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum status) { mAppBasicDelegate->SetApplicationStatus(status); }
 
-    ApplicationBasic::ApplicationStatusEnum GetApplicationStatus() { return mAppBasicDelegate->GetApplicationStatus(); }
+    ApplicationBasic::ApplicationStatusEnum GetApplicationStatus() const { return mAppBasicDelegate->GetApplicationStatus(); }
 
 private:
     EndpointId mEndpointId;
@@ -124,4 +124,4 @@ private:
 } // namespace app
 } // namespace chip
 
-// #endif
+#endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT

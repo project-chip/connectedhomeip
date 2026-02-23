@@ -149,8 +149,6 @@ private:
     Span<const ContentEntry> mLaunchableContent;
 };
 
-void AddDefaultDelegateForEndpioint(EndpointId endpoint);
-
 } // namespace Chef
 } // namespace ContentLauncher
 } // namespace Clusters

@@ -21,7 +21,7 @@
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/util/config.h>
 
-// #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace chip {
 namespace app {
@@ -48,7 +48,7 @@ public:
 
     void Register();
 
-    ApplicationStatusEnum GetApplicationStatus() { return mApplicationStatus; }
+    ApplicationStatusEnum GetApplicationStatus() const { return mApplicationStatus; }
 
 private:
     EndpointId mEndpointId;
@@ -65,4 +65,4 @@ private:
 } // namespace app
 } // namespace chip
 
-// #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT

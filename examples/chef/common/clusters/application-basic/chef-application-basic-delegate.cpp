@@ -23,7 +23,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-// #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using namespace chip;
 using namespace chip::app;
@@ -103,4 +103,4 @@ void ChefDelegate::Register()
 } // namespace app
 } // namespace chip
 
-// #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT

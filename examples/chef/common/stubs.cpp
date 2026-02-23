@@ -92,9 +92,9 @@ void InitIdentifyCluster()
 #include "application-basic/chef-application-basic-delegate.h"
 #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
 
-// #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "application-launch/chef-application-launch-delegate.h"
-// #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
 
 namespace {
 
@@ -598,6 +598,9 @@ void GenericSwitchInit()
 void CastingvideoplayerContentappInit()
 {
 
+#if (MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                              \
+    (MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                             \
+    (MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
     chip::EndpointId kPlatformEndpoint             = 1;
     chip::EndpointId kAppAEndpoint                 = 2;
     static constexpr uint16_t kAllowedVendorList[] = { 0xFFF1 };
@@ -635,6 +638,7 @@ void CastingvideoplayerContentappInit()
     appALauncher->Register();
     VerifyOrDie(platformLauncher->AddAppDelegate(appALauncher) == CHIP_NO_ERROR);
     appALauncher->setPlatformDelegate(platformLauncher);
+#endif
 }
 
 void ApplicationInit()
