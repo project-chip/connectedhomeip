@@ -17,7 +17,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include "app/EventLogging.h"
+#include <app/EventLogging.h>
 
 using namespace chip;
 using namespace chip::app;

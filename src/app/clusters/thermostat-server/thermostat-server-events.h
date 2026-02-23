@@ -24,6 +24,15 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/data-model/Nullable.h>
+
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
+
+#include <lib/support/BitMask.h>
+#include <lib/support/Span.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
