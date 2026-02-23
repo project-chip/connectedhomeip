@@ -40,12 +40,19 @@ source_set("storage") {
       libs = [ "${sl_provision_root}/libs/libProvision_si917.a" ]
     }
   } else {
-    if (use_provision_flash_storage) {
-      libs =
-          [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
+if (use_provision_flash_storage) {
+    if (is_clang) {
+      libs = [ "${sl_provision_root}/libs/libProvisionFlash-${silabs_family}-clang.a" ]
+    } else {
+      libs = [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
+    }
+} else {
+    if (is_clang) {
+      libs = [ "${sl_provision_root}/libs/libProvision-${silabs_family}-clang.a" ]
     } else {
       libs = [ "${sl_provision_root}/libs/libProvision_${silabs_family}.a" ]
     }
+}
   }
 
   deps = [ "${chip_root}/src/lib" ]

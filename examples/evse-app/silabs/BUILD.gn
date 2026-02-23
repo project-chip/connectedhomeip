@@ -208,11 +208,18 @@ silabs_executable("evse-app") {
     ]
   }
 
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  }
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [ 
+    "-T" + rebase_path(ldscript, root_build_dir), 
+    "-Wl,-Map," + rebase_path("${root_build_dir}/evse-clang.map", root_build_dir),
+  ]
 
   if (chip_print_memory_usage) {
     ldflags += [

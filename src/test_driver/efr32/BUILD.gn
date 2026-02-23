@@ -59,8 +59,11 @@ efr32_sdk("sdk") {
 }
 
 config("efr32_ldflags") {
-  _ldscript =
-      "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+  if (is_clang) {
+    _ldscript = "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}-clang.ld"
+  } else {
+    _ldscript = "${chip_root}/examples/platform/silabs/ldscripts/${silabs_family}.ld"
+  }
 
   ldflags = [
     "-T" + rebase_path(_ldscript, root_build_dir),

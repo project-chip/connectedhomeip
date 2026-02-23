@@ -52,7 +52,11 @@ static void _log_PSA_error(psa_status_t status)
 {
     if (status != PSA_SUCCESS)
     {
+#if !defined(__clang__)
         ChipLogError(Crypto, "PSA error: %ld", status);
+#else
+        ChipLogError(Crypto, "PSA error: %d", status);
+#endif
     }
 }
 
@@ -198,7 +202,12 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
         {
             // WARNING: Existing key! This is caused by a problem in the key store.
             // The key must be destroyed, otherwhise the device won't recover.
+
+#if !defined(__clang__)
             ChipLogError(Crypto, "WARNING: PSA key recycled: %d / %ld", opaque_id, key_id);
+#else
+            ChipLogError(Crypto, "WARNING: PSA key recycled: %d / %u", opaque_id, key_id);
+#endif
             psa_destroy_key(key_id);
         }
 
