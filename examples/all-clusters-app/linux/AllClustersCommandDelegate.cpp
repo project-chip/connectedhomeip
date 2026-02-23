@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
@@ -606,6 +607,23 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
 
         self->OnBooleanStateChangeHandler(endpointId, newState);
     }
+    else if (name == "SetBooleanStateSensorFault")
+    {
+        bool hasEndpointId  = HasNumericField(self->mJsonValue, "EndpointId");
+        bool hasSensorFault = HasNumericField(self->mJsonValue, "SensorFault");
+
+        if (!hasEndpointId || !hasSensorFault)
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Missing or invalid value for EndpointId or SensorFault in %s", inputJson.c_str());
+            return;
+        }
+
+        auto endpointId  = static_cast<chip::EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        auto sensorFault = static_cast<uint16_t>(self->mJsonValue["SensorFault"].asUInt());
+
+        self->OnBooleanStateSensorFaultHandler(endpointId, sensorFault);
+    }
     else if (name == "SetUnmounted")
     {
         uint8_t unmounted   = static_cast<uint8_t>(self->mJsonValue["Unmounted"].asUInt());
@@ -1040,6 +1058,18 @@ void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId 
         booleanState->SetStateValue(newState);
         ChipLogProgress(NotSpecified, "BooleanState changed to %s on endpoint %d", newState ? "true" : "false", endpointId);
     }
+}
+
+void AllClustersAppCommandHandler::OnBooleanStateSensorFaultHandler(chip::EndpointId endpointId, uint16_t sensorFault)
+{
+    BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault(sensorFault);
+    CHIP_ERROR err = BooleanStateConfiguration::EmitSensorFault(endpointId, fault);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to emit SensorFault on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        return;
+    }
+    ChipLogProgress(NotSpecified, "SensorFault set to 0x%04x on endpoint %d", sensorFault, endpointId);
 }
 
 void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)

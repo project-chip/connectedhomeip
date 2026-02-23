@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -126,7 +126,7 @@ class TC_GCAST_2_5(MatterBaseTest):
         )
 
         self.step(3)
-        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl="true")
+        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl=True)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(4)
@@ -137,7 +137,7 @@ class TC_GCAST_2_5(MatterBaseTest):
 
         self.step(5)
         sub.reset()
-        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl="false")
+        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl=False)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(6)
