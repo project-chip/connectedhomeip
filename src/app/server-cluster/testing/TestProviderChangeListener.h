@@ -33,6 +33,24 @@ public:
     std::vector<app::AttributePathParams> & DirtyList() { return mDirtyList; }
     const std::vector<app::AttributePathParams> & DirtyList() const { return mDirtyList; }
 
+    /**
+     * @brief Check if a specific attribute path is dirty.
+     *
+     * @param path The concrete attribute path to check
+     * @return true if the path is dirty, false otherwise
+     */
+    bool IsDirty(const app::ConcreteAttributePath & path) const
+    {
+        for (const auto & dirtyPath : mDirtyList)
+        {
+            if (dirtyPath.IsAttributePathSupersetOf(path))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 private:
     std::vector<app::AttributePathParams> mDirtyList;
 };

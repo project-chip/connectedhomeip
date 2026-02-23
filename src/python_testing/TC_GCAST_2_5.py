@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -83,11 +83,25 @@ class TC_GCAST_2_5(MatterBaseTest):
         if not ln_enabled:
             logger.info("Listener feature is not enabled, skip remaining steps.")
             self.mark_all_remaining_steps_skipped("1b")
+            return
+
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
         endpoints_list = [endpoints_list[0]]
 
         self.step("1b")
-        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        # Check if there are any groups on the DUT.
+        membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
+        if membership:
+            # LeaveGroup with groupID 0 will leave all groups on the fabric.
+            await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+
+        # remove any existing KeySetID on the DUT, except KeySetId 0 (IPK).
+        resp: Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse = await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
+
+        read_group_key_ids: list[int] = resp.groupKeySetIDs
+        for key_set_id in read_group_key_ids:
+            if key_set_id != 0:
+                await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRemove(key_set_id))
 
         self.step("1c")
         sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
@@ -112,7 +126,7 @@ class TC_GCAST_2_5(MatterBaseTest):
         )
 
         self.step(3)
-        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl="true")
+        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl=True)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(4)
@@ -123,7 +137,7 @@ class TC_GCAST_2_5(MatterBaseTest):
 
         self.step(5)
         sub.reset()
-        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl="false")
+        membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl=False)
         sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(6)
@@ -140,6 +154,7 @@ class TC_GCAST_2_5(MatterBaseTest):
 
         if not sd_enabled:
             self.mark_all_remaining_steps_skipped("7")
+            return
 
         self.step(7)
         groupID2 = 2

@@ -103,13 +103,13 @@ class BouffalolabBuilder(GnBuilder):
                  enable_debug_coredump: bool = False,
                  ):
 
-        if 'BL602' == module_type:
+        if module_type == 'BL602':
             bouffalo_chip = 'bl602'
-        elif 'BL704L' == module_type:
+        elif module_type == 'BL704L':
             bouffalo_chip = 'bl702l'
         elif "BL70" in module_type:
             bouffalo_chip = 'bl702'
-        elif "BL616" == module_type:
+        elif module_type == "BL616":
             bouffalo_chip = "bl616"
         else:
             raise Exception(f"module_type {module_type} is not supported")
@@ -172,7 +172,7 @@ class BouffalolabBuilder(GnBuilder):
 
         self.argsOpt.append(f'chip_enable_ethernet={str(enable_ethernet).lower()}')
         self.argsOpt.append(f'chip_enable_wifi={str(enable_wifi).lower()}')
-        self.argsOpt.append(f'chip_enable_openthread={str(enable_thread).lower()}')
+        self.argsOpt.append(f'chip_enable_thread={str(enable_thread).lower()}')
 
         # for enable_ethernet, do not need ble for commissioning
         self.argsOpt.append(f'chip_config_network_layer_ble={str(enable_wifi or enable_thread).lower()}')
