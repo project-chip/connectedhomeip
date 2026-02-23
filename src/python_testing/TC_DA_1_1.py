@@ -174,16 +174,16 @@ class TC_DA_1_1(MatterBaseTest):
         # *** STEP 5 ***
         # TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
         self.step(5)
-        fabrics_th2_ids_pase = await th2.ReadAttribute(
+        fabrics_th2_pase = await th2.ReadAttribute(
             nodeId=pase_node_id,
             attributes=[(root_node_id, fabrics_attr)],
             fabricFiltered=False
         )
 
         # Verify that TH1's FabricID is not present in TH2's Fabrics list
-        fabrics_th2_ids_pase = [f.fabricID for f in fabrics_th2_ids_pase[0][opcreds_cluster][fabrics_attr]]
+        fabrics_th2_ids_pase = [f.fabricID for f in fabrics_th2_pase[0][opcreds_cluster][fabrics_attr]]
         asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_th2_ids_pase,
-                              f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids}")
+                              f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids_pase}")
 
         # *** STEP 6 ***
         # TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to
