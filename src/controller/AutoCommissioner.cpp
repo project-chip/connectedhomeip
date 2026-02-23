@@ -787,6 +787,7 @@ void AutoCommissioner::CleanupCommissioning()
     mOperationalDeviceProxy  = OperationalDeviceProxy();
     mDeviceCommissioningInfo = ReadCommissioningInfo();
     mNeedsDST                = false;
+    mNeedsNetworkSetup       = false;
 }
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
