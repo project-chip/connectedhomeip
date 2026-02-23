@@ -609,6 +609,71 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetConfigurationVersion)
     EXPECT_EQ(configVersion, 2u);
 }
 
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestForbiddenAttributes)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "forbidden-test",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    ClusterTester tester(cluster);
+
+    const AttributeId kForbiddenAttributes[] = {
+        0x0000, // DataModelRevision
+        0x0006, // Location
+        0x0010, // LocalConfigDisabled
+        0x0013, // CapabilityMinima
+        0x0015, // SpecificationVersion
+        0x0016, // MaxPathsPerInvoke
+    };
+
+    for (AttributeId attrId : kForbiddenAttributes)
+    {
+        uint32_t dummy;
+        EXPECT_EQ(tester.ReadAttribute(attrId, dummy), Status::UnsupportedAttribute);
+    }
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestOptionalAttributesAbsence)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "optional-test",
+                                                 },
+                                                 {}, // No fixed data
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    ClusterTester tester(cluster);
+
+    CharSpan charSpanVal;
+    uint16_t u16Val;
+    uint32_t u32Val;
+
+    // These are optional and NOT provided in the constructor
+    EXPECT_EQ(tester.ReadAttribute(Attributes::VendorName::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::VendorID::Id, u16Val), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductName::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductID::Id, u16Val), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HardwareVersion::Id, u16Val), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HardwareVersionString::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::SoftwareVersion::Id, u32Val), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::SoftwareVersionString::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::PartNumber::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductURL::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductLabel::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::SerialNumber::Id, charSpanVal), Status::UnsupportedAttribute);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductAppearance::Id, u32Val), Status::UnsupportedAttribute);
+}
+
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteNodeLabel)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
