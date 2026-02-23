@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster RvcCleanMode (cluster code: 85/0x0455)
+// Identifier constant values for cluster RvcCleanMode (cluster code: 85/0x0055)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

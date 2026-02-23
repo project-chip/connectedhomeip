@@ -175,10 +175,10 @@ int main(void)
         goto exit;
     }
 
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sWiFiCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiCommissioningInstance.Init();
 #else
     err = CHIP_ERROR_INTERNAL;
     goto exit;

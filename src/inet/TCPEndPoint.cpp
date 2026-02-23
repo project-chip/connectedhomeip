@@ -150,7 +150,7 @@ void TCPEndPoint::Shutdown()
     if (mState == State::kConnected)
     {
         mState = State::kSendShutdown;
-        DriveSending();
+        TEMPORARY_RETURN_IGNORED DriveSending();
     }
 
     // Otherwise, if the peer has already closed their end of the connection,
@@ -215,8 +215,8 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        GetSystemLayer().StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleIdleTimer,
-                                    &GetEndPointManager());
+        TEMPORARY_RETURN_IGNORED GetSystemLayer().StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL),
+                                                             HandleIdleTimer, &GetEndPointManager());
     }
 }
 
@@ -246,7 +246,8 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
 
     if (lTimerRequired)
     {
-        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleIdleTimer, &endPointManager);
+        TEMPORARY_RETURN_IGNORED aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL),
+                                                          HandleIdleTimer, &endPointManager);
     }
 }
 
@@ -284,7 +285,8 @@ void TCPEndPoint::StartConnectTimerIfSet()
 {
     if (mConnectTimeoutMsecs > 0)
     {
-        GetSystemLayer().StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs), TCPConnectTimeoutHandler, this);
+        TEMPORARY_RETURN_IGNORED GetSystemLayer().StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs),
+                                                             TCPConnectTimeoutHandler, this);
     }
 }
 
@@ -322,10 +324,8 @@ CHIP_ERROR TCPEndPoint::DriveSending()
     return err;
 }
 
-void TCPEndPoint::DriveReceiving()
+void TCPEndPoint::DriveReceiving(const TCPEndPointHandle & handle)
 {
-    TCPEndPointHandle handle(this);
-
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
     if (!mRcvQueue.IsNull() && mReceiveEnabled && OnDataReceived != nullptr)
@@ -339,7 +339,7 @@ void TCPEndPoint::DriveReceiving()
             DoClose(err, false);
             return;
         }
-        AckReceive(ackLength);
+        TEMPORARY_RETURN_IGNORED AckReceive(ackLength);
     }
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete
@@ -438,7 +438,8 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
                       oldState == State::kClosing) &&
                      OnConnectionClosed != nullptr)
             {
-                OnConnectionClosed(*this, err);
+                TCPEndPointHandle handle(this);
+                OnConnectionClosed(handle, err);
             }
         }
     }
@@ -448,7 +449,7 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 
 void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
 {
-    GetSystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
+    TEMPORARY_RETURN_IGNORED GetSystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
 }
 
 void TCPEndPoint::StartTCPUserTimeoutTimer()

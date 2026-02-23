@@ -135,9 +135,10 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Proto
     return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
+                                                                       Messaging::UnsolicitedMessageHandler ** outHandler)
 {
-    return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
+    return UnregisterUMH(protocolId, static_cast<int16_t>(msgType), outHandler);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, UnsolicitedMessageHandler * handler)
@@ -170,16 +171,27 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgType)
+CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgType,
+                                          Messaging::UnsolicitedMessageHandler ** outHandler)
 {
     for (auto & umh : UMHandlerPool)
     {
         if (umh.IsInUse() && umh.Matches(protocolId, msgType))
         {
+            // Store the handler before unregistering.
+            if (outHandler != nullptr)
+            {
+                *outHandler = umh.Handler;
+            }
             umh.Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
+    }
+
+    if (outHandler != nullptr)
+    {
+        *outHandler = nullptr;
     }
 
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
@@ -270,7 +282,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                               ChipLogValueExchange(ec), ec->GetDelegate());
 
                 // Matched ExchangeContext; send to message handler.
-                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
+                TEMPORARY_RETURN_IGNORED ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags,
+                                                           std::move(msgBuf));
                 found = true;
                 return Loop::Break;
             }

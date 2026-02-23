@@ -469,20 +469,21 @@ MTR_DIRECT_MEMBERS
 - (void)setSerialNumber:(nullable NSString *)serialNumber
 {
     _subPayloads = nil;
+    CHIP_ERROR err;
     if (serialNumber) {
         NSString * existing = self.serialNumber;
         if (existing) {
             // The underlying TLV tag can be encoded as either a string or an integer,
             // avoid changing it if the represented serial number is not changing.
             VerifyOrReturn(![existing isEqualToString:serialNumber]);
-            _payload.removeSerialNumber();
+            TEMPORARY_RETURN_IGNORED _payload.removeSerialNumber();
         }
-        CHIP_ERROR err = _payload.addSerialNumber(serialNumber.UTF8String);
-        if (err != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Ignoring unexpected error in SetupPayload::addSerialNumber: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        err = _payload.addSerialNumber(serialNumber.UTF8String);
     } else {
-        _payload.removeSerialNumber();
+        err = _payload.removeSerialNumber();
+    }
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Ignoring unexpected error in SetupPayload::addSerialNumber: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -510,7 +511,7 @@ MTR_DIRECT_MEMBERS
 - (void)removeVendorElementWithTag:(NSNumber *)tag
 {
     _subPayloads = nil;
-    _payload.removeOptionalVendorData(ValidateVendorTag(tag));
+    TEMPORARY_RETURN_IGNORED _payload.removeOptionalVendorData(ValidateVendorTag(tag));
 }
 
 - (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element

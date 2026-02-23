@@ -15,6 +15,7 @@
  */
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 #include <tracing/esp32_diagnostics/DiagnosticEntry.h>
 #include <tracing/esp32_diagnostics/DiagnosticStorage.h>
@@ -433,7 +434,7 @@ TEST(ESP32DiagnosticsTest, FilteringInTraceOperations)
     EXPECT_FALSE(diagnostics.IsEnabled("DisabledScope"));
 
     // Clear storage to ensure clean test
-    storageBuffer.ClearBuffer();
+    EXPECT_SUCCESS(storageBuffer.ClearBuffer());
     EXPECT_TRUE(storageBuffer.IsBufferEmpty());
 
     // Test TraceBegin with enabled scope

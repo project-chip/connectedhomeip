@@ -98,6 +98,11 @@ void IdentifyCluster::TimerFired()
     }
 }
 
+void IdentifyCluster::StopIdentifying()
+{
+    NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+}
+
 // According to the spec, section 5.1 - IdentifyTime Attribute:
 // Changes to this attribute SHALL only be marked as reportable in the following cases:
 // 1. When it changes from 0 to any other value and vice versa, or

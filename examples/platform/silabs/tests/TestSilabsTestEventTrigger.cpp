@@ -42,7 +42,7 @@ public:
         VerifyOrReturnError(!forceError, CHIP_ERROR_INTERNAL);
 
         ByteSpan enableKeySpan = ByteSpan(mEnableKey, TestEventTriggerDelegate::kEnableKeyLength);
-        CopySpanToMutableSpan(enableKeySpan, keySpan);
+        TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(enableKeySpan, keySpan);
         return CHIP_NO_ERROR;
     }
 
@@ -81,7 +81,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_ValidKey)
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     ByteSpan validKeySpan(kTestEnableKey1);
     EXPECT_TRUE(delegate.DoesEnableKeyMatch(validKeySpan));
@@ -94,7 +94,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_InvalidKey)
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     ByteSpan invalidKeySpan(kInvalidEnableKey, TestEventTriggerDelegate::kEnableKeyLength - 1);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(invalidKeySpan));
@@ -107,7 +107,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_EmptyKey)
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(ByteSpan(kZeroEnableKey)));
 }
@@ -119,7 +119,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_DifferentValidKe
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     ByteSpan differentValidKeySpan(kTestEnableKey2);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(differentValidKeySpan));
@@ -131,7 +131,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_EmptyKe
     ProviderStub provider;
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     EXPECT_TRUE(delegate.DoesEnableKeyMatch(ByteSpan(kZeroEnableKey)));
 }
@@ -142,7 +142,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_ValidKe
     ProviderStub provider;
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     ByteSpan validKeySpan(kTestEnableKey1);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(validKeySpan));
@@ -181,7 +181,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Vali
     provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     ByteSpan validKeySpan(kTestEnableKey1);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(validKeySpan));
@@ -194,7 +194,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Inva
     provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     ByteSpan invalidKeySpan(kInvalidEnableKey);
     EXPECT_FALSE(delegate.DoesEnableKeyMatch(invalidKeySpan));
@@ -207,7 +207,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Empt
     provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
-    delegate.Init(&provider);
+    TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
 
     EXPECT_TRUE(delegate.DoesEnableKeyMatch(ByteSpan(kZeroEnableKey)));
 }

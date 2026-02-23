@@ -39,54 +39,55 @@ CHIP_ERROR BridgedDeviceBasicInformationImpl::Read(const ConcreteReadAttributePa
     BridgedDevice * dev = BridgedDeviceManager::Instance().GetDevice(path.mEndpointId);
     VerifyOrReturnError(dev != nullptr, CHIP_ERROR_NOT_FOUND);
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
     switch (path.mAttributeId)
     {
     case BasicInformation::Attributes::Reachable::Id:
-        encoder.Encode(dev->IsReachable());
+        err = encoder.Encode(dev->IsReachable());
         break;
     case BasicInformation::Attributes::NodeLabel::Id:
-        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().nodeLabel.c_str()));
+        err = encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().nodeLabel.c_str()));
         break;
     case BasicInformation::Attributes::ClusterRevision::Id:
-        encoder.Encode(kBridgedDeviceBasicInformationClusterRevision);
+        err = encoder.Encode(kBridgedDeviceBasicInformationClusterRevision);
         break;
     case BasicInformation::Attributes::FeatureMap::Id: {
         BitMask<Clusters::BridgedDeviceBasicInformation::Feature> features;
         features.Set(Clusters::BridgedDeviceBasicInformation::Feature::kBridgedICDSupport, dev->IsIcd());
-        encoder.Encode(features);
+        err = encoder.Encode(features);
     }
     break;
     case BasicInformation::Attributes::UniqueID::Id:
-        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().uniqueId.c_str()));
+        err = encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().uniqueId.c_str()));
         break;
     case BasicInformation::Attributes::VendorName::Id:
-        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().vendorName.c_str()));
+        err = encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().vendorName.c_str()));
         break;
     case BasicInformation::Attributes::VendorID::Id:
-        encoder.Encode(dev->GetBridgedAttributes().vendorId);
+        err = encoder.Encode(dev->GetBridgedAttributes().vendorId);
         break;
     case BasicInformation::Attributes::ProductName::Id:
-        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().productName.c_str()));
+        err = encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().productName.c_str()));
         break;
     case BasicInformation::Attributes::ProductID::Id:
-        encoder.Encode(dev->GetBridgedAttributes().productId);
+        err = encoder.Encode(dev->GetBridgedAttributes().productId);
         break;
     case BasicInformation::Attributes::HardwareVersion::Id:
-        encoder.Encode(dev->GetBridgedAttributes().hardwareVersion);
+        err = encoder.Encode(dev->GetBridgedAttributes().hardwareVersion);
         break;
     case BasicInformation::Attributes::HardwareVersionString::Id:
-        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().hardwareVersionString.c_str()));
+        err = encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().hardwareVersionString.c_str()));
         break;
     case BasicInformation::Attributes::SoftwareVersion::Id:
-        encoder.Encode(dev->GetBridgedAttributes().softwareVersion);
+        err = encoder.Encode(dev->GetBridgedAttributes().softwareVersion);
         break;
     case BasicInformation::Attributes::SoftwareVersionString::Id:
-        encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().softwareVersionString.c_str()));
+        err = encoder.Encode(CharSpan::fromCharString(dev->GetBridgedAttributes().softwareVersionString.c_str()));
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR BridgedDeviceBasicInformationImpl::Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)

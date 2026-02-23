@@ -982,7 +982,7 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralVal
         err                            = readerForGeneralValueObject.GetString(buffer.get(), bufferLen + 1);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
         chip::CharSpan valueSpan(buffer.get(), bufferLen);
-        chip::JniReferences::GetInstance().CharToStringUTF(valueSpan, retValue);
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CharToStringUTF(valueSpan, retValue);
         return retValue;
     }
     case TLV::kTLVType_ByteString: {

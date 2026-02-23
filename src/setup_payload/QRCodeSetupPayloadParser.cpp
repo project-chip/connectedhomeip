@@ -276,7 +276,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest;
-        readBits(buf, index, dest, 8);
+        TEMPORARY_RETURN_IGNORED readBits(buf, index, dest, 8);
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
 

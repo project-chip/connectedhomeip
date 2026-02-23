@@ -62,26 +62,16 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
 
     gServer.Create(endpoint, kDefaultSoilMoistureMeasurementLimits);
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "SoilMeasurement cluster error registration");
-        return;
-    }
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration()));
 
     // Set initial measured value to min since all clusters does not perform any actual measurements
-    gServer.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
+    LogErrorOnFailure(gServer.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue));
 }
 
 void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
 {
     VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "SoilMeasurement unregister error");
-    }
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
 
     gServer.Destroy();
 }

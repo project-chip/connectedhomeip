@@ -271,11 +271,32 @@ the test harness. Note that full-test gating is not currently implemented in the
 local runner or in the CI.
 
 Some test steps need to be gated on values from earlier in the test. In these
-cases, PICS cannot be used. Instead, the runIf: tag can be used. This tag
+cases, PICS cannot be used. Instead, the `runIf` tag can be used. This tag
 requires a boolean value. To convert values to booleans, the TestEqualities
 function can be use. See
 [TestEqualities](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/TestEqualities.yaml)
 for an example of how to use this pseudo-cluster.
+
+In addition to the `PICS` and `runIf` tags, there are the `minRevision` and
+`maxRevision` tags which use the step's `cluster`'s `ClusterRevision` attribute
+to determine if a step should be skipped because it only applies to older or
+newer versions. A step will be skipped if the cluster's `ClusterRevision`
+attribute is < `minRevision` (if present), or > `maxRevision` (if present).
+
+Here is an example of only checking for the value of a given attribute if
+`ClusterRevision` >= 3 using `minRevision`.
+
+```yaml
+- label: "Verify the minimum-to-support Max Paths Per Invoke value"
+  command: "readAttribute"
+  attribute: "MaxPathsPerInvoke"
+  minRevision:
+      3 # Attribute was added in revision 3, so this step applies
+      # to revision >= 3.
+  response:
+      constraints:
+          minValue: 1
+```
 
 #### Setting step timeouts
 
@@ -396,6 +417,49 @@ application, the KVS file will be in /tmp as chip_kvs
 
 Please see [CI testing](./ci_testing.md) for more information about how to set
 up examples apps, PICS and PIXIT values for use in the CI.
+
+### Defining the CI test arguments
+
+YAML tests will run against the `all-clusters` application by default. If you
+need to run the same test against a different application or with multiple sets
+of custom arguments, the YAML file supports a `CI` entry that contains a list of
+`name`, `app` and `args` (optional) to execute.
+
+```yaml
+CI:
+    - name: "This is displayed in logs"
+      # application name MUST be a supported placeholder
+      app: all-clusters
+    - name: "Some other names"
+      app: rvc
+      # Optional arguments, a list
+      args: ["--vendor-name", "Testing"]
+    - name: "Test against lit-icd app"
+      app: lit-icd
+      # List can be split in separate lines
+      args:
+          - --vendor-name
+          - test123
+```
+
+Application names are supported placeholders that will be replaced with the full
+application path. Example supported applications (see `test_definition.py` for a
+full list):
+
+-   `all-clusters`
+-   `bridge`
+-   `closure`
+-   `energy-gateway`
+-   `evse`
+-   `water-heater`
+-   `fabric-sync`
+-   `lit-icd`
+-   `lock`
+-   `microwave-oven`
+-   `network-manager`
+-   `ota-requestor`
+-   `rvc`
+-   `tv`
 
 ### Running in the TH
 

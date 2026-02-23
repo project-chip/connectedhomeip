@@ -45,16 +45,10 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
     reinterpret_cast<DeviceSynchronizer *>(context)->OnDeviceConnectionFailure(peerId, error);
 }
 
-bool SuccessOrLog(CHIP_ERROR err, const char * name)
+bool SuccessOrLogName(CHIP_ERROR err, const char * name)
 {
-    if (err == CHIP_NO_ERROR)
-    {
-        return true;
-    }
-
-    ChipLogError(NotSpecified, "Failed to read %s: %" CHIP_ERROR_FORMAT, name, err.Format());
-
-    return false;
+    SuccessOrLog(err, NotSpecified, "Failed to read %s", name);
+    return (err == CHIP_NO_ERROR);
 }
 
 } // namespace
@@ -85,7 +79,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     {
     case Clusters::BasicInformation::Attributes::UniqueID::Id: {
         char uniqueIdBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(uniqueIdBuffer, sizeof(uniqueIdBuffer)), "UniqueId"))
+        if (SuccessOrLogName(data->GetString(uniqueIdBuffer, sizeof(uniqueIdBuffer)), "UniqueId"))
         {
             mCurrentDeviceData.uniqueId = std::string(uniqueIdBuffer);
         }
@@ -93,7 +87,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::VendorID::Id: {
         uint32_t vendorId;
-        if (SuccessOrLog(data->Get(vendorId), "VendorID"))
+        if (SuccessOrLogName(data->Get(vendorId), "VendorID"))
         {
             mCurrentDeviceData.vendorId = static_cast<chip::VendorId>(vendorId);
         }
@@ -101,7 +95,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::VendorName::Id: {
         char vendorNameBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(vendorNameBuffer, sizeof(vendorNameBuffer)), "VendorName"))
+        if (SuccessOrLogName(data->GetString(vendorNameBuffer, sizeof(vendorNameBuffer)), "VendorName"))
         {
             mCurrentDeviceData.vendorName = std::string(vendorNameBuffer);
         }
@@ -109,7 +103,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::ProductID::Id: {
         uint32_t productId;
-        if (SuccessOrLog(data->Get(productId), "ProductID"))
+        if (SuccessOrLogName(data->Get(productId), "ProductID"))
         {
             mCurrentDeviceData.productId = productId;
         }
@@ -117,7 +111,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::ProductName::Id: {
         char productNameBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(productNameBuffer, sizeof(productNameBuffer)), "ProductName"))
+        if (SuccessOrLogName(data->GetString(productNameBuffer, sizeof(productNameBuffer)), "ProductName"))
         {
             mCurrentDeviceData.productName = std::string(productNameBuffer);
         }
@@ -125,7 +119,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::NodeLabel::Id: {
         char nodeLabelBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(nodeLabelBuffer, sizeof(nodeLabelBuffer)), "NodeLabel"))
+        if (SuccessOrLogName(data->GetString(nodeLabelBuffer, sizeof(nodeLabelBuffer)), "NodeLabel"))
         {
             mCurrentDeviceData.nodeLabel = std::string(nodeLabelBuffer);
         }
@@ -133,8 +127,8 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::HardwareVersionString::Id: {
         char hardwareVersionStringBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(hardwareVersionStringBuffer, sizeof(hardwareVersionStringBuffer)),
-                         "HardwareVersionString"))
+        if (SuccessOrLogName(data->GetString(hardwareVersionStringBuffer, sizeof(hardwareVersionStringBuffer)),
+                             "HardwareVersionString"))
         {
             mCurrentDeviceData.hardwareVersionString = std::string(hardwareVersionStringBuffer);
         }
@@ -142,7 +136,7 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::SoftwareVersion::Id: {
         uint32_t softwareVersion;
-        if (SuccessOrLog(data->Get(softwareVersion), "SoftwareVersion"))
+        if (SuccessOrLogName(data->Get(softwareVersion), "SoftwareVersion"))
         {
             mCurrentDeviceData.softwareVersion = softwareVersion;
         }
@@ -150,8 +144,8 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
     break;
     case Clusters::BasicInformation::Attributes::SoftwareVersionString::Id: {
         char softwareVersionStringBuffer[kBasicInformationAttributeBufSize];
-        if (SuccessOrLog(data->GetString(softwareVersionStringBuffer, sizeof(softwareVersionStringBuffer)),
-                         "SoftwareVersionString"))
+        if (SuccessOrLogName(data->GetString(softwareVersionStringBuffer, sizeof(softwareVersionStringBuffer)),
+                             "SoftwareVersionString"))
         {
             mCurrentDeviceData.softwareVersionString = std::string(softwareVersionStringBuffer);
         }
@@ -295,7 +289,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     VerifyOrDie(mState == State::ReceivedResponse || mState == State::GettingUid);
     ChipLogProgress(NotSpecified, "Synchronization complete and add device");
 
-    bridge::FabricBridge::Instance().AddSynchronizedDevice(mCurrentDeviceData);
+    TEMPORARY_RETURN_IGNORED bridge::FabricBridge::Instance().AddSynchronizedDevice(mCurrentDeviceData);
 
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
     if (!mCurrentDeviceData.isIcd.value_or(false))
@@ -306,7 +300,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Failed start subscription to NodeId:" ChipLogFormatX64, ChipLogValueX64(mNodeId));
-            bridge::FabricBridge::Instance().DeviceReachableChanged(mCurrentDeviceData.id, false);
+            TEMPORARY_RETURN_IGNORED bridge::FabricBridge::Instance().DeviceReachableChanged(mCurrentDeviceData.id, false);
         }
     }
 

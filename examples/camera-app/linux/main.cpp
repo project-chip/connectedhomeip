@@ -18,6 +18,8 @@
 #include "CameraAppCommandDelegate.h"
 #include "camera-app.h"
 #include "camera-device.h"
+#include "tls-certificate-management-instance.h"
+#include "tls-client-management-instance.h"
 
 #include <AppMain.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -57,7 +59,7 @@ void ApplicationInit()
     if ((!appPipePath.empty()) && (sChipNamedPipeCommands.Start(appPipePath, &sCameraAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
     gCameraDevice.Init();
@@ -70,12 +72,17 @@ void ApplicationShutdown()
 {
     CameraAppShutdown();
 
-    sChipNamedPipeCommands.Stop();
+    TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+    // Initialize TLS Client and Certificate Management delegates before server starts
+    // This must be called before ChipLinuxAppMainLoop() which initializes the server
+    InitializeTlsClientManagement();
+    InitializeTlsCertificateManagement();
 
     ChipLinuxAppMainLoop();
 

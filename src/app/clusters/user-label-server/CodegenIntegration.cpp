@@ -16,10 +16,12 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/user-label-server/user-label-cluster.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/UserLabel.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DeviceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,7 +42,14 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
+        DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
+        VerifyOrDie(deviceInfoProvider != nullptr);
+
+        gServers[clusterInstanceIndex].Create(endpointId,
+                                              UserLabelCluster::Context{
+                                                  .deviceInfoProvider = *deviceInfoProvider,
+                                                  .fabricTable        = Server::GetInstance().GetFabricTable(),
+                                              });
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -59,7 +68,6 @@ void MatterUserLabelClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                = endpointId,
@@ -72,11 +80,10 @@ void MatterUserLabelClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterUserLabelClusterShutdownCallback(EndpointId endpointId)
+void MatterUserLabelClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
-    // unregister a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                = endpointId,
@@ -84,7 +91,7 @@ void MatterUserLabelClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kUserLabelFixedClusterCount,
             .maxClusterInstanceCount   = kUserLabelMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterUserLabelPluginServerInitCallback() {}

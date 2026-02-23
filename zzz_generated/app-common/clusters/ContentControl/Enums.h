@@ -28,6 +28,38 @@ namespace app {
 namespace Clusters {
 namespace ContentControl {
 
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kInvalidPINCode            = 0x02,
+    kInvalidRating             = 0x03,
+    kInvalidChannel            = 0x04,
+    kChannelAlreadyExist       = 0x05,
+    kChannelNotExist           = 0x06,
+    kUnidentifiableApplication = 0x07,
+    kApplicationAlreadyExist   = 0x08,
+    kApplicationNotExist       = 0x09,
+    kTimeWindowAlreadyExist    = 0x0A,
+    kTimeWindowNotExist        = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for DayOfWeekBitmap
+enum class DayOfWeekBitmap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -36,6 +68,9 @@ enum class Feature : uint32_t
     kBlockUnrated           = 0x4,
     kOnDemandContentRating  = 0x8,
     kScheduledContentRating = 0x10,
+    kBlockChannels          = 0x20,
+    kBlockApplications      = 0x40,
+    kBlockContentTimeWindow = 0x80,
 };
 } // namespace ContentControl
 } // namespace Clusters

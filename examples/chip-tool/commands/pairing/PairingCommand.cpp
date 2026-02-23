@@ -17,11 +17,21 @@
  */
 
 #include "PairingCommand.h"
-#include "platform/PlatformManager.h"
 #include <commands/common/DeviceScanner.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/dnssd/Types.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadDiscoveryCode.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
 
@@ -31,11 +41,37 @@
 #include "../dcl/DCLClient.h"
 #include "../dcl/DisplayTermsAndConditions.h"
 
+#include <inttypes.h>
 #include <iostream>
+#include <memory>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <string>
+#include <sys/socket.h>
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+
+namespace {
+
+[[maybe_unused]] CHIP_ERROR ParseSetupPayload(SetupPayload & setupPayload, const char * onboardingPayload)
+{
+
+    bool isQRCode = strncmp(onboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+    if (isQRCode)
+    {
+        ReturnErrorOnFailure(QRCodeSetupPayloadParser(onboardingPayload).populatePayload(setupPayload));
+        VerifyOrReturnError(setupPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadParser(onboardingPayload).populatePayload(setupPayload));
+        VerifyOrReturnError(setupPayload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
@@ -105,6 +141,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
             mApFreqStr.HasValue() ? static_cast<uint16_t>(std::stol(mApFreqStr.Value())) : 0);
         err = Pair(remoteId, PeerAddress::WiFiPAF(remoteId));
         break;
+#endif
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    case PairingMode::ThreadMeshcop: {
+        Inet::IPAddress ipAddr;
+
+        VerifyOrReturnError(mThreadBaHost.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mThreadBaPort.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
+        err = Pair(remoteId, PeerAddress::ThreadMeshcop(ipAddr, mThreadBaPort.Value()));
+        break;
+    }
 #endif
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
@@ -183,12 +230,13 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
+                                                            sizeof(mRandomGeneratedICDSymmetricKey));
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
         {
-            mICDCheckInNodeId.SetValue(CurrentCommissioner().GetNodeId());
+            TEMPORARY_RETURN_IGNORED mICDCheckInNodeId.SetValue(CurrentCommissioner().GetNodeId());
         }
         if (!mICDMonitoredSubject.HasValue())
         {
@@ -259,12 +307,37 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
-    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode.value()).SetPeerAddress(address);
-    if (mDiscriminator.has_value())
+    auto params = RendezvousParameters().SetPeerAddress(address);
+    if (mOnboardingPayload != nullptr)
     {
-        params.SetDiscriminator(mDiscriminator.value());
+        SetupPayload payload;
+
+        ReturnErrorOnFailure(ParseSetupPayload(payload, mOnboardingPayload));
+        params.SetSetupPINCode(payload.setUpPINCode);
+        params.SetSetupDiscriminator(payload.discriminator);
     }
+    else
+    {
+        VerifyOrDieWithMsg(mSetupPINCode.has_value(), chipTool, "Using mSetupPINCode in a mode when we have not gotten one");
+        params.SetSetupPINCode(mSetupPINCode.value());
+        if (mDiscriminator.has_value())
+        {
+            params.SetDiscriminator(mDiscriminator.value());
+        }
+    }
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (address.GetTransportType() == Transport::Type::kThreadMeshcop)
+    {
+        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+        CommissioningParameters commissioningParams = GetCommissioningParameters();
+
+        commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
+        auto error = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
+        return error;
+    }
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
@@ -323,18 +396,7 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
         // be because the device is a ble device. In this case let's fall back to looking for
         // a device with this index and some RendezvousParameters.
         SetupPayload payload;
-        bool isQRCode = strncmp(mOnboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
-        if (isQRCode)
-        {
-            ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
-            VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
-        }
-        else
-        {
-            ReturnErrorOnFailure(ManualSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
-            VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
-        }
-
+        ReturnErrorOnFailure(ParseSetupPayload(payload, mOnboardingPayload));
         mSetupPINCode.emplace(payload.setUpPINCode);
         return PairWithMdnsOrBleByIndex(remoteId, index);
     }
@@ -498,8 +560,9 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.check_in_node     = ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
@@ -515,7 +578,7 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 
     if (err != CHIP_NO_ERROR)
     {
-        CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
+        TEMPORARY_RETURN_IGNORED CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
         ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId.GetNodeId()),
                      err.AsString());
         SetCommandExitStatus(err);
@@ -558,7 +621,7 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
     // outermost ScheduleLambda is only there to avoid the prompt interleaving
     // with logging that happens on the Matter thread after this function
     // returns.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         mPrompterThread.emplace([this] {
             do
             {
@@ -582,7 +645,7 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
                 ChipLogError(chipTool, "Invalid value for password");
             } while (true);
 
-            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
                 // Ensure that the background thread (and its writes to our members) is done.
                 mPrompterThread->join();
                 mPrompterThread.reset();
@@ -591,9 +654,9 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
                 CommissioningParameters params = commissioner.GetCommissioningParameters();
                 auto credentials               = Controller::WiFiCredentials(mSSID, mPassword);
                 params.SetWiFiCredentials(credentials);
-                commissioner.UpdateCommissioningParameters(params);
+                TEMPORARY_RETURN_IGNORED commissioner.UpdateCommissioningParameters(params);
 
-                commissioner.NetworkCredentialsReady();
+                TEMPORARY_RETURN_IGNORED commissioner.NetworkCredentialsReady();
             });
         });
     });
@@ -616,7 +679,7 @@ CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
     // outermost ScheduleLambda is only there to avoid the prompt interleaving
     // with logging that happens on the Matter thread after this function
     // returns.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         mPrompterThread.emplace([this] {
             do
             {
@@ -629,7 +692,7 @@ CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
                 ChipLogError(chipTool, "Invalid value for operational dataset");
             } while (true);
 
-            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
                 // Ensure that the background thread (and its writes to our members) is done.
                 mPrompterThread->join();
                 mPrompterThread.reset();
@@ -637,9 +700,9 @@ CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
                 auto & commissioner            = CurrentCommissioner();
                 CommissioningParameters params = commissioner.GetCommissioningParameters();
                 params.SetThreadOperationalDataset(mOperationalDataset);
-                commissioner.UpdateCommissioningParameters(params);
+                TEMPORARY_RETURN_IGNORED commissioner.UpdateCommissioningParameters(params);
 
-                commissioner.NetworkCredentialsReady();
+                TEMPORARY_RETURN_IGNORED commissioner.NetworkCredentialsReady();
             });
         });
     });

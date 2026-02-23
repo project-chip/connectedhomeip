@@ -210,7 +210,7 @@ CHIP_ERROR QPGConfig::FactoryResetConfig(void)
 {
     for (Key key = kMinConfigKey_ChipConfig; key <= kMaxConfigKey_ChipConfig; key++)
     {
-        ClearConfigValue(key);
+        TEMPORARY_RETURN_IGNORED ClearConfigValue(key);
     }
     qvOta_ResetProgressInfo();
 

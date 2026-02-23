@@ -39,8 +39,13 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+import matter.testing.matchers as matchers
 from matter.interaction_model import InteractionModelError
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 ''' Integration test of batch commands using UnitTesting Cluster
 
@@ -91,7 +96,7 @@ class TestBatchInvoke(MatterBaseTest):
                              "Unexpected response to first InvokeRequest")
         asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size,
                              "Unexpected response to second InvokeRequest")
-        logging.info("DUT successfully responded to a InvokeRequest action with two valid commands")
+        log.info("DUT successfully responded to a InvokeRequest action with two valid commands")
 
         # TODO(#31434): After TestEventTrigger adds ability to force one response per InvokeResponseMessage
         # we should be using that instead of relying on size of response_size. Right now we are relying on,
@@ -126,7 +131,7 @@ class TestBatchInvoke(MatterBaseTest):
                              "Unexpected response to first InvokeRequest")
         asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size,
                              "Unexpected response to second InvokeRequest")
-        logging.info("DUT successfully responded to a InvokeRequest spread accross multiple InvokeResponseMessages")
+        log.info("DUT successfully responded to a InvokeRequest spread accross multiple InvokeResponseMessages")
 
 
 if __name__ == "__main__":

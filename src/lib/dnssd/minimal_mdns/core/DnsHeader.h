@@ -84,7 +84,7 @@ private:
     static constexpr uint16_t kMdnsNonIgnoredMask = 0x8E08;
     static constexpr uint16_t kAuthoritativeMask  = 0x0400;
     static constexpr uint16_t kIsResponseMask     = 0x8000;
-    static constexpr uint16_t kOpcodeMask         = 0x7000;
+    static constexpr uint16_t kOpcodeMask         = 0x7800;
     static constexpr uint16_t kTruncationMask     = 0x0200;
     static constexpr uint16_t kReturnCodeMask     = 0x000F;
 };

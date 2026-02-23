@@ -73,10 +73,10 @@ source_set("thread-network-directory-test-srcs") {
 }
 
 source_set("time-sync-data-provider-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
-
   public_deps = [
+    "${chip_root}/src/app/clusters/time-synchronization-server:time-sync-data-provider",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/persistence:persistence",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -95,8 +95,10 @@ source_set("power-cluster-test-srcs") {
 }
 
 source_set("actions-cluster-test-srcs") {
-  sources =
-      [ "${chip_root}/src/app/clusters/actions-server/actions-server.cpp" ]
+  sources = [
+    "${chip_root}/src/app/clusters/actions-server/ActionsCluster.cpp",
+    "${chip_root}/src/app/clusters/actions-server/actions-server.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
@@ -107,19 +109,16 @@ source_set("actions-cluster-test-srcs") {
 }
 
 source_set("scenes-table-test-srcs") {
+  # Tests currently validate/use capping logic from codegen, so we add codegen support
+  # and mock data models.
   sources = [
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
-    "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/CodegenAttributeValuePairValidator.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/clusters/scenes-server:scenes",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/storage:fabric-table",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
@@ -142,12 +141,19 @@ source_set("thread-border-router-management-test-srcs") {
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+
+    # Sources needed because codegen integration of general commissioning provides general commissioning instance
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.h",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server/CodegenIntegration.cpp",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
+    "${chip_root}/src/app/clusters/group-key-mgmt-server",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -212,8 +218,8 @@ source_set("app-test-stubs") {
 
 source_set("closure-control-test-srcs") {
   sources = [
+    "${chip_root}/src/app/clusters/closure-control-server/ClosureControlClusterLogic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-delegate.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-objects.h",
@@ -237,7 +243,6 @@ chip_test_suite("tests") {
     "TestAclAttribute.cpp",
     "TestAclCommand.cpp",
     "TestAclEvent.cpp",
-    "TestActionsCluster.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePathParams.cpp",
@@ -268,6 +273,7 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalSessionSetupFallback.cpp",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
@@ -300,6 +306,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server:terms_and_conditions",
     "${chip_root}/src/app/tests:helpers",
@@ -315,6 +322,8 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestActionsCluster.cpp",
+      "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
@@ -322,17 +331,21 @@ chip_test_suite("tests") {
       ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
     ]
   }
 
-  if (chip_config_network_layer_ble &&
-      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+  # TestCommissioningWindowManager uses MockClock to advance time and force timer expiration which
+  # does not behave as expected on darwin
+  if (chip_config_network_layer_ble && chip_device_platform == "linux") {
     test_sources += [ "TestCommissioningWindowManager.cpp" ]
     public_deps += [
+      "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
-  } else if (!chip_fake_platform) {
+  }
+  if (!chip_fake_platform) {
     test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
     public_deps += [ ":thread-border-router-management-test-srcs" ]
   }

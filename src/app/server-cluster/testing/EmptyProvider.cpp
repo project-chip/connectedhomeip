@@ -17,7 +17,7 @@
 #include <app/server-cluster/testing/EmptyProvider.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 using Protocols::InteractionModel::Status;
 using namespace chip::app;
@@ -92,5 +92,5 @@ std::optional<ActionReturnStatus> EmptyProvider::InvokeCommand(const app::DataMo
     return Status::UnsupportedEndpoint;
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

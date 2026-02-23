@@ -375,6 +375,9 @@ DCL
 DCMAKE
 DCONF
 DCONFIG
+deallocate
+deallocated
+deallocation
 debianutils
 debugText
 decrypt
@@ -395,10 +398,13 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+Depacketization
 deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
 detokenization
@@ -595,6 +601,7 @@ forkpty
 formatter
 formatters
 FOTA
+framerate
 FreeRTOS
 FreeRTOSConfig
 FRDM
@@ -706,6 +713,7 @@ ICD
 ICDs
 iCloud
 ICMP
+idempotency
 IDF
 IDL
 IDLs
@@ -774,6 +782,7 @@ JCM
 JDK
 jf
 jinja
+jitter
 JLink
 JLinkExe
 JLinkRTTClient
@@ -850,6 +859,7 @@ LightingState
 LinkSoftwareAndDocumentationPack
 linter
 linters
+Livestream
 lladdr
 LocalConfigDisabled
 localedef
@@ -910,6 +920,7 @@ mcumgr
 MCUs
 mcux
 MCUXpresso
+MCXW
 mdash
 MDNS
 MediaInput
@@ -948,6 +959,7 @@ MLD
 mmevk
 moal
 Mobly
+Mockito
 ModeSelect
 modprobe
 Modustoolbox
@@ -963,6 +975,7 @@ MTR
 MTU
 Multiband
 Multicast
+multicasts
 multilib
 Multiprotocol
 multithreaded
@@ -1028,6 +1041,7 @@ nwk
 NXP
 objcopy
 OccupancySensing
+OCMock
 OctetString
 OECORE
 OID
@@ -1108,6 +1122,7 @@ PASE
 Passcode
 passRetained
 passwd
+Pausable
 PBKDF
 pbuf
 pbufs
@@ -1232,6 +1247,9 @@ Realtek
 rebase
 recommand
 recommanded
+Reconnection
+reconnection
+reconnections
 recurse
 refrigeratoralarm
 regen
@@ -1559,6 +1577,7 @@ UnitLocalization
 unittest
 unpair
 unprovisioned
+unregistration
 Unsecure
 Unselect
 untrusted
@@ -1599,6 +1618,7 @@ Verifier
 Verifiers
 VID
 vids
+viewport
 virtualenv
 visualstudio
 vlatest

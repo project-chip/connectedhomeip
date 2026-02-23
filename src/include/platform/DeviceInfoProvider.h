@@ -24,7 +24,7 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <platform/AttributeList.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -101,7 +101,7 @@ public:
      * @return CHIP_NO_ERROR on success.
      * @return CHIP_ERROR if an error occurs.
      */
-    CHIP_ERROR SetUserLabelList(EndpointId endpoint, const AttributeList<UserLabelType, kMaxUserLabelListLength> & labelList);
+    CHIP_ERROR SetUserLabelList(EndpointId endpoint, Span<const UserLabelType> labelList);
 
     /**
      * @brief Clears the user label list for a specified endpoint.
@@ -206,7 +206,7 @@ protected:
  *
  * Callers have to externally synchronize usage of this function.
  *
- * @return The global Device Info Provider. Assume never null.
+ * @return The global Device Info Provider.
  */
 DeviceInfoProvider * GetDeviceInfoProvider();
 
@@ -214,8 +214,6 @@ DeviceInfoProvider * GetDeviceInfoProvider();
  * Instance setter for the global DeviceInfoProvider.
  *
  * Callers have to externally synchronize usage of this function.
- *
- * If the `provider` is nullptr, no change is done.
  *
  * @param[in] provider the Device Info Provider
  */

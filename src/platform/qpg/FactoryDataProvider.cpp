@@ -82,7 +82,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
         status = qvCHIP_Crypto_SignWithDacPk((uint8_t *) messageToSign.data(), messageToSign.size(), signature.Bytes());
         VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
         ReturnErrorOnFailure(MapQorvoError(status));
-        signature.SetLength(signature.Capacity());
+        TEMPORARY_RETURN_IGNORED signature.SetLength(signature.Capacity());
     }
     else
     {

@@ -640,7 +640,7 @@ void TCPEndPointImplLwIP::HandleDataSent(uint16_t lenSent)
         // If unsent data exists, attempt to send it now...
         if (RemainingToSend() > 0)
         {
-            DriveSending();
+            TEMPORARY_RETURN_IGNORED DriveSending();
         }
         // If in the closing state and the send queue is now empty, attempt to transition to closed.
         if ((mState == State::kClosing) && (RemainingToSend() == 0))
@@ -653,53 +653,56 @@ void TCPEndPointImplLwIP::HandleDataSent(uint16_t lenSent)
 void TCPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && buf)
 {
     // Only receive new data while in the Connected or SendShutdown states.
-    if (mState == State::kConnected || mState == State::kSendShutdown)
+    if (mState != State::kConnected && mState != State::kSendShutdown)
     {
-        // Mark the connection as being active.
-        MarkActive();
+        return;
+    }
 
-        // If we received a data buffer, queue it on the receive queue.  If there's already data in
-        // the queue, compact the data into the head buffer.
-        if (!buf.IsNull())
+    TCPEndPointHandle handle(this);
+    // Mark the connection as being active.
+    MarkActive();
+
+    // If we received a data buffer, queue it on the receive queue.  If there's already data in
+    // the queue, compact the data into the head buffer.
+    if (!buf.IsNull())
+    {
+        if (mRcvQueue.IsNull())
         {
-            if (mRcvQueue.IsNull())
-            {
-                mRcvQueue = std::move(buf);
-            }
-            else
-            {
-                mRcvQueue->AddToEnd(std::move(buf));
-                mRcvQueue->CompactHead();
-            }
+            mRcvQueue = std::move(buf);
         }
-
-        // Otherwise buf == NULL means the other side closed the connection, so ...
         else
         {
-
-            // If in the Connected state and the app has provided an OnPeerClose callback,
-            // enter the ReceiveShutdown state.  Providing an OnPeerClose callback allows
-            // the app to decide whether to keep the send side of the connection open after
-            // the peer has closed. If no OnPeerClose is provided, we assume that the app
-            // wants to close both directions and automatically enter the Closing state.
-            if (mState == State::kConnected && OnPeerClose != nullptr)
-            {
-                mState = State::kReceiveShutdown;
-            }
-            else
-            {
-                mState = State::kClosing;
-            }
-            // Call the app's OnPeerClose.
-            if (OnPeerClose != NULL)
-            {
-                OnPeerClose(*this);
-            }
+            mRcvQueue->AddToEnd(std::move(buf));
+            mRcvQueue->CompactHead();
         }
-
-        // Drive the received data into the app.
-        DriveReceiving();
     }
+
+    // Otherwise buf == NULL means the other side closed the connection, so ...
+    else
+    {
+
+        // If in the Connected state and the app has provided an OnPeerClose callback,
+        // enter the ReceiveShutdown state.  Providing an OnPeerClose callback allows
+        // the app to decide whether to keep the send side of the connection open after
+        // the peer has closed. If no OnPeerClose is provided, we assume that the app
+        // wants to close both directions and automatically enter the Closing state.
+        if (mState == State::kConnected && OnPeerClose != nullptr)
+        {
+            mState = State::kReceiveShutdown;
+        }
+        else
+        {
+            mState = State::kClosing;
+        }
+        // Call the app's OnPeerClose.
+        if (OnPeerClose != NULL)
+        {
+            OnPeerClose(handle);
+        }
+    }
+
+    // Drive the received data into the app.
+    DriveReceiving(handle);
 }
 
 void TCPEndPointImplLwIP::HandleIncomingConnection(const TCPEndPointHandle & conEP)

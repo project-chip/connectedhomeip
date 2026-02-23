@@ -19,6 +19,7 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -42,7 +43,7 @@ void ClearBindingTable(Binding::Table & table)
     auto iter = table.begin();
     while (iter != table.end())
     {
-        table.RemoveAt(iter);
+        EXPECT_SUCCESS(table.RemoveAt(iter));
     }
 }
 
@@ -50,13 +51,13 @@ void CreateDefaultFullBindingTable(Binding::Table & table)
 {
     for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
     {
-        table.Add(Binding::TableEntry(i / 10, i % 5, 0, 0, std::make_optional<ClusterId>(i)));
+        EXPECT_SUCCESS(table.Add(Binding::TableEntry(i / 10, i % 5, 0, 0, std::make_optional<ClusterId>(i))));
     }
 }
 
 TEST_F(TestPendingNotificationMap, TestEmptyMap)
 {
-    PendingNotificationMap pendingMap;
+    PendingNotificationMap pendingMap(Binding::Table::GetInstance());
     EXPECT_EQ(pendingMap.begin(), pendingMap.end());
     chip::ScopedNodeId peer;
     EXPECT_EQ(pendingMap.FindLRUConnectPeer(peer), CHIP_ERROR_NOT_FOUND);
@@ -64,7 +65,7 @@ TEST_F(TestPendingNotificationMap, TestEmptyMap)
 
 TEST_F(TestPendingNotificationMap, TestAddRemove)
 {
-    PendingNotificationMap pendingMap;
+    PendingNotificationMap pendingMap(Binding::Table::GetInstance());
     ClearBindingTable(Binding::Table::GetInstance());
     CreateDefaultFullBindingTable(Binding::Table::GetInstance());
     for (uint8_t i = 0; i < Binding::Table::kMaxBindingEntries; i++)
@@ -112,7 +113,7 @@ TEST_F(TestPendingNotificationMap, TestAddRemove)
 
 TEST_F(TestPendingNotificationMap, TestLRUEntry)
 {
-    PendingNotificationMap pendingMap;
+    PendingNotificationMap pendingMap(Binding::Table::GetInstance());
     ClearBindingTable(Binding::Table::GetInstance());
     CreateDefaultFullBindingTable(Binding::Table::GetInstance());
     EXPECT_EQ(pendingMap.AddPendingNotification(0, nullptr), CHIP_NO_ERROR);

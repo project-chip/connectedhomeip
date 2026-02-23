@@ -71,7 +71,7 @@ void BluezObjectManager::Shutdown()
     // cleanup function releases the D-Bus manager client object, which handles D-Bus
     // signals. Otherwise, we will face race condition when the D-Bus signal is in
     // the middle of being processed when the cleanup function is called.
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezObjectManager * self) {
             self->mConnection.reset();
             self->mObjectManager.reset();
@@ -90,7 +90,7 @@ BluezAdapter1 * BluezObjectManager::GetAdapter(unsigned int aAdapterId)
         GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(&object));
         if (adapter && strcmp(g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(adapter.get())), expectedPath) == 0)
         {
-            SetupAdapter(adapter.get());
+            TEMPORARY_RETURN_IGNORED SetupAdapter(adapter.get());
             return adapter.release();
         }
     }
@@ -105,7 +105,7 @@ BluezAdapter1 * BluezObjectManager::GetAdapter(const char * aAdapterAddress)
         GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(&object));
         if (adapter && strcmp(bluez_adapter1_get_address(adapter.get()), aAdapterAddress) == 0)
         {
-            SetupAdapter(adapter.get());
+            TEMPORARY_RETURN_IGNORED SetupAdapter(adapter.get());
             return adapter.release();
         }
     }

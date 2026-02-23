@@ -44,7 +44,9 @@ import enum
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 # This test requires several additional command line arguments.
 # Run the test with
@@ -65,11 +67,11 @@ def error_enum_to_text(error_enum):
     except AttributeError:
         if error_enum == RvcStatusEnum.Success:
             return "Success(0x00)"
-        elif error_enum == RvcStatusEnum.UnsupportedMode:
+        if error_enum == RvcStatusEnum.UnsupportedMode:
             return "UnsupportedMode(0x01)"
-        elif error_enum == RvcStatusEnum.GenericFailure:
+        if error_enum == RvcStatusEnum.GenericFailure:
             return "GenericFailure(0x02)"
-        elif error_enum == RvcStatusEnum.InvalidInMode:
+        if error_enum == RvcStatusEnum.InvalidInMode:
             return "InvalidInMode(0x03)"
 
     raise AttributeError("Unknown Enum value")
@@ -92,10 +94,9 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     async def read_run_supported_modes(self) -> Clusters.Objects.RvcRunMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.SupportedModes)
-        return ret
 
     async def read_current_mode_with_check(self, expected_mode):
         run_mode = await self.read_mod_attribute_expect_success(
@@ -105,9 +106,8 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                             "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
-                                         endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+                                          endpoint=self.endpoint)
 
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
@@ -116,10 +116,9 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                             (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
 
     async def read_op_state_operational_state(self) -> Clusters.Objects.RvcOperationalState.Attributes.OperationalState:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcOperationalState,
             Clusters.RvcOperationalState.Attributes.OperationalState)
-        return ret
 
     def pics_TC_RVCRUNM_2_2(self) -> list[str]:
         return ["RVCRUNM.S"]

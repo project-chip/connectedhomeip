@@ -4,6 +4,9 @@ inputs:
   cache-key:
     required: true
     description: 'The cache key to delete'
+  github-token:
+    required: true
+    description: 'GitHub token for API authentication'
 runs:
   using: "composite"
   steps:
@@ -12,7 +15,7 @@ runs:
       env:
         CACHE_KEY: ${{ inputs.cache-key }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.github-token }}
         script: |
           const owner = context.repo.owner;
           const repo = context.repo.repo;

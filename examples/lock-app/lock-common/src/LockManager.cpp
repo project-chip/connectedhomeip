@@ -108,7 +108,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
                     "numberOfCredentialsSupportedPerUser=%d,holidaySchedules=%d]",
                     endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
                     numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser, numberOfHolidaySchedules);
-    DoorLockServer::Instance().SetDelegate(endpointId, mEndpoints.back().get());
+    TEMPORARY_RETURN_IGNORED DoorLockServer::Instance().SetDelegate(endpointId, mEndpoints.back().get());
 
     return true;
 }

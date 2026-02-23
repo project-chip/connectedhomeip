@@ -31,11 +31,6 @@
 // Uncomment this for a large Tunnel MTU.
 // #define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
-// Enable support functions for parsing command-line arguments
-#ifndef CHIP_CONFIG_ENABLE_ARG_PARSER
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
-#endif
-
 //  Enable use of test setup parameters for testing purposes only.
 //
 //    WARNING: This option makes it possible to circumvent basic chip security functionality.
@@ -94,6 +89,10 @@
 // Safe to enable this flag since standalone is associated with host and not a device.
 #ifndef CONFIG_BUILD_FOR_HOST_UNIT_TEST
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+#endif
+
+#ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
 #endif
 
 #endif /* CHIPPROJECTCONFIG_H */

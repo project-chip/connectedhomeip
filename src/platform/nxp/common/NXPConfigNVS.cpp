@@ -397,7 +397,7 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
 bool NXPConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
-    return (key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVS);
+    return (key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_App);
 }
 
 void NXPConfig::RunConfigUnitTest(void) {}

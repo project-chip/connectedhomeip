@@ -56,7 +56,7 @@ static migrationData_t migrationTable[] = {
 void MigrationManager::ApplyMigrations()
 {
     uint32_t lastMigationGroupDone = 0;
-    SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_MigrationCounter, lastMigationGroupDone);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_MigrationCounter, lastMigationGroupDone);
 
     uint32_t completedMigrationGroup = lastMigationGroupDone;
     for (uint32_t i = 0; i < MATTER_ARRAY_SIZE(migrationTable); i++)
@@ -67,7 +67,7 @@ void MigrationManager::ApplyMigrations()
             completedMigrationGroup = std::max(migrationTable[i].migrationGroup, completedMigrationGroup);
         }
     }
-    SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
 }
 
 void MigrationManager::MigrateUint16(uint32_t old_key, uint32_t new_key)
@@ -78,7 +78,7 @@ void MigrationManager::MigrateUint16(uint32_t old_key, uint32_t new_key)
         if (CHIP_NO_ERROR == SilabsConfig::WriteConfigValue(new_key, value))
         {
             // Free memory of old key location
-            SilabsConfig::ClearConfigValue(old_key);
+            TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(old_key);
         }
     }
 }
@@ -91,7 +91,7 @@ void MigrationManager::MigrateUint32(uint32_t old_key, uint32_t new_key)
         if (CHIP_NO_ERROR == SilabsConfig::WriteConfigValue(new_key, value))
         {
             // Free memory of old key location
-            SilabsConfig::ClearConfigValue(old_key);
+            TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(old_key);
         }
     }
 }

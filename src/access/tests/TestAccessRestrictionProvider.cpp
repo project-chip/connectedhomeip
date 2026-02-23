@@ -203,7 +203,7 @@ public: // protected
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
         GetAccessControl().SetAccessRestrictionProvider(&accessRestrictionProvider);
-        VerifyOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver) == CHIP_NO_ERROR);
+        SuccessOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver));
         EXPECT_EQ(LoadAccessControl(accessControl, aclEntryData, aclEntryDataCount), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()

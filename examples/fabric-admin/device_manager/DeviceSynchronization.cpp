@@ -50,16 +50,10 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
 }
 
 #if defined(PW_RPC_ENABLED)
-bool SuccessOrLog(CHIP_ERROR err, const char * name)
+bool SuccessOrLogName(CHIP_ERROR err, const char * name)
 {
-    if (err == CHIP_NO_ERROR)
-    {
-        return true;
-    }
-
-    ChipLogError(NotSpecified, "Failed to read %s: %" CHIP_ERROR_FORMAT, name, err.Format());
-
-    return false;
+    SuccessOrLog(err, NotSpecified, "Failed to read %s", name);
+    return (err == CHIP_NO_ERROR);
 }
 #endif
 
@@ -92,39 +86,41 @@ void DeviceSynchronizer::OnAttributeData(const ConcreteDataAttributePath & path,
 #if defined(PW_RPC_ENABLED)
     case Clusters::BasicInformation::Attributes::UniqueID::Id:
         mCurrentDeviceData.has_unique_id =
-            SuccessOrLog(data->GetString(mCurrentDeviceData.unique_id, sizeof(mCurrentDeviceData.unique_id)), "UniqueId");
+            SuccessOrLogName(data->GetString(mCurrentDeviceData.unique_id, sizeof(mCurrentDeviceData.unique_id)), "UniqueId");
         break;
     case Clusters::BasicInformation::Attributes::VendorName::Id:
         mCurrentDeviceData.has_vendor_name =
-            SuccessOrLog(data->GetString(mCurrentDeviceData.vendor_name, sizeof(mCurrentDeviceData.vendor_name)), "VendorName");
+            SuccessOrLogName(data->GetString(mCurrentDeviceData.vendor_name, sizeof(mCurrentDeviceData.vendor_name)), "VendorName");
         break;
     case Clusters::BasicInformation::Attributes::VendorID::Id:
-        mCurrentDeviceData.has_vendor_id = SuccessOrLog(data->Get(mCurrentDeviceData.vendor_id), "VendorID");
+        mCurrentDeviceData.has_vendor_id = SuccessOrLogName(data->Get(mCurrentDeviceData.vendor_id), "VendorID");
         break;
     case Clusters::BasicInformation::Attributes::ProductName::Id:
-        mCurrentDeviceData.has_product_name =
-            SuccessOrLog(data->GetString(mCurrentDeviceData.product_name, sizeof(mCurrentDeviceData.product_name)), "ProductName");
+        mCurrentDeviceData.has_product_name = SuccessOrLogName(
+            data->GetString(mCurrentDeviceData.product_name, sizeof(mCurrentDeviceData.product_name)), "ProductName");
         break;
     case Clusters::BasicInformation::Attributes::ProductID::Id:
-        mCurrentDeviceData.has_product_id = SuccessOrLog(data->Get(mCurrentDeviceData.product_id), "ProductID");
+        mCurrentDeviceData.has_product_id = SuccessOrLogName(data->Get(mCurrentDeviceData.product_id), "ProductID");
         break;
     case Clusters::BasicInformation::Attributes::NodeLabel::Id:
         mCurrentDeviceData.has_node_label =
-            SuccessOrLog(data->GetString(mCurrentDeviceData.node_label, sizeof(mCurrentDeviceData.node_label)), "NodeLabel");
+            SuccessOrLogName(data->GetString(mCurrentDeviceData.node_label, sizeof(mCurrentDeviceData.node_label)), "NodeLabel");
         break;
     case Clusters::BasicInformation::Attributes::HardwareVersion::Id:
-        mCurrentDeviceData.has_hardware_version = SuccessOrLog(data->Get(mCurrentDeviceData.hardware_version), "HardwareVersion");
+        mCurrentDeviceData.has_hardware_version =
+            SuccessOrLogName(data->Get(mCurrentDeviceData.hardware_version), "HardwareVersion");
         break;
     case Clusters::BasicInformation::Attributes::HardwareVersionString::Id:
-        mCurrentDeviceData.has_hardware_version_string = SuccessOrLog(
+        mCurrentDeviceData.has_hardware_version_string = SuccessOrLogName(
             data->GetString(mCurrentDeviceData.hardware_version_string, sizeof(mCurrentDeviceData.hardware_version_string)),
             "HardwareVersionString");
         break;
     case Clusters::BasicInformation::Attributes::SoftwareVersion::Id:
-        mCurrentDeviceData.has_software_version = SuccessOrLog(data->Get(mCurrentDeviceData.software_version), "HardwareVersion");
+        mCurrentDeviceData.has_software_version =
+            SuccessOrLogName(data->Get(mCurrentDeviceData.software_version), "HardwareVersion");
         break;
     case Clusters::BasicInformation::Attributes::SoftwareVersionString::Id:
-        mCurrentDeviceData.has_software_version_string = SuccessOrLog(
+        mCurrentDeviceData.has_software_version_string = SuccessOrLogName(
             data->GetString(mCurrentDeviceData.software_version_string, sizeof(mCurrentDeviceData.software_version_string)),
             "SoftwareVersionString");
         break;
@@ -280,7 +276,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     ChipLogProgress(NotSpecified, "Synchronization complete and add device");
 
 #if defined(PW_RPC_ENABLED)
-    AddSynchronizedDevice(mCurrentDeviceData);
+    TEMPORARY_RETURN_IGNORED AddSynchronizedDevice(mCurrentDeviceData);
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
     if (!mCurrentDeviceData.is_icd)
     {
@@ -294,7 +290,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
             reachabilityChanged.has_id       = true;
             reachabilityChanged.id           = mCurrentDeviceData.id;
             reachabilityChanged.reachability = false;
-            DeviceReachableChanged(reachabilityChanged);
+            TEMPORARY_RETURN_IGNORED DeviceReachableChanged(reachabilityChanged);
         }
     }
 #endif

@@ -245,7 +245,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
+    err = mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
 #if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
@@ -443,7 +443,7 @@ void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Increment life time counter to protect against long-term tracking of rotating device ID.
-    IncrementLifetimeCounter();
+    TEMPORARY_RETURN_IGNORED IncrementLifetimeCounter();
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
 #endif
 }

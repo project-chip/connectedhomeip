@@ -124,49 +124,11 @@ Status AmebaWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
     return Status::kSuccess;
 }
 
-CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    bool connected;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // If device is already connected to WiFi, then disconnect the WiFi,
-    chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(connected);
-    if (connected)
-    {
-        ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Disconnecting);
-        ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-        err = chip::DeviceLayer::Internal::AmebaUtils::WiFiDisconnect();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "WiFiDisconnect() failed");
-            return err;
-        }
-    }
-
-    // clear the WiFi configurations and add the newly provided WiFi configurations.
-    if (chip::DeviceLayer::Internal::AmebaUtils::IsStationProvisioned())
-    {
-        err = chip::DeviceLayer::Internal::AmebaUtils::ClearWiFiConfig();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed");
-            return err;
-        }
-    }
-
-    DeviceLayer::ConnectivityManager::WiFiStationState state = DeviceLayer::ConnectivityManager::kWiFiStationState_Connecting;
-    DeviceLayer::SystemLayer().ScheduleLambda([state, ssid, key]() {
-        ConnectivityMgrImpl().ChangeWiFiStationState(state);
-        chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
-    });
-#endif
-    return err;
-}
-
 void AmebaWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
+        DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailedTimer, nullptr);
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -200,6 +162,54 @@ void AmebaWiFiDriver::OnConnectWiFiNetworkFailed(uint16_t reason)
     }
 }
 
+void AmebaWiFiDriver::OnConnectWiFiNetworkFailedTimer(chip::System::Layer * aLayer, void * aAppState)
+{
+    matter_wifi_set_autoreconnect(0);
+    AmebaWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed(RTW_CONNECT_FAIL);
+}
+
+CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    bool connected;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    // If device is already connected to WiFi, then disconnect the WiFi,
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(connected);
+    if (connected)
+    {
+        ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Disconnecting);
+        ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
+        err = chip::DeviceLayer::Internal::AmebaUtils::WiFiDisconnect();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "WiFiDisconnect() failed");
+            return err;
+        }
+    }
+
+    // clear the WiFi configurations and add the newly provided WiFi configurations.
+    if (chip::DeviceLayer::Internal::AmebaUtils::IsStationProvisioned())
+    {
+        err = chip::DeviceLayer::Internal::AmebaUtils::ClearWiFiConfig();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed");
+            return err;
+        }
+    }
+
+    DeviceLayer::ConnectivityManager::WiFiStationState state = DeviceLayer::ConnectivityManager::kWiFiStationState_Connecting;
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([state, ssid, key]() {
+        ConnectivityMgrImpl().ChangeWiFiStationState(state);
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
+    });
+
+    err = DeviceLayer::SystemLayer().StartTimer(static_cast<System::Clock::Timeout>(kWiFiConnectNetworkTimeoutSeconds * 1000),
+                                                OnConnectWiFiNetworkFailedTimer, nullptr);
+#endif
+    return err;
+}
+
 void AmebaWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -230,11 +240,11 @@ CHIP_ERROR AmebaWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     if (!ssid.empty()) // ssid is given, only scan this network
     {
-        matter_scan_networks_with_ssid(ssid.data(), ssid.size());
+        matter_wifi_scan_networks_with_ssid(ssid.data(), ssid.size());
     }
     else // scan all networks
     {
-        matter_scan_networks();
+        matter_wifi_scan_networks();
     }
     return CHIP_NO_ERROR;
 }

@@ -18,6 +18,7 @@
 
 #include "Identify.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip::app;
 

@@ -45,7 +45,7 @@ extern ThermostatAttrAccess gThermostatAttrAccess;
 void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     EndpointId endpoint = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
-    gThermostatAttrAccess.ResetAtomicWrite(endpoint);
+    TEMPORARY_RETURN_IGNORED gThermostatAttrAccess.ResetAtomicWrite(endpoint);
 }
 
 namespace {
@@ -58,8 +58,8 @@ namespace {
  */
 void ScheduleTimer(EndpointId endpoint, System::Clock::Milliseconds16 timeout)
 {
-    DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
-                                          reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
+                                                                   reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
 /**

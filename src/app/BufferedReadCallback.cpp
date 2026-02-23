@@ -94,7 +94,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    writer.Finalize(backingBuffer);
+    TEMPORARY_RETURN_IGNORED writer.Finalize(backingBuffer);
 
     aReader.Init(std::move(backingBuffer), totalBufSize);
 

@@ -25,6 +25,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #if CHIP_CRYPTO_PSA
 #include <crypto/CHIPCryptoPALPSA.h>
@@ -221,7 +222,7 @@ TEST_F(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(2, loading.Limit());
 
     // Remove first entry
-    saving.Remove(0);
+    EXPECT_SUCCESS(saving.Remove(0));
 
     ICDMonitoringEntry entry4(&keystore);
     entry4.checkInNodeID    = kClientNodeId13;

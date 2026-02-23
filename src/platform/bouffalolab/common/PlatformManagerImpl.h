@@ -97,7 +97,7 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
 
 inline void PlatformManagerImpl::_RunEventLoop(void)
 {
-    PlatformInit();
+    TEMPORARY_RETURN_IGNORED PlatformInit();
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
 

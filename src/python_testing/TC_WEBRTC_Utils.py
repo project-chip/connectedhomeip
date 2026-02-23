@@ -18,6 +18,8 @@ import logging
 
 from matter.clusters import CameraAvStreamManagement
 
+log = logging.getLogger(__name__)
+
 
 class WebRTCTestHelper:
     async def read_avstr_attribute_expect_success(self, endpoint, attribute):
@@ -45,7 +47,7 @@ class WebRTCTestHelper:
 
                 case _:
                     aBitRate = 30000
-                    logging.warning(f"Using default bitrate {aBitRate} for unhandled codec {codec}")
+                    log.warning(f"Using default bitrate {aBitRate} for unhandled codec {codec}")
 
             adoStreamAllocateCmd = CameraAvStreamManagement.Commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -59,7 +61,7 @@ class WebRTCTestHelper:
             return audioStreamAllocateResponse.audioStreamID
 
         except Exception as e:
-            logging.error(f"Failed to allocate audio stream. {e}")
+            log.error(f"Failed to allocate audio stream. {e}")
             return None
 
     async def allocate_video_stream(self, endpoint, devCtrl=None, node_id=None):
@@ -108,5 +110,5 @@ class WebRTCTestHelper:
             return response.videoStreamID
 
         except Exception as e:
-            logging.error(f"Failed to allocate video stream. {e}")
+            log.error(f"Failed to allocate video stream. {e}")
             return None

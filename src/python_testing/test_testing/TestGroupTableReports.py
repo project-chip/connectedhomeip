@@ -41,8 +41,10 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 
 
 class TestGroupTableReports(MatterBaseTest):
@@ -94,7 +96,7 @@ class TestGroupTableReports(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap write failed")
 
         self.print_step(4, "TH subscribes to the GroupTable attribute from the Group Key Management Cluster")
-        subscription_gcm = await self.TH1.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GroupKeyManagement.Attributes.GroupTable)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
+        subscription_gcm = await self.TH1.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, Clusters.GroupKeyManagement.Attributes.GroupTable)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
         gcm_cb = AttributeSubscriptionHandler(expected_cluster=Clusters.GroupKeyManagement,
                                               expected_attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         subscription_gcm.SetAttributeUpdateCallback(gcm_cb)

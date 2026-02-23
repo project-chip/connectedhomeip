@@ -61,7 +61,7 @@ def ReplInit(debug):
     if debug:
         logging.getLogger().setLevel(logging.DEBUG)
     else:
-        logging.getLogger().setLevel(logging.WARN)
+        logging.getLogger().setLevel(logging.WARNING)
 
 
 certificateAuthorityManager = None

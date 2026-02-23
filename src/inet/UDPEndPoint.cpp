@@ -124,7 +124,15 @@ CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
 void UDPEndPoint::Free()
 {
     Close();
-    Delete();
+
+    // CloseImpl() may have called Ref() to keep endpoint alive for pending operations
+    // (when mDelayReleaseCount != 0). Only delete if ref count is still 0.
+    // If ref count > 0, the deferred Unref() scheduled by CloseImpl() will eventually
+    // call Free() again when all pending operations complete.
+    if (GetReferenceCount() == 0)
+    {
+        Delete();
+    }
 }
 
 void UDPEndPoint::Close()

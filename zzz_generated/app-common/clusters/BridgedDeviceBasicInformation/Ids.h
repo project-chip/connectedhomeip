@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster BridgedDeviceBasicInformation (cluster code: 57/0x0439)
+// Identifier constant values for cluster BridgedDeviceBasicInformation (cluster code: 57/0x0039)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

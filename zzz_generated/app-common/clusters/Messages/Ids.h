@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Messages (cluster code: 151/0x0497)
+// Identifier constant values for cluster Messages (cluster code: 151/0x0097)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

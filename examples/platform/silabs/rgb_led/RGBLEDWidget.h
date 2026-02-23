@@ -77,9 +77,4 @@ private:
     float CalculateRed(float ct);
     float CalculateGreen(float ct);
     float CalculateBlue(float ct);
-
-    uint8_t CalculateP(uint8_t v, uint8_t s);
-    uint8_t CalculateQ(uint8_t v, uint8_t s, uint32_t remainder);
-    uint8_t CalculateT(uint8_t v, uint8_t s, uint32_t remainder);
-    void SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_t q, uint8_t t, RgbColor_t & rgb);
 };

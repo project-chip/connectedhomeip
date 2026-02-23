@@ -271,10 +271,10 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
     size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    msg->Read(udcPayload, udcPayloadLength);
+    TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
 
     CommissionerDeclaration cd;
-    cd.ReadPayload(udcPayload, sizeof(udcPayload));
+    TEMPORARY_RETURN_IGNORED cd.ReadPayload(udcPayload, sizeof(udcPayload));
     cd.DebugLog();
 
     // Call the registered mCommissionerDeclarationHandler, if any.

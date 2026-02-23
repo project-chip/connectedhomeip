@@ -255,9 +255,10 @@ if (CONFIG_CHIP_APP_OTA_REQUESTOR)
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
         )
-    elseif (CONFIG_CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE)
+    elseif (CONFIG_CHIP_APP_OTA_REQUESTOR_INITIATOR_EMPTY_SELF_TEST)
         target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorEmptySelfTest.cpp
         )
     endif()
     if (CONFIG_CHIP_APP_PLATFORM_OTA_UTILS)

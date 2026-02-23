@@ -19,6 +19,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/ActiveResolveAttempts.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 namespace {
 
@@ -128,7 +129,7 @@ TEST(TestActiveResolveAttempts, TestSingleBrowseAddRemove)
     EXPECT_EQ(attempts.GetTimeUntilNextExpectedResponse(), std::make_optional<Timeout>(1900_ms32));
 
     // once complete, nothing to schedule
-    attempts.CompleteAllBrowses();
+    EXPECT_SUCCESS(attempts.CompleteAllBrowses());
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
     EXPECT_FALSE(attempts.NextScheduled().has_value());
 }
@@ -376,7 +377,7 @@ TEST(TestActiveResolveAttempts, TestCombination)
     // Complete all, we should see no more scheduled.
     attempts.Complete(MakePeerId(2));
     attempts.Complete(MakePeerId(1));
-    attempts.CompleteAllBrowses();
+    EXPECT_SUCCESS(attempts.CompleteAllBrowses());
 
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
     EXPECT_FALSE(attempts.NextScheduled().has_value());

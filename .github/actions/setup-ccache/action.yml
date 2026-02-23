@@ -28,11 +28,11 @@ runs:
         main: |
           mkdir -p .ccache
           echo "CCACHE_NOHASHDIR=1" >> $GITHUB_ENV
-          echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
           echo "CCACHE_NODIRECT=1" >> $GITHUB_ENV
-          echo "CCACHE_PREFIX_CPP=${{ github.workspace }}/scripts/helpers/ccache-prefix-cpp.sh" >> $GITHUB_ENV
+          echo "CCACHE_PREFIX_CPP=${GITHUB_WORKSPACE}/scripts/helpers/ccache-prefix-cpp.sh" >> $GITHUB_ENV
           echo "CCACHE_SLOPPINESS=time_macros" >> $GITHUB_ENV
-          echo "CCACHE_DIR=${{ github.workspace }}/.ccache" >> $GITHUB_ENV
+          echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
           echo "CCACHE_COMPILERCHECK=content" >> $GITHUB_ENV
           echo "CCACHE_MAXSIZE=5G" >> $GITHUB_ENV
           echo "CCACHE_COMPRESS=1" >> $GITHUB_ENV

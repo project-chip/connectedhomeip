@@ -46,16 +46,19 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const Bindin
         {
         case Clusters::OnOff::Commands::Toggle::Id:
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, toggleCommand,
+                                                                      onSuccess, onFailure);
             break;
         case Clusters::OnOff::Commands::On::Id:
             Clusters::OnOff::Commands::On::Type onCommand;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, onCommand,
+                                                                      onSuccess, onFailure);
             break;
 
         case Clusters::OnOff::Commands::Off::Id:
             Clusters::OnOff::Commands::Off::Type offCommand;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, offCommand,
+                                                                      onSuccess, onFailure);
             break;
         default:
             ChipLogError(NotSpecified, "Unsupported Command Id");
@@ -68,7 +71,8 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const Bindin
         {
             Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
             moveToLevelCommand.level = data->level;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToLevelCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote,
+                                                                      moveToLevelCommand, onSuccess, onFailure);
         }
         else
         {
@@ -82,7 +86,8 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const Bindin
             Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
             moveToColorCommand.colorX = data->colorXY.x;
             moveToColorCommand.colorY = data->colorXY.y;
-            Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote, moveToColorCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(exchangeMgr, sessionHandle, binding.remote,
+                                                                      moveToColorCommand, onSuccess, onFailure);
         }
         else
         {
@@ -107,16 +112,19 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const Binding:
         {
         case Clusters::OnOff::Commands::Toggle::Id:
             Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           toggleCommand);
             break;
         case Clusters::OnOff::Commands::On::Id:
             Clusters::OnOff::Commands::On::Type onCommand;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           onCommand);
 
             break;
         case Clusters::OnOff::Commands::Off::Id:
             Clusters::OnOff::Commands::Off::Type offCommand;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           offCommand);
             break;
         default:
             ChipLogError(NotSpecified, "Unsupported Command Id");
@@ -129,7 +137,8 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const Binding:
         {
             Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
             moveToLevelCommand.level = data->level;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToLevelCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           moveToLevelCommand);
         }
         else
         {
@@ -143,7 +152,8 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const Binding:
             Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
             moveToColorCommand.colorX = data->colorXY.x;
             moveToColorCommand.colorY = data->colorXY.y;
-            Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToColorCommand);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                           moveToColorCommand);
         }
         else
         {
@@ -229,5 +239,6 @@ void SwitchWorkerFunction(intptr_t context)
         Platform::Delete(data);
     }
 
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId,
+                                                                                       static_cast<void *>(data));
 }

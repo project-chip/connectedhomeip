@@ -26,6 +26,7 @@
 #include "messaging/ExchangeDelegate.h"
 #include "system/SystemClock.h"
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
@@ -69,7 +70,7 @@ using namespace chip::Messaging;
 using namespace chip::System;
 using namespace chip::Protocols;
 
-using TestExchangeHolder = chip::Test::LoopbackMessagingContext;
+using TestExchangeHolder = chip::Testing::LoopbackMessagingContext;
 
 class MockProtocolResponder : public ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
@@ -88,8 +89,8 @@ public:
     MockProtocolResponder(TestExchangeHolder & ctx, BehaviorModifier modifier1, Args &&... args) :
         mExchangeCtx(*this), mBehaviorModifier(modifier1, std::forward<Args>(args)...), testExchangeHolder(ctx)
     {
-        testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id,
-                                                                                             this);
+        EXPECT_SUCCESS(testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(
+            chip::Protocols::MockProtocol::Id, this));
         ChipLogDetail(ExchangeManager, "[%p] MockProtocolResponder: %p", this, &mExchangeCtx);
     }
 
@@ -97,15 +98,16 @@ public:
         mExchangeCtx(*this), testExchangeHolder(ctx)
     {
         mBehaviorModifier.Set(modifier);
-        testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id,
-                                                                                             this);
+        EXPECT_SUCCESS(testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(
+            chip::Protocols::MockProtocol::Id, this));
         ChipLogDetail(ExchangeManager, "[%p] MockProtocolResponder: %p", this, &mExchangeCtx);
     }
 
     ~MockProtocolResponder()
     {
         ChipLogDetail(ExchangeManager, "[%p] ~MockProtocolResponder", this);
-        testExchangeHolder.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id);
+        EXPECT_SUCCESS(testExchangeHolder.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(
+            chip::Protocols::MockProtocol::Id));
     }
 
     bool DidInteractionSucceed() { return mInteractionSucceeded; }
@@ -350,7 +352,7 @@ TEST_F(TestExchangeHolder, TestExchangeHolder)
 {
     auto sessionHandle = GetSessionAliceToBob();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(chip::Testing::MessagingContext::MRPMode::kResponsive);
 
     //
     // #1: Initiator (AllocExchange)

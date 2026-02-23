@@ -21,6 +21,7 @@ import os
 import random
 import shutil
 import tempfile
+from enum import Enum
 from typing import Optional
 
 import psutil
@@ -31,6 +32,14 @@ from TC_TLS_Utils import TLSUtils
 
 from matter.interaction_model import Status
 from matter.testing.tasks import Subprocess
+
+log = logging.getLogger(__name__)
+
+
+class SupportedIngestInterface(str, Enum):
+    cmaf = "cmaf-ingest"  # Interface 1
+    dash = "dash"  # Interface 2, DASH version
+    hls = "hls"  # Interface 2, HLS version
 
 
 class PushAvServerProcess(Subprocess):
@@ -51,7 +60,7 @@ class PushAvServerProcess(Subprocess):
         server_ip: str | None = None,
     ):
         if server_path is None:
-            logging.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
+            log.error(f"No path provided for Push AV Server, using the default path for TH: {self.DEFAULT_SERVER_PATH}")
             server_path = self.DEFAULT_SERVER_PATH
         self._working_directory = os.path.join(tempfile.gettempdir(), "pavstest")
         if os.path.exists(self._working_directory):
@@ -125,17 +134,17 @@ class PushAvServerProcess(Subprocess):
         csr_pem = csr.public_bytes(serialization.Encoding.PEM).decode("utf-8")
         return self._post_json(f"/certs/{device_name}/sign", {"csr": csr_pem})
 
-    def create_stream(self) -> str:
+    def create_stream(self, interface: SupportedIngestInterface) -> str:
         """Request the server to create a new stream."""
-        response = self._post_json("/streams")
-        return response["stream_id"]
+        response = self._post_json(f"/streams?interface={interface}")
+        return response["id"]
 
     def update_track_name(self, stream_id: str, trackName: str) -> None:
         """
             Request the server to add a track name associated with stream_id.
             This is required to validate trackName of the segments that are uploaded.
         """
-        self._post_json(endpoint=f"/streams/{stream_id}/trackName", data={"trackName": trackName})
+        self._post_json(endpoint=f"/streams/{stream_id}/trackName", data={"track_name": trackName})
 
 
 class PAVSTIUtils:
@@ -173,11 +182,11 @@ class PAVSTIUtils:
         if host_ip is None:
             # If no host ip specified, try to get private ip
             # this is mainly required when running TCs in Test Harness
-            logging.error("No host_ip provided in test arguments")
+            log.error("No host_ip provided in test arguments")
             host_ip = self.get_private_ip()
 
         tls_utils = TLSUtils(self, endpoint=endpoint)
-        logging.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
+        log.info(f"Using IP: {host_ip} as hostname to provision TLS Endpoint")
         root_cert_der = server.get_root_cert()
         prc_result = await tls_utils.send_provision_root_command(certificate=root_cert_der)
         tls_utils.assert_valid_caid(prc_result.caid)

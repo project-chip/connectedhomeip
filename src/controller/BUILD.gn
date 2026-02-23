@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/controller/flags.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -105,6 +106,7 @@ static_library("controller") {
     ":interactions",
     "${chip_root}/src/app",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials/jcm:jcm",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
@@ -122,19 +124,16 @@ static_library("controller") {
     public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
   }
 
-  public_configs = [ "${chip_root}/src:includes" ]
-}
+  if (chip_device_platform == "linux" && chip_crypto != "mbedtls" &&
+      chip_support_thread_meshcop && current_cpu == host_cpu &&
+      current_os == host_os) {
+    sources += [
+      "ThreadMeshcopCommissionProxy.cpp",
+      "ThreadMeshcopCommissionProxy.h",
+    ]
+    deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns:minimal_mdns" ]
+    public_deps += [ "${chip_root}/third_party/ot-commissioner" ]
+  }
 
-source_set("jcm") {
-  sources = [
-    "jcm/AutoCommissioner.cpp",
-    "jcm/AutoCommissioner.h",
-    "jcm/DeviceCommissioner.cpp",
-    "jcm/DeviceCommissioner.h",
-    "jcm/TrustVerification.h",
-  ]
-  public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/controller:controller",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

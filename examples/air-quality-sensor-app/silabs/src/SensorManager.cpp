@@ -26,6 +26,7 @@
 #include "AppTask.h"
 #include <AirQualityConfig.h>
 #include <air-quality-sensor-manager.h>
+#include <platform/PlatformError.h>
 
 #ifdef USE_AIR_QUALITY_SENSOR
 #include "AirQualitySensor.h"
@@ -104,7 +105,7 @@ void InitAirQualitySensorManager(intptr_t arg)
 
 CHIP_ERROR SensorManager::Init()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(InitAirQualitySensorManager);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(InitAirQualitySensorManager);
     // Create cmsisos sw timer for air quality sensor timer.
     mSensorTimer = osTimerNew(SensorTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
     if (mSensorTimer == NULL)
@@ -114,10 +115,11 @@ CHIP_ERROR SensorManager::Init()
     }
 
 #ifdef USE_AIR_QUALITY_SENSOR
-    if (SL_STATUS_OK != AirQualitySensor::Init())
+    sl_status_t status = AirQualitySensor::Init();
+    if (status != SL_STATUS_OK)
     {
-        ChipLogDetail(AppServer, "Failed to Init Sensor");
-        return CHIP_ERROR_INTERNAL;
+        ChipLogError(AppServer, "Failed to Init Sensor with error code: %lx", status);
+        return MATTER_PLATFORM_ERROR(status);
     }
 #endif
     // Update Air Quality immediatly at bootup
@@ -176,5 +178,6 @@ void SensorManager::SensorTimerEventHandler(void * arg)
 #endif // USE_AIR_QUALITY_SENSOR
     // create pointer for the int32_t air_quality
     int32_t * air_quality_ptr = new int32_t(air_quality);
-    DeviceLayer::PlatformMgr().ScheduleWork(writeAirQualityToAttribute, reinterpret_cast<intptr_t>(air_quality_ptr));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(writeAirQualityToAttribute,
+                                                                     reinterpret_cast<intptr_t>(air_quality_ptr));
 }

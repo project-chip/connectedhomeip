@@ -24,6 +24,27 @@
 
 namespace chip {
 namespace app {
-namespace Clusters {} // namespace Clusters
+namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentControl::StatusCodeEnum val)
+{
+    using EnumType = ContentControl::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kInvalidPINCode:
+    case EnumType::kInvalidRating:
+    case EnumType::kInvalidChannel:
+    case EnumType::kChannelAlreadyExist:
+    case EnumType::kChannelNotExist:
+    case EnumType::kUnidentifiableApplication:
+    case EnumType::kApplicationAlreadyExist:
+    case EnumType::kApplicationNotExist:
+    case EnumType::kTimeWindowAlreadyExist:
+    case EnumType::kTimeWindowNotExist:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+} // namespace Clusters
 } // namespace app
 } // namespace chip

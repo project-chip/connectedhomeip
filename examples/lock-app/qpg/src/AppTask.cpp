@@ -61,7 +61,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Init ZCL Data Model and start server
-    PlatformMgr().ScheduleWork(AppTask::InitServerWrapper, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(AppTask::InitServerWrapper, 0);
 
     // Setup powercycle reset expired handler
     gpAppFramework_SetResetExpiredHandler(AppTask::PowerCycleExpiredHandlerWrapper);
@@ -84,7 +84,7 @@ CHIP_ERROR AppTask::Init()
 
 void AppTask::JammedLockEventHandler(AppEvent * aEvent)
 {
-    SystemLayer().ScheduleLambda([] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([] {
         bool retVal;
 
         retVal = DoorLockServer::Instance().SendLockAlarmEvent(QPG_LOCK_ENDPOINT_ID, AlarmCodeEnum::kLockJammed);
@@ -249,7 +249,7 @@ void AppTask::UpdateClusterState(void)
     using namespace chip::app::Clusters;
     auto newValue = BoltLockMgr().IsUnlocked() ? DoorLock::DlLockState::kUnlocked : DoorLock::DlLockState::kLocked;
 
-    SystemLayer().ScheduleLambda([newValue] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newValue] {
         bool retVal = true;
         chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
         chip::app::Clusters::DoorLock::Attributes::LockState::Get(QPG_LOCK_ENDPOINT_ID, currentLockState);

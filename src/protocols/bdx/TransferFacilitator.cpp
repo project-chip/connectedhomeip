@@ -93,13 +93,13 @@ void TransferFacilitator::PollForOutput()
     HandleTransferSessionOutput(outEvent);
 
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
+    TEMPORARY_RETURN_IGNORED mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
 }
 
 void TransferFacilitator::ScheduleImmediatePoll()
 {
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    mSystemLayer->StartTimer(System::Clock::Milliseconds32(kImmediatePollDelay), PollTimerHandler, this);
+    TEMPORARY_RETURN_IGNORED mSystemLayer->StartTimer(System::Clock::Milliseconds32(kImmediatePollDelay), PollTimerHandler, this);
 }
 
 CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
@@ -113,8 +113,7 @@ CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole rol
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
 
     ChipLogProgress(BDX, "Start polling for messages");
-    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
-    return CHIP_NO_ERROR;
+    return mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
 }
 
 CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
@@ -127,8 +126,7 @@ CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role,
 
     ReturnErrorOnFailure(mTransfer.StartTransfer(role, initData, timeout));
 
-    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
-    return CHIP_NO_ERROR;
+    return mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
 }
 
 } // namespace bdx

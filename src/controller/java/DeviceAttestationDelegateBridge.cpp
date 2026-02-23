@@ -77,17 +77,17 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
         VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
         JniLocalReferenceScope scope(env);
         jclass deviceAttestationDelegateCls = nullptr;
-        JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
-                                                      deviceAttestationDelegateCls);
+        TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetLocalClassRef(
+            env, "chip/devicecontroller/DeviceAttestationDelegate", deviceAttestationDelegateCls);
         VerifyOrReturn(deviceAttestationDelegateCls != nullptr,
                        ChipLogError(Controller, "Could not find device attestation delegate class."));
 
         if (env->IsInstanceOf(mDeviceAttestationDelegate.ObjectRef(), deviceAttestationDelegateCls))
         {
             jmethodID onDeviceAttestationCompletedMethod;
-            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate.ObjectRef(), "onDeviceAttestationCompleted",
-                                                    "(JLchip/devicecontroller/AttestationInfo;J)V",
-                                                    &onDeviceAttestationCompletedMethod);
+            TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().FindMethod(
+                env, mDeviceAttestationDelegate.ObjectRef(), "onDeviceAttestationCompleted",
+                "(JLchip/devicecontroller/AttestationInfo;J)V", &onDeviceAttestationCompletedMethod);
             VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr,
                            ChipLogError(Controller, "Could not find deviceAttestation completed method"));
 

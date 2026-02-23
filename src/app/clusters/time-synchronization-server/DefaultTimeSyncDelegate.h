@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +18,10 @@
 
 #pragma once
 
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace TimeSynchronization {
+namespace chip::app::Clusters::TimeSynchronization {
+
 class DefaultTimeSyncDelegate : public Delegate
 {
 
@@ -34,7 +32,4 @@ public:
     CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
 };
 
-} // namespace TimeSynchronization
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::TimeSynchronization

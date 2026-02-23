@@ -171,29 +171,6 @@ public:
 };
 
 } // namespace MeasurementAccuracyStruct
-namespace ApplicationStruct {
-enum class Fields : uint8_t
-{
-    kCatalogVendorID = 0,
-    kApplicationID   = 1,
-};
-
-struct Type
-{
-public:
-    uint16_t catalogVendorID = static_cast<uint16_t>(0);
-    chip::CharSpan applicationID;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ApplicationStruct
 namespace ErrorStateStruct {
 enum class Fields : uint8_t
 {
@@ -627,6 +604,8 @@ enum class Fields : uint8_t
     kVideoStreamID   = 4,
     kAudioStreamID   = 5,
     kMetadataEnabled = 6,
+    kVideoStreams    = 7,
+    kAudioStreams    = 8,
     kFabricIndex     = 254,
 };
 
@@ -639,10 +618,10 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
-    bool metadataEnabled          = static_cast<bool>(0);
+    bool metadataEnabled = static_cast<bool>(0);
+    Optional<DataModel::List<const uint16_t>> videoStreams;
+    Optional<DataModel::List<const uint16_t>> audioStreams;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -657,7 +636,28 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    uint16_t id                          = static_cast<uint16_t>(0);
+    chip::NodeId peerNodeID              = static_cast<chip::NodeId>(0);
+    chip::EndpointId peerEndpointID      = static_cast<chip::EndpointId>(0);
+    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
+    DataModel::Nullable<uint16_t> videoStreamID;
+    DataModel::Nullable<uint16_t> audioStreamID;
+    bool metadataEnabled = static_cast<bool>(0);
+    Optional<DataModel::DecodableList<uint16_t>> videoStreams;
+    Optional<DataModel::DecodableList<uint16_t>> audioStreams;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+};
 
 } // namespace WebRTCSessionStruct
 

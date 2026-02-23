@@ -87,6 +87,7 @@ void CommissionerDiscoveryController::OnCancel(UDCClientState state)
     {
         mUserPrompter->HidePromptsOnCancel(state.GetVendorId(), state.GetProductId(), state.GetDeviceName());
     }
+    ResetState();
     return;
 }
 
@@ -130,7 +131,8 @@ void CommissionerDiscoveryController::OnCommissionerPasscodeReady(UDCClientState
             ChipLogError(AppServer, "On UDC: no udc server");
             return;
         }
-        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(state.GetPeerAddress().GetIPAddress(), state.GetCdPort()));
+        TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
+            cd, Transport::PeerAddress::UDP(state.GetPeerAddress().GetIPAddress(), state.GetCdPort()));
         return;
     }
     else
@@ -383,7 +385,9 @@ void CommissionerDiscoveryController::HandleTargetContentAppCheck(TargetAppInfo 
         ChipLogDetail(AppServer, "UX Ok - HandleContentAppCheck: target apps specified but none found, sending CDC");
         CommissionerDeclaration cd;
         cd.SetNoAppsFound(true);
-        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
+            cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        ResetState();
     }
     ChipLogDetail(AppServer, "UX Ok - HandleContentAppCheck: advancing");
     // otherwise, advance to the next step for trying to obtain a passcode.
@@ -467,7 +471,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                 CommissionerDeclaration cd;
                 cd.SetErrorCode(CommissionerDeclaration::CdError::kCommissionerPasscodeDisabled);
                 cd.SetNeedsPasscode(true);
-                mUdcServer->SendCDCMessage(
+                TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
                     cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
                 return;
             }
@@ -482,8 +486,8 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
             {
                 cd.SetQRCodeDisplayed(true);
             }
-            mUdcServer->SendCDCMessage(cd,
-                                       Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+            TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
+                cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
 
             // dialog
             ChipLogDetail(Controller,
@@ -493,7 +497,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
                           client->GetPairingInst(), ChipLogValueMEI(client->GetVendorId()), ChipLogValueMEI(client->GetProductId()),
                           client->GetInstanceName());
             mUserPrompter->PromptWithCommissionerPasscode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName(),
-                                                          passcode, client->GetPasscodeLength(), client->GetPairingHint(),
+                                                          passcode, passcodeInfo.displayLength, client->GetPairingHint(),
                                                           client->GetPairingInst());
             return;
         }
@@ -511,7 +515,9 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         ChipLogDetail(AppServer, "UX Ok: no app passcode and NoPasscode in UDC, sending CDC");
         CommissionerDeclaration cd;
         cd.SetNeedsPasscode(true);
-        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
+            cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        ResetState();
         return;
     }
 
@@ -522,7 +528,8 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         CommissionerDeclaration cd;
         cd.SetNeedsPasscode(true); // TODO: should this be set?
         cd.SetPasscodeDialogDisplayed(true);
-        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
+            cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
     }
 
     ChipLogDetail(Controller, "------PROMPT USER: please enter passcode displayed in casting app ");
@@ -636,7 +643,8 @@ void CommissionerDiscoveryController::Cancel()
         ChipLogDetail(AppServer, "UX Cancel: user cancelled entering PIN code, sending CDC");
         CommissionerDeclaration cd;
         cd.SetCancelPasscode(true);
-        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        TEMPORARY_RETURN_IGNORED mUdcServer->SendCDCMessage(
+            cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
     }
 
     mPendingConsent = false;

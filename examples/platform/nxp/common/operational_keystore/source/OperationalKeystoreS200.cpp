@@ -28,7 +28,7 @@ chip::Crypto::OperationalKeystore * chip::NXP::App::OperationalKeystore::GetInst
 CHIP_ERROR chip::NXP::App::OperationalKeystore::Init(PersistentStorageDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INTERNAL);
-    sInstance.Init(delegate);
+    TEMPORARY_RETURN_IGNORED sInstance.Init(delegate);
 
     return CHIP_NO_ERROR;
 }

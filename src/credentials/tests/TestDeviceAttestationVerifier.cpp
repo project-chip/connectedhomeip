@@ -30,6 +30,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -63,11 +64,11 @@ TEST_F(TestDeviceAttestationVerifier, AttestationDeviceInfoCopiesFields)
     // Add attestation elements to the TLV structure
     CHIP_ERROR err = writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
-    writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData));
-    writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData));
-    writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0)); // Timestamp
-    writer.Put(chip::TLV::ContextTag(4), ByteSpan());               // FirmwareInfo
-    writer.Put(chip::TLV::ContextTag(5), ByteSpan());               // VendorReserved
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(1), ByteSpan(cdData)));
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(2), ByteSpan(nonceData)));
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(3), static_cast<uint32_t>(0))); // Timestamp
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(4), ByteSpan()));               // FirmwareInfo
+    EXPECT_SUCCESS(writer.Put(chip::TLV::ContextTag(5), ByteSpan()));               // VendorReserved
     err = writer.EndContainer(outerType);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
@@ -136,7 +137,7 @@ TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainSuccess)
 
     // Create a test revocation delegate that returns success (no revocation data set)
     TestDACRevocationDelegateImpl revocationDelegate;
-    verifier.SetRevocationDelegate(&revocationDelegate);
+    EXPECT_SUCCESS(verifier.SetRevocationDelegate(&revocationDelegate));
 
     // Prepare dummy attestation data
     uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
@@ -170,8 +171,8 @@ TEST_F(TestDeviceAttestationVerifier, CheckForRevokedDACChainEmptyRevocationData
 
     // Create a test revocation delegate with empty revocation data
     TestDACRevocationDelegateImpl revocationDelegate;
-    revocationDelegate.SetDeviceAttestationRevocationData("[]"); // Empty revocation list
-    verifier.SetRevocationDelegate(&revocationDelegate);
+    EXPECT_SUCCESS(revocationDelegate.SetDeviceAttestationRevocationData("[]")); // Empty revocation list
+    EXPECT_SUCCESS(verifier.SetRevocationDelegate(&revocationDelegate));
 
     // Prepare dummy attestation data
     uint8_t testData[8] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };

@@ -90,7 +90,7 @@ runs:
 
     - name: Save bootstrap cache
       uses: ./.github/actions/dynamic
-      # Don't save cache if the build is a pull request, to prevent creation of multiple pr-ref caches with the same key. 
+      # Don't save cache if the build is a pull request, to prevent creation of multiple pr-ref caches with the same key.
       # PR builds still will be able to restore from cache created by master build.
       if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' && github.event_name != 'pull_request' }}
       continue-on-error: true
@@ -107,6 +107,7 @@ runs:
       if: ${{ always() && !env.ACT && fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' }}
       with:
         name: ${{ inputs.bootstrap-log-name }}
+        overwrite: true # may as well, avoid errors of "artifact already exists"
         path: |
             .environment/gn_out/.ninja_log
             .environment/pigweed-venv/*.log

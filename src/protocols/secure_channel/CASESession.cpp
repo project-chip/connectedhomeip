@@ -317,7 +317,7 @@ private:
         if (auto * session = helper->mSession.load())
         {
             // Execute callback in Matter thread; session should be OK with this
-            (session->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
+            TEMPORARY_RETURN_IGNORED(session->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
         }
     }
 
@@ -973,7 +973,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
                 // Found a match, stop working, cache IPK, update local fabric context
                 found = true;
                 MutableByteSpan ipkSpan(mIPK);
-                CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
+                TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(candidateIpkSpan, ipkSpan);
                 mFabricIndex = fabricInfo.GetFabricIndex();
                 mLocalNodeId = nodeId;
                 break;
@@ -1658,7 +1658,8 @@ CHIP_ERROR CASESession::ParseSigma2TBEData(ContiguousBufferTLVReader & decrypted
     // tbsData2Signature's length should equal kMax_ECDSA_Signature_Length as per the Specification
     size_t signatureLen = decryptedDataTlvReader.GetLength();
     VerifyOrReturnError(outParsedSigma2TBE.tbsData2Signature.Capacity() == signatureLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
-    outParsedSigma2TBE.tbsData2Signature.SetLength(signatureLen);
+    // Size checked above
+    RETURN_SAFELY_IGNORED outParsedSigma2TBE.tbsData2Signature.SetLength(signatureLen);
     ReturnErrorOnFailure(decryptedDataTlvReader.GetBytes(outParsedSigma2TBE.tbsData2Signature.Bytes(),
                                                          outParsedSigma2TBE.tbsData2Signature.Length()));
 
@@ -2073,7 +2074,8 @@ CHIP_ERROR CASESession::ParseSigma3TBEData(ContiguousBufferTLVReader & decrypted
     VerifyOrReturnError(decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSignature), CHIP_ERROR_INVALID_TLV_TAG);
     size_t signatureLen = decryptedDataTlvReader.GetLength();
     VerifyOrReturnError(outHandleSigma3TBEData.tbsData3Signature.Capacity() == signatureLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
-    outHandleSigma3TBEData.tbsData3Signature.SetLength(signatureLen);
+    // Size checked above
+    RETURN_SAFELY_IGNORED outHandleSigma3TBEData.tbsData3Signature.SetLength(signatureLen);
     ReturnErrorOnFailure(decryptedDataTlvReader.GetBytes(outHandleSigma3TBEData.tbsData3Signature.Bytes(),
                                                          outHandleSigma3TBEData.tbsData3Signature.Length()));
 

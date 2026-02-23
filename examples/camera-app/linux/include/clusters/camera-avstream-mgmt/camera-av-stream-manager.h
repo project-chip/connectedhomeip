@@ -20,7 +20,7 @@
 
 #include "camera-avstream-controller.h"
 #include "camera-device-interface.h"
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/util/config.h>
 #include <vector>
 
@@ -32,7 +32,7 @@ namespace CameraAvStreamManagement {
 /**
  * The application delegate to define the options & implement commands.
  */
-class CameraAVStreamManager : public CameraAVStreamMgmtDelegate, public CameraAVStreamController
+class CameraAVStreamManager : public CameraAVStreamManagementDelegate, public CameraAVStreamController
 {
 public:
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
@@ -67,14 +67,20 @@ public:
                                                         ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
-    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                        Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
+    ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
+                        Optional<std::vector<uint16_t>> & audioStreams) override;
 
     CHIP_ERROR
     ValidateVideoStreamID(uint16_t videoStreamId) override;
 
     CHIP_ERROR
     ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR
+    ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
+
+    CHIP_ERROR
+    ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override;
 
     CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
 
@@ -90,9 +96,11 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(const std::vector<uint16_t> & audioStreams,
+                                                   const std::vector<uint16_t> & videoStreams) override;
 
-    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID) override;
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(const std::vector<uint16_t> & audioStreams,
+                                                   const std::vector<uint16_t> & videoStreams) override;
 
     const std::vector<chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct> & GetAllocatedVideoStreams() const override;
 

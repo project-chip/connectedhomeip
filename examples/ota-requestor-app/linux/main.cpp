@@ -217,7 +217,7 @@ static void InitOTARequestor(void)
     gRequestorUser.SetSendNotifyUpdateApplied(gSendNotifyUpdateApplied);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    SuccessOrDie(gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader));
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
@@ -349,7 +349,8 @@ int main(int argc, char * argv[])
             ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
         }
 
-        argv[0] = kImageExecPath;
+        std::string imageExecPath(kImageExecPath);
+        argv[0] = imageExecPath.data();
         execv(argv[0], argv);
 
         // If successfully executing the new image, execv should not return

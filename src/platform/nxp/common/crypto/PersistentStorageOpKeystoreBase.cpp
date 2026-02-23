@@ -82,7 +82,7 @@ CHIP_ERROR PersistentStorageOpKeystoreNXP::CommitOpKeypairForFabric(FabricIndex 
     P256SerializedKeypairNXP tmpKeyBlob;
     uint16_t keyBlobLen = tmpKeyBlob.Capacity();
 
-    mPendingKeypair->ExportBlob(tmpKeyBlob);
+    TEMPORARY_RETURN_IGNORED mPendingKeypair->ExportBlob(tmpKeyBlob);
     ReturnErrorOnFailure(
         mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), tmpKeyBlob.Bytes(), keyBlobLen));
 
@@ -109,7 +109,7 @@ CHIP_ERROR PersistentStorageOpKeystoreNXP::NewOpKeypairForFabric(FabricIndex fab
     mPendingKeypair = Platform::New<P256KeypairNXP>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
+    TEMPORARY_RETURN_IGNORED mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
     size_t csrLength = outCertificateSigningRequest.size();
     CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
     if (err != CHIP_NO_ERROR)

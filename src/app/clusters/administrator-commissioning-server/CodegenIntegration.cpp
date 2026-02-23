@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/AdministratorCommissioning.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
@@ -58,7 +59,11 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(featureMap));
+        gServer.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>(featureMap),
+                       AdministratorCommissioningCluster::Context{ .commissioningWindowManager =
+                                                                       Server::GetInstance().GetCommissioningWindowManager(),
+                                                                   .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                                   .failSafeContext = Server::GetInstance().GetFailSafeContext() });
         return gServer.Registration();
     }
 
@@ -94,7 +99,7 @@ void MatterAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -108,7 +113,7 @@ void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpoint
             .fixedClusterInstanceCount = AdministratorCommissioning::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // only root-node functionality supported by this implementation
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterAdministratorCommissioningPluginServerInitCallback() {}

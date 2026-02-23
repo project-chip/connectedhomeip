@@ -90,7 +90,8 @@ extern "C" void __wrap_exit(int __status)
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 extern "C" int wlan_event_callback(enum wlan_event_reason reason, void * data)
 {
-    return 0;
+    /* Could be called by wifi driver for specific event scenarios like when the driver hangs */
+    return chip::DeviceLayer::ConnectivityMgrImpl()._WlanEventCallback(reason, data);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
@@ -339,7 +340,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -362,5 +364,5 @@ void PlatformManagerImpl::_Shutdown()
 
 extern "C" void mt_wipe(void)
 {
-    chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NXPConfig::FactoryResetConfig();
 }

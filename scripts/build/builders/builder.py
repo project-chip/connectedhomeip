@@ -108,8 +108,8 @@ class Builder(ABC):
         if self.options.enable_flashbundle:
             self._bundle()
 
-    def _Execute(self, cmdarray, title=None):
-        self._runner.Run(cmdarray, title=title)
+    def _Execute(self, cmdarray, title=None, dedup=False):
+        self._runner.Run(cmdarray, title=title, dedup=dedup)
 
     def CompressArtifacts(self, target_file: str):
         with tarfile.open(target_file, "w:gz") as tar:

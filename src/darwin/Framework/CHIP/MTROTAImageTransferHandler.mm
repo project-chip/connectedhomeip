@@ -535,13 +535,12 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err;
 
     // If we receive a ReceiveInit message, then we prepare for transfer.
     //
     // If init succeeds, or is not needed, we send the message to the AsyncTransferFacilitator for processing.
     if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-        err = Init(ec);
+        CHIP_ERROR err = Init(ec);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(Controller, "OnMessageReceived: Failed to prepare for transfer for BDX: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
@@ -549,6 +548,5 @@ CHIP_ERROR MTROTAImageTransferHandler::OnMessageReceived(
     }
 
     // Send the message to the AsyncFacilitator to drive the BDX session state machine.
-    AsyncTransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
-    return err;
+    return AsyncTransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }

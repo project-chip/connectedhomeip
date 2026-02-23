@@ -37,7 +37,6 @@
 #include <esp_log.h>
 #include <lib/dnssd/Advertiser.h>
 
-#include <app/TimerDelegates.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPMem.h>

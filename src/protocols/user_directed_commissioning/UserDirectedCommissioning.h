@@ -193,6 +193,7 @@ public:
 
     void DebugLog()
     {
+#if CHIP_DETAIL_LOGGING
         ChipLogDetail(AppServer, "---- Identification Declaration Start ----");
 
         ChipLogDetail(AppServer, "\tinstance: %s", mInstanceName);
@@ -215,8 +216,13 @@ public:
         if (mRotatingIdLen > 0)
         {
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(mRotatingId, mRotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
-            ChipLogDetail(AppServer, "\trotating id: %s", rotatingIdString);
+            const char * rotatingIdStringPtr                              = rotatingIdString;
+            if (Encoding::BytesToUppercaseHexString(mRotatingId, mRotatingIdLen, rotatingIdString, sizeof(rotatingIdString)) !=
+                CHIP_NO_ERROR)
+            {
+                rotatingIdStringPtr = "<invalid id>";
+            }
+            ChipLogDetail(AppServer, "\trotating id: %s", rotatingIdStringPtr);
         }
         for (uint8_t i = 0; i < mNumTargetAppInfos; i++)
         {
@@ -256,6 +262,7 @@ public:
             ChipLogDetail(AppServer, "\tpasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
         }
         ChipLogDetail(AppServer, "---- Identification Declaration End ----");
+#endif
     }
 
 private:

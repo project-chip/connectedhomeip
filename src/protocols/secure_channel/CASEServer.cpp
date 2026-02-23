@@ -51,7 +51,8 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     GetSession().SetGroupDataProvider(mGroupDataProvider);
 
     ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
-    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
+    TEMPORARY_RETURN_IGNORED mExchangeManager->RegisterUnsolicitedMessageHandlerForType(
+        Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
 
     PrepareForSessionEstablishment();
 

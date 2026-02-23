@@ -48,7 +48,7 @@ using namespace chip::Messaging;
 using namespace chip::Protocols;
 using namespace chip::System::Clock::Literals;
 
-using TestMessagingLayer = chip::Test::UDPMessagingContext;
+using TestMessagingLayer = chip::Testing::UDPMessagingContext;
 
 // The message timeout value in milliseconds.
 constexpr System::Clock::Timeout kMessageTimeout = System::Clock::Milliseconds32(100);

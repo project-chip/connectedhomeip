@@ -359,7 +359,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
             auto * fabricTable = factory.fabricTable;
             if (fabricTable) {
                 // We don't care about errors here. If our fabric is gone, nothing to do.
-                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::No);
+                TEMPORARY_RETURN_IGNORED fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::No);
                 [factory resetOperationalAdvertising];
             }
         }
@@ -376,7 +376,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
             auto * fabricTable = factory.fabricTable;
             if (fabricTable) {
                 // We don't care about errors here. If our fabric is gone, nothing to do.
-                fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::Yes);
+                TEMPORARY_RETURN_IGNORED fabricTable->SetShouldAdvertiseIdentity(self->_storedFabricIndex, chip::FabricTable::AdvertiseIdentity::Yes);
                 [factory resetOperationalAdvertising];
             }
         }
@@ -1226,7 +1226,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         using TimeZoneType = chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
         TimeZoneType timeZone;
         timeZone.validAt = 0;
-        timeZone.offset = static_cast<int32_t>(tz.secondsFromGMT - tz.daylightSavingTimeOffset);
+        timeZone.offset = static_cast<int32_t>(tz.secondsFromGMT) - static_cast<int32_t>(tz.daylightSavingTimeOffset);
         timeZone.name.Emplace(AsCharSpan(tz.name));
 
         params.SetTimeZone(chip::app::DataModel::List<TimeZoneType>(&timeZone, 1));

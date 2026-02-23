@@ -95,6 +95,7 @@ template("chip_test_suite") {
     } else {
       public_deps += [ "${chip_root}/src/platform/logging:default" ]
     }
+    public_deps += [ "${chip_root}/src/lib/support/tests:pw-test-macros" ]
 
     if (chip_device_platform == "esp32") {
       complete_static_lib = true
@@ -142,6 +143,7 @@ template("chip_test_suite") {
                                    "public_deps",
                                    "cflags",
                                    "configs",
+                                   "defines",
                                  ])
 
           # Link to the common lib for this suite so we get its `sources`.

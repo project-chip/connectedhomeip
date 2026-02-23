@@ -335,13 +335,9 @@ class TlsCertificateManagementCluster(
 
       if (tag == ContextSpecificTag(TAG_CCDID)) {
         ccdid_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_CSR)) {
+      } else if (tag == ContextSpecificTag(TAG_CSR)) {
         csr_decoded = tlvReader.getByteArray(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NONCE_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_NONCE_SIGNATURE)) {
         nonceSignature_decoded = tlvReader.getByteArray(tag)
       } else {
         tlvReader.skipElement()

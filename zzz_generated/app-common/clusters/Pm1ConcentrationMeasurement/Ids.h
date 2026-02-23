@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Pm1ConcentrationMeasurement (cluster code: 1068/0x0442C)
+// Identifier constant values for cluster Pm1ConcentrationMeasurement (cluster code: 1068/0x042C)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

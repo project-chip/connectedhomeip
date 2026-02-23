@@ -23,8 +23,10 @@ from mobly import asserts
 
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.conformance import ConformanceAssessmentData
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
 
 FEATURE_TEMPLATE = '''\
@@ -159,13 +161,13 @@ class TestConformanceSupport(MatterBaseTest):
         self.all_id_combos = []
         combos = []
         for r in range(1, num_elements + 1):
-            combos.extend(list(itertools.combinations(ids, r)))
+            combos.extend(itertools.combinations(ids, r))
         for combo in combos:
             # The first three IDs are all O.a, so we need exactly one for the conformance to be valid
             expected_failures = set()
-            if len(set([1, 2, 3]) & set(combo)) != 1:
+            if len({1, 2, 3} & set(combo)) != 1:
                 expected_failures.add('a')
-            if len(set([4, 5, 6]) & set(combo)) < 1:
+            if len({4, 5, 6} & set(combo)) < 1:
                 expected_failures.add('b')
             # For these, we are checking that choice conformance checkers
             # - Correctly report errors and correct cases when the gating feature is ON
@@ -173,9 +175,9 @@ class TestConformanceSupport(MatterBaseTest):
             # Errors where we incorrectly set disallowed features based on the gating feature are checked
             # elsewhere in the cert test in a comprehensive way. We just want to ensure that we are not
             # incorrectly reporting choice conformance error as well
-            if 13 in combo and ((len(set([7, 8, 9]) & set(combo)) != 1)):
+            if 13 in combo and len({7, 8, 9} & set(combo)) != 1:
                 expected_failures.add('c')
-            if 13 in combo and (len(set([10, 11, 12]) & set(combo)) < 1):
+            if 13 in combo and len({10, 11, 12} & set(combo)) < 1:
                 expected_failures.add('d')
 
             self.all_id_combos.append((combo, expected_failures))
@@ -184,7 +186,7 @@ class TestConformanceSupport(MatterBaseTest):
         if len(expected_failures) != len(problems):
             print(problems)
         asserts.assert_equal(len(expected_failures), len(problems), 'Unexpected number of choice conformance problems')
-        actual_failures = set([p.choice.marker for p in problems])
+        actual_failures = {p.choice.marker for p in problems}
         asserts.assert_equal(actual_failures, expected_failures, "Mismatch between failures")
 
     def test_features(self):
@@ -195,17 +197,21 @@ class TestConformanceSupport(MatterBaseTest):
             return feature_map
 
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_feature_choice_conformance(0, 1, self.clusters, make_feature_map(combo), [], [])
+            info = ConformanceAssessmentData(feature_map=make_feature_map(
+                combo), attribute_list=[], all_command_list=[], cluster_revision=1)
+            problems = evaluate_feature_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_attributes(self):
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_attribute_choice_conformance(0, 1, self.clusters, 0, list(combo), [])
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=list(combo), all_command_list=[], cluster_revision=1)
+            problems = evaluate_attribute_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_commands(self):
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_command_choice_conformance(0, 1, self.clusters, 0, [], list(combo))
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=[], all_command_list=list(combo), cluster_revision=1)
+            problems = evaluate_command_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
 

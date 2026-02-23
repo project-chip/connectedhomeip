@@ -73,7 +73,7 @@ Credentials::DeviceAttestationRevocationDelegate * GetTestAttestationRevocationD
     }
 
     static Credentials::TestDACRevocationDelegateImpl testDacRevocationDelegate;
-    testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
+    TEMPORARY_RETURN_IGNORED testDacRevocationDelegate.SetDeviceAttestationRevocationSetPath(dacRevocationSetPath);
     return &testDacRevocationDelegate;
 }
 
@@ -180,7 +180,7 @@ public:
                 // Convert RCAC to CHIP cert format to be deciphered by TLV later in python3
                 std::vector<uint8_t> chipRcac(Credentials::kMaxCHIPCertLength);
                 MutableByteSpan chipRcacSpan(chipRcac.data(), chipRcac.size());
-                chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
+                TEMPORARY_RETURN_IGNORED chip::Credentials::ConvertX509CertToChipCert(nocChain, chipRcacSpan);
 
                 mCHIPRCACData.assign(chipRcacSpan.data(), chipRcacSpan.data() + chipRcacSpan.size());
 
@@ -335,9 +335,13 @@ public:
             auto proxy        = chip::Controller::AutoCommissioner::GetCommissioneeDeviceProxy();
             if (proxy != nullptr)
             {
-                commissioner->StopPairing(proxy->GetDeviceId());
+                TEMPORARY_RETURN_IGNORED commissioner->StopPairing(proxy->GetDeviceId());
             }
         }
+    }
+    void OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+    {
+        ChipLogProgress(Controller, "OpCredsBinding OnCommissioningStageStart %s", stage);
     }
 
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
@@ -454,6 +458,11 @@ void pychip_OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::
 void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR err)
 {
     return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
+}
+
+void pychip_OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+{
+    return sTestCommissioner.OnCommissioningStageStart(nodeId, stage);
 }
 
 /**
@@ -613,6 +622,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
         pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
+        pairingDelegate->SetCommissioningStageStartCallback(pychip_OnCommissioningStageStart);
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
@@ -634,7 +644,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), defaultIpk, compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
+    TEMPORARY_RETURN_IGNORED sICDClientStorage.UpdateFabricList(devCtrl->GetFabricIndex());
     pairingDelegate->SetFabricIndex(devCtrl->GetFabricIndex());
 
     *outDevCtrl         = devCtrl.release();

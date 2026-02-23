@@ -51,7 +51,7 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
     reader.Init(std::move(aPayload));
     ReturnErrorOnFailure(response.Init(reader));
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    response.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED response.PrettyPrint();
 #endif
     StatusIB status;
     ReturnErrorOnFailure(response.GetStatus(status.mStatus));

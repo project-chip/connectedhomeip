@@ -35,7 +35,7 @@ CHIP_ERROR SilabsPlatform::VerifyIfUpdated()
     VerifyOrReturnLogError(CHIP_NO_ERROR == err || CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err, err);
     if (performedUpdate)
     {
-        Internal::SilabsConfig::ClearConfigValue(Internal::SilabsConfig::kConfigKey_MatterUpdateReboot);
+        TEMPORARY_RETURN_IGNORED Internal::SilabsConfig::ClearConfigValue(Internal::SilabsConfig::kConfigKey_MatterUpdateReboot);
         mRebootCause = to_underlying(BootReasonType::kSoftwareUpdateCompleted);
     }
 

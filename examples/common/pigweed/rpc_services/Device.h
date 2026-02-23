@@ -226,7 +226,7 @@ public:
     virtual pw::Status TriggerOta(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
                 if (requestor == nullptr)
@@ -235,7 +235,7 @@ public:
                 }
                 else
                 {
-                    requestor->TriggerImmediateQuery();
+                    TEMPORARY_RETURN_IGNORED requestor->TriggerImmediateQuery();
                 }
             },
             reinterpret_cast<intptr_t>(nullptr));
@@ -300,7 +300,7 @@ public:
     virtual pw::Status GetDeviceState(const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
     {
         uint64_t time_since_boot_sec;
-        DeviceLayer::GetDiagnosticDataProvider().GetUpTime(time_since_boot_sec);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::GetDiagnosticDataProvider().GetUpTime(time_since_boot_sec);
         response.time_since_boot_millis = time_since_boot_sec * 1000;
         size_t count                    = 0;
         DeviceLayer::StackLock lock;
@@ -382,7 +382,8 @@ public:
         if (GetQRCode(qrCodeText, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
         {
             snprintf(response.pairing_info.qr_code, sizeof(response.pairing_info.qr_code), "%s", qrCodeText.data());
-            GetQRCodeUrl(response.pairing_info.qr_code_url, sizeof(response.pairing_info.qr_code_url), qrCodeText);
+            TEMPORARY_RETURN_IGNORED GetQRCodeUrl(response.pairing_info.qr_code_url, sizeof(response.pairing_info.qr_code_url),
+                                                  qrCodeText);
             response.has_pairing_info = true;
         }
 
@@ -418,15 +419,16 @@ public:
     {
         if (request.has_salt)
         {
-            mCommissionableDataProvider.SetSpake2pSalt(ByteSpan(request.salt.bytes, request.salt.size));
+            TEMPORARY_RETURN_IGNORED mCommissionableDataProvider.SetSpake2pSalt(ByteSpan(request.salt.bytes, request.salt.size));
         }
         if (request.has_iteration_count)
         {
-            mCommissionableDataProvider.SetSpake2pIterationCount(request.iteration_count);
+            TEMPORARY_RETURN_IGNORED mCommissionableDataProvider.SetSpake2pIterationCount(request.iteration_count);
         }
         if (request.has_verifier)
         {
-            mCommissionableDataProvider.SetSpake2pVerifier(ByteSpan(request.verifier.bytes, request.verifier.size));
+            TEMPORARY_RETURN_IGNORED mCommissionableDataProvider.SetSpake2pVerifier(
+                ByteSpan(request.verifier.bytes, request.verifier.size));
         }
 
         if (Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
@@ -451,7 +453,7 @@ public:
                 DeviceLayer::StackLock lock;
                 System::Clock::Seconds16 commissioningTimeout =
                     System::Clock::Seconds16(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS); // Use default for timeout for now.
-                Server::GetInstance()
+                TEMPORARY_RETURN_IGNORED Server::GetInstance()
                     .GetCommissioningWindowManager()
                     .OpenBasicCommissioningWindowForAdministratorCommissioningCluster(commissioningTimeout, fabricIndex.Value(),
                                                                                       vendorId.Value());
@@ -459,7 +461,7 @@ public:
             else
             {
                 DeviceLayer::StackLock lock;
-                Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+                TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
             }
         }
 
@@ -484,7 +486,7 @@ public:
     virtual pw::Status ShutdownAllSubscriptions(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
                 ChipLogDetail(AppServer, "Being triggered to shutdown all subscriptions in server side");
@@ -500,7 +502,7 @@ public:
     virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 ChipLogDetail(AppServer, "Being triggered to send ICD check-in message to subscriber");
                 chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();

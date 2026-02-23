@@ -187,7 +187,7 @@ public:
     void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
                     NetworkCommissioning::ThreadScanResponseIterator * networks)
     {
-        mBLEManagerImpl->StartAdvertisingProcess();
+        TEMPORARY_RETURN_IGNORED mBLEManagerImpl->StartAdvertisingProcess();
     };
 
 private:

@@ -35,6 +35,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCaseSessionsPerFabric), caseSessionsPerFabric);
     encoder.Encode(to_underlying(Fields::kSubscriptionsPerFabric), subscriptionsPerFabric);
+    encoder.Encode(to_underlying(Fields::kSimultaneousInvocationsSupported), simultaneousInvocationsSupported);
+    encoder.Encode(to_underlying(Fields::kSimultaneousWritesSupported), simultaneousWritesSupported);
+    encoder.Encode(to_underlying(Fields::kReadPathsSupported), readPathsSupported);
+    encoder.Encode(to_underlying(Fields::kSubscribePathsSupported), subscribePathsSupported);
     return encoder.Finalize();
 }
 
@@ -55,6 +59,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSubscriptionsPerFabric))
         {
             err = DataModel::Decode(reader, subscriptionsPerFabric);
+        }
+        else if (__context_tag == to_underlying(Fields::kSimultaneousInvocationsSupported))
+        {
+            err = DataModel::Decode(reader, simultaneousInvocationsSupported);
+        }
+        else if (__context_tag == to_underlying(Fields::kSimultaneousWritesSupported))
+        {
+            err = DataModel::Decode(reader, simultaneousWritesSupported);
+        }
+        else if (__context_tag == to_underlying(Fields::kReadPathsSupported))
+        {
+            err = DataModel::Decode(reader, readPathsSupported);
+        }
+        else if (__context_tag == to_underlying(Fields::kSubscribePathsSupported))
+        {
+            err = DataModel::Decode(reader, subscribePathsSupported);
         }
 
         ReturnErrorOnFailure(err);

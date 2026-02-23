@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/config.h>
@@ -308,7 +309,19 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::Endpoin
                                                    chip::CharSpan endpointUniqueId                    = {},
                                                    chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 
-chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
+/// Free the given dynamic endpoint index.
+///
+/// The given endpoint index will be shut down and marked as not valid anymore.
+///
+/// `index` represents the 0-based index of the dynamic endpoints (i.e. the offset from
+/// FIXED_ENDPOINT_COUNT). Use `emberAfGetDynamicIndexFromEndpoint` to convert an EndpointId
+/// to an index.
+///
+/// Note that default shutdown type here is `assume endpoint removal` so clusters
+/// are free to clear any persistent data.
+chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index,
+                                             MatterClusterShutdownType shutdownType = MatterClusterShutdownType::kPermanentRemove);
+
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
  * @brief Loads attribute defaults and any non-volatile attributes stored
@@ -345,7 +358,7 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 
 /// Returns a change listener that uses the global InteractionModelEngine
 /// instance to report dirty paths
-chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener();
+chip::app::DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener();
 
 /// Mark the given attribute as having changed:
 ///   - increases the cluster data version for the given cluster
@@ -354,15 +367,15 @@ chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesCh
 ///     receive updated attribute values for a cluster.
 ///
 /// This is a convenience function to make it clear when a `emberAfDataVersionStorage` increase
-/// and a `AttributesChangeListener::MarkDirty` always occur in lock-step.
+/// and a `ProviderChangeListener::MarkDirty` always occur in lock-step.
 void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                             chip::app::AttributesChangedListener * listener);
+                             chip::app::DataModel::ProviderChangeListener * listener);
 
 /// Mark attributes on the given endpoint as having changed.
 ///
 /// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
 /// any cluster data versions.
-void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
+void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::DataModel::ProviderChangeListener * listener);
 
 /// Maintains a increasing index of structural changes within ember
 /// that determine if existing "indexes" and metadata pointers within ember

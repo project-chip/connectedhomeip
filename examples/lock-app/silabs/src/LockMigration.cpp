@@ -197,8 +197,8 @@ bool MigrateCredentials(chip::EndpointId endpoint_id, const SilabsDoorLock::Lock
         }
     }
 
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_CredentialData);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_Credential);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_CredentialData);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_Credential);
 exit:
     Platform::MemoryFree(creds_data_buffer);
     Platform::MemoryFree(creds_info_buffer);
@@ -285,9 +285,9 @@ bool MigrateUsers(chip::EndpointId endpoint_id, const SilabsDoorLock::LockInitPa
                                     info.credentialRule, new_creds, info.credentials.size());
     }
 
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_UserCredentials);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUserName);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUser);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_UserCredentials);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUserName);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUser);
 exit:
     Platform::MemoryFree(user_creds_buffer);
     Platform::MemoryFree(names_buffer);
@@ -403,9 +403,9 @@ bool MigrateSchedules(chip::EndpointId endpoint_id, const SilabsDoorLock::LockIn
         }
     }
 
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_WeekDaySchedules);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_YearDaySchedules);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_HolidaySchedules);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_WeekDaySchedules);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_YearDaySchedules);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_HolidaySchedules);
 exit:
     Platform::MemoryFree(week_schedules_buffer);
     Platform::MemoryFree(year_schedules_buffer);

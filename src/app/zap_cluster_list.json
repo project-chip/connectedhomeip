@@ -7,6 +7,7 @@
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [],
         "AIR_QUALITY_CLUSTER": [],
         "ALARM_CLUSTER": [],
+        "AMBIENT_CONTEXT_SENSING_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": [],
         "APPLICATION_LAUNCHER_CLUSTER": [],
         "AUDIO_OUTPUT_CLUSTER": [],
@@ -164,6 +165,7 @@
         ],
         "AIR_QUALITY_CLUSTER": ["air-quality-server"],
         "ALARM_CLUSTER": [],
+        "AMBIENT_CONTEXT_SENSING_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
         "AUDIO_OUTPUT_CLUSTER": ["audio-output-server"],
@@ -212,7 +214,7 @@
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
         ],
-        "GROUPCAST_CLUSTER": ["groupcast-server"],
+        "GROUPCAST_CLUSTER": ["groupcast"],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
@@ -243,7 +245,7 @@
         "GROUP_KEY_MANAGEMENT_CLUSTER": ["group-key-mgmt-server"],
         "ICD_MANAGEMENT_CLUSTER": ["icd-management-server"],
         "IDENTIFY_CLUSTER": ["identify-server"],
-        "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
+        "ILLUMINANCE_MEASUREMENT_CLUSTER": ["illuminance-measurement-server"],
         "JOINT_FABRIC_DATASTORE_CLUSTER": ["joint-fabric-datastore-server"],
         "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [
             "joint-fabric-administrator-server"

@@ -27,7 +27,7 @@ uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 extern "C" void main_task(void const * argument)
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    chip::NXP::App::GetAppTask().Start();
+    TEMPORARY_RETURN_IGNORED chip::NXP::App::GetAppTask().Start();
 }
 #else
 int main(int argc, char * argv[])

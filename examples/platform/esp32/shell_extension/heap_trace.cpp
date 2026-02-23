@@ -113,7 +113,7 @@ CHIP_ERROR HeapTraceDispatch(int argc, char ** argv)
 {
     if (argc == 0)
     {
-        HeapTraceHelpHandler(argc, argv);
+        TEMPORARY_RETURN_IGNORED HeapTraceHelpHandler(argc, argv);
         return CHIP_NO_ERROR;
     }
 

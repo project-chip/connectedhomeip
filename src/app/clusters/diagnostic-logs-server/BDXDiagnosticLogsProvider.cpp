@@ -178,19 +178,20 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     uint16_t blockSize = mTransfer.GetTransferBlockSize();
 
     auto blockBuf = System::PacketBufferHandle::New(blockSize);
-    VerifyOrReturn(!blockBuf.IsNull(), mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_NO_MEMORY)));
+    VerifyOrReturn(!blockBuf.IsNull(),
+                   TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_NO_MEMORY)));
 
     auto buffer     = MutableByteSpan(blockBuf->Start(), blockSize);
     bool isEndOfLog = false;
 
     // Get the log next chunk and see if it fits i.e. if is end of log is reported
     auto err = mDelegate->CollectLog(mLogSessionHandle, buffer, isEndOfLog);
-    VerifyOrReturn(CHIP_NO_ERROR == err, mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
+    VerifyOrReturn(CHIP_NO_ERROR == err, TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
 
     // If the buffer has empty space, end the log collection session.
     if (isEndOfLog)
     {
-        mDelegate->EndLogCollection(mLogSessionHandle, CHIP_ERROR_INTERNAL);
+        TEMPORARY_RETURN_IGNORED mDelegate->EndLogCollection(mLogSessionHandle, CHIP_ERROR_INTERNAL);
         mLogSessionHandle = kInvalidLogSessionHandle;
     }
 
@@ -204,7 +205,7 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
-        mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
+        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
     }
 }
 
@@ -278,7 +279,7 @@ void BDXDiagnosticLogsProvider::Reset(CHIP_ERROR error)
 
     if (mDelegate != nullptr)
     {
-        mDelegate->EndLogCollection(mLogSessionHandle, error);
+        TEMPORARY_RETURN_IGNORED mDelegate->EndLogCollection(mLogSessionHandle, error);
         mDelegate = nullptr;
     }
 

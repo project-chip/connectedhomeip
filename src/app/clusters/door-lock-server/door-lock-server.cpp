@@ -1181,7 +1181,7 @@ void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    EmberAfPluginDoorLockWeekDaySchedule scheduleInfo{};
+    EmberAfPluginDoorLockWeekDaySchedule scheduleInfo{ DaysMaskMap(0) };
     auto status = emberAfPluginDoorLockGetSchedule(endpointId, weekDayIndex, userIndex, scheduleInfo);
     if (DlStatus::kSuccess != status)
     {
@@ -3585,7 +3585,7 @@ void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
 
     if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
     {
-        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, *clusterStatus) == CHIP_NO_ERROR);
+        SuccessOrDie(commandObj->AddClusterSpecificFailure(commandPath, *clusterStatus));
     }
     else
     {
@@ -4312,7 +4312,7 @@ void emberAfPluginDoorLockServerRelockEventHandler() {}
 void MatterDoorLockPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Door Lock server initialized");
-    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
 
     AttributeAccessInterfaceRegistry::Instance().Register(&DoorLockServer::Instance());
 }

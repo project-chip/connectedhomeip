@@ -120,7 +120,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
         Args:
-            remote_candidates (list[str]): A list of remote ICE candidates to be set.
+            remote_candidates (list[IceCandidate]): A list of remote ICE candidates to be set.
         """
         # for candidate in remote_candidates:
         await self.set_remote_icecandidates(remote_candidates)
@@ -219,14 +219,14 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
     async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[IceCandidate]]:
-        """Waits for a remote SDP answer to be received through a matter command.
+        """Waits for a list of remote ICE Candidates to be received through a matter command.
 
         Args:
-            timeout_s (Optional[int]): The maximum time in seconds to wait for a remote offer.
+            timeout_s (Optional[int]): The maximum time in seconds to wait for a list of remote candidates.
             If None, the function will wait indefinitely.
 
         Returns:
-            tuple[int, list[str]]: A tuple containing the session ID and list of ice candidate strings.
+            tuple[int, list[IceCandidate]]: A tuple containing the session ID and list of IceCandidate objects.
 
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
@@ -255,7 +255,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
                 PeerConnectionState.INVALID,
             ]:
                 return False
-            elif self._peer_state == PeerConnectionState.CONNECTED:
+            if self._peer_state == PeerConnectionState.CONNECTED:
                 return True
             self._peer_state = await event_queue.get(timeout=30)
 
@@ -324,5 +324,17 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         self._remote_events[Events.ANSWER].put((sessionId, answer_sdp))
 
     def on_remote_ice_candidates(self, sessionId: int, candidates: list[IceCandidate]) -> None:
-        """Callback function called when a remote ICE candidates are received through a matter command."""
+        """Callback function called when a remote ICE candidates are received through a matter command.
+
+        Implements trickle ICE by scheduling candidates to be applied to the peer connection.
+        Also stores them in the event queue for tests that may need to wait for and verify them.
+        """
+        # Schedule candidates to be applied for trickle ICE support
+        LOGGER.debug(f"Scheduling {len(candidates)} candidates for trickle ICE support: {candidates}")
+        asyncio.run_coroutine_threadsafe(
+            self.set_remote_ice_candidates(candidates),
+            self.event_loop
+        )
+
+        # Also put in event queue for any waiting consumers
         self._remote_events[Events.ICE_CANDIDATE].put((sessionId, candidates))

@@ -145,6 +145,48 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BlockUnrated
+namespace BlockChannelList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BlockChannelList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BlockChannelList
+namespace BlockApplicationList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ContentControl::Structs::AppInfoStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentControl::Structs::AppInfoStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BlockApplicationList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BlockApplicationList
+namespace BlockContentTimeWindow {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BlockContentTimeWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BlockContentTimeWindow
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -192,6 +234,9 @@ struct TypeInfo
         Attributes::ScreenDailyTime::TypeInfo::DecodableType screenDailyTime         = static_cast<uint32_t>(0);
         Attributes::RemainingScreenTime::TypeInfo::DecodableType remainingScreenTime = static_cast<uint32_t>(0);
         Attributes::BlockUnrated::TypeInfo::DecodableType blockUnrated               = static_cast<bool>(0);
+        Attributes::BlockChannelList::TypeInfo::DecodableType blockChannelList;
+        Attributes::BlockApplicationList::TypeInfo::DecodableType blockApplicationList;
+        Attributes::BlockContentTimeWindow::TypeInfo::DecodableType blockContentTimeWindow;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
