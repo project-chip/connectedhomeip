@@ -24,4 +24,8 @@ namespace chip::app::Clusters::TemperatureMeasurement {
 
 TemperatureMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<int16_t> measuredValue);
+CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<int16_t> minMeasuredValue,
+                                 DataModel::Nullable<int16_t> maxMeasuredValue);
+
 } // namespace chip::app::Clusters::TemperatureMeasurement

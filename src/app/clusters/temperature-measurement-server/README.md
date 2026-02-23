@@ -1,8 +1,8 @@
-# This cluster is currently following a code driven approach.
+This cluster is currently following a code driven approach.
 
-# This means that the Accessors for the attribute MeasuredValue are no longer available.
+This means that the Accessors for the attribute MeasuredValue are no longer available.
 
-# Now to set the value for this attribute the following code change applies:
+Now to set the value for this attribute the following code change applies:
 
 # BEFORE (using the Accessors)
 
@@ -10,10 +10,7 @@
 
 # CURRENT (using the code driven approach)
 
-    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-    VerifyOrReturn(temperatureMeasurement != nullptr);
-
-    CHIP_ERROR err = temperatureMeasurement->SetMeasuredValue(value);
+    CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValue(1, value);
     if (err == CHIP_NO_ERROR)
     {
         // SetMeasuredValue() succeeded

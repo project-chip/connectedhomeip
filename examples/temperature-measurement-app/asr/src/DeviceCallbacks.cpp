@@ -98,11 +98,7 @@ void TempMeas(System::Layer * systemLayer, void * appState)
 
     ASR_LOG("Sensor T:%d H:%d", temperature, humidity);
 
-    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-    VerifyOrReturn(temperatureMeasurement != nullptr,
-                   ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", 1));
-
-    LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(/* temperature in 0.01*C */ temperature));
+    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, /* temperature in 0.01*C */ temperature));
 
     // chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
     //     /* endpoint ID */ 1, /* humidity in 0.01*C */ int16_t(humidity));

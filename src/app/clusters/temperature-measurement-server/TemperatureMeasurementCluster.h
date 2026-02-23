@@ -47,10 +47,8 @@ public:
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<int16_t> measuredValue);
     DataModel::Nullable<int16_t> GetMeasuredValue() const { return mMeasuredValue; }
 
-    CHIP_ERROR SetMinMeasuredValue(DataModel::Nullable<int16_t> minMeasuredValue);
+    CHIP_ERROR SetMeasuredValueRange(DataModel::Nullable<int16_t> minMeasuredValue, DataModel::Nullable<int16_t> maxMeasuredValue);
     DataModel::Nullable<int16_t> GetMinMeasuredValue() const { return mMinMeasuredValue; }
-
-    CHIP_ERROR SetMaxMeasuredValue(DataModel::Nullable<int16_t> maxmeasuredValue);
     DataModel::Nullable<int16_t> GetMaxMeasuredValue() const { return mMaxMeasuredValue; }
 
 protected:

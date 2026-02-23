@@ -98,11 +98,7 @@ void asr_matter_sensors(bool enable, int temp, int humi, int pressure)
 #ifdef ASR_BOARD_ENABLE_SENSORS
     if (enable)
     {
-        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-        VerifyOrReturn(temperatureMeasurement != nullptr,
-                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", 1));
-
-        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(temp)));
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, static_cast<int16_t>(temp)));
 
         chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
             /* endpoint ID */ 1, static_cast<int16_t>(humi));

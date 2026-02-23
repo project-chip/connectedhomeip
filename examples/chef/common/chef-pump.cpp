@@ -80,12 +80,8 @@ void updateSetPointsOnOff(EndpointId endpointId, bool onOff)
     epIndex = getIndexTemperatureMeasurement(endpointId);
     if (epIndex < kTemperatureMeasurementCount)
     {
-        auto updatedTemperature     = onOff ? TemperatureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
-        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
-        VerifyOrReturn(temperatureMeasurement != nullptr,
-                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", endpointId));
-
-        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(updatedTemperature));
+        auto updatedTemperature = onOff ? TemperatureRangeMax[epIndex] : chip::app::DataModel::Nullable<int16_t>(0);
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(endpointId, updatedTemperature));
 
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
@@ -154,10 +150,7 @@ void updateSetPointsLevel(EndpointId endpointId, DataModel::Nullable<uint8_t> le
     {
         DataModel::Nullable<int16_t> updatedTemperature =
             LevelToSetpoint(level, TemperatureRangeMin[epIndex], TemperatureRangeMax[epIndex]);
-        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
-        VerifyOrReturn(temperatureMeasurement != nullptr);
-
-        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(updatedTemperature));
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(endpointId, updatedTemperature));
 
         MatterReportingAttributeChangeCallback(endpointId, TemperatureMeasurement::Id,
                                                TemperatureMeasurement::Attributes::MeasuredValue::Id);
@@ -291,12 +284,8 @@ void init()
         epIndex = getIndexTemperatureMeasurement(endpointId);
         if (epIndex < kTemperatureMeasurementCount)
         {
-            auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(endpointId);
-            VerifyOrDieWithMsg(temperatureMeasurement != nullptr, DeviceLayer,
-                               "Failed to find Temperature Measurement Cluster for Endpoint: %d", endpointId);
-
             DataModel::Nullable<int16_t> temp;
-            CHIP_ERROR err = temperatureMeasurement->SetMeasuredValue(temp);
+            CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValue(endpointId, temp);
             VerifyOrDieWithMsg(err == CHIP_NO_ERROR, DeviceLayer,
                                "Failed to initialize Temperature Measured Value to NULL for Endpoint: %d", endpointId);
             if (TemperatureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, TemperatureRangeMin[epIndex]) !=

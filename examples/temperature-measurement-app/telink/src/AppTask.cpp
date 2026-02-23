@@ -49,18 +49,11 @@ CHIP_ERROR AppTask::Init(void)
 
     PlatformMgr().LockChipStack();
 
-    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(kExampleEndpointId);
-    VerifyOrReturn(
-        temperatureMeasurement != nullptr,
-        ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", kExampleEndpointId));
-
-    CHIP_ERROR err = temperatureMeasurement->SetMinMeasuredValue(SensorMgr().GetMinMeasuredTempValue());
+    CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValueRange(kExampleEndpointId, SensorMgr().GetMinMeasuredTempValue(),
+                                                                   SensorMgr().GetMaxMeasuredTempValue());
     VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
-
-    CHIP_ERROR err = temperatureMeasurement->SetMaxMeasuredValue(SensorMgr().GetMaxMeasuredTempValue());
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
+                   ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValueRange for Endpoint: %d"),
+                   kExampleEndpointId);
 
     PlatformMgr().UnlockChipStack();
 
@@ -100,11 +93,7 @@ void AppTask::TemperatureMeasurementUpdateTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Current temperature is (%d*0.01)°C", temperature);
 
     PlatformMgr().LockChipStack();
-    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(kExampleEndpointId);
-    if (temperatureMeasurement != nullptr)
-    {
-        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(temperature));
-    }
+    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(kExampleEndpointId, temperature));
     PlatformMgr().UnlockChipStack();
 
     // Start next timer to handle temp sensor.

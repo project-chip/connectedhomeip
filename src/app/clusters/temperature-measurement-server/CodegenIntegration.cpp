@@ -50,10 +50,16 @@ public:
         // Try to read the default value for these mandatory attributes but do not fail if the operation is not successful.
         // This is because not all apps are setting a default value for them in ember.
         DataModel::Nullable<int16_t> minMeasuredValue{};
-        MinMeasuredValue::Get(endpointId, minMeasuredValue);
+        if (MinMeasuredValue::Get(endpointId, minMeasuredValue) != Status::Success)
+        {
+            minMeasuredValue.SetNull();
+        }
 
         DataModel::Nullable<int16_t> maxMeasuredValue{};
-        MaxMeasuredValue::Get(endpointId, maxMeasuredValue);
+        if (MaxMeasuredValue::Get(endpointId, maxMeasuredValue) != Status::Success)
+        {
+            maxMeasuredValue.SetNull();
+        }
 
         uint16_t tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
@@ -127,6 +133,23 @@ TemperatureMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId)
         integrationDelegate);
 
     return static_cast<TemperatureMeasurementCluster *>(temperatureMeasurement);
+}
+
+CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<int16_t> measuredValue)
+{
+    auto temperatureMeasurement = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(temperatureMeasurement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return temperatureMeasurement->SetMeasuredValue(measuredValue);
+}
+
+CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<int16_t> minMeasuredValue,
+                                 DataModel::Nullable<int16_t> maxMeasuredValue)
+{
+    auto temperatureMeasurement = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(temperatureMeasurement != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return temperatureMeasurement->SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue);
 }
 
 } // namespace chip::app::Clusters::TemperatureMeasurement

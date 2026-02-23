@@ -134,111 +134,138 @@ TEST_F(TestTemperatureMeasurementCluster, ReadAttributeTest)
 
 TEST_F(TestTemperatureMeasurementCluster, MeasuredValue)
 {
-    {
-        TemperatureMeasurementCluster cluster(kRootEndpointId, TemperatureMeasurementCluster::OptionalAttributeSet(),
-                                              TemperatureMeasurementCluster::StartupConfiguration{
-                                                  .minMeasuredValue = DataModel::Nullable<int16_t>(1),
-                                                  .maxMeasuredValue = DataModel::Nullable<int16_t>(3),
-                                              });
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    TemperatureMeasurementCluster cluster(kRootEndpointId, TemperatureMeasurementCluster::OptionalAttributeSet(),
+                                          TemperatureMeasurementCluster::StartupConfiguration{
+                                              .minMeasuredValue = DataModel::Nullable<int16_t>(1),
+                                              .maxMeasuredValue = DataModel::Nullable<int16_t>(3),
+                                          });
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        DataModel::Nullable<int16_t> measuredValue{};
-        measuredValue.SetNonNull(0);
-        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+    DataModel::Nullable<int16_t> measuredValue{};
+    measuredValue.SetNonNull(0);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_ERROR_INVALID_ARGUMENT);
 
-        measuredValue.SetNonNull(1);
-        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-        DataModel::Nullable<int16_t> measuredVal = cluster.GetMeasuredValue();
-        EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
+    measuredValue.SetNonNull(1);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+    DataModel::Nullable<int16_t> measuredVal = cluster.GetMeasuredValue();
+    EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
 
-        measuredValue.SetNonNull(2);
-        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-        measuredVal = cluster.GetMeasuredValue();
-        EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
+    measuredValue.SetNonNull(2);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+    measuredVal = cluster.GetMeasuredValue();
+    EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
 
-        measuredValue.SetNonNull(3);
-        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-        measuredVal = cluster.GetMeasuredValue();
-        EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
+    measuredValue.SetNonNull(3);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+    measuredVal = cluster.GetMeasuredValue();
+    EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
 
-        measuredValue.SetNonNull(4);
-        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    measuredValue.SetNonNull(4);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
-        measuredValue.SetNull();
-        EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
-        measuredVal = cluster.GetMeasuredValue();
-        EXPECT_EQ(measuredVal, measuredValue);
+    measuredValue.SetNull();
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+    measuredVal = cluster.GetMeasuredValue();
+    EXPECT_EQ(measuredVal, measuredValue);
 
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
+    DataModel::Nullable<int16_t> minMeasuredValue{};
+    DataModel::Nullable<int16_t> maxMeasuredValue{};
+    minMeasuredValue.SetNull();
+    maxMeasuredValue.SetNull();
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+
+    measuredValue.SetNonNull(0);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_NO_ERROR);
+
+    measuredValue.SetNonNull(4);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+
+    measuredValue.SetNonNull(32766);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+
+    measuredValue.SetNonNull(-27316);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+
+    minMeasuredValue.SetNonNull(1);
+    maxMeasuredValue.SetNull();
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+
+    measuredValue.SetNonNull(0);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    measuredValue.SetNonNull(32766);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+
+    minMeasuredValue.SetNull();
+    maxMeasuredValue.SetNonNull(3);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+
+    measuredValue.SetNonNull(4);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+    measuredValue.SetNonNull(-27316);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestTemperatureMeasurementCluster, MinMeasuredValue)
+TEST_F(TestTemperatureMeasurementCluster, MeasuredValueRange)
 {
-    {
-        TemperatureMeasurementCluster cluster(kRootEndpointId, TemperatureMeasurementCluster::OptionalAttributeSet(),
-                                              TemperatureMeasurementCluster::StartupConfiguration{});
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    TemperatureMeasurementCluster cluster(kRootEndpointId, TemperatureMeasurementCluster::OptionalAttributeSet(),
+                                          TemperatureMeasurementCluster::StartupConfiguration{});
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        DataModel::Nullable<int16_t> minMeasuredValue{};
-        minMeasuredValue.SetNonNull(-27315);
-        EXPECT_EQ(cluster.SetMinMeasuredValue(minMeasuredValue), CHIP_NO_ERROR);
-        DataModel::Nullable<int16_t> minMeasuredVal = cluster.GetMinMeasuredValue();
-        EXPECT_EQ(minMeasuredVal.Value(), minMeasuredValue.Value());
+    DataModel::Nullable<int16_t> minMeasuredValue{};
+    DataModel::Nullable<int16_t> maxMeasuredValue{};
+    minMeasuredValue.SetNonNull(-27315);
+    maxMeasuredValue.SetNonNull(-27314);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+    DataModel::Nullable<int16_t> minMeasuredVal = cluster.GetMinMeasuredValue();
+    DataModel::Nullable<int16_t> maxMeasuredVal = cluster.GetMaxMeasuredValue();
+    EXPECT_EQ(minMeasuredVal.Value(), minMeasuredValue.Value());
+    EXPECT_EQ(maxMeasuredVal.Value(), maxMeasuredValue.Value());
 
-        minMeasuredValue.SetNonNull(32766);
-        EXPECT_EQ(cluster.SetMinMeasuredValue(minMeasuredValue), CHIP_NO_ERROR);
-        minMeasuredVal = cluster.GetMinMeasuredValue();
-        EXPECT_EQ(minMeasuredVal.Value(), minMeasuredValue.Value());
+    minMeasuredValue.SetNonNull(32766);
+    maxMeasuredValue.SetNonNull(32767);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+    minMeasuredVal = cluster.GetMinMeasuredValue();
+    maxMeasuredVal = cluster.GetMaxMeasuredValue();
+    EXPECT_EQ(minMeasuredVal.Value(), minMeasuredValue.Value());
+    EXPECT_EQ(maxMeasuredVal.Value(), maxMeasuredValue.Value());
 
-        minMeasuredValue.SetNonNull(-27316);
-        EXPECT_EQ(cluster.SetMinMeasuredValue(minMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    minMeasuredValue.SetNonNull(-27316);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
-        minMeasuredValue.SetNonNull(32767);
-        EXPECT_EQ(cluster.SetMinMeasuredValue(minMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    minMeasuredValue.SetNonNull(32767);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
-        minMeasuredValue.SetNull();
-        EXPECT_EQ(cluster.SetMinMeasuredValue(minMeasuredValue), CHIP_NO_ERROR);
-        minMeasuredVal = cluster.GetMinMeasuredValue();
-        EXPECT_EQ(minMeasuredVal, minMeasuredValue);
+    minMeasuredValue.SetNonNull(32766);
+    maxMeasuredValue.SetNonNull(32766);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
 
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-}
+    minMeasuredValue.SetNull();
+    maxMeasuredValue.SetNull();
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+    minMeasuredVal = cluster.GetMinMeasuredValue();
+    maxMeasuredVal = cluster.GetMaxMeasuredValue();
+    EXPECT_EQ(minMeasuredVal, minMeasuredValue);
+    EXPECT_EQ(maxMeasuredVal, maxMeasuredValue);
 
-TEST_F(TestTemperatureMeasurementCluster, MaxMeasuredValue)
-{
-    {
-        TemperatureMeasurementCluster cluster(kRootEndpointId, TemperatureMeasurementCluster::OptionalAttributeSet(),
-                                              TemperatureMeasurementCluster::StartupConfiguration{});
-        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    minMeasuredValue.SetNonNull(32766);
+    maxMeasuredValue.SetNull();
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+    minMeasuredVal = cluster.GetMinMeasuredValue();
+    maxMeasuredVal = cluster.GetMaxMeasuredValue();
+    EXPECT_EQ(minMeasuredVal, minMeasuredValue);
+    EXPECT_EQ(maxMeasuredVal, maxMeasuredValue);
 
-        DataModel::Nullable<int16_t> maxMeasuredValue{};
-        maxMeasuredValue.SetNonNull(-27314);
-        EXPECT_EQ(cluster.SetMaxMeasuredValue(maxMeasuredValue), CHIP_NO_ERROR);
-        DataModel::Nullable<int16_t> maxMeasuredVal = cluster.GetMaxMeasuredValue();
-        EXPECT_EQ(maxMeasuredVal.Value(), maxMeasuredValue.Value());
+    minMeasuredValue.SetNull();
+    maxMeasuredValue.SetNonNull(32766);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
+    minMeasuredVal = cluster.GetMinMeasuredValue();
+    maxMeasuredVal = cluster.GetMaxMeasuredValue();
+    EXPECT_EQ(minMeasuredVal, minMeasuredValue);
+    EXPECT_EQ(maxMeasuredVal, maxMeasuredValue);
 
-        maxMeasuredValue.SetNonNull(-27315);
-        EXPECT_EQ(cluster.SetMaxMeasuredValue(maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
-
-        DataModel::Nullable<int16_t> minMeasuredValue{};
-        minMeasuredValue.SetNonNull(32766);
-        EXPECT_EQ(cluster.SetMinMeasuredValue(minMeasuredValue), CHIP_NO_ERROR);
-
-        maxMeasuredValue.SetNonNull(32767);
-        EXPECT_EQ(cluster.SetMaxMeasuredValue(maxMeasuredValue), CHIP_NO_ERROR);
-        maxMeasuredVal = cluster.GetMaxMeasuredValue();
-        EXPECT_EQ(maxMeasuredVal.Value(), maxMeasuredValue.Value());
-
-        maxMeasuredValue.SetNonNull(32766);
-        EXPECT_EQ(cluster.SetMaxMeasuredValue(maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
-
-        maxMeasuredValue.SetNull();
-        EXPECT_EQ(cluster.SetMaxMeasuredValue(maxMeasuredValue), CHIP_NO_ERROR);
-        maxMeasuredVal = cluster.GetMaxMeasuredValue();
-        EXPECT_EQ(maxMeasuredVal, maxMeasuredValue);
-
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

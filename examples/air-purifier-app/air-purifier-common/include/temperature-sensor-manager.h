@@ -29,32 +29,22 @@ namespace Clusters {
 class TemperatureSensorManager
 {
 public:
-    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
+    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
 
     void Init()
     {
-        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(mEndpointId);
-        VerifyOrReturn(temperatureMeasurement != nullptr,
-                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", mEndpointId));
-
-        CHIP_ERROR err = temperatureMeasurement->SetMinMeasuredValue(-500);
-        VerifyOrReturn(err == CHIP_NO_ERROR,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
-
-        err = temperatureMeasurement->SetMaxMeasuredValue(6000);
-        VerifyOrReturn(err == CHIP_NO_ERROR,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
+        CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValueRange(mEndpointId, -500, 6000);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValueRange for Endpoint: %d", mEndpointId));
     }
 
     void OnTemperatureChangeHandler(int16_t newValue)
     {
-        auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(mEndpointId);
-        VerifyOrReturn(temperatureMeasurement != nullptr,
-                       ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", mEndpointId));
-
-        CHIP_ERROR err = temperatureMeasurement->SetMeasuredValue(newValue);
-        VerifyOrReturn(err == CHIP_NO_ERROR,
-                       ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue attribute"));
+        CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValue(mEndpointId, newValue);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue for Endpoint: %d", mEndpointId));
         ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
     }
 

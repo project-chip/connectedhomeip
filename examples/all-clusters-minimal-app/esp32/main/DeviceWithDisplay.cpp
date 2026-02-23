@@ -161,12 +161,8 @@ public:
             sprintf(buffer, "%d", n);
             if (name == "Temperature")
             {
-                auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-                VerifyOrReturn(temperatureMeasurement != nullptr,
-                               ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", 1));
-
                 // update the temp attribute here for hardcoded endpoint 1
-                LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(n * 100)));
+                LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(n * 100)));
             }
             else if (name == "Color Current Level")
             {
@@ -531,15 +527,7 @@ void SetupPretendDevices()
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
 
-    auto temperatureMeasurement = app::Clusters::TemperatureMeasurement::FindClusterOnEndpoint(1);
-    if (temperatureMeasurement != nullptr)
-    {
-        LogErrorOnFailure(temperatureMeasurement->SetMeasuredValue(static_cast<int16_t>(21 * 100)));
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Failed to find TemperatureMeasurement Cluster for Endpoint: %d", 1));
-    }
+    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(21 * 100)));
 
     AddDevice("Door Lock");
     AddEndpoint("Default");
