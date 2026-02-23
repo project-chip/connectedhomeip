@@ -46,9 +46,12 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off."),
                 TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher."),
                 TestStep(7, "[TC_CONTENTAPP_A] Test application basic."),
-                TestStep(8, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using platform endpoint."),
-                TestStep(9, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
-                TestStep(10, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
+                TestStep(
+                    8, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using platform endpoint."),
+                TestStep(
+                    9, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
+                TestStep(
+                    10, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
                 TestStep(11, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
@@ -65,26 +68,33 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         # 1. Launch App A via Platform
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(application=app_a),
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(
+                application=app_a),
             endpoint=command_on_endpoint
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
         # 2. Verify Status on App A Endpoint is ActiveVisibleFocus
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
-        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveVisibleFocus)
+        asserts.assert_equal(
+            status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveVisibleFocus)
 
         # 3. Verify CurrentApp on Platform Endpoint
         current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
-        asserts.assert_equal(current_app.application.catalogVendorID, self.APP_A_VENDOR_ID)
-        asserts.assert_equal(current_app.application.applicationID, self.APP_A_ID)
+        asserts.assert_equal(
+            current_app.application.catalogVendorID, self.APP_A_VENDOR_ID)
+        asserts.assert_equal(
+            current_app.application.applicationID, self.APP_A_ID)
 
         # 4. Stop App A via Platform
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(application=app_a),
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(
+                application=app_a),
             endpoint=command_on_endpoint
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
         # 5. Verify CurrentApp on Platform Endpoint is Null
         current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
@@ -92,7 +102,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         # 6. Verify Status on App A Endpoint is Stopped
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
-        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
+        asserts.assert_equal(
+            status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
 
     async def cuj_launch_hide_and_stop_app_a(self, command_on_endpoint):
         app_a = Clusters.Objects.ApplicationLauncher.Structs.ApplicationStruct(
@@ -100,26 +111,33 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         # 1. Launch App A via Platform
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(application=app_a),
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(
+                application=app_a),
             endpoint=command_on_endpoint
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
         # 2. Verify Status on App A Endpoint is ActiveVisibleFocus
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
-        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveVisibleFocus)
+        asserts.assert_equal(
+            status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveVisibleFocus)
 
         # 3. Verify CurrentApp on Platform Endpoint
         current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
-        asserts.assert_equal(current_app.application.catalogVendorID, self.APP_A_VENDOR_ID)
-        asserts.assert_equal(current_app.application.applicationID, self.APP_A_ID)
+        asserts.assert_equal(
+            current_app.application.catalogVendorID, self.APP_A_VENDOR_ID)
+        asserts.assert_equal(
+            current_app.application.applicationID, self.APP_A_ID)
 
         # 4. Hide App A via Platform
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ApplicationLauncher.Commands.HideApp(application=app_a),
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.HideApp(
+                application=app_a),
             endpoint=command_on_endpoint
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
         # 5. Verify CurrentApp on Platform Endpoint is Null
         current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
@@ -127,14 +145,17 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         # 6. Verify Status on App A Endpoint is Stopped
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
-        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveHidden)
+        asserts.assert_equal(
+            status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveHidden)
 
         # 7. Stop App A via Platform
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(application=app_a),
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(
+                application=app_a),
             endpoint=command_on_endpoint
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
 
         # 8. Verify CurrentApp on Platform Endpoint is Null
         current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
@@ -142,7 +163,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         # 9. Verify Status on App A Endpoint is Stopped
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
-        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
+        asserts.assert_equal(
+            status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
 
     async def _read_on_off(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -315,14 +337,16 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             endpoint=endpoint,
         )
         await self.send_single_cmd(
-            cmd=Clusters.Objects.MediaPlayback.Commands.SkipForward(deltaPositionMilliseconds=1000),
+            cmd=Clusters.Objects.MediaPlayback.Commands.SkipForward(
+                deltaPositionMilliseconds=1000),
             endpoint=endpoint,
         )
         pos = await self._read_media_playback_sampled_position(endpoint)
         asserts.assert_equal(pos.position, 1000)
 
         await self.send_single_cmd(
-            cmd=Clusters.Objects.MediaPlayback.Commands.SkipBackward(deltaPositionMilliseconds=1000),
+            cmd=Clusters.Objects.MediaPlayback.Commands.SkipBackward(
+                deltaPositionMilliseconds=1000),
             endpoint=endpoint,
         )
         pos = await self._read_media_playback_sampled_position(endpoint)
@@ -348,12 +372,15 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 continue
 
             await self.send_single_cmd(
-                cmd=Clusters.Objects.Channel.Commands.ChangeChannel(match=f"{next_channel.majorNumber}.{next_channel.minorNumber}"),
+                cmd=Clusters.Objects.Channel.Commands.ChangeChannel(
+                    match=f"{next_channel.majorNumber}.{next_channel.minorNumber}"),
                 endpoint=endpoint,
             )
             current_channel = await self._read_channel_current_channel(endpoint)
-            asserts.assert_equal(current_channel.majorNumber, next_channel.majorNumber)
-            asserts.assert_equal(current_channel.minorNumber, next_channel.minorNumber)
+            asserts.assert_equal(current_channel.majorNumber,
+                                 next_channel.majorNumber)
+            asserts.assert_equal(current_channel.minorNumber,
+                                 next_channel.minorNumber)
 
         for next_channel in channels_list:
             await self.send_single_cmd(
@@ -362,8 +389,10 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 endpoint=endpoint,
             )
             current_channel = await self._read_channel_current_channel(endpoint)
-            asserts.assert_equal(current_channel.majorNumber, next_channel.majorNumber)
-            asserts.assert_equal(current_channel.minorNumber, next_channel.minorNumber)
+            asserts.assert_equal(current_channel.majorNumber,
+                                 next_channel.majorNumber)
+            asserts.assert_equal(current_channel.minorNumber,
+                                 next_channel.minorNumber)
 
         if len(channels_list) > 1:
             # SkipChannel
@@ -374,68 +403,92 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 endpoint=endpoint,
             )
             await self.send_single_cmd(
-                cmd=Clusters.Objects.Channel.Commands.SkipChannel(count=num_channels - 1),
+                cmd=Clusters.Objects.Channel.Commands.SkipChannel(
+                    count=num_channels - 1),
                 endpoint=endpoint,
             )
             current_channel = await self._read_channel_current_channel(endpoint)
-            asserts.assert_equal(current_channel.majorNumber, channels_list[-1].majorNumber)
+            asserts.assert_equal(current_channel.majorNumber,
+                                 channels_list[-1].majorNumber)
 
             await self.send_single_cmd(
-                cmd=Clusters.Objects.Channel.Commands.SkipChannel(count=1 - num_channels),
+                cmd=Clusters.Objects.Channel.Commands.SkipChannel(
+                    count=1 - num_channels),
                 endpoint=endpoint,
             )
             current_channel = await self._read_channel_current_channel(endpoint)
-            asserts.assert_equal(current_channel.majorNumber, channels_list[0].majorNumber)
+            asserts.assert_equal(current_channel.majorNumber,
+                                 channels_list[0].majorNumber)
 
     async def content_launcher_interstellar_test(self, endpoint):
         # Launch Interstellar
         params = [
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kType, value="Movie"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kVideo, value="Interstellar"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kDirector, value="Christopher Nolan"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kActor, value="Matthew McConaughey"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kActor, value="Anne Hathaway"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kGenre, value="Sci-Fi"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kType, value="Movie"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kVideo, value="Interstellar"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kDirector, value="Christopher Nolan"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kActor, value="Matthew McConaughey"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kActor, value="Anne Hathaway"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kGenre, value="Sci-Fi"),
         ]
 
-        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(parameterList=params)
+        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(
+            parameterList=params)
 
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=search, autoPlay=True),
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(
+                search=search, autoPlay=True),
             endpoint=endpoint,
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
 
     async def content_launcher_man_united_match_test(self, endpoint):
         # Launch Man United Match
         params = [
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kType, value="SportsEvent"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kLeague, value="Premier League"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kSportsTeam, value="Manchester United"),
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kSport, value="Football"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kType, value="SportsEvent"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kLeague, value="Premier League"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kSportsTeam, value="Manchester United"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kSport, value="Football"),
         ]
 
-        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(parameterList=params)
+        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(
+            parameterList=params)
 
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=search, autoPlay=True),
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(
+                search=search, autoPlay=True),
             endpoint=endpoint,
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
 
     async def content_launcher_unavailable_test(self, endpoint):
         # Try to launch non-existent content
         params = [
-            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kVideo, value="NonExistentMovie"),
+            Clusters.Objects.ContentLauncher.Structs.ParameterStruct(
+                type=Clusters.Objects.ContentLauncher.Enums.ParameterEnum.kVideo, value="NonExistentMovie"),
         ]
 
-        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(parameterList=params)
+        search = Clusters.Objects.ContentLauncher.Structs.ContentSearchStruct(
+            parameterList=params)
 
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(search=search, autoPlay=True),
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchContent(
+                search=search, autoPlay=True),
             endpoint=endpoint,
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kURLNotAvailable)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kURLNotAvailable)
 
     async def content_launcher_launch_url_test(self, endpoint):
         # Launch URL
@@ -443,10 +496,12 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         display_string = "Google"
 
         response = await self.send_single_cmd(
-            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchURL(contentURL=url, displayString=display_string),
+            cmd=Clusters.Objects.ContentLauncher.Commands.LaunchURL(
+                contentURL=url, displayString=display_string),
             endpoint=endpoint,
         )
-        asserts.assert_equal(response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
+        asserts.assert_equal(
+            response.status, Clusters.Objects.ContentLauncher.Enums.StatusEnum.kSuccess)
         asserts.assert_equal(response.data, url)
 
     async def content_launcher_attribute_test(self, endpoint):
@@ -541,6 +596,7 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(11)
         await self.cuj_launch_hide_and_stop_app_a(command_on_endpoint=self.APP_A_ENDPOINT)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
