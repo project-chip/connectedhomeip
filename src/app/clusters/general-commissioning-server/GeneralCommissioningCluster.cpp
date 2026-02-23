@@ -400,7 +400,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
                                                const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
-    auto & failSafeContext = mClusterContext.failsafeContext;
+    auto & failSafeContext = mClusterContext.failSafeContext;
     Commands::ArmFailSafeResponse::Type response;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
@@ -457,7 +457,7 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
-    auto & failSafe = mClusterContext.failsafeContext;
+    auto & failSafe = mClusterContext.failSafeContext;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
@@ -525,6 +525,23 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
         CheckSuccess(err, Failure);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+    // Check if mContext is valid before accessing it (can be null during app shutdown/restart)
+    if (mContext == nullptr)
+    {
+        ChipLogError(FailSafe, "GeneralCommissioning: mContext is NULL, cluster not initialized");
+        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
+
+    if (!mContext->interactionContext.actionContext.CurrentExchange())
+    {
+        ChipLogError(FailSafe, "GeneralCommissioning: Invalid exchange during commissioning complete");
+        response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
 
     SessionHandle handle = mContext->interactionContext.actionContext.CurrentExchange()->GetSessionHandle();
 
@@ -619,7 +636,7 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-    auto & failSafeContext                  = mClusterContext.failsafeContext;
+    auto & failSafeContext                  = mClusterContext.failSafeContext;
     TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
 
     Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;

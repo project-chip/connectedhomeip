@@ -20,6 +20,7 @@
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <cstdint>
 #include <new>
@@ -97,7 +98,14 @@ public:
     template <typename... Args>
     void Create(Args &&... args)
     {
-        VerifyOrDie(!IsConstructed());
+        // Handle idempotent Create() - if already constructed, this is a no-op.
+        // The cluster remains registered and functional. This supports the Stop() → Start() lifecycle
+        // where clusters are shutdown but remain constructed.
+        if (IsConstructed())
+        {
+            ChipLogDetail(DataManagement, "LazyRegisteredServerCluster::Create: Cluster already constructed, skipping re-creation");
+            return;
+        }
 
         new (mCluster) SERVER_CLUSTER(std::forward<Args>(args)...);
         new (mRegistration) ServerClusterRegistration(Cluster());

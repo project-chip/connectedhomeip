@@ -1073,12 +1073,16 @@ def assert_valid_sat_key(sat_key: str) -> None:
     )
 
 
-@not_none_args
-def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
+def assert_valid_t_key(t_key: str, t_key_present: bool, supports_tcp_dut: bool, supports_tcp_pics: bool, enforce_provisional: bool = True) -> None:
     """
     **Transport Protocol Modes**
 
     Verify that the TXT record T key is valid.
+
+    This function validates the T key format, bit constraints, and TCP capability
+    alignment. If the T key is not present in the TXT record, the function returns
+    early without performing any validation. When the T key is present, it ensures
+    that DUT and PICS TCP support are consistent and validates the key value.
 
     Constraints:
     - Encoded as a decimal number in ASCII text
@@ -1088,17 +1092,26 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
     - Bits 1 and 2 are provisional:
         * If enforce_provisional=True → must not be set
         * If enforce_provisional=False → allowed, only bit 0 must be clear
+    - TCP capability must match:
+        * If TCP supported: allowed values are {4, 6}
+        * If TCP not supported (MRP-only support): allowed value is {0}
 
-    Example:
-        "0"
+    Examples:
+        "4"  # TCP supported (IPv4)
+        "6"  # TCP supported (IPv6)
 
     Args:
-        t_key (str): The value to validate
+        t_key (str): The T key value to validate (may be None if not present)
+        t_key_present (bool): Whether the T key is present in the TXT record
+        supports_tcp_dut (bool): Whether TCP is supported by the DUT
+        supports_tcp_pics (bool): Whether TCP is supported by PICS
         enforce_provisional (bool): Whether to enforce strict prohibition
                                     of provisional bits 1 and 2 (default: True)
 
     Raises:
-        TestFailure: If `t_key` does not conform to the constraints.
+        TestFailure:
+            - If DUT and PICS TCP support do not match.
+            - If `t_key` does not conform to the constraints.
 
     Spec:
         https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/secure_channel/Discovery.adoc#4-common-txt-keyvalue-pairs
@@ -1108,9 +1121,18 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
         "Only bits 0-2 may be present (value must fit in 3 bits)",
         "Bit 0 is reserved and must be 0",
         "Bits 1 and 2 are provisional and must not be set (strict mode)",
+        "Value must match TCP capability: {4, 6} if TCP supported, {0} if not",
     ]
 
     failed: list[str] = []
+
+    # If T key is not present, there's nothing to verify
+    if not t_key_present:
+        return
+
+    # Verify that DUT and PICS TCP support matches (both unsupported or both supported)
+    asserts.assert_true(supports_tcp_dut == supports_tcp_pics,
+                        f"TCP support in the PICS ({supports_tcp_pics}) must match TCP support in the DUT ({supports_tcp_dut}).")
 
     # Integer format (no leading zeroes except "0") — independent of bit checks
     if not re.fullmatch(r'(0|[1-9]\d*)', t_key):
@@ -1120,13 +1142,15 @@ def assert_valid_t_key(t_key: str, enforce_provisional: bool = True) -> None:
     if re.fullmatch(r'\d+', t_key):
         try:
             v = int(t_key)
-            # Evaluate all conditions independently (no elif gating)
             if v & ~0x7:
                 failed.append(constraints[1])   # bits above 2 present
             if v & 0x1:
                 failed.append(constraints[2])   # bit 0 must be 0
             if enforce_provisional and (v & 0x6):
                 failed.append(constraints[3])   # bits 1 or 2 set (strict mode)
+            allowed = {4, 6} if supports_tcp_dut else {0}
+            if v not in allowed:
+                failed.append(constraints[4])   # value must match TCP capability
         except ValueError:
             # Defensive: if parsing somehow fails, treat as integer-format error
             failed.append(constraints[0])

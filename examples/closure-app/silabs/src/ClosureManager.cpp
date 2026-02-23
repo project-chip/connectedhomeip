@@ -123,7 +123,10 @@ void ClosureManager::Init()
     if (pTestEventDelegate != nullptr)
     {
         CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint1.GetDelegate());
-        ChipLogFailure(err, AppServer, "Failed to add handler for delegate");
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to add handler for delegate: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     else
     {
