@@ -770,8 +770,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
     {
-        std::string nodeid = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        char * args[]      = { argv[0], nodeid.data() };
+        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        std::string logfile = "--log-file=thread.log";
+        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
 
         otSysInit(MATTER_ARRAY_SIZE(args), args);
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
@@ -899,6 +900,11 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+    // Enable automatic port retry to handle port conflicts
+    initParams.portRetryCount = CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT;
+#endif
+
 #if ENABLE_TRACING
     chip::CommandLineApp::TracingSetup tracing_setup;
 
@@ -1007,8 +1013,15 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     }
 
     static chip::PersistentStorageOpKeystorese05x se05xInstance;
-
     initParams.operationalKeystore = &se05xInstance;
+
+    // Set DAC provider before server init because Operational Credentials may snapshot
+    // the provider during cluster construction.
+#if ENABLE_SE05X_DEVICE_ATTESTATION
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleSe05xDACProvider());
+#else
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+#endif
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
@@ -1064,13 +1077,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
-    // Initialize device attestation config
-#if ENABLE_SE05X_DEVICE_ATTESTATION
-    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleSe05xDACProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
-#endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");
     VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
@@ -1109,9 +1115,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa = {};
-    sa.sa_handler       = StopSignalHandler;
-    sa.sa_flags         = SA_RESETHAND;
+    struct sigaction sa                        = {};
+    sa.sa_handler                              = StopSignalHandler;
+    sa.sa_flags                                = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif

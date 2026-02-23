@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 #include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
-#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <app/util/attribute-storage.h>
@@ -44,7 +43,8 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServer.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet(optionalAttributeBits));
+        gServer.Create(SoftwareDiagnosticsServerCluster::OptionalAttributeSet(optionalAttributeBits),
+                       DeviceLayer::GetDiagnosticDataProvider());
         return gServer.Registration();
     }
 

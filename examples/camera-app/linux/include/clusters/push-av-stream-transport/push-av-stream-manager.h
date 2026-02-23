@@ -119,6 +119,9 @@ public:
 
     void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
 
+    // Method to reset transport sink state - called by transports when starting transmission
+    void ResetTransportSinkStateForTransport(PushAVTransport * transport);
+
 private:
     MediaController * mMediaController                         = nullptr;
     CameraDeviceInterface * mCameraDevice                      = nullptr;

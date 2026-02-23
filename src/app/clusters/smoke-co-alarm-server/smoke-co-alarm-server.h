@@ -36,7 +36,7 @@ public:
     static SmokeCoAlarmServer & Instance();
 
     /* Expected byte size of the PriorityOrder */
-    static constexpr size_t kPriorityOrderLength = 8;
+    static constexpr size_t kPriorityOrderLength = 9;
 
     using AlarmStateEnum         = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
     using ContaminationStateEnum = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
@@ -76,6 +76,17 @@ public:
     bool SetInterconnectCOAlarm(chip::EndpointId endpointId, AlarmStateEnum newInterconnectCOAlarm);
     bool SetContaminationState(chip::EndpointId endpointId, ContaminationStateEnum newContaminationState);
     bool SetSmokeSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum newSmokeSensitivityLevel);
+    /**
+     * @brief Sets unmounted attribute and updates expressed state respectively.
+     * @param endpointId ID of the endpoint
+     * @param isUnmounted unmounted state
+     * @return true on success, false on failure
+     */
+    bool SetUnmountedState(chip::EndpointId endpointId, bool isUnmounted);
+    /**
+     * @brief If set to true, unmounting the device leads to inoperative state.
+     */
+    void SetInoperativeWhenUnmounted(bool inoperative) { mInoperativeWhenUnmounted = inoperative; }
 
     bool GetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum & expressedState);
     bool GetSmokeState(chip::EndpointId endpointId, AlarmStateEnum & smokeState);
@@ -90,6 +101,8 @@ public:
     bool GetContaminationState(chip::EndpointId endpointId, ContaminationStateEnum & contaminationState);
     bool GetSmokeSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum & smokeSensitivityLevel);
     bool GetExpiryDate(chip::EndpointId endpointId, uint32_t & expiryDate);
+    bool GetUnmountedState(chip::EndpointId endpointId, bool & unmountedState);
+    void GetInoperativeWhenUnmounted(bool & inoperative) { inoperative = mInoperativeWhenUnmounted; }
 
     chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
 
@@ -161,6 +174,7 @@ private:
         const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
 
     static SmokeCoAlarmServer sInstance;
+    bool mInoperativeWhenUnmounted = false;
 };
 
 // =============================================================================

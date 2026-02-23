@@ -405,6 +405,8 @@ deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
 detokenization
@@ -715,6 +717,7 @@ ICD
 ICDs
 iCloud
 ICMP
+idempotency
 IDF
 IDL
 IDLs
@@ -962,6 +965,7 @@ MLD
 mmevk
 moal
 Mobly
+Mockito
 ModeSelect
 modprobe
 Modustoolbox
@@ -1043,6 +1047,7 @@ nwk
 NXP
 objcopy
 OccupancySensing
+OCMock
 OctetString
 OECORE
 OID
@@ -1249,6 +1254,9 @@ Realtek
 rebase
 recommand
 recommanded
+Reconnection
+reconnection
+reconnections
 recurse
 refrigeratoralarm
 regen

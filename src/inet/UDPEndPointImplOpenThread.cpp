@@ -249,6 +249,7 @@ CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System:
     otError error = OT_ERROR_NONE;
     otMessage * message;
     otMessageInfo messageInfo;
+    otMessageSettings settings = {};
 
     // For now the entire message must fit within a single buffer.
     VerifyOrReturnError(!msg->HasChainedBuffer() && msg->DataLength() <= UINT16_MAX, CHIP_ERROR_MESSAGE_TOO_LONG);
@@ -260,7 +261,11 @@ CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System:
     messageInfo.mPeerPort = aPktInfo->DestPort;
 
     LockOpenThread();
-    message = otUdpNewMessage(mOTInstance, NULL);
+
+    settings.mPriority            = OT_MESSAGE_PRIORITY_NORMAL;
+    settings.mLinkSecurityEnabled = otThreadGetDeviceRole(mOTInstance) != OT_DEVICE_ROLE_DISABLED;
+
+    message = otUdpNewMessage(mOTInstance, &settings);
     VerifyOrExit(message != NULL, error = OT_ERROR_NO_BUFS);
 
     error = otMessageAppend(message, msg->Start(), static_cast<uint16_t>(msg->DataLength()));
