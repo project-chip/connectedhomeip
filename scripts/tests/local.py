@@ -53,10 +53,10 @@ except ImportError:
             extract_runs_args = None  # filtering by app (--app-filter) will not work.
 
 try:
-    from matter.testing.subprocess import SubprocessKind
+    from matter.testing.tasks import SubprocessKind
 except ImportError:
     with python_path.PythonPath(fallback_import_path, relative_to=__file__):
-        from matter.testing.subprocess import SubprocessKind
+        from matter.testing.tasks import SubprocessKind
 
 
 log = logging.getLogger(__name__)

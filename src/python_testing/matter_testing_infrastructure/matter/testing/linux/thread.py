@@ -22,7 +22,7 @@ import subprocess
 import threading
 from typing import Optional, Pattern
 
-from matter.testing.subprocess import SubprocessKind
+from matter.testing.tasks import SubprocessKind
 
 from .namespace import IsolatedNetworkNamespace
 

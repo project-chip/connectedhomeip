@@ -25,7 +25,7 @@ import subprocess
 import sys
 import time
 
-from matter.testing.subprocess import SubprocessKind
+from matter.testing.tasks import SubprocessKind
 
 log = logging.getLogger(__name__)
 
