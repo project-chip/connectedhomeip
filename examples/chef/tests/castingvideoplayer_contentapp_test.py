@@ -31,6 +31,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
     """Tests for chef castingvideoplayer device."""
 
     CASTINGVIDEOPLAYER_ENDPOINT = 1
+    APP_A_ENDPOINT = 2
+    APP_A_VENDOR_ID = 0xFFF1
+    APP_A_ID = "Application_A_ID"
 
     def desc_TC_CASTINGVIDEOPLAYER(self) -> str:
         return "[TC_CASTINGVIDEOPLAYER] chef castingvideoplayer functionality test."
@@ -42,7 +45,51 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(4, "[TC_CASTINGVIDEOPLAYER] Test channel."),
                 TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off."),
                 TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher."),
-                TestStep(7, "[TC_CONTENTAPP_A] Test application basic.")]
+                TestStep(7, "[TC_CONTENTAPP_A] Test application basic."),
+                TestStep(8, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using platform endpoint.")]
+
+    async def _read_application_launcher_current_app(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationLauncher, attribute=Clusters.Objects.ApplicationLauncher.Attributes.CurrentApp)
+
+    async def _read_application_basic_status(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.ApplicationBasic, attribute=Clusters.Objects.ApplicationBasic.Attributes.Status)
+
+    async def cuj_launch_stop_app_a_using_platform_endpoint(self):
+        app_a = Clusters.Objects.ApplicationLauncher.Structs.ApplicationStruct(
+            catalogVendorID=self.APP_A_VENDOR_ID, applicationID=self.APP_A_ID)
+
+        # 1. Launch App A via Platform
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.LaunchApp(application=app_a),
+            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+
+        # 2. Verify Status on App A Endpoint is ActiveVisibleFocus
+        status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
+        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kActiveVisibleFocus)
+
+        # 3. Verify CurrentApp on Platform Endpoint
+        current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        asserts.assert_equal(current_app.application.catalogVendorID, self.APP_A_VENDOR_ID)
+        asserts.assert_equal(current_app.application.applicationID, self.APP_A_ID)
+
+        # 4. Stop App A via Platform
+        response = await self.send_single_cmd(
+            cmd=Clusters.Objects.ApplicationLauncher.Commands.StopApp(application=app_a),
+            endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT
+        )
+        asserts.assert_equal(response.status, Clusters.Objects.ApplicationLauncher.Enums.StatusEnum.kSuccess)
+
+        # 5. Verify CurrentApp on Platform Endpoint is Null
+        current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        asserts.assert_is_none(current_app)
+
+        # 6. Verify Status on App A Endpoint is Stopped
+        status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
+        asserts.assert_equal(status, Clusters.Objects.ApplicationBasic.Enums.ApplicationStatusEnum.kStopped)
 
     async def _read_on_off(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -429,6 +476,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(7)
         await self.application_basic_test(2)
+
+        self.step(8)
+        await self.cuj_launch_stop_app_a_using_platform_endpoint()
 
 
 if __name__ == "__main__":
