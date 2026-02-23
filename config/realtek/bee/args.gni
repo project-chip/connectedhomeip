@@ -32,7 +32,7 @@ lwip_platform = "external"
 
 chip_build_tests = false
 
-chip_enable_openthread = true
+chip_enable_thread = true
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false

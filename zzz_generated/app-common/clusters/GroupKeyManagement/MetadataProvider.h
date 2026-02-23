@@ -31,6 +31,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GroupKeyMana
             return MaxGroupsPerFabric::kMetadataEntry;
         case MaxGroupKeysPerFabric::Id:
             return MaxGroupKeysPerFabric::kMetadataEntry;
+        case GroupcastAdoption::Id:
+            return GroupcastAdoption::kMetadataEntry;
         default:
             return std::nullopt;
         }

@@ -741,8 +741,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
     {
-        std::string nodeid = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        char * args[]      = { argv[0], nodeid.data() };
+        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+        std::string logfile = "--log-file=thread.log";
+        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
 
         otSysInit(MATTER_ARRAY_SIZE(args), args);
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
@@ -982,6 +983,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
 
+    // Set DAC provider before server init because Operational Credentials may snapshot
+    // the provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
@@ -1033,9 +1038,6 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");

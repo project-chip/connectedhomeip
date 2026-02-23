@@ -45,7 +45,7 @@ lwip_api = true
 lwip_ethernet = true
 
 chip_enable_wifi = true
-chip_enable_openthread = false
+chip_enable_thread = false
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false

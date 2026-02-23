@@ -23,9 +23,8 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("system.gni")
 
-assert(
-    chip_enable_openthread || !chip_system_config_use_openthread_inet_endpoints,
-    "OpenThread Endpoint is only available when Thread is enabled")
+assert(chip_enable_thread || !chip_system_config_use_openthread_inet_endpoints,
+       "OpenThread Endpoint is only available when Thread is enabled")
 
 if (chip_system_config_use_lwip) {
   import("//build_overrides/lwip.gni")

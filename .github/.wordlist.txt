@@ -403,6 +403,8 @@ deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
 detokenization
@@ -1247,6 +1249,7 @@ recommand
 recommanded
 Reconnection
 reconnection
+reconnections
 recurse
 refrigeratoralarm
 regen
