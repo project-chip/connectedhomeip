@@ -213,8 +213,7 @@ class TelinkBuilder(Builder):
         return cmd
 
     def generate(self):
-        if os.path.exists(self.output_dir):
-            return
+        os.makedirs(self.output_dir, exist_ok=True)
 
         flags = []
         if self.enable_ota:
