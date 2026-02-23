@@ -97,7 +97,7 @@ CHIP_ERROR WiFiNetworkManagementCluster::SetNetworkCredentials(ByteSpan ssid, By
         {
             mPassphraseSurrogate = std::max(mPassphraseSurrogate, realtime.count());
         }
-    NotifyAttributeChanged(PassphraseSurrogate::Id);
+        NotifyAttributeChanged(PassphraseSurrogate::Id);
     }
     return CHIP_NO_ERROR;
 }
