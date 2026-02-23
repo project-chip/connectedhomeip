@@ -788,6 +788,10 @@ void AutoCommissioner::CleanupCommissioning()
     mDeviceCommissioningInfo = ReadCommissioningInfo();
     mNeedsDST                = false;
     mNeedsNetworkSetup       = false;
+    mNeedIcdRegistration     = false;
+    mStopCommissioning       = false;
+    mAttestationElementsLen  = 0;
+    mAttestationSignatureLen = 0;
 }
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
