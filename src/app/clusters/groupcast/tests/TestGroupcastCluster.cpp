@@ -856,6 +856,20 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         size_t memershipCount = 0;
         ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
         ASSERT_EQ(memershipCount, 2u);
+
+        uint16_t expectedGroupIDs[] = { 1, 2 };
+        auto iterMembership         = memberships.begin();
+        size_t iteration            = 0;
+        while (iterMembership.Next())
+        {
+            auto membership = iterMembership.GetValue();
+            ASSERT_EQ(membership.groupID, expectedGroupIDs[iteration]);
+            ASSERT_EQ(membership.keySetID, 0xabcd);
+            size_t endpoint_count = 0;
+            ASSERT_EQ(membership.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
+            ASSERT_EQ(endpoint_count, kMaxEndpoints);
+            iteration++;
+        }
     }
 
     // LeaveGroup for GroupID 2 without providing any endpoints
@@ -875,6 +889,21 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         size_t memershipCount = 0;
         ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
         ASSERT_EQ(memershipCount, 1u);
+
+        uint16_t expectedGroupIDs[] = { 1 };
+        auto iterMembership         = memberships.begin();
+        size_t iteration            = 0;
+        while (iterMembership.Next())
+        {
+            auto membership = iterMembership.GetValue();
+            ASSERT_EQ(membership.groupID, expectedGroupIDs[iteration]);
+            ASSERT_EQ(membership.keySetID, 0xabcd);
+            size_t endpoint_count = 0;
+            ASSERT_EQ(membership.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
+            ASSERT_EQ(endpoint_count, kMaxEndpoints);
+            iteration++;
+        }
+        ASSERT_EQ(iteration, memershipCount);
     }
 
     // Create a Listener and Sender capable group with 1 endpoint.
@@ -903,6 +932,22 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         size_t memershipCount = 0;
         ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
         ASSERT_EQ(memershipCount, 2u);
+
+        uint16_t expectedGroupIDs[]       = { 1, 3 };
+        uint16_t expectedEndpointCounts[] = { kMaxEndpoints, 1 };
+        auto iterMembership               = memberships.begin();
+        size_t iteration                  = 0;
+        while (iterMembership.Next())
+        {
+            auto membership = iterMembership.GetValue();
+            ASSERT_EQ(membership.groupID, expectedGroupIDs[iteration]);
+            ASSERT_EQ(membership.keySetID, 0xabcd);
+            size_t endpoint_count = 0;
+            ASSERT_EQ(membership.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
+            ASSERT_EQ(endpoint_count, expectedEndpointCounts[iteration]);
+            iteration++;
+        }
+        ASSERT_EQ(iteration, memershipCount);
     }
 
     {
@@ -920,6 +965,30 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         ASSERT_EQ(listenerAndSendertester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
         ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
         ASSERT_EQ(memershipCount, 2u);
+
+        uint16_t expectedGroupIDs[]       = { 1, 3 };
+        uint16_t expectedEndpointCounts[] = { kMaxEndpoints, 0 };
+        auto iterMembership               = memberships.begin();
+        size_t iteration                  = 0;
+        while (iterMembership.Next())
+        {
+            auto membership = iterMembership.GetValue();
+            ASSERT_EQ(membership.groupID, expectedGroupIDs[iteration]);
+            ASSERT_EQ(membership.keySetID, 0xabcd);
+
+            if (expectedEndpointCounts[iteration] == 0)
+            {
+                ASSERT_FALSE(membership.endpoints.HasValue());
+            }
+            else
+            {
+                size_t endpoint_count = 0;
+                ASSERT_EQ(membership.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
+                ASSERT_EQ(endpoint_count, expectedEndpointCounts[iteration]);
+            }
+            iteration++;
+        }
+        ASSERT_EQ(iteration, memershipCount);
     }
     ListenerAndSender.Shutdown(app::ClusterShutdownType::kClusterShutdown);
 }
