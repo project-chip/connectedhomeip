@@ -61,7 +61,7 @@ namespace chip::app::Clusters {
 
 CHIP_ERROR WiFiNetworkManagementCluster::ClearNetworkCredentials()
 {
-    VerifyOrReturnError(HaveNetworkCredentials(), CHIP_NO_ERROR);
+    VerifyOrReturnError(HasNetworkCredentials(), CHIP_NO_ERROR);
 
     mSsid.clear();
     RETURN_SAFELY_IGNORED mPassphrase.SetLength(0);
@@ -76,8 +76,8 @@ CHIP_ERROR WiFiNetworkManagementCluster::SetNetworkCredentials(ByteSpan ssid, By
     VerifyOrReturnError(1 <= ssid.size() && ssid.size() <= mSsid.capacity(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidWpaPersonalCredential(passphrase), CHIP_ERROR_INVALID_ARGUMENT);
 
-    bool ssidChanged       = !SsidSpan().data_equal(ssid);
-    bool passphraseChanged = !PassphraseSpan().data_equal(passphrase);
+    bool ssidChanged       = !Ssid().data_equal(ssid);
+    bool passphraseChanged = !Passphrase().data_equal(passphrase);
     VerifyOrReturnError(ssidChanged || passphraseChanged, CHIP_NO_ERROR);
 
     mSsid.assign(ssid);
@@ -96,8 +96,8 @@ CHIP_ERROR WiFiNetworkManagementCluster::SetNetworkCredentials(ByteSpan ssid, By
         if (System::SystemClock().GetClock_RealTimeMS(realtime) == CHIP_NO_ERROR)
         {
             mPassphraseSurrogate = std::max(mPassphraseSurrogate, realtime.count());
+            NotifyAttributeChanged(PassphraseSurrogate::Id);
         }
-        NotifyAttributeChanged(PassphraseSurrogate::Id);
     }
     return CHIP_NO_ERROR;
 }
@@ -112,9 +112,9 @@ DataModel::ActionReturnStatus WiFiNetworkManagementCluster::ReadAttribute(const 
     case ClusterRevision::Id:
         return encoder.Encode(WiFiNetworkManagement::kRevision);
     case Ssid::Id:
-        return HaveNetworkCredentials() ? encoder.Encode(SsidSpan()) : encoder.EncodeNull();
+        return HasNetworkCredentials() ? encoder.Encode(Ssid()) : encoder.EncodeNull();
     case PassphraseSurrogate::Id:
-        return HaveNetworkCredentials() ? encoder.Encode(mPassphraseSurrogate) : encoder.EncodeNull();
+        return HasNetworkCredentials() ? encoder.Encode(mPassphraseSurrogate) : encoder.EncodeNull();
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -129,7 +129,7 @@ std::optional<DataModel::ActionReturnStatus> WiFiNetworkManagementCluster::Invok
     case NetworkPassphraseRequest::Id: {
         VerifyOrReturnValue(request.subjectDescriptor->authMode == Access::AuthMode::kCase,
                             Protocols::InteractionModel::Status::UnsupportedAccess);
-        VerifyOrReturnValue(HaveNetworkCredentials(), Protocols::InteractionModel::Status::InvalidInState);
+        VerifyOrReturnValue(HasNetworkCredentials(), Protocols::InteractionModel::Status::InvalidInState);
 
         NetworkPassphraseResponse::Type response;
         response.passphrase = mPassphrase.Span();

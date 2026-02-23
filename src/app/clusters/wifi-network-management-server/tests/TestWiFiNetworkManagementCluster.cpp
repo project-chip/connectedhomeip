@@ -75,6 +75,10 @@ TEST_F(TestWiFiNetworkManagementCluster, ReadGlobalAttributesTest)
 
 TEST_F(TestWiFiNetworkManagementCluster, InitialStateHasNoCredentials)
 {
+    EXPECT_FALSE(cluster.HasNetworkCredentials());
+    EXPECT_TRUE(cluster.Ssid().empty());
+    EXPECT_TRUE(cluster.Passphrase().empty());
+
     DataModel::Nullable<ByteSpan> ssid;
     ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);
     EXPECT_TRUE(ssid.IsNull());
@@ -89,6 +93,10 @@ TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentials)
     const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
     ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster.HasNetworkCredentials());
+    EXPECT_TRUE(cluster.Ssid().data_equal(ByteSpan(ssidData)));
+    EXPECT_TRUE(cluster.Passphrase().data_equal(ByteSpan(passphraseData)));
 
     DataModel::Nullable<ByteSpan> ssid;
     ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);
@@ -123,6 +131,10 @@ TEST_F(TestWiFiNetworkManagementCluster, ClearNetworkCredentials)
     // Clear credentials
     tester.GetDirtyList().clear();
     ASSERT_EQ(cluster.ClearNetworkCredentials(), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(cluster.HasNetworkCredentials());
+    EXPECT_TRUE(cluster.Ssid().empty());
+    EXPECT_TRUE(cluster.Passphrase().empty());
 
     // Verify credentials are cleared
     ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);

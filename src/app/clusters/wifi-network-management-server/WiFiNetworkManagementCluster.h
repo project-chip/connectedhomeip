@@ -32,16 +32,28 @@ class WiFiNetworkManagementCluster : public DefaultServerCluster
 public:
     WiFiNetworkManagementCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, WiFiNetworkManagement::Id }) {}
 
+    WiFiNetworkManagementCluster(WiFiNetworkManagementCluster const &)             = delete;
+    WiFiNetworkManagementCluster & operator=(WiFiNetworkManagementCluster const &) = delete;
+
     /// Sets the Wi-Fi credentials to expose via this cluster.
     /// The application is responsible for calling this method during startup,
     /// and whenever the Wi-Fi credentials are modified externally.
     CHIP_ERROR SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase);
     CHIP_ERROR ClearNetworkCredentials();
 
-    WiFiNetworkManagementCluster(WiFiNetworkManagementCluster const &)             = delete;
-    WiFiNetworkManagementCluster & operator=(WiFiNetworkManagementCluster const &) = delete;
+    /// Returns true if the cluster holds a valid SSID and Passphrase.
+    bool HasNetworkCredentials() const { return !mSsid.empty(); }
+
+    /// Returns the SSID of the Wi-Fi network managed by this cluster,
+    // or an empty span if no current network credentials are set.
+    ByteSpan Ssid() const { return mSsid.span(); }
+
+    /// Returns the passphrase for the Wi-Fi network managed by this cluster,
+    // or an empty span if there are no current network credentials.
+    ByteSpan Passphrase() const { return mPassphrase.Span(); }
 
     // ServerClusterInterface overrides
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
@@ -53,13 +65,8 @@ public:
 
 private:
     FixedByteBuffer<32, uint8_t> mSsid;
-    ByteSpan SsidSpan() const { return mSsid.span(); }
-
     uint64_t mPassphraseSurrogate = 0;
     Crypto::SensitiveDataBuffer<64> mPassphrase;
-    ByteSpan PassphraseSpan() const { return mPassphrase.Span(); }
-
-    bool HaveNetworkCredentials() const { return !mSsid.empty(); }
 };
 
 } // namespace chip::app::Clusters
