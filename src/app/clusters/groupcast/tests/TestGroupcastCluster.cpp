@@ -891,15 +891,15 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
                 .groupID         = 1,
-                .keySetID        = 0xabcd,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = 0xabcd,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             },
             {
                 .groupID         = 2,
-                .keySetID        = 0xabcd,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = 0xabcd,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
@@ -924,8 +924,8 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
 
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
             .groupID         = 1,
-            .keySetID        = 0xabcd,
             .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+            .keySetID        = 0xabcd,
             .hasAuxiliaryACL = MakeOptional(true),
             .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
         } };
@@ -959,15 +959,15 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
                 .groupID         = 1,
-                .keySetID        = 0xabcd,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = 0xabcd,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             },
             {
                 .groupID         = 3,
-                .keySetID        = 0xabcd,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], 1)),
+                .keySetID        = 0xabcd,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
@@ -992,15 +992,15 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
                 .groupID         = 1,
-                .keySetID        = 0xabcd,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
+                .keySetID        = 0xabcd,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             },
             {
                 .groupID         = 3,
-                .keySetID        = 0xabcd,
                 .endpoints       = chip::NullOptional,
+                .keySetID        = 0xabcd,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
