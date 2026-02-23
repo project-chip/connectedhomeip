@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 
 try:
     # Import all symbols used downstream not only those we use ourselves
-    from matter.testing.subprocess import SubprocessInfo, SubprocessKind
+    from matter.testing.subprocess import SubprocessInfo, SubprocessKind  # noqa: F401
 except ImportError:
     with python_path.PythonPath("../../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
         from matter.testing.subprocess import SubprocessInfo
