@@ -37,7 +37,7 @@ const uint32_t w1in_id_p = 0x7D200004;
 #endif
 
 #if ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-static CHIP_ERROR get_trust_provisioned_w0L_ids(uint32_t iterationCnt, uint32_t * tp_w0in_id_v, uint32_t * tp_Lin_id_v)
+static CHIP_ERROR get_trust_provisioned_w0L_ids(uint32_t * tp_w0in_id_v, uint32_t * tp_Lin_id_v)
 {
 
     switch (SE05X_SPAKE_VERIFIER_TP_SET_NO)

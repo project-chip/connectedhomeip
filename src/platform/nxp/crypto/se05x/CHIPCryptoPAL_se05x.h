@@ -80,7 +80,6 @@ public:
 
 #endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 
-
 /**
  * @brief
  *
@@ -148,12 +147,11 @@ private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
 
-
 class HKDF_sha_SE05x : public HKDF_sha
 {
 public:
     CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
-                                   const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length) override;
+                           const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length) override;
 };
 
 class HMAC_sha_SE05x : public HMAC_sha

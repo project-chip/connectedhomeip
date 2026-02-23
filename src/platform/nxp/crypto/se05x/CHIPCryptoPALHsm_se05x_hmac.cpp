@@ -31,7 +31,7 @@ namespace chip {
 namespace Crypto {
 
 CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
-                                 uint8_t * out_buffer, size_t out_length)
+                                       uint8_t * out_buffer, size_t out_length)
 
 {
     CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
@@ -113,8 +113,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
-                                 size_t out_length)
+CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length,
+                                       uint8_t * out_buffer, size_t out_length)
 {
     return HMAC_SHA256(key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), message, message_length,
                        out_buffer, out_length);

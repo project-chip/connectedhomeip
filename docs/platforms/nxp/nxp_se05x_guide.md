@@ -29,8 +29,9 @@ The following cryptographic operations can be offloaded to SE05x:
 -   HMAC (Hash-based Message Authentication Code)
 -   SPAKE2+ (Password Authenticated Key Exchange)
 
-The EC key generation / ECDSA Sign for the operational key is by default offloaded to SE05x on enabling secure element in the build.
-To offload other crypto operations to SE05x, application / matter stack changes will be required.
+The EC key generation / ECDSA Sign for the operational key is by default
+offloaded to SE05x on enabling secure element in the build. To offload other
+crypto operations to SE05x, application / matter stack changes will be required.
 
 <a name="supported_platforms"></a>
 
@@ -132,8 +133,9 @@ and all-clusters-app examples.
 **Prerequisites:** Refer to [RT1060](nxp_rt1060_guide.md) to set up the build
 environment.
 
-Refer to [RT1060 and SE05x](./nxp_rt1060_guide.md#se05x_secure_element_with_rt1060)
-for detailed hardware connections and build instructions.
+Refer to
+[RT1060 and SE05x](./nxp_rt1060_guide.md#se05x_secure_element_with_rt1060) for
+detailed hardware connections and build instructions.
 
 Refer to [SE05x Crypto Configurations](#se05x_crypto_configurations) to control
 which crypto operations are offloaded to SE05x.
@@ -141,16 +143,17 @@ which crypto operations are offloaded to SE05x.
 Refer to [SE05x Type Configurations](#se05x_type_configurations) to select the
 correct secure element variant.
 
-
 ### MCXW72
 
-Integration of SE05x with MCXW72 board is demonstrated using the lighting app example.
+Integration of SE05x with MCXW72 board is demonstrated using the lighting app
+example.
 
 **Prerequisites:** Refer to [MCXW72](nxp_mcxw72_guide.md) to set up the build
 environment.
 
-Refer to [MCXW72 and SE05x](./nxp_mcxw72_guide.md#se05x_secure_element_with_mcxw72)
-for detailed hardware connections and build instructions.
+Refer to
+[MCXW72 and SE05x](./nxp_mcxw72_guide.md#se05x_secure_element_with_mcxw72) for
+detailed hardware connections and build instructions.
 
 Refer to [SE05x Crypto Configurations](#se05x_crypto_configurations) to control
 which crypto operations are offloaded to SE05x.
@@ -158,8 +161,8 @@ which crypto operations are offloaded to SE05x.
 Refer to [SE05x Type Configurations](#se05x_type_configurations) to select the
 correct secure element variant.
 
-**Note:** - It is not recomended to enable random number generation from SE05x when using with W72.
-
+**Note:** - It is not recomended to enable random number generation from SE05x
+when using with W72.
 
 <a name="se05x_crypto_configurations"></a>
 
@@ -356,7 +359,7 @@ corresponding QR code to the T4T applet.
 **GN Build:**
 
 ```bash
-gn gen out --args="chip_se05x_spake_verifier=true chip_se05x_spake_verifier_use_tp_values=true chip_se05x_spake_verifier_tp_set_no=1 chip_se05x_spake_verifier_tp_itter_cnt=1000"
+gn gen out --args="chip_se05x_spake_verifier=true chip_se05x_spake_verifier_use_tp_values=true chip_se05x_spake_verifier_tp_set_no=1 chip_se05x_spake_verifier_tp_iter_cnt=1000"
 ```
 
 **CMake Build:**
@@ -365,7 +368,7 @@ gn gen out --args="chip_se05x_spake_verifier=true chip_se05x_spake_verifier_use_
 values. Refer to [NXP Manufacturing Flow](nxp_manufacturing_flow.md).
 
 ```bash
-west build -d <out_dir> -b <board> <example_path> -DCONF_FILE_NAME=prj_wifi_fdata.conf -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO=1 -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITTER_CNT=1000
+west build -d <out_dir> -b <board> <example_path> -DCONF_FILE_NAME=prj_wifi_fdata.conf -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES=y -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO=1 -DCONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT=1000
 ```
 
 **Running the Example:**

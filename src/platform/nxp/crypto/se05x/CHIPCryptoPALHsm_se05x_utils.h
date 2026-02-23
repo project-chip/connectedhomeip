@@ -32,9 +32,9 @@
 
 /* se05x includes */
 #include "ex_sss_boot.h"
-#include "sss/inc/fsl_sss_api.h"
 #include "se051h_nfc_comm_prov.h"
 #include "se05x_host_gpio.h"
+#include "sss/inc/fsl_sss_api.h"
 #include <fsl_sss_se05x_apis.h>
 #include <se05x_APDU.h>
 

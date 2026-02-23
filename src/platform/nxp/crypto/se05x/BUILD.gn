@@ -36,17 +36,18 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_p256.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_pbkdf.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_spake2p.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
-    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_spake2p.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.cpp",
   ]
 
-  if ((chip_device_platform == "linux") || (nxp_platform == "rt/rw61x") || (nxp_platform == "rt/rt1060")) {
+  if (chip_device_platform == "linux" || nxp_platform == "rt/rw61x" ||
+      nxp_platform == "rt/rt1060") {
     sources += [
       "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.cpp",
-      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLSCert.cpp",
       "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.h",
+      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLSCert.cpp",
     ]
   }
 
@@ -100,7 +101,8 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/third_party/inipp",
   ]
 
-  if ((nxp_platform != "rt/rw61x") && (nxp_platform != "rt/rt1060") && (nxp_platform != "mcxw72")) {
+  if (nxp_platform != "rt/rw61x" && nxp_platform != "rt/rt1060" &&
+      nxp_platform != "mcxw72") {
     public_deps += [ "${chip_root}/src/platform" ]
     public_deps += [ "${chip_root}/src/app/server" ]
   }

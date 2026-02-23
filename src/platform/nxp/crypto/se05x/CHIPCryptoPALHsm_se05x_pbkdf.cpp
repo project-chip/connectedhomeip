@@ -29,7 +29,7 @@ namespace chip {
 namespace Crypto {
 
 CHIP_ERROR PBKDF2_sha256_SE05x::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                                        unsigned int iteration_count, uint32_t key_length, uint8_t * output)
+                                              unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrReturnError(password != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

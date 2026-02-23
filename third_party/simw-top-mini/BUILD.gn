@@ -114,8 +114,8 @@ static_library("se05x") {
 
   if (chip_se05x_auth == "scp03" || chip_se05x_auth == "user_id" ||
       chip_se05x_auth == "aes_key" || chip_se05x_auth == "ec_key" ||
-      chip_se05x_auth == "scp03_user_id" || chip_se05x_auth == "scp03_aes_key" ||
-      chip_se05x_auth == "scp03_ec_key") {
+      chip_se05x_auth == "scp03_user_id" ||
+      chip_se05x_auth == "scp03_aes_key" || chip_se05x_auth == "scp03_ec_key") {
     sources += [
       "repo/hostlib/hostLib/libCommon/nxScp/nxScp03_Com.c",
       "repo/sss/ex/src/ex_sss_scp03_auth.c",

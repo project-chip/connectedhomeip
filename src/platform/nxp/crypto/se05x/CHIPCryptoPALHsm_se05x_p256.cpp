@@ -376,7 +376,7 @@ CHIP_ERROR SE05X_Set_ECDSA_Public_Key(sss_object_t * keyObject, const uint8_t * 
 }
 
 CHIP_ERROR P256PublicKeySE05x::ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
-                                                       const P256ECDSASignature & signature) const
+                                                            const P256ECDSASignature & signature) const
 {
     CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
     sss_status_t status        = kStatus_SSS_Success;
@@ -434,7 +434,7 @@ exit:
 }
 
 CHIP_ERROR P256PublicKeySE05x::ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
-                                                        const P256ECDSASignature & signature) const
+                                                             const P256ECDSASignature & signature) const
 {
     CHIP_ERROR error                                         = CHIP_ERROR_INTERNAL;
     sss_status_t status                                      = kStatus_SSS_Success;

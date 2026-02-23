@@ -64,7 +64,6 @@ CHIP_ERROR GeneratePaseSalt(std::vector<uint8_t> & spake2pSaltVector)
 
     setUpPINCode_se05x = (BCD_TO_DEC(cert[offset + 3])) + (100 * BCD_TO_DEC(cert[offset + 2])) +
         (10000 * BCD_TO_DEC(cert[offset + 1])) + (1000000 * BCD_TO_DEC(cert[offset]));
-    ChipLogProgress(Crypto, "SE05x passcode (set number = %d ) is  ==> %d", SE05X_SPAKE_VERIFIER_TP_SET_NO, setUpPINCode_se05x);
 
     return CHIP_NO_ERROR;
 }

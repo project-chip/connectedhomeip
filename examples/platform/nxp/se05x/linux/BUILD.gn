@@ -211,8 +211,6 @@ source_set("app-main") {
     "AppMain.cpp",
   ]
 
-
-
   public_deps = [
     ":app-main-loop",
     ":app-options",

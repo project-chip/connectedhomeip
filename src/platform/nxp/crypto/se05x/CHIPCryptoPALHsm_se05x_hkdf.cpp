@@ -28,8 +28,9 @@
 namespace chip {
 namespace Crypto {
 
-CHIP_ERROR HKDF_sha_SE05x::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                                 const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length)
+CHIP_ERROR HKDF_sha_SE05x::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
+                                       const size_t salt_length, const uint8_t * info, const size_t info_length,
+                                       uint8_t * out_buffer, size_t out_length)
 {
     CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
     uint32_t keyid         = kKeyId_hkdf_sha256_hmac_keyid;

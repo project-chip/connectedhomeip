@@ -121,10 +121,12 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
     return err;
 }
 
-CHIP_ERROR PersistentStorageOpKeystorese05x::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message, Crypto::P256ECDSASignature & outSignature) const
+CHIP_ERROR PersistentStorageOpKeystorese05x::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                                               Crypto::P256ECDSASignature & outSignature) const
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     ChipLogDetail(Crypto, "PersistentStorageOpKeystorese05x::SignWithOpKeypair :: ECDSA Sign using SE05x ");
 
@@ -144,7 +146,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::SignWithOpKeypair(FabricIndex fabri
 
     P256SerializedKeypair serializedOpKey;
     // Call base class method directly using 'this'
-    CHIP_ERROR err = const_cast<PersistentStorageOpKeystorese05x*>(this)->ExportOpKeypairForFabric(fabricIndex, serializedOpKey);
+    CHIP_ERROR err = const_cast<PersistentStorageOpKeystorese05x *>(this)->ExportOpKeypairForFabric(fabricIndex, serializedOpKey);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_ERROR_INVALID_FABRIC_INDEX;

@@ -347,7 +347,8 @@ CHIP_ERROR se05x_set_binary_data(uint32_t keyId, const uint8_t * buf, size_t buf
 }
 
 /* Set EC key in se05x */
-CHIP_ERROR se05x_set_ec_key(uint32_t keyId, const uint8_t * buf, size_t buflen) {
+CHIP_ERROR se05x_set_ec_key(uint32_t keyId, const uint8_t * buf, size_t buflen)
+{
     sss_object_t keyObject = { 0 };
     sss_status_t status    = kStatus_SSS_Fail;
 
