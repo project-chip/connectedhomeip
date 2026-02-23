@@ -1,6 +1,6 @@
 {{> header excludeZapComment=false}}
 
-#import "../MCCluster.h"
+#import "MCCluster.h"
 #import "MCAttributeObjects.h"
 #import "MCCommandObjects.h"
 #import <Foundation/Foundation.h>

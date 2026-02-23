@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "../MatterError.h"
+#import "MatterError.h"
 #import <Foundation/Foundation.h>
 
 #ifndef CommissioningCallbacksHandlers_h

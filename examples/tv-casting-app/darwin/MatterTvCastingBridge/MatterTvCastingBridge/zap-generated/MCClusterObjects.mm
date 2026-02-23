@@ -19,9 +19,9 @@
 
 #import "MCClusterObjects.h"
 
-#import "../MCAttribute_Internal.h"
-#import "../MCCluster_Internal.h"
-#import "../MCCommand_Internal.h"
+#import "MCAttribute_Internal.h"
+#import "MCCluster_Internal.h"
+#import "MCCommand_Internal.h"
 
 #include "core/Attribute.h"
 #include "core/Command.h"

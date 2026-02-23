@@ -19,7 +19,7 @@
 
 #import "MCInteractionModelStructs.h"
 
-#import "../MCAttribute.h"
+#import "MCAttribute.h"
 #import <Foundation/Foundation.h>
 
 #ifndef MCAttributeObjects_h

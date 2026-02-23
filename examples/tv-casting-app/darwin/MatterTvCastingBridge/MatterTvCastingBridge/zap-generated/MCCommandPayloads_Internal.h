@@ -17,7 +17,7 @@
 
 #import "MCCommandPayloads.h"
 
-#import "../MCErrorUtils.h"
+#import "MCErrorUtils.h"
 
 #import <Foundation/Foundation.h>
 #include <any>

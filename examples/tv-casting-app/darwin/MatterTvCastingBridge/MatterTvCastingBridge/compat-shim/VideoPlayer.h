@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "../MCCastingPlayer.h"
+#import "MCCastingPlayer.h"
 
 #ifndef VideoPlayer_h
 #define VideoPlayer_h

@@ -17,8 +17,8 @@
 
 #import "CastingServerBridge.h"
 
-#import "../zap-generated/MCClusterObjects.h"
-#import "../zap-generated/MCEndpointClusterType.h"
+#import "MCClusterObjects.h"
+#import "MCEndpointClusterType.h"
 #import "CastingPlayerDiscoveryListenerCompat.h"
 #import "DataSourceCompat.h"
 #import "MCCastingApp.h"

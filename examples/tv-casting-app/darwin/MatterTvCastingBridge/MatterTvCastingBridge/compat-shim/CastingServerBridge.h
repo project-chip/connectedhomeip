@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "../MatterError.h"
+#import "MatterError.h"
 #import "AppParameters.h"
 #import "CommissioningCallbackHandlers.h"
 #import "ContentApp.h"

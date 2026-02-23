@@ -1,6 +1,6 @@
 {{> header excludeZapComment=false}}
 
-#import "../MCCommand.h"
+#import "MCCommand.h"
 #import "MCCommandPayloads.h"
 #import <Foundation/Foundation.h>
 
