@@ -28,7 +28,7 @@ class TargetNavigatorManager : public chip::app::Clusters::TargetNavigator::Dele
     using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
 
 public:
-    TargetNavigatorManager() : TargetNavigatorManager({ "exampleName", "exampleName" }, kNoCurrentTarget){};
+    TargetNavigatorManager() : TargetNavigatorManager({ "exampleNameA", "exampleNameB" }, kNoCurrentTarget){};
     TargetNavigatorManager(std::list<std::string> targets, uint8_t currentTarget);
 
     CHIP_ERROR HandleGetTargetList(chip::app::AttributeValueEncoder & aEncoder) override;

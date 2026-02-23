@@ -423,34 +423,39 @@ void emberAfChannelClusterInitCallback(EndpointId endpoint)
 
 #ifdef MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER
 #include "keypad-input/KeypadInputManager.h"
-static KeypadInputManager keypadInputManager;
+static KeypadInputManager keypadInputManager[MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
-    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager[ep]);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_LOW_POWER_SERVER
 #include "low-power/LowPowerManager.h"
-static LowPowerManager lowPowerManager;
+static LowPowerManager lowPowerManager[MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LowPower::Id, MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager[ep]);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "target-navigator/TargetNavigatorManager.h"
-static TargetNavigatorManager targetNavigatorManager;
+static TargetNavigatorManager targetNavigatorManager[MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
+                                                       MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager[ep]);
 }
 #endif
 

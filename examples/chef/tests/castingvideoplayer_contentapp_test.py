@@ -47,12 +47,12 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher."),
                 TestStep(7, "[TC_CONTENTAPP_A] Test application basic."),
                 TestStep(
-                    8, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using platform endpoint."),
+                    8, "[APP_LAUNCH_CUJ] Launch and stop app A using platform endpoint."),
                 TestStep(
-                    9, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
+                    9, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
                 TestStep(
-                    10, "[CONTENT_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
-                TestStep(11, "[CONTENT_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint.")]
+                    10, "[APP_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
+                TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
