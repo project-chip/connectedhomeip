@@ -116,10 +116,10 @@ public:
 
     // Application interface for ICD
 
-    /// Returns the reuqested "StayActiveDuration" when the cluster is in "pending-active" state.
+    /// Returns the requested "StayActiveDuration" when the cluster is in "pending-active" state.
     ///
     /// When the bridged device is checking in, the application should keep it active
-    /// for the time period here and should `NotifyDeviceActie`
+    /// for the time period here and should `NotifyDeviceActive`
     std::optional<uint32_t> GetRequestedStayActiveDurationMs() const { return mStayActiveDurationMs; }
     void NotifyDeviceActive();
 
