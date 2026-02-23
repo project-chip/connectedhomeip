@@ -426,24 +426,6 @@ def factory_reset_config_removal(app_args: str, script_args: str, reset_type: Fa
         pathlib.Path(path).unlink(missing_ok=True)
 
 
-def handle_reset_flags(app_args, script_args, factory_reset, factory_reset_app_only):
-    if factory_reset or factory_reset_app_only:
-        # Remove native app config
-        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
-            pathlib.Path(path).unlink(missing_ok=True)
-
-        # Remove native app KVS if that was used
-        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
-            log.info("Removing KVS path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
-
-    if factory_reset:
-        # Remove Python test admin storage if provided
-        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
-            log.info("Removing storage path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
-
-
 if __name__ == '__main__':
     coloredlogs.install(level='INFO')
     main(auto_envvar_prefix='CHIP')
