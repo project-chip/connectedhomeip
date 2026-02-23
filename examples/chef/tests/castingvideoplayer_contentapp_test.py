@@ -52,7 +52,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                     9, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
                 TestStep(
                     10, "[APP_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
-                TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint.")]
+                TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
+                TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -526,6 +527,35 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         feature_map = await self._read_content_launcher_feature_map(endpoint)
         asserts.assert_equal(feature_map, 3)
 
+    async def _read_target_navigator_target_list(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.TargetNavigator, attribute=Clusters.Objects.TargetNavigator.Attributes.TargetList)
+
+    async def _read_target_navigator_current_target(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.TargetNavigator, attribute=Clusters.Objects.TargetNavigator.Attributes.CurrentTarget)
+
+    async def target_navigator_test(self, endpoint):
+        target_list = await self._read_target_navigator_target_list(endpoint)
+        asserts.assert_true(len(target_list) > 0, "Target list should not be empty.")
+
+        current_target = await self._read_target_navigator_current_target(endpoint)
+
+        for target in target_list:
+            if current_target == target.identifier:
+                continue
+
+            response = await self.send_single_cmd(
+                cmd=Clusters.Objects.TargetNavigator.Commands.NavigateTarget(
+                    target=target.identifier, data="test data"),
+                endpoint=endpoint,
+            )
+            asserts.assert_equal(
+                response.status, Clusters.Objects.TargetNavigator.Enums.StatusEnum.kSuccess)
+
+            current_target = await self._read_target_navigator_current_target(endpoint)
+            asserts.assert_equal(current_target, target.identifier)
+
     async def application_basic_test(self, endpoint):
         # Test VendorName
         vendor_name = await self._read_application_basic_vendor_name(endpoint)
@@ -598,6 +628,10 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(11)
         await self.cuj_launch_hide_and_stop_app_a(command_on_endpoint=self.APP_A_ENDPOINT)
+
+        self.step(12)
+        await self.target_navigator_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.target_navigator_test(self.APP_A_ENDPOINT)
 
 
 if __name__ == "__main__":
