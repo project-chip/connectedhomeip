@@ -62,7 +62,6 @@ public:
     CHIP_ERROR StartNonConcurrentThreadManagement();
     void SetRadioBlocked(bool state) { mRadioBlocked = state; }
     void Finalize(void);
-    CHIP_ERROR CommitConfiguration(void);
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.

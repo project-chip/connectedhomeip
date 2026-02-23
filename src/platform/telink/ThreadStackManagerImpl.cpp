@@ -28,8 +28,6 @@
 #include <platform/telink/ThreadStackManagerImpl.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/KeyValueStoreManager.h>
 #include <platform/ThreadStackManager.h>
 
 namespace chip {
@@ -71,8 +69,6 @@ CHIP_ERROR ThreadStackManagerImpl::StartNonConcurrentThreadManagement()
     VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
 #endif
 
-    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().CommitConfiguration();
-
 exit:
     return error;
 }
@@ -104,16 +100,6 @@ void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
     k_sem_give(&mSrpClearAllSemaphore);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-
-CHIP_ERROR ThreadStackManagerImpl::CommitConfiguration(void)
-{
-    // OpenThread persists the network configuration on AttachToThreadNetwork, so simply remove
-    // the backup, so that it cannot be restored. If no backup could be found, it means that the
-    // configuration has not been modified since the fail-safe was armed, so return with no error.
-    CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig().KeyName());
-
-    return error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ? CHIP_NO_ERROR : error;
-}
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
