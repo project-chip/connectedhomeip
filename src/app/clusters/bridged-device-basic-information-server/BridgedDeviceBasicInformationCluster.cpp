@@ -205,7 +205,7 @@ void BridgedDeviceBasicInformationCluster::Shutdown(ClusterShutdownType s)
 {
     DefaultServerCluster::Shutdown(s);
 
-    // if we are shut down, stop processing active timers
+    // if we are shutting down, stop processing active timers
     CancelPendingActiveTimer();
 }
 
