@@ -21,10 +21,11 @@
 
 import asyncio
 
+from mobly import asserts
+
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
-from mobly import asserts
 
 
 class TestCreateNewController(MatterBaseTest):
