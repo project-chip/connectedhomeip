@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include <clusters/BridgedDeviceBasicInformation/Commands.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::Clusters {

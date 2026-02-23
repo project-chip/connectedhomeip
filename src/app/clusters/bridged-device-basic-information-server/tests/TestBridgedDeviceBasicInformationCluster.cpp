@@ -24,6 +24,7 @@
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <clusters/BridgedDeviceBasicInformation/Commands.h>
 #include <clusters/BridgedDeviceBasicInformation/Enums.h>
 #include <clusters/BridgedDeviceBasicInformation/Events.h>
 #include <clusters/BridgedDeviceBasicInformation/Metadata.h>
