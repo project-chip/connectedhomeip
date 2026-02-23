@@ -2,7 +2,7 @@
 
 #import "MCCommandObjects.h"
 #import "MCCommandPayloads.h"
-#import "MCCommandPayloads_internal.h"
+#import "MCCommandPayloads_Internal.h"
 
 #import "MCCastingApp.h"
 #import "MCCommand_Internal.h"
