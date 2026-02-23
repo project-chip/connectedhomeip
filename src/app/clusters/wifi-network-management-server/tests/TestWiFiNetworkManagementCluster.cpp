@@ -19,7 +19,6 @@
 
 #include <access/SubjectDescriptor.h>
 #include <app/server-cluster/testing/ClusterTester.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/WiFiNetworkManagement/Attributes.h>
 #include <clusters/WiFiNetworkManagement/Commands.h>
@@ -40,16 +39,16 @@ struct TestWiFiNetworkManagementCluster : public ::testing::Test
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR); }
+    void SetUp() override { ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR); }
 
     void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestWiFiNetworkManagementCluster() : cluster(kTestEndpointId) {}
+    TestWiFiNetworkManagementCluster() : cluster(kTestEndpointId), tester(cluster) {}
 
     static constexpr EndpointId kTestEndpointId = 1;
 
-    TestServerClusterContext testContext;
     WiFiNetworkManagementCluster cluster;
+    ClusterTester tester;
 };
 
 } // namespace
@@ -65,8 +64,6 @@ TEST_F(TestWiFiNetworkManagementCluster, AttributeListTest)
 
 TEST_F(TestWiFiNetworkManagementCluster, ReadGlobalAttributesTest)
 {
-    ClusterTester tester(cluster);
-
     uint16_t revision{};
     ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
     EXPECT_EQ(revision, WiFiNetworkManagement::kRevision);
@@ -78,8 +75,6 @@ TEST_F(TestWiFiNetworkManagementCluster, ReadGlobalAttributesTest)
 
 TEST_F(TestWiFiNetworkManagementCluster, InitialStateHasNoCredentials)
 {
-    ClusterTester tester(cluster);
-
     DataModel::Nullable<ByteSpan> ssid;
     ASSERT_EQ(tester.ReadAttribute(Ssid::Id, ssid), CHIP_NO_ERROR);
     EXPECT_TRUE(ssid.IsNull());
@@ -91,8 +86,6 @@ TEST_F(TestWiFiNetworkManagementCluster, InitialStateHasNoCredentials)
 
 TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentials)
 {
-    ClusterTester tester(cluster);
-
     const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
     ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
@@ -105,12 +98,19 @@ TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentials)
     DataModel::Nullable<uint64_t> passphraseSurrogate;
     ASSERT_EQ(tester.ReadAttribute(PassphraseSurrogate::Id, passphraseSurrogate), CHIP_NO_ERROR);
     EXPECT_FALSE(passphraseSurrogate.IsNull());
+
+    // Both attributes should have been marked dirty
+    EXPECT_TRUE(tester.IsAttributeDirty(Ssid::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(PassphraseSurrogate::Id));
+
+    // Setting the same credentials again should not generate further notifications
+    tester.GetDirtyList().clear();
+    ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
+    EXPECT_TRUE(tester.GetDirtyList().empty());
 }
 
 TEST_F(TestWiFiNetworkManagementCluster, ClearNetworkCredentials)
 {
-    ClusterTester tester(cluster);
-
     const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
     ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
@@ -121,6 +121,7 @@ TEST_F(TestWiFiNetworkManagementCluster, ClearNetworkCredentials)
     ASSERT_FALSE(ssid.IsNull());
 
     // Clear credentials
+    tester.GetDirtyList().clear();
     ASSERT_EQ(cluster.ClearNetworkCredentials(), CHIP_NO_ERROR);
 
     // Verify credentials are cleared
@@ -130,6 +131,15 @@ TEST_F(TestWiFiNetworkManagementCluster, ClearNetworkCredentials)
     DataModel::Nullable<uint64_t> passphraseSurrogate;
     ASSERT_EQ(tester.ReadAttribute(PassphraseSurrogate::Id, passphraseSurrogate), CHIP_NO_ERROR);
     EXPECT_TRUE(passphraseSurrogate.IsNull());
+
+    // Both attributes should have been marked dirty
+    EXPECT_TRUE(tester.IsAttributeDirty(Ssid::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(PassphraseSurrogate::Id));
+
+    // Clearing again when already cleared should not generate further notifications
+    tester.GetDirtyList().clear();
+    ASSERT_EQ(cluster.ClearNetworkCredentials(), CHIP_NO_ERROR);
+    EXPECT_TRUE(tester.GetDirtyList().empty());
 }
 
 TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentialsValidation)
@@ -137,6 +147,10 @@ TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentialsValidation)
     // SSID too short (empty)
     const uint8_t validPassphrase[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd' };
     EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(), ByteSpan(validPassphrase)), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // SSID too long (> 32 bytes)
+    const uint8_t longSsid[33] = {};
+    EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(longSsid), ByteSpan(validPassphrase)), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Passphrase too short (less than 8 characters)
     const uint8_t ssidData[]      = { 'T', 'e', 's', 't' };
@@ -150,8 +164,6 @@ TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentialsValidation)
 
 TEST_F(TestWiFiNetworkManagementCluster, PassphraseSurrogateChangesOnPassphraseChange)
 {
-    ClusterTester tester(cluster);
-
     const uint8_t ssidData[]        = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData1[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1' };
     const uint8_t passphraseData2[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '2' };
@@ -174,8 +186,6 @@ TEST_F(TestWiFiNetworkManagementCluster, PassphraseSurrogateChangesOnPassphraseC
 
 TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCaseSession)
 {
-    ClusterTester tester(cluster);
-
     const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
     ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
@@ -197,8 +207,6 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCaseSes
 
 TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCredentials)
 {
-    ClusterTester tester(cluster);
-
     // Set up CASE session but don't set credentials
     Access::SubjectDescriptor caseDescriptor;
     caseDescriptor.authMode    = Access::AuthMode::kCase;
@@ -216,8 +224,6 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCredent
 
 TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestSuccess)
 {
-    ClusterTester tester(cluster);
-
     const uint8_t ssidData[]       = { 'T', 'e', 's', 't', 'S', 'S', 'I', 'D' };
     const uint8_t passphraseData[] = { 'p', 'a', 's', 's', 'w', 'o', 'r', 'd', '1', '2', '3' };
     ASSERT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(passphraseData)), CHIP_NO_ERROR);
