@@ -21,7 +21,9 @@
 
 import asyncio
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.runner import default_matter_test_main
 from mobly import asserts
 
 
@@ -96,13 +98,14 @@ class TestCreateNewController(MatterBaseTest):
         self.th1 = self.default_controller
 
         self.step(2)
-        self.th2 = self.certificate_authority_manager.create_new_controller(fabric_Id=self.th1.fabricId + 1, ca_List=1, node_Id=2)
+        th2_fabric_admin = self.certificate_authority_manager.new_fabric_admin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+        self.th2 = th2_fabric_admin.NewController(nodeId=2)
 
         self.step(3)
         self.th2.Shutdown()
 
         self.step(4)
-        self.th3 = self.certificate_authority_manager.create_new_controller(ca_List=0, new_Fabric=False, node_Id=2)
+        self.th3 = self.certificate_authority_manager.activeCaList[0].adminList[0].NewController(nodeId=2)
 
         self.step(5)
         self.th3.Shutdown()
