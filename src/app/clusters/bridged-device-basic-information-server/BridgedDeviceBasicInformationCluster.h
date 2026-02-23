@@ -88,8 +88,7 @@ public:
     BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
                                          Context && context) :
         DefaultServerCluster({ endpointId, BridgedDeviceBasicInformation::Id }),
-        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)),
-        mClusterContext(std::move(context))
+        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
 
     {}
 
