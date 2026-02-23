@@ -18,7 +18,7 @@
 #include <AppMain.h>
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
 #include <app/clusters/thread-network-directory-server/thread-network-directory-server.h>
-#include <app/clusters/wifi-network-management-server/CodegenIntegration.h>
+#include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -51,6 +51,13 @@ void emberAfThreadNetworkDirectoryClusterInitCallback(EndpointId endpoint)
     TEMPORARY_RETURN_IGNORED gThreadNetworkDirectoryServer.emplace(endpoint).Init();
 }
 
+std::optional<WiFiNetworkManagementServer> gWiFiNetworkManagementServer;
+void emberAfWiFiNetworkManagementClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrDie(!gWiFiNetworkManagementServer);
+    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer.emplace(endpoint).Init();
+}
+
 std::optional<ThreadBorderRouterManagement::ServerInstance> gThreadBorderRouterManagementServer;
 void emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
 {
@@ -74,10 +81,8 @@ static void ApplicationEarlyInit()
 
 void ApplicationInit()
 {
-    auto * wifiCluster = WiFiNetworkManagement::FindClusterOnEndpoint(1);
-    VerifyOrDie(wifiCluster != nullptr);
-    TEMPORARY_RETURN_IGNORED wifiCluster->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
-                                                                ByteSpanFromCharSpan("Setec Astronomy"_span));
+    TEMPORARY_RETURN_IGNORED gWiFiNetworkManagementServer->SetNetworkCredentials(ByteSpanFromCharSpan("MatterAP"_span),
+                                                                                 ByteSpanFromCharSpan("Setec Astronomy"_span));
 }
 
 void ApplicationShutdown()

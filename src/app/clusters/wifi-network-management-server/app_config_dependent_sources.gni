@@ -13,6 +13,6 @@
 # limitations under the License.
 
 app_config_dependent_sources = [
-  "CodegenIntegration.cpp",
-  "CodegenIntegration.h",
+  "wifi-network-management-server.cpp",
+  "wifi-network-management-server.h",
 ]
