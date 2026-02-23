@@ -70,6 +70,8 @@ public:
 
     CHIP_ERROR AddAppDelegate(AppDelegate * delegate); // Adds a new app to the list of managed apps
 
+    AppDelegate * FindAppDelegate(const Application & application) {}
+
     void Register();
 
 private:
@@ -79,7 +81,7 @@ private:
     chip::IntrusiveList<AppDelegate> mAppDelegateList; // List of managed content apps
 };
 
-class AppDelegate : public Delegate, public chip::IntrusiveListNodeBase<> // This is for the "Content App" endpoint.
+class AppDelegate : public Delegate, public chip::IntrusiveListNodeBase<> // This is for the "Content App" endpoints.
 {
 public:
     AppDelegate(EndpointId endpointId, ApplicationBasic::Chef::ChefDelegate * appBasicDelegate) :
@@ -101,11 +103,19 @@ public:
     void Register();
 
     bool Match(const Application & application); // Checks if the specified application matches with the current one
+
     ApplicationBasic::CatalogVendorApp * GetCatalogVendorApp() { return mAppBasicDelegate->GetCatalogVendorApp(); }
+
+    void setPlatformDelegate(PlatformDelegate * platformDelegate) { mPlatformDelegate = platformDelegate; }
+
+    void SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum status) { mAppBasicDelegate->SetApplicationStatus(status); }
+
+    ApplicationBasic::ApplicationStatusEnum GetApplicationStatus() { return mAppBasicDelegate->GetApplicationStatus(); }
 
 private:
     EndpointId mEndpointId;
     ApplicationBasic::Chef::ChefDelegate * mAppBasicDelegate;
+    PlatformDelegate * mPlatformDelegate = nullptr;
 };
 
 } // namespace Chef

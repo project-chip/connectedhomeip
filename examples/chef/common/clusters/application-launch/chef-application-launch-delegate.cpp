@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -41,26 +42,108 @@ namespace Chef {
 void PlatformDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                                        const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp");
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp (%d , %s)", application.catalogVendorID,
+                    application.applicationID.data());
     LauncherResponseType response;
-    response.status = StatusEnum::kSuccess;
-    response.data   = chip::MakeOptional(data);
+
+    AppDelegate * app = FindAppDelegate(application);
+
+    if (!app) // Did not find app in the list of managed apps
+    {
+        ChipLogError(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp : App not found");
+        response.status = StatusEnum::kAppNotAvailable;
+    }
+    else if (app != mCurrentApp) // Launching a new app
+    {
+        ChipLogProgress("ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp : Launching new app");
+        if (mCurrentApp != nullptr)
+        {
+            mCurrentApp->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus);
+            MatterReportingAttributeChangeCallback(mCurrentApp->GetEndpointId(), ApplicationBasic::Id,
+                                                   ApplicationBasic::Attributes::Status::Id);
+        }
+        mCurrentApp = app;
+        MatterReportingAttributeChangeCallback(mEndpointId, ApplicationLauncher::Id,
+                                               ApplicationLauncher::Attributes::CurrentApp::Id);
+        mCurrentApp->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
+        MatterReportingAttributeChangeCallback(mCurrentApp->GetEndpointId(), ApplicationBasic::Id,
+                                               ApplicationBasic::Attributes::Status::Id);
+        response.status = StatusEnum::kSuccess;
+    }
+    else // Launching current in-focus app. Nothing to do.
+    {
+        response.status = StatusEnum::kSuccess;
+    }
+
+    response.data = chip::MakeOptional(data);
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleStopApp");
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleStopApp (%d , %s)", application.catalogVendorID,
+                    application.applicationID.data());
     LauncherResponseType response;
-    response.status = StatusEnum::kSuccess;
+
+    AppDelegate * app = FindAppDelegate(application);
+
+    if (!app) // Did not find app in the list of managed apps
+    {
+        ChipLogError(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleStopApp : App not found");
+        response.status = StatusEnum::kAppNotAvailable;
+    }
+    else
+    {
+        auto status = app->GetApplicationStatus();
+        if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden ||
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
+        {
+            app->SetApplicationStatus(ApplicationStatusEnum::kStopped);
+            MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
+                                                   ApplicationBasic::Attributes::Status::Id);
+        }
+        if (app == mCurrentApp)
+        {
+            mCurrentApp = nullptr;
+            MatterReportingAttributeChangeCallback(mEndpointId, ApplicationLauncher::Id,
+                                                   ApplicationLauncher::Attributes::CurrentApp::Id);
+        }
+        response.status = StatusEnum::kSuccess;
+    }
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp");
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp (%s , %s)", application.catalogVendorID,
+                    application.applicationID.data());
     LauncherResponseType response;
-    response.status = StatusEnum::kSuccess;
+
+    AppDelegate * app = FindAppDelegate(application);
+    if (!app) // Did not find app in the list of managed apps
+    {
+        ChipLogError(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp : App not found");
+        response.status = StatusEnum::kAppNotAvailable;
+    }
+    else
+    {
+        auto status = app->GetApplicationStatus();
+        if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
+        {
+            app->SetApplicationStatus(ApplicationStatusEnum::kActiveHidden);
+            MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
+                                                   ApplicationBasic::Attributes::Status::Id);
+        }
+        if (app == mCurrentApp)
+        {
+            mCurrentApp = nullptr;
+            MatterReportingAttributeChangeCallback(mEndpointId, ApplicationLauncher::Id,
+                                                   ApplicationLauncher::Attributes::CurrentApp::Id);
+        }
+        response.status = StatusEnum::kSuccess;
+    }
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
@@ -79,7 +162,14 @@ CHIP_ERROR PlatformDelegate::HandleGetCatalogList(app::AttributeValueEncoder & a
 CHIP_ERROR PlatformDelegate::HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleGetCurrentApp");
-    return aEncoder.EncodeNull();
+    if (!mCurrentApp)
+        return aEncoder.EncodeNull();
+    ApplicationEPType currentApp;
+    ApplicationBasic::CatalogVendorApp * vendorApp = mCurrentApp->GetCatalogVendorApp();
+    currentApp.application.catalogVendorID         = vendorApp->catalogVendorId;
+    currentApp.application.applicationID           = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    currentApp.endpoint                            = Optional<EndpointId>(mCurrentApp->GetEndpointId());
+    return aEncoder.Encode(currentApp);
 }
 
 CHIP_ERROR PlatformDelegate::AddAppDelegate(AppDelegate * delegate)
@@ -93,7 +183,7 @@ CHIP_ERROR PlatformDelegate::AddAppDelegate(AppDelegate * delegate)
                          delegate->GetEndpointId());
             return CHIP_ERROR_ALREADY_INITIALIZED;
         }
-        ApplicationBasic::CatalogVendorApp CatalogApp(*it->GetCatalogVendorApp());
+        ApplicationBasic::CatalogVendorApp CatalogApp(it->GetCatalogVendorApp());
         if (delegate->GetCatalogVendorApp()->Matches(CatalogApp))
         {
             ChipLogError(Zcl,
@@ -104,6 +194,21 @@ CHIP_ERROR PlatformDelegate::AddAppDelegate(AppDelegate * delegate)
     }
     mAppDelegateList.PushBack(delegate);
     return CHIP_NO_ERROR;
+}
+
+AppDelegate * PlatformDelegate::FindAppDelegate(const Application & application)
+{
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::FindAppDelegate (%d , %s)", application.catalogVendorID,
+                    application.applicationID.data());
+    ApplicationBasic::CatalogVendorApp CatalogApp(application.catalogVendorID, application.applicationID.data());
+    for (auto it = mAppDelegateList.begin(); it != mAppDelegateList.end(); ++it)
+    {
+        if (it->GetCatalogVendorApp()->Matches(CatalogApp))
+        {
+            return it;
+        }
+    }
+    return nullptr;
 }
 
 void PlatformDelegate::Register()
@@ -118,26 +223,49 @@ void AppDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & 
                                   const Application & application)
 {
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleLaunchApp");
-    LauncherResponseType response;
-    response.status = StatusEnum::kSuccess;
-    response.data   = chip::MakeOptional(data);
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    if (!mPlatformDelegate)
+    {
+        ChipLogError(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleLaunchApp : Platform delegate not initialised.");
+        helper.Failure(Protocols::InteractionModel::Status::InvalidInState);
+        return;
+    }
+    Application targetApp;
+    ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
+    targetApp.catalogVendorID                      = vendorApp->catalogVendorId;
+    targetApp.applicationID                        = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    mPlatformDelegate->HandleLaunchApp(helper, data, targetApp);
 }
 
 void AppDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
 {
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleStopApp");
-    LauncherResponseType response;
-    response.status = StatusEnum::kSuccess;
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    if (!mPlatformDelegate)
+    {
+        ChipLogError(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleStopApp : Platform delegate not initialised.");
+        helper.Failure(Protocols::InteractionModel::Status::InvalidInState);
+        return;
+    }
+    Application targetApp;
+    ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
+    targetApp.catalogVendorID                      = vendorApp->catalogVendorId;
+    targetApp.applicationID                        = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    mPlatformDelegate->HandleStopApp(helper, targetApp);
 }
 
 void AppDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
 {
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleHideApp");
-    LauncherResponseType response;
-    response.status = StatusEnum::kSuccess;
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    if (!mPlatformDelegate)
+    {
+        ChipLogError(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleHideApp : Platform delegate not initialised.");
+        helper.Failure(Protocols::InteractionModel::Status::InvalidInState);
+        return;
+    }
+    Application targetApp;
+    ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
+    targetApp.catalogVendorID                      = vendorApp->catalogVendorId;
+    targetApp.applicationID                        = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    mPlatformDelegate->HandleHideApp(helper, targetApp);
 }
 
 CHIP_ERROR AppDelegate::HandleGetCatalogList(app::AttributeValueEncoder & aEncoder)

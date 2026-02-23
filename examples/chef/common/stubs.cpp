@@ -633,6 +633,8 @@ void CastingvideoplayerContentappInit()
     ApplicationLauncher::Chef::AppDelegate * appALauncher =
         Platform::New<ApplicationLauncher::Chef::AppDelegate>(kAppAEndpoint, appABasic);
     appALauncher->Register();
+    VerifyOrDie(platformLauncher->AddAppDelegate(appALauncher) == CHIP_NO_ERROR);
+    appALauncher->setPlatformDelegate(platformLauncher);
 }
 
 void ApplicationInit()

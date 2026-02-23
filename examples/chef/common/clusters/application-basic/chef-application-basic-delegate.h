@@ -48,6 +48,8 @@ public:
 
     void Register();
 
+    ApplicationStatusEnum GetApplicationStatus() { return mApplicationStatus; }
+
 private:
     EndpointId mEndpointId;
     const char * mApplicationName;
