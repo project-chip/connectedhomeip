@@ -30,9 +30,7 @@ namespace chip::app::Clusters {
 class WiFiNetworkManagementCluster : public DefaultServerCluster
 {
 public:
-    static constexpr auto Id = WiFiNetworkManagement::Id;
-
-    WiFiNetworkManagementCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, Id }) {}
+    WiFiNetworkManagementCluster(EndpointId endpoint) : DefaultServerCluster({ endpoint, WiFiNetworkManagement::Id }) {}
 
     /// Sets the Wi-Fi credentials to expose via this cluster.
     /// The application is responsible for calling this method during startup,
