@@ -184,16 +184,16 @@ not_automated:
           supported.
     - name: TC_GCAST_2_5.py
       reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
+          Test script relies on a attrribute report matcher which is currently
+          flaky in CI.
     - name: TC_GCAST_2_7.py
       reason:
           Cluster not finalized. Will re-enable before 1.6TE2. CI is not
           supported.
     - name: TC_GCAST_2_8.py
       reason:
-          Cluster not finalized. Will re-enable before 1.6TE2. CI is not
-          supported.
+          Test script relies on a attrribute report matcher which is currently
+          flaky in CI.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
