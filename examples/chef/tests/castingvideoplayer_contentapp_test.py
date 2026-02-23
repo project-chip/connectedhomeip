@@ -85,7 +85,7 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         # 5. Verify CurrentApp on Platform Endpoint is Null
         current_app = await self._read_application_launcher_current_app(self.CASTINGVIDEOPLAYER_ENDPOINT)
-        asserts.assert_is_none(current_app)
+        asserts.assert_equal(current_app, Clusters.Types.NullValue)
 
         # 6. Verify Status on App A Endpoint is Stopped
         status = await self._read_application_basic_status(self.APP_A_ENDPOINT)
