@@ -35,6 +35,7 @@ class GroupDataProvider
 public:
     using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
+    static constexpr size_t kMaxListeners                 = 2;
 
     struct GroupInfo
     {
@@ -346,8 +347,28 @@ public:
     virtual Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) = 0;
 
     // Listener
-    void SetListener(GroupListener * listener) { mListener = listener; };
-    void RemoveListener() { mListener = nullptr; };
+    void SetListener(GroupListener * listener)
+    {
+        for (size_t i = 0; listener && (i < kMaxListeners); ++i)
+        {
+            if (nullptr == mListeners[i])
+            {
+                mListeners[i] = listener;
+                return;
+            }
+        }
+    }
+    void RemoveListener(GroupListener * listener)
+    {
+        for (size_t i = 0; listener && (i < kMaxListeners); ++i)
+        {
+            if (listener == mListeners[i])
+            {
+                mListeners[i] = nullptr;
+                return;
+            }
+        }
+    }
 
     // Groupcast
     virtual uint16_t getMaxMembershipCount() = 0;
@@ -356,21 +377,27 @@ public:
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
     {
-        if (mListener)
+        for (auto * listener : mListeners)
         {
-            mListener->OnGroupAdded(fabric_index, new_group);
+            if (listener != nullptr)
+            {
+                listener->OnGroupAdded(fabric_index, new_group);
+            }
         }
     }
     void GroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group)
     {
-        if (mListener)
+        for (auto * listener : mListeners)
         {
-            mListener->OnGroupRemoved(fabric_index, old_group);
+            if (listener != nullptr)
+            {
+                listener->OnGroupRemoved(fabric_index, old_group);
+            }
         }
     }
     const uint16_t mMaxGroupsPerFabric;
     const uint16_t mMaxGroupKeysPerFabric;
-    GroupListener * mListener = nullptr;
+    GroupListener * mListeners[kMaxListeners] = { nullptr };
 };
 
 /**
