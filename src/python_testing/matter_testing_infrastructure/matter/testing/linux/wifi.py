@@ -50,7 +50,7 @@ class NANSimulator:
         self.subscribers: Dict[str, Tuple[str, Any]] = {}
         self._lock = threading.Lock()
 
-    def register_interface(self, name: str, interface: 'WpaSupplicantMock.WpaInterface'):
+    def register_interface(self, name: str, interface: WpaSupplicantMock.WpaInterface):
         """Register a WpaInterface instance with this simulator."""
         with self._lock:
             self.interfaces[name] = interface
@@ -484,7 +484,6 @@ class WpaSupplicantMock(threading.Thread):
         @State.setter_private
         def State_setter(self, value: str) -> None:
             self.state = value
-            self.PropertiesChanged.emit({'State': ('s', value)})
 
         @sdbus.dbus_property_async("o")
         def CurrentNetwork(self) -> str:
@@ -564,8 +563,8 @@ class WpaSupplicantMock(threading.Thread):
         self.password = password
         self.networking = ns
         self.interfaces_params = interfaces_params
-        self.interfaces: list = []  # List of WpaInterface instances
-        self.networks: list = []    # List of WpaNetwork instances
+        self.interfaces: list[WpaSupplicantMock.WpaInterface] = []
+        self.networks: list[WpaSupplicantMock.WpaNetwork] = []
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.startup())
         super().__init__(target=self.loop.run_forever)
