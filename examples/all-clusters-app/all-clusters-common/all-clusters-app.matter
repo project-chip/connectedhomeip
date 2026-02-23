@@ -8208,15 +8208,21 @@ endpoint 1 {
     callback attribute presets;
     callback attribute schedules;
     ram      attribute setpointHoldExpiryTimestamp;
+    callback attribute maxThermostatSuggestions;
+    callback attribute thermostatSuggestions;
+    callback attribute currentThermostatSuggestion;
+    callback attribute thermostatSuggestionNotFollowingReason;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0123;
+    ram      attribute featureMap default = 0x0523;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
     handle command SetActiveScheduleRequest;
     handle command SetActivePresetRequest;
+    handle command AddThermostatSuggestion;
+    handle command RemoveThermostatSuggestion;
     handle command AtomicRequest;
   }
 
