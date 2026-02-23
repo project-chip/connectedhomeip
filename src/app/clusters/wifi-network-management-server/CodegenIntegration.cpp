@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024-2026 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,20 +17,23 @@
 
 #include <app/clusters/wifi-network-management-server/CodegenIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip::app::Clusters;
 
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
-    if (IsStarted())
-    {
-        LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(this));
-    }
+    LogErrorOnFailure(Unregister().NoErrorIf(CHIP_ERROR_NOT_FOUND));
 }
 
-CHIP_ERROR WiFiNetworkManagementServer::Init()
+CHIP_ERROR WiFiNetworkManagementServer::Register()
 {
     return CodegenDataModelProvider::Instance().Registry().Register(mRegistration);
+}
+
+CHIP_ERROR WiFiNetworkManagementServer::Unregister(ClusterShutdownType clusterShutdownType)
+{
+    return CodegenDataModelProvider::Instance().Registry().Unregister(this, clusterShutdownType);
 }
 
 void MatterWiFiNetworkManagementClusterInitCallback(chip::EndpointId) {}

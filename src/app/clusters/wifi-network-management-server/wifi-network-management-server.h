@@ -17,5 +17,6 @@
 
 #pragma once
 
-// Compatibility header - new code should include CodegenIntegration.h directly.
+// Compatibility header - new code should include CodegenIntegration.h
+// (for ZAP-based applications) or WiFiNetworkManagementCluster.h.
 #include <app/clusters/wifi-network-management-server/CodegenIntegration.h>
