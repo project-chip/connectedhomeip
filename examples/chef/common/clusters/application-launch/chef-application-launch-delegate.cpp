@@ -192,6 +192,11 @@ CHIP_ERROR PlatformDelegate::AddAppDelegate(AppDelegate * delegate)
             return CHIP_ERROR_ALREADY_INITIALIZED;
         }
     }
+    ChipLogProgress(
+        Zcl,
+        "ApplicationLauncher::Chef::PlatformDelegate::AddAppDelegate : Adding new delegate Endpoint: %d, Application: (%d , %s)",
+        delegate->GetEndpointId(), delegate->GetCatalogVendorApp()->catalogVendorId,
+        delegate->GetCatalogVendorApp()->applicationId);
     mAppDelegateList.PushBack(delegate);
     return CHIP_NO_ERROR;
 }
