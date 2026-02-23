@@ -19,8 +19,8 @@ import shlex
 import subprocess
 import sys
 import threading
-from enum import StrEnum
 from dataclasses import dataclass, replace
+from enum import StrEnum
 from typing import BinaryIO, Callable, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
