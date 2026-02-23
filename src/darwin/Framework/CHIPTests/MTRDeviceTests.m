@@ -6327,7 +6327,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
                                                                   clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
                                                                 attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
-        MTRDataKey : @{
+        MTRDataKey : @ {
             MTRTypeKey : MTRNullValueType,
         }
     } ];
