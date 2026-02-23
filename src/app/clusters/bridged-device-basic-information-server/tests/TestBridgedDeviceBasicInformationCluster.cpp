@@ -315,6 +315,71 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     EXPECT_FALSE(mMockTimer.IsTimerActive(&cluster));
 }
 
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandMultipleRequests)
+{
+    TestBridgedDeviceIcdDelegate icdDelegate;
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "icd-dev",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                     .icdDelegate                = &icdDelegate,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Initial request: stay active for 1000ms, timeout 30s
+    {
+        Commands::KeepActive::Type request;
+        request.stayActiveDuration = 1000;
+        request.timeoutMs          = 30000;
+
+        auto response = tester.Invoke<Commands::KeepActive::Type>(request);
+        EXPECT_TRUE(response.IsSuccess());
+        EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), 1000u);
+    }
+
+    // Second request: stay active for 500ms (less), timeout 40s (more)
+    {
+        Commands::KeepActive::Type request;
+        request.stayActiveDuration = 500;
+        request.timeoutMs          = 40000;
+
+        auto response = tester.Invoke<Commands::KeepActive::Type>(request);
+        EXPECT_TRUE(response.IsSuccess());
+        // Max stay active duration should be kept
+        EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), 1000u);
+    }
+
+    // Third request: stay active for 2000ms (more), timeout 35s (less than current 40s)
+    {
+        Commands::KeepActive::Type request;
+        request.stayActiveDuration = 2000;
+        request.timeoutMs          = 35000;
+
+        auto response = tester.Invoke<Commands::KeepActive::Type>(request);
+        EXPECT_TRUE(response.IsSuccess());
+        // New max duration
+        EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), 2000u);
+    }
+
+    // Verify timer firing:
+    // After 39s, timer should still be active (40s was the max timeout)
+    mMockTimer.AdvanceClock(System::Clock::Milliseconds32(39000));
+    EXPECT_TRUE(mMockTimer.IsTimerActive(&cluster));
+    EXPECT_EQ(icdDelegate.mExpiredCalled, 0u);
+
+    // After another 2s (total 41s), timer should have fired
+    mMockTimer.AdvanceClock(System::Clock::Milliseconds32(2000));
+    EXPECT_FALSE(mMockTimer.IsTimerActive(&cluster));
+    EXPECT_EQ(icdDelegate.mExpiredCalled, 1u);
+    EXPECT_FALSE(cluster.GetRequestedStayActiveDurationMs().has_value());
+}
+
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandTimeoutDomain)
 {
     TestBridgedDeviceIcdDelegate icdDelegate;
