@@ -13438,6 +13438,38 @@
               "reportableChange": 0
             },
             {
+              "name": "TemperatureSetpointHold",
+              "code": 35,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TemperatureSetpointHoldEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "TemperatureSetpointHoldDuration",
+              "code": 36,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "PresetTypes",
               "code": 72,
               "mfgCode": null,

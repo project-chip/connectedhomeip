@@ -8196,6 +8196,8 @@ endpoint 1 {
     callback attribute minSetpointDeadBand;
     callback attribute controlSequenceOfOperation;
     callback attribute systemMode;
+    ram      attribute temperatureSetpointHold default = 0;
+    ram      attribute temperatureSetpointHoldDuration;
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
