@@ -161,7 +161,7 @@ which crypto operations are offloaded to SE05x.
 Refer to [SE05x Type Configurations](#se05x_type_configurations) to select the
 correct secure element variant.
 
-**Note:** - It is not recomended to enable random number generation from SE05x
+**Note:** - It is not recommended to enable random number generation from SE05x
 when using with W72.
 
 <a name="se05x_crypto_configurations"></a>
