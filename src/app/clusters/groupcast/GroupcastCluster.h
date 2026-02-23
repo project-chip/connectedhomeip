@@ -25,10 +25,11 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+using Status = chip::Protocols::InteractionModel::Status;
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
  */
-class GroupcastCluster : public DefaultServerCluster
+class GroupcastCluster : public DefaultServerCluster, public GroupcastLogic::Listener
 {
 public:
     GroupcastCluster(GroupcastContext && context) :
@@ -39,6 +40,9 @@ public:
     {}
     virtual ~GroupcastCluster() {}
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -47,9 +51,22 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
+    Status GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data);
+
+    inline FabricIndex GetFabricUnderTest() const { return mFabricUnderTest; }
+
 private:
+    void SetFabricUnderTest(FabricIndex fabricUnderTest);
+    static void OnGroupcastTestingDone(System::Layer * aLayer, void * appState);
+    // GroupcastLogic::Listener implementation
+    void OnMembershipChanged() override;
+    void OnUsedMcastAddrCountChange() override;
+
     GroupcastContext mContext;
     GroupcastLogic mLogic;
+
+    Groupcast::GroupcastTestingEnum mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
+    FabricIndex mFabricUnderTest                  = kUndefinedFabricIndex;
 };
 
 } // namespace Clusters

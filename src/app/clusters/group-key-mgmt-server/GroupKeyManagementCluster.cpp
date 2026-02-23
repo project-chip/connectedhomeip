@@ -637,6 +637,7 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
         return encoder.Encode(GroupKeyManagement::kRevision);
     case Attributes::FeatureMap::Id: {
         BitFlags<GroupKeyManagement::Feature> features;
+        features.Set(Clusters::GroupKeyManagement::Feature::kGroupcast);
         if (IsMCSPSupported())
         {
             features.Set(Clusters::GroupKeyManagement::Feature::kCacheAndSync);
@@ -651,6 +652,8 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
         return ReadMaxGroupsPerFabric(mContext.groupDataProvider, encoder);
     case GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id:
         return ReadMaxGroupKeysPerFabric(mContext.groupDataProvider, encoder);
+    case GroupKeyManagement::Attributes::GroupcastAdoption::Id:
+        return encoder.EncodeList([](const auto & e) { return CHIP_NO_ERROR; });
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -674,8 +677,11 @@ CHIP_ERROR GroupKeyManagementCluster::Attributes(const ConcreteClusterPath & pat
                                                  ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata),
-                              Span<const AttributeListBuilder::OptionalAttributeEntry>());
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { IsGCASTSupported(), GroupcastAdoption::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(GroupKeyManagement::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
 CHIP_ERROR GroupKeyManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,

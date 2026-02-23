@@ -6678,47 +6678,108 @@ public static class OccupancySensingClusterOccupancyChangedEvent {
     return output.toString();
   }
 }
-public static class AmbientContextSensingClusterAmbientContextDetectedEvent {
-  public ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextType;
+public static class AmbientContextSensingClusterAmbientContextDetectStartedEvent {
+  public Optional<ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct>> ambientContextType;
+  public Optional<Integer> objectCount;
   private static final long AMBIENT_CONTEXT_TYPE_ID = 0L;
+  private static final long OBJECT_COUNT_ID = 1L;
 
-  public AmbientContextSensingClusterAmbientContextDetectedEvent(
-    ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextType
+  public AmbientContextSensingClusterAmbientContextDetectStartedEvent(
+    Optional<ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct>> ambientContextType,
+    Optional<Integer> objectCount
   ) {
     this.ambientContextType = ambientContextType;
+    this.objectCount = objectCount;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(AMBIENT_CONTEXT_TYPE_ID, ArrayType.generateArrayType(ambientContextType, (elementambientContextType) -> elementambientContextType.encodeTlv())));
+    values.add(new StructElement(AMBIENT_CONTEXT_TYPE_ID, ambientContextType.<BaseTLVType>map((nonOptionalambientContextType) -> ArrayType.generateArrayType(nonOptionalambientContextType, (elementnonOptionalambientContextType) -> elementnonOptionalambientContextType.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(OBJECT_COUNT_ID, objectCount.<BaseTLVType>map((nonOptionalobjectCount) -> new UIntType(nonOptionalobjectCount)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static AmbientContextSensingClusterAmbientContextDetectedEvent decodeTlv(BaseTLVType tlvValue) {
+  public static AmbientContextSensingClusterAmbientContextDetectStartedEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct> ambientContextType = null;
+    Optional<ArrayList<ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct>> ambientContextType = Optional.empty();
+    Optional<Integer> objectCount = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == AMBIENT_CONTEXT_TYPE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          ambientContextType = castingValue.map((elementcastingValue) -> ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct.decodeTlv(elementcastingValue));
+          ambientContextType = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.AmbientContextSensingClusterAmbientContextTypeStruct.decodeTlv(elementcastingValue)));
+        }
+      } else if (element.contextTagNum() == OBJECT_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          objectCount = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
-    return new AmbientContextSensingClusterAmbientContextDetectedEvent(
-      ambientContextType
+    return new AmbientContextSensingClusterAmbientContextDetectStartedEvent(
+      ambientContextType,
+      objectCount
     );
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("AmbientContextSensingClusterAmbientContextDetectedEvent {\n");
+    output.append("AmbientContextSensingClusterAmbientContextDetectStartedEvent {\n");
     output.append("\tambientContextType: ");
     output.append(ambientContextType);
+    output.append("\n");
+    output.append("\tobjectCount: ");
+    output.append(objectCount);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
+  public Long startEventNumber;
+  private static final long START_EVENT_NUMBER_ID = 0L;
+
+  public AmbientContextSensingClusterAmbientContextDetectEndedEvent(
+    Long startEventNumber
+  ) {
+    this.startEventNumber = startEventNumber;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(START_EVENT_NUMBER_ID, new UIntType(startEventNumber)));
+
+    return new StructType(values);
+  }
+
+  public static AmbientContextSensingClusterAmbientContextDetectEndedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long startEventNumber = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == START_EVENT_NUMBER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startEventNumber = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new AmbientContextSensingClusterAmbientContextDetectEndedEvent(
+      startEventNumber
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("AmbientContextSensingClusterAmbientContextDetectEndedEvent {\n");
+    output.append("\tstartEventNumber: ");
+    output.append(startEventNumber);
     output.append("\n");
     output.append("}\n");
     return output.toString();

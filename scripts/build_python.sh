@@ -67,6 +67,7 @@ Input Options:
   -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=$enable_ble)
   -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=SDK default behavior)
   -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=$enable_ipv4)
+  -M, --enable_thread_meshcop       <true/false>            Enable Thread Meshcop support.
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
@@ -125,6 +126,15 @@ while (($#)); do
                 exit 1
             fi
             wifi_paf_config="chip_device_config_enable_wifipaf=$wifi_paf_arg"
+            shift
+            ;;
+        --enable_thread_meshcop | -M)
+            declare thread_meshcop_arg="$2"
+            if [[ "$thread_meshcop_arg" != "true" && "$thread_meshcop_arg" != "false" ]]; then
+                echo "Error: --enable_thread_meshcop/-M should have a true/false value, not '$thread_meshcop_arg'" >&2
+                exit 1
+            fi
+            thread_meshcop_config="chip_support_thread_meshcop=$thread_meshcop_arg"
             shift
             ;;
         --enable_ipv4 | -4)
@@ -233,6 +243,9 @@ echo "  enable_nfc=\"$enable_nfc\""
 if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
+if [[ -n $thread_meshcop_config ]]; then
+    echo "  $thread_meshcop_config"
+fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
 echo "  chip_support_webrtc_python_bindings=\"$enable_webrtc\""
@@ -308,6 +321,9 @@ if [[ -n "$pregen_dir" ]]; then
 fi
 if [[ -n $wifi_paf_config ]]; then
     gn_args+=("$wifi_paf_config")
+fi
+if [[ -n $thread_meshcop_config ]]; then
+    gn_args+=("$thread_meshcop_config")
 fi
 # Append extra arguments provided by the user.
 gn_args+=("${extra_gn_args[@]}")
