@@ -41,11 +41,11 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
     def steps_TC_CASTINGVIDEOPLAYER(self):
         return [TestStep(1, "[TC_CASTINGVIDEOPLAYER] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[TC_MEDIA_PLAYBACK] Test media playback."),
-                TestStep(3, "[TC_CASTINGVIDEOPLAYER] Test wake on lan."),
-                TestStep(4, "[TC_CASTINGVIDEOPLAYER] Test channel."),
-                TestStep(5, "[TC_CASTINGVIDEOPLAYER] Test on/off."),
-                TestStep(6, "[TC_CASTINGVIDEOPLAYER] Test content launcher."),
-                TestStep(7, "[TC_CONTENTAPP_A] Test application basic."),
+                TestStep(3, "[TC_WAKE_ON_LAN] Test wake on lan."),
+                TestStep(4, "[TC_CHANNEL] Test channel."),
+                TestStep(5, "[TC_ON_OFF] Test on/off."),
+                TestStep(6, "[TC_CONTENT_LAUNCHER] Test content launcher."),
+                TestStep(7, "[TC_APPLICATION_BASIC] Test application basic."),
                 TestStep(
                     8, "[APP_LAUNCH_CUJ] Launch and stop app A using platform endpoint."),
                 TestStep(
@@ -572,6 +572,7 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(4)
         await self.channel_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.channel_test(self.APP_A_ENDPOINT)
 
         self.step(5)
         await self.on_off_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
