@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import pathlib
 from dataclasses import dataclass, replace
 from enum import StrEnum
-import pathlib
 
 
 class SubprocessKind(StrEnum):

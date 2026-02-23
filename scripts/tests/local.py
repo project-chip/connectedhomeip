@@ -35,10 +35,9 @@ import alive_progress
 import click
 import colorama
 import coloredlogs
+import python_path
 import tabulate
 import yaml
-import python_path
-
 
 fallback_import_path = "../../src/python_testing/matter_testing_infrastructure"
 

@@ -38,6 +38,7 @@ except ImportError:
     with python_path.PythonPath("../../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
         from matter.testing.subprocess import SubprocessInfo
 
+
 class LogPipe(threading.Thread):
     """Create PTY-based PIPE for IPC.
 
