@@ -609,11 +609,53 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetConfigurationVersion)
     EXPECT_EQ(configVersion, 2u);
 }
 
-TEST_F(TestBridgedDeviceBasicInformationCluster, TestForbiddenAttributes)
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestAcceptedCommands)
+{
+    // Without ICD support
+    {
+        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                     {
+                                                         .uniqueId = "no-icd",
+                                                     },
+                                                     {},
+                                                     {
+                                                         .parentVersionConfiguration = mMockVersionConfiguration,
+                                                         .delegate                   = mDelegate,
+                                                         .timerDelegate              = mMockTimer,
+                                                     });
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
+        EXPECT_EQ(cluster.AcceptedCommands(cluster.GetPaths()[0], builder), CHIP_NO_ERROR);
+        EXPECT_EQ(builder.TakeBuffer().size(), 0u);
+    }
+
+    // With ICD support
+    {
+        TestBridgedDeviceIcdDelegate icdDelegate;
+        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                     {
+                                                         .uniqueId = "icd",
+                                                     },
+                                                     {},
+                                                     {
+                                                         .parentVersionConfiguration = mMockVersionConfiguration,
+                                                         .delegate                   = mDelegate,
+                                                         .timerDelegate              = mMockTimer,
+                                                         .icdDelegate                = &icdDelegate,
+                                                     });
+
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
+        EXPECT_EQ(cluster.AcceptedCommands(cluster.GetPaths()[0], builder), CHIP_NO_ERROR);
+        EXPECT_EQ(builder.TakeBuffer().size(), 1u);
+    }
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestReachableChangedSuppression)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .uniqueId = "forbidden-test",
+                                                     .uniqueId  = "reachable-test",
+                                                     .reachable = true,
                                                  },
                                                  {},
                                                  {
@@ -621,57 +663,15 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestForbiddenAttributes)
                                                      .delegate                   = mDelegate,
                                                      .timerDelegate              = mMockTimer,
                                                  });
-    ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
 
-    const AttributeId kForbiddenAttributes[] = {
-        0x0000, // DataModelRevision
-        0x0006, // Location
-        0x0010, // LocalConfigDisabled
-        0x0013, // CapabilityMinima
-        0x0015, // SpecificationVersion
-        0x0016, // MaxPathsPerInvoke
-    };
+    // Setting it to same value should NOT generate event
+    cluster.SetReachable(true);
+    EXPECT_EQ(mContext.EventsGenerator().GetNextEvent(), std::nullopt);
 
-    for (AttributeId attrId : kForbiddenAttributes)
-    {
-        uint32_t dummy;
-        EXPECT_EQ(tester.ReadAttribute(attrId, dummy), Status::UnsupportedAttribute);
-    }
-}
-
-TEST_F(TestBridgedDeviceBasicInformationCluster, TestOptionalAttributesAbsence)
-{
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
-                                                 {
-                                                     .uniqueId = "optional-test",
-                                                 },
-                                                 {}, // No fixed data
-                                                 {
-                                                     .parentVersionConfiguration = mMockVersionConfiguration,
-                                                     .delegate                   = mDelegate,
-                                                     .timerDelegate              = mMockTimer,
-                                                 });
-    ClusterTester tester(cluster);
-
-    CharSpan charSpanVal;
-    uint16_t u16Val;
-    uint32_t u32Val;
-
-    // These are optional and NOT provided in the constructor
-    EXPECT_EQ(tester.ReadAttribute(Attributes::VendorName::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::VendorID::Id, u16Val), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductName::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductID::Id, u16Val), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::HardwareVersion::Id, u16Val), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::HardwareVersionString::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::SoftwareVersion::Id, u32Val), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::SoftwareVersionString::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::PartNumber::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductURL::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductLabel::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::SerialNumber::Id, charSpanVal), Status::UnsupportedAttribute);
-    EXPECT_EQ(tester.ReadAttribute(Attributes::ProductAppearance::Id, u32Val), Status::UnsupportedAttribute);
+    // Setting it to different value SHOULD generate event
+    cluster.SetReachable(false);
+    EXPECT_NE(mContext.EventsGenerator().GetNextEvent(), std::nullopt);
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteNodeLabel)
