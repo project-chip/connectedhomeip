@@ -71,15 +71,15 @@ class TC_DA_1_1(MatterBaseTest):
             TestStep("precondition", "DUT is commissioned to TH1's fabric", is_commissioning=True),
             TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1", """
                      - Verify that there is a single entry in the NOCs list"""),
-            TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
+            TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster and saves the returned list as fabrics_th1", """
                      - Verify that there is a single entry in the Fabrics list
                      - Verify that the FabricID for that entry matches the FabricID for TH1"""),
-            TestStep(3, "Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state"),
+            TestStep(3, "Factory reset DUT", "Perform the necessary actions to put the DUT into a commissionable state"),
             TestStep(4, "TH2 opens a PASE session with the DUT"),
             TestStep(5, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
                      - Verify that TH1's FabricID is not present in TH2's Fabrics list"""),
             TestStep(6, "TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to the DUT to clear the fail-safe timer and close the PASE session"),
-            TestStep(7, "DUT is commissioned to TH2's fabric", is_commissioning=True),
+            TestStep(7, "DUT is commissioned to TH2's fabric"),
             TestStep(8, "TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster", """
                      - Verify that there is a single entry in the Fabrics list
                      - Verify that TH2's Fabrics attribute's FabricID is the same as TH2's FabricID
@@ -87,8 +87,8 @@ class TC_DA_1_1(MatterBaseTest):
             TestStep(9, "TH2 does a non-fabric-filtered read of the NOCs attribute from the Node Operational Credentials cluster", """
                      - Verify that there is a single entry in the NOCs list
                      - Verify that TH2's NOCs entry's public key is different than TH1's NOCs entry's public key"""),
-            TestStep(10, "Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state"),
-            TestStep(11, "TH1 commissions DUT to TH1's fabric", is_commissioning=True),
+            TestStep(10, "Factory reset DUT", "Perform the necessary actions to put the DUT into a commissionable state"),
+            TestStep(11, "DUT is commissioned to TH1's fabric")
         ]
 
     def get_new_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
@@ -161,7 +161,7 @@ class TC_DA_1_1(MatterBaseTest):
                              f"TH1 FabricID ({fabrics_th1[0].fabricID}) and Fabrics attribute FabricID ({th1.fabricId}) must match")
 
         # *** STEP 3 ***
-        # Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state
+        # Factory reset DUT
         self.step(3)
         await self.request_device_factory_reset()
 
@@ -174,17 +174,16 @@ class TC_DA_1_1(MatterBaseTest):
         # *** STEP 5 ***
         # TH2 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
         self.step(5)
-        response = await th2.ReadAttribute(
+        fabrics_th2_ids_pase = await th2.ReadAttribute(
             nodeId=pase_node_id,
             attributes=[(root_node_id, fabrics_attr)],
             fabricFiltered=False
         )
-        fabrics_pase = response[0][opcreds_cluster][fabrics_attr]
 
         # Verify that TH1's FabricID is not present in TH2's Fabrics list
-        fabrics_pase_ids = [f.fabricID for f in fabrics_pase]
-        asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_pase_ids,
-                              f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_pase_ids}")
+        fabrics_th2_ids_pase = [f.fabricID for f in fabrics_th2_ids_pase[0][opcreds_cluster][fabrics_attr]]
+        asserts.assert_not_in(fabrics_th1[0].fabricID, fabrics_th2_ids_pase,
+                              f"TH1's FabricID ({fabrics_th1[0].fabricID}) should not be present in TH2's Fabrics list, found: {fabrics_th2_ids}")
 
         # *** STEP 6 ***
         # TH2 sends ArmFailSafe command with expiryLengthSeconds set to 0 to
@@ -249,7 +248,7 @@ class TC_DA_1_1(MatterBaseTest):
                                  f"The public key of the TH2 NOCs entry ({nocs_th2_decoded_pk.hex()}) must be different from TH1's NOCs entry public key ({nocs_th1_decoded_pk.hex()})")
 
         # *** STEP 10 ***
-        # Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state
+        # Factory reset DUT
         self.step(10)
         await self.request_device_factory_reset()
 
