@@ -315,6 +315,82 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     EXPECT_FALSE(mMockTimer.IsTimerActive(&cluster));
 }
 
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestShutdownCancelsTimer)
+{
+    TestBridgedDeviceIcdDelegate icdDelegate;
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "icd-dev",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                     .icdDelegate                = &icdDelegate,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::KeepActive::Type request;
+    request.stayActiveDuration = 1000;
+    request.timeoutMs          = 30000;
+
+    auto response = tester.Invoke<Commands::KeepActive::Type>(request);
+    EXPECT_TRUE(response.IsSuccess());
+    EXPECT_TRUE(mMockTimer.IsTimerActive(&cluster));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_FALSE(mMockTimer.IsTimerActive(&cluster));
+    EXPECT_FALSE(cluster.GetRequestedStayActiveDurationMs().has_value());
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveTimerNoRegression)
+{
+    TestBridgedDeviceIcdDelegate icdDelegate;
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "icd-dev",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                     .icdDelegate                = &icdDelegate,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Initial request: timeout 60s
+    {
+        Commands::KeepActive::Type request;
+        request.stayActiveDuration = 1000;
+        request.timeoutMs          = 60000;
+        EXPECT_TRUE(tester.Invoke<Commands::KeepActive::Type>(request).IsSuccess());
+    }
+
+    // Advance 10s. Remaining is 50s.
+    mMockTimer.AdvanceClock(System::Clock::Milliseconds32(10000));
+
+    // Second request: timeout 30s. This should be ignored for timer extension because 30s < 50s.
+    {
+        Commands::KeepActive::Type request;
+        request.stayActiveDuration = 1000;
+        request.timeoutMs          = 30000;
+        EXPECT_TRUE(tester.Invoke<Commands::KeepActive::Type>(request).IsSuccess());
+    }
+
+    // Advance another 35s (total 45s from start). Timer should still be active.
+    mMockTimer.AdvanceClock(System::Clock::Milliseconds32(35000));
+    EXPECT_TRUE(mMockTimer.IsTimerActive(&cluster));
+
+    // Advance another 20s (total 65s from start). Timer should have fired.
+    mMockTimer.AdvanceClock(System::Clock::Milliseconds32(20000));
+    EXPECT_FALSE(mMockTimer.IsTimerActive(&cluster));
+    EXPECT_EQ(icdDelegate.mExpiredCalled, 1u);
+}
+
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandMultipleRequests)
 {
     TestBridgedDeviceIcdDelegate icdDelegate;

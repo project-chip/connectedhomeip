@@ -207,6 +207,9 @@ void BridgedDeviceBasicInformationCluster::Shutdown(ClusterShutdownType s)
 
     // if we are shutting down, stop processing active timers
     CancelPendingActiveTimer();
+
+    // we also do not expect to stay active to be propagated. Cluster is inactive.
+    mStayActiveDurationMs.reset();
 }
 
 std::optional<DataModel::ActionReturnStatus>
