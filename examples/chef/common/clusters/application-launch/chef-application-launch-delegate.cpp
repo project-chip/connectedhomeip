@@ -163,7 +163,11 @@ CHIP_ERROR PlatformDelegate::HandleGetCurrentApp(app::AttributeValueEncoder & aE
 {
     ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleGetCurrentApp");
     if (!mCurrentApp)
+    {
+        ChipLogProgress(Zcl, "No app in focus.");
         return aEncoder.EncodeNull();
+    }
+    ChipLogProgress(Zcl, "Returning current app.");
     ApplicationEPType currentApp;
     ApplicationBasic::CatalogVendorApp * vendorApp = mCurrentApp->GetCatalogVendorApp();
     currentApp.application.catalogVendorID         = vendorApp->catalogVendorId;
