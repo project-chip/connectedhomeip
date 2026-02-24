@@ -235,9 +235,7 @@ CHIP_ERROR ICDMonitoringTable::Get(uint16_t index, ICDMonitoringEntry & entry) c
 {
     entry.fabricIndex = this->mFabric;
     entry.index       = index;
-    ReturnErrorOnFailure(entry.Load(this->mStorage));
-    entry.fabricIndex = this->mFabric;
-    return CHIP_NO_ERROR;
+    return entry.Load(this->mStorage);
 }
 
 CHIP_ERROR ICDMonitoringTable::Find(NodeId id, ICDMonitoringEntry & entry)
