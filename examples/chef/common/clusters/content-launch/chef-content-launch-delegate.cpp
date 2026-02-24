@@ -40,24 +40,22 @@ namespace {
  */
 bool checkContentMatch(const ContentEntry & content, const SearchParameters & params)
 {
-    auto iter = params.begin();
-    while (iter.Next())
+    ChipLogProgress(Zcl, "In checkContentMatch");
+    auto required_it = params.begin();
+    while (required_it.Next())
     {
-        bool found           = false;
-        auto & requiredParam = iter.GetValue();
-        for (auto it = content.begin(); it != content.end(); ++it)
-        {
-            auto & availableParam = *it;
-            if (requiredParam.type == availableParam.type && availableParam.value.data_equal(requiredParam.value))
-            {
-                found = true;
-                break;
-            }
-        }
+        auto & requiredParam = required_it.GetValue();
+        ChipLogProgress(Zcl, "    Looking for param: type=%d value=%s", requiredParam.type,
+                        NullTerminated(requiredParam.value).c_str());
+        bool found = std::any_of(content.begin(), content.end(), [requiredParam](const ParameterType & availableParam) {
+            return requiredParam.type == availableParam.type && requiredParam.value.data_equal(availableParam.value);
+        });
         if (!found)
         {
+            ChipLogProgress(Zcl, "    Param not found");
             return false;
         }
+        ChipLogProgress(Zcl, "    Param found");
     }
     return true;
 }
