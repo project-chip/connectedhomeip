@@ -678,7 +678,7 @@ bool AccessControl::Entry::IsValid() const
     AuthMode authMode       = AuthMode::kNone;
     FabricIndex fabricIndex = kUndefinedFabricIndex;
     Privilege privilege     = static_cast<Privilege>(0);
-    AuxiliaryType auxiliaryType;
+    AuxiliaryType auxiliaryType = AuxiliaryType::kSystem;
     size_t subjectCount     = 0;
     size_t targetCount      = 0;
 

@@ -28,6 +28,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 
@@ -456,6 +457,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const override
+    {
+        auxiliaryType = mAuxiliaryType;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const override
     {
         fabricIndex = mFabricIndex;
@@ -471,6 +478,12 @@ public:
     CHIP_ERROR SetAuthMode(AuthMode authMode) override
     {
         mAuthMode = authMode;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) override
+    {
+        mAuxiliaryType = auxiliaryType;
         return CHIP_NO_ERROR;
     }
 
@@ -557,6 +570,7 @@ public:
     FabricIndex mFabricIndex = 1;
     Privilege mPrivilege     = Privilege::kView;
     AuthMode mAuthMode       = AuthMode::kCase;
+    AuxiliaryType mAuxiliaryType = AuxiliaryType::kSystem;
     NodeId mSubject          = kOperationalNodeId0;
     Target mTarget           = { .flags = Target::kCluster, .cluster = kOnOffCluster };
     size_t mSubjectCount     = 1;
@@ -1103,6 +1117,8 @@ public: // protected
     void SetUp() override { ASSERT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR); }
     static void SetUpTestSuite()
     {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+
         // Set and init access control delegate
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
@@ -1117,6 +1133,7 @@ public: // protected
 
         // Register group auxilary access control delegate
         AccessControl::Delegate * groupAuxiliaryAccessDelegate = Examples::GetGroupAuxiliaryAccessControlDelegate();
+        ASSERT_NE(groupAuxiliaryAccessDelegate, nullptr);
         SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(groupAuxiliaryAccessDelegate));
 
     }
@@ -1124,6 +1141,7 @@ public: // protected
     {
         GetAccessControl().Finish();
         ResetAccessControlToDefault();
+        chip::Platform::MemoryShutdown();
     }
 };
 
@@ -1910,24 +1928,24 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
     }
 }
 
-// TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
-// {
-//     // The delegate is already registered in SetUpTestSuite.
-//     AccessControl::Delegate * delegate = Examples::GetGroupAuxiliaryAccessControlDelegate();
+TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
+{
+    // The delegate is already registered in SetUpTestSuite.
+    AccessControl::Delegate * delegate = Examples::GetGroupAuxiliaryAccessControlDelegate();
 
-//     // Verify registering again fails.
-//     EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_ERROR_INCORRECT_STATE);
+    // Verify registering again fails.
+    EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_ERROR_INCORRECT_STATE);
 
-//     // Verify unregistration.
-//     accessControl.UnregisterGroupAuxiliaryDelegate();
+    // Verify unregistration.
+    accessControl.UnregisterGroupAuxiliaryDelegate();
 
-//     // Verify AuxiliaryEntries returns CHIP_ERROR_INCORRECT_STATE when no delegate is registered.
-//     EntryIterator iterator;
-//     EXPECT_EQ(accessControl.AuxiliaryEntries(1, iterator), CHIP_ERROR_INCORRECT_STATE);
+    // Verify AuxiliaryEntries returns CHIP_ERROR_INCORRECT_STATE when no delegate is registered.
+    EntryIterator iterator;
+    EXPECT_EQ(accessControl.AuxiliaryEntries(1, iterator), CHIP_ERROR_INCORRECT_STATE);
 
-//     // Verify registration again after unregistration.
-//     EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_NO_ERROR);
-// }
+    // Verify registration again after unregistration.
+    EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_NO_ERROR);
+}
 
 TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
 {
@@ -1979,58 +1997,58 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
 
     EntryIterator iterator;
     Entry entry;
-    // NodeId actualSubject;
-    // Entry::Target actualTarget;
-    // FabricIndex actualFabric;
+    NodeId actualSubject;
+    Entry::Target actualTarget;
+    FabricIndex actualFabric;
 
     // Test Fabric 1
     EXPECT_EQ(accessControl.AuxiliaryEntries(fabric1, iterator), CHIP_NO_ERROR);
-    // EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
+    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
     
-    // // Group 1 check
-    // EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x1111));
+    // Group 1 check
+    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
+    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x1111));
 
-    // EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualTarget.endpoint, 10u);
+    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(actualTarget.endpoint, 10u);
     
-    // EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualFabric, fabric1);
+    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
+    EXPECT_EQ(actualFabric, fabric1);
 
-    // EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
+    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
 
-    // // Group 2 check
-    // EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x2222));
+    // Group 2 check
+    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
+    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x2222));
 
-    // EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualTarget.endpoint, 20u);
+    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(actualTarget.endpoint, 20u);
     
-    // EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualFabric, fabric1);
+    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
+    EXPECT_EQ(actualFabric, fabric1);
 
-    // EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
+    EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
 
-    // // Test Fabric 2
-    // EXPECT_EQ(accessControl.AuxiliaryEntries(fabric2, iterator), CHIP_NO_ERROR);
-    // EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
+    // Test Fabric 2
+    EXPECT_EQ(accessControl.AuxiliaryEntries(fabric2, iterator), CHIP_NO_ERROR);
+    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
     
-    // // Group 3 check
-    // EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x3333));
+    // Group 3 check
+    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
+    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x3333));
 
-    // EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualTarget.endpoint, 30u);
+    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
+    EXPECT_EQ(actualTarget.endpoint, 30u);
     
-    // EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
-    // EXPECT_EQ(actualFabric, fabric2);
+    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
+    EXPECT_EQ(actualFabric, fabric2);
 
-    // // This should be the end of the entries, and confirms the group without kHasAuxiliaryACL has no entry
-    // EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
+    // This should be the end of the entries, and confirms the group without kHasAuxiliaryACL has no entry
+    EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
 
-    // // Cleanup provider for next tests
-    // EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
-    // EXPECT_EQ(provider->RemoveFabric(fabric2), CHIP_NO_ERROR);
+    // Cleanup
+    EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->RemoveFabric(fabric2), CHIP_NO_ERROR);
 }
 
 TEST_F(TestAccessControl, TestIterator)
