@@ -6308,6 +6308,72 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
 }
 
+// Tests that time synchronization loss is detected even when the cached CurrentTime
+// value has not changed (i.e. when the device power-cycles repeatedly and always
+// reports null, matching what we already have in cache from the previous cycle).
+- (void)test049b_TimeSyncLossDetectedWhenCacheUnchanged
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
+
+    [device setDelegate:delegate queue:queue];
+
+    // Build a null CurrentTime report (UTCTime = null means the device has no time).
+    NSArray * nullTimeSyncReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                  clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                                                attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRNullValueType,
+        }
+    } ];
+
+    // Step 1: First injection primes the cache with null CurrentTime and should
+    // detect time sync loss (null UTCTime => device has no time).
+    XCTestExpectation * firstLossDetected = [self expectationWithDescription:@"First time sync loss detected"];
+    XCTestExpectation * firstReportEnd = [self expectationWithDescription:@"First report end"];
+    delegate.onTimeSynchronizationLossDetected = ^{
+        [firstLossDetected fulfill];
+    };
+    delegate.onReportEnd = ^{
+        [firstReportEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
+    [self waitForExpectations:@[ firstLossDetected, firstReportEnd ] timeout:kTimeoutInSeconds];
+
+    // Step 2: Reset the detection callback and inject the same null report again.
+    // The cache still holds null from step 1, so readCacheValueChanged == NO.
+    // The fix ensures we still detect the time sync loss unconditionally.
+    XCTestExpectation * secondLossDetected = [self expectationWithDescription:@"Second time sync loss detected (cache unchanged)"];
+    XCTestExpectation * secondReportEnd = [self expectationWithDescription:@"Second report end"];
+    delegate.onTimeSynchronizationLossDetected = ^{
+        [secondLossDetected fulfill];
+    };
+    delegate.onReportEnd = ^{
+        [secondReportEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:YES];
+    [self waitForExpectations:@[ secondLossDetected, secondReportEnd ] timeout:kTimeoutInSeconds];
+
+    // Step 3: Verify that a non-subscription injection does NOT trigger detection.
+    XCTestExpectation * nonSubscriptionReportEnd = [self expectationWithDescription:@"Non-subscription report end"];
+    XCTestExpectation * noLossFromRead = [self expectationWithDescription:@"No time sync loss from non-subscription report"];
+    noLossFromRead.inverted = YES;
+    delegate.onTimeSynchronizationLossDetected = ^{
+        [noLossFromRead fulfill];
+    };
+    delegate.onReportEnd = ^{
+        [nonSubscriptionReportEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:nullTimeSyncReport fromSubscription:NO];
+    [self waitForExpectations:@[ nonSubscriptionReportEnd ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ noLossFromRead ] timeout:2];
+}
+
 - (void)test050_readAttributePaths_withWildCardPath
 {
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
