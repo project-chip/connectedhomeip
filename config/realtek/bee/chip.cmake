@@ -135,6 +135,11 @@ string(APPEND CHIP_GN_ARGS "chip_error_logging = true\n")
 string(APPEND CHIP_GN_ARGS "chip_progress_logging = true\n")
 string(APPEND CHIP_GN_ARGS "chip_detail_logging= true\n")
 
+if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  # Non-debug builds for GN will default to `-Os` which is desirable for release builds to save flash
+  string(APPEND CHIP_GN_ARGS "is_debug= false\n")
+endif ()
+
 # project config
 string(APPEND CHIP_GN_ARGS "chip_project_config_include_dirs = [\"${matter_example_path}/main/include\"]\n")
 string(APPEND CHIP_GN_ARGS "chip_device_project_config_include = \"<CHIPProjectConfig.h>\"\n")
