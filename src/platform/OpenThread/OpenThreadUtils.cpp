@@ -27,9 +27,11 @@
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <openthread/dataset.h>
 #include <openthread/error.h>
 
 #include <cstdio>
@@ -94,7 +96,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
     const uint32_t kParamsChanged = (OT_CHANGED_THREAD_NETWORK_NAME | OT_CHANGED_THREAD_PANID | OT_CHANGED_THREAD_EXT_PANID |
                                      OT_CHANGED_THREAD_CHANNEL | OT_CHANGED_NETWORK_KEY | OT_CHANGED_PSKC);
     static char strBuf[64];
-
+    
     ChipLogDetail(DeviceLayer, "OpenThread State Changed (Flags: 0x%08" PRIx32 ")", flags);
     if ((flags & OT_CHANGED_THREAD_ROLE) != 0)
     {
@@ -103,17 +105,29 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
     if ((flags & kParamsChanged) != 0)
     {
         otOperationalDataset aDataset;
-        otError err = otDatasetGetActive(otInst, &aDataset);
-        if ( err == OT_ERROR_NONE ) {
-            ChipLogDetail(DeviceLayer, "   Network Name: %s", aDataset.mNetworkName.m8);
-            ChipLogDetail(DeviceLayer, "   PAN Id: 0x%04X", aDataset.mPanId);
+        otError otErr                   = otDatasetGetActive(otInst, &aDataset);
+        if (otErr == OT_ERROR_NONE)
+        {
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            if (aDataset.mComponents.mIsNetworkNamePresent)
             {
-                const otExtendedPanId * exPanId = &(aDataset.mExtendedPanId);
-                snprintf(strBuf, sizeof(strBuf), "0x%02X%02X%02X%02X%02X%02X%02X%02X", exPanId->m8[0], exPanId->m8[1], exPanId->m8[2],
-                        exPanId->m8[3], exPanId->m8[4], exPanId->m8[5], exPanId->m8[6], exPanId->m8[7]);
-                ChipLogDetail(DeviceLayer, "   Extended PAN Id: %s", strBuf);
+                ChipLogDetail(DeviceLayer, "   Network Name: %s", aDataset.mNetworkName.m8);
             }
-            ChipLogDetail(DeviceLayer, "   Channel: %d", aDataset.mChannel);
+            if (aDataset.mComponents.mIsPanIdPresent)
+            {
+                ChipLogDetail(DeviceLayer, "   PAN Id: 0x%04X", aDataset.mPanId);
+            }
+            if (aDataset.mComponents.mIsExtendedPanIdPresent)
+            {
+                err = Encoding::BytesToHex(aDataset.mExtendedPanId.m8, sizeof(aDataset.mExtendedPanId.m8), strBuf,
+                                              sizeof(strBuf), Encoding::HexFlags::kNullTerminate);
+                ChipLogDetail(DeviceLayer, "   Extended PANID: %s", (err == CHIP_NO_ERROR) ? strBuf : "");
+            }
+            if (aDataset.mComponents.mIsChannelPresent)
+            {
+                ChipLogDetail(DeviceLayer, "   Channel: %d", aDataset.mChannel);
+            }
+            if (aDataset.mComponents.mIsMeshLocalPrefixPresent)
             {
                 const otMeshLocalPrefix * otMeshPrefix = &(aDataset.mMeshLocalPrefix);
                 chip::Inet::IPAddress meshPrefix;
@@ -123,12 +137,11 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
                 ChipLogDetail(DeviceLayer, "   Mesh Prefix: %s/64", strBuf);
             }
 #if CHIP_CONFIG_SECURITY_TEST_MODE
+            if (aDataset.mComponents.mIsNetworkKeyPresent)
             {
-                otNetworkKey otKey;
-                otThreadGetNetworkKey(otInst, &otKey);
-                for (int i = 0; i < OT_NETWORK_KEY_SIZE; i++)
-                    snprintf(&strBuf[i * 2], 3, "%02X", otKey.m8[i]);
-                ChipLogDetail(DeviceLayer, "   Network Key: %s", strBuf);
+                err = Encoding::BytesToHex(aDataset.mNetworkKey.m8, sizeof(aDataset.mNetworkKey.m8), strBuf, sizeof(strBuf),
+                                              Encoding::HexFlags::kNullTerminate);
+                ChipLogDetail(DeviceLayer, "   Network Key: %s", (err == CHIP_NO_ERROR) ? strBuf : "");
             }
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
         }
