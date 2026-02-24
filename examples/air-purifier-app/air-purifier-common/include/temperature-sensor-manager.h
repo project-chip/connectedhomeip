@@ -29,7 +29,7 @@ namespace Clusters {
 class TemperatureSensorManager
 {
 public:
-    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
+    TemperatureSensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
 
     void Init() { LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValueRange(mEndpointId, -500, 6000)); }
 
