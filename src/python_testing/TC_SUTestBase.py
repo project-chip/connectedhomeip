@@ -397,9 +397,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 FIXED_HEADER_FORMAT, fixed_header)
             header_tlv = TLVReader(file.read(header_size)).get()['Any']
         try:
-            # Version is the index 2
+            # Version has context tag 2
             version = header_tlv[2]
-        except IndexError:
+        except KeyError:
             asserts.fail("Unable to retrieve the Software Version from the ota image.")
 
         return version
