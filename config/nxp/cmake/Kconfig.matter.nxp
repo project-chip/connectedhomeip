@@ -122,8 +122,9 @@ config CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 	help
 		Allows to use a custom factory data provider singleton implementation.
 		If enabled, the user must define a custom singleton implementation.
-		Such feature could be useful when only a subset of the platform factory data module needs to be replaced.
-		Application may in this case override only method(s) that need to be customized.
+		Such feature is useful when an application needs to customize the factory data provider behavior.
+		The application can provide its own singleton, for example by creating
+		a class that inherits from FactoryDataProviderImpl and overrides only the methods that need customization.
 
 endif
 
