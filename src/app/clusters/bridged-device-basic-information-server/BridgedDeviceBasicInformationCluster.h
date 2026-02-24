@@ -50,7 +50,7 @@ public:
         ConfigurationVersionDelegate & parentVersionConfiguration;
         BridgedDeviceBasicInformationDelegate & delegate;
         TimerDelegate & timerDelegate;
-        BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if NULL, ICD support feature is disabled
+        BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if nullptr, ICD support feature is disabled
     };
 
     /// Most attributes in the bridged device basic information cluster are fixed and cannot be
