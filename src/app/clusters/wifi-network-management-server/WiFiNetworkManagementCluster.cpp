@@ -96,8 +96,8 @@ CHIP_ERROR WiFiNetworkManagementCluster::SetNetworkCredentials(ByteSpan ssid, By
         if (System::SystemClock().GetClock_RealTimeMS(realtime) == CHIP_NO_ERROR)
         {
             mPassphraseSurrogate = std::max(mPassphraseSurrogate, realtime.count());
-            NotifyAttributeChanged(PassphraseSurrogate::Id);
         }
+        NotifyAttributeChanged(PassphraseSurrogate::Id);
     }
     return CHIP_NO_ERROR;
 }
