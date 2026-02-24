@@ -351,10 +351,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             }
 
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, reason]() {
-                if (mpConnectCallback != nullptr)
+                if (mpOneShotConnectCallback != nullptr)
                 {
-                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
-                    mpConnectCallback = nullptr;
+                    mpOneShotConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
+                    mpOneShotConnectCallback = nullptr;
                 }
             });
             if (delegate != nullptr)
@@ -384,10 +384,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         if (mAssociationStarted)
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                if (mpConnectCallback != nullptr)
+                if (mpOneShotConnectCallback != nullptr)
                 {
-                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-                    mpConnectCallback = nullptr;
+                    mpOneShotConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+                    mpOneShotConnectCallback = nullptr;
                 }
                 ConnectivityMgrImpl().PostNetworkConnect();
             });
@@ -875,7 +875,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     // Network was provisioned successfully - emit a connectivity change event so the application can update its state.
     NotifyWiFiConnectivityChange(kConnectivity_NoChange);
 
-    mpConnectCallback = apCallback;
+    mpOneShotConnectCallback = apCallback;
     return CHIP_NO_ERROR;
 }
 
@@ -893,7 +893,7 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
     // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpOneShotConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     GVariantBuilder builder;
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
@@ -948,7 +948,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
 
     // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpOneShotConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // Convert identities and our key pair to DER and add them to wpa_supplicant as blobs
     {
