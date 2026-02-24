@@ -84,10 +84,10 @@ void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
-    
+
     static constexpr AttrMigrationData attributesToUpdate[] = { { UnitLocalization::Attributes::TemperatureUnit::Id,
                                                                   &DefaultMigrators::ScalarValue<uint8_t> } };
-    SuccessOrLog(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({endpointId, UnitLocalization::Id}, Span(attributesToUpdate), 
+    SuccessOrLog(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({endpointId, UnitLocalization::Id}, Span(attributesToUpdate),
     chip::Server::GetInstance().GetPersistentStorage()), Zcl, "Error migrating UnitLocalization");
 }
 

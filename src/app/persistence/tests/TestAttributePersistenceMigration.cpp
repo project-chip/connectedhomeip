@@ -121,7 +121,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
 
 // When WriteValue to AttributePersistence fails, the value is still deleted from SafeAttribute ("one time" migration guarantee).
 // Uses a custom migrator (PoisonAfterReadMigrator) that poisons the normal provider key after the migrator runs, so that the
-// initial ReadValue check passes (returns CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) but the subsequent WriteValue 
+// initial ReadValue check passes (returns CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) but the subsequent WriteValue
 // hits the poisoned key and fails.
 TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailure)
 {
