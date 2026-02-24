@@ -143,7 +143,7 @@ TEST_F(TestTemperatureMeasurementCluster, MeasuredValue)
 
     DataModel::Nullable<int16_t> measuredValue{};
     measuredValue.SetNonNull(0);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     measuredValue.SetNonNull(1);
     EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
@@ -161,7 +161,7 @@ TEST_F(TestTemperatureMeasurementCluster, MeasuredValue)
     EXPECT_EQ(measuredVal.Value(), measuredValue.Value());
 
     measuredValue.SetNonNull(4);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     measuredValue.SetNull();
     EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
@@ -191,7 +191,7 @@ TEST_F(TestTemperatureMeasurementCluster, MeasuredValue)
     EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
 
     measuredValue.SetNonNull(0);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue.Value()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     measuredValue.SetNonNull(32766);
     EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
@@ -201,7 +201,7 @@ TEST_F(TestTemperatureMeasurementCluster, MeasuredValue)
     EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_NO_ERROR);
 
     measuredValue.SetNonNull(4);
-    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     measuredValue.SetNonNull(-27316);
     EXPECT_EQ(cluster.SetMeasuredValue(measuredValue), CHIP_NO_ERROR);
@@ -234,14 +234,14 @@ TEST_F(TestTemperatureMeasurementCluster, MeasuredValueRange)
     EXPECT_EQ(maxMeasuredVal.Value(), maxMeasuredValue.Value());
 
     minMeasuredValue.SetNonNull(-27316);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     minMeasuredValue.SetNonNull(32767);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     minMeasuredValue.SetNonNull(32766);
     maxMeasuredValue.SetNonNull(32766);
-    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     minMeasuredValue.SetNull();
     maxMeasuredValue.SetNull();

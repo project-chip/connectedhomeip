@@ -197,7 +197,7 @@ public:
             if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
-                LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(n * 100)));
+                LogErrorOnFailure(app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(n * 100)));
             }
             else if (name == "Color Current Level")
             {
@@ -669,7 +669,7 @@ void SetupPretendDevices()
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
 
-    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(21 * 100)));
+    LogErrorOnFailure(app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(21 * 100)));
 
     AddDevice("Garage 1");
     AddEndpoint("Door 1");

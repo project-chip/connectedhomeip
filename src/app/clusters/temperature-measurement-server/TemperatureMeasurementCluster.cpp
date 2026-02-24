@@ -32,8 +32,7 @@ constexpr uint16_t kMaxTolerance = 2048;
 TemperatureMeasurementCluster::TemperatureMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }),
-    mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet)
 {
     if (!config.minMeasuredValue.IsNull())
     {
@@ -93,12 +92,12 @@ CHIP_ERROR TemperatureMeasurementCluster::SetMeasuredValue(DataModel::Nullable<i
     {
         if (!mMinMeasuredValue.IsNull())
         {
-            VerifyOrReturnError(measuredValue.Value() >= mMinMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(measuredValue.Value() >= mMinMeasuredValue.Value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
 
         if (!mMaxMeasuredValue.IsNull())
         {
-            VerifyOrReturnError(measuredValue.Value() <= mMaxMeasuredValue.Value(), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(measuredValue.Value() <= mMaxMeasuredValue.Value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
     }
 
@@ -113,11 +112,11 @@ CHIP_ERROR TemperatureMeasurementCluster::SetMeasuredValueRange(DataModel::Nulla
     {
         VerifyOrReturnError(minMeasuredValue.Value() >= kMinMeasuredValueRange &&
                                 minMeasuredValue.Value() <= kMaxMeasuredValueRange,
-                            CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         if (!maxMeasuredValue.IsNull())
         {
-            VerifyOrReturnError(maxMeasuredValue.Value() >= minMeasuredValue.Value() + 1, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(maxMeasuredValue.Value() >= minMeasuredValue.Value() + 1, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
     }
 
