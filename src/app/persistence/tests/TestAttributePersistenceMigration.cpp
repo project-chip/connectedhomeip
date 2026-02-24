@@ -20,6 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/Scoped.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -27,6 +28,20 @@ namespace {
 
 using namespace chip;
 using namespace chip::app;
+
+// Used by TestMigrationDeletesFromSafeOnWriteFailure to poison the normal-provider
+// key after the initial ReadValue check has already passed.
+TestPersistentStorageDelegate * sStorageDelegateForPoisoning = nullptr;
+
+CHIP_ERROR PoisonAfterReadMigrator(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider,
+                                   MutableByteSpan & buffer)
+{
+    CHIP_ERROR err = DefaultMigrators::ScalarValue<uint32_t>(attrPath, provider, buffer);
+    // Poison the normal provider key now, after ReadValue already returned CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+    sStorageDelegateForPoisoning->AddPoisonKey(
+        DefaultStorageKeyAllocator::AttributeValue(attrPath.mEndpointId, attrPath.mClusterId, attrPath.mAttributeId).KeyName());
+    return err;
+}
 
 // Single attribute migrated successfully: value appears in AttributePersistence, deleted from SafeAttribute.
 TEST(TestAttributePersistenceMigration, TestMigrationSuccess)
@@ -104,10 +119,14 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
     }
 }
 
-// Tests that the attribute was removed from SafeAttributePersistence even if Write fails.
+// When WriteValue to AttributePersistence fails, the value is still deleted from SafeAttribute ("one time" migration guarantee).
+// Uses a custom migrator (PoisonAfterReadMigrator) that poisons the normal provider key after the migrator runs, so that the
+// initial ReadValue check passes (returns CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) but the subsequent WriteValue 
+// hits the poisoned key and fails.
 TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailure)
 {
     TestPersistentStorageDelegate storageDelegate;
+    ScopedChange ptrGuard(sStorageDelegateForPoisoning, &storageDelegate);
 
     DefaultAttributePersistenceProvider ramProvider;
     DefaultSafeAttributePersistenceProvider safeRamProvider;
@@ -122,13 +141,13 @@ TEST(TestAttributePersistenceMigration, TestMigrationDeletesFromSafeOnWriteFailu
     ASSERT_EQ(safeRamProvider.WriteScalarValue(path, kValueToStore), CHIP_NO_ERROR);
 
     const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
+        { 3, &PoisonAfterReadMigrator },
     };
     uint8_t buf[128] = {};
     MutableByteSpan buffer(buf);
     EXPECT_NE(
         MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
-        CHIP_ERROR_HAD_FAILURES);
+        CHIP_NO_ERROR);
 
     // Value should still be deleted from the safe provider
     {

@@ -41,6 +41,9 @@ struct AttrMigrationData
  * When a value is found, it is always deleted from the safe provider after the read, regardless of whether
  * the write to the standard provider succeeds. This ensures each attribute is only migrated once and avoids
  * overwriting newer runtime values with stale persisted data on subsequent startups.
+ * 
+ * This function will return CHIP_ERROR_HAD_FAILURES when there are errors reading/deleting from the SafeAttributePersistence
+ * or when the write to the destination provider failed.
  *
  * The user should ensure that the provided buffer has enough capacity for the attributes to be migrated.
  *
@@ -61,7 +64,7 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
 
 /**
  * @brief
- * This overload provides a simple function to migrate from the SafeAttributeProvider to the standard provider mechanism over
+ * This overload provides a simple function to migrate from the SafeAttributeProvider to the standard provider mechanism using
  * the same storageDelegate.
  *
  *

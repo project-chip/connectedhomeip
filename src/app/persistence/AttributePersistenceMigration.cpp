@@ -31,8 +31,10 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
     {
         attrPath                          = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, entry.attributeId);
 
-        // Create a copy of the buffer to check if the value is already in the AttributePersistence
+        // Create a copy of the buffer to check if the value is already in the AttributePersistence.
         // If the attribute value is already stored in AttributePersistence, skip it.
+        // Note: we assume any other error (e.g. including buffer too small) to be an indication that
+        //       the key exists. The only case we migrate is if we are explicitly told "not found".
         MutableByteSpan readAttrBuffer = buffer;
         if (dstProvider.ReadValue(attrPath, readAttrBuffer) != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
@@ -72,6 +74,7 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
         attributeMigrationError = safeProvider.SafeDeleteValue(attrPath);
         if (attributeMigrationError != CHIP_NO_ERROR)
         {
+            migrationError = CHIP_ERROR_HAD_FAILURES;
             ChipLogError(DataManagement,
                          "AttributeMigration: Error deleting SafeAttribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI
                          "' (err=%" CHIP_ERROR_FORMAT ")",

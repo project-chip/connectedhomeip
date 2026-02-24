@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/UnitLocalization/Metadata.h>
@@ -33,15 +34,12 @@ CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    uint8_t storedTempUnit = 0;
-    MutableByteSpan span(&storedTempUnit, sizeof(storedTempUnit));
-    CHIP_ERROR err =
-        context.attributeStorage.ReadValue(ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), span);
-
-    if (err == CHIP_NO_ERROR)
+    AttributePersistence attrPersistence{ context.attributeStorage };
+    const TempUnitEnum defaultTempUnit = mTemperatureUnit;
+    if (attrPersistence.LoadNativeEndianValue<TempUnitEnum>(
+            ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), mTemperatureUnit, defaultTempUnit))
     {
-        mTemperatureUnit = static_cast<TempUnitEnum>(storedTempUnit);
-        ChipLogDetail(Zcl, "UnitLocalization ep0 Loaded TemperatureUnit: %u", storedTempUnit);
+        ChipLogDetail(Zcl, "UnitLocalization ep0 Loaded TemperatureUnit: %u", to_underlying(mTemperatureUnit));
     }
     else
     {
