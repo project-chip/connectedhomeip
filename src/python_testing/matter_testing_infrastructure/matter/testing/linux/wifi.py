@@ -528,21 +528,12 @@ class WpaSupplicantMock(threading.Thread):
         # Expose main wpa_supplicant service
         self.wpa = WpaSupplicantMock.Wpa(self)
         self.wpa.export_to_dbus(self.wpa.path)
+
         # Create and export multiple interfaces
-        for i in range(len(self.interfaces_params)):
-            iface = WpaSupplicantMock.WpaInterface(self, i)
-            iface.export_to_dbus(iface.path)
-            self.interfaces.append(iface)
-            # Create network for each interface
-            net = WpaSupplicantMock.WpaNetwork(self, i)
-            net.export_to_dbus(net.path)
-            self.networks.append(net)
-
-        self.nan_simulator = NANSimulator(discovery_delay=0.1)
-
-        # Assign interfaces to given names
-        for i in range(len(self.interfaces_params)):
-            self.nan_simulator.register_interface(self.interfaces_params[i]['name'], self.interfaces[i])
+        for i in self.interfaces:
+            i.export_to_dbus(i.path)
+        for n in self.networks:
+            n.export_to_dbus(n.path)
 
         log.info("WiFi-PAF mode enabled with NAN simulator")
 
@@ -551,23 +542,32 @@ class WpaSupplicantMock(threading.Thread):
         If no match is found, returns the index of the last available interface.
         """
         name_lower = name.lower()
-        for idx, param_dict in enumerate(self.interfaces_params):
-            if param_dict['name'] in name_lower:  # Case-insensitive match
+        for idx, i in enumerate(self.interfaces):
+            if i.interface_name_in_sim in name_lower:  # Case-insensitive match
                 return idx
 
         return -1  # Default to last interface if no app found in the interface name
 
-    def __init__(self, ssid: str, password: str, ns: IsolatedNetworkNamespace,
-                 interfaces_params: list = []):
+    def __init__(self, interfaces_info: list, ssid: str, password: str, ns: IsolatedNetworkNamespace):
         self.ssid = ssid
         self.password = password
         self.networking = ns
-        self.interfaces_params = interfaces_params
         self.interfaces: list[WpaSupplicantMock.WpaInterface] = []
         self.networks: list[WpaSupplicantMock.WpaNetwork] = []
+
+        self.nan_simulator = NANSimulator(discovery_delay=0.1)
+
+        for i, info in enumerate(interfaces_info):
+            self.interfaces.append(WpaSupplicantMock.WpaInterface(self, i))
+            self.networks.append(WpaSupplicantMock.WpaNetwork(self, i))
+            # Assign interfaces to given names
+            self.nan_simulator.register_interface(info, self.interfaces[i])
+
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.startup())
+
         super().__init__(target=self.loop.run_forever)
+
         self.start()
 
     def terminate(self):
