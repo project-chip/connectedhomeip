@@ -158,7 +158,7 @@ class BouffalolabBuilder(GnBuilder):
                 raise Exception(f"SoC {bouffalo_chip} does NOT support connectivity Ethernet/Wi-Fi currently.")
         elif bouffalo_chip == "bl616":
             sdk_path = os.path.join(root, os.path.split(os.path.realpath(__file__))[
-                                    0], '../../../third_party/bouffalolab/bouffalo_sdk/VERSION')
+                                    0], '../../../third_party/bouffalolab/repo_bouffalo_sdk/VERSION')
             x, y, z = self.extract_sdk_version(sdk_path)
             self.argsOpt.append(f'app_ver_x={x}')
             self.argsOpt.append(f'app_ver_y={y}')
@@ -213,7 +213,7 @@ class BouffalolabBuilder(GnBuilder):
                 else:
                     self.argsOpt.append('openthread_package_version="ed6235304"')
                     self.argsOpt.append(
-                        'openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/bouffalo_sdk/components/wireless/thread/openthread"')
+                        'openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo_bouffalo_sdk/components/wireless/thread/openthread"')
 
         if enable_cdc:
             if bouffalo_chip != "bl702":

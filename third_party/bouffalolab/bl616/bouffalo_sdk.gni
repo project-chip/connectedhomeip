@@ -19,7 +19,7 @@ import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
   # Location of the bl616 SDK.
-  bouffalo_sdk_root = "${chip_root}/third_party/bouffalolab/bouffalo_sdk"
+  bouffalo_sdk_root = "${chip_root}/third_party/bouffalolab/repo_bouffalo_sdk"
 
   enable_debug_coredump = false
   coredump_binary_id = 0
