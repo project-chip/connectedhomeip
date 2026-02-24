@@ -6,7 +6,6 @@ from typing import Literal, Self
 log = logging.getLogger(__name__)
 
 
-
 class StartStopContextMixin(ABC):
     @abstractmethod
     def start(self) -> None: ...
@@ -26,9 +25,11 @@ class StartStopContextMixin(ABC):
         if exc_type is None:
             log.debug("Stopping %s", self.name)
         elif issubclass(exc_type, KeyboardInterrupt):
-            log.debug("Interrupting %s", self.name)
+            log.warning("Interrupting %s per user request", self.name)
+        elif exc is not None and tb is not None:
+            log.exception("Stopping %s due to exception", self.name, exc_info=(exc_type, exc, tb))
         else:
-            log.debug("Stopping %s due to exception", self.name)
+            log.exception("Stopping %s due to exception: %r", self.name, exc)
 
         self.stop()
         return False

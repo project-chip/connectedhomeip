@@ -16,7 +16,7 @@ from multiprocessing.managers import SyncManager
 from pathlib import Path
 from typing import ClassVar, Concatenate, Generic, Iterator, ParamSpec, Self, TypeVar
 
-from .log_utils import LogConfig
+from chiptest.log_utils import LogConfig
 from .queue import EndOfWork, WorkQueue, WorkQueueCancelled
 from .state import ProcessGroupState, ProcessState
 
@@ -24,15 +24,16 @@ log = logging.getLogger(__name__)
 
 
 @contextmanager
-def mp_wrapped_spawn_context(wrapper: str | None,
-                             source_context: SpawnContext = multiprocessing.get_context("spawn")) -> Iterator[SpawnContext]:
+def mp_wrapped_spawn_context(wrapper_linux: str | None) -> Iterator[SpawnContext]:
     """Create platform-specific multiprocessing context.
 
     Linux:
     - We need to use spawn for the pool to have separate environment variables per runner, and to be able to use a wrapper script.
-    - We need unshare wrapper script to have an option to mount per-worker /tmp.
+    - We need unshare wrapper script to have an option to mount per-worker /tmp (initialized per-worker).
     """
-    if sys.platform != "linux" or wrapper is None:
+    source_context = multiprocessing.get_context("spawn")
+
+    if sys.platform != "linux" or wrapper_linux is None:
         yield source_context
         return
 
@@ -42,7 +43,7 @@ def mp_wrapped_spawn_context(wrapper: str | None,
     try:
         with tempfile.NamedTemporaryFile("w", encoding="utf8", delete=False) as wrapper_file:
             mp_wrapper_name = Path(wrapper_file.name)
-            wrapper_file.write(f'#!/bin/sh\nexec {wrapper} {executable} "$@"')
+            wrapper_file.write(f'#!/bin/sh\nexec {wrapper_linux} {executable} "$@"')
         mp_wrapper_name.chmod(mp_wrapper_name.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
         source_context.set_executable(str(mp_wrapper_name))

@@ -136,8 +136,16 @@ class WorkQueue(Generic[WorkRequestT, WorkResponseT]):
     def get_rsp_or_cancel(self, timeout: float | None = None) -> WorkResponseT:
         return self._rsp.get_or_cancel(timeout)
 
+    @property
+    def cancelled(self) -> bool:
+        return self._cancel_event.is_set()
+
     def cancel(self) -> None:
         """Set cancel event and notify all consumers."""
+        # Fast path check without acquiring the condition, to avoid unnecessary locking when cancellation is already observed.
+        if self.cancelled:
+            return
+
         with contextlib.ExitStack() as stack, self._rsp:
             for req_queue in self._req:
                 stack.enter_context(req_queue)

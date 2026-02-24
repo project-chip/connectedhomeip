@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeAli
 from xmlrpc.server import SimpleXMLRPCServer
 
 from .mp_utils.common import StartStopContextMixin
-from .mp_utils.log_utils import LogConfig
+from .log_utils import LogConfig
 from .mp_utils.process import ProcessConfigTemplate, WrappedProcess, mp_wrapped_spawn_context
 from .mp_utils.queue import WorkQueue, WorkQueueCancelled
 
@@ -147,7 +147,7 @@ class XmlRpcServerProcessManager(threading.Thread):
     def run(self) -> None:
         log.debug("Starting server process")
         try:
-            with (mp_wrapped_spawn_context(self._apps.net_ns_wrapper) as ctx,
+            with (mp_wrapped_spawn_context(wrapper_linux=self._apps.net_ns_wrapper) as ctx,
                   XmlRpcServerProcess(ctx, self._mp_manager, self._work_queue, self._apps.log_config) as server):
                 log.debug("XMLRPC Server process started")
                 self._init_done.set()

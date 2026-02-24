@@ -29,8 +29,8 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT, ConfigT, WorkRequestT, Wo
                                        self.state)
                            for id in range(concurrency))
 
-    def __len__(self) -> int:
-        return len(self._pool)
+    def collect_exceptions(self) -> bool:
+        return self.state.collect_exceptions()
 
     def _execute_for_all_workers(self, fn: Callable[[WrappedProcessT], None], exception_message: str) -> None:
         exceptions: list[Exception] = []
@@ -52,6 +52,8 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT, ConfigT, WorkRequestT, Wo
             raise
 
     def stop(self) -> None:
+        self.work_queue.cancel()
+
         if self.state.phase_min == ProcessState.Phase.CLOSED:
             return
 

@@ -1,5 +1,3 @@
-# TODO: Move up a level.
-
 import logging
 from dataclasses import dataclass
 from functools import cache
@@ -40,3 +38,6 @@ class LogConfig:
 
     def set_log_fmt(self, logger: logging.Logger | None = None, task: str | None = None):
         coloredlogs.install(level=self.log_level_int, fmt=self.get_log_format(task), logger=logger)
+
+
+LOG_LEVELS = tuple(coloredlogs.find_defined_levels().keys())

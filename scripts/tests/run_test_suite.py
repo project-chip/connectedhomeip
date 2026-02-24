@@ -28,14 +28,15 @@ from typing import Any, Protocol
 
 import chiptest
 import click
-import coloredlogs
-import tempfile
-from chiptest.concurrent import TestPoolManager, TestJobConfig, WorkerError
+from chiptest.concurrent.config import TestJobConfig, TestSchedulerType
+from chiptest.concurrent.worker import WorkerError
+from chiptest.concurrent.pool import TestPool
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.mp_utils.log_utils import LogConfig
+from scripts.tests.chiptest.log_utils import LogConfig
 from chiptest.runner import SubprocessKind
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
+from chiptest.log_utils import LOG_LEVELS
 
 log = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.option(
     '--log-level',
     default='info',
-    type=click.Choice(tuple(coloredlogs.find_defined_levels().keys()), case_sensitive=False),
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
     '--target',
@@ -417,16 +418,18 @@ class Terminable(Protocol):
     type=float,
     help='Periodically show the status of test execution. <0: automatic period, 0: turn off, other values: periodicity of report in seconds.'
 )
-@click.option(  # TODO: Refactor to --concurrency-mode
-    '--concurrency-fast',
-    is_flag=True,
-    default=False,
-    help='TODO'
+@click.option(
+    '--concurrency-mode',
+    type=click.Choice(TestSchedulerType, case_sensitive=False),  # type: ignore[arg-type]
+    default=TestSchedulerType.REPRODUCIBLE,
+    help=('Type of scheduler to use when running tests concurrently. "reproducible" is the default scheduler that tries to '
+          'minimize randomness in test execution order, while "fast" scheduler prioritizes overall execution time over '''
+          'reproducibility.')
 )
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
             help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
-            commissioning_method: str, concurrency: int, concurrency_status: float, concurrency_fast: bool,
+            commissioning_method: str, concurrency: int, concurrency_status: float, concurrency_mode: TestSchedulerType,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -519,14 +522,13 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
         log.info("Each test will be executed %d times", iterations)
 
-    config = TestJobConfig(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_fast,
+    config = TestJobConfig(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_mode,
                            dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds, iterations, keep_going,
                            expected_failures)
-    pool = TestPoolManager(context.obj.log_config, config)
     try:
-        pool.run_tests(context.obj.tests)
+        TestPool.run_tests(context.obj.log_config, config, context.obj.tests)
     except WorkerError as e:
-        log.error("%s", e)
+        log.exception("%s", e, exc_info=e)
         sys.exit(1)
 
 

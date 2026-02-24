@@ -1,0 +1,209 @@
+import dataclasses
+import logging
+import os
+import queue
+import subprocess
+import sys
+import time
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Protocol, TypeVar
+
+import chiptest
+
+if sys.platform == "linux":
+    import chiptest.linux as linux
+elif sys.platform == "darwin":
+    import chiptest.darwin as darwin
+
+from chiptest.accessories import AppsRegister
+from chiptest.mp_utils.process import ProcessState, WrappedProcess
+from chiptest.runner import Executor
+from chiptest.test_definition import TestDefinition
+from .config import WorkerConfig
+
+log = logging.getLogger(__name__)
+
+
+class WorkerError(RuntimeError):
+    pass
+
+
+@dataclasses.dataclass
+class WorkerJob:
+    iteration: int
+    test: TestDefinition
+
+@dataclasses.dataclass
+class WorkerResult:
+    job: WorkerJob
+    worker_id: int | None = None
+    runtime: float | None = None
+    exception: BaseException | None = None
+
+
+class Terminable(Protocol):
+    def terminate(self) -> None: ...
+
+
+ToCleanT = TypeVar("ToCleanT", bound=Terminable)
+
+
+class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
+    def _add_to_clean(self, component: ToCleanT) -> ToCleanT | None:
+        """Add a component to be cleaned up on process termination.
+
+        Returning Optional to hint that in case of cleanup the reference will be set to None. These fields should be explicily
+        checked for None before use.
+        """
+        self._to_clean.put(component)
+        return component
+
+    def _proc_init(self) -> None:
+        self._to_clean: queue.LifoQueue[Terminable] = queue.LifoQueue()
+        self.mgmt_ns_wrapper: str | None = None
+        self.ble_controller_app: int | None = None
+        self.ble_controller_tool: int | None = None
+        self.thread_ba_host: str | None = None
+        self.thread_ba_port: int | None = None
+
+        # Initialize platform-specific executor.
+        self.executor = self._add_to_clean(executor := self._platform_init())
+
+        # Finalize common parts.
+        self.runner = chiptest.runner.Runner(executor)
+        self.apps_register = self._add_to_clean(apps := AppsRegister(self.mgmt_ns_wrapper, self._config.log_config))
+        apps.init()
+
+    @abstractmethod
+    def _platform_init(self) -> Executor:
+        """Initialize platform-specific executor."""
+
+    def _proc_work(self) -> None:
+        while True:
+            work = self.work_queue.get_req_or_cancel()
+            self.state.phase = ProcessState.Phase.WORKING
+            self.work_queue.put_rsp(self._run_test(work))
+            self.state.phase = ProcessState.Phase.READY
+
+    def _run_test(self, job: WorkerJob) -> WorkerResult:
+        result = WorkerResult(job, self._config.id)
+        test_start = time.monotonic()  # Initialize here to also cover the case when the test fails to start.
+        try:
+            if self.apps_register is None:
+                raise RuntimeError("Invalid state of the worker")
+
+            self._config.log_config.set_log_fmt(log, job.test.name)
+
+            log.info("Would run test" if self._config.dry_run else "Starting test")
+            test_start = time.monotonic()
+            job.test.Run(self.runner, self.apps_register, self._config.subproc_info_repo, self._config.pics_file,
+                         self._config.test_timeout_seconds, self._config.dry_run, self._config.runtime,
+                         ble_controller_app=self.ble_controller_app,
+                         ble_controller_tool=self.ble_controller_tool,
+                         op_network='Thread' if self._config.thread_required else 'WiFi',
+                         thread_ba_host=self.thread_ba_host,
+                         thread_ba_port=self.thread_ba_port)
+            result.runtime = time.monotonic() - test_start
+
+            if not self._config.dry_run:
+                log.info("✅ Completed in %0.2f seconds", result.runtime)
+        except BaseException as e:
+            result.runtime = time.monotonic() - test_start
+            result.exception = e
+
+            if isinstance(e, KeyboardInterrupt):
+                log.info("❔ Cancelled after %0.2f seconds", result.runtime)
+                raise
+
+            # TODO: Use proper path construction.
+            if Path('/tmp/thread.pcap').exists():
+                os.system("echo 'base64 -d - >/tmp/thread.pcap <<EOF' && base64 /tmp/thread.pcap && echo EOF")
+
+            log.exception("❌ Failed in %0.2f seconds", result.runtime, exc_info=True)
+        finally:
+            self._config.log_config.set_log_fmt(log, None)
+            return result
+
+    def _proc_cleanup(self):
+        log.debug("Cleaning up state of the worker")
+
+        while not self._to_clean.empty():
+            # During termination treat exceptions as warnings to ensure that all items get a chance to terminate.
+            try:
+                item = self._to_clean.get_nowait()
+
+                # Get member name if exists.
+                if (name := next((attr for attr, val in vars(self).items() if val == item), None)) is not None:
+                    log.debug("Cleaning up %s (%s)", name, item.__class__.__name__)
+                    setattr(self, name, None)
+                else:
+                    log.debug("Cleaning up %s", item.__class__.__name__)
+                item.terminate()
+            except BaseException as e:
+                log.warning("Exception during cleanup: %s", e)
+
+
+if sys.platform == "linux":
+
+    class LinuxWorkerProcess(WorkerProcess):
+        def _platform_init(self) -> Executor:
+            log.debug("Initializing Linux test executor.")
+
+            # Create a virtual /tmp.
+            tmp_dir_default = self._config.tmp_dir_default
+            tmp_dir = self._config.tmp_dir_worker_base / str(self._config.id)
+            tmp_dir.mkdir(parents=True, exist_ok=True)
+
+            log.info("Remounting %s as %s for the worker", tmp_dir, tmp_dir_default)
+            if subprocess.run(["mount", "-o", "bind", str(tmp_dir), str(tmp_dir_default)]).returncode != 0:
+                raise RuntimeError(f"Failed to mount a virtual {tmp_dir_default}")
+
+            self.net_ns = self._add_to_clean(net_ns := linux.IsolatedNetworkNamespace(
+                index=self._config.id,
+                # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+                app_link_up=not self._config.wifi_required,
+                add_ula=not self._config.thread_required,
+                # Change the app link name so the interface will be recognized as WiFi or Ethernet
+                # depending on the commissioning method used.
+                app_name='wlx-app' if self._config.wifi_required else 'eth-app'))
+            self.mgmt_ns_wrapper = net_ns.mgmt_ns.netns_cmd_wrapper
+
+            if self._config.commissioning_method == 'ble-wifi':
+                self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
+                self.bluetooth = self._add_to_clean(linux.BluetoothMock())
+                self.wifi = self._add_to_clean(linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", net_ns))
+                self.ble_controller_app = 0   # Bind app to the first BLE controller
+                self.ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif self._config.commissioning_method == 'ble-thread':
+                self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
+                self.bluetooth = self._add_to_clean(linux.BluetoothMock())
+                self.thread = self._add_to_clean(linux.ThreadBorderRouter(net_ns))
+                self.ble_controller_app = 0   # Bind app to the first BLE controller
+                self.ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif self._config.commissioning_method == 'thread-meshcop':
+                self.thread = self._add_to_clean(thread := linux.ThreadBorderRouter(net_ns))
+                self.thread_ba_host = thread.get_border_agent_host()
+                self.thread_ba_port = thread.get_border_agent_port()
+
+            return linux.LinuxNamespacedExecutor(net_ns)
+
+    WorkerProcessCls = LinuxWorkerProcess
+
+elif sys.platform == "darwin":
+
+    class DarwinWorkerProcess(WorkerProcess):
+        def _platform_init(self) -> Executor:
+            log.debug("Initializing Darwin test executor.")
+            return darwin.DarwinExecutor()
+
+    WorkerProcessCls = DarwinWorkerProcess
+
+else:
+
+    class GenericWorkerProcess(WorkerProcess):
+        def _platform_init(self) -> Executor:
+            log.warning("No platform-specific executor for '%s'", sys.platform)
+            return Executor()
+
+    WorkerProcessCls = GenericWorkerProcess

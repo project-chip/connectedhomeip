@@ -41,9 +41,15 @@ class ProcessGroupState:
         with self._state_changed:
             return self._state_changed.wait_for(lambda: predicate(self._states), timeout)
 
-    def collect_exceptions(self) -> None:
+    def collect_exceptions(self) -> bool:
+        """Collect exceptions from all processes.
+
+        Raise them as an ExceptionGroup if there are any, or return True if there are no exceptions, which allows to use this method
+        in a predicate for wait_for.
+        """
         if (exceptions := tuple(state.exception for state in self._states if isinstance(state.exception, Exception))):
             raise ExceptionGroup("Caught exceptions in processes", exceptions)
+        return True
 
 
 class ProcessState:
