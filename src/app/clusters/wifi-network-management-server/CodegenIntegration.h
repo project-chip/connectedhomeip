@@ -32,7 +32,7 @@ namespace chip::app::Clusters {
 /// std::optional<WiFiNetworkManagementServer> gServer;
 /// void emberAfWiFiNetworkManagementClusterInitCallback(EndpointId endpoint)
 /// {
-///     SuccessOrDie(gServer.emplace(endpoint).Register());
+///     SuccessOrDie(gServer.emplace(endpoint).Init());
 /// }
 /// @endcode
 class WiFiNetworkManagementServer : public WiFiNetworkManagementCluster
@@ -43,13 +43,11 @@ public:
     ~WiFiNetworkManagementServer();
 
     /// Registers this cluster with the CodegenDataModelProvider.
-    /// Can also be spelled Init() for compatibility with existing code.
-    CHIP_ERROR Register();
-    CHIP_ERROR Init() { return Register(); }
+    CHIP_ERROR Init();
 
     /// Unregisters this cluster from the CodegenDataModelProvider.
     /// Unregistration happens automatically during destruction if necessary.
-    CHIP_ERROR Unregister(ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
+    CHIP_ERROR Deinit(ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
 
 private:
     ServerClusterRegistration mRegistration{ *this };

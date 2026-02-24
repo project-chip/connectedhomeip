@@ -23,15 +23,15 @@ using namespace chip::app::Clusters;
 
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
-    LogErrorOnFailure(Unregister().NoErrorIf(CHIP_ERROR_NOT_FOUND));
+    LogErrorOnFailure(Deinit().NoErrorIf(CHIP_ERROR_NOT_FOUND));
 }
 
-CHIP_ERROR WiFiNetworkManagementServer::Register()
+CHIP_ERROR WiFiNetworkManagementServer::Init()
 {
     return CodegenDataModelProvider::Instance().Registry().Register(mRegistration);
 }
 
-CHIP_ERROR WiFiNetworkManagementServer::Unregister(ClusterShutdownType clusterShutdownType)
+CHIP_ERROR WiFiNetworkManagementServer::Deinit(ClusterShutdownType clusterShutdownType)
 {
     return CodegenDataModelProvider::Instance().Registry().Unregister(this, clusterShutdownType);
 }

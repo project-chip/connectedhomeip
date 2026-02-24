@@ -172,6 +172,18 @@ TEST_F(TestWiFiNetworkManagementCluster, SetNetworkCredentialsValidation)
     // Valid credentials should succeed
     const uint8_t validPassword[] = { 'v', 'a', 'l', 'i', 'd', 'p', 'a', 's', 's' };
     EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(validPassword)), CHIP_NO_ERROR);
+
+    // Valid 64-byte hex PSK
+    const uint8_t validHexPsk[64] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+                                      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+                                      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+                                      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(validHexPsk)), CHIP_NO_ERROR);
+
+    // Invalid 64-byte non-hex PSK (contains 'G')
+    uint8_t invalidHexPsk[64];
+    std::fill(std::begin(invalidHexPsk), std::end(invalidHexPsk), uint8_t('G'));
+    EXPECT_EQ(cluster.SetNetworkCredentials(ByteSpan(ssidData), ByteSpan(invalidHexPsk)), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestWiFiNetworkManagementCluster, PassphraseSurrogateChangesOnPassphraseChange)
