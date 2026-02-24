@@ -36,14 +36,16 @@ template <typename RawType, typename Converter>
 class BflbScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    BflbScanResponseIterator(size_t size, const RawType* pScanResults, Converter conv)
-        : mSize(size), mpRawResults(pScanResults), mConvert(std::move(conv)) {}
+    BflbScanResponseIterator(size_t size, const RawType * pScanResults, Converter conv) :
+        mSize(size), mpRawResults(pScanResults), mConvert(std::move(conv))
+    {}
     size_t Count() override { return mSize; }
     void Release() override {}
 
-    bool Next(WiFiScanResponse& item) override
+    bool Next(WiFiScanResponse & item) override
     {
-        if (mIternum >= mSize || mpRawResults == nullptr) {
+        if (mIternum >= mSize || mpRawResults == nullptr)
+        {
             return false;
         }
 
@@ -51,19 +53,19 @@ public:
         ++mIternum;
         return true;
     }
+
 private:
     const size_t mSize;
     size_t mIternum = 0;
 
-    const RawType* mpRawResults;
+    const RawType * mpRawResults;
     Converter mConvert;
 };
 
-template<typename RawType, typename Converter>
-auto makeBflbScanIterator(size_t count, const RawType* results, Converter&& conv) {
-    return BflbScanResponseIterator<RawType, std::decay_t<Converter>>(
-        count, results, std::forward<Converter>(conv)
-    );
+template <typename RawType, typename Converter>
+auto makeBflbScanIterator(size_t count, const RawType * results, Converter && conv)
+{
+    return BflbScanResponseIterator<RawType, std::decay_t<Converter>>(count, results, std::forward<Converter>(conv));
 }
 
 class BflbWiFiDriver final : public WiFiDriver

@@ -20,7 +20,6 @@
 #include <platform/CHIPDeviceEvent.h>
 #include <system/SystemPacketBuffer.h>
 
-
 namespace chip {
 namespace DeviceLayer {
 

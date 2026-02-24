@@ -82,10 +82,12 @@ NetworkIterator * BflbEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
     memset(ret->interfaceName, 0, sizeof(ret->interfaceName));
-    if (netif_index_to_name(0, SafePointerCast<char *>(ret->interfaceName))) {
+    if (netif_index_to_name(0, SafePointerCast<char *>(ret->interfaceName)))
+    {
         ret->interfaceNameLen = NETIF_NAMESIZE;
     }
-    else {
+    else
+    {
         ret->interfaceNameLen = 0;
     }
     return ret;

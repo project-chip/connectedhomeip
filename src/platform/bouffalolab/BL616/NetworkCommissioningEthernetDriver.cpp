@@ -16,10 +16,10 @@
  */
 
 #include <FreeRTOS.h>
-#include <task.h>
 #include <lwip/dhcp6.h>
-#include <lwip/netifapi.h>
 #include <lwip/ethip6.h>
+#include <lwip/netifapi.h>
+#include <task.h>
 
 extern "C" {
 #include <eth_phy.h>
@@ -44,17 +44,19 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-void lwip_status_update_task(void *pvParameters)
+void lwip_status_update_task(void * pvParameters)
 {
     /* Infinite loop */
-    while (1) {
+    while (1)
+    {
         vTaskDelay(200);
 
         /* update link status */
         eth_link_state_update(&gnetif);
 
         LOCK_TCPIP_CORE();
-        if (!gnetif.ip6_autoconfig_enabled && netif_is_link_up(&gnetif)) {
+        if (!gnetif.ip6_autoconfig_enabled && netif_is_link_up(&gnetif))
+        {
             gnetif.flags |= NETIF_FLAG_ETHERNET | NETIF_FLAG_MLD6;
             gnetif.output_ip6 = ethip6_output;
             netif_create_ip6_linklocal_address(&gnetif, 1);
@@ -95,14 +97,14 @@ void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_t reason, c
 
 CHIP_ERROR BflbEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
-    VerifyOrDie (netif_add(&gnetif, NULL, NULL, NULL, NULL, &eth_emac_if_init, &tcpip_input));
+    VerifyOrDie(netif_add(&gnetif, NULL, NULL, NULL, NULL, &eth_emac_if_init, &tcpip_input));
 
     LOCK_TCPIP_CORE();
     netif_set_default(&gnetif);
     netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
     UNLOCK_TCPIP_CORE();
 
-    xTaskCreate(lwip_status_update_task, (char *)"lwip_sta_update", 256, NULL, osPriorityHigh, NULL);
+    xTaskCreate(lwip_status_update_task, (char *) "lwip_sta_update", 256, NULL, osPriorityHigh, NULL);
 
     return CHIP_NO_ERROR;
 }
@@ -111,10 +113,12 @@ NetworkIterator * BflbEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
     memset(ret->interfaceName, 0, sizeof(ret->interfaceName));
-    if (netif_index_to_name(0, SafePointerCast<char *>(ret->interfaceName))) {
+    if (netif_index_to_name(0, SafePointerCast<char *>(ret->interfaceName)))
+    {
         ret->interfaceNameLen = NETIF_NAMESIZE;
     }
-    else {
+    else
+    {
         ret->interfaceNameLen = 0;
     }
     return ret;

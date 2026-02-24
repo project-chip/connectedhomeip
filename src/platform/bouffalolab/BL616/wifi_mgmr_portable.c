@@ -4,8 +4,8 @@
 #include <FreeRTOS.h>
 #include <lwip/tcpip.h>
 
-#include <wifi_mgmr_ext.h>
 #include <fhost_api.h>
+#include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_portable.h>
 
 #define WIFI_STACK_SIZE (1536)

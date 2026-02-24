@@ -68,7 +68,8 @@ void wifi_mgmr_get_scan_result(wifi_mgmr_ap_item_t * result, int * num, int ssid
         {
             if (ssid_len)
             {
-                if (wifiMgmr.scan_items[i].ssid_len != ssid_len || memcmp(ssid, wifiMgmr.scan_items[i].ssid, wifiMgmr.scan_items[i].ssid_len) != 0)
+                if (wifiMgmr.scan_items[i].ssid_len != ssid_len ||
+                    memcmp(ssid, wifiMgmr.scan_items[i].ssid, wifiMgmr.scan_items[i].ssid_len) != 0)
                 {
                     continue;
                 }
@@ -141,8 +142,11 @@ static void wifi_event_handler_raw(input_event_t * event, void * private_data)
     wifi_event_handler(event->code);
 }
 
-err_t dhcp_server_stop(struct netif *netif) { return 0; }
-void dhcpd_start(struct netif *netif, int start, int limit) {}
+err_t dhcp_server_stop(struct netif * netif)
+{
+    return 0;
+}
+void dhcpd_start(struct netif * netif, int start, int limit) {}
 
 void wifi_start_firmware_task(void)
 {

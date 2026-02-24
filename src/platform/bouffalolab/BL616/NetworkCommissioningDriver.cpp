@@ -36,16 +36,16 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-auto converter = [](const wifi_mgmr_scan_item_t& raw) -> WiFiScanResponse {
+auto converter = [](const wifi_mgmr_scan_item_t & raw) -> WiFiScanResponse {
     WiFiScanResponse item;
 
     item.security.SetRaw(raw.auth);
-    item.ssidLen  = (uint32_t) (raw.ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-         ? raw.ssid_len
-         : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
-    item.channel  = raw.channel;
-    item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-    item.signal.type = WirelessSignalType::kdBm;
+    item.ssidLen         = (uint32_t) (raw.ssid_len) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+                ? raw.ssid_len
+                : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+    item.channel         = raw.channel;
+    item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+    item.signal.type     = WirelessSignalType::kdBm;
     item.signal.strength = raw.rssi;
     memcpy(item.ssid, raw.ssid, item.ssidLen);
     memcpy(item.bssid, raw.bssid, 6);
@@ -111,7 +111,7 @@ bool BflbWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkI
 }
 
 Status BflbWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
-                                        uint8_t & outNetworkIndex)
+                                          uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -241,10 +241,10 @@ void BflbWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * call
 
 void BflbWiFiDriver::OnScanWiFiNetworkDone()
 {
-    uint32_t nums = wifi_mgmr_sta_scanlist_nums_get();
+    uint32_t nums                          = wifi_mgmr_sta_scanlist_nums_get();
     struct wifi_mgmr_scan_item * pScanList = nullptr;
-    wifi_mgmr_scan_item_t * pScanResult = nullptr;
-    uint32_t scanResultNum = 0;
+    wifi_mgmr_scan_item_t * pScanResult    = nullptr;
+    uint32_t scanResultNum                 = 0;
 
     if (nums)
     {
@@ -272,16 +272,19 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone()
     }
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([scanResultNum, pScanResult, pScanList]() {
-        if (GetInstance().mpScanCallback) {
+        if (GetInstance().mpScanCallback)
+        {
             BflbScanResponseIterator iter(scanResultNum, pScanResult, converter);
             GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
         }
-        else {
+        else
+        {
             ChipLogError(DeviceLayer, "can't find the ScanCallback function");
         }
     });
 
-    if (pScanList) {
+    if (pScanList)
+    {
         MemoryFree(pScanList);
     }
     mScanSSIDlength = 0;
@@ -407,7 +410,7 @@ void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-extern "C" void wifi_event_handler(async_input_event_t ev, void *priv)
+extern "C" void wifi_event_handler(async_input_event_t ev, void * priv)
 {
     ChipDeviceEvent event;
     uint32_t code = ev->code;

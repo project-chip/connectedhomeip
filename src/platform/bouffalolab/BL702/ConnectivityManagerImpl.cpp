@@ -22,8 +22,8 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
@@ -121,15 +121,17 @@ extern "C" void wifiInterface_eventScanDone(struct netif * interface, netbus_fs_
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args)
 {
-    if (nullptr == args || nullptr == nif) {
+    if (nullptr == args || nullptr == nif)
+    {
         return;
     }
 
-    if ((LWIP_NSC_IPV4_SETTINGS_CHANGED) & reason)
+    if ((LWIP_NSC_IPV4_SETTINGS_CHANGED) &reason)
     {
         if (memcmp(netif_ip4_addr(nif), args->ipv4_changed.old_address, sizeof(ip4_addr_t)) ||
             memcmp(netif_ip4_netmask(nif), args->ipv4_changed.old_netmask, sizeof(ip4_addr_t)) ||
-            memcmp(netif_ip4_gw(nif), args->ipv4_changed.old_gw, sizeof(ip4_addr_t))) {
+            memcmp(netif_ip4_gw(nif), args->ipv4_changed.old_gw, sizeof(ip4_addr_t)))
+        {
             ConnectivityMgrImpl().OnConnectivityChanged(nif);
             return;
         }

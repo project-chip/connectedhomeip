@@ -35,26 +35,30 @@ extern "C" struct netif * deviceInterface_getNetif(void);
 #if CHIP_DEVICE_LAYER_TARGET_BL616
 void get_usage_info(uint64_t & used_size, uint64_t & free_size)
 {
-    uintptr_t irq_flags = mm_lock_save();
-    mem_manager_t *manager = &g_mem_manager;
-    mm_heap_t *heap;
-    const mm_allocator_t *allocator;
+    uintptr_t irq_flags     = mm_lock_save();
+    mem_manager_t * manager = &g_mem_manager;
+    mm_heap_t * heap;
+    const mm_allocator_t * allocator;
     struct mm_usage_info usage;
     int heap_id = 0;
 
     used_size = free_size = 0;
-    for (heap_id = 0; heap_id < CONFIG_MM_HEAP_COUNT; heap_id ++) {
-        if (!manager->initialized) {
+    for (heap_id = 0; heap_id < CONFIG_MM_HEAP_COUNT; heap_id++)
+    {
+        if (!manager->initialized)
+        {
             break;
         }
 
         heap = manager->heaps[heap_id];
-        if (!heap || !heap->is_active) {
+        if (!heap || !heap->is_active)
+        {
             continue;
         }
 
         allocator = manager->allocators[heap->allocator_id];
-        if (!allocator || !allocator->get_usage_info) {
+        if (!allocator || !allocator->get_usage_info)
+        {
             continue;
         }
 
@@ -89,7 +93,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 #ifdef CFG_USE_PSRAM
     currentHeapFree = xPortGetFreeHeapSize() + xPortGetFreeHeapSizePsram();
 #else
-    currentHeapFree = xPortGetFreeHeapSize();
+    currentHeapFree          = xPortGetFreeHeapSize();
 #endif
 #endif
 
@@ -105,7 +109,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 #ifdef CFG_USE_PSRAM
     currentHeapUsed = (get_heap_size() + get_heap3_size() - xPortGetFreeHeapSize() - xPortGetFreeHeapSizePsram());
 #else
-    currentHeapUsed = (get_heap_size() - xPortGetFreeHeapSize());
+    currentHeapUsed          = (get_heap_size() - xPortGetFreeHeapSize());
 #endif
 #endif
 
@@ -285,12 +289,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     }
 
     Platform::CopyString(ifp->Name, netif->name);
-    ifp->name           = CharSpan::fromCharString(ifp->Name);
-    ifp->isOperational  = true;
+    ifp->name          = CharSpan::fromCharString(ifp->Name);
+    ifp->isOperational = true;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    ifp->type           = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+    ifp->type          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
 #else
-    ifp->type           = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
+    ifp->type                = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
 #endif
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
@@ -306,15 +310,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     {
         if (interfAddrIterator.GetAddress(ipAddress) == CHIP_NO_ERROR)
         {
-            if (ipAddress.IsIPv4()) {
-                if (ipv4AddressesCount < kMaxIPv4AddrCount) {
+            if (ipAddress.IsIPv4())
+            {
+                if (ipv4AddressesCount < kMaxIPv4AddrCount)
+                {
                     memcpy(ifp->Ipv4AddressesBuffer[ipv4AddressesCount], ipAddress.Addr, kMaxIPv4AddrSize);
                     ifp->Ipv4AddressSpans[ipv4AddressesCount] = ByteSpan(ifp->Ipv4AddressesBuffer[ipv4AddressesCount]);
                     ipv4AddressesCount++;
                 }
             }
-            else {
-                if (ipv6AddressesCount < kMaxIPv6AddrCount) {
+            else
+            {
+                if (ipv6AddressesCount < kMaxIPv6AddrCount)
+                {
                     memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipAddress.Addr, kMaxIPv6AddrSize);
                     ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
                     ipv6AddressesCount++;
@@ -330,7 +338,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     return CHIP_NO_ERROR;
 }
-
 
 void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
 {

@@ -20,8 +20,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 
-#include <lwip/tcpip.h>
 #include <lwip/ethip6.h>
+#include <lwip/tcpip.h>
 
 #include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_portable.h>
@@ -37,12 +37,11 @@ auto converter = [](const wifi_mgmr_ap_item_t & raw) -> WiFiScanResponse {
     WiFiScanResponse item;
 
     item.security.SetRaw(raw.auth);
-    item.ssidLen  = raw.ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-         ? raw.ssid_len
-         : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
-    item.channel  = raw.channel;
-    item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-    item.signal.type = WirelessSignalType::kdBm;
+    item.ssidLen         = raw.ssid_len < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength ? raw.ssid_len
+                                                                                          : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+    item.channel         = raw.channel;
+    item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+    item.signal.type     = WirelessSignalType::kdBm;
     item.signal.strength = raw.rssi;
     memcpy(item.ssid, raw.ssid, item.ssidLen);
     memcpy(item.bssid, raw.bssid, 6);
@@ -109,7 +108,7 @@ bool BflbWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkI
 }
 
 Status BflbWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
-                                        uint8_t & outNetworkIndex)
+                                          uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -256,35 +255,41 @@ void BflbWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * call
 
 void BflbWiFiDriver::OnScanWiFiNetworkDone()
 {
-    int ap_num = 0;
+    int ap_num                        = 0;
     wifi_mgmr_ap_item_t * pScanResult = nullptr;
 
     ap_num = wifi_mgmr_get_scan_ap_num();
     if (ap_num)
     {
-        if (mScanSSIDlength) {
+        if (mScanSSIDlength)
+        {
             ap_num = 1;
         }
         pScanResult = (wifi_mgmr_ap_item_t *) pvPortMalloc(ap_num * sizeof(wifi_mgmr_ap_item_t));
     }
-    if (pScanResult) {
+    if (pScanResult)
+    {
         wifi_mgmr_get_scan_result(pScanResult, &ap_num, mScanSSIDlength, mScanSSID);
     }
-    else {
+    else
+    {
         ap_num = 0;
     }
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([ap_num, pScanResult]() {
-        if (GetInstance().mpScanCallback) {
+        if (GetInstance().mpScanCallback)
+        {
             BflbScanResponseIterator iter(ap_num, pScanResult, converter);
             GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
         }
-        else {
+        else
+        {
             ChipLogError(DeviceLayer, "can't find the ScanCallback function");
         }
     });
 
-    if (pScanResult) {
+    if (pScanResult)
+    {
         vPortFree(pScanResult);
     }
     mScanSSIDlength = 0;
@@ -470,7 +475,8 @@ extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_
 
     memset(&event, 0, sizeof(ChipDeviceEvent));
 
-    if ((LWIP_NSC_STATUS_CHANGED & reason) && args && !nif->ip6_autoconfig_enabled) {
+    if ((LWIP_NSC_STATUS_CHANGED & reason) && args && !nif->ip6_autoconfig_enabled)
+    {
         nif->flags |= NETIF_FLAG_ETHERNET | NETIF_FLAG_MLD6;
         nif->output_ip6 = ethip6_output;
         netif_create_ip6_linklocal_address(nif, 1);

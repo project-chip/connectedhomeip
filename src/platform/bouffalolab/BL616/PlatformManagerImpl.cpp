@@ -22,8 +22,8 @@
 
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -60,7 +60,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
     int iret_rfInit = -1;
 
     pt_table_set_flash_operation(bflb_flash_erase, bflb_flash_write, bflb_flash_read);
@@ -97,7 +97,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
 exit:

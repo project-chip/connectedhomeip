@@ -17,8 +17,8 @@
 
 #include <lib/support/SafePointerCast.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
@@ -27,7 +27,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-auto converter = [](const WiFiScanResponse& raw) -> WiFiScanResponse { return raw; };
+auto converter = [](const WiFiScanResponse & raw) -> WiFiScanResponse { return raw; };
 
 CHIP_ERROR BflbWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
@@ -46,11 +46,11 @@ CHIP_ERROR BflbWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChang
                                                    sizeof(mSavedNetwork.ssid), &ssidLen);
     SuccessOrExit(err);
 
-    mSavedNetwork.credentialsLen    = credentialsLen;
-    mSavedNetwork.ssidLen           = ssidLen;
+    mSavedNetwork.credentialsLen = credentialsLen;
+    mSavedNetwork.ssidLen        = ssidLen;
 
-    mStagingNetwork                 = mSavedNetwork;
-    mScanSSIDlength                 = 0;
+    mStagingNetwork = mSavedNetwork;
+    mScanSSIDlength = 0;
 
 exit:
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -64,8 +64,8 @@ exit:
 
 void BflbWiFiDriver::Shutdown()
 {
-    mpStatusChangeCallback  = nullptr;
-    mScanSSIDlength         = 0;
+    mpStatusChangeCallback = nullptr;
+    mScanSSIDlength        = 0;
     memset(mScanSSID, 0, sizeof(mScanSSID));
 }
 
@@ -92,7 +92,7 @@ bool BflbWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkI
 }
 
 Status BflbWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
-                                        uint8_t & outNetworkIndex)
+                                          uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -245,7 +245,8 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
             }
         }
 
-        ChipLogProgress(DeviceLayer, "Wi-Fi SSID scanned %d in total, %s matched SSID %s", pmsg->num, ap_num ? "with": "without", mScanSSID);
+        ChipLogProgress(DeviceLayer, "Wi-Fi SSID scanned %d in total, %s matched SSID %s", pmsg->num, ap_num ? "with" : "without",
+                        mScanSSID);
     }
     else
     {
@@ -298,21 +299,24 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone(void)
     WiFiScanResponse * pScanResponse = mScanResponse;
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([ap_cnt, pScanResponse]() {
-        if (GetInstance().mpScanCallback) {
+        if (GetInstance().mpScanCallback)
+        {
             BflbScanResponseIterator iter(ap_cnt, pScanResponse, converter);
             GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
         }
-        else {
+        else
+        {
             ChipLogError(DeviceLayer, "can't find the ScanCallback function");
         }
     });
 
-    if (mScanResponse) {
+    if (mScanResponse)
+    {
         free(mScanResponse);
     }
-    mScanResponse = nullptr;
+    mScanResponse    = nullptr;
     mScanResponseNum = 0;
-    mScanSSIDlength = 0;
+    mScanSSIDlength  = 0;
 }
 
 CHIP_ERROR GetConfiguredNetwork(Network & network)
