@@ -682,7 +682,7 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     if (!sIsNetworkProvisioned)
     {
         ThreadStackMgrImpl().SetRadioBlocked(false);
-        ThreadStackMgrImpl().SetThreadEnabled(true);
+        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
         StartDefaultThreadNetwork();
     }
     else
@@ -783,14 +783,6 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
-        break;
-    case DeviceEventType::kCHIPoBLEConnectionClosed:
-        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
-        {
-            LOG_INF("BLE disconnected during commissioning");
-            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
-            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
-        }
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:

@@ -27,6 +27,7 @@
 
 #include <platform/telink/BLEManagerImpl.h>
 
+#include <app/server/Server.h> // nogncheck
 #include <ble/Ble.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -517,12 +518,9 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
-    const uint8_t hciResult            = connEvent->HciResult;
 
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", hciResult);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
 
-    mNeedToResetFailSafeTimer = !ConfigurationMgr().IsFullyProvisioned() &&
-        (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
     mGAPConns--;
 
     // If indications were enabled for this connection, record that they are now disabled and
@@ -530,7 +528,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
     if (UnsetSubscribed(connEvent->BtConn))
     {
         CHIP_ERROR disconReason;
-        switch (hciResult)
+        switch (connEvent->HciResult)
         {
         case BT_HCI_ERR_REMOTE_USER_TERM_CONN:
             // Do not treat proper connection termination as an error and exit.
@@ -932,17 +930,24 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
-    bt_disable();
-    mBLERadioInitialized = false;
+    if (mState == kState_NotInitialized) // Expected BLE disconnect: switching to Thread
+    {
+        bt_disable();
+        mBLERadioInitialized = false;
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
-    pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+        pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().StartNonConcurrentThreadManagement();
+        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().StartNonConcurrentThreadManagement();
 #endif
-
+    }
+    else // Unexpected BLE disconnect during commissioning
+    {
+        LOG_INF("BLE disconnected during commissioning");
+        chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+    }
     return CHIP_NO_ERROR;
 }
 
