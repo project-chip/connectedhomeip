@@ -21,8 +21,8 @@
 
 #include "power-source-server.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
+// #include <app-common/zap-generated/cluster-objects.h>
+// #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>

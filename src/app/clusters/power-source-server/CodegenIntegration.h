@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>

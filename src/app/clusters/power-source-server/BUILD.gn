@@ -11,5 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("power-source-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("power-source-server") {
+  sources = [
+    "PowerSourceCluster.cpp",
+    "PowerSourceCluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/app/util:types",
+    "${chip_root}/zzz_generated/app-common/clusters/PowerSource",
+    "${chip_root}/src/lib/support",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+source_set("power-source-server-new") {
+    sources = [
+        "Delegates.h",
+        "PowerSourceClusterNew.cpp",
+        "PowerSourceClusterNew.h",
+    ]
+
+    public_deps = [
+        "${chip_root}/src/app/server-cluster",
+        "${chip_root}/src/lib/support",
+        "${chip_root}/zzz_generated/app-common/clusters/PowerSource",
+    ]
 }
