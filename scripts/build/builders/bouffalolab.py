@@ -14,7 +14,6 @@
 
 import logging
 import os
-import sys
 import re
 import time
 from enum import Enum, auto
@@ -184,8 +183,7 @@ class BouffalolabBuilder(GnBuilder):
         if bouffalo_chip == "bl616":
             if enable_easyflash:
                 raise Exception("BL616 doesn't support easyflash.")
-            else:
-                enable_littlefs = True
+            enable_littlefs = True
         else:
             if not enable_easyflash and not enable_littlefs:
                 logging.fatal('*' * 80)
@@ -277,8 +275,7 @@ class BouffalolabBuilder(GnBuilder):
                 if len(ver) != 3:
                     raise Exception('Invalid version format')
                 return ver
-            else:
-                raise Exception('Invalid version format')
+            raise Exception('Invalid version format')
         except Exception as err:
             logging.error(f"Failed to extract SDK version: {err}")
             return (2, 1, 0)
