@@ -161,9 +161,6 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
     }
 
     bool havePasscode = setupPasscode.HasValue();
-#if !ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-    Spake2pVerifier passcodeVerifier{};
-#endif
     std::vector<uint8_t> serializedPasscodeVerifier(kSpake2p_VerifierSerialized_Length);
     chip::MutableByteSpan saltSpan{ spake2pSalt.Value().data(), spake2pSalt.Value().size() };
     if (havePasscode)
@@ -174,6 +171,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
             "*** WARNING: Overriding the passcode (default / passcode from command line) with value provisioned in SE05x *** ");
         setupPasscode.SetValue(setUpPINCode_se05x);
 #else
+        Spake2pVerifier passcodeVerifier{};
         err = passcodeVerifier.Generate(spake2pIterationCount, saltSpan, setupPasscode.Value());
         if (err != CHIP_NO_ERROR)
         {
