@@ -57,7 +57,10 @@ jobs:
 
     if: github.actor != 'restyled-io[bot]'
     # Namespace MacOS 26 profile is configued as "26.3 with Xcode 26.2" currently
-    runs-on: namespace-profile-macos-26
+    # This is not yet enabled since namespace still has high concurrency limit: we have
+    # 48 cores and are forced to 6 cores minimum.
+    # runs-on: namespace-profile-macos-26
+    runs-on: macos-26
 
     steps:
       - name: Checkout
