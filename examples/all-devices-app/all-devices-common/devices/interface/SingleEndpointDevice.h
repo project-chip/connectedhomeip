@@ -52,7 +52,7 @@ protected:
 
     /// Internal function to unregister a single endpoint device. This will destroy the clusters part of
     /// this class, and must be called in a subclass' device-specific Unregister() function. This allows
-    /// for the destruction of the general SingleEndpointDevice clusters and device-specifc clusters from
+    /// for the destruction of the general SingleEndpointDevice clusters and device-specific clusters from
     /// the subclass, as well as removal of the device endpoint from the provider to happen together.
     void SingleEndpointUnregistration(CodeDrivenDataModelProvider & provider);
 
