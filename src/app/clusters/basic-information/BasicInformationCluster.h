@@ -35,8 +35,7 @@ namespace Clusters {
 
 /// As a PlatformManagerDelegate, it automatically hooks into the node's lifecycle to
 /// emit the mandatory StartUp and optional ShutDown events, ensuring spec compliance.
-class BasicInformationCluster : public DefaultServerCluster,
-                                public DeviceLayer::PlatformManagerDelegate
+class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
     // Define the Context struct with References
