@@ -287,7 +287,7 @@ private:
     uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
     uint8_t sInterestedSSIDLen;
 #endif
-    NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::WiFiDriver::ScanCallback * mpOneShotScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 

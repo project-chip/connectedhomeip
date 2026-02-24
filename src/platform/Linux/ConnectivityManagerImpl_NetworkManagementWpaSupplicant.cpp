@@ -1269,7 +1269,7 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
     // There is another ongoing scan request, reject the new one.
-    VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpOneShotScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(ssid.size() <= sizeof(sInterestedSSID), CHIP_ERROR_INVALID_ARGUMENT);
 
     GAutoPtr<GError> err;
@@ -1283,11 +1283,11 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     g_variant_builder_add(&builder, "{sv}", "Type", g_variant_new_string("active"));
     args = g_variant_builder_end(&builder);
 
-    mpScanCallback = callback;
+    mpOneShotScanCallback = callback;
     if (!wpa_supplicant_1_interface_call_scan_sync(mWpaSupplicant.iface.get(), args, nullptr, &err.GetReceiver()))
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to start network scan: %s", err ? err->message : "unknown error");
-        mpScanCallback = nullptr;
+        mpOneShotScanCallback = nullptr;
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -1572,10 +1572,10 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: no network found");
         TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-            if (mpScanCallback != nullptr)
+            if (mpOneShotScanCallback != nullptr)
             {
-                mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
-                mpScanCallback = nullptr;
+                mpOneShotScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
+                mpOneShotScanCallback = nullptr;
             }
         });
         return;
@@ -1597,11 +1597,11 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, networkScanned]() {
         // Note: We cannot post an event in ScheduleLambda since std::vector is not trivial copyable.
-        if (mpScanCallback != nullptr)
+        if (mpOneShotScanCallback != nullptr)
         {
             LinuxScanResponseIterator<WiFiScanResponse> iter(networkScanned);
-            mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-            mpScanCallback = nullptr;
+            mpOneShotScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+            mpOneShotScanCallback = nullptr;
         }
 
         delete networkScanned;

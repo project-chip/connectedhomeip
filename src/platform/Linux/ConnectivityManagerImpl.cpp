@@ -83,7 +83,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 #endif
     mpConnectCallback = nullptr;
-    mpScanCallback    = nullptr;
+    mpOneShotScanCallback    = nullptr;
 
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
