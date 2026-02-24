@@ -409,7 +409,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         If sucessfull return the software version to update.
         """
         if not path.exists(ota_image_path):
-            raise FileNotFoundError(f"Provider app not found {ota_image_path}")
+            raise FileNotFoundError(f"Ota image not found {ota_image_path}")
 
         ota_version = self.get_ota_image_software_version(ota_image_path=ota_image_path)
         basicinfo_softwareversion = await self.read_single_attribute_check_success(
