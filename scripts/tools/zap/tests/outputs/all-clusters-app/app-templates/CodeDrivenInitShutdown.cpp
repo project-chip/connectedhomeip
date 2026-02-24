@@ -61,6 +61,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::UnitLocalization::Id:
         MatterUnitLocalizationClusterInitCallback(endpoint);
         break;
+    case app::Clusters::PowerSource::Id:
+        MatterPowerSourceClusterInitCallback(endpoint);
+        break;
     case app::Clusters::GeneralCommissioning::Id:
         MatterGeneralCommissioningClusterInitCallback(endpoint);
         break;
@@ -208,6 +211,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::UnitLocalization::Id:
         MatterUnitLocalizationClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::PowerSource::Id:
+        MatterPowerSourceClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::GeneralCommissioning::Id:
         MatterGeneralCommissioningClusterShutdownCallback(endpoint, shutdownType);

@@ -5896,6 +5896,22 @@
               "reportableChange": 0
             },
             {
+              "name": "WiredCurrentType",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "type": "WiredCurrentTypeEnum",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "EndpointList",
               "code": 31,
               "mfgCode": null,
@@ -5969,7 +5985,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

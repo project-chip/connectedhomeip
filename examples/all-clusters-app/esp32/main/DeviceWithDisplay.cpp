@@ -27,6 +27,7 @@
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/power-source-server/CodegenIntegration.h>
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
@@ -401,8 +402,19 @@ public:
             else if (name == "Bat remaining")
             {
                 // update the battery percent remaining here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Battery percent remaining changed to : %d", n);
-                app::Clusters::PowerSource::Attributes::BatPercentRemaining::Set(1, static_cast<uint8_t>(n * 2));
+                auto * powerSource = app::Clusters::PowerSource::FindBatteryClusterOnEndpoint(1);
+                if (powerSource != nullptr)
+                {
+                    CHIP_ERROR err = powerSource->SetBatPercentRemaining(static_cast<uint8_t>(n * 2));
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        ESP_LOGI(TAG, "Battery percent remaining changed to : %d", n);
+                    }
+                    else
+                    {
+                        ESP_LOGE(TAG, "Failed to set battery percent remaining: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
+                }
             }
             value = buffer;
         }
@@ -464,8 +476,19 @@ public:
                 }
 
                 // update the battery charge level here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Battery charge level changed to : %u", static_cast<uint8_t>(attributeValue));
-                app::Clusters::PowerSource::Attributes::BatChargeLevel::Set(1, attributeValue);
+                auto * powerSource = app::Clusters::PowerSource::FindBatteryClusterOnEndpoint(1);
+                if (powerSource != nullptr)
+                {
+                    CHIP_ERROR err = powerSource->SetBatChargeLevel(attributeValue);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        ESP_LOGI(TAG, "Battery charge level changed to : %u", static_cast<uint8_t>(attributeValue));
+                    }
+                    else
+                    {
+                        ESP_LOGE(TAG, "Failed to set battery charge level: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
+                }
             }
             else
             {
@@ -768,9 +791,23 @@ void SetupPretendDevices()
     AddEndpoint("1");
     AddCluster("Power Source");
     AddAttribute("Bat remaining", "70");
-    app::Clusters::PowerSource::Attributes::BatPercentRemaining::Set(1, static_cast<uint8_t>(70 * 2));
     AddAttribute("Charge level", "0");
-    app::Clusters::PowerSource::Attributes::BatChargeLevel::Set(1, app::Clusters::PowerSource::BatChargeLevelEnum::kOk);
+    auto * powerSource = app::Clusters::PowerSource::FindBatteryClusterOnEndpoint(1);
+    if (powerSource != nullptr)
+    {
+        CHIP_ERROR err;
+        err = powerSource->SetBatPercentRemaining(static_cast<uint8_t>(70 * 2));
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to set battery percent remaining: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        err = powerSource->SetBatChargeLevel(app::Clusters::PowerSource::BatChargeLevelEnum::kOk);
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to set battery charge level: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
 }
 
 esp_err_t InitM5Stack(std::string qrCodeText)

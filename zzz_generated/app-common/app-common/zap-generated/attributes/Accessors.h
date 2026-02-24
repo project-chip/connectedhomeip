@@ -386,231 +386,126 @@ namespace PowerSource {
 namespace Attributes {
 
 namespace Status {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PowerSource::PowerSourceStatusEnum * value); // PowerSourceStatusEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum * value); // PowerSourceStatusEnum
 } // namespace Status
 
 namespace Order {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace Order
 
 namespace Description {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 } // namespace Description
 
 namespace WiredAssessedInputVoltage {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 } // namespace WiredAssessedInputVoltage
 
 namespace WiredAssessedInputFrequency {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 } // namespace WiredAssessedInputFrequency
 
 namespace WiredCurrentType {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PowerSource::WiredCurrentTypeEnum * value); // WiredCurrentTypeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum * value); // WiredCurrentTypeEnum
 } // namespace WiredCurrentType
 
 namespace WiredAssessedCurrent {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 } // namespace WiredAssessedCurrent
 
 namespace WiredNominalVoltage {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // int32u
 } // namespace WiredNominalVoltage
 
 namespace WiredMaximumCurrent {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // int32u
 } // namespace WiredMaximumCurrent
 
 namespace WiredPresent {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
 } // namespace WiredPresent
 
 namespace BatVoltage {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 } // namespace BatVoltage
 
 namespace BatPercentRemaining {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 } // namespace BatPercentRemaining
 
 namespace BatTimeRemaining {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 } // namespace BatTimeRemaining
 
 namespace BatChargeLevel {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PowerSource::BatChargeLevelEnum * value); // BatChargeLevelEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::PowerSource::BatChargeLevelEnum * value); // BatChargeLevelEnum
 } // namespace BatChargeLevel
 
 namespace BatReplacementNeeded {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
 } // namespace BatReplacementNeeded
 
 namespace BatReplaceability {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PowerSource::BatReplaceabilityEnum * value); // BatReplaceabilityEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status
+GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum * value); // BatReplaceabilityEnum
 } // namespace BatReplaceability
 
 namespace BatPresent {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
 } // namespace BatPresent
 
 namespace BatReplacementDescription {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 } // namespace BatReplacementDescription
 
 namespace BatCommonDesignation {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum * value); // BatCommonDesignationEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value,
-                                        MarkAttributeDirty markDirty);
+GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum * value); // BatCommonDesignationEnum
 } // namespace BatCommonDesignation
 
 namespace BatANSIDesignation {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 } // namespace BatANSIDesignation
 
 namespace BatIECDesignation {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 } // namespace BatIECDesignation
 
 namespace BatApprovedChemistry {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum * value); // BatApprovedChemistryEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value,
-                                        MarkAttributeDirty markDirty);
+GetDefault(EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum * value); // BatApprovedChemistryEnum
 } // namespace BatApprovedChemistry
 
 namespace BatCapacity {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // int32u
 } // namespace BatCapacity
 
 namespace BatQuantity {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint8_t * value); // int8u
 } // namespace BatQuantity
 
 namespace BatChargeState {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::PowerSource::BatChargeStateEnum * value); // BatChargeStateEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::PowerSource::BatChargeStateEnum * value); // BatChargeStateEnum
 } // namespace BatChargeState
 
 namespace BatTimeToFullCharge {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 } // namespace BatTimeToFullCharge
 
 namespace BatFunctionalWhileCharging {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, bool * value); // boolean
 } // namespace BatFunctionalWhileCharging
 
 namespace BatChargingCurrent {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
-                                        MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 } // namespace BatChargingCurrent
 
 namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint32_t * value); // bitmap32
 } // namespace FeatureMap
 
 } // namespace Attributes

@@ -20,7 +20,6 @@
 #include <ElectricalSensorManager.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
-#include <app/clusters/power-source-server/power-source-server.h>
 #include <app/server/Server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>

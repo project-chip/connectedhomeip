@@ -2239,7 +2239,7 @@ endpoint 1 {
     ram      attribute batReplacementDescription default = "2x AA/LR6 Alkaline";
     ram      attribute batCommonDesignation default = 2;
     ram      attribute batApprovedChemistry default = 1;
-    ram      attribute batQuantity;
+    ram      attribute batQuantity default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

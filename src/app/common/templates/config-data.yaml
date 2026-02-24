@@ -144,6 +144,7 @@ CodeDrivenClusters:
     - OTA Software Update Requestor
     - Occupancy Sensing
     - Operational Credentials
+    - Power Source
     - Power Topology
     - Pressure Measurement
     - Proximity Ranging

@@ -43,7 +43,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/power-source-server/power-source-server.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/im-client-callbacks.h>
 

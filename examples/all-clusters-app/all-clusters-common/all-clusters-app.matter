@@ -7334,6 +7334,7 @@ endpoint 0 {
     ram      attribute status default = 0;
     ram      attribute order default = 3;
     ram      attribute description default = "B1";
+    ram      attribute batPercentRemaining;
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
@@ -7829,6 +7830,7 @@ endpoint 1 {
     ram      attribute status default = 0;
     ram      attribute order default = 2;
     ram      attribute description default = "B2";
+    ram      attribute batPercentRemaining;
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
@@ -8969,6 +8971,7 @@ endpoint 2 {
     ram      attribute status default = 0;
     ram      attribute order default = 1;
     ram      attribute description default = "B3";
+    ram      attribute batPercentRemaining;
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;

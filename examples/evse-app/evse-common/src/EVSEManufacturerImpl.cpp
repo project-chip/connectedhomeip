@@ -440,31 +440,27 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
 
 /**
  * @brief   Allows a client application to initialise the PowerSource cluster
+ * @note    Initial configuration of the cluster will need to be done using
+ *          the zap tool, and here list attributes can be set, which can't be
+ *          set with the zap tool, and some other attributes. You can see
+ *          which attributes can be set here by looking up public `Set*`
+ *          member functions in the `PowerSourceCluster` class.
+ *          (see power-source-server/PowerSourceCluster.cpp)
  */
 CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpointId)
 {
-    Protocols::InteractionModel::Status status;
+    EmberWiredPowerSourceCluster * cluster = PowerSource::FindWiredClusterOnEndpoint(endpointId);
 
-    status = PowerSource::Attributes::Status::Set(endpointId, PowerSourceStatusEnum::kActive);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(PowerSource::Feature::kWired));
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredNominalVoltage::Set(endpointId, 230'000); // 230V in mv
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredMaximumCurrent::Set(endpointId, 32'000); // 32A in mA
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    status = PowerSource::Attributes::WiredCurrentType::Set(endpointId, PowerSource::WiredCurrentTypeEnum::kAc);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::Description::Set(endpointId, "Primary Mains Power"_span);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(cluster->SetStatus(PowerSourceStatusEnum::kActive));
 
     chip::EndpointId endpointArray[] = { endpointId };
     Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
 
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
-    // since it takes a copy (see power-source-server/codegen/power-source-server.cpp)
-    return PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
+    // since it takes a copy (see power-source-server/PowerSourceCluster.cpp)
+    return cluster->SetEndpointList(endpointList);
 }
 
 void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent)
