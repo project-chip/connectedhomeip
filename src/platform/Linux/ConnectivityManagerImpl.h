@@ -287,7 +287,7 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     Internal::WiFiSSIDFixedBuffer mInterestedSSID;
 #endif
-    NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::WiFiDriver::ScanCallback * mpOneShotScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
