@@ -287,6 +287,14 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     Internal::WiFiSSIDFixedBuffer mInterestedSSID;
 #endif
+    /**
+     *  A callback through which, when non-null, the Wi-Fi driver
+     *  'OnFinished' method is invoked after a Wi-Fi scan is
+     *  complete. The semantics of this callback are one-shot in that
+     *  it is set-scan-invoke-and-clear.
+     *
+     *  A non-null value implies that a Wi-Fi scan is in progress.
+     */
     NetworkCommissioning::WiFiDriver::ScanCallback * mpOneShotScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
