@@ -118,7 +118,7 @@ static_library("BL702") {
     sources += [
       "ConfigurationManagerImpl.cpp",
       "ConnectivityManagerImpl.cpp",
-      "NetworkCommissioningEthernetDriver.cpp"
+      "NetworkCommissioningEthernetDriver.cpp",
     ]
 
     deps += [

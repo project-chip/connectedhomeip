@@ -110,9 +110,7 @@ static_library("BL616") {
   }
 
   if (chip_enable_ethernet) {
-    sources += [
-      "NetworkCommissioningEthernetDriver.cpp"
-    ]
+    sources += [ "NetworkCommissioningEthernetDriver.cpp" ]
 
     deps += [
       "${chip_root}/src/app:app_config",

@@ -67,9 +67,8 @@ template("bl_iot_sdk") {
   }
 
   config("${sdk_target_name}_config_soc") {
-    include_dirs = [
-      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_rf/include" 
-    ]
+    include_dirs =
+        [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_rf/include" ]
   }
 
   source_set("${sdk_target_name}_soc") {
@@ -84,12 +83,8 @@ template("bl_iot_sdk") {
     libs = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_rf/lib/libbl702_rf.a" ]
 
     cflags_c = [ "-Wno-format-truncation" ]
-    configs += [
-      ":${sdk_target_name}_config",
-    ]
-    configs += [
-      ":${sdk_target_name}_config_freertos",
-    ]
+    configs += [ ":${sdk_target_name}_config" ]
+    configs += [ ":${sdk_target_name}_config_freertos" ]
     public_configs = [ ":${sdk_target_name}_config_soc" ]
   }
 
@@ -147,9 +142,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_xip_sflash_ext.c",
     ]
 
-    cflags_c = [
-      "-Wno-unused-variable",
-    ]
+    cflags_c = [ "-Wno-unused-variable" ]
 
     configs += [
       ":${sdk_target_name}_config",
@@ -187,15 +180,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/timers.c",
     ]
 
-    cflags_c = [
-      "-Wno-old-style-declaration",
-    ]
-    configs += [
-      ":${sdk_target_name}_config",
-    ]
-    public_configs = [
-      ":${sdk_target_name}_config_freertos",
-    ]
+    cflags_c = [ "-Wno-old-style-declaration" ]
+    configs += [ ":${sdk_target_name}_config" ]
+    public_configs = [ ":${sdk_target_name}_config_freertos" ]
   }
 
   source_set("${sdk_target_name}_bl702_usb_cdc") {
@@ -322,9 +309,7 @@ template("bl_iot_sdk") {
       configs += [ ":${sdk_target_name}_config_ble" ]
     }
 
-    public_configs = [
-      ":${sdk_target_name}_config_hosal",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_hosal" ]
   }
 
   config("${sdk_target_name}_config_fs") {
@@ -351,9 +336,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_fs",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_fs" ]
   }
 
   source_set("${sdk_target_name}_libc") {
@@ -485,9 +468,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_utils",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_sys",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_sys" ]
   }
 
   config("${sdk_target_name}_config_utils") {
@@ -516,18 +497,14 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/utils/src/utils_tlv_bl.c",
     ]
 
-    cflags_c = [
-      "-Wno-shadow",
-    ]
+    cflags_c = [ "-Wno-shadow" ]
 
     configs += [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_utils",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_utils" ]
   }
 
   config("${sdk_target_name}_config_mbedtls") {
@@ -612,9 +589,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_mbedtls",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_mbedtls" ]
   }
 
   config("${sdk_target_name}_config_ble") {
@@ -649,7 +624,6 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_ble") {
-
     libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_bl702_m0s1/lib/libblecontroller_bl702_m0s1.a" ]
 
     include_dirs = [
@@ -699,7 +673,7 @@ template("bl_iot_sdk") {
     defines = [
       "OT_FREERTOS_ENABLE=1",
       "CONFIG_LMAC154_LOG=0",
-      "NXSPI_OPENTHREAD_RADIO=0"
+      "NXSPI_OPENTHREAD_RADIO=0",
     ]
 
     include_dirs = [
@@ -754,9 +728,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_stage",
       ":${sdk_target_name}_config_freertos",
     ]
-    public_configs = [
-      ":${sdk_target_name}_config_openthread_port",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_openthread_port" ]
 
     public_deps = [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -773,12 +745,12 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_ethernet") {
-    sources = [ 
+    sources = [
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/ephy_general.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/ephy_lan8720.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/eth_bd.c",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/eth_phy.c",
-      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/eth_phy_port.c"
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_ethernet/Src/eth_phy_port.c",
     ]
 
     configs += [
@@ -790,9 +762,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_utils",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config_ethernet",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_ethernet" ]
   }
 
   config("${sdk_target_name}_config_wifi") {
@@ -834,9 +804,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_lwip",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config_wifi",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_wifi" ]
   }
 
   config("${sdk_target_name}_config_lwip") {
@@ -921,14 +889,12 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/api/tcpip.c",
     ]
 
-    configs += [ 
+    configs += [
       ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_freertos"
+      ":${sdk_target_name}_config_freertos",
     ]
 
-    public_configs = [
-      ":${sdk_target_name}_config_lwip",
-    ]
+    public_configs = [ ":${sdk_target_name}_config_lwip" ]
   }
 
   config("${sdk_target_name}_config_factory_data") {

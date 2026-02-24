@@ -83,8 +83,7 @@ bouffalo_sdk("sdk") {
 
   if (chip_enable_ethernet) {
     include_dirs += [ "${example_dir}/bl616/ethernet" ]
-  }
-  else if (chip_enable_wifi) {
+  } else if (chip_enable_wifi) {
     include_dirs += [ "${example_dir}/bl616/wifi" ]
   }
   defines += [ "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}" ]
