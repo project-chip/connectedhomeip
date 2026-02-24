@@ -161,6 +161,13 @@
     return self.forceTimeSynchronizationLossDetectionCadenceToZero;
 }
 
+- (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device
+{
+    if (self.onTimeSynchronizationLossDetected != nil) {
+        self.onTimeSynchronizationLossDetected();
+    }
+}
+
 @end
 
 @implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride
