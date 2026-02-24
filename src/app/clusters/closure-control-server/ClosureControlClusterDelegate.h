@@ -27,11 +27,11 @@ namespace ClosureControl {
 
 /** @brief Defines methods for implementing application-specific logic for the Closure Control Cluster.
  */
-class DelegateBase
+class ClosureControlClusterDelegate
 {
 public:
-    DelegateBase()          = default;
-    virtual ~DelegateBase() = default;
+    ClosureControlClusterDelegate()          = default;
+    virtual ~ClosureControlClusterDelegate() = default;
 
     /**
      * @brief This function handles Stop command implementaion.

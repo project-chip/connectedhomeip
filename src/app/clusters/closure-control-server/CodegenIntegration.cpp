@@ -1,0 +1,107 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "CodegenIntegration.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/closure-control-server/ClosureControlCluster.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterMatterContext.h>
+#include <app/static-cluster-config/ClosureControl.h>
+#include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ClosureControl;
+using namespace chip::app::Clusters::ClosureControl::Attributes;
+using namespace chip::Protocols::InteractionModel;
+
+namespace {
+ClosureControlClusterDelegate * gDelegate      = nullptr;
+ClusterConformance gConformance;
+ClusterInitParameters gInitParams;
+
+constexpr size_t kClosureControlFixedClusterCount = ClosureControl::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kClosureControlMaxClusterCount = kClosureControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<ClosureControlCluster> gServer[kClosureControlMaxClusterCount];
+}
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ClosureControl {
+
+ClosureControlCluster & GetInstance(EndpointId endpointId)
+{
+    return gServer[endpointId].Cluster();
+}
+
+void MatterClosureControlSetDelegate(ClosureControlClusterDelegate & delegate)
+{
+    gDelegate = &delegate;
+}
+
+void MatterClosureControlSetConformance(const ClusterConformance & conformance)
+{
+    gConformance = conformance;
+}
+
+void MatterClosureControlSetInitParams(const ClusterInitParameters & initParams)
+{
+    gInitParams = initParams;
+}
+
+} // namespace ClosureControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+
+void MatterClosureControlClusterInitCallback(EndpointId endpointId) {
+    if (gServer[endpointId].IsConstructed()) {
+        ChipLogError(Zcl, "Closure Control Cluster already initialized. Ignoring duplicate initialization.");
+        return;
+    }
+
+    if (gDelegate == nullptr) {
+        ChipLogError(Zcl, "Closure Control Cluster cannot be initialized without a delegate. Call MatterClosureControlSetDelegate() before ServerInit().");
+        return;
+    }
+
+    ClosureControlCluster::Context context{ *gDelegate, gConformance, gInitParams };
+    gServer[endpointId].Create(endpointId, context);
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer[endpointId].Registration()));
+}
+
+void MatterClosureControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType) {
+    if (!gServer[endpointId].IsConstructed()) {
+        ChipLogError(Zcl, "Closure Control Cluster not initialized. Ignoring shutdown.");
+        return;
+    }
+
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer[endpointId].Cluster()));
+    gServer[endpointId].Destroy();
+}
+// -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterClosureControlPluginServerInitCallback() {}
+void MatterClosureControlPluginServerShutdownCallback() {}

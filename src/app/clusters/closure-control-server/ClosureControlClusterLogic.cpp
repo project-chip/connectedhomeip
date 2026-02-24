@@ -32,7 +32,7 @@ using namespace Protocols::InteractionModel;
     ClusterLogic Implementation
 */
 
-CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const ClusterInitParameters & initParams)
+CHIP_ERROR ClosureControlClusterLogic::Init(const ClusterConformance & conformance, const ClusterInitParameters & initParams)
 {
     VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
@@ -46,7 +46,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     return CHIP_NO_ERROR;
 }
 
-bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState) const
+bool ClosureControlClusterLogic::IsSupportedMainState(MainStateEnum mainState) const
 {
     bool isSupported = false;
 
@@ -82,7 +82,7 @@ bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState) const
     return isSupported;
 }
 
-bool ClusterLogic::IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const
+bool ClosureControlClusterLogic::IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const
 {
     bool isSupported = false;
 
@@ -112,7 +112,7 @@ bool ClusterLogic::IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum
     return isSupported;
 }
 
-bool ClusterLogic::IsSupportedOverallTargetStatePositioning(TargetPositionEnum positioning) const
+bool ClosureControlClusterLogic::IsSupportedOverallTargetStatePositioning(TargetPositionEnum positioning) const
 {
     bool isSupported = false;
 
@@ -141,7 +141,7 @@ bool ClusterLogic::IsSupportedOverallTargetStatePositioning(TargetPositionEnum p
     return isSupported;
 }
 
-CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate)
+CHIP_ERROR ClosureControlClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -170,7 +170,7 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
+CHIP_ERROR ClosureControlClusterLogic::SetMainState(MainStateEnum mainState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -216,7 +216,7 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
+CHIP_ERROR ClosureControlClusterLogic::SetOverallCurrentState(const DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -317,7 +317,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetOverallTargetState(const DataModel::Nullable<GenericOverallTargetState> & overallTarget)
+CHIP_ERROR ClosureControlClusterLogic::SetOverallTargetState(const DataModel::Nullable<GenericOverallTargetState> & overallTarget)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -372,7 +372,7 @@ CHIP_ERROR ClusterLogic::SetOverallTargetState(const DataModel::Nullable<Generic
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBitmap> & latchControlModes)
+CHIP_ERROR ClosureControlClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBitmap> & latchControlModes)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -384,7 +384,7 @@ CHIP_ERROR ClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
+CHIP_ERROR ClosureControlClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -404,7 +404,7 @@ CHIP_ERROR ClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
     return CHIP_NO_ERROR;
 }
 
-void ClusterLogic::ClearCurrentErrorList()
+void ClosureControlClusterLogic::ClearCurrentErrorList()
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "ClearCurrentErrorList called before Initialization of closure");
@@ -419,7 +419,7 @@ void ClusterLogic::ClearCurrentErrorList()
 }
 
 // TODO: Move the CountdownTime handling to Delegate
-CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
+CHIP_ERROR ClosureControlClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -431,7 +431,7 @@ CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countd
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetMainState(MainStateEnum & mainState)
+CHIP_ERROR ClosureControlClusterLogic::GetMainState(MainStateEnum & mainState)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -440,7 +440,7 @@ CHIP_ERROR ClusterLogic::GetMainState(MainStateEnum & mainState)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
+CHIP_ERROR ClosureControlClusterLogic::GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -450,7 +450,7 @@ CHIP_ERROR ClusterLogic::GetOverallCurrentState(DataModel::Nullable<GenericOvera
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget)
+CHIP_ERROR ClosureControlClusterLogic::GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -460,7 +460,7 @@ CHIP_ERROR ClusterLogic::GetOverallTargetState(DataModel::Nullable<GenericOveral
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan)
+CHIP_ERROR ClosureControlClusterLogic::GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -474,7 +474,7 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR ClosureControlClusterLogic::ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -487,7 +487,7 @@ CHIP_ERROR ClusterLogic::ReadCurrentErrorListAttribute(const AttributeValueEncod
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes)
+CHIP_ERROR ClosureControlClusterLogic::GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -496,21 +496,21 @@ CHIP_ERROR ClusterLogic::GetLatchControlModes(BitFlags<LatchControlModesBitmap> 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
+CHIP_ERROR ClosureControlClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     featureMap = mConformance.FeatureMap();
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
+CHIP_ERROR ClosureControlClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     clusterRevision = ClosureControl::kRevision;
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status ClusterLogic::HandleStop()
+Protocols::InteractionModel::Status ClosureControlClusterLogic::HandleStop()
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "Stop Command called before Initialization of closure");
 
@@ -535,7 +535,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
+Protocols::InteractionModel::Status ClosureControlClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed)
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "MoveTo Command called before Initialization of closure");
@@ -627,7 +627,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
+Protocols::InteractionModel::Status ClosureControlClusterLogic::HandleCalibrate()
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "Calibrate Command called before Initialization of closure");
 
@@ -655,7 +655,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     return Status::Success;
 }
 
-CHIP_ERROR ClusterLogic::GenerateOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState)
+CHIP_ERROR ClosureControlClusterLogic::GenerateOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState)
 {
     ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
 
@@ -665,7 +665,7 @@ CHIP_ERROR ClusterLogic::GenerateOperationalErrorEvent(const DataModel::List<con
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GenerateMovementCompletedEvent()
+CHIP_ERROR ClosureControlClusterLogic::GenerateMovementCompletedEvent()
 {
     VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
@@ -675,7 +675,7 @@ CHIP_ERROR ClusterLogic::GenerateMovementCompletedEvent()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GenerateEngageStateChangedEvent(const bool engageValue)
+CHIP_ERROR ClosureControlClusterLogic::GenerateEngageStateChangedEvent(const bool engageValue)
 {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kManuallyOperable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
@@ -685,7 +685,7 @@ CHIP_ERROR ClusterLogic::GenerateEngageStateChangedEvent(const bool engageValue)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GenerateSecureStateChangedEvent(const bool secureValue)
+CHIP_ERROR ClosureControlClusterLogic::GenerateSecureStateChangedEvent(const bool secureValue)
 {
     Events::SecureStateChanged::Type event{ .secureValue = secureValue };
     ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));

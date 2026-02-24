@@ -19,4 +19,4 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/ClosureControlClusterLogic.h>
+#include <app/clusters/closure-control-server/CodegenIntegration.h>

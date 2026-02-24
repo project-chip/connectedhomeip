@@ -43,7 +43,7 @@ namespace ClosureControl {
  * for closure control operations such as Stop, MoveTo, Calibration, and
  * error retrieval, and Test event triggering.
  */
-class ClosureControlDelegate : public DelegateBase, public TestEventTriggerHandler
+class ClosureControlDelegate : public ClosureControlClusterDelegate, public TestEventTriggerHandler
 {
 public:
     ClosureControlDelegate() {}
@@ -64,12 +64,12 @@ public:
 
     // Delegate specific functions and variables
 
-    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+    void SetClusterInstance(ClosureControlCluster * clusterInstance) { mClusterInstance = clusterInstance; }
 
-    ClusterLogic * GetLogic() const { return mLogic; }
+    ClosureControlCluster * GetClusterInstance() const { return mClusterInstance; }
 
 private:
-    ClusterLogic * mLogic;
+    ClosureControlCluster * mClusterInstance;
 };
 
 /**
@@ -89,9 +89,10 @@ class ClosureControlEndpoint
 {
 public:
     ClosureControlEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mClusterInstance(GetInstance(mEndpoint))
     {
-        mDelegate.SetLogic(&mLogic);
+        MatterClosureControlSetDelegate(mDelegate);
+        mDelegate.SetClusterInstance(&mClusterInstance);
     }
 
     /**
@@ -109,11 +110,11 @@ public:
     ClosureControlDelegate & GetDelegate() { return mDelegate; }
 
     /**
-     * @brief Returns a reference to the ClusterLogic instance associated with this object.
+     * @brief Returns a reference to the ClosureControlCluster instance associated with this object.
      *
-     * @return ClusterLogic& Reference to the internal ClusterLogic object.
+     * @return ClosureControlCluster& Reference to the internal ClosureControlCluster object.
      */
-    ClusterLogic & GetLogic() { return mLogic; }
+    ClosureControlCluster & GetClusterInstance() { return mClusterInstance; }
 
     /**
      * @brief Handles the completion of a stop motion action.
@@ -171,10 +172,9 @@ public:
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
-    MatterContext mContext;
+    ClosureControlClusterMatterContext mContext;
     ClosureControlDelegate mDelegate;
-    ClusterLogic mLogic;
-    Interface mInterface;
+    ClosureControlCluster & mClusterInstance;
 
     /**
      * @brief Updates the current state of the closure control endpoint from the target state.

@@ -140,14 +140,14 @@ struct ClusterInitParameters
  * @brief Class containing the cluster business logic
  *
  */
-class ClusterLogic
+class ClosureControlClusterLogic
 {
 public:
-    // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
-    // the ClusterLogic class.
-    ClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext) {}
+    // Instantiates a ClosureControlClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
+    // the ClosureControlClusterLogic class.
+    ClosureControlClusterLogic(DelegateBase & delegate, MatterContext & matterContext) : mDelegate(delegate), mMatterContext(matterContext) {}
 
-    ~ClusterLogic() = default;
+    ~ClosureControlClusterLogic() = default;
 
     const ClusterConformance & GetConformance() const { return mConformance; }
     const ClusterState & GetState() const { return mState; }

@@ -25,7 +25,6 @@ CommandHandlerInterfaceOnlyClusters:
     # keep-sorted start
     - Actions
     - Camera AV Settings User Level Management
-    - Closure Control
     - Closure Dimension
     - Commissioner Control
     - Commodity Price
@@ -121,6 +120,7 @@ CodeDrivenClusters:
     - Boolean State Configuration
     - Camera AV Stream Management
     - Chime
+    - Closure Control
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs

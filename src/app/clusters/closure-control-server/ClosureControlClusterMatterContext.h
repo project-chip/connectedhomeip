@@ -34,11 +34,11 @@ namespace ClosureControl {
 /**
  * @brief Interface to allow interaction with interaction model and ember layers. Can be faked for unit testing.
  */
-class MatterContext
+class ClosureControlClusterMatterContext
 {
 public:
-    MatterContext(EndpointId endpointId) : mEndpointId(endpointId) {}
-    virtual ~MatterContext() = default;
+    ClosureControlClusterMatterContext(EndpointId endpointId) : mEndpointId(endpointId) {}
+    virtual ~ClosureControlClusterMatterContext() = default;
 
     virtual void MarkDirty(AttributeId attributeId)
     {

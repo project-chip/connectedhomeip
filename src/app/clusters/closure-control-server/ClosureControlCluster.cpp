@@ -1,5 +1,7 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,154 +16,816 @@
  *    limitations under the License.
  */
 
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/clusters/closure-control-server/ClosureControlCluster.h>
-#include <app/util/attribute-storage.h>
+#include "ClosureControlCluster.h"
+
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/ClosureControl/Attributes.h>
+#include <clusters/ClosureControl/Commands.h>
+#include <clusters/ClosureControl/Metadata.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ClosureControl;
-
+using namespace chip::app::Clusters::ClosureControl::Attributes;
 using chip::Protocols::InteractionModel::Status;
-
-namespace {
-
-template <typename T, typename F>
-CHIP_ERROR EncodeRead(AttributeValueEncoder & aEncoder, const F & getter)
-{
-    T ret;
-    CHIP_ERROR err = getter(ret);
-
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err);
-    return aEncoder.Encode(ret);
-}
-
-} // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-CHIP_ERROR Interface::Init()
+ClosureControlCluster::ClosureControlCluster(EndpointId endpointId, const Context & context) :
+    DefaultServerCluster({ endpointId, ClosureControl::Id }), mMatterContext(endpointId), mDelegate(context.delegate), mConformance(context.conformance)
 {
-    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(this), AppServer,
-                       "Failed to register attribute access");
-    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this) == CHIP_NO_ERROR, AppServer,
-                       "Failed to register command handler");
-
-    return CHIP_NO_ERROR;
+    LogErrorOnFailure(SetMainState(context.initParams.mMainState));
+    LogErrorOnFailure(SetOverallCurrentState(context.initParams.mOverallCurrentState));
 }
 
-CHIP_ERROR Interface::Shutdown()
-{
-    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this) == CHIP_NO_ERROR, AppServer,
-                       "Failed to unregister command handler");
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+ClosureControlCluster::~ClosureControlCluster() {}
 
-    return CHIP_NO_ERROR;
+CHIP_ERROR ClosureControlCluster::Attributes(const ConcreteClusterPath & path,
+                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const ClusterConformance & conformance = mConformance;
+
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { conformance.HasFeature(Feature::kPositioning) && !conformance.HasFeature(Feature::kInstantaneous),
+          CountdownTime::kMetadataEntry }
+    };
+
+    return listBuilder.Append(Span(ClosureControl::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
-CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ClosureControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                   ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    switch (aPath.mAttributeId)
+    const ClusterConformance & conformance = mConformance;
+
+    static constexpr DataModel::AcceptedCommandEntry kMandatoryCommands[] = {
+        ClosureControl::Commands::MoveTo::kMetadataEntry,
+    };
+
+    static constexpr DataModel::AcceptedCommandEntry kStopCommand[] = {
+        ClosureControl::Commands::Stop::kMetadataEntry,
+    };
+
+    static constexpr DataModel::AcceptedCommandEntry kCalibrateCommand[] = {
+        ClosureControl::Commands::Calibrate::kMetadataEntry,
+    };
+
+    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
+
+    if (!conformance.HasFeature(Feature::kInstantaneous))
     {
-    case Attributes::CountdownTime::Id: {
-        typedef Attributes::CountdownTime::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCountdownTime(ret); });
+        ReturnErrorOnFailure(builder.ReferenceExisting(kStopCommand));
     }
 
-    case Attributes::MainState::Id: {
-        typedef Attributes::MainState::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetMainState(ret); });
+    if (conformance.HasFeature(Feature::kCalibration))
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kCalibrateCommand));
     }
 
-    case Attributes::CurrentErrorList::Id: {
-        return aEncoder.EncodeList(
-            [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.ReadCurrentErrorListAttribute(encoder); });
-    }
+    return CHIP_NO_ERROR;
+}
 
-    case Attributes::OverallCurrentState::Id: {
-        typedef DataModel::Nullable<GenericOverallCurrentState> T;
-        return EncodeRead<T>(aEncoder,
-                             [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallCurrentState(ret); });
+DataModel::ActionReturnStatus ClosureControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                   AttributeValueEncoder & encoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case ClusterRevision::Id: {
+        Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
+        ReturnErrorOnFailure(GetClusterRevision(clusterRevision));
+        return encoder.Encode(clusterRevision);
     }
-
-    case Attributes::OverallTargetState::Id: {
-        typedef DataModel::Nullable<GenericOverallTargetState> T;
-        return EncodeRead<T>(aEncoder,
-                             [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallTargetState(ret); });
+    case FeatureMap::Id: {
+        BitFlags<Feature> featureMap;
+        ReturnErrorOnFailure(GetFeatureMap(featureMap));
+        return encoder.Encode(featureMap);
     }
-
-    case Attributes::LatchControlModes::Id: {
-        typedef BitFlags<LatchControlModesBitmap> T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLatchControlModes(ret); });
+    case MainState::Id: {
+        MainStateEnum mainState;
+        ReturnErrorOnFailure(GetMainState(mainState));
+        return encoder.Encode(mainState);
     }
-
-    case Attributes::FeatureMap::Id: {
-        typedef BitFlags<Feature> T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
+    case CountdownTime::Id: {
+        DataModel::Nullable<ElapsedS> countdownTime;
+        ReturnErrorOnFailure(GetCountdownTime(countdownTime));
+        return encoder.Encode(countdownTime);
     }
-
-    case Attributes::ClusterRevision::Id: {
-        typedef Attributes::ClusterRevision::TypeInfo::Type T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetClusterRevision(ret); });
+    case CurrentErrorList::Id: {
+        return encoder.EncodeList(
+            [this](const auto & subEncoder) -> CHIP_ERROR { return ReadCurrentErrorListAttribute(subEncoder); });
     }
-
+    case OverallCurrentState::Id: {
+        DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+        ReturnErrorOnFailure(GetOverallCurrentState(overallCurrentState));
+        return encoder.Encode(overallCurrentState);
+    }
+    case OverallTargetState::Id: {
+        DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+        ReturnErrorOnFailure(GetOverallTargetState(overallTargetState));
+        return encoder.Encode(overallTargetState);
+    }
+    case LatchControlModes::Id: {
+        BitFlags<LatchControlModesBitmap> latchControlModes;
+        ReturnErrorOnFailure(GetLatchControlModes(latchControlModes));
+        return encoder.Encode(latchControlModes);
+    }
     default:
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return Status::UnsupportedAttribute;
     }
 }
 
-void Interface::InvokeCommand(HandlerContext & handlerContext)
+std::optional<DataModel::ActionReturnStatus> ClosureControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                  chip::TLV::TLVReader & input_arguments,
+                                                                                  CommandHandler * handler)
 {
-    Status status = Status::UnsupportedCommand;
+    VerifyOrReturnValue(handler != nullptr, Status::Failure);
 
-    switch (handlerContext.mRequestPath.mCommandId)
+    switch (request.path.mCommandId)
     {
     case Commands::Stop::Id:
-        HandleCommand<Commands::Stop::DecodableType>(
-            handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
-                status = logic.HandleStop();
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-            });
-        return;
-
-    case Commands::MoveTo::Id:
-        HandleCommand<Commands::MoveTo::DecodableType>(
-            handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
-                status = logic.HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-            });
-        return;
+        return HandleStopCommand(*handler, request.path);
+    case Commands::MoveTo::Id: {
+        Commands::MoveTo::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandleMoveToCommand(*handler, request.path, commandData);
+    }
     case Commands::Calibrate::Id:
-        HandleCommand<Commands::Calibrate::DecodableType>(
-            handlerContext, [&logic = mClusterLogic, &status](HandlerContext & ctx, const auto & commandData) {
-                status = logic.HandleCalibrate();
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-            });
-        return;
+        return HandleCalibrateCommand(*handler, request.path);
+    default:
+        return Status::UnsupportedCommand;
+    }
+}
+
+DataModel::ActionReturnStatus ClosureControlCluster::HandleStopCommand(CommandHandler & handler, const ConcreteCommandPath & path)
+{
+    ChipLogDetail(Zcl, "ClosureControl: Stop");
+    Status status = HandleStop();
+    handler.AddStatus(path, status);
+    return status;
+}
+
+DataModel::ActionReturnStatus ClosureControlCluster::HandleMoveToCommand(CommandHandler & handler, const ConcreteCommandPath & path,
+                                                                         const Commands::MoveTo::DecodableType & commandData)
+{
+    ChipLogDetail(Zcl, "ClosureControl: MoveTo");
+    Status status = HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
+    handler.AddStatus(path, status);
+    return status;
+}
+
+DataModel::ActionReturnStatus ClosureControlCluster::HandleCalibrateCommand(CommandHandler & handler,
+                                                                            const ConcreteCommandPath & path)
+{
+    ChipLogDetail(Zcl, "ClosureControl: Calibrate");
+    Status status = HandleCalibrate();
+    handler.AddStatus(path, status);
+    return status;
+}
+
+bool ClosureControlCluster::IsSupportedMainState(MainStateEnum mainState) const
+{
+    bool isSupported = false;
+
+    switch (mainState)
+    {
+    case MainStateEnum::kStopped:
+    case MainStateEnum::kMoving:
+    case MainStateEnum::kWaitingForMotion:
+    case MainStateEnum::kError:
+    case MainStateEnum::kSetupRequired:
+        // Mandatory states are always supported
+        isSupported = true;
+        break;
+
+    case MainStateEnum::kCalibrating:
+        isSupported = mConformance.HasFeature(Feature::kCalibration);
+        break;
+
+    case MainStateEnum::kProtected:
+        isSupported = mConformance.HasFeature(Feature::kProtection);
+        break;
+
+    case MainStateEnum::kDisengaged:
+        // Disengaged requires the ManuallyOperable feature
+        isSupported = mConformance.HasFeature(Feature::kManuallyOperable);
+        break;
 
     default:
-        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        return;
+        isSupported = false;
+        break;
     }
+
+    return isSupported;
+}
+
+bool ClosureControlCluster::IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const
+{
+    bool isSupported = false;
+
+    switch (positioning)
+    {
+    case CurrentPositionEnum::kFullyClosed:
+    case CurrentPositionEnum::kFullyOpened:
+    case CurrentPositionEnum::kPartiallyOpened:
+    case CurrentPositionEnum::kOpenedAtSignature:
+        // Mandatory states are always supported
+        isSupported = true;
+        break;
+
+    case CurrentPositionEnum::kOpenedForPedestrian:
+        isSupported = mConformance.HasFeature(Feature::kPedestrian);
+        break;
+
+    case CurrentPositionEnum::kOpenedForVentilation:
+        isSupported = mConformance.HasFeature(Feature::kVentilation);
+        break;
+
+    default:
+        isSupported = false;
+        break;
+    }
+
+    return isSupported;
+}
+
+bool ClosureControlCluster::IsSupportedOverallTargetStatePositioning(TargetPositionEnum positioning) const
+{
+    bool isSupported = false;
+
+    switch (positioning)
+    {
+    case TargetPositionEnum::kMoveToFullyClosed:
+    case TargetPositionEnum::kMoveToFullyOpen:
+    case TargetPositionEnum::kMoveToSignaturePosition:
+        // Mandatory states are always supported
+        isSupported = true;
+        break;
+
+    case TargetPositionEnum::kMoveToPedestrianPosition:
+        isSupported = mConformance.HasFeature(Feature::kPedestrian);
+        break;
+
+    case TargetPositionEnum::kMoveToVentilationPosition:
+        isSupported = mConformance.HasFeature(Feature::kVentilation);
+        break;
+
+    default:
+        isSupported = false;
+        break;
+    }
+
+    return isSupported;
+}
+
+CHIP_ERROR ClosureControlCluster::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    auto now       = System::SystemClock().GetMonotonicTimestamp();
+    bool markDirty = false;
+
+    // When fromDelegate=true (delegate updates), we rely on the QuieterReportingAttribute policies
+    // to determine if reporting is needed (increment, change to/from zero, null changes).
+    // When fromDelegate=false (MainState change), we force reporting since the tracked operation changed.
+
+    auto predicate = [fromDelegate](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool {
+        // Force reporting when the tracked operation changes due to MainState change
+        return !fromDelegate;
+    };
+    markDirty = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+
+    if (markDirty)
+    {
+        mMatterContext.MarkDirty(Attributes::CountdownTime::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::SetMainState(MainStateEnum mainState)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(IsSupportedMainState(mainState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mainState != mState.mMainState, CHIP_NO_ERROR);
+
+    // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged state
+    if (mState.mMainState == MainStateEnum::kDisengaged)
+    {
+        TEMPORARY_RETURN_IGNORED GenerateEngageStateChangedEvent(true);
+    }
+
+    if (mainState == MainStateEnum::kDisengaged)
+    {
+        TEMPORARY_RETURN_IGNORED GenerateEngageStateChangedEvent(false);
+    }
+
+    mState.mMainState = mainState;
+    mMatterContext.MarkDirty(Attributes::MainState::Id);
+
+    if (!mConformance.HasFeature(Feature::kInstantaneous))
+    {
+        if (mainState == MainStateEnum::kCalibrating)
+        {
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
+        }
+        else if (mainState == MainStateEnum::kMoving)
+        {
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime());
+        }
+        else if (mainState == MainStateEnum::kWaitingForMotion)
+        {
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
+        }
+        else
+        {
+            // Reset the countdown time to 0 when the main state is not in motion or calibration.
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+ClosureControlCluster::SetOverallCurrentState(const DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(mState.mOverallCurrentState != overallCurrentState, CHIP_NO_ERROR);
+
+    if (!overallCurrentState.IsNull())
+    {
+        const GenericOverallCurrentState & incomingOverallCurrentState = overallCurrentState.Value();
+
+        // Validate the incoming Positioning value and FeatureMap conformance.
+        if (incomingOverallCurrentState.position.HasValue())
+        {
+            // If the positioning member is present in the incoming OverallCurrentState, we need to check if the Positioning
+            // feature is supported by the closure. If the Positioning feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            if (!incomingOverallCurrentState.position.Value().IsNull())
+            {
+                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallCurrentState.position.Value().Value()) !=
+                                        CurrentPositionEnum::kUnknownEnumValue,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(IsSupportedOverallCurrentStatePositioning(incomingOverallCurrentState.position.Value().Value()),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+            }
+        }
+
+        // Validate the incoming Latch FeatureMap conformance.
+        if (incomingOverallCurrentState.latch.HasValue())
+        {
+            // If the latch member is present in the incoming OverallCurrentState, we need to check if the MotionLatching
+            // feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        }
+
+        // Validate the incoming Speed value and FeatureMap conformance.
+        if (incomingOverallCurrentState.speed.HasValue())
+        {
+            // If the speed member is present in the incoming OverallCurrentState, we need to check if the Speed feature is
+            // supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallCurrentState.speed.Value()) !=
+                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+        }
+
+        // SecureState can only be true if the closure meets the required conditions for a secure state, preventing unauthorized or
+        // undetectable access.
+        if (!incomingOverallCurrentState.secureState.IsNull() && incomingOverallCurrentState.secureState.Value())
+        {
+            // secure state requires the closure to meet all of the following conditions based on feature support:
+            // If the Positioning feature is supported, then the Position field of OverallCurrentState is FullyClosed.
+            // If the MotionLatching feature is supported, then the Latch field of OverallCurrentState is True.
+
+            if (mConformance.HasFeature(Feature::kPositioning))
+            {
+                VerifyOrReturnError(incomingOverallCurrentState.position.HasValue() &&
+                                        !incomingOverallCurrentState.position.Value().IsNull(),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(incomingOverallCurrentState.position.Value().Value() == CurrentPositionEnum::kFullyClosed,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+            }
+
+            if (mConformance.HasFeature(Feature::kMotionLatching))
+            {
+                VerifyOrReturnError(incomingOverallCurrentState.latch.HasValue() &&
+                                        !incomingOverallCurrentState.latch.Value().IsNull(),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(incomingOverallCurrentState.latch.Value().Value() == true, CHIP_ERROR_INVALID_ARGUMENT);
+            }
+        }
+
+        // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute changes
+        if (!incomingOverallCurrentState.secureState.IsNull())
+        {
+            if (mState.mOverallCurrentState.IsNull() || mState.mOverallCurrentState.Value().secureState.IsNull())
+            {
+                // As secureState field is not set in present current state and incoming current state has value, we generate the
+                // event
+                TEMPORARY_RETURN_IGNORED GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+            }
+            else
+            {
+                // If the secureState field is set in both present and incoming current state, we generate the event only if the
+                // value has changed.
+                if (mState.mOverallCurrentState.Value().secureState.Value() != incomingOverallCurrentState.secureState.Value())
+                {
+                    TEMPORARY_RETURN_IGNORED GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+                }
+            }
+        }
+    }
+
+    mState.mOverallCurrentState = overallCurrentState;
+    mMatterContext.MarkDirty(Attributes::OverallCurrentState::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::SetOverallTargetState(const DataModel::Nullable<GenericOverallTargetState> & overallTarget)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(mState.mOverallTargetState != overallTarget, CHIP_NO_ERROR);
+
+    if (!overallTarget.IsNull())
+    {
+        const GenericOverallTargetState & incomingOverallTargetState = overallTarget.Value();
+
+        // Validate the incoming Position value and FeatureMap conformance.
+        if (incomingOverallTargetState.position.HasValue())
+        {
+            // If the position member is present in the incoming OverallTargetState, we need to check if the Position
+            // feature is supported by the closure. If the Position feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            if (!incomingOverallTargetState.position.Value().IsNull())
+            {
+                VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTargetState.position.Value().Value()) !=
+                                        TargetPositionEnum::kUnknownEnumValue,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(IsSupportedOverallTargetStatePositioning(incomingOverallTargetState.position.Value().Value()),
+                                    CHIP_ERROR_INVALID_ARGUMENT);
+            }
+        }
+
+        // Validate the incoming Latch FeatureMap conformance.
+        if (incomingOverallTargetState.latch.HasValue())
+        {
+            // If the latch member is present in the incoming OverallTargetState, we need to check if the MotionLatching
+            // feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        }
+
+        // Validate the incoming Speed value and FeatureMap conformance.
+        if (incomingOverallTargetState.speed.HasValue())
+        {
+            // If the speed member is present in the incoming OverallTargetState, we need to check if the Speed feature is
+            // supported by the closure. If the Speed feature is not supported, return an error.
+            VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTargetState.speed.Value()) !=
+                                    Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
+        }
+    }
+
+    mState.mOverallTargetState = overallTarget;
+    mMatterContext.MarkDirty(Attributes::OverallTargetState::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::SetLatchControlModes(const BitFlags<LatchControlModesBitmap> & latchControlModes)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    mState.mLatchControlModes = latchControlModes;
+    mMatterContext.MarkDirty(Attributes::LatchControlModes::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::AddErrorToCurrentErrorList(ClosureErrorEnum error)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mState.mCurrentErrorCount < kCurrentErrorListMaxSize, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
+                        ChipLogError(AppServer, "Error list is full"));
+    // Check for duplicates
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    {
+        VerifyOrReturnError(mState.mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED,
+                            ChipLogError(AppServer, "Error already exists in the list"));
+    }
+    mState.mCurrentErrorList[mState.mCurrentErrorCount++] = error;
+    DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mState.mCurrentErrorCount);
+    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+    ReturnLogErrorOnFailure(GenerateOperationalErrorEvent(currentErrorList));
+    return CHIP_NO_ERROR;
+}
+
+void ClosureControlCluster::ClearCurrentErrorList()
+{
+    assertChipStackLockedByCurrentThread();
+    // Clearing the error list array by setting all elements to kUnknownEnumValue
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    {
+        mState.mCurrentErrorList[i] = ClosureErrorEnum::kUnknownEnumValue;
+    }
+    // Reset the current error count to 0
+    mState.mCurrentErrorCount = 0;
+    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+}
+
+// TODO: Move the CountdownTime handling to Delegate
+CHIP_ERROR ClosureControlCluster::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    countdownTime = mState.mCountdownTime.value();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GetMainState(MainStateEnum & mainState)
+{
+    assertChipStackLockedByCurrentThread();
+
+    mainState = mState.mMainState;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
+{
+    assertChipStackLockedByCurrentThread();
+
+    overallCurrentState = mState.mOverallCurrentState;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget)
+{
+    assertChipStackLockedByCurrentThread();
+
+    overallTarget = mState.mOverallTargetState;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan)
+{
+    assertChipStackLockedByCurrentThread();
+
+    VerifyOrReturnError(outputSpan.size() == kCurrentErrorListMaxSize, CHIP_ERROR_BUFFER_TOO_SMALL,
+                        ChipLogError(AppServer, "Output buffer size is not equal to kCurrentErrorListMaxSize"));
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    {
+        outputSpan[i] = mState.mCurrentErrorList[i];
+    }
+    outputSpan.reduce_size(mState.mCurrentErrorCount);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    assertChipStackLockedByCurrentThread();
+
+    for (size_t i = 0; i < mState.mCurrentErrorCount; i++)
+    {
+        ClosureErrorEnum error = mState.mCurrentErrorList[i];
+        // Encode the error
+        ReturnErrorOnFailure(encoder.Encode(error));
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes)
+{
+
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    latchControlModes = mState.mLatchControlModes;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GetFeatureMap(BitFlags<Feature> & featureMap)
+{
+
+    featureMap = mConformance.FeatureMap();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
+{
+
+    clusterRevision = ClosureControl::kRevision;
+    return CHIP_NO_ERROR;
+}
+
+Protocols::InteractionModel::Status ClosureControlCluster::HandleStop()
+{
+
+    // Stop command can only be supported if closure doesnt support instantaneous features
+    VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), Status::UnsupportedCommand);
+
+    MainStateEnum state;
+    VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
+
+    // Stop action is supported only if the closure is in one of the following states Moving, WaitingForMotion or Calibrating.
+    // A status code of SUCCESS SHALL always be returned, regardless if it is in above states or not.
+    if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
+    {
+        // Set the MainState to 'Stopped' only if the delegate call to HandleStopCommand is successful.
+        Status status = mDelegate.HandleStopCommand();
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        VerifyOrReturnError(SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR, Status::Failure,
+                            ChipLogError(AppServer, "Stop Command: Failed to set MainState to Stopped"));
+    }
+
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ClosureControlCluster::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
+                                                                        Optional<Globals::ThreeLevelAutoEnum> speed)
+{
+
+    VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+    VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
+                        ChipLogError(AppServer, "OverallCurrentState is null on endpoint : %d", mMatterContext.GetEndpointId()));
+
+    if (overallTargetState.IsNull())
+    {
+        // If overallTargetState is null, we need to initialize to default value.
+        // This is to ensure that we can set the position, latch, and speed values in the overallTargetState.
+        overallTargetState.SetNonNull(GenericOverallTargetState{});
+    }
+
+    if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
+    {
+        VerifyOrReturnError(position.Value() != TargetPositionEnum::kUnknownEnumValue, Status::ConstraintError);
+
+        overallTargetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
+    }
+
+    if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // If latch value is true and the Remote Latching feature is not supported, or
+        // if latch value is false and the Remote Unlatching feature is not supported, return InvalidInState.
+        if ((latch.Value() && !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
+            (!latch.Value() && !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteUnlatching)))
+        {
+            return Status::InvalidInState;
+        }
+
+        overallTargetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
+    }
+
+    if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
+    {
+        VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
+
+        overallTargetState.Value().speed.SetValue(speed.Value());
+    }
+
+    MainStateEnum state;
+    VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
+
+    // If the MoveTo command is received in any state other than 'Moving', 'WaitingForMotion', or 'Stopped', an error code
+    // INVALID_IN_STATE shall be returned.
+    VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
+                            state == MainStateEnum::kStopped,
+                        Status::InvalidInState);
+
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // If this command requests a position change while the Latch field of the OverallCurrentState is True (Latched), and the
+        // Latch field of this command is not set to False (Unlatched), a status code of INVALID_IN_STATE SHALL be returned.
+        if (position.HasValue() && overallCurrentState.Value().latch.HasValue() &&
+            !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value())
+        {
+            VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState,
+                                ChipLogError(AppServer,
+                                             "Latch is True in OverallCurrentState, but MoveTo command does not set latch to False "
+                                             "when position change is requested on endpoint : %d",
+                                             mMatterContext.GetEndpointId()));
+        }
+    }
+
+    // Set MainState and OverallTargetState only if the delegate call to HandleMoveToCommand is successful
+    Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
+    VerifyOrReturnValue(status == Status::Success, status);
+
+    if (mDelegate.IsReadyToMove())
+    {
+        VerifyOrReturnError(SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
+                            ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to Moving"));
+    }
+    else
+    {
+        VerifyOrReturnError(SetMainState(MainStateEnum::kWaitingForMotion) == CHIP_NO_ERROR, Status::Failure,
+                            ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
+    }
+
+    VerifyOrReturnError(SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
+
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ClosureControlCluster::HandleCalibrate()
+{
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kCalibration), Status::UnsupportedCommand);
+
+    MainStateEnum state;
+    VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
+
+    // If Calibrate command is received when already in the Calibrating state,
+    // the server SHALL respond with a status code of SUCCESS.
+    VerifyOrReturnValue(state != MainStateEnum::kCalibrating, Status::Success);
+
+    // If the Calibrate command is invoked in any state other than Stopped or SetupRequired,
+    // the server SHALL respond with INVALID_IN_STATE and there SHALL be no other effect.
+    // This check excludes the 'Calibrating' MainState as it is already validated above
+    VerifyOrReturnError(state == MainStateEnum::kStopped || state == MainStateEnum::kSetupRequired, Status::InvalidInState);
+
+    // Set the MainState to 'Calibrating' only if the delegate call to HandleCalibrateCommand is successful
+    Status status = mDelegate.HandleCalibrateCommand();
+    VerifyOrReturnValue(status == Status::Success, status);
+
+    VerifyOrReturnError(SetMainState(MainStateEnum::kCalibrating) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Calibrate Command: Failed to set MainState to Calibrating"));
+
+    return Status::Success;
+}
+
+CHIP_ERROR ClosureControlCluster::GenerateOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> & errorState)
+{
+    ReturnErrorOnFailure(SetMainState(MainStateEnum::kError));
+
+    Events::OperationalError::Type event{ .errorState = errorState };
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GenerateMovementCompletedEvent()
+{
+    VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    Events::MovementCompleted::Type event{};
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GenerateEngageStateChangedEvent(const bool engageValue)
+{
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kManuallyOperable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    Events::EngageStateChanged::Type event{ .engageValue = engageValue };
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlCluster::GenerateSecureStateChangedEvent(const bool secureValue)
+{
+    Events::SecureStateChanged::Type event{ .secureValue = secureValue };
+    ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-// -----------------------------------------------------------------------------
-// Plugin initialization
-
-void MatterClosureControlPluginServerInitCallback() {}
-void MatterClosureControlPluginServerShutdownCallback() {}

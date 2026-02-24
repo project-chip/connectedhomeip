@@ -18,4 +18,4 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/ClosureControlCluster.h>
+#include <app/clusters/closure-control-server/CodegenIntegration.h>
