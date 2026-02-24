@@ -267,7 +267,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         try:
             xml_clusters, _ = build_xml_clusters(dm_dir)
-        except Exception as e:
+        except SpecParsingException as e:
             LOGGER.warning("Could not build XML clusters for C/Q exclusion set: %s", e)
             return frozenset()
 
