@@ -96,7 +96,7 @@ void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_t reason, c
 CHIP_ERROR BflbEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     VerifyOrDie (netif_add(&gnetif, NULL, NULL, NULL, NULL, &eth_emac_if_init, &tcpip_input));
-    
+
     LOCK_TCPIP_CORE();
     netif_set_default(&gnetif);
     netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);

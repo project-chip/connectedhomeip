@@ -33,7 +33,7 @@ namespace DeviceLayer {
 extern "C" struct netif * deviceInterface_getNetif(void);
 
 #if CHIP_DEVICE_LAYER_TARGET_BL616
-void get_usage_info(uint64_t & used_size, uint64_t & free_size) 
+void get_usage_info(uint64_t & used_size, uint64_t & free_size)
 {
     uintptr_t irq_flags = mm_lock_save();
     mem_manager_t *manager = &g_mem_manager;

@@ -261,7 +261,7 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone()
 
     ap_num = wifi_mgmr_get_scan_ap_num();
     if (ap_num)
-    {   
+    {
         if (mScanSSIDlength) {
             ap_num = 1;
         }

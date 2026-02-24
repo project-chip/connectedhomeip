@@ -217,7 +217,7 @@ static const HeapRegion_t xHeapRegions[] = {
 #if CHIP_DEVICE_LAYER_TARGET_BL702
 extern "C" uint8_t __bss_plat_start;
 extern "C" uint8_t __bss_plat_end;
-void do_platform_bss_reset(void) 
+void do_platform_bss_reset(void)
 {
     memset(&__bss_plat_start, 0, &__bss_plat_end - &__bss_plat_start);
 }

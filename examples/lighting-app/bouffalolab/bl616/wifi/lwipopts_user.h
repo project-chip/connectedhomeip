@@ -94,9 +94,9 @@
 
 #if (defined(BL602))
 #define LWIP_HEAP_SIZE (14 * 1024)
-#else 
+#else
 #define LWIP_HEAP_SIZE (18 * 1024)
-#endif 
+#endif
 
 #ifdef LWIP_HEAP_SIZE
 #define MEM_SIZE LWIP_HEAP_SIZE

@@ -125,9 +125,9 @@ extern "C" void network_netif_ext_callback(struct netif * nif, netif_nsc_reason_
         return;
     }
 
-    if ((LWIP_NSC_IPV4_SETTINGS_CHANGED) & reason) 
+    if ((LWIP_NSC_IPV4_SETTINGS_CHANGED) & reason)
     {
-        if (memcmp(netif_ip4_addr(nif), args->ipv4_changed.old_address, sizeof(ip4_addr_t)) || 
+        if (memcmp(netif_ip4_addr(nif), args->ipv4_changed.old_address, sizeof(ip4_addr_t)) ||
             memcmp(netif_ip4_netmask(nif), args->ipv4_changed.old_netmask, sizeof(ip4_addr_t)) ||
             memcmp(netif_ip4_gw(nif), args->ipv4_changed.old_gw, sizeof(ip4_addr_t))) {
             ConnectivityMgrImpl().OnConnectivityChanged(nif);

@@ -40,7 +40,7 @@ public:
         : mSize(size), mpRawResults(pScanResults), mConvert(std::move(conv)) {}
     size_t Count() override { return mSize; }
     void Release() override {}
-    
+
     bool Next(WiFiScanResponse& item) override
     {
         if (mIternum >= mSize || mpRawResults == nullptr) {
