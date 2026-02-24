@@ -157,7 +157,8 @@ class BouffalolabBuilder(GnBuilder):
             if enable_ethernet or enable_wifi:
                 raise Exception(f"SoC {bouffalo_chip} does NOT support connectivity Ethernet/Wi-Fi currently.")
         elif bouffalo_chip == "bl616":
-            sdk_path = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../third_party/bouffalolab/bouffalo_sdk/VERSION')
+            sdk_path = os.path.join(root, os.path.split(os.path.realpath(__file__))[
+                                    0], '../../../third_party/bouffalolab/bouffalo_sdk/VERSION')
             x, y, z = self.extract_sdk_version(sdk_path)
             self.argsOpt.append(f'app_ver_x={x}')
             self.argsOpt.append(f'app_ver_y={y}')
