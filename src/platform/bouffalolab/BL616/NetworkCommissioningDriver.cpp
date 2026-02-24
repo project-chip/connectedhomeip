@@ -249,7 +249,7 @@ void BflbWiFiDriver::OnScanWiFiNetworkDone()
     if (nums)
     {
         pScanList = (struct wifi_mgmr_scan_item *) MemoryAlloc(nums * sizeof(wifi_mgmr_scan_item_t));
-        if (pScanList || wifi_mgmr_sta_scanlist_dump(pScanList, nums)) 
+        if (pScanList && wifi_mgmr_sta_scanlist_dump(pScanList, nums)) 
         {
             if (mScanSSIDlength)
             {

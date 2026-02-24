@@ -300,18 +300,30 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     // IPv6-only support
     Inet::InterfaceAddressIterator interfAddrIterator;
-    uint8_t ipv6AddressesCount = 0;
-    while (interfAddrIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+    uint32_t ipv6AddressesCount = 0, ipv4AddressesCount = 0;
+    chip::Inet::IPAddress ipAddress;
+    while (interfAddrIterator.HasCurrent())
     {
-        chip::Inet::IPAddress ipv6Address;
-        if (interfAddrIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+        if (interfAddrIterator.GetAddress(ipAddress) == CHIP_NO_ERROR)
         {
-            memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
-            ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
-            ipv6AddressesCount++;
+            if (ipAddress.IsIPv4()) {
+                if (ipv4AddressesCount < kMaxIPv4AddrCount) {
+                    memcpy(ifp->Ipv4AddressesBuffer[ipv4AddressesCount], ipAddress.Addr, kMaxIPv4AddrSize);
+                    ifp->Ipv4AddressSpans[ipv4AddressesCount] = ByteSpan(ifp->Ipv4AddressesBuffer[ipv4AddressesCount]);
+                    ipv4AddressesCount++;
+                }
+            }
+            else {
+                if (ipv6AddressesCount < kMaxIPv6AddrCount) {
+                    memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipAddress.Addr, kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+                    ipv6AddressesCount++;
+                }
+            }
         }
         interfAddrIterator.Next();
     }
+    ifp->IPv4Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, ipv4AddressesCount);
     ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
 
     *netifpp = ifp.release();

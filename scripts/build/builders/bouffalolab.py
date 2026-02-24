@@ -280,6 +280,7 @@ class BouffalolabBuilder(GnBuilder):
             else:
                 raise Exception('Invalid version format')
         except Exception as err:
+            logging.error(f"Failed to extract SDK version: {err}")
             return (2, 1, 0)
 
     def GnBuildArgs(self):
