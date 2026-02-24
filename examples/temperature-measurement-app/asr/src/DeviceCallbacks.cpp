@@ -98,7 +98,8 @@ void TempMeas(System::Layer * systemLayer, void * appState)
 
     ASR_LOG("Sensor T:%d H:%d", temperature, humidity);
 
-    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, /* temperature in 0.01*C */ temperature));
+    LogErrorOnFailure(
+        app::Clusters::TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, /* temperature in 0.01*C */ temperature));
 
     // chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
     //     /* endpoint ID */ 1, /* humidity in 0.01*C */ int16_t(humidity));
