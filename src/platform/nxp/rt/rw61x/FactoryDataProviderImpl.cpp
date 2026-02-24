@@ -63,8 +63,6 @@ using namespace ::chip::Crypto;
 namespace chip {
 namespace DeviceLayer {
 
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
-
 static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
 CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * source)
@@ -421,7 +419,8 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
 #ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
-    return FactoryDataProviderImpl::sInstance;
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
 }
 #endif
 
