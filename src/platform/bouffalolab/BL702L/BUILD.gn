@@ -21,7 +21,7 @@ import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 
 assert(chip_device_platform == "bl702l")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -77,7 +77,7 @@ static_library("BL702L") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     # needed for MTD/FTD
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")

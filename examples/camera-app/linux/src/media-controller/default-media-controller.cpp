@@ -53,6 +53,8 @@ void DefaultMediaController::RegisterTransport(Transport * transport, const std:
     // 1: Deliver with a delay of up to 1 ms (default)
     // Other values: Deliver with the specified delay
     bufferSink->requestedPreBufferLengthMs = 1;
+    bufferSink->registrationTimeMs         = mPreRollBuffer.NowMs();
+    bufferSink->hasDeliveredFirstFrame     = false;
 
     if (mCameraDevice)
     {
@@ -157,4 +159,20 @@ Transport * DefaultMediaController::GetTransportForAudioStream(uint16_t audioStr
         }
     }
     return nullptr;
+}
+
+void DefaultMediaController::ResetTransportSinkState(Transport * transport)
+{
+    auto it = mSinkMap.find(transport);
+    if (it != mSinkMap.end() && it->second != nullptr)
+    {
+        it->second->registrationTimeMs     = mPreRollBuffer.NowMs();
+        it->second->hasDeliveredFirstFrame = false;
+        ChipLogProgress(Camera, "Reset sink state for transport: registrationTimeMs=%lld",
+                        static_cast<long long>(it->second->registrationTimeMs));
+    }
+    else
+    {
+        ChipLogError(Camera, "ResetTransportSinkState: Transport not registered");
+    }
 }

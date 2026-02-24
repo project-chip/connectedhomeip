@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Push AV Server</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="top-level">
+        <a href="/ui/streams">Streams</a>
+        <a href="/ui/certificates">Certificates</a>
+    </nav>
+    <div class="left-bar">
+        <h2>Streams</h2>
+
+
+        <ul>
+            {% for stream in streams %}
+            <li> Stream {{stream.id}}
+                <ul>
+                    {% for session in stream.sessions %}
+                        {% for (file, crt) in session.uploaded_segments %}
+                        <li><a href="/ui/streams/{{stream.id}}/{{file}}">{{file}}</a></li>
+                        {% endfor %}
+                        {% for (file, crt) in session.uploaded_manifests %}
+                        <li><a href="/ui/streams/{{stream.id}}/{{file}}">{{file}}</a></li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="center">
+        {% if type == 'cert' %}
+        <pre><code>{{cert}}</code></pre>
+        {% else %}
+        <div>
+            <video controls src="/streams/{{stream_id}}/{{file_path}}"></video>
+        </div>
+        <div>
+            <pre><code>{{pretty_probe}}</code></pre>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

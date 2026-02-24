@@ -407,6 +407,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device;
+- (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -4530,22 +4531,38 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
 
                 [self _attributeValue:attributeDataValue reportedForPath:attributePath];
+            }
 
-                // If we've never detected a time synchronization loss, or it's
-                // been a while since we last detected a time synchronization
-                // loss then check for a time synchronization loss now.
-                if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeTimeSynchronizationID
-                    && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID
-                    && [self shouldDetectTimeSynchronizationLoss]) {
-                    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:attributeResponseValue error:nil];
-                    if (attrReport) {
-                        NSNumber * deviceUTCTime = attrReport.value;
-                        auto * deviceDate = MatterEpochMicrosecondsAsDate(deviceUTCTime.unsignedLongLongValue);
-                        if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
-                            MTR_LOG("%@ Time synchronization loss detected", self);
-                            _timeSynchronizationLossDetected = YES;
-                            _timeSynchronizationLossDetectedTime = [NSDate now];
-                        }
+            // If we've never detected a time synchronization loss, or it's
+            // been a while since we last detected a time synchronization
+            // loss then check for a time synchronization loss now.
+            //
+            // This check must be done unconditionally (not just when the
+            // cache value changed) because CurrentTime has the C (non-
+            // reportable) quality.  After we set time on a device that
+            // lost time sync, our cached value stays null even though the
+            // device now has a valid time.  If the device power-cycles
+            // again and reports null, the value matches the cache and the
+            // check would be skipped.
+            if (isFromSubscription
+                && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeTimeSynchronizationID
+                && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID
+                && [self shouldDetectTimeSynchronizationLoss]) {
+                auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:attributeResponseValue error:nil];
+                if (attrReport) {
+                    NSNumber * deviceUTCTime = attrReport.value;
+                    auto * deviceDate = MatterEpochMicrosecondsAsDate(deviceUTCTime.unsignedLongLongValue);
+                    if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
+                        MTR_LOG("%@ Time synchronization loss detected", self);
+                        _timeSynchronizationLossDetected = YES;
+                        _timeSynchronizationLossDetectedTime = [NSDate now];
+#ifdef DEBUG
+                        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                            if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectedForDevice:)]) {
+                                [testDelegate unitTestTimeSynchronizationLossDetectedForDevice:self];
+                            }
+                        }];
+#endif
                     }
                 }
             }

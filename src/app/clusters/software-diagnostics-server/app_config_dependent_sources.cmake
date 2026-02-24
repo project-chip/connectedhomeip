@@ -19,19 +19,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/SoftwareDiagnosticsCluster.h"
-    "${CLUSTER_DIR}/SoftwareDiagnosticsLogic.cpp"
-    "${CLUSTER_DIR}/SoftwareDiagnosticsLogic.h"
-)
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/software-fault-listener.cpp"
-    "${CLUSTER_DIR}/software-fault-listener.h"
-)

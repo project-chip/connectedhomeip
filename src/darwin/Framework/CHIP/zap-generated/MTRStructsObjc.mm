@@ -3337,6 +3337,8 @@ NS_ASSUME_NONNULL_BEGIN
         _epochKey2 = nil;
 
         _epochStartTime2 = nil;
+
+        _groupKeyMulticastPolicy = @(0);
     }
     return self;
 }
@@ -3353,13 +3355,44 @@ NS_ASSUME_NONNULL_BEGIN
     other.epochStartTime1 = self.epochStartTime1;
     other.epochKey2 = self.epochKey2;
     other.epochStartTime2 = self.epochStartTime2;
+    other.groupKeyMulticastPolicy = self.groupKeyMulticastPolicy;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; groupKeyMulticastPolicy:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2, _groupKeyMulticastPolicy];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRGroupKeyManagementClusterGroupcastAdoptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupcastAdopted = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRGroupKeyManagementClusterGroupcastAdoptionStruct alloc] init];
+
+    other.groupcastAdopted = self.groupcastAdopted;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupcastAdopted:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupcastAdopted, _fabricIndex];
     return descriptionString;
 }
 
@@ -8502,6 +8535,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTROccupancySensingClusterPredictedOccupancyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startTimestamp = @(0);
+
+        _endTimestamp = @(0);
+
+        _occupancy = @(0);
+
+        _confidence = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROccupancySensingClusterPredictedOccupancyStruct alloc] init];
+
+    other.startTimestamp = self.startTimestamp;
+    other.endTimestamp = self.endTimestamp;
+    other.occupancy = self.occupancy;
+    other.confidence = self.confidence;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTimestamp:%@; endTimestamp:%@; occupancy:%@; confidence:%@; >", NSStringFromClass([self class]), _startTimestamp, _endTimestamp, _occupancy, _confidence];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROccupancySensingClusterOccupancyChangedEvent
 - (instancetype)init
 {
@@ -8537,10 +8606,6 @@ NS_ASSUME_NONNULL_BEGIN
         _ambientContextSensed = [NSArray array];
 
         _detectionStartTime = nil;
-
-        _objectCountThreshold = nil;
-
-        _objectCount = nil;
     }
     return self;
 }
@@ -8551,15 +8616,13 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.ambientContextSensed = self.ambientContextSensed;
     other.detectionStartTime = self.detectionStartTime;
-    other.objectCountThreshold = self.objectCountThreshold;
-    other.objectCount = self.objectCount;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; objectCountThreshold:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime, _objectCountThreshold, _objectCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime];
     return descriptionString;
 }
 
@@ -8593,6 +8656,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterObjectCountConfigStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _countingObject = [MTRDataTypeSemanticTagStruct new];
+
+        _objectCountThreshold = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterObjectCountConfigStruct alloc] init];
+
+    other.countingObject = self.countingObject;
+    other.objectCountThreshold = self.objectCountThreshold;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: countingObject:%@; objectCountThreshold:%@; >", NSStringFromClass([self class]), _countingObject, _objectCountThreshold];
     return descriptionString;
 }
 
@@ -8640,28 +8733,58 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAmbientContextSensingClusterAmbientContextDetectedEvent
+@implementation MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _ambientContextType = [NSArray array];
+        _ambientContextType = nil;
+
+        _objectCount = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectedEvent alloc] init];
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent alloc] init];
 
     other.ambientContextType = self.ambientContextType;
+    other.objectCount = self.objectCount;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; >", NSStringFromClass([self class]), _ambientContextType];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextType, _objectCount];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startEventNumber = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent alloc] init];
+
+    other.startEventNumber = self.startEventNumber;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startEventNumber:%@; >", NSStringFromClass([self class]), _startEventNumber];
     return descriptionString;
 }
 
