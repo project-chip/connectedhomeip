@@ -29,7 +29,7 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
 
     for (const auto & entry : attributes)
     {
-        attrPath                          = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, entry.attributeId);
+        attrPath = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, entry.attributeId);
 
         // Create a copy of the buffer to check if the value is already in the AttributePersistence.
         // If the attribute value is already stored in AttributePersistence, skip it.

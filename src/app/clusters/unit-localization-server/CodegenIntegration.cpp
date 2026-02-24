@@ -19,8 +19,8 @@
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/persistence/AttributePersistenceMigration.h>
-#include <app/static-cluster-config/UnitLocalization.h>
 #include <app/server/Server.h>
+#include <app/static-cluster-config/UnitLocalization.h>
 #include <clusters/UnitLocalization/Ids.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
@@ -87,8 +87,10 @@ void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
 
     static constexpr AttrMigrationData attributesToUpdate[] = { { UnitLocalization::Attributes::TemperatureUnit::Id,
                                                                   &DefaultMigrators::ScalarValue<uint8_t> } };
-    SuccessOrLog(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({endpointId, UnitLocalization::Id}, Span(attributesToUpdate),
-    chip::Server::GetInstance().GetPersistentStorage()), Zcl, "Error migrating UnitLocalization");
+    SuccessOrLog(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({ endpointId, UnitLocalization::Id },
+                                                                                Span(attributesToUpdate),
+                                                                                chip::Server::GetInstance().GetPersistentStorage()),
+                 Zcl, "Error migrating UnitLocalization");
 }
 
 void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
