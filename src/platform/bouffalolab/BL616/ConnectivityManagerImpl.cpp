@@ -17,10 +17,12 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <NetworkCommissioningDriver.h>
-
 #include <platform/DiagnosticDataProvider.h>
+
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
+#endif
 
 extern "C" {
 #undef IS_ENABLED

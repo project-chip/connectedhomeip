@@ -42,7 +42,8 @@ auto converter = [](const wifi_mgmr_ap_item_t & raw) -> WiFiScanResponse {
          : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
     item.channel  = raw.channel;
     item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-    item.rssi     = raw.rssi;
+    item.signal.type = WirelessSignalType::kdBm;
+    item.signal.strength = raw.rssi;
     memcpy(item.ssid, raw.ssid, item.ssidLen);
     memcpy(item.bssid, raw.bssid, 6);
 

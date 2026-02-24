@@ -19,10 +19,10 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <NetworkCommissioningDriver.h>
-
 #include <platform/DiagnosticDataProvider.h>
+
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 
 using namespace ::chip;
 

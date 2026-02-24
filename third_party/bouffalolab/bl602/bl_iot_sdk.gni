@@ -590,14 +590,14 @@ template("bl_iot_sdk") {
 
     defines = [
       "CONFIG_BT_CONN=1",
-      "CFG_BLE_TX_BUFF_DATA=2",
+      "CONFIG_BLE_TX_BUFF_DATA=2",
       "CONFIG_BT_PERIPHERAL",
       "CFG_BLE_ENABLE",
       "BFLB_BLE",
       "CFG_BLE",
       "CFG_IOT_SDK",
 
-      "CFG_CON=1",
+      "CONFIG_CON=1",
       "CONFIG_BT_L2CAP_DYNAMIC_CHANNEL",
       "CONFIG_BT_GATT_CLIENT",
     ]
