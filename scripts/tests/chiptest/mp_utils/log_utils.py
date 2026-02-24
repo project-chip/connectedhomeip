@@ -1,8 +1,11 @@
+# TODO: Move up a level.
+
 import logging
 from dataclasses import dataclass
 from functools import cache
 
 import coloredlogs
+
 
 @dataclass(frozen=True)
 class LogConfig:

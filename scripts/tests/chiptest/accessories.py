@@ -25,13 +25,13 @@ import threading
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeVar, TypeAlias
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from .mp_utils.log_utils import LogConfig
-from .mp_utils.process import WrappedProcess, mp_wrapped_spawn_context, ProcessConfig, ProcessConfigTemplate
-from .mp_utils.queue import WorkQueue, WorkQueueCancelled
 from .mp_utils.common import StartStopContextMixin
+from .mp_utils.log_utils import LogConfig
+from .mp_utils.process import ProcessConfigTemplate, WrappedProcess, mp_wrapped_spawn_context
+from .mp_utils.queue import WorkQueue, WorkQueueCancelled
 
 if TYPE_CHECKING:
     from .test_definition import App
@@ -51,12 +51,11 @@ XmlRpcFuncCallT: TypeAlias = tuple[str, tuple[Any, ...]]
 XmlRpcFuncRetT: TypeAlias = bool | Exception
 
 
-class XmlRpcServerProcess(WrappedProcess[ProcessConfigTemplate, XmlRpcFuncCallT, XmlRpcFuncRetT], StartStopContextMixin):
+class XmlRpcServerProcess(WrappedProcess, StartStopContextMixin):
     def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, work_queue: WorkQueue[XmlRpcFuncCallT, XmlRpcFuncRetT],
                  log_config: LogConfig) -> None:
         super().__init__(mp_context, mp_manager,
-                         ProcessConfig.from_template(id=0, template=ProcessConfigTemplate("XMLRPC", "XML RPC Server", log_config)),
-                         work_queue=work_queue)
+                         ProcessConfigTemplate(name_short="XMLRPC", name_long="XML RPC Server", log_config=log_config), work_queue)
 
         self._server: SimpleXMLRPCServer | None = None
         self._server_thread: threading.Thread | None = None

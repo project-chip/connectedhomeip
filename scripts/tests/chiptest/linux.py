@@ -423,7 +423,7 @@ class ThreadBorderRouter:
                                       text=True,
                                       encoding='UTF-8')
 
-        sniffer_cmd = f'{self._ns_cmd_wrapper} tcpdump -ilo -U -Zroot -wthread.pcap udp port 9000'
+        sniffer_cmd = f'{self._ns_cmd_wrapper} tcpdump -ilo -U -Zroot -w/tmp/thread.pcap udp port 9000'
 
         self._sniffer = subprocess.Popen(sniffer_cmd,
                                          stdout=sys.stdout,

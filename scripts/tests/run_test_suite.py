@@ -29,9 +29,10 @@ from typing import Any, Protocol
 import chiptest
 import click
 import coloredlogs
-from chiptest.concurrent import TestPoolManager, WorkerConfigTemplate, WorkerError
+import tempfile
+from chiptest.concurrent import TestPoolManager, TestJobConfig, WorkerError
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.log_utils import LogConfig
+from chiptest.mp_utils.log_utils import LogConfig
 from chiptest.runner import SubprocessKind
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
@@ -518,9 +519,10 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
         log.info("Each test will be executed %d times", iterations)
 
-    config = WorkerConfigTemplate(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_fast,
-                          dry_run, context.obj.log_config, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds)
-    pool = TestPoolManager(config, iterations, keep_going, expected_failures)
+    config = TestJobConfig(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_fast,
+                           dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds, iterations, keep_going,
+                           expected_failures)
+    pool = TestPoolManager(context.obj.log_config, config)
     try:
         pool.run_tests(context.obj.tests)
     except WorkerError as e:

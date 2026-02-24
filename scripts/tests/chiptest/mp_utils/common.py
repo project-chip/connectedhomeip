@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from types import TracebackType
-from typing import Literal,  Self
+from typing import Literal, Self
 
 log = logging.getLogger(__name__)
 

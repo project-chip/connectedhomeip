@@ -1,5 +1,5 @@
-from collections.abc import Callable
 import dataclasses
+import functools
 import logging
 import multiprocessing
 import multiprocessing.spawn
@@ -8,19 +8,17 @@ import signal
 import stat
 import sys
 import tempfile
-import threading
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from contextlib import contextmanager
-import enum
 from multiprocessing.context import SpawnContext
-from multiprocessing.managers import SyncManager, ValueProxy
+from multiprocessing.managers import SyncManager
 from pathlib import Path
-from types import TracebackType
-from typing import Generic, Iterator, TypeVar,  ClassVar, ParamSpec, Concatenate
-import functools
+from typing import ClassVar, Concatenate, Generic, Iterator, ParamSpec, Self, TypeVar
 
 from .log_utils import LogConfig
-from .queue import WorkQueue, WorkQueueCancelled
+from .queue import EndOfWork, WorkQueue, WorkQueueCancelled
+from .state import ProcessGroupState, ProcessState
 
 log = logging.getLogger(__name__)
 
@@ -55,13 +53,13 @@ def mp_wrapped_spawn_context(wrapper: str | None,
         if mp_wrapper_name is not None:
             mp_wrapper_name.unlink()
 
-
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ProcessConfigTemplate:
     DEFAULT_START_TIMEOUT: ClassVar[float] = 4.0
     DEFAULT_STOP_TIMEOUT: ClassVar[float] = 4.0
     DEFAULT_TERMINATION_TIMEOUT: ClassVar[float] = 2.0
 
+    id: int = -1
     name_short: str = "P{id}"
     name_long: str = "Process {id}"
     log_config: LogConfig = dataclasses.field(default_factory=LogConfig)
@@ -69,85 +67,17 @@ class ProcessConfigTemplate:
     stop_timeout: float = DEFAULT_STOP_TIMEOUT
     termination_timeout: float = DEFAULT_TERMINATION_TIMEOUT
 
-    def format_name(self) -> None:
-        # Format the process name with the class fields (useful for subclassing).
-        self.name_short = self.name_short.format_map(dataclasses.asdict(self))
-        self.name_long = self.name_long.format_map(dataclasses.asdict(self))
+    def with_formatted_name(self, id: int) -> Self:
+        name_short=self.name_short.format(id=id)
+        name_long=self.name_long.format(id=id)
 
         # If the logger config defines a name of the base process, use it as a prefix for the short name and in the log config
         # itself, to make it more clear which process is logging.
         if self.log_config.process_name is not None:
-            self.name_short = f"{self.log_config.process_name}/{self.name_short}"
-        self.log_config = dataclasses.replace(self.log_config, process_name=self.name_short)
+            name_short = f"{self.log_config.process_name}/{name_short}"
 
-@dataclasses.dataclass
-class ProcessConfigMixin(ABC):
-    id: int
-
-    @abstractmethod
-    def format_name(self) -> None: ...
-
-    @classmethod
-    def from_template(cls, id: int, template: ProcessConfigTemplate):
-        template_kwargs = {f.name: getattr(template, f.name) for f in dataclasses.fields(type(template)) if f.init}
-        ret = cls(**template_kwargs, id=id)
-        ret.format_name()
-        return ret
-
-@dataclasses.dataclass
-class ProcessConfig(ProcessConfigTemplate, ProcessConfigMixin):
-    pass
-
-ConfigTemplateT = TypeVar("ConfigTemplateT", bound=ProcessConfigTemplate)
-
-class ProcessState(Generic[ConfigTemplateT]):
-    # TODO: Document behavior of the states and transitions between them, and how to use the state as a synchronization primitive.
-
-    class Phase(enum.IntEnum):
-        NOT_STARTED = enum.auto()
-        UNINITIALIZED = enum.auto()
-        READY = enum.auto()
-        CLOSED = enum.auto()
-
-    def __init__(self, mp_manager: SyncManager, config: ConfigTemplateT, state_changed_cond: threading.Condition | None = None,
-                 initial_state: Phase = Phase.NOT_STARTED) -> None:
-        self._config = config
-        self._state_changed = mp_manager.Condition() if state_changed_cond is None else state_changed_cond
-        self._phase: ValueProxy[ProcessState.Phase] = mp_manager.Value(object, initial_state)
-        self._exception: ValueProxy[BaseException | None] = mp_manager.Value(object, None)
-
-    @property
-    def phase(self) -> Phase:
-        return self._phase.get()
-
-    @phase.setter
-    def phase(self, value: Phase) -> None:
-        with self._state_changed:
-            self._phase.set(value)
-            self._state_changed.notify_all()
-
-    @property
-    def exception(self) -> BaseException | None:
-        return self._exception.get()
-
-    @exception.setter
-    def exception(self, value: BaseException | None) -> None:
-        with self._state_changed:
-            if value is not None:
-                value.add_note(f"Exception in process {self._config.name_long} in phase {self.phase}")
-            self._exception.set(value)
-            self._state_changed.notify_all()
-
-    def __enter__(self) -> bool:
-        return self._state_changed.__enter__()
-
-    def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None):
-        return self._state_changed.__exit__(exc_type, exc_val, exc_tb)
-
-    def wait_for(self, predicate: Callable[[Phase], bool], timeout: float | None = None):
-        with self._state_changed:
-            return self._state_changed.wait_for(lambda: predicate(self._phase.get()), timeout)
-
+        return dataclasses.replace(self, id=id, name_short=name_short, name_long=name_long,
+                                   log_config=dataclasses.replace(self.log_config, process_name=name_short))
 
 
 S = TypeVar("S", bound="WrappedProcess")
@@ -155,7 +85,7 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-def with_enriched_exception(fn: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
+def with_annotated_exception(fn: Callable[Concatenate[S, P], R]) -> Callable[Concatenate[S, P], R]:
     """Decorator to enrich exceptions from WrappedProcess methods with process information."""
 
     @functools.wraps(fn)
@@ -168,20 +98,23 @@ def with_enriched_exception(fn: Callable[Concatenate[S, P], R]) -> Callable[Conc
 
     return wrapper
 
+
+ConfigT = TypeVar("ConfigT", bound=ProcessConfigTemplate)
 WorkRequestT = TypeVar("WorkRequestT")
 WorkResponseT = TypeVar("WorkResponseT")
 
-class WrappedProcess(ABC, Generic[ConfigTemplateT, WorkRequestT, WorkResponseT]):
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: ConfigTemplateT,
+
+class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: ConfigT,
                  work_queue: WorkQueue[WorkRequestT, WorkResponseT] | None = None,
-                 state_changed_cond: threading.Condition | None = None) -> None:
+                 group_state: ProcessGroupState | None = None) -> None:
         # Neither mp_context or mp_manager should be saved in the instance, as they are not picklable between processes but they can
         # be used to initialize some shared resources.
 
         # Create state and work queue.
         self._config = config
-        self.state = ProcessState(mp_manager, config, state_changed_cond)
         self.work_queue = work_queue if work_queue is not None else WorkQueue[WorkRequestT, WorkResponseT](mp_manager)
+        self.state = ProcessState(mp_manager, config, group_state)
 
         # Create multiprocessing.Process in the given context.
         self._proc = mp_context.Process(target=self.run, name=self._config.name_short)
@@ -190,7 +123,7 @@ class WrappedProcess(ABC, Generic[ConfigTemplateT, WorkRequestT, WorkResponseT])
     def name(self) -> str:
         return self._config.name_long
 
-    @with_enriched_exception
+    @with_annotated_exception
     def start(self) -> None:
         log.debug("Starting process")
         self._proc.start()
@@ -224,7 +157,7 @@ class WrappedProcess(ABC, Generic[ConfigTemplateT, WorkRequestT, WorkResponseT])
             self.stop()
             raise
 
-    @with_enriched_exception
+    @with_annotated_exception
     def stop(self) -> None:
         def has_stopped(timeout: float) -> bool:
             self._proc.join(timeout)
@@ -273,6 +206,8 @@ class WrappedProcess(ABC, Generic[ConfigTemplateT, WorkRequestT, WorkResponseT])
 
             # Perform work.
             self._proc_work()
+        except EndOfWork:
+            log.debug("Received end of work signal")
         except WorkQueueCancelled:
             log.debug("Received a cancel event")
         except BaseException as e:
@@ -295,7 +230,7 @@ class WrappedProcess(ABC, Generic[ConfigTemplateT, WorkRequestT, WorkResponseT])
     def _proc_work(self) -> None:
         """Perform the work.
 
-        Should consume the work_queue or wait for cancellation (default).
+        Should wait for cancellation (default) or consume the work_queue while actively setting `Phase.READY` and `Phase.WORKING`.
         """
         self.work_queue.wait_for_cancel()
 
