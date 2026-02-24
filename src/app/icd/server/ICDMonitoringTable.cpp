@@ -178,15 +178,15 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
     VerifyOrReturnValue(tempEntry.SetKey(keyData) == CHIP_NO_ERROR, false);
 
     // Challenge
-    uint8_t mic[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES]  = { 0 };
-    uint8_t aead[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES] = { 0 };
+    uint8_t mic[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES]     = { 0 };
+    uint8_t nonce[Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES] = { 0 };
 
     CHIP_ERROR err;
 
     uint64_t data = Crypto::GetRandU64(), validation, encrypted;
     validation    = data;
 
-    err = Crypto::AES_CCM_encrypt(reinterpret_cast<uint8_t *>(&data), sizeof(data), nullptr, 0, tempEntry.aesKeyHandle, aead,
+    err = Crypto::AES_CCM_encrypt(reinterpret_cast<uint8_t *>(&data), sizeof(data), nullptr, 0, tempEntry.aesKeyHandle, nonce,
                                   Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, reinterpret_cast<uint8_t *>(&encrypted), mic,
                                   Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
@@ -194,7 +194,7 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
     if (err == CHIP_NO_ERROR)
     {
         err = Crypto::AES_CCM_decrypt(reinterpret_cast<uint8_t *>(&encrypted), sizeof(encrypted), nullptr, 0, mic,
-                                      Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, aesKeyHandle, aead,
+                                      Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, aesKeyHandle, nonce,
                                       Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, reinterpret_cast<uint8_t *>(&data));
     }
     TEMPORARY_RETURN_IGNORED tempEntry.DeleteKey();
