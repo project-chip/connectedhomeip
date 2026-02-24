@@ -362,7 +362,10 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     VerifyOrReturnError(IsValidPrivilege(requestPrivilege), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
-    // if result != chip no error, then try result = check on auxiliary one
+    if (result != CHIP_NO_ERROR && IsGroupAuxiliaryDelegateRegistered() && subjectDescriptor.authMode == AuthMode::kGroup && IsGroupId(subjectDescriptor.subject)) {
+        CHIP_ERROR groupCheckErr = mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
+        result = groupCheckErr!=CHIP_ERROR_NOT_IMPLEMENTED ? groupCheckErr : result;
+    }
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (result == CHIP_NO_ERROR)
     {
@@ -424,7 +427,6 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
             return result;
         }
 
-        //fallthrough to attempting auxiliary acl delegation. mGroupAuxDelegate->Check()
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.

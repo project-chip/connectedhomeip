@@ -1111,6 +1111,28 @@ constexpr CheckData checkData1[] = {
       .allow             = true },
 };
 
+constexpr CheckData groupCheckData[] = {
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
+        .requestPath       = { .cluster = 0, .endpoint = 10 },
+        .privilege         = Privilege::kOperate,
+        .allow    = true },
+
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
+        .requestPath       = { .cluster = 0, .endpoint = 20 },
+        .privilege         = Privilege::kOperate,
+        .allow    = false },
+
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
+        .requestPath       = { .cluster = 0, .endpoint = 30 },
+        .privilege         = Privilege::kOperate,
+        .allow    = true },
+
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
+        .requestPath       = { .cluster = 0, .endpoint = 30 },
+        .privilege         = Privilege::kOperate,
+        .allow    = false },
+};
+
 class TestAccessControl : public ::testing::Test
 {
 public: // protected
@@ -2049,6 +2071,43 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
     // Cleanup
     EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
     EXPECT_EQ(provider->RemoveFabric(fabric2), CHIP_NO_ERROR);
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
+{
+    // Ensure GroupDataProvider is available
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    // Set up group 1 data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x1111;
+        info.SetName("Group 1");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 10), CHIP_NO_ERROR);
+    }
+
+    // Set up group 2 data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x2222;
+        info.SetName("Group 2");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(2, info.group_id, 30), CHIP_NO_ERROR);
+    }
+
+    for (const auto & data : groupCheckData)
+    {
+        CHIP_ERROR expectedResult = data.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
+        EXPECT_EQ(accessControl.Check(data.subjectDescriptor, data.requestPath, data.privilege), expectedResult);
+    }
+
+    // Cleanup
+    EXPECT_EQ(provider->RemoveFabric(1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->RemoveFabric(2), CHIP_NO_ERROR);
 }
 
 TEST_F(TestAccessControl, TestIterator)

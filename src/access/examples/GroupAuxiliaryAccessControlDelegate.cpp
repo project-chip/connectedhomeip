@@ -224,7 +224,37 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        EntryIterator iterator;
+        ReturnErrorOnFailure(AuxiliaryEntries(iterator, &subjectDescriptor.fabricIndex));
+
+        Entry entry;
+        while (iterator.Next(entry) == CHIP_NO_ERROR)
+        {
+            // Simplest form of Auxliliary ACL Entry format assumes only 1 subject and 1 target per entry.
+            // With more compelx ACL entry format, checks should be done accross all subjects and targets
+            size_t numSubjects;
+            size_t numTargets;
+            ReturnErrorOnFailure(entry.GetSubjectCount(numSubjects));
+            ReturnErrorOnFailure(entry.GetTargetCount(numTargets));
+            VerifyOrReturnError(numSubjects == 1, CHIP_ERROR_SENTINEL);
+            VerifyOrReturnError(numTargets == 1, CHIP_ERROR_SENTINEL);
+
+            NodeId subjectFromEntry;
+            ReturnErrorOnFailure(entry.GetSubject(0, subjectFromEntry));
+            if (subjectFromEntry != subjectDescriptor.subject) {
+                continue;
+            }
+
+            Target targetFromEntry;
+            ReturnErrorOnFailure(entry.GetTarget(0, targetFromEntry));
+            if (targetFromEntry.endpoint != requestPath.endpoint) {
+                continue;
+            }
+
+            return CHIP_NO_ERROR;
+        }
+
+        return CHIP_ERROR_ACCESS_DENIED;
     }
 
 private:
