@@ -4,8 +4,6 @@ from functools import cache
 
 import coloredlogs
 
-log = logging.getLogger(__name__)
-
 @dataclass(frozen=True)
 class LogConfig:
     log_level: int | str = logging.INFO
@@ -37,5 +35,5 @@ class LogConfig:
             return self.log_level
         return coloredlogs.find_defined_levels()[self.log_level]
 
-    def set_log_fmt(self, task: str | None = None):
-        coloredlogs.install(level=self.log_level_int, fmt=self.get_log_format(task))
+    def set_log_fmt(self, logger: logging.Logger | None = None, task: str | None = None):
+        coloredlogs.install(level=self.log_level_int, fmt=self.get_log_format(task), logger=logger)

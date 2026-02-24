@@ -29,7 +29,7 @@ from typing import Any, Protocol
 import chiptest
 import click
 import coloredlogs
-from chiptest.concurrent import TestPoolManager, WorkerConfig, WorkerError
+from chiptest.concurrent import TestPoolManager, WorkerConfigTemplate, WorkerError
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_utils import LogConfig
 from chiptest.runner import SubprocessKind
@@ -518,7 +518,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
         log.info("Each test will be executed %d times", iterations)
 
-    config = WorkerConfig(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_fast,
+    config = WorkerConfigTemplate(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_fast,
                           dry_run, context.obj.log_config, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds)
     pool = TestPoolManager(config, iterations, keep_going, expected_failures)
     try:

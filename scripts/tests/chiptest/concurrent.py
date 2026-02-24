@@ -11,12 +11,12 @@ import threading
 import time
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from dataclasses import dataclass
+import dataclasses
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
 from pathlib import Path
 from statistics import mean
-from typing import Callable, Protocol, TypeAlias, TypeVar
+from typing import Callable, ClassVar, Protocol, TypeVar, TypeAlias
 
 import chiptest
 if sys.platform == "linux":
@@ -25,14 +25,16 @@ elif sys.platform == "darwin":
     import chiptest.darwin as darwin
 
 from .accessories import AppsRegister
-from .mp_utils import PROCESS_EXIT_STATES, LogConfig, WrappedProcess, WrappedProcessPoolContext, mp_wrapped_spawn_context
+from .mp_utils.process import ProcessConfigTemplate, ProcessState, WorkQueueCancelled, WrappedProcess, mp_wrapped_spawn_context, ProcessConfigMixin
+from .mp_utils.queue import WorkQueue
+from .mp_utils.pool import WrappedProcessPool
+from .mp_utils.log_utils import LogConfig
+from .mp_utils.common import StartStopContextMixin
 from .runner import Executor
 from .test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime
 
 log = logging.getLogger(__name__)
 
-WORKER_START_TIMEOUT = 15
-WORKER_STOP_TIMEOUT = 10
 
 if sys.platform == "linux":
     # We have a private /run as we're running in unshare, so we can place it in any place under /run. We don't want it in /tmp, as
@@ -47,8 +49,8 @@ class WorkerError(RuntimeError):
     pass
 
 
-@dataclass
-class WorkerConfig:
+@dataclasses.dataclass
+class TestConfig:
     """Worker configuration which is a subset of command line options."""
     wifi_required: bool
     thread_required: bool
@@ -57,7 +59,6 @@ class WorkerConfig:
     concurrency_status: float
     concurrency_fast: bool
     dry_run: bool
-    logconfig: LogConfig
     subproc_info_repo: SubprocessInfoRepo
     pics_file: Path
     runtime: TestRunTime
@@ -68,7 +69,27 @@ class WorkerConfig:
         self.tmp_dir_worker_base = self.tmp_dir_default / "matter_test_suite"
 
 
-@dataclass
+@dataclasses.dataclass
+class WorkerConfigTemplate(ProcessConfigTemplate, TestConfig):
+    WORKER_START_TIMEOUT: ClassVar[float] = 15
+    WORKER_STOP_TIMEOUT: ClassVar[float] = 10
+
+    @classmethod
+    def from_test_config(cls, log_config: LogConfig, config: TestConfig):
+        return cls(**dataclasses.asdict(config), name_short="W{id:0{len(str(config.concurrency))}}", name_long="Worker {id}",
+                   log_config=log_config, start_timeout=WorkerConfigTemplate.WORKER_START_TIMEOUT,
+                   stop_timeout=WorkerConfigTemplate.WORKER_STOP_TIMEOUT)
+
+
+@dataclasses.dataclass
+class WorkerConfig(WorkerConfigTemplate, ProcessConfigMixin):
+    pass
+
+
+WorkerJob: TypeAlias = TestDefinition | None
+
+
+@dataclasses.dataclass
 class WorkerResult:
     test: TestDefinition
     worker_id: int | None = None
@@ -94,22 +115,14 @@ class Terminable(Protocol):
     def terminate(self) -> None: ...
 
 
-class WorkerProcess(WrappedProcess, ABC):
-    WorkQueueT: TypeAlias = queue.Queue[TestDefinition | None]
-    ResultQueueT: TypeAlias = queue.Queue[WorkerResult]
+class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfig,
+                 worker_ready_queue: queue.Queue[int], work_queue: WorkQueue[WorkerJob, WorkerResult],
+                 state_changed_cond: threading.Condition) -> None:
+        super().__init__(mp_context, mp_manager, config, work_queue, state_changed_cond)
 
-    def __init__(self, id: int, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
-                 cancel_event: threading.Event, config: WorkerConfig, worker_ready_queue: queue.Queue[int],
-                 resp_queue: ResultQueueT) -> None:
-        super().__init__(mp_context, mp_manager, state_changed, cancel_event, f"Worker {id}",
-                         f"W{id:0{len(str(config.concurrency))}}", config.logconfig)
-        self.id = id
-        self.config = config
-
-        self.active = mp_manager.Event()
-        self.work_queue = mp_manager.Queue()
-        self.worker_ready_queue = worker_ready_queue
-        self.resp_queue = resp_queue
+        self.active = mp_manager.Event()  # TODO: Move to process state.
+        self.worker_ready_queue = worker_ready_queue  # TODO: Move to WrappedProcess.
 
     def _proc_init(self) -> None:
         self._to_clean: queue.LifoQueue[Terminable] = queue.LifoQueue()
@@ -124,11 +137,9 @@ class WorkerProcess(WrappedProcess, ABC):
 
         # Finalize common parts.
         self.runner = chiptest.runner.Runner(executor)
-        self.apps_register = self._add_to_clean(apps := AppsRegister(self.mgmt_ns_wrapper, self.log_config))
+        self.apps_register = self._add_to_clean(apps := AppsRegister(self.mgmt_ns_wrapper, self._config.log_config))
         apps.init()
-        with self.state_changed:
-            self.worker_ready_queue.put(self.id)
-            self.state_changed.notify_all()
+        self.worker_ready_queue.put(self._config.id)
 
     @abstractmethod
     def _platform_init(self) -> Executor:
@@ -140,32 +151,23 @@ class WorkerProcess(WrappedProcess, ABC):
         self._to_clean.put(component)
         return component
 
-    def _proc_work(self, state_changed: threading.Condition, cancel_event: threading.Event):
-        while not cancel_event.is_set():
-            try:
-                work = self.work_queue.get_nowait()
-            except queue.Empty:
-                continue
-
-            # Check for end of work signal.
-            if work is None:
+    def _proc_work(self) -> None:
+        while True:
+            # Get the work item and check for end of work signal.
+            if (work := self.work_queue.get_req_or_cancel()) is None:
                 log.info("Cleaning up as there are no more jobs to process")
                 break
 
             # Perform the test.
             self.active.set()
-            self.resp_queue.put(self._run_test(work))
-            with self.state_changed:
-                self.worker_ready_queue.put(self.id)
-                self.state_changed.notify_all()
+            self.work_queue.put_rsp(self._run_test(work))
+            self.worker_ready_queue.put(self._config.id)
             self.active.clear()
-
-            with state_changed:
-                state_changed.wait()
 
     def _proc_cleanup(self):
         log.debug("Cleaning up state of the worker")
 
+        # TODO: Change _to_clean to deque.
         while not self._to_clean.empty():
             # During termination treat exceptions as warnings to ensure that all items get a chance to terminate.
             try:
@@ -185,27 +187,27 @@ class WorkerProcess(WrappedProcess, ABC):
         log.debug("Worker terminated")
 
     def _run_test(self, test: TestDefinition) -> WorkerResult:
-        result = WorkerResult(test, self.id)
+        result = WorkerResult(test, self._config.id)
         test_start = time.monotonic()
         try:
             if self.apps_register is None:
                 raise RuntimeError("Invalid state of the worker")
 
-            self.log_config.set_log_fmt(test.name)
+            self._config.log_config.set_log_fmt(log, test.name)
 
-            log.info("Would run test" if self.config.dry_run else "Starting test")
+            log.info("Would run test" if self._config.dry_run else "Starting test")
             # TODO: Potentially intercept stdout/stderr to output it in one block.
             test_start = time.monotonic()
-            test.Run(self.runner, self.apps_register, self.config.subproc_info_repo, self.config.pics_file,
-                     self.config.test_timeout_seconds, self.config.dry_run, self.config.runtime,
+            test.Run(self.runner, self.apps_register, self._config.subproc_info_repo, self._config.pics_file,
+                     self._config.test_timeout_seconds, self._config.dry_run, self._config.runtime,
                      ble_controller_app=self.ble_controller_app,
                      ble_controller_tool=self.ble_controller_tool,
-                     op_network='Thread' if self.config.thread_required else 'WiFi',
+                     op_network='Thread' if self._config.thread_required else 'WiFi',
                      thread_ba_host=self.thread_ba_host,
                      thread_ba_port=self.thread_ba_port)
             result.runtime = time.monotonic() - test_start
 
-            if not self.config.dry_run:
+            if not self._config.dry_run:
                 log.info("✅ Completed in %0.2f seconds", result.runtime)
         except BaseException as e:
             result.runtime = time.monotonic() - test_start
@@ -218,7 +220,7 @@ class WorkerProcess(WrappedProcess, ABC):
                 raise
             log.exception("❌ FAILED in %0.2f seconds", result.runtime, exc_info=True)
         finally:
-            self.log_config.set_log_fmt(None)
+            self._config.log_config.set_log_fmt(log, None)
             return result
 
 
@@ -229,8 +231,8 @@ if sys.platform == "linux":
             log.debug("Initializing Linux test executor.")
 
             # Create a virtual /tmp.
-            tmp_dir_default = self.config.tmp_dir_default
-            tmp_dir = self.config.tmp_dir_worker_base / str(self.id)
+            tmp_dir_default = self._config.tmp_dir_default
+            tmp_dir = self._config.tmp_dir_worker_base / str(self._config.id)
             tmp_dir.mkdir(parents=True, exist_ok=True)
 
             log.info("Remounting %s as %s for the worker", tmp_dir, tmp_dir_default)
@@ -238,29 +240,29 @@ if sys.platform == "linux":
                 raise RuntimeError(f"Failed to mount a virtual {tmp_dir_default}")
 
             self.net_ns = self._add_to_clean(net_ns := linux.IsolatedNetworkNamespace(
-                index=self.id,
+                index=self._config.id,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                app_link_up=not self.config.wifi_required,
-                add_ula=not self.config.thread_required,
+                app_link_up=not self._config.wifi_required,
+                add_ula=not self._config.thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_name='wlx-app' if self.config.wifi_required else 'eth-app'))
+                app_name='wlx-app' if self._config.wifi_required else 'eth-app'))
             self.mgmt_ns_wrapper = net_ns.mgmt_ns.netns_cmd_wrapper
 
-            if self.config.commissioning_method == 'ble-wifi':
+            if self._config.commissioning_method == 'ble-wifi':
                 self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
                 self.bluetooth = self._add_to_clean(linux.BluetoothMock())
                 self.wifi = self._add_to_clean(linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", net_ns))
                 self.ble_controller_app = 0  # Bind app to the first BLE controller
                 self.ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif self.config.commissioning_method == 'ble-thread':
+            elif self._config.commissioning_method == 'ble-thread':
                 self.dbus = self._add_to_clean(linux.DBusTestSystemBus())
                 self.bluetooth = self._add_to_clean(linux.BluetoothMock())
                 self.thread = self._add_to_clean(linux.ThreadBorderRouter(net_ns))
                 self.ble_controller_app = 0   # Bind app to the first BLE controller
                 self.ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif self.config.commissioning_method == 'thread-meshcop':
-                self.thread = self._add_to_clean(thread:=linux.ThreadBorderRouter(net_ns))
+            elif self._config.commissioning_method == 'thread-meshcop':
+                self.thread = self._add_to_clean(thread := linux.ThreadBorderRouter(net_ns))
                 self.thread_ba_host = thread.get_border_agent_host()
                 self.thread_ba_port = thread.get_border_agent_port()
 
@@ -290,18 +292,13 @@ else:
 WorkerPoolProcessT = TypeVar("WorkerPoolProcessT", bound=WorkerProcess)
 
 
-class WorkerPool(WrappedProcessPoolContext[WorkerPoolProcessT]):
-    def __init__(self, process_cls: type[WorkerPoolProcessT], mp_context: SpawnContext, mp_manager: SyncManager, config: WorkerConfig) -> None:
+class WorkerPool(WrappedProcessPool[WorkerPoolProcessT, WorkerConfig, WorkerJob, WorkerResult], StartStopContextMixin):
+    def __init__(self, process_cls: type[WorkerPoolProcessT], mp_context: SpawnContext, mp_manager: SyncManager, log_config: LogConfig, config: TestConfig) -> None:
         self.config = config
-        self.result_queue: WorkerProcess.ResultQueueT = mp_manager.Queue()
         self.worker_ready_queue: queue.Queue[int] = mp_manager.Queue()
 
-        super().__init__(process_cls, mp_context, mp_manager, config.concurrency, "Test Pool", WORKER_START_TIMEOUT, WORKER_STOP_TIMEOUT)
-
-    def _init_process(self, process_cls: type[WorkerPoolProcessT], id: int, mp_context: SpawnContext, mp_manager: SyncManager,
-                      state_changed: threading.Condition, cancel_event: threading.Event) -> WorkerPoolProcessT:
-        return process_cls(id, mp_context, mp_manager, state_changed, cancel_event, self.config, self.worker_ready_queue,
-                           self.result_queue)
+        super().__init__(process_cls, mp_context, mp_manager, config.concurrency, "Test Pool", config_cls=WorkerConfig,
+                         config_template=WorkerConfigTemplate.from_test_config(log_config, config))
 
     @property
     def worker_utilization(self) -> int:
@@ -310,25 +307,14 @@ class WorkerPool(WrappedProcessPoolContext[WorkerPoolProcessT]):
     def get_first_free_worker(self) -> int | None:
         return next((wid for wid, working in enumerate(worker.active for worker in self._pool) if not working.is_set()), None)
 
-    def put(self, id: int | None, item: TestDefinition | None, block: bool = True, timeout: float | None = None) -> None:
-        if id is None:
-            for id in range(len(self)):
-                self.put(id, item, block, timeout)
-            return
-
-        if id > self.config.concurrency:
-            raise ValueError(f"No worker with ID {id}")
-        with self.state_changed:
-            self._pool[id].work_queue.put(item, block, timeout)
-            self.state_changed.notify_all()
-
     def finalize(self):
-        return self.put(None, None)
+        return self.work_queue.put_req(None, req_queue_id=None)
 
 
-@dataclass
+@dataclasses.dataclass
 class TestPoolManager:
-    config: WorkerConfig
+    log_config: LogConfig
+    config: WorkerConfigTemplate
     iterations: int
     keep_going: bool
     expected_failures: int
@@ -342,7 +328,7 @@ class TestPoolManager:
         match self.config.concurrency_status:
             case num if num < 0:
                 # "Automatic" periodicity. Could be improved with checking activity of logger.
-                self.status_periodicity = (0.5 if self.config.logconfig.log_level_int <= logging.DEBUG else
+                self.status_periodicity = (0.5 if self.log_config.log_level_int <= logging.DEBUG else
                                            2 if self.config.concurrency > 4 else
                                            5 if self.config.concurrency > 1 else
                                            10)
@@ -356,7 +342,7 @@ class TestPoolManager:
 
         with (SyncManager(address=SYNC_MANAGER_PATH) as manager,
               mp_wrapped_spawn_context("unshare --map-root-user -n -m") as ctx,
-              WorkerPool(WorkerProcessCls, ctx, manager, self.config) as pool):
+              WorkerPool(WorkerProcessCls, ctx, manager, self.log_config, self.config) as pool):
             # Set up the periodic status overview thread.
             status_thread_cancel = threading.Event()
             status_thread = threading.Thread(target=self._print_periodic_status,
@@ -369,6 +355,7 @@ class TestPoolManager:
                                              args=(pool, result_thread_cancel, result_thread_exception))
 
             def check_if_error():
+                # TODO: As exception group
                 pool.check_if_error(raise_error=True)
                 with suppress(queue.Empty):
                     raise result_thread_exception.get_nowait()
@@ -397,7 +384,8 @@ class TestPoolManager:
 
                 log.info("All jobs scheduled")
 
-                while not all(state in PROCESS_EXIT_STATES for state in pool.state):
+                while not all(state == ProcessState.Phase.CLOSED for state in pool.state):
+                    # TODO: Wait for all and check if error at the end with exception group
                     with pool.state_changed:
                         pool.state_changed.wait()
                     check_if_error()
@@ -428,31 +416,30 @@ class TestPoolManager:
         for test in tests:
             while True:
                 with pool.state_changed:
+                    # TODO: Wait for worker_ready_queue or
                     pool.state_changed.wait()
-                check_if_error()
+                check_if_error()  # TODO: You sure?
                 with suppress(queue.Empty):
                     worker_id = pool.worker_ready_queue.get_nowait()
                     break
             log.debug("Enqueuing test %s to worker %i", test.name, worker_id)
-            pool.put(worker_id, test)
+            pool.work_queue.put_req(test, worker_id)
 
     def _scheduler_reproducible(self, pool: WorkerPool, tests: list[TestDefinition]):
-        for test, wid in zip(tests, itertools.cycle(range(len(pool)))):
-            log.debug("Enqueuing test %s to worker %i", test.name, wid)
-            pool.put(wid, test)
+        for test, worker_id in zip(tests, itertools.cycle(range(len(pool)))):
+            log.debug("Enqueuing test %s to worker %i", test.name, worker_id)
+            pool.work_queue.put_req(test, worker_id)
 
     def _process_result_queue(self, pool: WorkerPool, cancel_event: threading.Event,
                               exception_queue: queue.Queue[Exception]) -> None:
-        while not cancel_event.is_set():
-            with pool.state_changed:
-                pool.state_changed.wait()
-
+        while True:
             try:
-                result = pool.result_queue.get_nowait()
-            except queue.Empty:
-                continue
+                result = pool.work_queue.get_rsp_or_cancel()
+            except WorkQueueCancelled:
+                break
 
             if not isinstance(result, WorkerResult):
+                # Can happen if the mp_manager is already shut down, which can happen in some unclean cancellation cases.
                 log.warning("Wrong work result: %r", result)
                 continue
 

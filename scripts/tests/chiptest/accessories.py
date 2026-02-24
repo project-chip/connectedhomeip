@@ -13,26 +13,25 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# TODO: Double check the process creation flow.
-
 from __future__ import annotations
 
 import filecmp
 import functools
 import logging
 import multiprocessing
-import queue
 import subprocess
 import sys
 import threading
-from dataclasses import dataclass
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeVar, TypeAlias
 from xmlrpc.server import SimpleXMLRPCServer
 
-from .mp_utils import LogConfig, WrappedProcessContext, mp_wrapped_spawn_context
+from .mp_utils.log_utils import LogConfig
+from .mp_utils.process import WrappedProcess, mp_wrapped_spawn_context, ProcessConfig, ProcessConfigTemplate
+from .mp_utils.queue import WorkQueue, WorkQueueCancelled
+from .mp_utils.common import StartStopContextMixin
 
 if TYPE_CHECKING:
     from .test_definition import App
@@ -46,6 +45,123 @@ if sys.platform == 'linux':
     IP = '10.10.10.5'
 else:
     IP = '127.0.0.1'
+
+
+XmlRpcFuncCallT: TypeAlias = tuple[str, tuple[Any, ...]]
+XmlRpcFuncRetT: TypeAlias = bool | Exception
+
+
+class XmlRpcServerProcess(WrappedProcess[ProcessConfigTemplate, XmlRpcFuncCallT, XmlRpcFuncRetT], StartStopContextMixin):
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, work_queue: WorkQueue[XmlRpcFuncCallT, XmlRpcFuncRetT],
+                 log_config: LogConfig) -> None:
+        super().__init__(mp_context, mp_manager,
+                         ProcessConfig.from_template(id=0, template=ProcessConfigTemplate("XMLRPC", "XML RPC Server", log_config)),
+                         work_queue=work_queue)
+
+        self._server: SimpleXMLRPCServer | None = None
+        self._server_thread: threading.Thread | None = None
+
+    def _call(self, name: str, *args: Any) -> bool:
+        self.work_queue.put_req((name, args))
+
+        # Propagate any exception to the RPC server process, so that it can be handled by it.
+        if isinstance(rsp := self.work_queue.get_rsp_or_cancel(), Exception):
+            raise rsp
+        return rsp
+
+    def _create_func(self, name: str):
+        return lambda *args: self._call(name, *args)
+
+    @staticmethod
+    def to_camel_case(name: str):
+        s = name.split("_")
+        return s[0] + "".join(word.capitalize() for word in s[1:])
+
+    def _proc_init(self) -> None:
+        self._server = SimpleXMLRPCServer((IP, PORT))
+        for func in APPS_RPC_FUNCS:
+            self._server.register_function(self._create_func(func), self.to_camel_case(func))
+
+        self._server_thread = threading.Thread(target=self._server.serve_forever, name=f"{self._config.name_short}/Server")
+        self._server_thread.start()
+
+    def _proc_cleanup(self):
+        if self._server is not None:
+            log.debug("Stopping XMLRPC Server")
+            self._server.shutdown()
+        if self._server_thread is not None:
+            self._server_thread.join()
+
+
+class XmlRpcServerProcessManager(threading.Thread):
+    def __init__(self, apps: AppsRegister) -> None:
+        super().__init__(name=self.__class__.__name__)
+        self._apps = apps
+        self._mp_manager = multiprocessing.Manager()
+        self._work_queue = WorkQueue[XmlRpcFuncCallT, XmlRpcFuncRetT](self._mp_manager)
+
+        self._init_done = threading.Event()
+        self._exception: Exception | None = None
+
+    def start(self) -> None:
+        super().start()
+
+        if not self._init_done.wait(timeout=ProcessConfigTemplate.DEFAULT_START_TIMEOUT):
+            self.cancel()
+            raise TimeoutError("XMLRPC Manager failed to start within timeout")
+
+        if self._exception is not None:
+            raise RuntimeError(f"XMLRPC Manager initialization failed with {self._exception!r}")
+
+    def cancel(self) -> None:
+        self._work_queue.cancel()
+
+        self.join(timeout=ProcessConfigTemplate.DEFAULT_STOP_TIMEOUT)
+        if self.is_alive():
+            raise TimeoutError("XMLRPC Manager failed to stop within timeout")
+
+        if self._exception is not None:
+            raise RuntimeError(f"XMLRPC Manager failed with {self._exception!r}")
+
+    def _execute_func(self, request: XmlRpcFuncCallT) -> XmlRpcFuncRetT | Exception:
+        try:
+            name, args = request
+
+            # Check if the function exists and is registered as an RPC function.
+            if (func := getattr(self._apps, name, None)) is None or not callable(func):
+                raise RuntimeError(f'Function "{name}" does not exist in AppsRegister')
+            if func.__name__ not in APPS_RPC_FUNCS:
+                raise RuntimeError(f'Function "{name}" is not registered as an RPC function')
+
+            # Execute the function with given arguments and propagate the return value.
+            if not isinstance(ret := func(*args), bool):
+                raise RuntimeError(f'Function "{name}" returned invalid type {type(ret)}')
+            return ret
+        except WorkQueueCancelled:
+            log.debug("Caught a cancel event in XMLRPC Manager")
+            raise
+        except Exception as e:
+            # On error, pass the exception to the XMLRPC server process and continue.
+            log.error("Error in XMLRPC Manager: %s", e, exc_info=True)
+            return e
+
+    def run(self) -> None:
+        log.debug("Starting server process")
+        try:
+            with (mp_wrapped_spawn_context(self._apps.net_ns_wrapper) as ctx,
+                  XmlRpcServerProcess(ctx, self._mp_manager, self._work_queue, self._apps.log_config) as server):
+                log.debug("XMLRPC Server process started")
+                self._init_done.set()
+
+                while True:
+                    server.work_queue.put_rsp(self._execute_func(server.work_queue.get_req_or_cancel()))
+        except WorkQueueCancelled:
+            pass
+        except Exception as e:
+            log.exception("Error in XMLRPC Manager: %r", e, exc_info=True)
+            self._exception = e
+            self._init_done.set()
+            raise
 
 
 S = TypeVar("S", bound="AppsRegister")
@@ -73,51 +189,10 @@ class AppsRegister:
         self._accessories: dict[str, App] = {}
         self._accessories_lock = threading.RLock()
 
-        self._log_config = log_config
+        self.net_ns_wrapper = net_ns_wrapper
+        self.log_config = log_config
 
-        self._server = AppsRegister.XmlRpcServerManager(net_ns_wrapper, log_config)
-
-    class XmlRpcServerManager(threading.Thread):
-        def __init__(self, net_ns_wrapper: str | None, log_config: LogConfig) -> None:
-            super().__init__(name="XmlRpcServerManager")
-            self.net_ns_wrapper = net_ns_wrapper
-            self.log_config = log_config
-            self.mp_manager = manager = multiprocessing.Manager()
-            self.state_changed = self.mp_manager.Condition()
-            self.cancel_event = manager.Event()
-            self.init_done = manager.Event()
-
-        def run(self) -> None:
-            log.debug("Starting server process")
-            with (mp_wrapped_spawn_context(self.net_ns_wrapper) as ctx,
-                  AppsXmlRpcServer(ctx, self.mp_manager, self.state_changed, self.cancel_event, self.log_config) as server):
-                log.debug("XMLRPC Server process started")
-                with self.state_changed:
-                    self.init_done.set()
-                    self.state_changed.notify_all()
-
-                while not self.cancel_event.is_set():
-                    try:
-                        # Get a command from queue.
-                        name, args = server.cmd_queue.get(timeout=1)
-                        assert isinstance(name, str) and isinstance(args, tuple), "Wrong command format"
-
-                        # Execute function with arguments and push return value to the response queue.
-                        if (func := getattr(self, name, None)) is None or not callable(func):
-                            raise RuntimeError(f'Function "{name}" does not exist in AppsRegister')
-                        if func.__name__ not in APPS_RPC_FUNCS:
-                            raise RuntimeError(f'Function "{name}" is not registered as an RPC function')
-                        server.rsp_queue.put(func(*args))  # pyright: ignore[reportArgumentType]
-                    except queue.Empty:
-                        # No command received within timeout. Continue polling.
-                        pass
-                    except Exception as e:
-                        # On error, pass the exception to the XMLRPC server process and continue.
-                        log.error("Error in XMLRPC Manager: %s", e, exc_info=True)
-                        server.rsp_queue.put(e)
-                log.debug("Caught a cancel event in XMLRPC Manager")
-
-                self._server_thread_cancel = None
+        self._server = XmlRpcServerProcessManager(self)
 
     def init(self) -> None:
         if self._server.is_alive():
@@ -126,7 +201,6 @@ class AppsRegister:
 
         log.debug("Starting XMLRPC Manager")
         self._server.start()
-        self._server.state_changed.wait_for(lambda: self._server.init_done.is_set(), AppsXmlRpcServer.DEFAULT_START_TIMEOUT)
         log.debug("XMLRPC Manager started")
 
     def uninit(self) -> None:
@@ -135,10 +209,7 @@ class AppsRegister:
             return
 
         log.debug("Stopping XMLRPC Manager")
-        with self._server.state_changed:
-            self._server.cancel_event.set()
-            self._server.state_changed.notify_all()
-        self._server.join(AppsXmlRpcServer.DEFAULT_STOP_TIMEOUT)
+        self._server.cancel()
         log.debug("XMLRPC Manager stopped")
 
     def terminate(self):
@@ -266,48 +337,3 @@ APPS_RPC_FUNCS = tuple(func.__name__ for func in (
     AppsRegister.start, AppsRegister.stop, AppsRegister.reboot, AppsRegister.factory_reset, AppsRegister.wait_for_message,
     AppsRegister.compare_files, AppsRegister.create_ota_image, AppsRegister.create_file, AppsRegister.delete_file
 ))
-
-
-class AppsXmlRpcServer(WrappedProcessContext):
-    CommandQueue = queue.Queue[tuple[str, tuple[Any, ...]]]
-    ResponseQueue = queue.Queue[bool | Exception]
-
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, state_changed: threading.Condition,
-                 cancel_event: threading.Event, log_config: LogConfig) -> None:
-        proc_name_short = f"{log_config.process_name}/XMLRPC" if log_config.process_name is not None else "XMLRPC"
-        super().__init__(mp_context, mp_manager, state_changed, cancel_event, "XML RPC Server", proc_name_short, log_config)
-
-        self.cmd_queue: AppsXmlRpcServer.CommandQueue = mp_manager.Queue()
-        self.rsp_queue: AppsXmlRpcServer.ResponseQueue = mp_manager.Queue()
-
-        self._server: SimpleXMLRPCServer | None = None
-        self._server_thread: threading.Thread | None = None
-
-    def _call(self, name: str, *args: Any) -> bool:
-        self.cmd_queue.put((name, args))
-        if isinstance(rsp := self.rsp_queue.get(), Exception):
-            raise rsp
-        return rsp
-
-    def create_func(self, name: str):
-        return lambda *args: self._call(name, *args)
-
-    @staticmethod
-    def to_camel_case(name: str):
-        s = name.split("_")
-        return s[0] + "".join(word.capitalize() for word in s[1:])
-
-    def _proc_init(self) -> None:
-        self._server = SimpleXMLRPCServer((IP, PORT))
-        for func in APPS_RPC_FUNCS:
-            self._server.register_function(self.create_func(func), self.to_camel_case(func))
-
-        self._server_thread = threading.Thread(target=self._server.serve_forever)
-        self._server_thread.start()
-
-    def _proc_cleanup(self):
-        if self._server is not None:
-            log.debug("Stopping XMLRPC Server")
-            self._server.shutdown()
-        if self._server_thread is not None:
-            self._server_thread.join()
