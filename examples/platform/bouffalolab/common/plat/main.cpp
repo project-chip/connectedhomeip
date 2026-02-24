@@ -18,7 +18,7 @@
 
 #include <AppTask.h>
 
-#include <BLConfig.h>
+#include <BflbConfig.h>
 
 #include <plat.h>
 
@@ -47,7 +47,7 @@ extern "C" int START_ENTRY(void)
 {
     platform_port_init();
 
-    Internal::BLConfig::Init();
+    Internal::BflbConfig::Init();
 
     ChipLogProgress(NotSpecified, "==================================================");
     ChipLogProgress(NotSpecified, "bouffalolab chip-lighting-example, built at " __DATE__ " " __TIME__);

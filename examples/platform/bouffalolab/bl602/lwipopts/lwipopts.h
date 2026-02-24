@@ -219,7 +219,7 @@ a lot of data that needs to be copied, this should be set high. */
 */
 
 #define TCPIP_THREAD_NAME "TCP/IP"
-#define TCPIP_THREAD_STACKSIZE 4000
+#define TCPIP_THREAD_STACKSIZE 1536
 #define TCPIP_MBOX_SIZE 50
 #define DEFAULT_UDP_RECVMBOX_SIZE 50
 #define DEFAULT_TCP_RECVMBOX_SIZE 50

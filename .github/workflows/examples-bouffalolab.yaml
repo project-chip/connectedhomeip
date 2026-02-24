@@ -134,6 +134,30 @@ jobs:
       - name: Clean out build output
         run: rm -rf ./out
 
+  bouffalolab-bl616:
+    name: BL616
+
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
+
+    container:
+      image: ghcr.io/project-chip/chip-build-bouffalolab:181
+      volumes:
+        - "/tmp/bloat_reports:/tmp/bloat_reports"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: bouffalolab
+          extra-submodule-parameters: " --recursive"
+      - name: Set up environment for size reports
+        uses: ./.github/actions/setup-size-reports
+        if: ${{ !env.ACT }}
+        with:
+          gh-context: ${{ toJson(github) }}
+
       - name: Build example BL616 Lighting App
         timeout-minutes: 30
         run: |

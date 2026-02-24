@@ -35,7 +35,7 @@ chip_build_tests = false
 openthread_external_mbedtls = mbedtls_target
 
 openthread_core_config_platform_check_file =
-    "bl702l-openthread-core-bl-config-check.h"
+    "bl702l-openthread-core-config-check.h"
 openthread_project_include_dirs =
     [ "${chip_root}/src/platform/bouffalolab/BL702L" ]
 openthread_external_platform =

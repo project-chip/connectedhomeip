@@ -39,10 +39,10 @@ CHIP_ERROR BflbWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChang
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.credentials,
+    err = PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiSSID, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     SuccessOrExit(err);
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.ssid,
+    err = PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiPassword, mSavedNetwork.ssid,
                                                    sizeof(mSavedNetwork.ssid), &ssidLen);
     SuccessOrExit(err);
 
@@ -73,8 +73,8 @@ CHIP_ERROR BflbWiFiDriver::CommitConfiguration()
 {
     ChipLogProgress(NetworkProvisioning, "BflbWiFiDriver::CommitConfiguration");
     ReturnErrorOnFailure(
-        PersistedStorage::KeyValueStoreMgr().Put(BLConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(BLConfig::kConfigKey_WiFiPassword, mStagingNetwork.credentials,
+        PersistedStorage::KeyValueStoreMgr().Put(BflbConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(BflbConfig::kConfigKey_WiFiPassword, mStagingNetwork.credentials,
                                                                   mStagingNetwork.credentialsLen));
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;

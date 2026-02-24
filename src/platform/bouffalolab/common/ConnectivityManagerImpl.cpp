@@ -21,7 +21,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/bouffalolab/common/BLConfig.h>
+#include <platform/bouffalolab/common/BflbConfig.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/BLEManager.h>
 
@@ -102,10 +102,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0);
     SuccessOrExit(err);
 
     return (ssidLen != 0);
@@ -155,10 +155,10 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiSSID);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BflbConfig::kConfigKey_WiFiSSID);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiPassword);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BflbConfig::kConfigKey_WiFiPassword);
     SuccessOrExit(err);
 
 exit:
@@ -177,8 +177,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BflbConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
 
     return NetworkCommissioning::BflbWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
 }

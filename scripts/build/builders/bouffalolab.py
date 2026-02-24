@@ -198,7 +198,7 @@ class BouffalolabBuilder(GnBuilder):
 
             self.argsOpt.append('chip_system_config_use_openthread_inet_endpoints=true')
             self.argsOpt.append('chip_with_lwip=false')
-            self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
+            self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-config.h"')
 
             if enable_thread_type == BouffalolabThreadType.THREAD_FTD:
                 self.argsOpt.append('chip_openthread_ftd=true')
