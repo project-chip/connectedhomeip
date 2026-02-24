@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <set>
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
 #include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
@@ -691,6 +692,24 @@ struct EntryData
     }
 };
 
+struct AuxiliaryEquivalenceEntry {
+    chip::FabricIndex fabricIndex;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+
+    bool operator<(const AuxiliaryEquivalenceEntry& other) const {
+        if (fabricIndex != other.fabricIndex) return fabricIndex < other.fabricIndex;
+        if (groupId != other.groupId) return groupId < other.groupId;
+        return endpointId < other.endpointId;
+    }
+
+    bool operator==(const AuxiliaryEquivalenceEntry& other) const {
+        return fabricIndex == other.fabricIndex &&
+               groupId == other.groupId &&
+               endpointId == other.endpointId;
+    }
+};
+
 CHIP_ERROR CompareEntry(const Entry & entry, const EntryData & entryData)
 {
     AuthMode authMode = AuthMode::kNone;
@@ -771,6 +790,53 @@ CHIP_ERROR LoadAccessControl(AccessControl & ac, const EntryData * entryData, si
         ReturnErrorOnFailure(ac.CreateEntry(nullptr, entry));
     }
     return CHIP_NO_ERROR;
+}
+
+/**
+ * The format of Auxiliary entries is up to the implementation of the appropriate 
+ * access control delegate. This means there is not only 1 valid format of entries, rather
+ * there is a set of rules that the collection of entries follows. This function reduces
+ * the entries reported to the base equivalence class to compare with an expected set.
+ */
+void ValidateAuxiliaryEntries(AccessControl& ac, 
+                             FabricIndex fabric, 
+                             const std::set<AuxiliaryEquivalenceEntry>& expectedSet) 
+{
+    EntryIterator iterator;
+    EXPECT_EQ(ac.AuxiliaryEntries(fabric, iterator), CHIP_NO_ERROR);
+
+    std::set<AuxiliaryEquivalenceEntry> actualSet;
+    Entry entry;
+    
+    while (iterator.Next(entry) == CHIP_NO_ERROR) {
+        FabricIndex entryFabric;
+        size_t subjectCount = 0;
+        size_t targetCount = 0;
+
+        EXPECT_EQ(entry.GetFabricIndex(entryFabric), CHIP_NO_ERROR);
+        EXPECT_EQ(entry.GetSubjectCount(subjectCount), CHIP_NO_ERROR);
+        EXPECT_EQ(entry.GetTargetCount(targetCount), CHIP_NO_ERROR);
+
+        for (size_t s = 0; s < subjectCount; ++s) {
+            NodeId subject;
+            if (entry.GetSubject(s, subject) == CHIP_NO_ERROR && IsGroupId(subject)) {
+                
+                for (size_t t = 0; t < targetCount; ++t) {
+                    Entry::Target target;
+                    if (entry.GetTarget(t, target) == CHIP_NO_ERROR) {
+                        actualSet.insert({
+                            .fabricIndex = entryFabric,
+                            .groupId = GroupIdFromNodeId(subject),
+                            .endpointId = target.endpoint
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    // Comparing sets provides a clear diff if the test fails
+    EXPECT_EQ(actualSet, expectedSet);
 }
 
 constexpr size_t kNumFabric1EntriesInEntryData1 = 4;
@@ -2017,56 +2083,19 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
         EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 40), CHIP_NO_ERROR);
     }
 
-    EntryIterator iterator;
-    Entry entry;
-    NodeId actualSubject;
-    Entry::Target actualTarget;
-    FabricIndex actualFabric;
+    // Define Golden Sets (The base equivalence classes) that are expected
+    std::set<AuxiliaryEquivalenceEntry> expectedFabric1 = {
+        { .fabricIndex = fabric1, .groupId = 0x1111, .endpointId = 10 },
+        { .fabricIndex = fabric1, .groupId = 0x2222, .endpointId = 20 }
+    };
 
-    // Test Fabric 1
-    EXPECT_EQ(accessControl.AuxiliaryEntries(fabric1, iterator), CHIP_NO_ERROR);
-    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
-    
-    // Group 1 check
-    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
-    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x1111));
+    std::set<AuxiliaryEquivalenceEntry> expectedFabric2 = {
+        { .fabricIndex = fabric2, .groupId = 0x3333, .endpointId = 30 }
+    };
 
-    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
-    EXPECT_EQ(actualTarget.endpoint, 10u);
-    
-    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
-    EXPECT_EQ(actualFabric, fabric1);
-
-    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
-
-    // Group 2 check
-    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
-    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x2222));
-
-    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
-    EXPECT_EQ(actualTarget.endpoint, 20u);
-    
-    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
-    EXPECT_EQ(actualFabric, fabric1);
-
-    EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
-
-    // Test Fabric 2
-    EXPECT_EQ(accessControl.AuxiliaryEntries(fabric2, iterator), CHIP_NO_ERROR);
-    EXPECT_EQ(iterator.Next(entry), CHIP_NO_ERROR);
-    
-    // Group 3 check
-    EXPECT_EQ(entry.GetSubject(0, actualSubject), CHIP_NO_ERROR);
-    EXPECT_EQ(actualSubject, NodeIdFromGroupId(0x3333));
-
-    EXPECT_EQ(entry.GetTarget(0, actualTarget), CHIP_NO_ERROR);
-    EXPECT_EQ(actualTarget.endpoint, 30u);
-    
-    EXPECT_EQ(entry.GetFabricIndex(actualFabric), CHIP_NO_ERROR);
-    EXPECT_EQ(actualFabric, fabric2);
-
-    // This should be the end of the entries, and confirms the group without kHasAuxiliaryACL has no entry
-    EXPECT_EQ(iterator.Next(entry), CHIP_ERROR_SENTINEL);
+    // Execute Validation
+    ValidateAuxiliaryEntries(accessControl, fabric1, expectedFabric1);
+    ValidateAuxiliaryEntries(accessControl, fabric2, expectedFabric2);
 
     // Cleanup
     EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
