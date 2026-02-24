@@ -66,7 +66,7 @@ CHIP_ERROR SpeakerDevice::Register(chip::EndpointId endpoint, CodeDrivenDataMode
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void SpeakerDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void SpeakerDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
     if (mLevelControlCluster.IsConstructed())
