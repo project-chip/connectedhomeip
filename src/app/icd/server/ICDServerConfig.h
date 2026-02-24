@@ -20,3 +20,7 @@
 #if CHIP_HAVE_CONFIG_H
 #include <app/icd/server/ICDServerBuildConfig.h>
 #endif
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#error "The ICD feature is not ready and cannot be enabled in v1.3. Please set chip_enable_icd_server=false."
+#endif
