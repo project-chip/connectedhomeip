@@ -18,22 +18,50 @@
 
 #pragma once
 
-#include <app/clusters/device-energy-management-server/DeviceEnergyManagementDelegate.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace DeviceEnergyManagement {
+namespace CommissioningProxy {
 
-class DeviceEnergyManagementMockDelegate : public Delegate
+class CommissioningProxyMockDelegate : public Delegate
 {
 public:
+#if 0
     static constexpr int64_t kAbsMinPower = 0;
     static constexpr int64_t kAbsMaxPower = 5000;
+#endif
+    CommissioningProxyMockDelegate();
+    ~CommissioningProxyMockDelegate() override; // = default;
 
-    DeviceEnergyManagementMockDelegate();
-    ~DeviceEnergyManagementMockDelegate() override = default;
+    /**
+     * @brief Handle PowerAdjustRequest command
+     *
+     * The cluster verifies that PowerAdjustmentCapability.cause is updated to match the command's cause.
+     */
 
+    Protocols::InteractionModel::Status ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
+                        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+                        uint16_t discriminator,
+                        chip::VendorId vendorid,
+                        uint16_t productid,
+                        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
+                        app::CommandHandler * commandObj,
+                        const DataModel::InvokeRequest & request) override;
+
+    /**
+     * @brief Handle PowerAdjustRequest command
+     *
+     * The cluster verifies that PowerAdjustmentCapability.cause is updated to match the command's cause.
+     */
+    Protocols::InteractionModel::Status ProxyScanRequest(
+        CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands, app::CommandHandler * commandObj,
+        const DataModel::InvokeRequest & request) override;
+
+    uint8_t GetScanMaxTime() override;
+    void SetScanMaxTime(uint8_t seconds) override;
+#if 0
     /**
      * @brief Handle PowerAdjustRequest command
      *
@@ -104,9 +132,15 @@ public:
     void SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> & forecast) { mForecast = forecast; }
     DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecastMutable() { return mForecast; }
     void SetOptOutState(OptOutStateEnum state) { mOptOutState = state; }
+#endif
 
 private:
-    ESAStateEnum mESAState       = ESAStateEnum::kOnline;
+    uint8_t     mScanMaxTime        = 120;
+    // uint8_t     mMaxSessions        = 1;
+    // uint8_t     mMaxCachedResult    = 1;
+    // uint16_t    mCacheTimeout       = 120;
+#if 0
+ ESAStateEnum mESAState       = ESAStateEnum::kOnline;
     ESATypeEnum mESAType         = ESATypeEnum::kEvse;
     bool mESACanGenerate         = false;
     int64_t mAbsMinPower         = kAbsMinPower;
@@ -114,9 +148,10 @@ private:
     OptOutStateEnum mOptOutState = OptOutStateEnum::kNoOptOut;
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
+#endif
 };
 
-} // namespace DeviceEnergyManagement
+} // namespace CommissioningProxy
 } // namespace Clusters
 } // namespace app
 } // namespace chip

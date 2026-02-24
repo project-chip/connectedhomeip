@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/device-energy-management-server/CodegenIntegration.h>
-#include <app/clusters/device-energy-management-server/tests/DeviceEnergyManagementMockDelegate.h>
+#include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
+#include <app/clusters/commissioning-proxy-server/tests/CommissioningProxyMockDelegate.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <pw_unit_test/framework.h>
@@ -25,7 +25,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::CommissioningProxy;
 using namespace chip::Testing;
 
 // Mock function for linking
@@ -35,7 +35,7 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 
-struct TestDeviceEnergyManagementClusterBackwardsCompatibility : public ::testing::Test
+struct TestCommissioningProxyClusterBackwardsCompatibility : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
@@ -45,14 +45,12 @@ struct TestDeviceEnergyManagementClusterBackwardsCompatibility : public ::testin
     TestServerClusterContext mContext;
 };
 
-TEST_F(TestDeviceEnergyManagementClusterBackwardsCompatibility, TestInstanceLifecycle)
+TEST_F(TestCommissioningProxyClusterBackwardsCompatibility, TestInstanceLifecycle)
 {
     // Test 1: Create Instance with all features
     {
-        DeviceEnergyManagementMockDelegate mockDelegate;
-        BitMask<Feature> allFeatures(Feature::kPowerAdjustment, Feature::kPowerForecastReporting, Feature::kStateForecastReporting,
-                                     Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
-                                     Feature::kConstraintBasedAdjustment);
+        CommissioningProxyMockDelegate mockDelegate;
+        BitMask<Feature> allFeatures(Feature::kBackgroundScan, Feature::kWiFiNetworkInterface);
 
         Instance instance(kTestEndpointId, mockDelegate, allFeatures);
 
@@ -61,30 +59,25 @@ TEST_F(TestDeviceEnergyManagementClusterBackwardsCompatibility, TestInstanceLife
 
         // Verify cluster is registered in the registry
         auto * registeredCluster =
-            CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id));
+            CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, CommissioningProxy::Id));
         ASSERT_NE(registeredCluster, nullptr);
 
         // Test feature checking
-        EXPECT_TRUE(instance.HasFeature(Feature::kPowerAdjustment));
-        EXPECT_TRUE(instance.HasFeature(Feature::kPowerForecastReporting));
-        EXPECT_TRUE(instance.HasFeature(Feature::kStateForecastReporting));
-        EXPECT_TRUE(instance.HasFeature(Feature::kStartTimeAdjustment));
-        EXPECT_TRUE(instance.HasFeature(Feature::kPausable));
-        EXPECT_TRUE(instance.HasFeature(Feature::kForecastAdjustment));
-        EXPECT_TRUE(instance.HasFeature(Feature::kConstraintBasedAdjustment));
+        EXPECT_TRUE(instance.HasFeature(Feature::kBackgroundScan));
+        EXPECT_TRUE(instance.HasFeature(Feature::kWiFiNetworkInterface));
 
         // Test shutdown (unregistration)
         instance.Shutdown(ClusterShutdownType::kClusterShutdown);
 
         // Verify cluster is unregistered from the registry
         auto * unregisteredCluster =
-            CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, DeviceEnergyManagement::Id));
+            CodegenDataModelProvider::Instance().Registry().Get(ConcreteClusterPath(kTestEndpointId, CommissioningProxy::Id));
         EXPECT_EQ(unregisteredCluster, nullptr);
     }
 
     // Test Instance with no features enabled
     {
-        DeviceEnergyManagementMockDelegate mockDelegate;
+        CommissioningProxyMockDelegate mockDelegate;
         BitMask<Feature> noFeatures;
         Instance instance(kTestEndpointId, mockDelegate, noFeatures);
 
@@ -92,9 +85,8 @@ TEST_F(TestDeviceEnergyManagementClusterBackwardsCompatibility, TestInstanceLife
         EXPECT_EQ(instance.Init(), CHIP_NO_ERROR);
 
         // Verify no features are enabled
-        EXPECT_FALSE(instance.HasFeature(Feature::kPowerAdjustment));
-        EXPECT_FALSE(instance.HasFeature(Feature::kStartTimeAdjustment));
-        EXPECT_FALSE(instance.HasFeature(Feature::kPausable));
+        EXPECT_FALSE(instance.HasFeature(Feature::kBackgroundScan));
+        EXPECT_FALSE(instance.HasFeature(Feature::kWiFiNetworkInterface));
 
         // Test shutdown
         instance.Shutdown(ClusterShutdownType::kClusterShutdown);

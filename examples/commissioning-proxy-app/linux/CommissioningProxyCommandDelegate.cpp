@@ -87,9 +87,9 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 
     ChipLogProgress(Controller, "===SHM %s() Before", __func__);
     // Ensure Response Timeout is greater than the ScanMaxTime
-    if (auto * ec = commandObj->GetExchangeContext())
+    if (auto * responseTimeout = commandObj->GetExchangeContext())
     {
-        ec->SetResponseTimeout(chip::System::Clock::Seconds16(scanMaxTime + 5));
+        responseTimeout->SetResponseTimeout(chip::System::Clock::Seconds16(scanMaxTime + 5));
         ChipLogProgress(Controller, "===SHM %s() In", __func__);
     }
 

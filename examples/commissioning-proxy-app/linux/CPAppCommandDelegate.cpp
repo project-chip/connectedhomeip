@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include "CPAppCommandDelegate.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include "CPAppCommandDelegate.h"
 
 using namespace chip;
 using namespace chip::app;

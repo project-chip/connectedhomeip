@@ -44,7 +44,6 @@ constexpr bool HasExactlyOneBitSet(T v)
     return v != 0 && (v & (v - 1)) == 0;
 }
 
-
 CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "===SHM %s() EndpointId - delegate has %d, cluster has %d", 
@@ -185,9 +184,15 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(
     Commands::ProxyScanRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
+    if (commandData.transport.Has(CapabilitiesBitmap::kWiFiPAF) &&
+        !mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    {
+        ChipLogError(Zcl, "Commissioning Proxy: kWiFiPAF selected however kWiFiNetworkInterface feature disabled");
+        return Status::Failure;
+    }
+
     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands =
         static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
-
     if (commandData.wiFiBands.HasValue())
     {
         wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(

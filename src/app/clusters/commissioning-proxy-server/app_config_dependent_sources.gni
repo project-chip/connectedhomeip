@@ -15,5 +15,4 @@ app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
   "CommissioningProxyTestEventTriggerHandler.h",
-  "commissioning-proxy-server.h",
 ]
