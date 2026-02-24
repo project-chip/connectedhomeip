@@ -180,6 +180,7 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
     // Challenge
     uint8_t mic[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES]     = { 0 };
     uint8_t nonce[Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES] = { 0 };
+    VerifyOrReturnValue(Crypto::DRBG_get_bytes(nonce, sizeof(nonce)) == CHIP_NO_ERROR, false);
 
     CHIP_ERROR err;
 
