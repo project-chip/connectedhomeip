@@ -350,7 +350,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     async def clear_ota_providers(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int):
         """
         Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
-
         Args:
             controller (ChipDeviceCtrl): The controller to use for writing attributes.
             requestor_node_id (int): Node ID of the Requestor device.
