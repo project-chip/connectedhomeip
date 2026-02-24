@@ -69,8 +69,8 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
                          ChipLogValueMEI(entry.attributeId), ChipLogValueMEI(cluster.mClusterId), attributeMigrationError.Format());
         }
 
-        // Always delete from the safe provider to ensure we only attempt migration once.
-        // This avoids overwriting a newer runtime value with a stale persisted one on the next startup.
+        // Always delete from the safe provider, this helps ensure that we only try to migrate the
+        // persisted values once.
         attributeMigrationError = safeProvider.SafeDeleteValue(attrPath);
         if (attributeMigrationError != CHIP_NO_ERROR)
         {
