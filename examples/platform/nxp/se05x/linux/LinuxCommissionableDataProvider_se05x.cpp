@@ -173,9 +173,7 @@ CHIP_ERROR LinuxCommissionableDataProvider::Init(chip::Optional<std::vector<uint
             Support,
             "*** WARNING: Overriding the passcode (default / passcode from command line) with value provisioned in SE05x *** ");
         setupPasscode.SetValue(setUpPINCode_se05x);
-#endif
-
-#if !ENABLE_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+#else
         err = passcodeVerifier.Generate(spake2pIterationCount, saltSpan, setupPasscode.Value());
         if (err != CHIP_NO_ERROR)
         {

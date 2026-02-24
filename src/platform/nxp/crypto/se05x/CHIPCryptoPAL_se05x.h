@@ -81,7 +81,7 @@ public:
 #endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 
 /**
- * @brief
+ * @brief P256 derived class to use SE05x secure element for P256 Operations.
  *
  */
 class P256KeypairSE05x : public P256Keypair
